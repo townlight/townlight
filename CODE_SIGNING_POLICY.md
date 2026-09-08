@@ -29,7 +29,7 @@ and never stored locally.
 
 ## Distribution
 
-Releases are published at: <https://github.com/CivicSuite/civicsuite/releases>
+Releases are published at: <https://github.com/townlight/townlight/releases>
 
 ## Privacy
 

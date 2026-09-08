@@ -28,10 +28,10 @@ Welcome to the CivicSuite community space. This post is a snapshot of where the 
 
 **Shipping today:**
 
-- `civiccore` v1.2.0 - the shared platform package for the active city-core profile. Repo: <https://github.com/CivicSuite/civiccore>.
-- `civicrecords-ai` v1.7.3 - open-source FOIA / public records management. Repo: <https://github.com/CivicSuite/civicrecords-ai>.
-- `civicclerk` v1.0.4 - meetings, agendas, packets, minutes, notices, votes, and public meeting records. Repo: <https://github.com/CivicSuite/civicclerk>.
-- `civiccode` v1.0.8 - municipal code search, cited Q&A, and Clerk ordinance handoff support. Repo: <https://github.com/CivicSuite/civiccode>.
+- `civiccore` v1.2.0 - the shared platform package for the active city-core profile. Repo: <https://github.com/townlight/core>.
+- `civicrecords-ai` v1.7.3 - open-source FOIA / public records management. Repo: <https://github.com/townlight/sunshine>.
+- `civicclerk` v1.0.4 - meetings, agendas, packets, minutes, notices, votes, and public meeting records. Repo: <https://github.com/townlight/meetings>.
+- `civiccode` v1.0.8 - municipal code search, cited Q&A, and Clerk ordinance handoff support. Repo: <https://github.com/townlight/ordinances>.
 
 **Planned or queued:**
 
@@ -96,7 +96,7 @@ If you're considering contributing a new module or are evaluating the architectu
 
 A status note on a piece of governance some readers may have noticed:
 
-`civicrecords-ai` currently lives at `github.com/CivicSuite/civicrecords-ai`. The intent is to transfer the repo to the `CivicSuite` org so all modules live under the same umbrella. This is intentionally not yet done — we want the suite-wide documentation, governance, and contribution standards to settle first so the transfer is a clean handoff rather than a scramble.
+`civicrecords-ai` currently lives at `github.com/townlight/sunshine`. The intent is to transfer the repo to the `CivicSuite` org so all modules live under the same umbrella. This is intentionally not yet done — we want the suite-wide documentation, governance, and contribution standards to settle first so the transfer is a clean handoff rather than a scramble.
 
 Until the transfer happens, every link to records-ai in our docs uses `CivicSuite/civicrecords-ai`. After the transfer, links will be updated and old links will redirect via GitHub's automatic forwarding.
 

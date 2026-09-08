@@ -7,8 +7,8 @@ labels: bug
 
 > **Most bugs belong on a module repo, not here.** This umbrella repo holds documentation, ADRs, governance, the roadmap, and the compatibility matrix — no runtime code. If your bug is in a module's code, please file it on that module's repo:
 >
-> - civicrecords-ai → <https://github.com/CivicSuite/civicrecords-ai/issues>
-> - civiccore → <https://github.com/CivicSuite/civiccore/issues>
+> - civicrecords-ai → <https://github.com/townlight/sunshine/issues>
+> - civiccore → <https://github.com/townlight/core/issues>
 >
 > If your bug is in **this umbrella repo's docs or governance artifacts**, continue below.
 

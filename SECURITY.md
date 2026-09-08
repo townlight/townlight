@@ -8,8 +8,8 @@ The `civicsuite` repository is the umbrella/orientation repo for the CivicSuite 
 
 If you found a vulnerability in a specific module's code, deployment, or runtime behavior, please report it on that module's repo:
 
-- **civicrecords-ai** (FOIA / public records management) — open a private GitHub Security Advisory at <https://github.com/CivicSuite/civicrecords-ai/security/advisories/new>
-- **civiccore** (shared platform package) — open a private GitHub Security Advisory at <https://github.com/CivicSuite/civiccore/security/advisories/new>
+- **civicrecords-ai** (FOIA / public records management) — open a private GitHub Security Advisory at <https://github.com/townlight/sunshine/security/advisories/new>
+- **civiccore** (shared platform package) — open a private GitHub Security Advisory at <https://github.com/townlight/core/security/advisories/new>
 
 ### Suite-wide vulnerabilities
 
@@ -19,7 +19,7 @@ This umbrella accepts reports for issues that affect the **suite as a whole** �
 - A governance, signing, or release-process flaw that could compromise multiple repos
 - A documented protocol or contract between modules that has a security implication
 
-For these, open a private GitHub Security Advisory on this repo at <https://github.com/CivicSuite/civicsuite/security/advisories/new>.
+For these, open a private GitHub Security Advisory on this repo at <https://github.com/townlight/townlight/security/advisories/new>.
 
 ## What to include
 

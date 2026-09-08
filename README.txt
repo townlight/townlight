@@ -69,9 +69,9 @@ The most important distinction: **"all repos have releases" is not the same thin
 
 ## Historical 2026-07-02 availability snapshot
 
-- **`civicrecords-ai`** (FOIA / public records) - v1.7.3 — city-core records module, shipped in the v1.0.2 build, on CivicCore v1.2.0. Repo: <https://github.com/CivicSuite/civicrecords-ai>
-- **`civiccore`** (shared platform) - v1.2.0 is the current shared-platform release for city-core. Repo: <https://github.com/CivicSuite/civiccore>
-- **`civicclerk`** (meetings/agendas/minutes) - v1.0.4 is the current meeting workflow module release with protected staff auth defaults. Repo: <https://github.com/CivicSuite/civicclerk>
+- **`civicrecords-ai`** (FOIA / public records) - v1.7.3 — city-core records module, shipped in the v1.0.2 build, on CivicCore v1.2.0. Repo: <https://github.com/townlight/sunshine>
+- **`civiccore`** (shared platform) - v1.2.0 is the current shared-platform release for city-core. Repo: <https://github.com/townlight/core>
+- **`civicclerk`** (meetings/agendas/minutes) - v1.0.4 is the current meeting workflow module release with protected staff auth defaults. Repo: <https://github.com/townlight/meetings>
 - **`civiccode`** - v1.0.8 is the current municipal-code city-core module release on CivicCore v1.2.0.
 - **`civicnotice`** - v0.2.0 is the current public-notice city-core module release on CivicCore v1.2.0.
 - **`civicaccess`** - v0.4.0 accessibility and records-ready export city-core module release on CivicCore v1.2.0 (sixth city-core module; its clerk-facing Accessibility workflow tab — with three local-AI features — is the headline of the current v1.0.2 build).
@@ -99,7 +99,7 @@ The Windows MSI is Authenticode code-signed via Azure Trusted Signing. Because t
 - 32 GB RAM is recommended (16 GB is a workable minimum) — headroom for the local model resident alongside PostgreSQL and the services.
 - The end-user Windows clerk path does not require Docker, WSL, a terminal, a browser URL, or developer tooling.
 - First-run setup covers local folders, module selection, city profile, first CivicSuite admin sign-in, backup folder, model download/verification, health verification, and finish.
-- Trust path: download `CivicSuite_1.0.2_x64_en-US.msi` from the [civicsuite-windows-local-v1.0.2 release](https://github.com/CivicSuite/civicsuite/releases/tag/civicsuite-windows-local-v1.0.2), verify its SHA-256 `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`, and confirm the module pins in [installer/modules.json](installer/modules.json).
+- Trust path: download `CivicSuite_1.0.2_x64_en-US.msi` from the [civicsuite-windows-local-v1.0.2 release](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2), verify its SHA-256 `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`, and confirm the module pins in [installer/modules.json](installer/modules.json).
 - macOS and Linux package paths remain separate future or historical profiles until each has refreshed install-lifecycle testing on the same operating system it ships for.
 
 See [docs/troubleshooting.md](docs/troubleshooting.md) for operator recovery guidance, [installer/README.md](installer/README.md) for the generated-package contract, and [docs/installer/suite-installer-plan.md](docs/installer/suite-installer-plan.md) for the plan.
@@ -107,7 +107,7 @@ Operators evaluating the Windows Local city-core beta path should use [docs/inst
 
 **Per-module install path:**
 
-- FOIA / public records: <https://github.com/CivicSuite/civicrecords-ai> - module release consumed by the Windows Local city-core package.
+- FOIA / public records: <https://github.com/townlight/sunshine> - module release consumed by the Windows Local city-core package.
 - Other modules: see each module's README for install instructions. Most modules ship as Python packages depending on `civiccore`.
 
 If you are orienting yourself for the first time, read in this order:

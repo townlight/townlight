@@ -150,7 +150,7 @@ A municipality should evaluate the Windows Local city-core package as a beta pac
 
 > **In plain English.** CivicSuite v1.0.1 bundled the **CivicAccess** module under the hood — its code was installed on disk, its database tables were created on first run, a secret token was provisioned for it, and the system reported it as available — but there was no on-screen tab yet. **The current v1.0.2 release ships the on-screen "Accessibility" workflow tab and its buttons**, so a clerk now sees six workflow areas (Meetings, Records, Code, Notice, Accessibility, Search). Three of the tab's tools draft with the suite's local AI engine — see Part 1.6 for what they do and the human-review rules that apply.
 
-> **For IT.** Per the [2026-06-29 deep-read audit](docs/audits/civicaccess-citycore-deep-read-2026-06-29/FINAL-REPORT.md), v1.0.1 bundled the module's runtime without UI (Phases B/C). v1.0.2 completed it: PR [#216](https://github.com/CivicSuite/civicsuite/pull/216) delivered the native Accessibility tab and PR [#220](https://github.com/CivicSuite/civicsuite/pull/220) put its three drafting tools on the shared local AI engine, with deterministic fallbacks retained.
+> **For IT.** Per the [2026-06-29 deep-read audit](docs/audits/civicaccess-citycore-deep-read-2026-06-29/FINAL-REPORT.md), v1.0.1 bundled the module's runtime without UI (Phases B/C). v1.0.2 completed it: PR [#216](https://github.com/townlight/townlight/pull/216) delivered the native Accessibility tab and PR [#220](https://github.com/townlight/townlight/pull/220) put its three drafting tools on the shared local AI engine, with deterministic fallbacks retained.
 
 ### What this means for your city
 
@@ -182,7 +182,7 @@ If you want to try CivicSuite today, start with the Windows Local city-core desk
 
 ### Install (Windows Local desktop)
 
-1. Download `CivicSuite_1.0.2_x64_en-US.msi` from the current GitHub release: <https://github.com/CivicSuite/civicsuite/releases/tag/civicsuite-windows-local-v1.0.2>.
+1. Download `CivicSuite_1.0.2_x64_en-US.msi` from the current GitHub release: <https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2>.
 2. Verify the SHA-256 checksum matches the published value: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
 3. Open the installer and follow the installer screens.
 4. Open CivicSuite after install.
@@ -198,7 +198,7 @@ Linux and macOS are not the current clerk install promise for Windows Local 1.0.
 
 City-core artifacts ship from the published GitHub release, not restored committed `installer/dist` files. Before testing a package:
 
-1. Download from the published release tag: <https://github.com/CivicSuite/civicsuite/releases/tag/civicsuite-windows-local-v1.0.2>.
+1. Download from the published release tag: <https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2>.
 2. Verify the MSI SHA-256 matches the published value: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
 3. Confirm the source pins in `installer/modules.json` match the city-core module commits.
 4. For module release assets, confirm the published SHA256 and attestation assets recorded in the module release evidence where applicable.

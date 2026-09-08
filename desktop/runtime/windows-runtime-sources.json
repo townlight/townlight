@@ -8,7 +8,7 @@
       "label": "PostgreSQL 17 Windows x86-64 binaries",
       "provider": "CivicSuite mirrored EDB",
       "version": "17.10-2",
-      "download_url": "https://github.com/CivicSuite/civicsuite/releases/download/windows-runtime-postgres-17.10-2/postgresql-17.10-2-windows-x64-binaries.zip",
+      "download_url": "https://github.com/townlight/townlight/releases/download/windows-runtime-postgres-17.10-2/postgresql-17.10-2-windows-x64-binaries.zip",
       "download_sha256": "ef9b1e5e23d2e8a83914ba13d9dc536a72210fba53fd1808ff1f7e06bb22b106",
       "mirror_of": "https://get.enterprisedb.com/postgresql/postgresql-17.10-2-windows-x64-binaries.zip",
       "download_page": "https://www.enterprisedb.com/download-postgresql-binaries",

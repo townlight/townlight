@@ -319,7 +319,7 @@
                     {
                         "id":  "civicclerk",
                         "display_name":  "CivicClerk",
-                        "repo":  "CivicSuite/civicclerk",
+                        "repo":  "townlight/meetings",
                         "tier":  1,
                         "role":  "meetings workflow",
                         "selectable":  true,
@@ -404,7 +404,7 @@
                     {
                         "id":  "civiccode",
                         "display_name":  "CivicCode",
-                        "repo":  "CivicSuite/civiccode",
+                        "repo":  "townlight/ordinances",
                         "tier":  1,
                         "role":  "municipal code",
                         "selectable":  true,
@@ -490,7 +490,7 @@
                     {
                         "id":  "civiczone",
                         "display_name":  "CivicZone",
-                        "repo":  "CivicSuite/civiczone",
+                        "repo":  "townlight/zone",
                         "tier":  2,
                         "role":  "zoning and land use",
                         "selectable":  true,
@@ -516,7 +516,7 @@
                     {
                         "id":  "civicplan",
                         "display_name":  "CivicPlan",
-                        "repo":  "CivicSuite/civicplan",
+                        "repo":  "townlight/plan",
                         "tier":  2,
                         "role":  "planning policy lookup",
                         "selectable":  true,
@@ -543,7 +543,7 @@
                     {
                         "id":  "civicpermit",
                         "display_name":  "CivicPermit",
-                        "repo":  "CivicSuite/civicpermit",
+                        "repo":  "townlight/permit",
                         "tier":  2,
                         "role":  "permit intake readiness",
                         "selectable":  true,
@@ -656,7 +656,7 @@
                     {
                         "id":  "civicinspect",
                         "display_name":  "CivicInspect",
-                        "repo":  "CivicSuite/civicinspect",
+                        "repo":  "townlight/inspect",
                         "tier":  2,
                         "role":  "inspection workflow",
                         "selectable":  true,
@@ -683,7 +683,7 @@
                     {
                         "id":  "civicgrants",
                         "display_name":  "CivicGrants",
-                        "repo":  "CivicSuite/civicgrants",
+                        "repo":  "townlight/grants",
                         "tier":  3,
                         "role":  "grants workflow",
                         "selectable":  true,
@@ -708,7 +708,7 @@
                     {
                         "id":  "civicprocure",
                         "display_name":  "CivicProcure",
-                        "repo":  "CivicSuite/civicprocure",
+                        "repo":  "townlight/procure",
                         "tier":  3,
                         "role":  "procurement workflow",
                         "selectable":  true,
@@ -732,7 +732,7 @@
                     {
                         "id":  "civiccontracts",
                         "display_name":  "CivicContracts",
-                        "repo":  "CivicSuite/civiccontracts",
+                        "repo":  "townlight/contracts",
                         "tier":  3,
                         "role":  "contract workflow",
                         "selectable":  true,
@@ -753,7 +753,7 @@
                     {
                         "id":  "civicboards",
                         "display_name":  "CivicBoards",
-                        "repo":  "CivicSuite/civicboards",
+                        "repo":  "townlight/boards",
                         "tier":  3,
                         "role":  "boards and commissions workflow",
                         "selectable":  true,
@@ -856,7 +856,7 @@
                     {
                         "id":  "civic311",
                         "display_name":  "Civic311",
-                        "repo":  "CivicSuite/civic311",
+                        "repo":  "townlight/311",
                         "tier":  3,
                         "role":  "resident request workflow",
                         "selectable":  true,
@@ -876,7 +876,7 @@
                     {
                         "id":  "civiccomms",
                         "display_name":  "CivicComms",
-                        "repo":  "CivicSuite/civiccomms",
+                        "repo":  "townlight/comms",
                         "tier":  3,
                         "role":  "communications workflow",
                         "selectable":  true,
@@ -897,7 +897,7 @@
                     {
                         "id":  "civicdata",
                         "display_name":  "CivicData",
-                        "repo":  "CivicSuite/civicdata",
+                        "repo":  "townlight/data",
                         "tier":  3,
                         "role":  "open data workflow",
                         "selectable":  true,
@@ -955,7 +955,7 @@
                     {
                         "id":  "civichr",
                         "display_name":  "CivicHR",
-                        "repo":  "CivicSuite/civichr",
+                        "repo":  "townlight/hr",
                         "tier":  3,
                         "role":  "human resources workflow",
                         "selectable":  true,
@@ -975,7 +975,7 @@
                     {
                         "id":  "civicbudget",
                         "display_name":  "CivicBudget",
-                        "repo":  "CivicSuite/civicbudget",
+                        "repo":  "townlight/budget",
                         "tier":  3,
                         "role":  "budget workflow",
                         "selectable":  true,
@@ -995,7 +995,7 @@
                     {
                         "id":  "civiclegal",
                         "display_name":  "CivicLegal",
-                        "repo":  "CivicSuite/civiclegal",
+                        "repo":  "townlight/legal",
                         "tier":  3,
                         "role":  "legal workflow",
                         "selectable":  true,
@@ -1016,7 +1016,7 @@
                     {
                         "id":  "civicelections",
                         "display_name":  "CivicElections",
-                        "repo":  "CivicSuite/civicelections",
+                        "repo":  "townlight/elections",
                         "tier":  3,
                         "role":  "elections workflow",
                         "selectable":  true,
@@ -1036,7 +1036,7 @@
                     {
                         "id":  "civicutility",
                         "display_name":  "CivicUtility",
-                        "repo":  "CivicSuite/civicutility",
+                        "repo":  "townlight/utility",
                         "tier":  3,
                         "role":  "utility billing workflow",
                         "selectable":  true,
@@ -1056,7 +1056,7 @@
                     {
                         "id":  "civiccourt",
                         "display_name":  "CivicCourt",
-                        "repo":  "CivicSuite/civiccourt",
+                        "repo":  "townlight/court",
                         "tier":  3,
                         "role":  "court workflow",
                         "selectable":  true,
@@ -1077,7 +1077,7 @@
                     {
                         "id":  "civicsafety",
                         "display_name":  "CivicSafety",
-                        "repo":  "CivicSuite/civicsafety",
+                        "repo":  "townlight/safety",
                         "tier":  3,
                         "role":  "public safety workflow",
                         "selectable":  true,
@@ -1097,7 +1097,7 @@
                     {
                         "id":  "civiclibrary",
                         "display_name":  "CivicLibrary",
-                        "repo":  "CivicSuite/civiclibrary",
+                        "repo":  "townlight/library",
                         "tier":  3,
                         "role":  "library workflow",
                         "selectable":  true,
@@ -1117,7 +1117,7 @@
                     {
                         "id":  "civicparks",
                         "display_name":  "CivicParks",
-                        "repo":  "CivicSuite/civicparks",
+                        "repo":  "townlight/parks",
                         "tier":  3,
                         "role":  "parks and recreation workflow",
                         "selectable":  true,
