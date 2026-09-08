@@ -1,10 +1,10 @@
 # Townlight status
 
-**Last verified:** 2026-08-27
+**Last verified:** 2026-09-08
 
 **Active product:** Townlight Records 1.1.0-beta.1 release candidate
 
-**Publication status:** not yet published
+**Publication status:** signed draft prerelease staged; not yet published
 
 ## Current Records beta truth
 
@@ -15,10 +15,10 @@
 | Demo data | Deterministic fictional Redstone Valley fixture; explicit load only |
 | State safety | `city-work.json` schema version 1; missing-version upgrade requires verified backup; unsupported future versions fail closed |
 | Local product tests | Passed: 197 Rust tests, 30 browser tests, desktop static/state tests, production build, dependency audit, suite-state checks, Rust formatting, and Git whitespace checks |
-| Module integration | Accepted and pinned: Core `b4d0156`, Records `edf1c8d`, Notice `79b8d07`, Access `b9100ed` |
+| Module integration | Accepted and pinned: Core `b4d0156`, Records `edf1c8d`, Notice `79b8d07`, Access `b9100ed`. Gemma 4 model pin re-pinned 2026-09-08 to immutable HF revision `29d09777` (PR #250); live org references repointed to `townlight/*` (PR #251) |
 | Unsigned MSI | PR #248 verified candidate code head `dc77736` passed build, real-runtime integration, install, launch, first run, backup/restore, repair, and uninstall; evidence records `SignatureState=UNSIGNED` and `PublicationAllowed=false` |
-| Signing | Townlight organization credentials exist; the exact merged `main` commit has not yet been signed |
-| Release | Blocked only until merge, validated publisher signature, signed clean-machine journey, exact-SHA tag, and human publication approval pass |
+| Signing | Merged `main` `397023c9` signed by manual publication run [34268337013](https://github.com/townlight/townlight/actions/runs/34268337013); `Townlight_1.1.0-1_x64_en-US.msi` SHA-256 `1b2eff2428db5d9bf32b1a17dac322b02b0d9120a213e8413844a5f5f9cfb30e`, signer subject equal to the validated individual publisher identity in RELEASING.md, thumbprint `C763F2374C54FF70DF98FCA312E235C77D989524`, RFC3161 timestamp 2026-09-08; independently re-verified on MICROMONSTERPC with `signtool verify /pa /v` (0 errors) and `Get-AuthenticodeSignature` (Valid), and again inside a fresh Windows Sandbox before install |
+| Release | Annotated tag `townlight-records-v1.1.0-beta.1` at `397023c9`; `release-windows-msi` run [34275611374](https://github.com/townlight/townlight/actions/runs/34275611374) attached the signed MSI and evidence to a **draft** prerelease. Signed Sandbox install of the MSI passed (msiexec exit 0, product Townlight 1.1.0.1). Remaining before publication: the hands-on Records beta journey (USER-MANUAL.md steps 1-10) on the signed install and human publication approval |
 
 The beta's public Records/Notice/Access workflow currently executes in the Rust
 desktop application. Installed Python/FastAPI modules are reference/contract
