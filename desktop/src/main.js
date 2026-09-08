@@ -358,7 +358,7 @@ const fallbackState = {
     provider: "Google",
     source_repo: "google/gemma-4-12B-it-qat-q4_0-gguf",
     source_url: "https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf",
-    resolve_url: "https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf",
+    resolve_url: "https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/29d097773436b69ff9feafd636ab4cf873786537/gemma-4-12b-it-qat-q4_0.gguf",
     documentation_url: "https://ai.google.dev/gemma/docs/core",
     license: "Apache-2.0",
     runtime: "ollama",
@@ -369,7 +369,7 @@ const fallbackState = {
     parameters: "12B",
     context_window_tokens: 256000,
     approximate_weight_memory_gb: 6.7,
-    download_size_bytes: 6975877728,
+    download_size_bytes: 6975879296,
     download_resumable: true,
     download_requires_consent: true,
     download_policy: "Explicit model setup only",
@@ -381,7 +381,7 @@ const fallbackState = {
       message: "No verified or partial Gemma model download is saved on this machine.",
       local_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
       partial_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf.part",
-      expected_size_bytes: 6975877728,
+      expected_size_bytes: 6975879296,
       local_bytes: 0,
       partial_bytes: 0,
       progress_percent: 0,
@@ -391,11 +391,11 @@ const fallbackState = {
     artifact: {
       file_name: "gemma-4-12b-it-qat-q4_0.gguf",
       local_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
-      expected_size_bytes: 6975877728,
-      expected_sha256: "faff1a63667fac17ac5e777f47114688fcefea96e220e211aaa8d62c2c4561f1",
+      expected_size_bytes: 6975879296,
+      expected_sha256: "93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b",
       checksum_required: true,
       checksum_source: "https://huggingface.co/api/models/google/gemma-4-12B-it-qat-q4_0-gguf?blobs=true",
-      etag_blob_id: "2bf67e31a647c65d7037e38fd6e42fd6319da4bc"
+      etag_blob_id: "66249953aa5def165c094b17c26e19a77b008346"
     },
     checks: [
       {
