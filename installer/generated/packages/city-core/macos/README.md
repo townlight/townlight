@@ -108,7 +108,6 @@ bash ./start-civicsuite-installer.sh plan --module civicrecords-ai
 bash ./start-civicsuite-installer.sh plan --module civicclerk
 bash ./start-civicsuite-installer.sh plan --module civiccode
 bash ./start-civicsuite-installer.sh plan --module civicnotice
-bash ./start-civicsuite-installer.sh plan --module civicaccess
 bash ./start-civicsuite-installer.sh install --module civicrecords-ai --module civicclerk --module civiccode --module civicnotice --module civicaccess
 ```
 
@@ -131,9 +130,8 @@ bash ./start-civicsuite-installer.sh install --staff-mode bearer --workflow-proo
 - Verify mode checks live service endpoints. `--workflow-proof` /
   `-WorkflowProof` also creates live CivicRecords AI request/search/review/
   response proof records, CivicClerk agenda/packet/minutes/vote/notice/
-  archive proof records, CivicCode health/public lookup proof when
-  CivicCode is selected, and a CivicAccess accessibility-review record
-  round-trip proof when CivicAccess is selected.
+  archive proof records, and CivicCode health/public lookup proof when
+  CivicCode is selected.
 - Backup mode writes per-module PostgreSQL custom dumps plus a manifest under
   the installer runtime backup directory.
 - Restore mode verifies the latest backup by restoring each dump into a
