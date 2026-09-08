@@ -69,9 +69,9 @@ just supplies the same file the download step would have fetched.
 Pinned model file (from `desktop/runtime/gemma4-model.json`):
 
 - File name: `gemma-4-12b-it-qat-q4_0.gguf`
-- Size: 6,975,877,728 bytes (about 6.97 GB)
-- SHA-256: `faff1a63667fac17ac5e777f47114688fcefea96e220e211aaa8d62c2c4561f1`
-- Source: <https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf>
+- Size: 6,975,879,296 bytes (about 6.97 GB)
+- SHA-256: `93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b`
+- Source: <https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf> at revision `29d097773436b69ff9feafd636ab4cf873786537` (content-addressed; the `resolve/main` pointer is mutable and drifted on 2026-07-17)
 
 Procedure:
 

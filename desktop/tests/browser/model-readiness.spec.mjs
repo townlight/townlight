@@ -25,7 +25,7 @@ test("system health shows model readiness with pre-admin actions locked", async 
 
   await expect(page.getByRole("heading", { name: "Gemma 4 12B QAT Q4_0" })).toBeVisible();
   await expect(page.getByText("No silent download starts from this screen.")).toBeVisible();
-  await expect(page.getByText("faff1a63667fac17ac5e777f47114688fcefea96e220e211aaa8d62c2c4561f1")).toBeVisible();
+  await expect(page.getByText("93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b")).toBeVisible();
   await expect(page.getByText("hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0")).toBeVisible();
   await expect(page.getByText("Download progress")).toBeVisible();
   await expect(page.getByText("No verified or partial Gemma model download is saved on this machine.")).toBeVisible();

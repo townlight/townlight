@@ -1,8 +1,11 @@
 name: model-pin-check
 
 # Non-blocking integrity check for the pinned Gemma model: confirms the pinned
-# Hugging Face resolve URL is reachable and its size matches the manifest. Kept
-# OUT of the required `verify` gate on purpose so HF uptime never blocks a merge.
+# Hugging Face resolve URL is reachable, its size matches the manifest, its
+# X-Linked-Etag (the LFS sha256) matches the manifest sha256, and the URL is
+# pinned to an immutable HF revision rather than the mutable `main` pointer.
+# Kept OUT of the required `verify` gate on purpose so HF uptime never blocks
+# a merge.
 on:
   workflow_dispatch:
   schedule:
@@ -20,18 +23,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: HEAD the pinned model URL and compare size to the manifest
+      - name: HEAD the pinned model URL and compare size and sha256 to the manifest
         run: |
           set -euo pipefail
           manifest="desktop/runtime/gemma4-model.json"
           url="$(jq -r '.model.resolve_url' "$manifest")"
           expected="$(jq -r '.model.artifact.size_bytes' "$manifest")"
+          expected_sha="$(jq -r '.model.artifact.sha256' "$manifest")"
           echo "Pinned URL : $url"
-          echo "Manifest   : $expected bytes"
-          # -I HEAD, -L follow HF -> CDN redirects; take the LAST Content-Length seen.
-          len="$(curl -sIL --retry 3 --max-time 120 "$url" | tr -d '\r' \
-            | awk 'tolower($1)=="content-length:"{v=$2} END{print v}')"
-          echo "Live HEAD  : ${len:-<none>} bytes"
+          echo "Manifest   : $expected bytes, sha256 $expected_sha"
+          # The pin must name an immutable 40-hex HF revision, never a branch.
+          case "$url" in
+            */resolve/main/*|*/resolve/master/*)
+              echo "FAIL: resolve_url points at a mutable branch; pin an HF commit revision"; exit 1 ;;
+          esac
+          echo "$url" | grep -Eq '/resolve/[0-9a-f]{40}/' \
+            || { echo "FAIL: resolve_url is not pinned to a 40-hex HF revision"; exit 1; }
+          # -I HEAD, -L follow HF -> CDN redirects; take the LAST value seen.
+          headers="$(curl -sIL --retry 3 --max-time 120 "$url" | tr -d '\r')"
+          len="$(printf '%s\n' "$headers" | awk 'tolower($1)=="content-length:"{v=$2} END{print v}')"
+          etag="$(printf '%s\n' "$headers" | awk 'tolower($1)=="x-linked-etag:"{v=$2} END{print v}' | tr -d '"')"
+          echo "Live HEAD  : ${len:-<none>} bytes, x-linked-etag ${etag:-<none>}"
           test -n "${len:-}" || { echo "FAIL: no Content-Length from $url"; exit 1; }
           test "$len" = "$expected" || { echo "FAIL: size $len != manifest $expected"; exit 1; }
-          echo "PASS: pinned model URL reachable and size matches the manifest."
+          test -n "${etag:-}" || { echo "FAIL: no X-Linked-Etag from $url"; exit 1; }
+          test "$etag" = "$expected_sha" || { echo "FAIL: sha256 $etag != manifest $expected_sha"; exit 1; }
+          echo "PASS: pinned model URL is revision-pinned, reachable, and size and sha256 match the manifest."
