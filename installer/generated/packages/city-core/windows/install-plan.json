@@ -38,7 +38,7 @@
     },
     {
       "civiccore_requirement": null,
-      "display_name": "CivicCore",
+      "display_name": "Townlight Core",
       "module": "civiccore",
       "proof_required": [
         "install",
@@ -47,12 +47,12 @@
         "windows_local_contracts",
         "task_queue_worker"
       ],
-      "repo": "CivicSuite/civiccore",
+      "repo": "townlight/core",
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicRecords AI",
+      "civiccore_requirement": "1.2.1",
+      "display_name": "Townlight Records",
       "module": "civicrecords-ai",
       "proof_required": [
         "install",
@@ -62,7 +62,7 @@
         "backup",
         "restore"
       ],
-      "repo": "CivicSuite/civicrecords-ai",
+      "repo": "townlight/sunshine",
       "type": "install_module"
     },
     {
@@ -97,8 +97,8 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicNotice",
+      "civiccore_requirement": "1.2.1",
+      "display_name": "Townlight Notice",
       "module": "civicnotice",
       "proof_required": [
         "module_selection",
@@ -110,12 +110,12 @@
         "restore",
         "release_artifacts"
       ],
-      "repo": "CivicSuite/civicnotice",
+      "repo": "townlight/notice",
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicAccess",
+      "civiccore_requirement": "1.2.1",
+      "display_name": "Townlight Access",
       "module": "civicaccess",
       "proof_required": [
         "module_selection",
@@ -129,7 +129,7 @@
         "accessibility_audit",
         "export_correctness"
       ],
-      "repo": "CivicSuite/civicaccess",
+      "repo": "townlight/access",
       "type": "install_module"
     },
     {

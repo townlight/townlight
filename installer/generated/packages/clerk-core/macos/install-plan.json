@@ -20,7 +20,7 @@
     },
     {
       "civiccore_requirement": null,
-      "display_name": "CivicCore",
+      "display_name": "Townlight Core",
       "module": "civiccore",
       "proof_required": [
         "install",
@@ -29,12 +29,12 @@
         "windows_local_contracts",
         "task_queue_worker"
       ],
-      "repo": "CivicSuite/civiccore",
+      "repo": "townlight/core",
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicRecords AI",
+      "civiccore_requirement": "1.2.1",
+      "display_name": "Townlight Records",
       "module": "civicrecords-ai",
       "proof_required": [
         "install",
@@ -44,7 +44,7 @@
         "backup",
         "restore"
       ],
-      "repo": "CivicSuite/civicrecords-ai",
+      "repo": "townlight/sunshine",
       "type": "install_module"
     },
     {
