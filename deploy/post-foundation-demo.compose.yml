@@ -85,8 +85,8 @@ services:
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/CivicSuite/civiccore/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
-        https://github.com/CivicSuite/civicclerk/releases/download/v1.0.0/civicclerk-1.0.0-py3-none-any.whl
+        https://github.com/townlight/core/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
+        https://github.com/townlight/meetings/releases/download/v1.0.0/civicclerk-1.0.0-py3-none-any.whl
         && uvicorn civicclerk.main:app --host 0.0.0.0 --port 8010
     environment:
       CIVICCORE_LLM_PROVIDER: ollama
@@ -108,8 +108,8 @@ services:
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/CivicSuite/civiccore/releases/download/v0.22.0/civiccore-0.22.0-py3-none-any.whl
-        https://github.com/CivicSuite/civiccode/releases/download/v0.1.18/civiccode-0.1.18-py3-none-any.whl
+        https://github.com/townlight/core/releases/download/v0.22.0/civiccore-0.22.0-py3-none-any.whl
+        https://github.com/townlight/ordinances/releases/download/v0.1.18/civiccode-0.1.18-py3-none-any.whl
         && uvicorn civiccode.main:app --host 0.0.0.0 --port 8020
     environment:
       CIVICCORE_LLM_PROVIDER: ollama
@@ -131,8 +131,8 @@ services:
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/CivicSuite/civiccore/releases/download/v0.3.0/civiccore-0.3.0-py3-none-any.whl
-        https://github.com/CivicSuite/civiczone/releases/download/v0.1.1/civiczone-0.1.1-py3-none-any.whl
+        https://github.com/townlight/core/releases/download/v0.3.0/civiccore-0.3.0-py3-none-any.whl
+        https://github.com/townlight/zone/releases/download/v0.1.1/civiczone-0.1.1-py3-none-any.whl
         && uvicorn civiczone.main:app --host 0.0.0.0 --port 8030
     environment:
       CIVICCORE_LLM_PROVIDER: ollama

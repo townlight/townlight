@@ -236,7 +236,7 @@ Modules pin to CivicCore as a released dependency. The exact form (example shown
 ```toml
 [project]
 dependencies = [
-  "civiccore @ https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl#sha256=561d7a8f73260d50de79351d330876d2cb3488c0e046a2888e82fe09d1e03969",
+  "civiccore @ https://github.com/townlight/core/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl#sha256=561d7a8f73260d50de79351d330876d2cb3488c0e046a2888e82fe09d1e03969",
   ...
 ]
 ```

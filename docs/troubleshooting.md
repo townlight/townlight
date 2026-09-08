@@ -13,7 +13,7 @@ The Windows Local clerk path is a Tauri/WebView2 desktop app installed from an M
 3. After install, open CivicSuite from the Start menu or desktop shortcut.
 4. If the app opens but a local service is unhealthy, open System Health, run **Check**, then **Repair** after reviewing the repair panel.
 
-If the app asks for Docker, WSL, a terminal, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/CivicSuite/civicsuite/issues>).
+If the app asks for Docker, WSL, a terminal, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
 
 ## Model Download, Resume, Or Checksum Fails
 

@@ -204,7 +204,7 @@ def selftest() -> int:
     assert any(h[2] == "Scott" for h in hard), "name not caught"
     assert any("QA-B1" in h[2] for h in hard), "QA-B1 not caught"
     # A linked reference must NOT be flagged as a bare ref.
-    good = "See [PR #99](https://github.com/CivicSuite/civicsuite/pull/99)."
+    good = "See [PR #99](https://github.com/townlight/townlight/pull/99)."
     spans = markdown_links(good)
     m = re.search(r"PR #\d+", good)
     assert any(a <= m.start() < b for a, b in spans), "linked ref wrongly flagged"

@@ -10,7 +10,7 @@ This FAQ is for civic operators (city CIO, clerk, IT lead, attorney, procurement
 
 The supported operator path is the **CivicSuite Windows Local "city-core" desktop app**: a single Tauri/WebView2 MSI installer (about 1.65 GB) that you run like any normal Windows program. It bundles a portable PostgreSQL 17 with pgvector and a portable Ollama runtime. There is **no Docker, no WSL, no terminal, and no developer tooling** on this path.
 
-**Where to download:** get `CivicSuite_1.0.2_x64_en-US.msi` from the current release tag, <https://github.com/CivicSuite/civicsuite/releases/tag/civicsuite-windows-local-v1.0.2>, and verify its SHA-256 before running: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
+**Where to download:** get `CivicSuite_1.0.2_x64_en-US.msi` from the current release tag, <https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2>, and verify its SHA-256 before running: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
 
 What an operator does:
 
@@ -21,7 +21,7 @@ What an operator does:
 
 Recommended machine: **32 GB RAM** (16 GB is a workable minimum; the local model needs about 6.7 GB resident at runtime on top of Windows, PostgreSQL, and services, and 32 GB leaves headroom for the local database and the generation context) and **at least 15 GB free disk** (1.65 GB MSI + about 7 GB model + data/backup headroom; the installer enforces a 15 GB floor for the model download).
 
-The current release is **[civicsuite-windows-local-v1.0.2](https://github.com/CivicSuite/civicsuite/releases/tag/civicsuite-windows-local-v1.0.2)** (Latest; it supersedes v1.0.1, which superseded v1.0.0; the earlier first-run-fix prerelease is retired). For the full step-by-step, see [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md).
+The current release is **[civicsuite-windows-local-v1.0.2](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2)** (Latest; it supersedes v1.0.1, which superseded v1.0.0; the earlier first-run-fix prerelease is retired). For the full step-by-step, see [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md).
 
 This is a **GA candidate, open for public beta**: feature-complete for city-core and validated end-to-end on a clean machine. The MSI is Authenticode code-signed via Azure Trusted Signing. Because the certificate is new, Windows SmartScreen may still show *"Windows protected your PC"* on first run — click **More info**, confirm it shows a **verified publisher** (not "Unknown Publisher"), then **Run anyway** (see [docs/troubleshooting.md](docs/troubleshooting.md#windows-smartscreen-when-you-run-the-installer)). You can download and use it now for real hands-on evaluation and early adoption. It is still a **beta** — **not yet production-, city-, or procurement-ready** — so do not run your city's system of record on it yet.
 
@@ -79,7 +79,7 @@ Do not restore old `installer/dist` artifacts unless the maintainers explicitly 
 
 ## Why are some modules called "CivicCourt Assist" and others bare "CivicCourt"?
 
-Both names refer to the same thing: CivicCourt, a planned specialized-tier module. The "Assist" / "Bridge" / "Research" suffix is the canonical product name when the module needs to be clearly described as a copilot or bridge, not a system-of-record replacement. The bare name is the casual reference used in tier rollout lists. [CONSISTENCY.md](https://github.com/CivicSuite/civicsuite/blob/main/CONSISTENCY.md) section 3 documents this convention.
+Both names refer to the same thing: CivicCourt, a planned specialized-tier module. The "Assist" / "Bridge" / "Research" suffix is the canonical product name when the module needs to be clearly described as a copilot or bridge, not a system-of-record replacement. The bare name is the casual reference used in tier rollout lists. [CONSISTENCY.md](https://github.com/townlight/townlight/blob/main/CONSISTENCY.md) section 3 documents this convention.
 
 CivicSuite is deliberately not a system-of-record replacement for ERP, utility billing, permitting, CAD/RMS, or court case management. The "Assist" naming is the suite's way of being explicit about that scope boundary.
 

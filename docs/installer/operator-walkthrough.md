@@ -30,7 +30,7 @@ Have these ready:
 - A stable internet connection for first install/model download unless the model file has already been staged by IT (see "Offline / Air-Gapped Model Pre-Staging").
 - A city name, records contact, clerk contact, first local administrator name/email, and a backup folder location.
 
-Do not install Docker Desktop or WSL for this product path. If the app asks for Docker, WSL, a terminal, or manual environment edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/CivicSuite/civicsuite/issues>).
+Do not install Docker Desktop or WSL for this product path. If the app asks for Docker, WSL, a terminal, or manual environment edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
 
 ## Install
 
@@ -189,4 +189,4 @@ If disk space is low, free space and run health verification again.
 
 If the app cannot write backups, choose a folder the local user can write and run backup again.
 
-If the app asks for Docker, WSL, terminal commands, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/CivicSuite/civicsuite/issues>).
+If the app asks for Docker, WSL, terminal commands, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).

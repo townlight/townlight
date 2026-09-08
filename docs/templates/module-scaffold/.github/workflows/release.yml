@@ -13,7 +13,7 @@ on:
       wheel_url:
         description: "Published wheel URL for the cleanroom rehearsal"
         required: true
-        default: "https://github.com/CivicSuite/{{MODULE_REPO_NAME}}/releases/download/v0.0.1/{{MODULE_WHEEL_STEM}}-0.0.1-py3-none-any.whl"
+        default: "https://github.com/townlight/{{MODULE_REPO_NAME}}/releases/download/v0.0.1/{{MODULE_WHEEL_STEM}}-0.0.1-py3-none-any.whl"
 
 permissions:
   contents: write
