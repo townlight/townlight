@@ -12,6 +12,13 @@ const desktopPackageLockJson = JSON.parse(readFileSync(join(root, "package-lock.
 const cargoToml = readFileSync(join(root, "src-tauri", "Cargo.toml"), "utf8");
 const cargoLock = readFileSync(join(root, "src-tauri", "Cargo.lock"), "utf8");
 const desktopMsiWorkflow = readFileSync(join(root, "..", ".github", "workflows", "desktop-windows-msi.yml"), "utf8");
+const cargoConfig = readFileSync(join(root, ".cargo", "config.toml"), "utf8");
+if (!cargoConfig.includes('[target.x86_64-pc-windows-msvc]') || !cargoConfig.includes('target-feature=+crt-static')) {
+  throw new Error('Windows desktop must statically link the CRT for clean-machine startup');
+}
+if (!desktopMsiWorkflow.includes('verify-desktop-runtime.ps1')) {
+  throw new Error('Packaging must inspect actual desktop imports before signing');
+}
 const rustMain = readFileSync(join(root, "src-tauri", "src", "main.rs"), "utf8");
 const authRust = readFileSync(join(root, "src-tauri", "src", "auth.rs"), "utf8");
 const moduleRegistryRust = readFileSync(join(root, "src-tauri", "src", "module_registry.rs"), "utf8");

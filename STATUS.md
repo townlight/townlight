@@ -4,7 +4,22 @@
 
 **Active product:** Townlight Records 1.1.0-beta.2 candidate in preparation
 
-**Publication status:** beta.1 signed draft remains unpublished; beta.2 build/signing and full installed acceptance are pending
+**Publication status:** beta.1 and beta.2 signed drafts remain unpublished. The first beta.2 passed signing and CI lifecycle, but clean Windows Sandbox acceptance found a desktop startup dependency defect; replacement-candidate acceptance and publication approval remain required.
+
+## Clean-machine startup correction
+
+Signed run [37694186543](https://github.com/townlight/townlight/actions/runs/37694186543)
+produced independently verified MSI/EXE signatures and passed CI lifecycle.
+The same MSI (`b3f11d6ada4014670246a4662e4432b66b20cb79f6d67a2b3c26d4f0b7d9d5f6`)
+installed successfully in a fresh Windows Sandbox, but its EXE imports
+`VCRUNTIME140.dll` and `VCRUNTIME140_1.dll` absent from both the system and the
+desktop executable directory. Python/PostgreSQL app-local CRT files do not
+satisfy desktop startup. This candidate is not accepted for publication.
+
+The correction statically links the desktop MSVC CRT and adds actual PE-import
+inspection before signing. The negative gate rejects the defective EXE.
+A replacement must pass that gate, be signed, and complete installed acceptance.
+CI's installed-process survival check alone did not prove a usable app window.
 
 ## Restart work
 
