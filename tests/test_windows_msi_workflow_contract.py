@@ -127,7 +127,9 @@ def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes(
         "name: Record unsigned executable intake",
         "name: Sign desktop executable (Azure Artifact Signing)",
         "name: Verify executable before packaging",
-        "run: npm run tauri -- bundle --bundles msi",
+        "name: Record executable bytes before bundling",
+        "run: npm run tauri -- bundle --bundles msi --no-binary-patching",
+        "name: Verify bundling preserved executable bytes",
         "name: Sign MSI (Azure Trusted Signing)",
         "name: Verify packaged executable and write signing receipt",
     ]
@@ -137,6 +139,9 @@ def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes(
     assert "MSI does not contain the exact signed executable" in workflow
     assert "Verify installed executable trust and exact bytes" in workflow
     assert "Installed executable hash differs from packaged evidence" in workflow
+    assert "Bundling changed executable bytes after signing intake." in workflow
+    package = json.loads(_read(ROOT / "desktop" / "package.json"))
+    assert package["devDependencies"]["@tauri-apps/cli"] == "2.12.0"
 
 
 def test_release_checks_both_artifacts_and_receipt_against_selected_run() -> None:

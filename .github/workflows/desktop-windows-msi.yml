@@ -277,9 +277,23 @@ jobs:
         run: |
           & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path "${{ steps.exe_intake.outputs.path }}"
 
+      - name: Record executable bytes before bundling
+        id: bundle_exe_input
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -LiteralPath '${{ steps.exe_intake.outputs.path }}' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+
       - name: Bundle the already built executable into Windows MSI
         working-directory: civicsuite/desktop
-        run: npm run tauri -- bundle --bundles msi
+        # Never patch the already signed EXE while building the installer.
+        run: npm run tauri -- bundle --bundles msi --no-binary-patching
+
+      - name: Verify bundling preserved executable bytes
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -LiteralPath '${{ steps.exe_intake.outputs.path }}' -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne '${{ steps.bundle_exe_input.outputs.sha256 }}') { throw 'Bundling changed executable bytes after signing intake.' }
 
       # --- Explicit publication-signing gate ---------------------------------------
       # Azure holds the certificate in its HSM and performs the signing; nothing is

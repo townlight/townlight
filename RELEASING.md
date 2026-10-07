@@ -45,7 +45,10 @@ identities.
 
    This is the only lane that reads the Townlight organization Azure secrets.
    It builds the desktop EXE without bundling, hashes its unsigned bytes, signs
-   and verifies it, then bundles that exact executable into the MSI. The MSI
+   and verifies it, then bundles that exact executable into the MSI using
+   Tauri CLI 2.12.0 with `--no-binary-patching`. This flag is mandatory: the
+   default bundler rewrites the EXE's bundle-type marker and would invalidate
+   its signature. Hashes before and after bundling must match. The MSI
    is hashed before signing and independently verified afterward. It signs
    through Azure Artifact Signing with the fixed account/profile and
    must independently pass `signtool verify /pa /v` and
