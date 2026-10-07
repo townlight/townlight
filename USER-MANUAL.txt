@@ -1,8 +1,8 @@
 # Townlight Records — User Manual
 
-**Candidate version:** 1.1.0-beta.1
+**Candidate version:** 1.1.0-beta.2
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-10-07
 
 **Publication status:** release candidate; not yet a published beta
 
@@ -15,7 +15,7 @@ Townlight Notice, and Townlight Access.
 
 Do not use an unsigned GitHub Actions artifact as a public release. The beta is
 ready for external use only when a prerelease named
-`townlight-records-v1.1.0-beta.1` appears under the
+`townlight-records-v1.1.0-beta.2` appears under the
 [Townlight releases page](https://github.com/townlight/townlight/releases) with
 the signed MSI and its evidence file.
 
@@ -25,6 +25,10 @@ Before running the MSI:
 2. Confirm the signer subject matches the identity published with the release evidence.
 3. Compare the MSI's SHA-256 with the release evidence.
 4. Install only the exact signed asset attached to the release.
+
+After installation, confirm the installed desktop executable also has a valid
+signature from the publisher identified in the release evidence and matches the signed hash in the release signing
+receipt. The MSI and executable are both signed in this candidate.
 
 Townlight runs locally. The normal operator path does not require Docker, WSL,
 a terminal, or a hosted vendor account. A local AI model is optional for the
@@ -334,7 +338,7 @@ Generated from `installer/modules.json`.
 | Module | Version | Role | Dependencies | Source commit | Installer status |
 |---|---:|---|---|---|---|
 | Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
-| Townlight Records | 1.7.3 | records workflow | `civiccore` | `edf1c8d8078c` | `v1_7_3_records_beta_candidate` |
+| Townlight Records | 1.7.3 | records workflow | `civiccore` | `ff99d8c7e692` | `v1_7_3_records_beta_candidate` |
 | Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
 | Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
 

@@ -85,6 +85,30 @@ jobs:
           & $signtool.FullName verify /pa /v $msi.FullName
           if ($LASTEXITCODE -ne 0) { throw "signtool rejected the release MSI." }
 
+          $receiptFiles = @(Get-ChildItem -LiteralPath ./msi-artifact -Filter '*signing-receipt.json' -File)
+          if ($receiptFiles.Count -ne 1) { throw 'Expected exactly one signing receipt.' }
+          $receipt = Get-Content -LiteralPath $receiptFiles[0].FullName -Raw | ConvertFrom-Json
+          if ($receipt.source_commit -ne $tagSha -or $receipt.workflow_run -ne [string]$run.databaseId) {
+            throw 'Signing receipt source/run does not match the selected release.'
+          }
+          $extract = Join-Path $env:RUNNER_TEMP 'townlight-release-extract'
+          $p = Start-Process msiexec.exe -ArgumentList @('/a', "`"$($msi.FullName)`"", '/qn', "TARGETDIR=`"$extract`"") -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "MSI extraction failed: $($p.ExitCode)" }
+          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter civicsuite-desktop.exe -Recurse -File)
+          if ($embedded.Count -ne 1) { throw 'Expected one embedded desktop executable.' }
+          & ./desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
+          foreach ($artifact in @($msi, $embedded[0])) {
+            $entries = @($receipt.files | Where-Object { $_.file -eq $artifact.Name })
+            if ($entries.Count -ne 1) { throw 'Signing receipt artifact entry is missing or ambiguous.' }
+            $sig = Get-AuthenticodeSignature -LiteralPath $artifact.FullName
+            $sha = (Get-FileHash -LiteralPath $artifact.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($entries[0].signed_sha256 -ne $sha -or $entries[0].unsigned_sha256 -notmatch '^[0-9a-f]{64}$' -or
+                $entries[0].signer_subject -ne $sig.SignerCertificate.Subject -or
+                $entries[0].signer_thumbprint -ne $sig.SignerCertificate.Thumbprint) {
+              throw 'Signing receipt does not match independently verified artifact evidence.'
+            }
+          }
+
           # The annotated tag is expected to already exist (see RELEASING.md). If the
           # release object does not exist yet, create it from the tag as a DRAFT
           # prerelease for a human to finalize and explicitly publish only after
@@ -94,6 +118,6 @@ jobs:
             gh release create $tag --draft --prerelease --title "Townlight Records $tag" --notes "Automated signed Townlight Records MSI attach from main build run $($run.databaseId). Finalize notes and publish only after signed clean-machine validation."
             if ($LASTEXITCODE -ne 0) { throw "Failed to create the draft prerelease." }
           }
-          gh release upload $tag $msi.FullName $evidenceFiles[0].FullName --clobber
+          gh release upload $tag $msi.FullName $evidenceFiles[0].FullName $receiptFiles[0].FullName --clobber
           if ($LASTEXITCODE -ne 0) { throw "Failed to upload the signed MSI release assets." }
           Write-Host "Attached the independently verified signed MSI to draft release $tag; publication remains blocked."

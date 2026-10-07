@@ -1,5 +1,16 @@
 # CivicCore <-> Module Compatibility Matrix
 
+## Townlight Records beta.2 source-pin pairing
+
+Prepared 2026-10-07; candidate signing and installed acceptance are pending.
+The Records desktop profile pins Core `b4d0156bdc6883c1c3ef167abe0379f9ca32b258`
+with Records `ff99d8c7e692ba1f75e1781f517bb54f5c618b48`, Notice
+`79b8d07199ee77cd425b31c0e0a44f3a0832b810`, and Access
+`b9100edc80ca496d6061f1cdb3eb39a60ff5f31a`. Only the Records source commit
+advances from beta.1; package versions and Core compatibility requirements
+remain unchanged. Source pins identify the bundled code independently of
+the older published module tags.
+
 This matrix tracks the compatibility contract between the shared `civiccore`
 package and the suite modules that consume it. It is the suite's
 authoritative record of release pairings - when a row changes, this is the

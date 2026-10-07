@@ -1,12 +1,25 @@
 # Townlight status
 
-**Last verified:** 2026-09-08
+**Last verified:** 2026-10-07
 
-**Active product:** Townlight Records 1.1.0-beta.1 release candidate
+**Active product:** Townlight Records 1.1.0-beta.2 candidate in preparation
 
-**Publication status:** signed draft prerelease staged; not yet published
+**Publication status:** beta.1 signed draft remains unpublished; beta.2 build/signing and full installed acceptance are pending
 
-## Current Records beta truth
+## Restart work
+
+The beta.2 changes sign the desktop executable before MSI bundling and then
+sign the outer MSI. Extraction, installed-file, and release-stage checks verify
+the inner executable's signature and exact hash. A signing receipt records both
+artifacts and the build commit/run. Desktop build versions advance to `1.1.0-2`.
+Records source advances to `ff99d8c7` for the reviewed post-transfer repository
+URL and dependency-lock cleanup. Core, Notice, and Access pins are unchanged.
+
+Existing beta.1 evidence below remains historical evidence for those bytes;
+it does not prove beta.2. Full signed clean-machine acceptance and publication
+approval remain required. Convergence remains blocking before Meetings.
+
+## Records beta.1 baseline evidence
 
 | Gate | Current state |
 |---|---|

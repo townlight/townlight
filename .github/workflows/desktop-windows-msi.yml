@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       sign_for_publication:
-        description: "Sign and verify the MSI for publication (manual main-branch release gate only)"
+        description: "Sign and verify desktop EXE and MSI for publication (manual main-branch release gate only)"
         required: true
         type: boolean
         default: false
@@ -111,7 +111,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: edf1c8d8078c85baff691030a599b8eef670bca6
+          ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48
           path: civicrecords-ai
 
       - name: Check out Townlight Notice runtime source
@@ -187,7 +187,7 @@ jobs:
               Write-Error "Preflight FAILED - bad or expired AZURE_CLIENT_SECRET ($code). Fix the secret before rebuilding."
               exit 1
             }
-            Write-Warning "Preflight inconclusive ($code): $($_.Exception.Message). Not blocking; the sign step will surface any real auth issue."
+            Write-Warning "Preflight inconclusive ($code). The sign step will verify authorization; credential response details are suppressed."
             exit 0
           }
 
@@ -232,20 +232,74 @@ jobs:
 
       - name: Run Tauri Rust tests
         working-directory: civicsuite/desktop/src-tauri
+        env:
+          CIVICSUITE_DESKTOP_STATE_DIR: ${{ runner.temp }}\townlight-unit-test-state
         run: cargo test
 
       - name: Check Rust formatting
         working-directory: civicsuite/desktop/src-tauri
         run: cargo fmt --check
 
-      - name: Build Windows Local MSI
+      - name: Build desktop executable without packaging
         working-directory: civicsuite/desktop
-        run: npm run tauri -- build
+        run: npm run tauri -- build --no-bundle
+
+      - name: Record unsigned executable intake
+        id: exe_intake
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $exe = Get-Item -LiteralPath "civicsuite/desktop/src-tauri/target/release/civicsuite-desktop.exe"
+          if ((Get-AuthenticodeSignature -LiteralPath $exe.FullName).Status -ne 'NotSigned') {
+            throw "Freshly built executable is not unsigned; refusing signing intake."
+          }
+          "path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
+          "sha256=$((Get-FileHash -LiteralPath $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      - name: Sign desktop executable (Azure Artifact Signing)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: "https://wcus.codesigning.azure.net"
+          signing-account-name: "scottconverse-signing"
+          certificate-profile-name: "ScottConversePublic"
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          files: ${{ steps.exe_intake.outputs.path }}
+          file-digest: "SHA256"
+          timestamp-rfc3161: "http://timestamp.acs.microsoft.com"
+          timestamp-digest: "SHA256"
+
+      - name: Verify executable before packaging
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
+        shell: pwsh
+        run: |
+          & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path "${{ steps.exe_intake.outputs.path }}"
+
+      - name: Record executable bytes before bundling
+        id: bundle_exe_input
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -LiteralPath '${{ steps.exe_intake.outputs.path }}' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+
+      - name: Bundle the already built executable into Windows MSI
+        working-directory: civicsuite/desktop
+        # Never patch the already signed EXE while building the installer.
+        run: npm run tauri -- bundle --bundles msi --no-binary-patching
+
+      - name: Verify bundling preserved executable bytes
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -LiteralPath '${{ steps.exe_intake.outputs.path }}' -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne '${{ steps.bundle_exe_input.outputs.sha256 }}') { throw 'Bundling changed executable bytes after signing intake.' }
 
       # --- Explicit publication-signing gate ---------------------------------------
       # Azure holds the certificate in its HSM and performs the signing; nothing is
       # signed locally and no .pfx ever touches the runner. Must run on windows-latest,
-      # AFTER the MSI is built and BEFORE evidence/checksums (signing changes the hash).
+      # The EXE is signed before bundling; the outer MSI is signed afterward.
+      # Evidence/checksums follow both signatures because signing changes the hashes.
       # Auth = service-principal client secret passed DIRECTLY to the action. This
       # is the currently proven pattern; OIDC remains a separately verified migration.
       # FAIL-CLOSED: the config guard + two independent verification paths below
@@ -257,7 +311,11 @@ jobs:
         run: |
           $msi = Get-ChildItem -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi" -Filter "*.msi" | Select-Object -First 1
           if (-not $msi) { throw "Townlight Windows Local MSI was not produced." }
+          if ((Get-AuthenticodeSignature -LiteralPath $msi.FullName).Status -ne 'NotSigned') {
+            throw "Freshly bundled MSI is not unsigned; refusing signing intake."
+          }
           "path=$($msi.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$((Get-FileHash -LiteralPath $msi.FullName -Algorithm SHA256).Hash.ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
       - name: Sign MSI (Azure Trusted Signing)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
@@ -291,6 +349,30 @@ jobs:
             throw "Unexpected Authenticode signer; refusing to publish."
           }
           if (-not $signature.TimeStamperCertificate) { throw "Signed MSI has no timestamp certificate." }
+
+      - name: Verify packaged executable and write signing receipt
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $exe = "${{ steps.exe_intake.outputs.path }}"
+          $msi = "${{ steps.locate_msi.outputs.path }}"
+          $extract = Join-Path $env:RUNNER_TEMP "townlight-signed-msi-extract"
+          $p = Start-Process msiexec.exe -ArgumentList @('/a', "`"$msi`"", '/qn', "TARGETDIR=`"$extract`"") -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "MSI extraction failed: $($p.ExitCode)" }
+          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter civicsuite-desktop.exe -Recurse -File)
+          if ($embedded.Count -ne 1) { throw "Expected one embedded desktop executable." }
+          & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
+          $exeHash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ((Get-FileHash -LiteralPath $embedded[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $exeHash) {
+            throw "MSI does not contain the exact signed executable."
+          }
+          $receipt = [ordered]@{ schema_version = 1; source_commit = '${{ github.sha }}'; workflow_run = '${{ github.run_id }}'; files = @() }
+          foreach ($item in @(@{path=$exe; unsigned='${{ steps.exe_intake.outputs.sha256 }}'}, @{path=$msi; unsigned='${{ steps.locate_msi.outputs.sha256 }}'})) {
+            $sig = Get-AuthenticodeSignature -LiteralPath $item.path
+            $receipt.files += [ordered]@{ file=(Split-Path $item.path -Leaf); unsigned_sha256=$item.unsigned; signed_sha256=(Get-FileHash -LiteralPath $item.path -Algorithm SHA256).Hash.ToLowerInvariant(); signer_subject=$sig.SignerCertificate.Subject; signer_thumbprint=$sig.SignerCertificate.Thumbprint; timestamp_subject=$sig.TimeStamperCertificate.Subject }
+          }
+          $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi/Townlight-signing-receipt.json" -Encoding utf8
 
       - name: Classify and label MSI artifact
         id: artifact_mode
@@ -338,6 +420,8 @@ jobs:
             "Bytes=$($msi.Length)"
             "SHA256=$($hash.Hash.ToLowerInvariant())"
             "SignatureState=$env:SIGNATURE_STATE"
+            "InnerExecutableSignatureState=$env:SIGNATURE_STATE"
+            "InnerExecutableSHA256=$((Get-FileHash -LiteralPath '${{ steps.exe_intake.outputs.path }}' -Algorithm SHA256).Hash.ToLowerInvariant())"
             "PublicationAllowed=$publicationAllowed"
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
@@ -368,6 +452,7 @@ jobs:
           path: |
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*.msi
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
+            civicsuite/desktop/src-tauri/target/release/bundle/msi/*signing-receipt.json
           retention-days: 7
 
   desktop-civiccore-integration:
@@ -393,7 +478,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: edf1c8d8078c85baff691030a599b8eef670bca6
+          ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48
           path: civicrecords-ai
 
       - name: Check out Townlight Notice runtime source
@@ -565,6 +650,23 @@ jobs:
           Write-Host "Main binary: $($exe.FullName) ($([math]::Round($exe.Length/1KB)) KB)"
           "TOWNLIGHT_INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "TOWNLIGHT_EXE=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Verify installed executable trust and exact bytes
+        shell: pwsh
+        env:
+          EXPECTED_SIGNATURE_STATE: ${{ needs.windows-local-msi.outputs.signature_state }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $evidenceFile = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*evidence*.txt' -Recurse -File)
+          if ($evidenceFile.Count -ne 1) { throw 'Expected exactly one MSI evidence file.' }
+          $evidence = Get-Content -LiteralPath $evidenceFile[0].FullName -Raw
+          $hash = (Get-FileHash -LiteralPath $env:TOWNLIGHT_EXE -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($evidence -notmatch "(?m)^InnerExecutableSHA256=$hash\r?$") { throw 'Installed executable hash differs from packaged evidence.' }
+          if ($env:EXPECTED_SIGNATURE_STATE -eq 'Valid') {
+            & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path $env:TOWNLIGHT_EXE
+          } elseif ((Get-AuthenticodeSignature -LiteralPath $env:TOWNLIGHT_EXE).Status -ne 'NotSigned') {
+            throw 'Routine CI installed executable is unexpectedly signed.'
+          }
 
       - name: Launch the installed Townlight application
         shell: pwsh

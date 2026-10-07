@@ -63,7 +63,7 @@
       "compatibility": {"development_core": "1.2.0", "installer_core": "1.2.1", "public_status_core": "1.2.1"},
       "dependencies": ["core"],
       "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 1, "legacy_grade": "released", "public_status_released_at": "2026-05-24"},
-      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "edf1c8d8078c85baff691030a599b8eef670bca6"}
+      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "ff99d8c7e692ba1f75e1781f517bb54f5c618b48"}
     },
     "meetings": {
       "public_name": "Townlight Meetings", "public_slug": "meetings",

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +14,19 @@ RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release-windows-msi.yml"
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def test_records_checkout_pins_match_the_accepted_installer_source() -> None:
+    manifest = json.loads(_read(ROOT / "installer" / "modules.json"))
+    records = next(module for module in manifest["modules"] if module["id"] == "civicrecords-ai")
+    pin = records["source_commit"]
+    for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
+        workflow = _read(path)
+        checkouts = workflow.split("repository: townlight/sunshine")[1:]
+        assert checkouts, f"No Records checkout in {path.name}"
+        for checkout in checkouts:
+            checkout_inputs = checkout.split("\n      - ", 1)[0]
+            assert f"ref: {pin}" in checkout_inputs, path.name
 
 
 def test_routine_ci_builds_a_visibly_unsigned_private_artifact() -> None:
@@ -104,3 +118,37 @@ def test_public_product_name_changes_without_replacing_installer_identity() -> N
     assert '"upgradeCode": "a63fc1d3-5437-5f55-89a2-fef93fb1f930"' in tauri_config
     assert "Townlight Windows Local MSI build evidence" in workflow
     assert "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930" in workflow
+
+
+def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes() -> None:
+    workflow = _read(BUILD_WORKFLOW)
+    stages = [
+        "run: npm run tauri -- build --no-bundle",
+        "name: Record unsigned executable intake",
+        "name: Sign desktop executable (Azure Artifact Signing)",
+        "name: Verify executable before packaging",
+        "name: Record executable bytes before bundling",
+        "run: npm run tauri -- bundle --bundles msi --no-binary-patching",
+        "name: Verify bundling preserved executable bytes",
+        "name: Sign MSI (Azure Trusted Signing)",
+        "name: Verify packaged executable and write signing receipt",
+    ]
+    positions = [workflow.index(stage) for stage in stages]
+    assert positions == sorted(positions)
+    assert workflow.count("uses: azure/artifact-signing-action@v2") == 2
+    assert "MSI does not contain the exact signed executable" in workflow
+    assert "Verify installed executable trust and exact bytes" in workflow
+    assert "Installed executable hash differs from packaged evidence" in workflow
+    assert "Bundling changed executable bytes after signing intake." in workflow
+    package = json.loads(_read(ROOT / "desktop" / "package.json"))
+    assert package["devDependencies"]["@tauri-apps/cli"] == "2.12.0"
+
+
+def test_release_checks_both_artifacts_and_receipt_against_selected_run() -> None:
+    workflow = _read(RELEASE_WORKFLOW)
+    assert "$receipt.source_commit -ne $tagSha" in workflow
+    assert "$receipt.workflow_run -ne [string]$run.databaseId" in workflow
+    assert "verify-publication-signature.ps1 -Path $embedded[0].FullName" in workflow
+    assert "$entries[0].signed_sha256 -ne $sha" in workflow
+    assert "$entries[0].signer_thumbprint -ne $sig.SignerCertificate.Thumbprint" in workflow
+    assert "$receiptFiles[0].FullName --clobber" in workflow
