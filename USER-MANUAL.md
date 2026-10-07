@@ -14,10 +14,16 @@ Townlight Notice, and Townlight Access.
 ## Before installing
 
 Do not use an unsigned GitHub Actions artifact as a public release. The beta is
-ready for external use only when a prerelease named
-`townlight-records-v1.1.0-beta.2` appears under the
+ready for external use only when the verified Townlight Records 1.1.0-beta.2
+prerelease appears under the
 [Townlight releases page](https://github.com/townlight/townlight/releases) with
 the signed MSI and its evidence file.
+
+The original `townlight-records-v1.1.0-beta.2` draft failed clean-machine
+startup acceptance and must not be used. Its replacement candidate uses
+`townlight-records-v1.1.0-beta.2-rc.2` to preserve the rejected tag and evidence.
+Neither a draft nor a release-candidate tag alone proves acceptance; use only
+the installer identified in the published release's completed acceptance record.
 
 Before running the MSI:
 
