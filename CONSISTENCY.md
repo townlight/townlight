@@ -1,5 +1,15 @@
 # CivicSuite — Consistency Reference
 
+## Townlight Records beta.2 candidate (2026-10-07)
+
+The current candidate uses public label `1.1.0-beta.2`, desktop build version
+`1.1.0-2`, and a Records profile of Core + Records + Notice + Access. The
+Records source pin is `ff99d8c7e692ba1f75e1781f517bb54f5c618b48` in
+`townlight/sunshine`. Both desktop EXE and MSI must be signed and independently
+verified before publication. Existing beta.1 evidence proves only beta.1 bytes.
+The candidate remains unpublished, and architecture convergence remains a
+blocking gate before Meetings. The legacy reference below is historical.
+
 Every count, cross-reference, version, and named fact used in CHARTER.md and README.md is verified here against the source-of-truth spec. Update this file whenever any of those facts change. Do not let the charter or README drift from this table.
 
 Last verified: June 27, 2026.

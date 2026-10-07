@@ -1017,23 +1017,27 @@ mod tests {
 
     #[test]
     fn app_state_reports_runtime_health_from_manifest() {
-        let state = app_state().expect("app state builds");
-        assert!(state.health.iter().any(|item| item.id == "desktop-shell"));
-        assert!(state.health.iter().any(|item| item.id == "postgres"));
-        assert!(state.health.iter().any(|item| item.id == "model-runtime"));
+        with_clean_first_run_state(|_| {
+            let state = app_state().expect("app state builds");
+            assert!(state.health.iter().any(|item| item.id == "desktop-shell"));
+            assert!(state.health.iter().any(|item| item.id == "postgres"));
+            assert!(state.health.iter().any(|item| item.id == "model-runtime"));
+        });
     }
 
     #[test]
     fn app_state_reports_model_readiness_contract() {
-        let state = app_state().expect("app state builds");
-        assert_eq!(state.model.display_name, "Gemma 4 12B QAT Q4_0");
-        assert_eq!(state.model.status, "Needs download");
-        assert!(state.model.artifact.checksum_required);
-        assert!(state
-            .model
-            .checks
-            .iter()
-            .any(|check| check.id == "checksum" && !check.ok));
+        with_clean_first_run_state(|_| {
+            let state = app_state().expect("app state builds");
+            assert_eq!(state.model.display_name, "Gemma 4 12B QAT Q4_0");
+            assert_eq!(state.model.status, "Needs download");
+            assert!(state.model.artifact.checksum_required);
+            assert!(state
+                .model
+                .checks
+                .iter()
+                .any(|check| check.id == "checksum" && !check.ok));
+        });
     }
 
     #[test]

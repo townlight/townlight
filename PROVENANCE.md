@@ -1,4 +1,32 @@
-# CivicSuite Windows Local — Bundled Module Provenance
+# Townlight Records — Bundled Module Provenance
+
+## Records beta.2 candidate provenance
+
+Prepared 2026-10-07. This candidate is not yet signed or published. It installs
+Core, Records, Notice, and Access. The Records domain workflow still executes
+in Rust until the blocking convergence gate passes.
+
+| Module | Repository | Accepted source commit |
+|---|---|---|
+| Townlight Core | townlight/core | `b4d0156bdc6883c1c3ef167abe0379f9ca32b258` |
+| Townlight Records | townlight/sunshine | `ff99d8c7e692ba1f75e1781f517bb54f5c618b48` |
+| Townlight Notice | townlight/notice | `79b8d07199ee77cd425b31c0e0a44f3a0832b810` |
+| Townlight Access | townlight/access | `b9100edc80ca496d6061f1cdb3eb39a60ff5f31a` |
+
+The Records pin advances by one post-transfer cleanup commit from beta.1,
+correcting repository URLs and frontend dependency locks. The source commit
+pins, rather than older module release tags, identify the bundled source.
+
+The public version is `1.1.0-beta.2`; synchronized desktop manifests use
+`1.1.0-2`. The publication lane signs the desktop EXE before MSI packaging and
+then signs the MSI. Its receipt records source commit, run, unsigned/signed
+hashes, and signing identities for both. Independent installed-artifact and
+clean-machine acceptance remain required before publication.
+
+## Historical CivicSuite v1.0.2 provenance
+
+The material below describes the retired predecessor release, not the current
+Records candidate.
 
 **Last updated:** 2026-07-02
 **Scope:** the CivicSuite Windows Local v1.0.2 city-core MSI artifact and the source it bundles.

@@ -104,3 +104,32 @@ def test_public_product_name_changes_without_replacing_installer_identity() -> N
     assert '"upgradeCode": "a63fc1d3-5437-5f55-89a2-fef93fb1f930"' in tauri_config
     assert "Townlight Windows Local MSI build evidence" in workflow
     assert "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930" in workflow
+
+
+def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes() -> None:
+    workflow = _read(BUILD_WORKFLOW)
+    stages = [
+        "run: npm run tauri -- build --no-bundle",
+        "name: Record unsigned executable intake",
+        "name: Sign desktop executable (Azure Artifact Signing)",
+        "name: Verify executable before packaging",
+        "run: npm run tauri -- bundle --bundles msi",
+        "name: Sign MSI (Azure Trusted Signing)",
+        "name: Verify packaged executable and write signing receipt",
+    ]
+    positions = [workflow.index(stage) for stage in stages]
+    assert positions == sorted(positions)
+    assert workflow.count("uses: azure/artifact-signing-action@v2") == 2
+    assert "MSI does not contain the exact signed executable" in workflow
+    assert "Verify installed executable trust and exact bytes" in workflow
+    assert "Installed executable hash differs from packaged evidence" in workflow
+
+
+def test_release_checks_both_artifacts_and_receipt_against_selected_run() -> None:
+    workflow = _read(RELEASE_WORKFLOW)
+    assert "$receipt.source_commit -ne $tagSha" in workflow
+    assert "$receipt.workflow_run -ne [string]$run.databaseId" in workflow
+    assert "verify-publication-signature.ps1 -Path $embedded[0].FullName" in workflow
+    assert "$entries[0].signed_sha256 -ne $sha" in workflow
+    assert "$entries[0].signer_thumbprint -ne $sig.SignerCertificate.Thumbprint" in workflow
+    assert "$receiptFiles[0].FullName --clobber" in workflow

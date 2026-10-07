@@ -379,7 +379,7 @@ for (const phrase of [
   "path: civiccore",
   "ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
   "path: civicrecords-ai",
-  "ref: edf1c8d8078c85baff691030a599b8eef670bca6",
+  "ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48",
   "path: civicnotice",
   "ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810",
   "path: civicaccess",

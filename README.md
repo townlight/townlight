@@ -5,7 +5,7 @@ product at a time.**
 
 ## Current product: Townlight Records
 
-Townlight Records 1.1.0-beta.1 is the active release candidate. It is a Windows
+Townlight Records 1.1.0-beta.2 is the candidate in preparation. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and
@@ -27,12 +27,13 @@ Valley records are independently authored, deterministic, hashed, visibly
 watermarked, and never loaded automatically. No Longmont or Longmont Public
 Media content is redistributed in this fixture.
 
-The release-candidate pipeline is complete through the unsigned MSI lifecycle.
+The predecessor beta.1 signed MSI remains a draft. The replacement beta.2
+pipeline signs the desktop executable before packaging and then signs the MSI.
 The candidate becomes the public beta only after merge to `main`, Authenticode
 signing with the validated individual publisher identity, independent
 signature/hash verification, the full signed clean-machine Records journey,
 and human publication approval. Install only the signed asset attached to the
-[`townlight-records-v1.1.0-beta.1` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.1)
+[`townlight-records-v1.1.0-beta.2` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2)
 once that release exists. See [RELEASING.md](RELEASING.md) and
 [USER-MANUAL.md](USER-MANUAL.md).
 
