@@ -20,6 +20,12 @@ The correction statically links the desktop MSVC CRT and adds actual PE-import
 inspection before signing. The negative gate rejects the defective EXE.
 A replacement must pass that gate, be signed, and complete installed acceptance.
 CI's installed-process survival check alone did not prove a usable app window.
+The follow-up batch also requires an actual Townlight WebView page during CI
+startup and adds an explicit authenticated choice to defer optional AI weights.
+Deferral still requires all prior setup steps and local runtime health checks;
+opting into AI retains checksum and model-readiness requirements. Targeted local
+verification passed 24 first-run tests, the admin authorization test, static
+smoke, and workflow YAML parsing. This is not installed candidate acceptance.
 
 ## Restart work
 

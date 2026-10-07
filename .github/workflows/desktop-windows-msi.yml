@@ -679,14 +679,33 @@ jobs:
           if (-not (Test-Path -LiteralPath $env:TOWNLIGHT_EXE -PathType Leaf)) {
             throw "Installed Townlight executable is missing before launch: $env:TOWNLIGHT_EXE"
           }
-          $process = Start-Process -FilePath $env:TOWNLIGHT_EXE -PassThru
-          Start-Sleep -Seconds 15
-          if ($process.HasExited) {
-            throw "Installed Townlight application exited during launch smoke test with code $($process.ExitCode)."
+          # A loader-error dialog also keeps a process alive. Require the real
+          # installed WebView page, not just process survival.
+          if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) {
+            throw 'Startup proof requires an unused debug port; an existing browser could give false evidence.'
           }
-          Stop-Process -Id $process.Id -Force
-          $process.WaitForExit()
-          Write-Host "Installed Townlight application launched and remained running for the smoke interval."
+          $previousArguments = $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS
+          $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = '--remote-debugging-port=9222'
+          $process = Start-Process -FilePath $env:TOWNLIGHT_EXE -PassThru
+          try {
+            $ready = $false
+            $deadline = (Get-Date).AddSeconds(60)
+            while ((Get-Date) -lt $deadline) {
+              $process.Refresh()
+              if ($process.HasExited) { throw "Installed Townlight exited during startup with code $($process.ExitCode)." }
+              try {
+                $pages = Invoke-RestMethod 'http://127.0.0.1:9222/json/list' -TimeoutSec 2
+                $ready = @($pages | Where-Object { $_.type -eq 'page' -and $_.title -eq 'Townlight' -and $_.webSocketDebuggerUrl }).Count -gt 0
+              } catch { $ready = $false }
+              if ($ready) { break }
+              Start-Sleep -Seconds 1
+            }
+            if (-not $ready) { throw 'Installed Townlight did not open its WebView page within 60 seconds.' }
+            Write-Host 'Installed Townlight WebView page opened. This is startup proof, not full Records acceptance.'
+          } finally {
+            if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force; $process.WaitForExit() }
+            $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = $previousArguments
+          }
 
       - name: Repair the installed Townlight MSI
         shell: pwsh
@@ -704,15 +723,10 @@ jobs:
           }
 
       # ---- FIRST-RUN + BACKUP/RESTORE (verifiable subset) ---------------------
-      # The shipped UI is a Tauri/WebView2 GUI with no headless entry point, so the
-      # interactive first-run wizard and GUI-driven backup/restore cannot be driven
-      # on a hosted runner without a real desktop UI-automation session (this is the
-      # standing QA-B1 clean-VM blocker). What IS verifiable here -- and what the
-      # product's first-run, backup, and restore *logic* actually is -- runs as the
-      # desktop crate's tests against the state-dir isolation hook
-      # (CIVICSUITE_DESKTOP_STATE_DIR), exercised below. This proves the install
-      # produced a working runtime whose lifecycle code passes on this machine,
-      # without claiming a GUI walkthrough that did not happen.
+      # Startup above checks the installed WebView. Tests below compile source
+      # and exercise lifecycle logic with isolated state; they do NOT drive the
+      # installed wizard or prove the complete installed Records journey.
+      # Exact-byte clean-machine acceptance remains a separate release gate.
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -735,7 +749,7 @@ jobs:
         run: |
           # first_run::* and supervisor backup/restore unit+integration tests run
           # against an isolated state dir; this is the headless-feasible proof of
-          # first-run -> backup -> restore behavior for the installed runtime.
+          # first-run -> backup -> restore source logic, not installed UI behavior.
           cargo test first_run -- --nocapture
           cargo test backup -- --nocapture
           cargo test restore -- --nocapture

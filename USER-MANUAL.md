@@ -45,7 +45,8 @@ release.
 4. Create the first Townlight admin and store its passcode in an approved
    password vault.
 5. Sign in as that admin and confirm the backup folder.
-6. Complete System Health. If you will use local-AI features, download, verify,
+6. Choose **Continue without local AI** to defer model weights and complete
+   System Health for Records workflows. If you will use local-AI features, download, verify,
    and start the pinned model through the guided controls.
 7. Finish setup and open Records Requests.
 

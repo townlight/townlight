@@ -819,10 +819,16 @@ if (firstRunStepIds.indexOf("first-admin") > firstRunStepIds.indexOf("model")) {
   throw new Error("Windows first-run setup must create the first local admin before model setup");
 }
 
-for (const action of ["choose-location", "select-modules", "download-model", "create-city-profile", "create-admin", "choose-backup", "verify-health", "open-app", "repair", "backup", "uninstall"]) {
+for (const action of ["choose-location", "select-modules", "download-model", "defer-model", "create-city-profile", "create-admin", "choose-backup", "verify-health", "open-app", "repair", "backup", "uninstall"]) {
   if (!firstRunManifest.actions.includes(action)) {
     throw new Error(`Windows first-run manifest missing action: ${action}`);
   }
+}
+if (!main.includes('data-first-run-action="defer-model"') || !main.includes('Continue without local AI')) {
+  throw new Error("First-run must expose the explicit optional-AI choice");
+}
+if (!desktopMsiWorkflow.includes('/json/list') || !desktopMsiWorkflow.includes("$_.title -eq 'Townlight'")) {
+  throw new Error("Installed launch proof must require the actual Townlight WebView page");
 }
 
 if (modelManifest.local_only !== true) {
