@@ -63,7 +63,7 @@ and restricted to a signed-in Townlight admin.
 
 1. Start with an empty local city-work profile.
 2. Open **Records Requests** on the Staff surface.
-3. Select **Load demo town** and confirm the guided review.
+3. Review the fictional-fixture explanation, then select **Load demo town**.
 4. Verify the persistent synthetic-data banner and watermark.
 
 Townlight creates and verifies a backup before loading, validates the fixture
