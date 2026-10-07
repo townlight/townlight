@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +14,19 @@ RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release-windows-msi.yml"
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def test_records_checkout_pins_match_the_accepted_installer_source() -> None:
+    manifest = json.loads(_read(ROOT / "installer" / "modules.json"))
+    records = next(module for module in manifest["modules"] if module["id"] == "civicrecords-ai")
+    pin = records["source_commit"]
+    for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
+        workflow = _read(path)
+        checkouts = workflow.split("repository: townlight/sunshine")[1:]
+        assert checkouts, f"No Records checkout in {path.name}"
+        for checkout in checkouts:
+            checkout_inputs = checkout.split("\n      - ", 1)[0]
+            assert f"ref: {pin}" in checkout_inputs, path.name
 
 
 def test_routine_ci_builds_a_visibly_unsigned_private_artifact() -> None:
