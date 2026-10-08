@@ -17,8 +17,8 @@ after exact-byte installed acceptance and Scott's completed-package approval.
 
 ## Version contract
 
-The public release version is `1.1.0-beta.2`, and the annotated tag is
-`townlight-records-v1.1.0-beta.2`.
+The public release version is `1.1.0-beta.2`, and the replacement annotated tag is
+`townlight-records-v1.1.0-beta.2-rc.3`. Do not move the original or rc.2 tags.
 
 Windows Installer cannot consume that textual prerelease directly. The
 synchronized build manifests therefore use the MSI-safe prerelease
@@ -78,8 +78,8 @@ identities.
 8. Create an annotated tag at the signed run's exact SHA:
 
    ```powershell
-   git tag -a townlight-records-v1.1.0-beta.2 -m "Townlight Records 1.1.0-beta.2"
-   git push origin townlight-records-v1.1.0-beta.2
+   git tag -a townlight-records-v1.1.0-beta.2-rc.3 <signed-run-head-sha> -m "Townlight Records 1.1.0-beta.2 rc.3"
+   git push origin townlight-records-v1.1.0-beta.2-rc.3
    ```
 
 9. `release-windows-msi.yml` accepts only a successful manual signing run on

@@ -1,4 +1,25 @@
-# CivicSuite Troubleshooting
+# Townlight Troubleshooting
+
+## Townlight Records 1.1.0-beta.2 rc.3
+
+Use the current [Records manual](../USER-MANUAL.md) for installation and setup.
+Earlier beta.2 drafts are not accepted releases. The original beta.2 startup
+defect is corrected by statically linking the desktop CRT; do not install
+unrelated runtime packages to disguise an unaccepted candidate.
+
+If export reports approval is required after response text changes, review the
+new text and approve it explicitly. Failed AI generation does not replace the
+old response or revoke its approval. Assignment, deadline, and other unrelated
+edits do not revoke approval. Historical notes and exports are retained.
+
+Local AI is optional; **Continue without local AI** supports deterministic
+Records setup. Ordinary Windows uninstall preserves municipal data. Use the
+application's backup-first **Prepare Uninstall** only when intentionally
+removing the local profile, and retain the final backup.
+
+## Historical city-core troubleshooting
+
+The older names, versions, and module selections below describe the predecessor.
 
 **Last verified:** 2026-07-02
 

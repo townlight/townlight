@@ -1,114 +1,13 @@
-﻿graph TB
-    subgraph SUITE["GitHub: CivicSuite organization"]
-        SuiteRepo["civicsuite<br/>umbrella repo<br/>governance, compatibility matrix,<br/>spec docs, ADRs"]
-        Core["civiccore<br/>v1.0.1 shared library<br/>migrations + db.Base + llm + shared primitives"]
-    end
-    subgraph PRODUCT["GitHub: CivicSuite organization"]
-        Records["civicrecords-ai<br/>v1.4.10<br/>FOIA / public records app"]
-        Clerk["civicclerk<br/>v1.0.1<br/>meeting management"]
-        Code["civiccode<br/>v0.1.18<br/>municipal code"]
-        Zone["civiczone<br/>v0.1.1<br/>zoning / land use"]
-        Access["civicaccess<br/>v0.1.1<br/>accessibility / language"]
-        Plan["civicplan<br/>v0.1.1<br/>plan policy support"]
-        Permit["civicpermit<br/>v0.1.1<br/>permit intake support"]
-        Inspect["civicinspect<br/>v0.1.1<br/>inspection support"]
-        Grants["civicgrants<br/>v0.1.1<br/>grant support"]
-        Procure["civicprocure<br/>v0.1.1<br/>procurement support"]
-        Contracts["civiccontracts<br/>v0.1.1<br/>contract repository"]
-        Boards["civicboards<br/>v0.1.1<br/>board administration"]
-        Notice["civicnotice<br/>v0.1.1<br/>public notices"]
-        Civic311["civic311<br/>v0.1.1<br/>resident service requests"]
-        Comms["civiccomms<br/>v0.1.1<br/>public communications"]
-        Data["civicdata<br/>v0.1.2<br/>open data bridge"]
-        HR["civichr<br/>v0.1.1<br/>HR policy support"]
-        Budget["civicbudget<br/>v0.1.2<br/>budget narratives"]
-        Legal["civiclegal<br/>v0.1.2<br/>legal records"]
-        Elections["civicelections<br/>v0.1.1<br/>election support"]
-        Utility["civicutility<br/>v0.1.1<br/>utility customer service"]
-        Court["civiccourt<br/>v0.1.2<br/>court clerk support"]
-        Safety["civicsafety<br/>v0.1.1<br/>non-CJIS safety admin"]
-        Library["civiclibrary<br/>v0.1.1<br/>library policy / reference"]
-        Parks["civicparks<br/>v0.1.1<br/>parks / recreation"]
-    end
-    SuiteRepo -.documents.-> Core
-    SuiteRepo -.documents.-> Records
-    SuiteRepo -.governs.-> Clerk
-    SuiteRepo -.governs.-> Code
-    SuiteRepo -.governs.-> Zone
-    SuiteRepo -.governs.-> Access
-    SuiteRepo -.governs.-> Plan
-    SuiteRepo -.governs.-> Permit
-    SuiteRepo -.governs.-> Inspect
-    SuiteRepo -.governs.-> Grants
-    SuiteRepo -.governs.-> Procure
-    SuiteRepo -.governs.-> Contracts
-    SuiteRepo -.governs.-> Boards
-    SuiteRepo -.governs.-> Notice
-    SuiteRepo -.governs.-> Civic311
-    SuiteRepo -.governs.-> Comms
-    SuiteRepo -.governs.-> Data
-    SuiteRepo -.governs.-> HR
-    SuiteRepo -.governs.-> Budget
-    SuiteRepo -.governs.-> Legal
-    SuiteRepo -.governs.-> Elections
-    SuiteRepo -.governs.-> Utility
-    SuiteRepo -.governs.-> Court
-    SuiteRepo -.governs.-> Safety
-    SuiteRepo -.governs.-> Library
-    SuiteRepo -.governs.-> Parks
-    Records -->|"depends on ==0.22.1"| Core
-    Clerk -->|"depends on ==1.0.0"| Core
-    Code -->|"depends on ==0.22.1"| Core
-    Zone -->|"depends on ==0.3.0"| Core
-    Access -->|"depends on ==0.3.0"| Core
-    Plan -->|"depends on ==0.3.0"| Core
-    Permit -->|"depends on ==0.3.0"| Core
-    Inspect -->|"depends on ==0.3.0"| Core
-    Grants -->|"depends on ==0.3.0"| Core
-    Procure -->|"depends on ==0.3.0"| Core
-    Contracts -->|"depends on ==0.3.0"| Core
-    Boards -->|"depends on ==0.3.0"| Core
-    Notice -->|"depends on ==0.3.0"| Core
-    Civic311 -->|"depends on ==0.3.0"| Core
-    Comms -->|"depends on ==0.3.0"| Core
-    Data -->|"depends on ==0.3.0"| Core
-    HR -->|"depends on ==0.3.0"| Core
-    Budget -->|"depends on ==0.3.0"| Core
-    Legal -->|"depends on ==0.3.0"| Core
-    Elections -->|"depends on ==0.3.0"| Core
-    Utility -->|"depends on ==0.3.0"| Core
-    Court -->|"depends on ==0.3.0"| Core
-    Safety -->|"depends on ==0.3.0"| Core
-    Library -->|"depends on ==0.3.0"| Core
-    Parks -->|"depends on ==0.3.0"| Core
-    classDef shipping fill:#d4f4dd,stroke:#3a7a4a,stroke-width:2px,color:#000
-    classDef governance fill:#e1e1ff,stroke:#5a5aa0,stroke-width:2px,color:#000
-    classDef future fill:#fff4e1,stroke:#a08040,stroke-width:1px,stroke-dasharray:5 5,color:#000
-    classDef scaffold fill:#e8f3ff,stroke:#3973a3,stroke-width:1px,color:#000
-    class SuiteRepo governance
-    class Core shipping
-    class Records shipping
-    class Clerk shipping
-    class Code shipping
-    class Zone shipping
-    class Access shipping
-    class Plan shipping
-    class Permit shipping
-    class Inspect shipping
-    class Grants shipping
-    class Procure shipping
-    class Contracts shipping
-    class Boards shipping
-    class Notice shipping
-    class Civic311 shipping
-    class Comms shipping
-    class Data shipping
-    class HR shipping
-    class Budget shipping
-    class Legal shipping
-    class Elections shipping
-    class Utility shipping
-    class Court shipping
-    class Safety shipping
-    class Library shipping
-    class Parks shipping
+flowchart TB
+    UI["Townlight Records 1.1.0-beta.2 rc.3<br/>Windows desktop — candidate, not published"]
+    Domain["Current Records / Notice / Access actions<br/>Rust desktop domain implementation"]
+    State["Versioned city-work.json + local files<br/>Audit history, verified backup/restore"]
+    Review["Changed response text → fresh human approval<br/>Failed generation / unrelated edits preserve approval"]
+    Release["Approved export → fulfillment → public status<br/>No automatic release of AI drafts"]
+    Runtime["Supervised Python/FastAPI + PostgreSQL<br/>Not yet the desktop domain execution path"]
+    AI["Optional local Ollama / verified Gemma<br/>On-device drafting"]
+    UI --> Domain
+    Domain --> State
+    Domain --> Review --> Release
+    UI -. supervises .-> Runtime
+    Domain -. optional generation .-> AI

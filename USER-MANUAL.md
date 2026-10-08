@@ -1,8 +1,8 @@
 # Townlight Records — User Manual
 
-**Candidate version:** 1.1.0-beta.2
+**Candidate version:** 1.1.0-beta.2 (rc.3)
 
-**Last updated:** 2026-10-07
+**Last updated:** 2026-10-08
 
 **Publication status:** release candidate; not yet a published beta
 

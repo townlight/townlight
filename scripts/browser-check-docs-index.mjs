@@ -11,7 +11,7 @@ const viewports = [
   { name: "mobile", width: 390, height: 844 },
 ];
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: process.env.TOWNLIGHT_BROWSER_CHANNEL || undefined });
 const results = [];
 
 async function captureScreenshot(page, screenshot) {
@@ -52,7 +52,7 @@ try {
       .getByRole("heading", { name: "Public-records work that stays accountable and stays local." })
       .isVisible();
     const candidateStatusVisible = await page
-      .getByText("1.1.0-beta.1 · release candidate", { exact: true })
+      .getByText("1.1.0-beta.2 rc.3 · not published", { exact: true })
       .isVisible();
     const productModulesVisible = await Promise.all(
       ["Townlight Core", "Townlight Records", "Townlight Notice", "Townlight Access"].map((name) =>

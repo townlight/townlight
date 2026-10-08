@@ -1,5 +1,14 @@
 # City-Core Windows Local Operator Walkthrough
 
+**Historical city-core walkthrough.** For Townlight Records 1.1.0-beta.2
+(rc.3), use the current [Townlight Records manual](../../USER-MANUAL.md).
+Fresh Records setup includes Core, Records, Notice, and Access, not Meetings
+or Code. Successfully replacing response text requires fresh approval;
+failed generation and unrelated edits do not revoke approval. Use the exact
+signed installer identified by completed release evidence after publication
+approval. The older module versions and city-core selection below are retained
+as historical predecessor guidance, not current candidate instructions.
+
 This walkthrough is for a city clerk, city employee, or local IT helper installing the Windows Local city-core package on one Windows workstation.
 
 The clerk path does not require Docker, WSL, a terminal, or a developer account. Legacy archive runners and Docker-based lifecycle scripts remain CI/developer proof tools, not the end-user installation path.

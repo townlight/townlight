@@ -5,7 +5,7 @@ product at a time.**
 
 ## Current product: Townlight Records
 
-Townlight Records 1.1.0-beta.2 is the candidate in preparation. It is a Windows
+Townlight Records 1.1.0-beta.2 (rc.3) is the candidate in preparation. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and
@@ -33,8 +33,13 @@ The candidate becomes the public beta only after merge to `main`, Authenticode
 signing with the validated individual publisher identity, independent
 signature/hash verification, the full signed clean-machine Records journey,
 and human publication approval. Install only the signed asset attached to the
-[`townlight-records-v1.1.0-beta.2` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2)
-once that release exists. See [RELEASING.md](RELEASING.md) and
+[`townlight-records-v1.1.0-beta.2-rc.3` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3)
+only after it is published with completed acceptance evidence. Earlier beta.2
+drafts remain preserved, not accepted for publication. Saving or successfully
+generating different response text requires fresh human approval before export.
+Failed generation, identical-text saves, and unrelated request edits preserve
+approval; historical approval notes and exported files remain intact.
+See [RELEASING.md](RELEASING.md) and
 [USER-MANUAL.md](USER-MANUAL.md).
 
 ### Architecture truth
