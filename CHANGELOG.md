@@ -13,8 +13,9 @@ All notable changes to the Townlight umbrella repo are documented here.
   Core + Records + Notice + Access profile.
 - Earlier beta.2 drafts and their evidence are preserved, not promoted.
   The replacement tag is `townlight-records-v1.1.0-beta.2-rc.3`; MSI metadata
-  remains `1.1.0-2` / ProductVersion `1.1.0.2`. Publication awaits exact signed
-  installer acceptance and Scott's explicit approval.
+  remains `1.1.0-2` / ProductVersion `1.1.0.2`. Exact signed installer
+  [acceptance passed](docs/installer/townlight-records-beta2-rc3-acceptance.md);
+  publication awaits Scott's explicit approval.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
