@@ -21,7 +21,12 @@ the signed MSI and its evidence file.
 
 The original `townlight-records-v1.1.0-beta.2` draft failed clean-machine
 startup acceptance and must not be used. Its replacement candidate uses
-`townlight-records-v1.1.0-beta.2-rc.2` to preserve the rejected tag and evidence.
+`townlight-records-v1.1.0-beta.2-rc.3` to preserve earlier tags and evidence.
+The rc.2 draft is dormant: replacing an approved response's text could retain
+the earlier approval. The replacement requires fresh approval when manual or
+AI response text changes. Failed generation, identical-text saves, and unrelated
+request edits do not revoke the existing approval. Historical notes and files
+remain preserved.
 Neither a draft nor a release-candidate tag alone proves acceptance; use only
 the installer identified in the published release's completed acceptance record.
 
