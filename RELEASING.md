@@ -5,7 +5,10 @@ This is the fail-closed release path for a tag such as
 
 The first beta.2 draft failed clean-machine startup acceptance. Preserve its
 tag and artifact evidence; do not move the tag or replace its bytes silently.
-The corrected beta.2 candidate uses `townlight-records-v1.1.0-beta.2-rc.2` at
+The rc.2 draft passed startup and upgrade but failed renewed human-approval
+acceptance: editing or regenerating an approved response retained stale approval.
+Preserve that draft and its evidence; it is not approved for publication.
+The corrected beta.2 candidate uses `townlight-records-v1.1.0-beta.2-rc.3` at
 its exact signed source SHA. This candidate suffix does not change the
 public beta version or the MSI-safe `1.1.0-2` mapping below. Substitute that
 replacement tag in the tagging and draft-staging commands; publish only

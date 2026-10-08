@@ -203,6 +203,11 @@ test("Townlight Records beta completes the fictional request-to-release journey"
               language: args.payload.language,
               has_alt_text: args.payload.hasAltText
             });
+          } else if (action === "suggest-records-response") {
+            // UI adapter contract only; real model inference is installed acceptance.
+            active.response_draft = "Synthetic adapter-generated draft for human editing.";
+            active.approved_at_unix_seconds = null;
+            active.status = "local AI draft ready for review";
           } else if (action === "draft-records-response") {
             active.response_draft = args.payload.responseDraft;
             active.status = "drafted";
@@ -302,6 +307,9 @@ test("Townlight Records beta completes the fictional request-to-release journey"
   await expect(page.getByText("No findings (advisory)")).toBeVisible();
 
   await primaryNav.getByRole("button", { name: /Records Requests/ }).click();
+  await confirmWorkAction(page, "Generate Local AI Draft", "Generate Draft");
+  await expect(page.locator('[data-work-field="responseDraft"]'))
+    .toHaveValue("Synthetic adapter-generated draft for human editing.");
   await page.getByLabel("Response draft").fill("Attached is the approved fictional response with its cited source.");
   await page.getByRole("button", { name: "Save Draft", exact: true }).click();
   await page.getByLabel("Approval note").fill("Human-reviewed for release and accessibility.");
@@ -336,6 +344,7 @@ test("Townlight Records beta completes the fictional request-to-release journey"
     "record-records-search-session",
     "add-records-exemption-decision",
     "accessibility-review",
+    "suggest-records-response",
     "draft-records-response",
     "approve-records-response",
     "build-records-release-package",

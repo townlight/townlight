@@ -6765,6 +6765,12 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     state.workActionResult = result;
     state.app.city_work = result.state;
     syncWorkSelectionAfterAction(action, result.state, previousWork);
+    if (action === "suggest-records-response" && result.accepted) {
+      const generatedRequest = (result.state.records_requests || []).find((request) => request.id === payload.recordsRequestId);
+      if (generatedRequest && currentRecordsRequest(result.state)?.id === generatedRequest.id) {
+        state.workDraft.responseDraft = generatedRequest.response_draft || "";
+      }
+    }
     state.searchResults = result.search_results || [];
     if (action === "submit-public-records-request") {
       const trackingNumber = String(result.message || "").match(/\bREQ-\d+\b/)?.[0] || "";

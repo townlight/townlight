@@ -565,6 +565,14 @@ pub struct RecordsRequest {
     pub deadline_reviewed_at_unix_seconds: Option<u64>,
     #[serde(default)]
     pub approved_at_unix_seconds: Option<u64>,
+    // Legacy requests deserialize at revision zero. Historical artifacts remain
+    // available, but cannot fulfill a subsequently changed response revision.
+    #[serde(default)]
+    pub release_revision: u64,
+    #[serde(default)]
+    pub exported_revision: u64,
+    #[serde(default)]
+    pub packaged_revision: u64,
     #[serde(default)]
     pub fulfilled_at_unix_seconds: Option<u64>,
     #[serde(default)]
@@ -1194,6 +1202,9 @@ fn load_demo_town(state: &mut CityWorkState) -> Result<String, String> {
         documents: Vec::new(),
         deadline_reviewed_at_unix_seconds: None,
         approved_at_unix_seconds: None,
+        release_revision: 0,
+        exported_revision: 0,
+        packaged_revision: 0,
         fulfilled_at_unix_seconds: None,
         closed_at_unix_seconds: None,
         created_at_unix_seconds: loaded_at,
@@ -2225,6 +2236,21 @@ fn ensure_records_request_active(request: &RecordsRequest) -> Result<(), String>
             "This records request has already been fulfilled. Close it or create a new request."
                 .to_string(),
         );
+    }
+    Ok(())
+}
+
+fn invalidate_records_release(request: &mut RecordsRequest) -> Result<(), String> {
+    request.release_revision = request
+        .release_revision
+        .checked_add(1)
+        .ok_or_else(|| "Records response revision limit reached.".to_string())?;
+    request.approved_at_unix_seconds = None;
+    if matches!(
+        request.status.as_str(),
+        "approved" | "response package exported" | "release package built"
+    ) {
+        request.status = "needs renewed human approval".to_string();
     }
     Ok(())
 }
@@ -5069,6 +5095,9 @@ fn create_records_request(
             documents: Vec::new(),
             deadline_reviewed_at_unix_seconds: Some(now_unix_seconds()),
             approved_at_unix_seconds: None,
+            release_revision: 0,
+            exported_revision: 0,
+            packaged_revision: 0,
             fulfilled_at_unix_seconds: None,
             closed_at_unix_seconds: None,
             created_at_unix_seconds: now_unix_seconds(),
@@ -5153,6 +5182,9 @@ fn submit_public_records_request(
             documents: Vec::new(),
             deadline_reviewed_at_unix_seconds: None,
             approved_at_unix_seconds: None,
+            release_revision: 0,
+            exported_revision: 0,
+            packaged_revision: 0,
             fulfilled_at_unix_seconds: None,
             closed_at_unix_seconds: None,
             created_at_unix_seconds: now_unix_seconds(),
@@ -5476,6 +5508,7 @@ fn add_public_records_message(
         };
         request.messages.push(message);
         request.status = "requester message received".to_string();
+        invalidate_records_release(request)?;
         push_records_timeline(
             request,
             "requester message received",
@@ -6343,6 +6376,7 @@ fn build_records_release_package(
         created_at_unix_seconds: now_unix_seconds(),
     };
     request.release_packages.push(package);
+    request.packaged_revision = request.release_revision;
     request.status = "release package built".to_string();
     push_records_timeline(
         request,
@@ -6460,6 +6494,7 @@ fn export_records_response(
     );
     let export_path = write_export_file("records", &request.requester, &contents)?;
     request.exports.push(export_path.clone());
+    request.exported_revision = request.release_revision;
     request.status = "response package exported".to_string();
     push_records_timeline(
         request,
@@ -6519,6 +6554,17 @@ fn fulfill_records_request(
         }
         if request.release_packages.is_empty() {
             return Err("Build the records release package before fulfillment.".to_string());
+        }
+        if request.exported_revision != request.release_revision {
+            return Err(
+                "Export the newly approved response revision before fulfillment.".to_string(),
+            );
+        }
+        if request.packaged_revision != request.release_revision {
+            return Err(
+                "Rebuild the release package for the current response revision before fulfillment."
+                    .to_string(),
+            );
         }
         request.fulfilled_at_unix_seconds = Some(now_unix_seconds());
         request.status = "fulfilled".to_string();
@@ -9099,6 +9145,31 @@ pub fn city_work_action(
         }
         _ => return Err(format!("Unsupported city workflow action: {action}")),
     };
+    // Approval covers the reviewed content, not the request forever. Only
+    // successful edits reach this point; failed generation leaves approval and
+    // artifact references untouched. Historical exports are never deleted.
+    if matches!(
+        action,
+        "set-records-deadline"
+            | "calculate-records-deadline"
+            | "request-records-clarification"
+            | "add-records-message"
+            | "assign-records-request"
+            | "record-records-search"
+            | "record-records-search-session"
+            | "add-records-document"
+            | "add-records-release-copy"
+            | "add-records-exemption-review"
+            | "add-records-exemption-decision"
+            | "estimate-records-fee"
+            | "add-records-fee-line"
+            | "waive-records-fee"
+            | "suggest-records-response"
+            | "draft-records-response"
+    ) {
+        let request = selected_record_mut(&mut state, payload)?;
+        invalidate_records_release(request)?;
+    }
     write_state(&state)?;
     if action == "load-demo-town" {
         state = verify_or_restore_demo_state(
@@ -12277,6 +12348,143 @@ mod tests {
     }
 
     #[test]
+    fn records_revisions_require_fresh_approval_exports_and_packages() {
+        with_temp_state_dir(|_| {
+            city_work_action(
+                "create-records-request",
+                Some(&serde_json::json!({
+                    "requester": "Synthetic revision test", "summary": "Fictional park records",
+                    "deadline": "2026-10-16"
+                })),
+            )
+            .expect("create");
+            city_work_action("record-records-search-session", Some(&serde_json::json!({
+                "searchQuery": "fictional park", "searchLocations": "synthetic archive",
+                "searchResultTitle": "Synthetic list", "searchResultCitation": "TEST-001",
+                "searchResultSummary": "Fictional responsive list", "searchResultStatus": "responsive",
+                "searchReviewer": "Synthetic reviewer"
+            }))).expect("search");
+            city_work_action("add-records-exemption-decision", Some(&serde_json::json!({
+                "exemptionSource": "TEST-001", "exemptionKind": "none",
+                "exemptionFinding": "Fictional list is releasable", "exemptionDecision": "release",
+                "exemptionBasis": "Synthetic policy", "exemptionReviewer": "Synthetic reviewer"
+            }))).expect("decision");
+            city_work_action(
+                "draft-records-response",
+                Some(&serde_json::json!({
+                    "responseDraft": "Original human-reviewed response", "citation": "TEST-001"
+                })),
+            )
+            .expect("draft");
+            city_work_action("approve-records-response", None).expect("approve");
+            city_work_action("build-records-release-package", None).expect("package");
+            city_work_action("export-records-response", None).expect("export");
+            let baseline = city_work_state().expect("baseline");
+            let historical_path = baseline.records_requests[0].exports[0].clone();
+            let historical_bytes = fs::read(&historical_path).expect("historical export");
+            for (action, payload) in [
+                (
+                    "draft-records-response",
+                    Some(serde_json::json!({"responseDraft": "Changed human draft"})),
+                ),
+                ("suggest-records-response", None),
+                (
+                    "record-records-search",
+                    Some(serde_json::json!({"sourceNote": "New evidence", "citation": "TEST-002"})),
+                ),
+                (
+                    "estimate-records-fee",
+                    Some(serde_json::json!({"feeEstimate": "$20 synthetic estimate"})),
+                ),
+            ] {
+                write_state(&baseline).expect("reset saved baseline");
+                env::set_var(
+                    "CIVICSUITE_FAKE_MODEL_RESPONSE",
+                    "Changed AI draft for human review",
+                );
+                let result = city_work_action(action, payload.as_ref());
+                env::remove_var("CIVICSUITE_FAKE_MODEL_RESPONSE");
+                result.expect("successful content change");
+                let changed = city_work_state().expect("changed state");
+                assert!(
+                    changed.records_requests[0]
+                        .approved_at_unix_seconds
+                        .is_none(),
+                    "{action}"
+                );
+                assert_eq!(
+                    changed.records_requests[0].release_revision,
+                    baseline.records_requests[0].release_revision + 1
+                );
+                assert!(city_work_action("export-records-response", None).is_err());
+                assert!(city_work_action("fulfill-records-request", None).is_err());
+                assert_eq!(
+                    fs::read(&historical_path).expect("historical retained"),
+                    historical_bytes
+                );
+                city_work_action("approve-records-response", None).expect("fresh human approval");
+                let error = city_work_action("fulfill-records-request", None)
+                    .err()
+                    .expect("stale export rejected");
+                assert!(error.contains("newly approved response revision"));
+                city_work_action("export-records-response", None).expect("fresh export");
+                let error = city_work_action("fulfill-records-request", None)
+                    .err()
+                    .expect("stale package rejected");
+                assert!(error.contains("current response revision"));
+                city_work_action("build-records-release-package", None).expect("fresh package");
+                city_work_action("fulfill-records-request", None)
+                    .expect("fresh release can fulfill");
+            }
+            // Legacy on-disk requests retain historical approvals/artifact
+            // references at revision zero until a successful content edit.
+            let mut legacy =
+                serde_json::to_value(&baseline.records_requests[0]).expect("serialize");
+            for field in ["release_revision", "exported_revision", "packaged_revision"] {
+                legacy
+                    .as_object_mut()
+                    .expect("request object")
+                    .remove(field);
+            }
+            let restored: RecordsRequest = serde_json::from_value(legacy).expect("legacy request");
+            assert_eq!(restored.release_revision, 0);
+            assert_eq!(restored.exported_revision, 0);
+            assert_eq!(restored.packaged_revision, 0);
+            assert_eq!(restored.exports, baseline.records_requests[0].exports);
+            assert!(restored.approved_at_unix_seconds.is_some());
+        });
+    }
+
+    #[test]
+    fn records_failed_generation_preserves_prior_approval_and_revision() {
+        with_temp_state_dir(|_| {
+            city_work_action("create-records-request", Some(&serde_json::json!({
+                "requester": "Synthetic unavailable AI", "summary": "Fictional records", "deadline": "2026-10-16"
+            }))).expect("create");
+            city_work_action(
+                "draft-records-response",
+                Some(&serde_json::json!({
+                    "responseDraft": "Previously approved human response", "citation": "TEST-001"
+                })),
+            )
+            .expect("draft");
+            city_work_action("approve-records-response", None).expect("approve");
+            let before =
+                serde_json::to_value(city_work_state().expect("before")).expect("serialize before");
+            env::set_var(
+                "CIVICSUITE_FAKE_MODEL_ERROR",
+                "Synthetic model failure after readiness",
+            );
+            let result = city_work_action("suggest-records-response", None);
+            env::remove_var("CIVICSUITE_FAKE_MODEL_ERROR");
+            assert!(result.is_err());
+            let after =
+                serde_json::to_value(city_work_state().expect("after")).expect("serialize after");
+            assert_eq!(before, after);
+        });
+    }
+
+    #[test]
     fn records_workflow_requires_human_approval_before_release() {
         with_temp_state_dir(|root| {
             let payload = serde_json::json!({
@@ -12398,7 +12606,6 @@ mod tests {
             };
             assert!(error.contains("Approve the records response"));
             let approval = serde_json::json!({ "approvalNote": "Reviewed and approved by clerk." });
-            city_work_action("approve-records-response", Some(&approval)).expect("approved");
             let package_without_release_copy =
                 match city_work_action("build-records-release-package", None) {
                     Ok(_) => panic!("release package cannot build without redacted release copy"),
@@ -12419,6 +12626,8 @@ mod tests {
             });
             city_work_action("add-records-release-copy", Some(&release_copy))
                 .expect("redacted copy attached");
+            city_work_action("approve-records-response", Some(&approval))
+                .expect("approve after reviewing the newly attached release copy");
             city_work_action("build-records-release-package", None).expect("release package built");
             city_work_action("export-records-response", None).expect("export saved");
             city_work_action("fulfill-records-request", None).expect("fulfilled");
