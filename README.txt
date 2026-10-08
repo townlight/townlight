@@ -5,7 +5,7 @@ product at a time.**
 
 ## Current product: Townlight Records
 
-Townlight Records 1.1.0-beta.2 (rc.3) is the candidate in preparation. It is a Windows
+Townlight Records 1.1.0-beta.2 (rc.3) is the signed, installed-tested candidate. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and

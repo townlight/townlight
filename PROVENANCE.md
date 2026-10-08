@@ -9,8 +9,8 @@ in Rust until the blocking convergence gate passes.
 The signed candidate source is `22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`,
 from merged [PR #256](https://github.com/townlight/townlight/pull/256). Signing run
 [37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
-must pass and match the independent signature, receipt, and installed acceptance
-record before publication approval. The replacement tag is
+passed and matches the independent signature, receipt, and installed acceptance
+[record](docs/installer/townlight-records-beta2-rc3-acceptance.md). Publication still requires the project owner's approval. The replacement tag is
 `townlight-records-v1.1.0-beta.2-rc.3`; earlier drafts and tags are preserved.
 Documentation-only follow-up commits do not change this signed source or bytes.
 
@@ -29,7 +29,7 @@ The public version is `1.1.0-beta.2`; synchronized desktop manifests use
 `1.1.0-2`. The publication lane signs the desktop EXE before MSI packaging and
 then signs the MSI. Its receipt records source commit, run, unsigned/signed
 hashes, and signing identities for both. Independent installed-artifact and
-clean-machine acceptance remain required before publication.
+clean-machine acceptance passed on these exact bytes; publication approval remains required.
 
 ## Historical CivicSuite v1.0.2 provenance
 
