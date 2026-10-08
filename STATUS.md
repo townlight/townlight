@@ -27,6 +27,16 @@ opting into AI retains checksum and model-readiness requirements. Targeted local
 verification passed 24 first-run tests, the admin authorization test, static
 smoke, and workflow YAML parsing. This is not installed candidate acceptance.
 
+Combined run [37702668762](https://github.com/townlight/townlight/actions/runs/37702668762)
+passed real-runtime integration, the MSI build, 200 Rust tests, browser tests,
+and the actual EXE import gate. MSI installation passed, but the installed
+WebView probe timed out. The install log confirms WebView2 153 is present.
+Microsoft documents that elevated WebView2 150+ hosts ignore environment-only
+debug switches; the revised probe uses an app-specific HKLM policy on the
+disposable runner and restores it afterward. The real page-readiness gate is
+unchanged. A stale source-contract assertion is corrected in the same batch.
+This harness diagnosis still requires confirmation from the next CI run.
+
 ## Restart work
 
 The beta.2 changes sign the desktop executable before MSI bundling and then

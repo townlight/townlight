@@ -686,8 +686,22 @@ jobs:
           }
           $previousArguments = $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS
           $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = '--remote-debugging-port=9222'
-          $process = Start-Process -FilePath $env:TOWNLIGHT_EXE -PassThru
+          # WebView2 150+ ignores WEBVIEW2_* environment switches in elevated
+          # hosts. Use the supported HKLM policy only for this test executable
+          # on the disposable runner; preserve and restore any prior value.
+          $debugPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments'
+          $debugAppName = Split-Path -Leaf $env:TOWNLIGHT_EXE
+          $priorKey = Get-Item -LiteralPath $debugPolicy -ErrorAction SilentlyContinue
+          $hadDebugPolicy = $priorKey -and $priorKey.GetValueNames() -contains $debugAppName
+          if ($hadDebugPolicy) {
+            $priorDebugValue = $priorKey.GetValue($debugAppName)
+            $priorDebugKind = $priorKey.GetValueKind($debugAppName)
+          }
+          $process = $null
           try {
+            New-Item -Path $debugPolicy -Force | Out-Null
+            New-ItemProperty -LiteralPath $debugPolicy -Name $debugAppName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
+            $process = Start-Process -FilePath $env:TOWNLIGHT_EXE -PassThru
             $ready = $false
             $deadline = (Get-Date).AddSeconds(60)
             while ((Get-Date) -lt $deadline) {
@@ -700,10 +714,21 @@ jobs:
               if ($ready) { break }
               Start-Sleep -Seconds 1
             }
-            if (-not $ready) { throw 'Installed Townlight did not open its WebView page within 60 seconds.' }
+            if (-not $ready) {
+              $process.Refresh()
+              Write-Host "Startup diagnostic: PID=$($process.Id) Window=$($process.MainWindowTitle) Responding=$($process.Responding)"
+              Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table
+              Get-CimInstance Win32_Process -Filter "name = 'msedgewebview2.exe'" | Select-Object ProcessId,ParentProcessId,ExecutablePath | Format-Table
+              throw 'Installed Townlight did not open its WebView page within 60 seconds.'
+            }
             Write-Host 'Installed Townlight WebView page opened. This is startup proof, not full Records acceptance.'
           } finally {
-            if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force; $process.WaitForExit() }
+            if ($process -and -not $process.HasExited) { Stop-Process -Id $process.Id -Force; $process.WaitForExit() }
+            if ($hadDebugPolicy) {
+              (Get-Item -LiteralPath $debugPolicy).SetValue($debugAppName, $priorDebugValue, $priorDebugKind)
+            } else {
+              Remove-ItemProperty -LiteralPath $debugPolicy -Name $debugAppName -ErrorAction SilentlyContinue
+            }
             $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = $previousArguments
           }
 
