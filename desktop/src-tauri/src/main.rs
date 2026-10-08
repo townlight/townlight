@@ -368,6 +368,7 @@ fn first_run_action_requires_admin_after_setup(action: &str) -> bool {
         "choose-location"
             | "select-modules"
             | "download-model"
+            | "defer-model"
             | "create-city-profile"
             | "create-admin"
             | "choose-backup"
@@ -1505,6 +1506,12 @@ mod tests {
                 .contains("Sign in as the Townlight admin"));
 
             let signed_out_result = first_run_action_authorized("backup".to_string(), None, None);
+            let signed_out_deferral = first_run_action_authorized(
+                "defer-model".to_string(),
+                Some("model".to_string()),
+                None,
+            );
+            assert!(signed_out_deferral.is_err());
 
             assert!(signed_out_result.is_err());
             assert!(signed_out_result

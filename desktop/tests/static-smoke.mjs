@@ -12,6 +12,13 @@ const desktopPackageLockJson = JSON.parse(readFileSync(join(root, "package-lock.
 const cargoToml = readFileSync(join(root, "src-tauri", "Cargo.toml"), "utf8");
 const cargoLock = readFileSync(join(root, "src-tauri", "Cargo.lock"), "utf8");
 const desktopMsiWorkflow = readFileSync(join(root, "..", ".github", "workflows", "desktop-windows-msi.yml"), "utf8");
+const cargoConfig = readFileSync(join(root, ".cargo", "config.toml"), "utf8");
+if (!cargoConfig.includes('[target.x86_64-pc-windows-msvc]') || !cargoConfig.includes('target-feature=+crt-static')) {
+  throw new Error('Windows desktop must statically link the CRT for clean-machine startup');
+}
+if (!desktopMsiWorkflow.includes('verify-desktop-runtime.ps1')) {
+  throw new Error('Packaging must inspect actual desktop imports before signing');
+}
 const rustMain = readFileSync(join(root, "src-tauri", "src", "main.rs"), "utf8");
 const authRust = readFileSync(join(root, "src-tauri", "src", "auth.rs"), "utf8");
 const moduleRegistryRust = readFileSync(join(root, "src-tauri", "src", "module_registry.rs"), "utf8");
@@ -812,10 +819,16 @@ if (firstRunStepIds.indexOf("first-admin") > firstRunStepIds.indexOf("model")) {
   throw new Error("Windows first-run setup must create the first local admin before model setup");
 }
 
-for (const action of ["choose-location", "select-modules", "download-model", "create-city-profile", "create-admin", "choose-backup", "verify-health", "open-app", "repair", "backup", "uninstall"]) {
+for (const action of ["choose-location", "select-modules", "download-model", "defer-model", "create-city-profile", "create-admin", "choose-backup", "verify-health", "open-app", "repair", "backup", "uninstall"]) {
   if (!firstRunManifest.actions.includes(action)) {
     throw new Error(`Windows first-run manifest missing action: ${action}`);
   }
+}
+if (!main.includes('data-first-run-action="defer-model"') || !main.includes('Continue without local AI')) {
+  throw new Error("First-run must expose the explicit optional-AI choice");
+}
+if (!desktopMsiWorkflow.includes('/json/list') || !desktopMsiWorkflow.includes("$_.title -eq 'Townlight'")) {
+  throw new Error("Installed launch proof must require the actual Townlight WebView page");
 }
 
 if (modelManifest.local_only !== true) {

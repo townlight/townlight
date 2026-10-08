@@ -240,7 +240,7 @@ const fallbackState = {
       data_root: "%LOCALAPPDATA%\\Townlight\\Data",
       backup_root: "%USERPROFILE%\\Documents\\Townlight Backups"
     },
-    available_actions: ["choose-location", "select-modules", "create-city-profile", "create-admin", "choose-backup", "download-model", "verify-health", "open-app", "repair", "backup", "uninstall"],
+    available_actions: ["choose-location", "select-modules", "create-city-profile", "create-admin", "choose-backup", "download-model", "defer-model", "verify-health", "open-app", "repair", "backup", "uninstall"],
     steps: [
       {
         id: "locations",
@@ -1362,7 +1362,7 @@ function renderSetupFields(step, actionLocked = false) {
     return `
       <div class="setup-note" aria-label="Model download expectation">
         <p>The local AI weights are a one-time ${escapeHtml(size)} download (about 15-60+ minutes depending on your internet connection).</p>
-        <p>You can keep using setup while it runs, and the download resumes from where it left off if it is interrupted.</p>
+        <p>Choose Continue without local AI to use Records without this download. You can configure AI later; interrupted downloads resume where they left off.</p>
       </div>
     `;
   }
@@ -1408,6 +1408,7 @@ function renderFirstRunStep(step, index) {
             <button type="button" class="primary-action" data-first-run-action="${step.action}" data-step-id="${step.id}" ${actionLocked ? "disabled" : ""}>
               ${setupActionLabel(step)}
             </button>
+            ${step.id === "model" ? `<button type="button" data-first-run-action="defer-model" data-step-id="model" ${actionLocked ? "disabled" : ""}>Continue without local AI</button>` : ""}
             ${adminLockMessage ? `<small>${adminLockMessage}</small>` : ""}
             ${moduleSelectionLocked ? `<small>Select at least one ready product module for a custom profile.</small>` : ""}
           </div>

@@ -24,13 +24,14 @@ const REQUIRED_STEP_IDS: [&str; 8] = [
     "health",
     "finish",
 ];
-const REQUIRED_ACTIONS: [&str; 11] = [
+const REQUIRED_ACTIONS: [&str; 12] = [
     "choose-location",
     "select-modules",
     "create-city-profile",
     "create-admin",
     "choose-backup",
     "download-model",
+    "defer-model",
     "verify-health",
     "open-app",
     "repair",
@@ -135,6 +136,8 @@ pub struct FirstRunActionResult {
 
 #[derive(Deserialize, Serialize, Default)]
 struct FirstRunProgress {
+    #[serde(default)]
+    local_ai_deferred: bool,
     completed_step_ids: Vec<String>,
     last_action: Option<String>,
     last_updated_unix_seconds: u64,
@@ -695,7 +698,7 @@ pub fn first_run_action(
         .iter()
         .find(|candidate| candidate.id == target_step_id)
         .ok_or_else(|| format!("Unknown first-run step: {target_step_id}"))?;
-    if step.action != action {
+    if step.action != action && !(step.id == "model" && action == "defer-model") {
         return Err(format!(
             "Step {} expects action {}, not {action}",
             step.id, step.action
@@ -717,7 +720,16 @@ pub fn first_run_action(
     }
 
     let mut action_completion: Option<(&'static str, String, String)> = None;
+    if action == "defer-model" {
+        progress.local_ai_deferred = true;
+        action_completion = Some((
+            "Deferred",
+            "Local AI is optional. Records workflows remain available without downloading or loading model weights.".to_string(),
+            "Continue to health verification. Local AI can be configured later.".to_string(),
+        ));
+    }
     if action == "download-model" {
+        progress.local_ai_deferred = false;
         if model::local_model_artifact_verified()? {
             action_completion = Some((
                 "Verified",
@@ -753,7 +765,7 @@ pub fn first_run_action(
         ));
     }
     if action == "verify-health" {
-        if !model::local_model_artifact_verified()? {
+        if !progress.local_ai_deferred && !model::local_model_artifact_verified()? {
             return Ok(FirstRunActionResult {
                 accepted: false,
                 action: action.to_string(),
@@ -777,19 +789,29 @@ pub fn first_run_action(
                 next_action: bootstrap.next_action,
             });
         }
-        let model_load = model::model_action("load-runtime-model")?;
-        if !model_load.accepted {
-            return Ok(FirstRunActionResult {
-                accepted: false,
-                action: action.to_string(),
-                step_id: Some(target_step_id),
-                status: model_load.status,
-                message: model_load.message,
-                next_action: model_load.next_action,
-            });
-        }
-        if !model::local_model_ready()? {
-            return Ok(FirstRunActionResult {
+        if progress.local_ai_deferred {
+            action_completion = Some((
+                "Ready",
+                format!(
+                    "{} Local AI remains deferred; no model weights were loaded.",
+                    bootstrap.message
+                ),
+                "Continue to finish setup.".to_string(),
+            ));
+        } else {
+            let model_load = model::model_action("load-runtime-model")?;
+            if !model_load.accepted {
+                return Ok(FirstRunActionResult {
+                    accepted: false,
+                    action: action.to_string(),
+                    step_id: Some(target_step_id),
+                    status: model_load.status,
+                    message: model_load.message,
+                    next_action: model_load.next_action,
+                });
+            }
+            if !model::local_model_ready()? {
+                return Ok(FirstRunActionResult {
                 accepted: false,
                 action: action.to_string(),
                 step_id: Some(target_step_id),
@@ -801,12 +823,13 @@ pub fn first_run_action(
                     "Use Local AI model setup to verify the file, start Ollama, and load the pinned model before final health verification."
                         .to_string(),
             });
+            }
+            action_completion = Some((
+                "Ready",
+                format!("{} {}", bootstrap.message, model_load.message),
+                "Continue to finish setup.".to_string(),
+            ));
         }
-        action_completion = Some((
-            "Ready",
-            format!("{} {}", bootstrap.message, model_load.message),
-            "Continue to finish setup.".to_string(),
-        ));
     }
     if action == "open-app" {
         action_completion = Some((
@@ -843,7 +866,8 @@ pub fn first_run_action(
         },
         "create-city-profile" => persist_city_profile(payload)?,
         "create-admin" => persist_first_admin(payload)?,
-        "download-model" | "verify-health" | "open-app" | "repair" | "backup" | "uninstall" => {}
+        "download-model" | "defer-model" | "verify-health" | "open-app" | "repair" | "backup"
+        | "uninstall" => {}
         _ => {
             return Err(format!(
                 "First-run action {action} has no desktop executor yet"
@@ -884,6 +908,7 @@ mod tests {
 
     fn mark_setup_ready_for_first_admin_step() {
         write_progress(&FirstRunProgress {
+            local_ai_deferred: false,
             completed_step_ids: vec![
                 "locations".to_string(),
                 "modules".to_string(),
@@ -897,6 +922,7 @@ mod tests {
 
     fn mark_setup_ready_for_city_profile_step() {
         write_progress(&FirstRunProgress {
+            local_ai_deferred: false,
             completed_step_ids: vec!["locations".to_string(), "modules".to_string()],
             last_action: Some("select-modules".to_string()),
             last_updated_unix_seconds: now_unix_seconds(),
@@ -906,6 +932,7 @@ mod tests {
 
     fn mark_setup_ready_for_module_step() {
         write_progress(&FirstRunProgress {
+            local_ai_deferred: false,
             completed_step_ids: vec!["locations".to_string()],
             last_action: Some("choose-location".to_string()),
             last_updated_unix_seconds: now_unix_seconds(),
@@ -915,6 +942,7 @@ mod tests {
 
     fn mark_setup_ready_for_model_step() {
         write_progress(&FirstRunProgress {
+            local_ai_deferred: false,
             completed_step_ids: vec![
                 "locations".to_string(),
                 "modules".to_string(),
@@ -930,6 +958,7 @@ mod tests {
 
     fn mark_setup_ready_for_health_step() {
         write_progress(&FirstRunProgress {
+            local_ai_deferred: false,
             completed_step_ids: vec![
                 "locations".to_string(),
                 "modules".to_string(),
@@ -1018,6 +1047,7 @@ mod tests {
                 .map(|step| step.id.clone())
                 .collect::<Vec<_>>();
             write_progress(&FirstRunProgress {
+                local_ai_deferred: false,
                 completed_step_ids,
                 last_action: Some("verify-health".to_string()),
                 last_updated_unix_seconds: now_unix_seconds(),
@@ -1088,6 +1118,49 @@ mod tests {
                 .steps
                 .iter()
                 .any(|step| step.id == "model" && step.completed));
+        });
+    }
+
+    #[test]
+    fn legacy_progress_keeps_model_verification_required() {
+        let progress: FirstRunProgress = serde_json::from_str(
+            r#"{"completed_step_ids":[],"last_action":null,"last_updated_unix_seconds":0}"#,
+        )
+        .expect("legacy progress parses");
+        assert!(!progress.local_ai_deferred);
+    }
+
+    #[test]
+    fn first_run_can_defer_model_without_downloading_weights() {
+        with_temp_state_dir(|root| {
+            mark_setup_ready_for_model_step();
+            let result = first_run_action("defer-model", Some("model"), None)
+                .expect("model deferral succeeds");
+            assert!(result.accepted);
+            let progress = read_progress().expect("progress persists");
+            assert!(progress.local_ai_deferred);
+            assert!(progress.completed_step_ids.iter().any(|id| id == "model"));
+            assert_eq!(
+                first_run_state(&[]).unwrap().current_step_id.as_deref(),
+                Some("health")
+            );
+            assert!(!root.join("config").join("model-state.json").exists());
+            let health = first_run_action("verify-health", Some("health"), None)
+                .expect("health still checks runtime");
+            assert!(!health.accepted);
+            assert_eq!(health.status, "Needs runtime files");
+            assert!(!health.message.contains("checksum verification"));
+        });
+    }
+
+    #[test]
+    fn model_deferral_cannot_bypass_required_admin_setup() {
+        with_temp_state_dir(|_| {
+            let result = first_run_action("defer-model", Some("model"), None).unwrap();
+            assert!(!result.accepted);
+            assert_eq!(result.status, "Setup incomplete");
+            assert!(!read_progress().unwrap().local_ai_deferred);
+            assert!(first_run_action("defer-model", Some("health"), None).is_err());
         });
     }
 

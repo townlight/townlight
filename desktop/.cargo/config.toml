@@ -1,0 +1,4 @@
+# The desktop EXE must start on clean Windows without a system VC++ redist.
+# Python and PostgreSQL keep their own app-local CRT payloads.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]

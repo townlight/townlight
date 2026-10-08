@@ -7,6 +7,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_WORKFLOW = ROOT / ".github" / "workflows" / "desktop-windows-msi.yml"
 RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release-windows-msi.yml"
@@ -68,11 +70,41 @@ def test_lifecycle_consumes_and_verifies_the_same_classified_artifact() -> None:
     assert "Signed lifecycle lane received an unexpected signer" in workflow
     assert 'Where-Object { $_.DisplayName -like "*Townlight*" }' in workflow
     assert "Launch the installed Townlight application" in workflow
-    assert "Installed Townlight application launched and remained running" in workflow
+    _assert_installed_startup_requires_webview(workflow)
     assert "Repair the installed Townlight MSI" in workflow
     assert 'Start-Process msiexec.exe -ArgumentList @("/fa"' in workflow
     assert 'Join-Path $env:LOCALAPPDATA "CivicSuite\\workflows\\city-work.json"' in workflow
     assert workflow.count('-replace "`r`n?", "`n"') >= 1
+
+
+def _assert_installed_startup_requires_webview(workflow: str) -> None:
+    launch = workflow.split("- name: Launch the installed Townlight application", 1)[1]
+    launch = launch.split("- name: Repair the installed Townlight MSI", 1)[0]
+    assert "--remote-debugging-port=9222" in launch
+    assert "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\\WebView2\\AdditionalBrowserArguments" in launch
+    assert "$debugAppName = Split-Path -Leaf $env:TOWNLIGHT_EXE" in launch
+    assert "Remove-ItemProperty -LiteralPath $debugPolicy -Name $debugAppName" in launch
+    assert "Get-NetTCPConnection -LocalPort 9222 -State Listen" in launch
+    assert "http://127.0.0.1:9222/json/list" in launch
+    assert "$_.type -eq 'page'" in launch
+    assert "$_.title -eq 'Townlight'" in launch
+    assert "if (-not $ready) {" in launch
+    assert "throw 'Installed Townlight did not open its WebView page within 60 seconds.'" in launch
+    assert "finally" in launch
+
+
+@pytest.mark.parametrize("removed", [
+    "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\\WebView2\\AdditionalBrowserArguments",
+    "Get-NetTCPConnection -LocalPort 9222 -State Listen",
+    "http://127.0.0.1:9222/json/list",
+    "$_.title -eq 'Townlight'",
+    "if (-not $ready) {",
+    "throw 'Installed Townlight did not open its WebView page within 60 seconds.'",
+])
+def test_installed_startup_contract_rejects_weakened_proof(removed: str) -> None:
+    workflow = _read(BUILD_WORKFLOW)
+    with pytest.raises(AssertionError):
+        _assert_installed_startup_requires_webview(workflow.replace(removed, "REMOVED"))
 
 
 def test_release_accepts_only_a_signed_artifact_for_the_tag_commit() -> None:

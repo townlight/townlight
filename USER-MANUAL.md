@@ -14,10 +14,16 @@ Townlight Notice, and Townlight Access.
 ## Before installing
 
 Do not use an unsigned GitHub Actions artifact as a public release. The beta is
-ready for external use only when a prerelease named
-`townlight-records-v1.1.0-beta.2` appears under the
+ready for external use only when the verified Townlight Records 1.1.0-beta.2
+prerelease appears under the
 [Townlight releases page](https://github.com/townlight/townlight/releases) with
 the signed MSI and its evidence file.
+
+The original `townlight-records-v1.1.0-beta.2` draft failed clean-machine
+startup acceptance and must not be used. Its replacement candidate uses
+`townlight-records-v1.1.0-beta.2-rc.2` to preserve the rejected tag and evidence.
+Neither a draft nor a release-candidate tag alone proves acceptance; use only
+the installer identified in the published release's completed acceptance record.
 
 Before running the MSI:
 
@@ -45,7 +51,8 @@ release.
 4. Create the first Townlight admin and store its passcode in an approved
    password vault.
 5. Sign in as that admin and confirm the backup folder.
-6. Complete System Health. If you will use local-AI features, download, verify,
+6. Choose **Continue without local AI** to defer model weights and complete
+   System Health for Records workflows. If you will use local-AI features, download, verify,
    and start the pinned model through the guided controls.
 7. Finish setup and open Records Requests.
 
@@ -56,7 +63,7 @@ and restricted to a signed-in Townlight admin.
 
 1. Start with an empty local city-work profile.
 2. Open **Records Requests** on the Staff surface.
-3. Select **Load demo town** and confirm the guided review.
+3. Review the fictional-fixture explanation, then select **Load demo town**.
 4. Verify the persistent synthetic-data banner and watermark.
 
 Townlight creates and verifies a backup before loading, validates the fixture

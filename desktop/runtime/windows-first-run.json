@@ -20,6 +20,7 @@
     "create-admin",
     "choose-backup",
     "download-model",
+    "defer-model",
     "verify-health",
     "open-app",
     "repair",
@@ -82,9 +83,9 @@
       "label": "Local AI model download",
       "surface": "First run",
       "required": true,
-      "summary": "Download the local AI model files this app needs.",
-      "detail": "A signed-in Townlight admin downloads the pinned Gemma 4 12B model, with a resumable download, checksum verification, and local-only default behavior.",
-      "next_action": "Sign in as the Townlight admin, then download and verify the pinned local model weights.",
+      "summary": "Choose whether to configure optional local AI now or continue without it.",
+      "detail": "Records workflows do not require model weights. A signed-in Townlight admin may defer local AI, or download the pinned Gemma 4 12B model with resumable download and checksum verification.",
+      "next_action": "Continue without local AI, or download and verify the pinned local model weights.",
       "action": "download-model"
     },
     {
@@ -92,8 +93,8 @@
       "label": "Health verification",
       "surface": "First run",
       "required": true,
-      "summary": "Verify local services, storage, backup, and the local model before staff work.",
-      "detail": "The health step checks the desktop shell, local data store, workflow services, task queue, local AI model, and document storage.",
+      "summary": "Verify local services, storage, backup, and any configured local model before staff work.",
+      "detail": "The health step checks local services and storage. Model verification and loading are required only when local AI has not been deferred.",
       "next_action": "Run local health verification.",
       "action": "verify-health"
     },
