@@ -1,4 +1,4 @@
-# Townlight Records 1.1.0-beta.2 rc.3 candidate
+# Townlight Records 1.1.0-beta.2 rc.3 public beta
 
 Townlight Records brings public-records intake, deadlines, cited search,
 human review, accessibility support, release packaging, fulfillment, public
@@ -13,10 +13,12 @@ successfully replaced. Failed generation and unrelated request changes preserve
 approval. Historical notes and exports remain intact. Both desktop executable
 and MSI are signed, independently verified, and installed-tested. See the
 [completed acceptance record](docs/installer/townlight-records-beta2-rc3-acceptance.md).
-Publication still needs the project owner's approval. This is a candidate announcement, not a ship signal.
+The project owner approved publication. The public beta was published on October 8, 2026.
+[Download the signed beta and acceptance evidence](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3).
+This is a beta prerelease, not a general-availability release.
 
 Read the [current manual](USER-MANUAL.md) and [release evidence status](STATUS.md).
-The replacement candidate tag is `townlight-records-v1.1.0-beta.2-rc.3`.
+The published beta tag is `townlight-records-v1.1.0-beta.2-rc.3`.
 Earlier beta.2 drafts are preserved but not accepted releases.
 
 ## Historical CivicSuite Windows Local 1.0.2 announcement

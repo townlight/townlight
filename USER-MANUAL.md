@@ -1,10 +1,10 @@
 # Townlight Records — User Manual
 
-**Candidate version:** 1.1.0-beta.2 (rc.3)
+**Release version:** 1.1.0-beta.2 (rc.3)
 
 **Last updated:** 2026-10-08
 
-**Publication status:** release candidate; not yet a published beta
+**Publication status:** published public beta — 2026-10-08, 06:47:25 MDT (12:47:25 UTC)
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records
@@ -13,11 +13,11 @@ Townlight Notice, and Townlight Access.
 
 ## Before installing
 
-Do not use an unsigned GitHub Actions artifact as a public release. The beta is
-ready for external use only when the verified Townlight Records 1.1.0-beta.2
-prerelease appears under the
-[Townlight releases page](https://github.com/townlight/townlight/releases) with
-the signed MSI and its evidence file.
+Do not use an unsigned GitHub Actions artifact as a public release. Download
+Townlight Records 1.1.0-beta.2 (rc.3) from the
+[published public beta](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3),
+which includes the verified signed MSI and completed acceptance evidence.
+This is a prerelease for beta evaluation, not a general-availability release.
 
 The original `townlight-records-v1.1.0-beta.2` draft failed clean-machine
 startup acceptance and must not be used. Its replacement candidate uses

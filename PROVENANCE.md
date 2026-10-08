@@ -1,8 +1,8 @@
 # Townlight Records — Bundled Module Provenance
 
-## Records beta.2 rc.3 candidate provenance
+## Records beta.2 rc.3 public beta provenance
 
-Prepared 2026-10-08. This candidate is not yet published. It installs
+Published 2026-10-08 at 06:47:25 MDT (12:47:25 UTC), with owner approval. It installs
 Core, Records, Notice, and Access. The Records domain workflow still executes
 in Rust until the blocking convergence gate passes.
 
@@ -10,7 +10,7 @@ The signed candidate source is `22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`,
 from merged [PR #256](https://github.com/townlight/townlight/pull/256). Signing run
 [37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
 passed and matches the independent signature, receipt, and installed acceptance
-[record](docs/installer/townlight-records-beta2-rc3-acceptance.md). Publication still requires the project owner's approval. The replacement tag is
+[record](docs/installer/townlight-records-beta2-rc3-acceptance.md). The owner approved publication of the unchanged signed bytes. The replacement tag is
 `townlight-records-v1.1.0-beta.2-rc.3`; earlier drafts and tags are preserved.
 Documentation-only follow-up commits do not change this signed source or bytes.
 
@@ -29,7 +29,7 @@ The public version is `1.1.0-beta.2`; synchronized desktop manifests use
 `1.1.0-2`. The publication lane signs the desktop EXE before MSI packaging and
 then signs the MSI. Its receipt records source commit, run, unsigned/signed
 hashes, and signing identities for both. Independent installed-artifact and
-clean-machine acceptance passed on these exact bytes; publication approval remains required.
+clean-machine acceptance passed on these exact bytes before approved publication.
 
 ## Historical CivicSuite v1.0.2 provenance
 
