@@ -1,6 +1,9 @@
 # Releasing the Townlight Records Windows MSI
 
-This is the fail-closed release path for a tag such as
+The rc.3 public beta was published with owner approval on 2026-10-08 at
+06:47:25 MDT (12:47:25 UTC), using the exact signed, installed-tested bytes.
+[Published release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3).
+The procedure below remains the fail-closed release path for a tag such as
 `townlight-records-v1.1.0-beta.2`.
 
 The first beta.2 draft failed clean-machine startup acceptance. Preserve its

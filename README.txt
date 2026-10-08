@@ -5,13 +5,13 @@ product at a time.**
 
 ## Current product: Townlight Records
 
-Townlight Records 1.1.0-beta.2 (rc.3) is the signed, installed-tested candidate. It is a Windows
+Townlight Records 1.1.0-beta.2 (rc.3) is a published, signed, installed-tested public beta. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and
 backup/restore.
 
-The candidate installs the dependency-closed Records product profile:
+The beta installs the dependency-closed Records product profile:
 
 - Townlight Core
 - Townlight Records (`townlight/sunshine`)
@@ -29,12 +29,13 @@ Media content is redistributed in this fixture.
 
 The predecessor beta.1 signed MSI remains a draft. The replacement beta.2
 pipeline signs the desktop executable before packaging and then signs the MSI.
-The candidate becomes the public beta only after merge to `main`, Authenticode
-signing with the validated individual publisher identity, independent
+The public beta completed merge to `main`, Authenticode signing, independent
 signature/hash verification, the full signed clean-machine Records journey,
-and human publication approval. Install only the signed asset attached to the
+and human publication approval. Published October 8, 2026 at 06:47:25 MDT
+(12:47:25 UTC). Install the signed MSI attached to the
 [`townlight-records-v1.1.0-beta.2-rc.3` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3)
-only after it is published with completed acceptance evidence. Earlier beta.2
+with its completed acceptance evidence. This is a public beta, not a general-
+availability release. Earlier beta.2
 drafts remain preserved, not accepted for publication. Saving or successfully
 generating different response text requires fresh human approval before export.
 Failed generation, identical-text saves, and unrelated request edits preserve

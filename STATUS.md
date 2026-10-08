@@ -4,7 +4,7 @@
 
 **Active product:** Townlight Records 1.1.0-beta.2 (rc.3), signed installed acceptance passed
 
-**Publication status:** unpublished. The rc.3 signed candidate passed installed Records acceptance; the project owner's explicit publication approval remains required. Earlier signed drafts remain preserved and are not accepted releases.
+**Publication status:** published public beta with the project owner's explicit approval on 2026-10-08 at 06:47:25 MDT (12:47:25 UTC). The exact signed rc.3 installer passed installed Records acceptance. [Download the beta](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3). Earlier signed drafts remain preserved and are not accepted releases.
 
 The rc.2 startup correction passed installed Records, offline, backup/restore,
 upgrade, repair, and uninstall checks, but real local-AI testing found changed

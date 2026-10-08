@@ -52,7 +52,7 @@ try {
       .getByRole("heading", { name: "Public-records work that stays accountable and stays local." })
       .isVisible();
     const candidateStatusVisible = await page
-      .getByText("1.1.0-beta.2 rc.3 · not published", { exact: true })
+      .getByText("1.1.0-beta.2 rc.3 · public beta", { exact: true })
       .isVisible();
     const productModulesVisible = await Promise.all(
       ["Townlight Core", "Townlight Records", "Townlight Notice", "Townlight Access"].map((name) =>

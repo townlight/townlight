@@ -1,6 +1,6 @@
 # Townlight Records beta.2 rc.3 installed acceptance
 
-**Verified:** 2026-10-08. **Result:** PASS. **Publication:** not approved, not published.
+**Verified:** 2026-10-08. **Result:** PASS. **Publication:** owner approved; published public beta on 2026-10-08 at 06:47:25 MDT (12:47:25 UTC).
 
 This record certifies the exact signed rc.3 installer below, not earlier rc.2
 bytes. The wider suite, convergence work, and Meetings are outside this acceptance.
@@ -49,12 +49,13 @@ The unapproved broad-policy branch remains dormant, unchanged and excluded.
 
 ## Evidence delivery and boundary
 
-The draft release carries the signing receipt, MSI evidence, current manuals,
+The published beta carries the signing receipt, MSI evidence, current manuals,
 architecture drawings, this record and an installed acceptance evidence archive.
 The archive separates fresh-install and upgrade-lane results. Earlier evidence
 is retained separately and is not substituted for rc.3 proof.
 
 These are explicitly fictional acceptance records, not real municipal records.
 Staff package/response exports are not automatically public-safe documents.
-Passing acceptance does not authorize publication: Scott must approve the final
-release package, and the release must remain a draft until then.
+Acceptance alone did not authorize publication. The owner subsequently approved
+the completed package, and the exact signed installer was published unchanged.
+The attached preparation records retain their historical prepublication wording.
