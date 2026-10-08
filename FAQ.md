@@ -1,4 +1,23 @@
-# CivicSuite FAQ
+# Townlight FAQ
+
+## Current Townlight Records candidate
+
+The active product is Townlight Records 1.1.0-beta.2 (rc.3), not a released
+full suite. Fresh Windows setup includes Core, Records, Notice, and Access.
+The model is optional: deterministic Records work can use **Continue without
+local AI**. Successfully changing response text needs fresh human approval
+before export; failed generation and unrelated edits preserve approval.
+
+Use the current [Records manual](USER-MANUAL.md) and [release status](STATUS.md).
+Install only the exact signed MSI identified by completed acceptance evidence
+after publication approval. Both the MSI and desktop EXE must have valid,
+timestamped signatures matching the publisher identity in the release receipt.
+Older beta.2 drafts are preserved but not accepted releases.
+
+## Historical city-core FAQ
+
+The older product names, package versions, and download directions below are
+historical predecessor guidance, not current Townlight Records instructions.
 
 **Last verified:** 2026-07-02 (civicsuite-windows-local-v1.0.2)
 

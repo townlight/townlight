@@ -1,10 +1,11 @@
 # Townlight desktop
 
-Status: Townlight Records 1.1.0-beta.1 release candidate
+Status: Townlight Records 1.1.0-beta.2 (rc.3) release candidate; not published
 
-The public candidate label is `1.1.0-beta.1`. Its synchronized desktop build
-manifests use the MSI-compatible SemVer prerelease `1.1.0-1`, which Tauri maps
-to WiX ProductVersion `1.1.0.1`. The numeric form is installer metadata; it does
+The public candidate label is `1.1.0-beta.2`, using replacement tag
+`townlight-records-v1.1.0-beta.2-rc.3`. Its synchronized desktop build
+manifests use the MSI-compatible SemVer prerelease `1.1.0-2`, which Tauri maps
+to WiX ProductVersion `1.1.0.2`. The numeric form is installer metadata; it does
 not rename or promote the public beta candidate.
 
 This directory contains the Tauri/WebView2 desktop application used by the
@@ -28,6 +29,11 @@ developer tooling. It provides Staff, Resident/Public, and IT/Admin surfaces;
 human approval before a response can be released; local audit history; backup,
 restore, repair, and uninstall entry points; and an explicit fictional
 demo-town loader.
+
+Successfully replacing response text, manually or through local AI, requires
+fresh human approval before export. Failed generation, identical-text saves,
+and unrelated request changes preserve approval. Historical notes and exports
+are retained. Earlier beta.2 drafts are preserved but not accepted for publication.
 
 The demo loader is local-admin-only, never automatic, accepts only an empty
 profile, creates and verifies a backup before mutation, and imports the pinned

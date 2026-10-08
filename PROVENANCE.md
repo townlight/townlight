@@ -1,10 +1,18 @@
 # Townlight Records — Bundled Module Provenance
 
-## Records beta.2 candidate provenance
+## Records beta.2 rc.3 candidate provenance
 
-Prepared 2026-10-07. This candidate is not yet signed or published. It installs
+Prepared 2026-10-08. This candidate is not yet published. It installs
 Core, Records, Notice, and Access. The Records domain workflow still executes
 in Rust until the blocking convergence gate passes.
+
+The signed candidate source is `22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`,
+from merged [PR #256](https://github.com/townlight/townlight/pull/256). Signing run
+[37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
+must pass and match the independent signature, receipt, and installed acceptance
+record before publication approval. The replacement tag is
+`townlight-records-v1.1.0-beta.2-rc.3`; earlier drafts and tags are preserved.
+Documentation-only follow-up commits do not change this signed source or bytes.
 
 | Module | Repository | Accepted source commit |
 |---|---|---|

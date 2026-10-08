@@ -1,10 +1,20 @@
 # Townlight status
 
-**Last verified:** 2026-10-07
+**Last verified:** 2026-10-08
 
-**Active product:** Townlight Records 1.1.0-beta.2 candidate in preparation
+**Active product:** Townlight Records 1.1.0-beta.2 (rc.3) candidate in preparation
 
 **Publication status:** beta.1 and beta.2 signed drafts remain unpublished. The first beta.2 passed signing and CI lifecycle, but clean Windows Sandbox acceptance found a desktop startup dependency defect; replacement-candidate acceptance and publication approval remain required.
+
+The rc.2 startup correction passed installed Records, offline, backup/restore,
+upgrade, repair, and uninstall checks, but real local-AI testing found changed
+response text could export under the previous text's approval. Rc.2 is dormant.
+[PR #256](https://github.com/townlight/townlight/pull/256) contains only the accepted response-text correction and is merged at
+`22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`; all required PR checks passed.
+Signed replacement run [37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
+is the rc.3 candidate build. Its independent signed installed acceptance is
+still required; rc.2 evidence does not certify rc.3. Failed generation and
+unrelated edits preserve approval. The blanket-policy branch remains dormant.
 
 ## Clean-machine startup correction
 

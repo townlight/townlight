@@ -1,4 +1,19 @@
-# CivicSuite Architecture
+# Townlight Architecture
+
+## Current Records candidate architecture
+
+Townlight Records 1.1.0-beta.2 (rc.3) installs Core, Records, Notice, and Access.
+The current desktop domain actions execute in Rust and persist versioned
+`city-work.json` plus local files. The shell supervises Python/FastAPI,
+PostgreSQL, and optional local Ollama/Gemma; Python is not yet the desktop
+Records domain execution path. Successfully replacing response text requires
+fresh human approval. Failed generation and unrelated edits preserve approval.
+
+![Current Townlight Records candidate architecture](docs/diagrams/suite-architecture.png)
+
+The historical suite topology below records intent and earlier package
+relationships. It is not evidence that all catalog products ship today.
+See [STATUS.md](STATUS.md) for current release evidence.
 
 **Last verified:** 2026-07-02
 

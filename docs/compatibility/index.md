@@ -1,8 +1,10 @@
 # CivicCore <-> Module Compatibility Matrix
 
-## Townlight Records beta.2 source-pin pairing
+## Townlight Records beta.2 rc.3 source-pin pairing
 
-Prepared 2026-10-07; candidate signing and installed acceptance are pending.
+Prepared 2026-10-08. The candidate must pass signing and exact installed
+acceptance before publication. The rc.3 tag preserves older draft evidence;
+MSI metadata remains `1.1.0-2` / Windows ProductVersion `1.1.0.2`.
 The Records desktop profile pins Core `b4d0156bdc6883c1c3ef167abe0379f9ca32b258`
 with Records `ff99d8c7e692ba1f75e1781f517bb54f5c618b48`, Notice
 `79b8d07199ee77cd425b31c0e0a44f3a0832b810`, and Access

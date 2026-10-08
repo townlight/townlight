@@ -127,7 +127,7 @@ pdf = SimpleDocTemplate(
     rightMargin=0.9 * inch,
     topMargin=0.9 * inch,
     bottomMargin=0.9 * inch,
-    title="CivicSuite User Manual",
+    title="Townlight Records User Manual",
 )
 flow = []
 for kind, text in blocks:

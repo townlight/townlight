@@ -1,5 +1,15 @@
 # CivicSuite Installer Contract
 
+## Current Townlight Records candidate
+
+Townlight Records 1.1.0-beta.2 (rc.3) uses the signed Windows MSI/EXE release
+path described in [RELEASING.md](../RELEASING.md) and
+[USER-MANUAL.md](../USER-MANUAL.md). Fresh setup installs Core, Records,
+Notice, and Access. MSI metadata is `1.1.0-2` / ProductVersion `1.1.0.2`.
+The older contract below is historical, not the current installation guide.
+Use only the exact installer with completed signed acceptance evidence after
+Scott authorizes publication; earlier beta.2 drafts are not accepted releases.
+
 Status: Legacy Docker/browser planner and beta package history. The Windows
 Local 1.0 clerk path now lives in `desktop/` as the Tauri/WebView2 app and
 portable-native runtime contract.
