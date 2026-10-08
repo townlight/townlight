@@ -6098,6 +6098,9 @@ fn draft_records_response(
     let citation = payload_optional_string(payload, "citation");
     let request = selected_record_mut(state, payload)?;
     ensure_records_request_active(request)?;
+    if request.response_draft != draft {
+        request.approved_at_unix_seconds = None;
+    }
     request.response_draft = draft;
     request.status = "drafted".to_string();
     if !citation.is_empty() {
@@ -6160,6 +6163,9 @@ fn suggest_records_response(
         list_or_default(&request.citations, "No citations recorded.")
     );
     let (runtime_model, generated) = crate::model::generate_local_text(&prompt)?;
+    if request.response_draft != generated {
+        request.approved_at_unix_seconds = None;
+    }
     request.response_draft = generated;
     request.status = "local AI draft ready for review".to_string();
     push_records_timeline(
@@ -12273,6 +12279,84 @@ mod tests {
                     && entry.summary.contains("Personally identifying information")
             }));
             assert_valid_audit_chain(&state.audit_entries);
+        });
+    }
+
+    #[test]
+    fn records_response_replacement_requires_approval_without_revoking_unrelated_edits() {
+        with_temp_state_dir(|_| {
+            city_work_action("create-records-request", Some(&serde_json::json!({
+                "requester": "Synthetic approval test", "summary": "Fictional records", "deadline": "2026-10-16"
+            }))).expect("create");
+            let original = serde_json::json!({"responseDraft": "Human-reviewed response A", "citation": "TEST-001"});
+            city_work_action("draft-records-response", Some(&original)).expect("draft A");
+            city_work_action(
+                "approve-records-response",
+                Some(&serde_json::json!({"approvalNote":"Review of response A"})),
+            )
+            .expect("approve A");
+            city_work_action("export-records-response", None).expect("export A");
+            let approved =
+                city_work_state().expect("approved").records_requests[0].approved_at_unix_seconds;
+            for (action, payload) in [
+                (
+                    "assign-records-request",
+                    serde_json::json!({"assignedTo":"Synthetic new officer"}),
+                ),
+                (
+                    "set-records-deadline",
+                    serde_json::json!({"deadline":"2026-10-20","deadlineBasis":"Synthetic revised deadline"}),
+                ),
+                (
+                    "estimate-records-fee",
+                    serde_json::json!({"feeEstimate":"$20 synthetic estimate"}),
+                ),
+                (
+                    "draft-records-response",
+                    serde_json::json!({"responseDraft":"Human-reviewed response A"}),
+                ),
+            ] {
+                city_work_action(action, Some(&payload)).expect("unrelated or identical-text edit");
+                assert_eq!(
+                    city_work_state().expect("read").records_requests[0].approved_at_unix_seconds,
+                    approved,
+                    "{action}"
+                );
+            }
+            let before = serde_json::to_value(city_work_state().expect("before failed generation"))
+                .expect("serialize");
+            env::set_var("CIVICSUITE_FAKE_MODEL_ERROR", "Synthetic failed generation");
+            let failure = city_work_action("suggest-records-response", None);
+            env::remove_var("CIVICSUITE_FAKE_MODEL_ERROR");
+            assert!(failure.is_err());
+            assert_eq!(
+                before,
+                serde_json::to_value(city_work_state().expect("after failure")).expect("serialize")
+            );
+            for action in ["draft-records-response", "suggest-records-response"] {
+                let payload = serde_json::json!({"responseDraft":"Replacement manual response B"});
+                env::set_var(
+                    "CIVICSUITE_FAKE_MODEL_RESPONSE",
+                    "Replacement AI response C",
+                );
+                let replacement = city_work_action(action, Some(&payload));
+                env::remove_var("CIVICSUITE_FAKE_MODEL_RESPONSE");
+                replacement.expect("replacement succeeds");
+                let changed = city_work_state().expect("changed");
+                assert!(changed.records_requests[0]
+                    .approved_at_unix_seconds
+                    .is_none());
+                assert!(changed.records_requests[0]
+                    .approval_notes
+                    .iter()
+                    .any(|note| note == "Review of response A"));
+                assert!(PathBuf::from(&changed.records_requests[0].exports[0]).is_file());
+                assert!(city_work_action("export-records-response", None).is_err());
+                assert!(city_work_action("fulfill-records-request", None).is_err());
+                city_work_action("approve-records-response", None).expect("fresh approval");
+                city_work_action("export-records-response", None)
+                    .expect("fresh approval permits export");
+            }
         });
     }
 
