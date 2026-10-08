@@ -1,4 +1,27 @@
-# CivicSuite Windows Local 1.0.2 — GA candidate, public beta — local AI now behind every AI feature in the suite, including the new Accessibility tab
+# Townlight Records 1.1.0-beta.2 rc.3 candidate
+
+Townlight Records brings public-records intake, deadlines, cited search,
+human review, accessibility support, release packaging, fulfillment, public
+status, audit history, and backup/restore to one Windows desktop product.
+Fresh setup includes Core, Records, Notice, and Access. It requires no Docker,
+WSL, terminal, or paid AI account. The fictional Redstone Valley demo is
+explicitly loaded by a local admin; optional local AI is not needed to try
+deterministic Records work.
+
+The rc.3 correction requires fresh human approval when response text is
+successfully replaced. Failed generation and unrelated request changes preserve
+approval. Historical notes and exports remain intact. Both desktop executable
+and MSI must be signed, independently verified, and installed-tested before
+publication approval. This is a candidate announcement, not a ship signal.
+
+Read the [current manual](USER-MANUAL.md) and [release evidence status](STATUS.md).
+The intended replacement tag is `townlight-records-v1.1.0-beta.2-rc.3`.
+Earlier beta.2 drafts are preserved but not accepted releases.
+
+## Historical CivicSuite Windows Local 1.0.2 announcement
+
+The original announcement below describes a predecessor. Its old download
+directions and six-module claims do not describe the Records candidate.
 
 **TL;DR:** CivicSuite city-core for Windows v1.0.2 is out. One MSI still installs the whole six-module suite — database, local AI model, and clerk workflows on one Windows machine — and this release makes the suite better in three ways: the **Accessibility tab is now on screen and three of its tools run on the suite's local AI**, a shared engine fix **improved the output quality of every AI feature in the suite**, and a clean-machine fix means **first-run setup now completes on a factory-fresh Windows PC**. No cloud, no signup, no telemetry. Download it, run it, try it.
 

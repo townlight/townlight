@@ -7,7 +7,7 @@ Core, Records, Notice, and Access. The Records domain workflow still executes
 in Rust until the blocking convergence gate passes.
 
 The signed candidate source is `22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`,
-from merged PR #256. Signing run
+from merged [PR #256](https://github.com/townlight/townlight/pull/256). Signing run
 [37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
 must pass and match the independent signature, receipt, and installed acceptance
 record before publication approval. The replacement tag is

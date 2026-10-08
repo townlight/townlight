@@ -10,8 +10,9 @@ before export; failed generation and unrelated edits preserve approval.
 
 Use the current [Records manual](USER-MANUAL.md) and [release status](STATUS.md).
 Install only the exact signed MSI identified by completed acceptance evidence
-after publication approval. Both the MSI and desktop EXE must verify as
-`CN=Scott Converse`. Older beta.2 drafts are preserved but not accepted releases.
+after publication approval. Both the MSI and desktop EXE must have valid,
+timestamped signatures matching the publisher identity in the release receipt.
+Older beta.2 drafts are preserved but not accepted releases.
 
 ## Historical city-core FAQ
 

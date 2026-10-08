@@ -9,7 +9,7 @@
 The rc.2 startup correction passed installed Records, offline, backup/restore,
 upgrade, repair, and uninstall checks, but real local-AI testing found changed
 response text could export under the previous text's approval. Rc.2 is dormant.
-PR #256 contains only the accepted response-text correction and is merged at
+[PR #256](https://github.com/townlight/townlight/pull/256) contains only the accepted response-text correction and is merged at
 `22ee2dea9a6038dc1ab1acf45bfe873ae59affe0`; all required PR checks passed.
 Signed replacement run [37736131162](https://github.com/townlight/townlight/actions/runs/37736131162)
 is the rc.3 candidate build. Its independent signed installed acceptance is
