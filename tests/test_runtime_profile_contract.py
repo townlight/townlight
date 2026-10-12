@@ -49,3 +49,47 @@ def test_unknown_embedded_runtime_profile_fails_closed(monkeypatch: pytest.Monke
 
     with pytest.raises(RuntimeError, match="Unsupported Townlight product profile"):
         services._product_profile()
+
+
+def test_runtime_hosts_real_records_app_without_activating_writes(monkeypatch, tmp_path):
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setenv("TESTING", "1")
+    monkeypatch.setenv("CIVICSUITE_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "records-beta")
+    monkeypatch.setattr(services, "health_payload", lambda: {"status": "ok", "local_only": True})
+    app = services.create_runtime_app()
+    with TestClient(app) as client:
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json()["local_only"] is True
+        # This is the real authenticated Records route, not a health-only host.
+        denied = client.post("/desktop/v1/requests", json={
+            "requester": "Synthetic Resident", "summary": "Synthetic request", "deadline": "2026-10-15"
+        })
+        assert denied.status_code == 401
+        assert client.get("/ready").status_code == 503
+
+
+def test_runtime_domain_readiness_is_not_an_import_health_result(monkeypatch, tmp_path):
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setenv("TESTING", "1")
+    monkeypatch.setenv("CIVICSUITE_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "records-beta")
+    monkeypatch.setattr(services, "health_payload", lambda: {"status": "ok", "local_only": True})
+    monkeypatch.setattr(services, "_domain_database_status", lambda: {
+        "ok": False, "reason": "synthetic-missing-domain-schema"
+    })
+    app = services.create_runtime_app(domain_enabled=True)
+    with TestClient(app) as client:
+        assert client.get("/health").status_code == 200
+        readiness = client.get("/ready")
+        assert readiness.status_code == 503
+        assert readiness.json()["status"] == "not-ready"
+
+
+def test_native_runtime_refuses_non_loopback_bind(monkeypatch):
+    monkeypatch.setenv("CIVICSUITE_RUNTIME_HOST", "0.0.0.0")
+    with pytest.raises(RuntimeError, match="127.0.0.1 only"):
+        services.main()

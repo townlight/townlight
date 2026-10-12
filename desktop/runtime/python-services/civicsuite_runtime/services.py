@@ -1,12 +1,11 @@
-"""Local service host for Townlight Windows desktop module checks."""
+"""Single loopback host for the real Townlight domain app and runtime health."""
 
 from __future__ import annotations
 
 import importlib
-import json
 import os
 import secrets
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -177,29 +176,88 @@ def health_payload() -> dict[str, Any]:
     }
 
 
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self) -> None:
-        if self.path not in {"/health", "/modules"}:
-            self.send_error(404, "Not Found")
-            return
-        payload = health_payload()
-        body = json.dumps(payload, sort_keys=True).encode("utf-8")
-        self.send_response(200 if payload["status"] == "ok" else 503)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+def _domain_database_status() -> dict[str, Any]:
+    """A domain schema probe, not merely process/import/TCP health."""
+    from app.models.audit import AuditLog
+    from app.models.fees import FeeLineItem, FeeWaiver
+    from app.models.notifications import NotificationLog
+    from app.models.records_evidence import RequestEvidenceNote, RequestExemptionDecision
+    from app.models.request import RecordsRequest
+    from app.models.request_workflow import RequestMessage, RequestPublicStatus, RequestTimeline
+    from app.models.search import SearchQuery, SearchResult, SearchSession
+    from sqlalchemy import select
 
-    def log_message(self, format: str, *args: Any) -> None:
-        return
+    database = create_engine(_sync_database_url(os.environ["DATABASE_URL"]), pool_pre_ping=True)
+    try:
+        with database.connect() as connection:
+            for model in (RecordsRequest, RequestTimeline, RequestPublicStatus, RequestMessage,
+                          RequestEvidenceNote, RequestExemptionDecision, SearchSession, SearchQuery,
+                          SearchResult, FeeLineItem, FeeWaiver, NotificationLog, AuditLog):
+                connection.execute(select(model).limit(0))
+        return {"ok": True, "reason": "domain-schema-ready"}
+    except Exception:  # Connection details/secrets do not belong in readiness responses.
+        return {"ok": False, "reason": "domain-schema-unavailable"}
+    finally:
+        database.dispose()
+
+
+def create_runtime_app(*, domain_enabled: bool = False):
+    """Mount the existing application; packaged migrations are explicit.
+
+    The web app's Docker-specific lifespan must NOT run on Windows. The outer
+    runtime owns lifespan; Starlette does not run mounted subapp lifespans.
+    Production domain writes stay inactive until validated coherent cutover.
+    The explicit enabled argument is also the isolated candidate test seam.
+    """
+    from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
+
+    _set_local_defaults()
+    from app.main import create_app
+    from app.database import engine as domain_engine
+
+    modules = frozenset(module_id for module_id, _ in _required_module_imports(_product_profile()))
+    domain_app = create_app(
+        desktop_profile_root=_profile_root(), desktop_enabled_modules=modules,
+        desktop_domain_enabled=domain_enabled,
+    )
+
+    @asynccontextmanager
+    async def runtime_lifespan(app):
+        yield
+        await domain_engine.dispose()
+
+    app = FastAPI(title="Townlight local runtime", lifespan=runtime_lifespan)
+
+    @app.get("/health")
+    @app.get("/modules")
+    def runtime_health():
+        payload = health_payload()
+        return JSONResponse(payload, status_code=200 if payload["status"] == "ok" else 503)
+
+    @app.get("/ready")
+    def domain_ready():
+        if not domain_app.state.desktop_domain_enabled:
+            return JSONResponse({"status": "not-ready", "reason": "domain-inactive"}, status_code=503)
+        database = _domain_database_status()
+        return JSONResponse(
+            {"status": "ready" if database["ok"] else "not-ready", "reason": database["reason"]},
+            status_code=200 if database["ok"] else 503,
+        )
+
+    app.mount("/", domain_app)
+    return app
 
 
 def main() -> int:
     host = os.environ.get("CIVICSUITE_RUNTIME_HOST", DEFAULT_HOST)
+    if host != DEFAULT_HOST:
+        raise RuntimeError("The Townlight native domain runtime must bind to 127.0.0.1 only.")
     port = int(os.environ.get("CIVICSUITE_RUNTIME_PORT", str(DEFAULT_PORT)))
-    server = ThreadingHTTPServer((host, port), HealthHandler)
+    import uvicorn
+
     print(f"Townlight runtime services listening on http://{host}:{port}", flush=True)
-    server.serve_forever()
+    uvicorn.run(create_runtime_app(), host=host, port=port, access_log=False, log_level="warning")
     return 0
 
 
