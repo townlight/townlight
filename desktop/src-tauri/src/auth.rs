@@ -527,6 +527,23 @@ pub fn require_signed_in_session() -> Result<AccessState, String> {
     Err("Sign in with a staff or Townlight admin account before changing city work.".to_string())
 }
 
+/// Native-to-service proof only. Never return this through a Tauri command,
+/// UI state, logging, or a diagnostic receipt. The service revalidates it.
+pub(crate) fn domain_session_proof() -> Result<String, String> {
+    valid_session()?
+        .map(|session| session.session_hash)
+        .ok_or_else(|| "Sign in before using Records.".to_string())
+}
+
+/// Domain-separated local-shell proof; never a staff/resident identity.
+pub(crate) fn domain_public_proof() -> Result<String, String> {
+    if !access_state()?.configured {
+        return Err("Finish first-run setup before public Records is available.".into());
+    }
+    Ok(hmac_sha256(&session_mac_key()?, b"townlight-native-public-records-v1")
+        .iter().map(|byte| format!("{byte:02x}")).collect())
+}
+
 fn role_module_ids(role: &str) -> Option<&'static [&'static str]> {
     match role {
         "local-admin" | "city-staff" => None,

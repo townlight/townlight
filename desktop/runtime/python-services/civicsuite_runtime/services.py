@@ -182,6 +182,10 @@ def _domain_database_status() -> dict[str, Any]:
     from app.models.fees import FeeLineItem, FeeWaiver
     from app.models.notifications import NotificationLog
     from app.models.records_evidence import RequestEvidenceNote, RequestExemptionDecision
+    from app.models.records_files import RequestFileEvidence, RequestReleaseCopy
+    from app.models.records_artifacts import RequestArtifact, RequestPublication
+    from app.models.document import DataSource, Document
+    from app.models.request import RequestDocument
     from app.models.request import RecordsRequest
     from app.models.request_workflow import RequestMessage, RequestPublicStatus, RequestTimeline
     from app.models.search import SearchQuery, SearchResult, SearchSession
@@ -192,8 +196,14 @@ def _domain_database_status() -> dict[str, Any]:
         with database.connect() as connection:
             for model in (RecordsRequest, RequestTimeline, RequestPublicStatus, RequestMessage,
                           RequestEvidenceNote, RequestExemptionDecision, SearchSession, SearchQuery,
-                          SearchResult, FeeLineItem, FeeWaiver, NotificationLog, AuditLog):
+                          SearchResult, FeeLineItem, FeeWaiver, NotificationLog, AuditLog,
+                          DataSource, Document, RequestDocument, RequestFileEvidence, RequestReleaseCopy,
+                          RequestArtifact, RequestPublication):
                 connection.execute(select(model).limit(0))
+            from civicaccess.access_review import accessibility_review_records, audit_events
+            from civicsuite_runtime.access_bridge import review_advice, review_exports
+            for table in (accessibility_review_records, audit_events, review_advice, review_exports):
+                connection.execute(select(table).limit(0))
         return {"ok": True, "reason": "domain-schema-ready"}
     except Exception:  # Connection details/secrets do not belong in readiness responses.
         return {"ok": False, "reason": "domain-schema-unavailable"}
@@ -221,6 +231,10 @@ def create_runtime_app(*, domain_enabled: bool = False):
         desktop_profile_root=_profile_root(), desktop_enabled_modules=modules,
         desktop_domain_enabled=domain_enabled,
     )
+    from civicsuite_runtime.access_bridge import router as access_router
+    domain_app.include_router(access_router)
+    from civicsuite_runtime.records_snapshot import router as snapshot_router
+    domain_app.include_router(snapshot_router)
 
     @asynccontextmanager
     async def runtime_lifespan(app):

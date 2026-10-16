@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const main = readFileSync(join(root, "src", "main.js"), "utf8");
+const main = readFileSync(join(root, "src", "main.js"), "utf8") + "\n" +
+  readFileSync(join(root, "src", "records", "view.js"), "utf8");
 const css = readFileSync(join(root, "src", "styles.css"), "utf8");
 const tauriConfig = readFileSync(join(root, "src-tauri", "tauri.conf.json"), "utf8");
 const tauriConfigJson = JSON.parse(tauriConfig);

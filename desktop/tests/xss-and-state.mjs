@@ -13,7 +13,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const mainSrc = readFileSync(join(root, "src", "main.js"), "utf8");
@@ -117,6 +117,8 @@ globalThis.matchMedia = windowStub.matchMedia;
 //  - append an internals export for assertions.
 // ---------------------------------------------------------------------------
 let rewritten = mainSrc.replace(/^﻿/, "");
+rewritten = rewritten.replace('"./records/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "records", "view.js")).href));
+rewritten = rewritten.replace('"./records/controller.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "controller.ts")).href));
 rewritten = rewritten.replace(
   /import\s*\{\s*invoke\s*\}\s*from\s*["']@tauri-apps\/api\/core["'];?/,
   "const invoke = (...args) => globalThis.__TEST_INVOKE__(...args);"

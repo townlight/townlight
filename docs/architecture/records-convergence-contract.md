@@ -1,7 +1,7 @@
 # Records convergence: accepted desktop contract and migration mapping
 
 Status: local implementation contract; not a release or feature-completion claim.
-Scope authority: TL-REC-CONV-001 revision 1.1, approved 2026-10-12.
+Scope authority: bounded plan revision 2.0, local Records implementation resumed with Scott's approval on 2026-10-15. No outward writes authorized.
 
 Working repositories:
 
@@ -12,9 +12,9 @@ Baseline: Townlight `a563843eee07c168f0cecbc54efda64a579209a8`; Sunshine `ff99d8
 
 ## 1. Current callers and ownership
 
-The active product is `records-beta`: Core, Records, Notice, Access. The explicit historical `city-core` profile is not removed or automatically migrated by this job. Records activation must refuse a conflicting active legacy writer rather than disable another profile silently.
+The first implementation milestone is `records-beta`: Core, Records, Notice, Access. The target first connected system is `city-core`: those modules plus Meetings and Code. There are no deployed customers; preserving Scott's work and state does not require an indefinite second municipal backend.
 
-Execution decision outstanding: city-core is still enabled in config/suite-state.json and installer/modules.json, selectable through first_run.rs, and uses the same main.rs/workflows.rs Records handlers and JSON state. Removing those handlers would also remove its Records behavior. Scott has been asked whether to retain that implementation solely for the unmigrated compatibility profile (Records beta still becomes Python-only), or expand convergence to city-core before deletion. No profile has been disabled, migrated, frozen, split into a new state store or cut over while that choice is unresolved. This is the P0/P7 compatibility boundary already identified by the plan, not an instruction to begin Meetings.
+Resolved planning boundary: deliver Records, then connected Meetings, then Code. No partial action-by-action authority switch. Shared handlers remain until their last consumer is replaced and proven; intermediate candidates cannot expose a stale competing Records copy through another profile. Full city-core delivery is later, not a prerequisite to finishing Records. No profile or real data has been activated by this transport slice.
 
 `main.rs` gates commands by authenticated native role and enabled module before calling `workflows.rs`. Both initial `get_app_state` and `get_city_work_state` currently read the JSON workflow state. `main.js` replaces the entire `city_work` projection with `result.state` after each action. All three paths must change together at activation.
 
@@ -121,6 +121,10 @@ For staff create, preserve the desktop's initially unassigned officer even thoug
 
 ## 4. Typed transport and readiness
 
+Current implementation slice: `records_domain_request` is a native-only authenticated transport to fixed loopback service routes, with a closed operation/action enum, UUID route identifiers, no proxies/redirects, bounded responses, timeout/unknown-outcome errors, and no automatic retry or JSON fallback. The existing UI dispatcher has NOT switched to it. The service still defaults inactive. Native compilation and two focused transport unit tests passed on October 16 after the owner reported removing the Windows security block. This is not yet proof of the live native-to-Python operation or installed acceptance.
+
+`GET /desktop/v1/records-state` supplies the current non-file Records projection for authenticated refresh. Each request carries both its stable presentation `id` and canonical `request_id` for subsequent API calls; these must not be confused. This is not yet the full CityWorkState projection: documents/packages and shared Notice/Access/audit consumers remain outstanding. Do not activate the UI against a partial replacement projection.
+
 - Keep the current operation/result semantics, including `accepted`, `action`, status/message/next_action, complete canonical `state`, search results and Access advisories.
 - Define validated payloads per operation; do not pass arbitrary dicts directly into SQL or native file APIs.
 - Serve the real FastAPI domain app through the existing loopback runtime. Do not add a second sidecar port or independent database authority.
@@ -151,3 +155,36 @@ The versioned extension is records-desktop-lifecycle-v2.json, present in the nat
 Two public-projection details must be preserved rather than silently tightened during this job: rc.3 clears response text, private review/search/fee/document fields but retains export-path strings; it does not distribute those files. For an already released request, matching-contact lookup reuses the existing status-only projection, whereas an unreleased matching request can expose its requester-visible thread. These are source-observed compatibility details, not new features or approval-policy changes. Changing them requires a separate owner decision and is not admitted as an incidental fix.
 
 This file describes the intended implementation and inventory. Unimplemented items are not evidence of completed behavior. Installed acceptance and final retirement remain later plan phases.
+
+## October 16 local integration checkpoint (not activated)
+
+The native client now stages attachment/release-copy bytes and performs the
+prepare/write/finalize export protocol against the existing Records domain.
+Python independently verifies paths, hashes and manifests before recording
+completed exports. Failed/unknown completion never erases historical files.
+Public intake has a separate local-shell proof; anonymous work is not attributed
+to a fabricated staff account. Draft generation uses the existing Rust model
+runtime transport with a Python-owned prompt and stale-response guard.
+
+The runtime Access adapter calls the existing `civicaccess` engine and qualified
+Access tables. It adds typed advice/export evidence tables after the existing
+Access bootstrap, not another copy of reviews in Records storage. Review AI
+failure preserves deterministic findings; failed rewrite/translation generation
+does not silently substitute a sample. Explicitly unavailable AI produces the
+existing labelled sample behavior. Access exports retain verified files and
+audit events after a review is deleted. Native capabilities remain distinct:
+clerks may use Access without gaining Records privileges.
+
+The Records milestone snapshot/search reads only canonical SQL, filtered by
+native capabilities. Meetings, Code and meeting-dependent notices are explicitly
+unavailable there; no old JSON is merged. Search records its audit event. Records
+snapshots do not expose Access audit summaries. Existing Records presentation is
+extracted into `desktop/src/records/view.js`; typed clients are in the same
+directory. The old production UI dispatcher remains active until coherent
+import, recovery and activation are implemented. Neither the local endpoints
+nor passing focused checks constitute installed acceptance.
+
+Pending: demo fixture/marker parity, full UI activation/error paths, lossless
+owner/test import and account mapping, consistent SQL-plus-files backup/recovery,
+packaged candidates, installed acceptance, and evidence-gated retirement.
+No current changes authorize push, merge, signing or publication.

@@ -1,6 +1,8 @@
 mod atomic_io;
 mod auth;
 mod demo_fixture;
+mod domain_client;
+mod domain_files;
 mod first_run;
 mod local_paths;
 mod local_shell;
@@ -750,6 +752,63 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
     }
 }
 
+/// Candidate transport boundary. The domain service remains inactive until
+/// coherent profile activation; the existing workflow dispatcher is unchanged.
+#[tauri::command]
+async fn records_domain_request(
+    request: domain_client::RecordsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "create-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("create-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute(request, proof).await
+}
+
+#[tauri::command]
+async fn records_public_request(request: domain_client::PublicRecordsRequest) -> Result<Value, domain_client::DomainError> {
+    require_enabled_city_modules("submit-public-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_public_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_public(request, proof).await
+}
+
+#[tauri::command]
+async fn access_domain_request(request: domain_client::AccessRequest) -> Result<Value, domain_client::DomainError> {
+    let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "accessibility-review", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("accessibility-review", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_access(request, proof).await
+}
+
+#[tauri::command]
+async fn suite_domain_request(request: domain_client::SuiteRequest) -> Result<Value, domain_client::DomainError> {
+    let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "search-city-knowledge", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("search-city-knowledge", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_suite(request, proof).await
+}
+
+#[tauri::command]
+async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value, String> {
+    let access = auth::require_signed_in_session()?;
+    let payload = serde_json::json!({"folder":request.folder.name()});
+    require_role_for_city_work(&access, "open-exports-folder", Some(&payload))?;
+    require_enabled_city_modules("open-exports-folder", Some(&payload))?;
+    let message = tauri::async_runtime::spawn_blocking(move || domain_files::open_exports(request.folder))
+        .await.map_err(|_| "Could not open the local exports folder.".to_string())??;
+    Ok(serde_json::json!({"message":message}))
+}
+
 fn city_work_action_authorized(
     action: String,
     payload: Option<Value>,
@@ -852,6 +911,11 @@ pub fn run() {
             choose_folder_path,
             module_action,
             get_city_work_state,
+            records_domain_request,
+            records_public_request,
+            access_domain_request,
+            suite_domain_request,
+            open_domain_exports,
             city_work_action
         ])
         .run(tauri::generate_context!())

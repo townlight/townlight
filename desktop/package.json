@@ -9,7 +9,7 @@
     "build": "vite build",
     "generate-icon": "node scripts/generate-icon.mjs",
     "prepare-runtime-payload": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-runtime-payload.ps1",
-    "test": "node tests/static-smoke.mjs && node tests/xss-and-state.mjs",
+    "test": "node tests/static-smoke.mjs && node tests/xss-and-state.mjs && node tests/records-client.mjs",
     "test:browser": "playwright test",
     "tauri": "tauri"
   },
