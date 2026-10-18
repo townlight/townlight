@@ -25,6 +25,21 @@ workflows are enabled.
 
 Current state:
 
+- In the local Records convergence candidate, the service host and native
+  migration/demo CLI entrypoints initialize the per-install secret paths before
+  importing backend settings. They use the same local profile; no Linux
+  `/run/secrets` path or test-only credential override is required.
+- Records activation is explicit and fenced. After activation, Python/PostgreSQL
+  owns current Records data; the preserved JSON snapshot is historical, not a
+  fallback writer. A cold backup/restore leaves data services stopped: use Start
+  to verify the restored database and resume work.
+- The owner/test rc.3 transition preserves native `.sha256.json` export receipts,
+  public-intake status labels and prefixed Access audit IDs. Receipts still require
+  matching content hashes and sizes. A native ID mapping preserves historical
+  audit labels without widening or replacing the existing Access engine's keys.
+  Import advances the existing public tracking-number sequence past imported
+  `REQ-` numbers without resetting it, so subsequent intake cannot reuse them.
+
 - The runtime manifest defines the local services the supervisor owns.
 - The payload manifest defines the files install/repair can copy into the local
   runtime profile.

@@ -7,6 +7,11 @@ from pathlib import Path
 import time
 import uuid
 
+# Match the service host: local secrets must exist before backend imports.
+if __name__ == "__main__":
+    from civicsuite_runtime.services import _set_local_defaults
+    _set_local_defaults()
+
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.auth.desktop_session import validate_native_session

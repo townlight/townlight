@@ -7,6 +7,7 @@ labels are preserved; import attribution is not invented historical authorship.
 from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
+import re
 from pathlib import Path
 import uuid
 
@@ -60,6 +61,7 @@ def identifier(root, kind, label):
 
 
 STATUS = {
+    "public intake received": RequestStatus.RECEIVED,
     "received": RequestStatus.RECEIVED, "deadline reviewed": RequestStatus.RECEIVED,
     "deadline calculated": RequestStatus.RECEIVED, "message sent": RequestStatus.RECEIVED,
     "requester message received": RequestStatus.RECEIVED,
@@ -235,5 +237,13 @@ async def import_snapshot(session, root: Path, expected_sha256: str, backup_path
         from civicsuite_runtime.records_import_access import import_access
         counts["access_reviews"] = await import_access(session, root, snapshot.original.get("access", {}))
         await session.flush()
+        # Imported public identifiers already occupy numbers in the native
+        # namespace. Never reset the allocator or let new intake reuse them.
+        tracking_floor = max((int(match.group(1)) for row in snapshot.records
+            if (match := re.fullmatch(r"REQ-(\d+)", row.public_tracking_number))), default=0)
+        if tracking_floor:
+            await session.execute(sa.text("SELECT setval('records_public_tracking_seq', "
+                "GREATEST(:floor, (SELECT last_value FROM records_public_tracking_seq)), true)"),
+                {"floor": tracking_floor})
         await session.execute(imports.insert().values(**receipt))
         return receipt

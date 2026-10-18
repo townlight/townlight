@@ -1,6 +1,17 @@
 # Records convergence: accepted desktop contract and migration mapping
 
 Status: local implementation contract; not a release or feature-completion claim.
+
+## Installed Records milestone — October 18, 2026
+
+Local installed acceptance now passes for the Records Python/PostgreSQL path. Candidate A (`2bf6f4d1e21119a620f606490dba5b3189abddc14648890acf79a0fd9d631156`) passed fresh setup, the accepted lifecycle, public/staff privacy, real cached-model generation and changed-response reapproval, offline restart/write, cold backup/restore, repair, uninstall/reinstall and explicit profile removal with verified backup.
+
+Final corrected candidate B (`efffd2731e821e8c9aa523a21e6f37d2e4fa7b78b804fad68f9c21135b2dc503`) passed installed import of actual rc.3-created synthetic work, exact historical comparison, new intake/assignment, no JSON fallback during Python outage and cold recovery. Independent checks verified unchanged read-only source, completion receipt, normalized counts, audit chain, original Access IDs, export hashes and all six changed runtime source identities in both installed and active locations. The clean-origin guest first upgraded rc.3 to intermediate B, then restored its original pre-import checkpoint and installed corrected B; this is not a claim of a second direct rc.3-to-final upgrade.
+
+Evidence and final uninstall/cleanup results: `C:\Users\scott\Documents\Codex\Townlight-Records-Convergence-2026-10-12\RECORDS-INSTALLED-ACCEPTANCE-2026-10-18.md`. Exact evidence folders are `installed-candidate-a-final` and `installed-transition-corrected` beside that report. Earlier pending checkpoints below are historical.
+
+Both candidates are unsigned local artifacts; no publication permission is implied. A private Microsoft-signed WebView prerequisite was supplied inside Sandbox because its registered prerequisite was broken. Shared/pre-activation Rust handlers remain referenced and are not claimed retired. Meetings, Code, full city-core completion and outward release actions remain outside this milestone.
+
 Scope authority: bounded plan revision 2.0, local Records implementation resumed with Scott's approval on 2026-10-15. No outward writes authorized.
 
 Working repositories:
@@ -154,7 +165,7 @@ The versioned extension is records-desktop-lifecycle-v2.json, present in the nat
 
 Two public-projection details must be preserved rather than silently tightened during this job: rc.3 clears response text, private review/search/fee/document fields but retains export-path strings; it does not distribute those files. For an already released request, matching-contact lookup reuses the existing status-only projection, whereas an unreleased matching request can expose its requester-visible thread. These are source-observed compatibility details, not new features or approval-policy changes. Changing them requires a separate owner decision and is not admitted as an incidental fix.
 
-This file describes the intended implementation and inventory. Unimplemented items are not evidence of completed behavior. Installed acceptance and final retirement remain later plan phases.
+This section records the first implementation batch. Unimplemented items were not evidence of completed behavior; installed acceptance and retirement were later phases at that checkpoint. Dated continuation evidence below supersedes checkpoint status, not scope.
 
 ## Historical October 16 local integration checkpoint (not activated)
 
@@ -189,9 +200,9 @@ owner/test import and account mapping, consistent SQL-plus-files backup/recovery
 packaged candidates, installed acceptance, and evidence-gated retirement.
 No current changes authorize push, merge, signing or publication.
 
-## October 17 local activation and recovery implementation
+## Historical October 17 local activation and recovery implementation
 
-These changes are implemented and tested locally, not yet certified by an installed candidate.
+At this checkpoint, these changes were implemented and tested locally, not yet certified by an installed candidate.
 
 - **Finish Records Migration**, in System Health, is an explicit local-administrator operation. It fences legacy writers, stops the profile's database writers, preserves a verified backup, provisions identities from current native accounts, and imports supported Records/Access evidence into normalized SQL tables. Historical audit hashes and original JSON bytes are retained. User labels are evidence, not authentication.
 - Import verifies source and managed-file hashes, references, counts and reconstructed Records views. A transaction records completion with the imported data. Retrying identical input is idempotent; changed input or a conflicting nonempty destination is rejected. An interruption after database commit remains inactive until receipt reconciliation succeeds.

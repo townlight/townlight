@@ -122,7 +122,12 @@ def preflight(profile_root: Path) -> ImportPreflight:
             path = Path(path_text).resolve(strict=True)
             if not path.is_relative_to(data_root.resolve()):
                 raise ValueError("Referenced export is outside the configured data root.")
-            manifest = json.loads(path.with_name(path.name + ".manifest.json").read_bytes())
+            manifest_path = path.with_name(path.name + ".manifest.json")
+            if not manifest_path.exists():
+                # Published native rc.3 exports use this receipt suffix. Keep
+                # the same content/hash checks; never rewrite historical files.
+                manifest_path = path.with_name(path.name + ".sha256.json")
+            manifest = json.loads(manifest_path.read_bytes())
             if (manifest.get("export_file") != path.name or type(manifest.get("schema_version")) is not int
                     or manifest["schema_version"] != 1 or type(manifest.get("size_bytes")) is not int
                     or manifest["size_bytes"] < 0):

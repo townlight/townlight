@@ -2,7 +2,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 import sqlalchemy as sa
 
-from civicsuite_runtime.access_bridge import reviews, review_advice, audit_events
+from civicsuite_runtime.access_bridge import reviews, review_advice, audit_events, legacy_audit_ids
 from civicsuite_runtime.records_import import stable_id
 from civicsuite_runtime.records_import_store import timestamp
 
@@ -59,8 +59,11 @@ async def import_access(session, root, data):
     # Legacy event and subject labels are historical evidence, not API target IDs.
     # The current engine's event_id field is bounded to UUID-length strings.
     for row in events:
+        event_id = row.event_id
         if len(row.event_id) > 36:
-            raise ValueError("Access event identity exceeds existing storage capacity.")
+            event_id = stable_id(root, "access-audit", row.event_id)
+            await session.execute(legacy_audit_ids.insert().values(event_id=event_id, legacy_id=row.event_id))
         await session.execute(audit_events.insert().values(
-            **row.model_dump(exclude={"created_at_unix_seconds"}), created_at=timestamp(row.created_at_unix_seconds)))
+            **row.model_dump(exclude={"event_id", "created_at_unix_seconds"}), event_id=event_id,
+            created_at=timestamp(row.created_at_unix_seconds)))
     return len(items)

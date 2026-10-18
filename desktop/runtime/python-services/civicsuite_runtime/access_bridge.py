@@ -30,6 +30,12 @@ from civicaccess.multilingual import create_language_variant
 
 router = APIRouter(prefix="/desktop/v1/access", tags=["native-access"])
 extension_metadata = sa.MetaData()
+legacy_audit_ids = sa.Table(
+    "native_legacy_audit_ids", extension_metadata,
+    sa.Column("event_id", sa.String(36), primary_key=True),
+    sa.Column("legacy_id", sa.Text, nullable=False),
+    schema="civicaccess",
+)
 review_advice = sa.Table(
     "native_review_advice", extension_metadata,
     sa.Column("review_id", sa.String(36), primary_key=True),
@@ -151,9 +157,12 @@ async def state(session):
         item["review_id"] = item.pop("legacy_id") or item["review_id"]
         item["created_at_unix_seconds"] = int(item.pop("created_at").timestamp())
         result.append(item)
-    events = (await session.execute(sa.select(audit_events).order_by(audit_events.c.created_at))).mappings().all()
+    events = (await session.execute(sa.select(audit_events, legacy_audit_ids.c.legacy_id)
+        .outerjoin(legacy_audit_ids, audit_events.c.event_id == legacy_audit_ids.c.event_id)
+        .order_by(audit_events.c.created_at))).mappings().all()
     return {"reviews": result, "audit_events": [
-        {**{k: v for k, v in row.items() if k != "created_at"},
+        {**{k: v for k, v in row.items() if k not in {"created_at", "legacy_id"}},
+         "event_id": row["legacy_id"] or row["event_id"],
          "created_at_unix_seconds": int(row["created_at"].timestamp())} for row in events]}
 
 
