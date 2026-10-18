@@ -13,3 +13,6 @@ dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["civicsuite_runtime*"]
+
+[tool.setuptools.package-data]
+civicsuite_runtime = ["fixtures/*.json"]

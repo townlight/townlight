@@ -43,6 +43,11 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
 
 
 def _profile_root() -> Path:
+    explicit = os.environ.get("TOWNLIGHT_PROFILE_ROOT")
+    if explicit:
+        if not Path(explicit).is_absolute():
+            raise RuntimeError("The Townlight profile root must be absolute.")
+        return Path(explicit)
     data_dir = os.environ.get("CIVICSUITE_DATA_DIR")
     if data_dir:
         return Path(data_dir).parent
@@ -202,7 +207,9 @@ def _domain_database_status() -> dict[str, Any]:
                 connection.execute(select(model).limit(0))
             from civicaccess.access_review import accessibility_review_records, audit_events
             from civicsuite_runtime.access_bridge import review_advice, review_exports
-            for table in (accessibility_review_records, audit_events, review_advice, review_exports):
+            from civicsuite_runtime.records_import_store import imports, legacy_audit
+            from civicsuite_runtime.native_accounts import accounts
+            for table in (accessibility_review_records, audit_events, review_advice, review_exports, imports, legacy_audit, accounts):
                 connection.execute(select(table).limit(0))
         return {"ok": True, "reason": "domain-schema-ready"}
     except Exception:  # Connection details/secrets do not belong in readiness responses.
@@ -225,6 +232,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
     _set_local_defaults()
     from app.main import create_app
     from app.database import engine as domain_engine
+    from civicsuite_runtime.records_cutover import verify_activation
+    domain_enabled = domain_enabled or verify_activation(_profile_root(), os.environ["DATABASE_URL"])
 
     modules = frozenset(module_id for module_id, _ in _required_module_imports(_product_profile()))
     domain_app = create_app(
@@ -235,6 +244,15 @@ def create_runtime_app(*, domain_enabled: bool = False):
     domain_app.include_router(access_router)
     from civicsuite_runtime.records_snapshot import router as snapshot_router
     domain_app.include_router(snapshot_router)
+    async def demo_marker(session):
+        from sqlalchemy import select
+        from civicsuite_runtime.records_import_store import imports
+        return await session.scalar(select(imports.c.demo_fixture).limit(1))
+    domain_app.state.desktop_demo_marker = demo_marker
+    async def sync_native_identity(session):
+        from civicsuite_runtime.native_accounts import provision_accounts
+        return await provision_accounts(session, _profile_root())
+    domain_app.state.desktop_identity_sync = sync_native_identity
 
     @asynccontextmanager
     async def runtime_lifespan(app):

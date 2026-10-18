@@ -25,7 +25,9 @@ export function createRecordsController(invoke: Invoke) {
     async action(action: string, payload: Record<string, string>, current: RecordsState) {
       let result: Result;
       let publicOnly = false;
-      if (isPublicRecordsAction(action)) {
+      if (action === "load-demo-town") {
+        result = await invoke<Result>("supervisor_action", {action:"load-records-demo", serviceId:null});
+      } else if (isPublicRecordsAction(action)) {
         publicOnly = true;
         result = await records.publicAction(action, payload);
       } else if (isRecordsAction(action)) {

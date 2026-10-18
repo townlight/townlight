@@ -8,6 +8,8 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod profile_gate;
+mod records_authority;
 #[cfg(test)]
 mod records_golden_contract;
 mod supervisor;
@@ -34,6 +36,7 @@ struct NavigationItem {
 
 #[derive(Serialize)]
 struct AppState {
+    domain_authority: &'static str,
     product_name: &'static str,
     status_label: &'static str,
     local_only: bool,
@@ -386,7 +389,16 @@ fn app_state() -> Result<AppState, String> {
     let access = auth::access_state()?;
     let admin_signed_in = access_is_local_admin(&access);
     let signed_in = access_is_signed_in(&access);
-    let city_work = if signed_in {
+    let authority = records_authority::read()?;
+    let domain_authority = match authority.as_ref().map(|journal| journal.phase.as_str()) {
+        Some("active") => "python-records",
+        Some(_) => "records-migration-pending",
+        None => "legacy",
+    };
+    let city_work = if authority.is_some() {
+        // The typed async client loads canonical state; never read old JSON here.
+        CityWorkState::default()
+    } else if signed_in {
         workflows::city_work_state()?
     } else {
         workflows::public_city_work_state()?
@@ -407,6 +419,7 @@ fn app_state() -> Result<AppState, String> {
         public_runtime_health(supervisor::runtime_health()?)
     };
     Ok(AppState {
+        domain_authority,
         product_name: "Townlight",
         status_label: "Windows Local 1.0 desktop",
         local_only: true,
@@ -758,6 +771,7 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
 async fn records_domain_request(
     request: domain_client::RecordsRequest,
 ) -> Result<Value, domain_client::DomainError> {
+    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let access =
         auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "create-records-request", None)
@@ -770,6 +784,7 @@ async fn records_domain_request(
 
 #[tauri::command]
 async fn records_public_request(request: domain_client::PublicRecordsRequest) -> Result<Value, domain_client::DomainError> {
+    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     require_enabled_city_modules("submit-public-records-request", None)
         .map_err(|_| domain_client::DomainError::denied())?;
     let proof = auth::domain_public_proof().map_err(|_| domain_client::DomainError::denied())?;
@@ -778,6 +793,7 @@ async fn records_public_request(request: domain_client::PublicRecordsRequest) ->
 
 #[tauri::command]
 async fn access_domain_request(request: domain_client::AccessRequest) -> Result<Value, domain_client::DomainError> {
+    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "accessibility-review", None)
         .map_err(|_| domain_client::DomainError::denied())?;
@@ -789,6 +805,7 @@ async fn access_domain_request(request: domain_client::AccessRequest) -> Result<
 
 #[tauri::command]
 async fn suite_domain_request(request: domain_client::SuiteRequest) -> Result<Value, domain_client::DomainError> {
+    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "search-city-knowledge", None)
         .map_err(|_| domain_client::DomainError::denied())?;

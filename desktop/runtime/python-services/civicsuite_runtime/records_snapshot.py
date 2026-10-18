@@ -15,6 +15,7 @@ from app.desktop_bridge.projection import records_state, epoch
 from app.models.audit import AuditLog
 from app.models.user import User
 from civicsuite_runtime.access_bridge import state as access_state
+from civicsuite_runtime.records_import_store import imports, legacy_audit
 
 router = APIRouter(prefix="/desktop/v1/suite", tags=["native-records-snapshot"])
 
@@ -52,6 +53,13 @@ async def snapshot(session, allowed, actor_id):
         module_id={"request":"civicrecords-ai", "access":"civicaccess"}.get(row.resource_type, "civiccore"),
         action=row.action, summary=str((row.details or {}).get("note", row.action)),
         created_at_unix_seconds=epoch(row.timestamp), previous_hash=row.prev_hash, entry_hash=row.entry_hash) for row in audits]
+    # Legacy hashes retain their original algorithm and identities, not SQL hashes.
+    historical = (await session.execute(select(legacy_audit).where(
+        legacy_audit.c.module_id.in_(allowed)).order_by(legacy_audit.c.position))).mappings().all()
+    data["audit_entries"] = [dict(id=row["legacy_id"], **{key:row[key] for key in
+        ("module_id", "action", "summary", "created_at_unix_seconds", "previous_hash", "entry_hash")})
+        for row in historical] + data["audit_entries"]
+    data["demo_fixture"] = await session.scalar(select(imports.c.demo_fixture).limit(1))
     return data
 
 

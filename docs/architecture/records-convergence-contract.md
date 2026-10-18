@@ -16,7 +16,7 @@ The first implementation milestone is `records-beta`: Core, Records, Notice, Acc
 
 Resolved planning boundary: deliver Records, then connected Meetings, then Code. No partial action-by-action authority switch. Shared handlers remain until their last consumer is replaced and proven; intermediate candidates cannot expose a stale competing Records copy through another profile. Full city-core delivery is later, not a prerequisite to finishing Records. No profile or real data has been activated by this transport slice.
 
-`main.rs` gates commands by authenticated native role and enabled module before calling `workflows.rs`. Both initial `get_app_state` and `get_city_work_state` currently read the JSON workflow state. `main.js` replaces the entire `city_work` projection with `result.state` after each action. All three paths must change together at activation.
+`main.rs` gates commands by authenticated native role and enabled module. Before migration, the legacy profile reads JSON. Once a migration journal exists, legacy reads and writes are fenced, including interrupted or corrupt-journal cases. Active profiles refresh the canonical SQL projection through the typed client; service failure never selects the old JSON. `main.js` retains shell navigation while Records rendering and its typed controller live under `desktop/src/records/`.
 
 The following is the finite Records operation inventory. Every operation writes state unless identified otherwise; action names are not read/write guarantees.
 
@@ -121,9 +121,9 @@ For staff create, preserve the desktop's initially unassigned officer even thoug
 
 ## 4. Typed transport and readiness
 
-Current implementation slice: `records_domain_request` is a native-only authenticated transport to fixed loopback service routes, with a closed operation/action enum, UUID route identifiers, no proxies/redirects, bounded responses, timeout/unknown-outcome errors, and no automatic retry or JSON fallback. The existing UI dispatcher has NOT switched to it. The service still defaults inactive. Native compilation and two focused transport unit tests passed on October 16 after the owner reported removing the Windows security block. This is not yet proof of the live native-to-Python operation or installed acceptance.
+Current implementation: `records_domain_request` is a native-only authenticated transport to fixed loopback service routes, with a closed operation/action enum, UUID route identifiers, no proxies/redirects, bounded responses, timeout/unknown-outcome errors, and no automatic retry or JSON fallback. The typed controller is selected only after explicit migration activation. Runtime activation requires an active local journal matching a committed SQL import receipt. Native-to-Python/database tests passed on disposable profiles; installed acceptance remains outstanding.
 
-`GET /desktop/v1/records-state` supplies the current non-file Records projection for authenticated refresh. Each request carries both its stable presentation `id` and canonical `request_id` for subsequent API calls; these must not be confused. This is not yet the full CityWorkState projection: documents/packages and shared Notice/Access/audit consumers remain outstanding. Do not activate the UI against a partial replacement projection.
+`GET /desktop/v1/records-state` supplies the canonical Records projection for authenticated refresh, including file/package metadata and permitted shared Access/outbox/audit evidence. Each request carries both its stable presentation `id` and canonical `request_id` for subsequent API calls; these must not be confused. Meetings and Code are not supplied by this Records projection and remain later milestones.
 
 - Keep the current operation/result semantics, including `accepted`, `action`, status/message/next_action, complete canonical `state`, search results and Access advisories.
 - Define validated payloads per operation; do not pass arbitrary dicts directly into SQL or native file APIs.
@@ -156,7 +156,7 @@ Two public-projection details must be preserved rather than silently tightened d
 
 This file describes the intended implementation and inventory. Unimplemented items are not evidence of completed behavior. Installed acceptance and final retirement remain later plan phases.
 
-## October 16 local integration checkpoint (not activated)
+## Historical October 16 local integration checkpoint (not activated)
 
 The native client now stages attachment/release-copy bytes and performs the
 prepare/write/finalize export protocol against the existing Records domain.
@@ -188,3 +188,18 @@ Pending: demo fixture/marker parity, full UI activation/error paths, lossless
 owner/test import and account mapping, consistent SQL-plus-files backup/recovery,
 packaged candidates, installed acceptance, and evidence-gated retirement.
 No current changes authorize push, merge, signing or publication.
+
+## October 17 local activation and recovery implementation
+
+These changes are implemented and tested locally, not yet certified by an installed candidate.
+
+- **Finish Records Migration**, in System Health, is an explicit local-administrator operation. It fences legacy writers, stops the profile's database writers, preserves a verified backup, provisions identities from current native accounts, and imports supported Records/Access evidence into normalized SQL tables. Historical audit hashes and original JSON bytes are retained. User labels are evidence, not authentication.
+- Import verifies source and managed-file hashes, references, counts and reconstructed Records views. A transaction records completion with the imported data. Retrying identical input is idempotent; changed input or a conflicting nonempty destination is rejected. An interruption after database commit remains inactive until receipt reconciliation succeeds.
+- Activation atomically updates the local journal after commit and marks the old JSON read-only. That file is historical evidence, not a rollback source for later SQL writes. Incomplete migration displays an explicit unavailable state instead of pretending that there are no requests.
+- Native accounts reconcile through authenticated session validation. An unrelated existing SQL email is not overwritten or promoted; credential verifiers are never copied into SQL or exposed to JavaScript. Module-specific native permissions remain authoritative for desktop calls.
+- **Load Demo Town** reuses the pinned fictional Redstone Valley fixture and preserves its watermark in public/export views. It backs up first and refuses to overwrite non-demo work. It does not scrape or impersonate a municipality.
+- **Backup** stops this profile's Python/task/database writers and requires PostgreSQL to report a clean shutdown before copying database files. It leaves those services stopped; use **Start Services** afterward. It does not stop the local model or unrelated host processes.
+- **Restore** first stops the same writers and creates a safety backup of current data/files. Database backups without the cold-consistency marker are refused. Restored services require an explicit start. Newer work remains in the safety backup; it is not claimed to be present in the older restored snapshot. Existing secret/model-cache exclusions remain unchanged.
+- Lifecycle operations exclude in-flight canonical domain/file calls. The importer and activation path do not touch Scott's actual profile during development checks.
+
+Evidence includes a real disposable PostgreSQL cold-backup/restore test, interruption/idempotency tests, full imported-view/file comparisons, fixture/watermark checks, native journal fencing and the recovered production frontend build. One bounded read-only source reviewer found no concrete blocker. These results do not replace the required exact installed Candidate A/B journeys, real model/offline/repair/uninstall proof, or evidence-gated retirement. No retired Rust handlers have been deleted by this batch.

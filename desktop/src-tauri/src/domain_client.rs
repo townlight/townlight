@@ -384,6 +384,9 @@ pub struct DomainError {
 }
 
 impl DomainError {
+    pub fn maintenance() -> Self {
+        Self::new("profile-maintenance", "Profile maintenance is in progress. No Records operation was started; retry after maintenance finishes.", false)
+    }
     fn new(code: &'static str, message: &'static str, outcome_unknown: bool) -> Self {
         Self {
             code,

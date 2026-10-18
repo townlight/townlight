@@ -925,8 +925,16 @@ async function loadAppState() {
     state.app = await invoke("get_app_state");
     // The native activation receipt will supply this authority only after
     // import/recovery validation. Never merge old JSON into a canonical read.
+    state.domainLoadError = null;
     if (state.app.domain_authority === "python-records") {
-      state.app.city_work = await recordsController.refresh(!state.app.access?.signed_in);
+      try {
+        state.app.city_work = await recordsController.refresh(!state.app.access?.signed_in);
+      } catch (error) {
+        // The shell/config loaded successfully. Keep recovery controls usable
+        // when a backup, restore or outage leaves the domain service stopped.
+        // Do not display an empty Records collection as successfully loaded.
+        state.domainLoadError = String(error?.message || error);
+      }
     }
     state.appLoadError = null;
     appStateLoaded = true;
@@ -4976,6 +4984,7 @@ function renderHealth() {
       </div>
       <div class="health-actions lifecycle-actions">
         <button type="button" class="secondary-action" data-supervisor-action="backup" ${adminDisabled}>Backup Now</button>
+        ${state.app.domain_authority !== "python-records" ? `<button type="button" class="secondary-action" data-supervisor-action="activate-records" ${adminDisabled}>Finish Records Migration</button><p>Records migration preserves the existing data and switches to Python/PostgreSQL. If interrupted, use this action again; the old writer remains blocked.</p>` : ""}
         <button type="button" class="secondary-action" data-supervisor-action="open-backup-folder" ${adminDisabled}>Open Backup Folder</button>
         <button type="button" class="secondary-action" data-supervisor-action="support-bundle" ${adminDisabled}>Create Support Bundle</button>
         <button type="button" class="secondary-action" data-supervisor-action="restore" ${adminDisabled}>Restore Latest Backup</button>
@@ -5018,6 +5027,12 @@ function renderActiveArea() {
   }
   if (state.activeArea === "settings" && access.configured && access.role !== "local-admin") {
     return renderAccessPanel();
+  }
+  if (state.domainLoadError && !["health", "settings"].includes(state.activeArea)) {
+    return `<section class="section-band" role="alert"><h2>Records service is unavailable</h2>
+      <p>Saved Records could not be refreshed. No legacy copy was loaded. Use System Health to start or repair the local services, then retry.</p>
+      <pre>${escapeHtml(state.domainLoadError)}</pre>
+      <button type="button" data-action="retry-domain-state">Retry Records</button></section>`;
   }
   switch (state.activeArea) {
     case "meetings":
@@ -5139,6 +5154,10 @@ function render() {
 }
 
 function bindEvents() {
+  document.querySelector('[data-action="retry-domain-state"]')?.addEventListener("click", async () => {
+    await loadAppState();
+    render();
+  });
   document.querySelectorAll("[data-area]").forEach((button) => {
     button.addEventListener("click", () => {
       if (!areaIsEnabled(button.dataset.area)) return;

@@ -8,6 +8,8 @@ param(
     [string]$ManifestPath = "",
     [string]$PayloadManifestPath = "",
     [string]$PayloadRoot = "",
+    [string]$RecordsBackendRoot = "",
+    [switch]$ReuseInstalledServiceDependencies,
     [ValidateSet("records-beta", "city-core")]
     [string]$ProductProfile = "records-beta",
     [switch]$SkipDownloads,
@@ -722,7 +724,7 @@ function Copy-CivicRecordsMigrations {
         [string]$PythonRoot,
         [string]$RepoRoot
     )
-    $SourceRoot = (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path
+    $SourceRoot = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path }
     $Destination = Join-Path $PythonRoot "Lib\site-packages\civicsuite_runtime\civicrecords_alembic"
     $DestinationRoot = [System.IO.Path]::GetFullPath((Join-Path $PythonRoot "Lib\site-packages\civicsuite_runtime"))
     $DestinationPath = [System.IO.Path]::GetFullPath($Destination)
@@ -746,13 +748,16 @@ function Install-PythonServicePackages {
         [string]$ProductProfile
     )
     $PipStatus = Ensure-PythonPip -Source $Source -CacheRoot $CacheRoot -PythonRoot $PythonRoot
-    $CivicCore = (Resolve-Path (Join-Path $RepoRoot "..\civiccore")).Path
-    $CivicRecords = (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path
-    $CivicNotice = (Resolve-Path (Join-Path $RepoRoot "..\civicnotice")).Path
-    $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
+    $CivicRecords = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path }
     $RuntimeBridge = (Resolve-Path (Join-Path $RepoRoot "desktop\runtime\python-services")).Path
 
-    $ServicePackages = @($CivicRecords, $CivicNotice, $CivicAccess, $RuntimeBridge)
+    $ServicePackages = @($CivicRecords, $RuntimeBridge)
+    if (-not $ReuseInstalledServiceDependencies) {
+        $CivicCore = (Resolve-Path (Join-Path $RepoRoot "..\civiccore")).Path
+        $CivicNotice = (Resolve-Path (Join-Path $RepoRoot "..\civicnotice")).Path
+        $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
+        $ServicePackages += @($CivicNotice, $CivicAccess)
+    }
     if ($ProductProfile -eq "city-core") {
         $ServicePackages += @(
             (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path,
@@ -767,6 +772,7 @@ function Install-PythonServicePackages {
         "wheel",
         "hatchling>=1.27.0"
     )
+    if (-not $ReuseInstalledServiceDependencies) {
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServiceInstallArguments
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
         "-m", "pip", "install",
@@ -777,6 +783,7 @@ function Install-PythonServicePackages {
         "psycopg2-binary>=2.9.0,<3.0.0",
         "PyMuPDF>=1.26.0,<2.0.0"
     )
+    }
     $ServicePackageInstallArguments = @(
         "-m", "pip", "install",
         "--disable-pip-version-check",
@@ -785,6 +792,7 @@ function Install-PythonServicePackages {
         "--no-deps",
         "--force-reinstall"
     ) + $ServicePackages
+    if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
     Copy-CivicRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
