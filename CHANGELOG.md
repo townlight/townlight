@@ -2,7 +2,7 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
-## Townlight Records 1.1.0-beta.3 — release candidate
+## Townlight Records 1.1.0-beta.3 — 2026-10-19
 
 - Active Records workflows now use the bundled Python/PostgreSQL domain path
   after explicit administrator activation. Typed desktop transport retains the
@@ -10,9 +10,12 @@ All notable changes to the Townlight umbrella repo are documented here.
 - Transactional import preserves historical requests, audit, Access reviews,
   export receipts and identifiers, with an intact pre-import backup and writer
   fence. New intake continues beyond imported tracking numbers.
-- Cold database/files backup and restore, offline use, privacy and installed
-  lifecycle acceptance passed on local candidates. Signed exact-byte release
-  acceptance is still required before publication.
+- The exact signed MSI passed fresh installation and direct rc.3 upgrade,
+  Records/privacy workflows, real local AI and renewed approval, offline work,
+  database/files backup and restore, repair, retained-data reinstall, explicit
+  profile removal and uninstall. [Acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+- Sunshine's approved narrow Tailwind/Vitest dependency migration preserves
+  the existing UI and passes existing tests; the dependency audit is clean.
 - New desktop build version `1.1.0-3`; beta.2 releases and draft evidence remain
   preserved. Meetings and Code are not part of this release.
 

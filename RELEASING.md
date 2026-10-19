@@ -17,8 +17,12 @@ publish an unsigned file.
 
 This update makes Python/PostgreSQL the active Records authority following
 explicit migration, with no legacy JSON fallback. Upgrade instructions and
-recovery boundaries are in USER-MANUAL.md. Until publication succeeds, the
-public download continues to point to the accepted rc.3 release.
+recovery boundaries are in USER-MANUAL.md. Exact signed acceptance passed on
+October 19, 2026 at 02:31:39 MDT (08:31:39 UTC); see
+[the beta.3 acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+The signed source is `7129b079a9c77b3f21b384c6e5beeb9fc4f45979`, from successful
+main signing run `39211809039`. Documentation-only follow-up commits do not
+change the release tag or accepted MSI/EXE bytes. Preserve all prior tags/assets.
 
 ## Historical beta.2 release and retained procedure
 

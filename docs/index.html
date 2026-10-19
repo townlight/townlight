@@ -226,11 +226,11 @@
     <div class="hero-body">
       <p class="eyebrow">Public records · human decisions · the city's own computer</p>
       <h1>Public-records work that stays accountable and stays local.</h1>
-      <p class="lede">Townlight Records brings intake, deadline tracking, cited search, human exemption review, accessibility checks, release packaging, fulfillment, and public status into one local Windows product. The public beta is <strong>1.1.0-beta.2 (rc.3)</strong>. Signed installed acceptance passed; published October 8, 2026 with owner approval.</p>
+      <p class="lede">Townlight Records brings intake, deadline tracking, cited search, human exemption review, accessibility checks, release packaging, fulfillment, and public status into one local Windows product. The public beta is <strong>1.1.0-beta.3</strong>. The signed installer passed fresh-install and upgrade acceptance on October 19, 2026. Records now uses the bundled Python service and PostgreSQL after explicit activation.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3">Download public beta</a>
+        <a class="btn primary" href="https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3">Download public beta</a>
         <a class="btn" href="https://github.com/townlight/townlight/blob/main/USER-MANUAL.md">Read the manual</a>
-        <span class="badge dot" style="margin-left:4px;">1.1.0-beta.2 rc.3 · public beta</span>
+        <span class="badge dot" style="margin-left:4px;">1.1.0-beta.3 · public beta</span>
       </div>
     </div>
   </div>
@@ -252,12 +252,12 @@
     <section>
       <p class="section-eyebrow">Status · 2026-10-08</p>
       <h2>Where the project is today</h2>
-      <div class="section-intro"><p>Current public beta: <strong>Townlight Records 1.1.0-beta.2 (rc.3)</strong> <span class="badge navy" style="vertical-align:middle;">published public beta</span>. MSI metadata remains 1.1.0-2 (Windows ProductVersion 1.1.0.2); the rc.3 tag preserves earlier draft evidence.</p></div>
+      <div class="section-intro"><p>Current public beta: <strong>Townlight Records 1.1.0-beta.3</strong> <span class="badge navy" style="vertical-align:middle;">public beta</span>. MSI metadata is 1.1.0-3 (Windows ProductVersion 1.1.0.3). Earlier releases and dormant drafts remain preserved.</p></div>
       <div class="note">
         <span class="n-ic" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5" stroke-linecap="round"/><circle cx="12" cy="16" r="0.6" fill="currentColor" stroke="none"/></svg>
         </span>
-        <p><b>What "public beta" means.</b> The narrow response-approval correction is merged. The exact replacement MSI and desktop EXE are signed as <code>CN=Scott Converse</code> and passed signed clean-machine Records acceptance, including offline work, recovery, upgrade, real local AI approval checks, and uninstall. The owner approved publication of these exact signed bytes. Original beta.2 and rc.2 drafts are preserved but not accepted for publication.</p>
+        <p><b>What "public beta" means.</b> The exact MSI and desktop EXE are signed as <code>CN=Scott Converse</code> and passed fresh-install and direct rc.3-upgrade acceptance, including privacy, offline work, recovery, real local AI approval checks, repair, reinstall, and uninstall. This is the bounded Records update, not completion of every historical suite feature. Read the <a href="https://github.com/townlight/townlight/blob/main/docs/installer/townlight-records-beta3-acceptance.md">acceptance record and environment limits</a> and the <a href="https://github.com/townlight/townlight/blob/main/USER-MANUAL.md#records-beta3-activation-and-upgrade">activation and upgrade instructions</a>.</p>
       </div>
     </section>
 
@@ -351,7 +351,7 @@
       <figure class="arch">
         <svg viewBox="0 0 760 420" role="img" aria-labelledby="arch-t arch-d">
           <title id="arch-t">Townlight Records beta topology</title>
-          <desc id="arch-d">All components run locally on one Windows machine. The current Records domain path executes in the Rust desktop shell and saves versioned local state. The shell also supervises bundled Python and PostgreSQL runtimes and an optional local Gemma model.</desc>
+          <desc id="arch-d">All components run locally on one Windows machine. The typed desktop client calls authenticated loopback Python services. PostgreSQL owns Records after explicit validated import. Rust provides native integration and supervision; legacy JSON is not a fallback. Local Gemma remains optional.</desc>
           <defs>
             <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8a6a1f"/></marker>
           </defs>
@@ -360,16 +360,16 @@
 
           <rect x="270" y="52" width="220" height="66" rx="9" fill="#1a3a52" stroke="#122a3d" stroke-width="2"/>
           <text x="380" y="82" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#fff" font-weight="600">Tauri / WebView2</text>
-          <text x="380" y="103" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#f5edd6">desktop UI + current Records domain path</text>
+          <text x="380" y="103" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#f5edd6">typed UI + native OS integration</text>
 
           <rect x="270" y="172" width="220" height="66" rx="9" fill="#fff" stroke="#cabe9f" stroke-width="1.5"/>
-          <text x="380" y="202" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#1a2330" font-weight="600">Supervised local runtimes</text>
+          <text x="380" y="202" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#1a2330" font-weight="600">Python Records services</text>
           <text x="380" y="222" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#6b7280">CPython · PostgreSQL · local task queue</text>
 
           <rect x="44" y="300" width="300" height="86" rx="9" fill="#fff" stroke="#cabe9f" stroke-width="1.5"/>
           <text x="194" y="330" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#1a2330" font-weight="600">Local persistence</text>
-          <text x="194" y="350" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#6b7280">versioned Records state + verified backups</text>
-          <text x="194" y="368" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#6b7280">bundled PostgreSQL for service runtimes</text>
+          <text x="194" y="350" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#6b7280">PostgreSQL + files + verified backups</text>
+          <text x="194" y="368" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#6b7280">validated import; no legacy JSON fallback</text>
 
           <rect x="416" y="300" width="300" height="86" rx="9" fill="#fff" stroke="#b08a2e" stroke-width="1.5"/>
           <text x="566" y="330" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#1a2330" font-weight="600">Ollama + local Gemma</text>
@@ -377,19 +377,19 @@
           <text x="566" y="368" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#8a6a1f">on-device inference — no API</text>
 
           <line x1="380" y1="118" x2="380" y2="170" stroke="#8a6a1f" stroke-width="1.6" marker-end="url(#ar)"/>
-          <text x="388" y="148" font-family="Consolas,monospace" font-size="11" fill="#6b7280">process supervision</text>
+          <text x="388" y="148" font-family="Consolas,monospace" font-size="11" fill="#6b7280">authenticated loopback</text>
           <line x1="320" y1="238" x2="200" y2="298" stroke="#8a6a1f" stroke-width="1.6" marker-end="url(#ar)"/>
           <text x="214" y="276" font-family="Consolas,monospace" font-size="11" fill="#6b7280">state + migrations</text>
           <line x1="440" y1="238" x2="560" y2="298" stroke="#8a6a1f" stroke-width="1.6" marker-end="url(#ar)"/>
           <text x="470" y="276" font-family="Consolas,monospace" font-size="11" fill="#6b7280">HTTP · localhost</text>
         </svg>
         <ol class="arch-mobile" aria-label="Townlight Records beta topology">
-          <li><b>1. Townlight desktop</b>Tauri and WebView2 provide the user interface and the current Records domain path.</li>
-          <li><b>2. Supervised local runtimes</b>The desktop starts and monitors embedded CPython, PostgreSQL, and the local task queue.</li>
-          <li><b>3. Versioned local persistence</b>Records state has an explicit schema version and verified backup/rollback behavior.</li>
+          <li><b>1. Townlight desktop</b>Tauri and WebView2 provide the typed interface, native integration, and supervision.</li>
+          <li><b>2. Python Records services</b>Authenticated local calls reach the bundled Python service and local task queue.</li>
+          <li><b>3. PostgreSQL and local files</b>Validated import preserves historical evidence. Database/files backups recover new work; old JSON is not a fallback.</li>
           <li><b>4. Optional local AI</b>Ollama serves a pinned Gemma model that is explicitly downloaded and SHA-verified.</li>
         </ol>
-        <figcaption>The current Records workflow executes in the desktop shell and saves versioned local state. The same shell supervises the bundled Python/PostgreSQL runtime and optional local Ollama model. Service-path convergence is required before Meetings.</figcaption>
+        <figcaption>After explicit activation, Records executes in bundled Python/PostgreSQL with no JSON fallback. Rust handles native integration and supervision and retains unmigrated city-core compatibility. Meetings and Code are not part of this release.</figcaption>
       </figure>
       <div class="specrow">
         <span class="chip"><span class="cdot"></span><b>Tauri / WebView2</b> desktop shell</span>

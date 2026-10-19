@@ -1,6 +1,6 @@
 # Townlight Troubleshooting
 
-## Townlight Records 1.1.0-beta.2 rc.3
+## Townlight Records 1.1.0-beta.3
 
 Use the current [Records manual](../USER-MANUAL.md) for installation and setup.
 Earlier beta.2 drafts are not accepted releases. The original beta.2 startup
@@ -16,6 +16,18 @@ Local AI is optional; **Continue without local AI** supports deterministic
 Records setup. Ordinary Windows uninstall preserves municipal data. Use the
 application's backup-first **Prepare Uninstall** only when intentionally
 removing the local profile, and retain the final backup.
+
+After a beta.3 upgrade, use **Repair** for **Townlight Records services**, then
+**Finish Records Migration**, as described in the manual. An unavailable Records
+service is not an empty database: start/repair it rather than editing the old
+JSON. Backup/restore leaves services stopped until restarted. If maintenance
+says to finish current operations, allow the current refresh/action to finish
+before retrying; do not remove the safety guard or force a concurrent operation.
+
+The acceptance environment used a normally registered Microsoft WebView2 runtime.
+It did not establish compatibility with enforced Smart App Control or enterprise
+allowlisting. If Windows blocks a bundled runtime, preserve the error and consult
+your administrator; do not disable workstation protections to imitate a test guest.
 
 ## Historical city-core troubleshooting
 

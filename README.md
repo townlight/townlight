@@ -5,7 +5,7 @@ product at a time.**
 
 ## Current product: Townlight Records
 
-Townlight Records 1.1.0-beta.2 (rc.3) is a published, signed, installed-tested public beta. It is a Windows
+Townlight Records 1.1.0-beta.3 is a signed, installed-tested public beta. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and
@@ -27,16 +27,15 @@ Valley records are independently authored, deterministic, hashed, visibly
 watermarked, and never loaded automatically. No Longmont or Longmont Public
 Media content is redistributed in this fixture.
 
-The predecessor beta.1 signed MSI remains a draft. The replacement beta.2
-pipeline signs the desktop executable before packaging and then signs the MSI.
-The public beta completed merge to `main`, Authenticode signing, independent
-signature/hash verification, the full signed clean-machine Records journey,
-and human publication approval. Published October 8, 2026 at 06:47:25 MDT
-(12:47:25 UTC). Install the signed MSI attached to the
-[`townlight-records-v1.1.0-beta.2-rc.3` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3)
-with its completed acceptance evidence. This is a public beta, not a general-
-availability release. Earlier beta.2
-drafts remain preserved, not accepted for publication. Saving or successfully
+The release pipeline signs the desktop executable before packaging and then
+signs the MSI. Beta.3 passed independent signature/hash verification and both
+fresh-install and direct rc.3-upgrade acceptance on October 19, 2026.
+Install the signed MSI attached to the
+[`townlight-records-v1.1.0-beta.3` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3)
+with its [completed acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+This is a public beta, not a general-availability release or completion of the
+entire suite specification. Historical releases and dormant drafts are preserved.
+Saving or successfully
 generating different response text requires fresh human approval before export.
 Failed generation, identical-text saves, and unrelated request edits preserve
 approval; historical approval notes and exported files remain intact.
@@ -45,19 +44,16 @@ See [RELEASING.md](RELEASING.md) and
 
 ### Architecture truth
 
-**Next update, beta.3 (not yet published):** local installed acceptance passed
-for the Records Python/PostgreSQL authority, explicit historical import,
-typed desktop transport, outage handling and database/files recovery. Final
-signed-release verification is still required. The current public rc.3 download
-above remains unchanged until that gate passes. See the beta.3 upgrade section
-of [USER-MANUAL.md](USER-MANUAL.md).
+After explicit activation, beta.3 routes Records through the bundled Python
+service and PostgreSQL database. Validated import preserves existing requests,
+audit history, Access evidence and exports. The old JSON becomes read-only
+historical evidence, not a fallback or a way to recover newer work.
+See the upgrade and recovery instructions in [USER-MANUAL.md](USER-MANUAL.md).
 
-For the published rc.3 beta, the user-facing Records, Notice, and Access workflows execute in
-the Rust desktop application. The Python/FastAPI packages and PostgreSQL
-runtime also ship, but are not yet the desktop's domain execution path.
-Convergence to one Python/PostgreSQL domain path is a blocking gate before
-Townlight Meetings; the Rust parity implementation is not the template for 25
-products.
+Rust retains native desktop integration, supervision and unmigrated city-core
+compatibility handlers. This is one active Records path, not a claim that all
+municipal Rust has been deleted. Meetings and Code remain separate, unfinished
+stages under the connected-system plan.
 
 Public branding is Townlight. Existing `civic*` imports, database names,
 environment variables, MSI identity, and legacy data paths remain compatibility

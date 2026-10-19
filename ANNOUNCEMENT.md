@@ -1,4 +1,4 @@
-# Townlight Records 1.1.0-beta.2 rc.3 public beta
+# Townlight Records 1.1.0-beta.3 public beta
 
 Townlight Records brings public-records intake, deadlines, cited search,
 human review, accessibility support, release packaging, fulfillment, public
@@ -8,17 +8,21 @@ WSL, terminal, or paid AI account. The fictional Redstone Valley demo is
 explicitly loaded by a local admin; optional local AI is not needed to try
 deterministic Records work.
 
-The rc.3 correction requires fresh human approval when response text is
+Beta.3 moves active Records work to bundled Python/PostgreSQL after explicit
+administrator activation, preserving historical requests, audit and exports
+through validated import. There is no fallback to the old JSON after cutover.
+The existing approval rule requires fresh human approval when response text is
 successfully replaced. Failed generation and unrelated request changes preserve
 approval. Historical notes and exports remain intact. Both desktop executable
 and MSI are signed, independently verified, and installed-tested. See the
-[completed acceptance record](docs/installer/townlight-records-beta2-rc3-acceptance.md).
-The project owner approved publication. The public beta was published on October 8, 2026.
-[Download the signed beta and acceptance evidence](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3).
+[completed acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+Final signed fresh-install and direct-upgrade acceptance passed October 19, 2026;
+the project owner approved publication conditional on that result.
+[Download the signed beta and acceptance evidence](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3).
 This is a beta prerelease, not a general-availability release.
 
 Read the [current manual](USER-MANUAL.md) and [release evidence status](STATUS.md).
-The published beta tag is `townlight-records-v1.1.0-beta.2-rc.3`.
+The beta tag is `townlight-records-v1.1.0-beta.3`.
 Earlier beta.2 drafts are preserved but not accepted releases.
 
 ## Historical CivicSuite Windows Local 1.0.2 announcement

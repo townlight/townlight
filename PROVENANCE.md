@@ -1,6 +1,25 @@
 # Townlight Records — Bundled Module Provenance
 
-## Records beta.2 rc.3 public beta provenance
+## Records beta.3 public beta provenance
+
+Signed source `7129b079a9c77b3f21b384c6e5beeb9fc4f45979`, tag
+`townlight-records-v1.1.0-beta.3`, MSI version `1.1.0-3` / `1.1.0.3`.
+[Signing run 39211809039](https://github.com/townlight/townlight/actions/runs/39211809039)
+and exact signed fresh/upgrade acceptance passed. See the
+[acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+
+| Module | Repository | Accepted source commit |
+|---|---|---|
+| Townlight Core | townlight/core | `b4d0156bdc6883c1c3ef167abe0379f9ca32b258` |
+| Townlight Records | townlight/sunshine | `62cee04abaec7f908f222e21c5a09b4b7977a575` |
+| Townlight Notice | townlight/notice | `79b8d07199ee77cd425b31c0e0a44f3a0832b810` |
+| Townlight Access | townlight/access | `b9100edc80ca496d6061f1cdb3eb39a60ff5f31a` |
+
+Records is Python/PostgreSQL-authoritative after explicit activation. Rust keeps
+native integration and unmigrated city-core compatibility. The signed bytes
+remain tied to the source above; documentation-only commits do not replace them.
+
+## Historical Records beta.2 rc.3 public beta provenance
 
 Published 2026-10-08 at 06:47:25 MDT (12:47:25 UTC), with owner approval. It installs
 Core, Records, Notice, and Access. The Records domain workflow still executes

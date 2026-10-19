@@ -1,7 +1,7 @@
 # City-Core Windows Local Operator Walkthrough
 
-**Historical city-core walkthrough.** For Townlight Records 1.1.0-beta.2
-(rc.3), use the current [Townlight Records manual](../../USER-MANUAL.md).
+**Historical city-core walkthrough.** For Townlight Records 1.1.0-beta.3,
+use the current [Townlight Records manual](../../USER-MANUAL.md).
 Fresh Records setup includes Core, Records, Notice, and Access, not Meetings
 or Code. Successfully replacing response text requires fresh approval;
 failed generation and unrelated edits do not revoke approval. Use the exact
