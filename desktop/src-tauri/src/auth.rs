@@ -540,8 +540,12 @@ pub(crate) fn domain_public_proof() -> Result<String, String> {
     if !access_state()?.configured {
         return Err("Finish first-run setup before public Records is available.".into());
     }
-    Ok(hmac_sha256(&session_mac_key()?, b"townlight-native-public-records-v1")
-        .iter().map(|byte| format!("{byte:02x}")).collect())
+    Ok(
+        hmac_sha256(&session_mac_key()?, b"townlight-native-public-records-v1")
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect(),
+    )
 }
 
 fn role_module_ids(role: &str) -> Option<&'static [&'static str]> {

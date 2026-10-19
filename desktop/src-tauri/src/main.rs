@@ -771,7 +771,8 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
 async fn records_domain_request(
     request: domain_client::RecordsRequest,
 ) -> Result<Value, domain_client::DomainError> {
-    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let access =
         auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "create-records-request", None)
@@ -783,8 +784,11 @@ async fn records_domain_request(
 }
 
 #[tauri::command]
-async fn records_public_request(request: domain_client::PublicRecordsRequest) -> Result<Value, domain_client::DomainError> {
-    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+async fn records_public_request(
+    request: domain_client::PublicRecordsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     require_enabled_city_modules("submit-public-records-request", None)
         .map_err(|_| domain_client::DomainError::denied())?;
     let proof = auth::domain_public_proof().map_err(|_| domain_client::DomainError::denied())?;
@@ -792,9 +796,13 @@ async fn records_public_request(request: domain_client::PublicRecordsRequest) ->
 }
 
 #[tauri::command]
-async fn access_domain_request(request: domain_client::AccessRequest) -> Result<Value, domain_client::DomainError> {
-    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
-    let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+async fn access_domain_request(
+    request: domain_client::AccessRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "accessibility-review", None)
         .map_err(|_| domain_client::DomainError::denied())?;
     require_enabled_city_modules("accessibility-review", None)
@@ -804,9 +812,13 @@ async fn access_domain_request(request: domain_client::AccessRequest) -> Result<
 }
 
 #[tauri::command]
-async fn suite_domain_request(request: domain_client::SuiteRequest) -> Result<Value, domain_client::DomainError> {
-    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
-    let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+async fn suite_domain_request(
+    request: domain_client::SuiteRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "search-city-knowledge", None)
         .map_err(|_| domain_client::DomainError::denied())?;
     require_enabled_city_modules("search-city-knowledge", None)
@@ -821,8 +833,10 @@ async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value
     let payload = serde_json::json!({"folder":request.folder.name()});
     require_role_for_city_work(&access, "open-exports-folder", Some(&payload))?;
     require_enabled_city_modules("open-exports-folder", Some(&payload))?;
-    let message = tauri::async_runtime::spawn_blocking(move || domain_files::open_exports(request.folder))
-        .await.map_err(|_| "Could not open the local exports folder.".to_string())??;
+    let message =
+        tauri::async_runtime::spawn_blocking(move || domain_files::open_exports(request.folder))
+            .await
+            .map_err(|_| "Could not open the local exports folder.".to_string())??;
     Ok(serde_json::json!({"message":message}))
 }
 

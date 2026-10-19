@@ -8,21 +8,36 @@ pub struct Operation;
 pub struct Lifecycle;
 
 pub fn operation() -> Result<Operation, String> {
-    ACTIVE.fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
-        if value >= EXCLUSIVE - 1 { None } else { Some(value + 1) }
-    }).map(|_| Operation).map_err(|_| "Profile maintenance is in progress; no operation started.".to_string())
+    ACTIVE
+        .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+            if value >= EXCLUSIVE - 1 {
+                None
+            } else {
+                Some(value + 1)
+            }
+        })
+        .map(|_| Operation)
+        .map_err(|_| "Profile maintenance is in progress; no operation started.".to_string())
 }
 
 pub fn lifecycle() -> Result<Lifecycle, String> {
-    ACTIVE.compare_exchange(0, EXCLUSIVE, Ordering::AcqRel, Ordering::Acquire)
-        .map(|_| Lifecycle).map_err(|_| "Finish current Records/file operations before profile maintenance.".to_string())
+    ACTIVE
+        .compare_exchange(0, EXCLUSIVE, Ordering::AcqRel, Ordering::Acquire)
+        .map(|_| Lifecycle)
+        .map_err(|_| {
+            "Finish current Records/file operations before profile maintenance.".to_string()
+        })
 }
 
 impl Drop for Operation {
-    fn drop(&mut self) { ACTIVE.fetch_sub(1, Ordering::Release); }
+    fn drop(&mut self) {
+        ACTIVE.fetch_sub(1, Ordering::Release);
+    }
 }
 impl Drop for Lifecycle {
-    fn drop(&mut self) { ACTIVE.store(0, Ordering::Release); }
+    fn drop(&mut self) {
+        ACTIVE.store(0, Ordering::Release);
+    }
 }
 
 #[cfg(test)]

@@ -1329,12 +1329,17 @@ fn stop_data_writers_for_snapshot() -> Result<(), String> {
     let manifest = parse_manifest()?;
     // Do not unload the model. Stop only this install's domain/queue writers,
     // then PostgreSQL. The native profile gate excludes concurrent commands.
-    let services = ["python-services", "task-queue", "postgres"].iter()
-        .map(|id| service_by_id(&manifest, id)).collect::<Result<Vec<_>, _>>()?;
+    let services = ["python-services", "task-queue", "postgres"]
+        .iter()
+        .map(|id| service_by_id(&manifest, id))
+        .collect::<Result<Vec<_>, _>>()?;
     stop_services(&services)?;
     wait_for_services_to_release_profile(&services);
     let state = read_state()?;
-    if services.iter().any(|service| service_process_health_ok(service, &state)) {
+    if services
+        .iter()
+        .any(|service| service_process_health_ok(service, &state))
+    {
         return Err("Data services did not stop; no consistent backup can be made.".to_string());
     }
     Ok(())
@@ -1342,16 +1347,28 @@ fn stop_data_writers_for_snapshot() -> Result<(), String> {
 
 fn verify_cold_database() -> Result<Option<String>, String> {
     let data = postgres_data_dir();
-    if !data.join("PG_VERSION").is_file() { return Ok(None); }
+    if !data.join("PG_VERSION").is_file() {
+        return Ok(None);
+    }
     if postgres_tcp_ready() || data.join("postmaster.pid").exists() {
         return Err("PostgreSQL is not stopped; refusing a live-directory backup.".to_string());
     }
     let manifest = parse_manifest()?;
     let binary = postgres_binary(service_by_id(&manifest, "postgres")?, "pg_controldata.exe")?;
-    let control = command_output(Command::new(binary).arg(&data).env("LC_ALL", "C"), "Database snapshot readiness")?;
-    let clean = control.lines().any(|line| line.split_once(':')
-        .is_some_and(|(name, value)| name.trim() == "Database cluster state" && value.trim() == "shut down"));
-    if !clean { return Err("PostgreSQL has not completed a clean shutdown; no backup certified.".to_string()); }
+    let control = command_output(
+        Command::new(binary).arg(&data).env("LC_ALL", "C"),
+        "Database snapshot readiness",
+    )?;
+    let clean = control.lines().any(|line| {
+        line.split_once(':').is_some_and(|(name, value)| {
+            name.trim() == "Database cluster state" && value.trim() == "shut down"
+        })
+    });
+    if !clean {
+        return Err(
+            "PostgreSQL has not completed a clean shutdown; no backup certified.".to_string(),
+        );
+    }
     Ok(Some("postgres-clean-shutdown-v1".to_string()))
 }
 
@@ -1408,12 +1425,18 @@ fn create_backup_with_options(kind: &str, options: BackupOptions) -> Result<Path
             .then_with(|| left.reason.cmp(&right.reason))
     });
     skipped_files.dedup();
-    if database_consistency.is_some() && skipped_files.iter().any(|entry| {
-        let path = entry.path.replace('\\', "/");
-        !(path == "config/secrets" || path.starts_with("config/secrets/")
-            || (!options.include_model_cache && (path == "Data/models" || path.starts_with("Data/models/"))))
-    }) {
-        return Err("Database backup is incomplete; no restore-ready manifest was written.".to_string());
+    if database_consistency.is_some()
+        && skipped_files.iter().any(|entry| {
+            let path = entry.path.replace('\\', "/");
+            !(path == "config/secrets"
+                || path.starts_with("config/secrets/")
+                || (!options.include_model_cache
+                    && (path == "Data/models" || path.starts_with("Data/models/"))))
+        })
+    {
+        return Err(
+            "Database backup is incomplete; no restore-ready manifest was written.".to_string(),
+        );
     }
 
     let manifest = BackupManifest {
@@ -1454,7 +1477,8 @@ fn verified_backup_manifest(source: &Path) -> Result<BackupManifest, String> {
         ));
     }
     if source.join("Data/postgres/PG_VERSION").is_file()
-        && manifest.database_consistency.as_deref() != Some("postgres-clean-shutdown-v1") {
+        && manifest.database_consistency.as_deref() != Some("postgres-clean-shutdown-v1")
+    {
         return Err("This backup has no verified consistent PostgreSQL snapshot; preserve it, but do not restore it over current Records.".to_string());
     }
     let (actual_files, actual_skipped_files) = collect_backup_files_with_skips(source)?;
@@ -2052,7 +2076,10 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
     let data = data_root();
     let db_url = local_database_url("postgresql+asyncpg")?;
     let mut env = vec![
-        ("TOWNLIGHT_PROFILE_ROOT".to_string(), civic_suite_root().display().to_string()),
+        (
+            "TOWNLIGHT_PROFILE_ROOT".to_string(),
+            civic_suite_root().display().to_string(),
+        ),
         (
             "CIVICSUITE_DATA_DIR".to_string(),
             data.to_string_lossy().to_string(),
@@ -3287,7 +3314,7 @@ fn backup_action() -> Result<SupervisorActionResult, String> {
             "Local data services remain stopped. Use Start to resume; keep {} for recovery.",
             destination.join("backup-manifest.json").display()
         )
-            .to_string(),
+        .to_string(),
     })
 }
 
@@ -3302,7 +3329,10 @@ fn activate_records_action() -> Result<SupervisorActionResult, String> {
         crate::workflows::initialize_empty_migration_source()?;
         let (_, hash) = sha256_file(&data_root().join("workflows/city-work.json"))?;
         let journal = crate::records_authority::Journal {
-            schema_version: 1, phase: "importing".to_string(), source_sha256: hash, backup_path: String::new(),
+            schema_version: 1,
+            phase: "importing".to_string(),
+            source_sha256: hash,
+            backup_path: String::new(),
         };
         crate::records_authority::write(&journal)?;
         journal
@@ -3310,20 +3340,33 @@ fn activate_records_action() -> Result<SupervisorActionResult, String> {
     if journal.backup_path.is_empty() {
         let backup = create_backup("pre-records-migration")?;
         verified_backup_manifest(&backup)?;
-        journal.backup_path = backup.join("Data/workflows/city-work.json").display().to_string();
+        journal.backup_path = backup
+            .join("Data/workflows/city-work.json")
+            .display()
+            .to_string();
         crate::records_authority::write(&journal)?;
     }
     start_postgres_service(service_by_id(&manifest, "postgres")?, false)?;
     let python = service_by_id(&manifest, "python-services")?;
     let mut command = Command::new(service_binary_path(python));
     command.args(["-m", "civicsuite_runtime.records_cutover"]);
-    for (name, value) in service_environment(python)? { command.env(name, value); }
-    command.env("TOWNLIGHT_MIGRATION_PROOF", crate::auth::domain_session_proof()?);
+    for (name, value) in service_environment(python)? {
+        command.env(name, value);
+    }
+    command.env(
+        "TOWNLIGHT_MIGRATION_PROOF",
+        crate::auth::domain_session_proof()?,
+    );
     command_output(&mut command, "Records migration")?;
     if crate::records_authority::read()?.is_none_or(|receipt| receipt.phase != "active") {
-        return Err("Records migration has no active receipt; no legacy fallback is permitted.".to_string());
+        return Err(
+            "Records migration has no active receipt; no legacy fallback is permitted.".to_string(),
+        );
     }
-    start_services(&target_services_with_start_dependencies(&manifest, Some("python-services"))?, false)?;
+    start_services(
+        &target_services_with_start_dependencies(&manifest, Some("python-services"))?,
+        false,
+    )?;
     Ok(SupervisorActionResult { accepted:true, action:"activate-records".to_string(), service_id:None,
         status:"Records migration complete", message:"Records now uses Python and PostgreSQL. Historical JSON and its verified backup are retained, not used as a fallback.".to_string(),
         next_action:"Refresh Records and verify the saved work. Meetings and Code remain unavailable in this candidate.".to_string() })
@@ -3342,11 +3385,19 @@ fn load_records_demo_action() -> Result<SupervisorActionResult, String> {
     let python = service_by_id(&manifest, "python-services")?;
     let mut command = Command::new(service_binary_path(python));
     command.args(["-m", "civicsuite_runtime.records_demo"]);
-    for (name, value) in service_environment(python)? { command.env(name, value); }
-    command.env("TOWNLIGHT_MIGRATION_PROOF", crate::auth::domain_session_proof()?);
+    for (name, value) in service_environment(python)? {
+        command.env(name, value);
+    }
+    command.env(
+        "TOWNLIGHT_MIGRATION_PROOF",
+        crate::auth::domain_session_proof()?,
+    );
     let loaded = command_output(&mut command, "Canonical Records demo");
     // A rejected load must not strand an otherwise valid profile with no service.
-    start_services(&target_services_with_start_dependencies(&manifest, Some("python-services"))?, false)?;
+    start_services(
+        &target_services_with_start_dependencies(&manifest, Some("python-services"))?,
+        false,
+    )?;
     loaded?;
     Ok(SupervisorActionResult { accepted:true, action:"load-records-demo".to_string(), service_id:None,
         status:"Demo ready", message:"The canonical synthetic demo is loaded; repeat loading does not duplicate or overwrite work.".to_string(),
@@ -3521,9 +3572,22 @@ pub fn supervisor_action(
     action: &str,
     service_id: Option<&str>,
 ) -> Result<SupervisorActionResult, String> {
-    let _lifecycle = if matches!(action, "install" | "repair" | "start" | "stop" | "backup" | "restore" | "uninstall" | "activate-records" | "load-records-demo") {
+    let _lifecycle = if matches!(
+        action,
+        "install"
+            | "repair"
+            | "start"
+            | "stop"
+            | "backup"
+            | "restore"
+            | "uninstall"
+            | "activate-records"
+            | "load-records-demo"
+    ) {
         Some(crate::profile_gate::lifecycle()?)
-    } else { None };
+    } else {
+        None
+    };
     let manifest = parse_manifest()?;
     validate_manifest(&manifest)?;
     if !manifest
@@ -3584,10 +3648,18 @@ mod tests {
     #[test]
     #[ignore = "Requires explicit disposable stopped database and cached PostgreSQL payload"]
     fn records_cold_backup_restores_real_database_and_files() {
-        let source = PathBuf::from(env::var("TOWNLIGHT_TEST_COLD_DATABASE").expect("disposable database"));
-        let payload = PathBuf::from(env::var("TOWNLIGHT_TEST_POSTGRES_PAYLOAD").expect("cached PostgreSQL"));
-        assert!(!source.join("postmaster.pid").exists(), "source must be stopped");
-        assert!(std::net::TcpListener::bind(("127.0.0.1", 25433)).is_ok(), "test port is occupied");
+        let source =
+            PathBuf::from(env::var("TOWNLIGHT_TEST_COLD_DATABASE").expect("disposable database"));
+        let payload =
+            PathBuf::from(env::var("TOWNLIGHT_TEST_POSTGRES_PAYLOAD").expect("cached PostgreSQL"));
+        assert!(
+            !source.join("postmaster.pid").exists(),
+            "source must be stopped"
+        );
+        assert!(
+            std::net::TcpListener::bind(("127.0.0.1", 25433)).is_ok(),
+            "test port is occupied"
+        );
         with_temp_state_dir(|root| {
             copy_path_recursive(&source, &postgres_data_dir()).expect("copy disposable database");
             let installed = root.join("Runtime/runtime/postgres");
@@ -3598,18 +3670,60 @@ mod tests {
             struct StopOnExit(PathBuf, PathBuf);
             impl Drop for StopOnExit {
                 fn drop(&mut self) {
-                    let _ = Command::new(&self.0).args(["stop", "-m", "fast", "-w", "-D"])
-                        .arg(&self.1).stdout(Stdio::null()).stderr(Stdio::null()).status();
+                    let _ = Command::new(&self.0)
+                        .args(["stop", "-m", "fast", "-w", "-D"])
+                        .arg(&self.1)
+                        .stdout(Stdio::null())
+                        .stderr(Stdio::null())
+                        .status();
                 }
             }
             let _cleanup = StopOnExit(ctl.clone(), database.clone());
-            let start = || command_output(Command::new(&ctl).args(["start", "-w", "-D"])
-                .arg(&database).arg("-l").arg(root.join("test-postgres.log"))
-                .args(["-o", "-p 25433 -h 127.0.0.1 -c shared_buffers=128MB -c max_connections=20"]), "test database start").unwrap();
-            let stop = || command_output(Command::new(&ctl).args(["stop", "-m", "fast", "-w", "-D"])
-                .arg(&database), "test database stop").unwrap();
-            let sql = |query: &str| command_output(Command::new(&psql)
-                .args(["-h", "127.0.0.1", "-p", "25433", "-U", "townlight_convergence", "-d", "civicrecords", "-At", "-v", "ON_ERROR_STOP=1", "-c", query]), "test SQL").unwrap();
+            let start = || {
+                command_output(
+                    Command::new(&ctl)
+                        .args(["start", "-w", "-D"])
+                        .arg(&database)
+                        .arg("-l")
+                        .arg(root.join("test-postgres.log"))
+                        .args([
+                            "-o",
+                            "-p 25433 -h 127.0.0.1 -c shared_buffers=128MB -c max_connections=20",
+                        ]),
+                    "test database start",
+                )
+                .unwrap()
+            };
+            let stop = || {
+                command_output(
+                    Command::new(&ctl)
+                        .args(["stop", "-m", "fast", "-w", "-D"])
+                        .arg(&database),
+                    "test database stop",
+                )
+                .unwrap()
+            };
+            let sql = |query: &str| {
+                command_output(
+                    Command::new(&psql).args([
+                        "-h",
+                        "127.0.0.1",
+                        "-p",
+                        "25433",
+                        "-U",
+                        "townlight_convergence",
+                        "-d",
+                        "civicrecords",
+                        "-At",
+                        "-v",
+                        "ON_ERROR_STOP=1",
+                        "-c",
+                        query,
+                    ]),
+                    "test SQL",
+                )
+                .unwrap()
+            };
             start();
             sql("CREATE TABLE records_recovery_proof (content text NOT NULL); INSERT INTO records_recovery_proof VALUES ('before-backup')");
             assert!(create_backup("must-refuse-live").is_err());
@@ -3618,21 +3732,48 @@ mod tests {
             fs::create_dir_all(file.parent().unwrap()).unwrap();
             fs::write(&file, "before-backup").unwrap();
             let backup = create_backup("manual").expect("cold backup");
-            assert_eq!(verified_backup_manifest(&backup).unwrap().database_consistency.as_deref(), Some("postgres-clean-shutdown-v1"));
+            assert_eq!(
+                verified_backup_manifest(&backup)
+                    .unwrap()
+                    .database_consistency
+                    .as_deref(),
+                Some("postgres-clean-shutdown-v1")
+            );
             start();
             sql("UPDATE records_recovery_proof SET content='newer-work'");
             stop();
             fs::write(&file, "newer-work").unwrap();
             let restored = restore_action(&[]).expect("restore with safety backup");
-            assert_eq!(restored.status, "Restore needs service start", "{}", restored.message);
-            assert!(restored.message.starts_with("Restored Townlight local data"));
+            assert_eq!(
+                restored.status, "Restore needs service start",
+                "{}",
+                restored.message
+            );
+            assert!(restored
+                .message
+                .starts_with("Restored Townlight local data"));
             assert_eq!(fs::read_to_string(&file).unwrap(), "before-backup");
             start();
-            assert_eq!(sql("SELECT content FROM records_recovery_proof").trim(), "before-backup");
+            assert_eq!(
+                sql("SELECT content FROM records_recovery_proof").trim(),
+                "before-backup"
+            );
             stop();
-            let safety = fs::read_dir(backup_root()).unwrap().flatten().map(|entry| entry.path())
-                .find(|path| path.file_name().unwrap().to_string_lossy().contains("pre-restore")).unwrap();
-            assert_eq!(fs::read_to_string(safety.join("Data/files/records/proof.txt")).unwrap(), "newer-work");
+            let safety = fs::read_dir(backup_root())
+                .unwrap()
+                .flatten()
+                .map(|entry| entry.path())
+                .find(|path| {
+                    path.file_name()
+                        .unwrap()
+                        .to_string_lossy()
+                        .contains("pre-restore")
+                })
+                .unwrap();
+            assert_eq!(
+                fs::read_to_string(safety.join("Data/files/records/proof.txt")).unwrap(),
+                "newer-work"
+            );
             verified_backup_manifest(&safety).expect("newer-work safety backup retained");
         });
     }

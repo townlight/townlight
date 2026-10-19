@@ -13,6 +13,8 @@ const desktopPackageLockJson = JSON.parse(readFileSync(join(root, "package-lock.
 const cargoToml = readFileSync(join(root, "src-tauri", "Cargo.toml"), "utf8");
 const cargoLock = readFileSync(join(root, "src-tauri", "Cargo.lock"), "utf8");
 const desktopMsiWorkflow = readFileSync(join(root, "..", ".github", "workflows", "desktop-windows-msi.yml"), "utf8");
+const recordsSourcePin = JSON.parse(readFileSync(join(root, "..", "installer", "modules.json"), "utf8"))
+  .modules.find((module) => module.id === "civicrecords-ai").source_commit;
 const cargoConfig = readFileSync(join(root, ".cargo", "config.toml"), "utf8");
 if (!cargoConfig.includes('[target.x86_64-pc-windows-msvc]') || !cargoConfig.includes('target-feature=+crt-static')) {
   throw new Error('Windows desktop must statically link the CRT for clean-machine startup');
@@ -387,7 +389,7 @@ for (const phrase of [
   "path: civiccore",
   "ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
   "path: civicrecords-ai",
-  "ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48",
+  `ref: ${recordsSourcePin}`,
   "path: civicnotice",
   "ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810",
   "path: civicaccess",
