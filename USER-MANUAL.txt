@@ -48,6 +48,33 @@ release.
 
 ## First run
 
+### Records beta.3 update (candidate until published)
+
+The beta.3 update moves active Records work to the bundled Python service and
+PostgreSQL database. It does not require Docker or a hosted account. Do not
+install a draft or unsigned candidate; the download above remains the accepted
+public release until beta.3's signed installer passes publication acceptance.
+
+For an existing installation, create a backup before updating. After installing
+beta.3, sign in as the local administrator. In **System Health**, select
+**Repair** for **Townlight Records services** to refresh the per-user runtime,
+then select **Finish Records Migration**. A fresh beta.3 installation also uses
+the explicit migration/activation control before creating Records work.
+
+Migration preserves and checks existing requests, audit history, accessibility
+reviews and exported files. Do not edit the preserved city-work JSON. After
+activation it is read-only historical evidence, not a fallback database. If
+Records services are unavailable, repair/start them; do not switch back to the
+old copy. New work must be recovered using the database/files backup and restore
+controls, not by reinstalling an old beta over newer work. Restore leaves services
+stopped until they are started again. Uninstalling normally retains user data;
+explicit profile removal is a separate admin action with a final backup.
+
+Meetings and Code are not enabled by this update. Response approval rules are
+unchanged: changed response text requires renewed approval, unrelated edits do not.
+
+### Setup steps
+
 1. Choose the local data and backup folders. The application location is owned
    by Windows Installer.
 2. Keep the default **Townlight Records** profile unless you are intentionally

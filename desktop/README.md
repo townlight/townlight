@@ -1,15 +1,15 @@
 # Townlight desktop
 
-Status: local, unsigned Records convergence candidate; not a new published release.
+Status: Records 1.1.0-beta.3 release candidate; publication awaits signed acceptance.
 
-This working branch builds on the Records beta.2 rc.3 baseline. Its local
-convergence installer retains the numeric build version below for testing; do
-not mistake that version for a signed release or for completed acceptance.
+This working branch builds on the Records beta.2 rc.3 baseline. Unsigned local
+integration acceptance passed; the final signed release bytes have a separate
+publication gate.
 
-The public candidate label is `1.1.0-beta.2`, using replacement tag
-`townlight-records-v1.1.0-beta.2-rc.3`. Its synchronized desktop build
-manifests use the MSI-compatible SemVer prerelease `1.1.0-2`, which Tauri maps
-to WiX ProductVersion `1.1.0.2`. The numeric form is installer metadata; it does
+The public candidate label is `1.1.0-beta.3`, using tag
+`townlight-records-v1.1.0-beta.3`. Its synchronized desktop build
+manifests use the MSI-compatible SemVer prerelease `1.1.0-3`, which Tauri maps
+to WiX ProductVersion `1.1.0.3`. The numeric form is installer metadata; it does
 not rename or promote the public beta candidate.
 
 This directory contains the Tauri/WebView2 desktop application used by the

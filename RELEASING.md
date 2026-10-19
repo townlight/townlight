@@ -1,5 +1,27 @@
 # Releasing the Townlight Records Windows MSI
 
+## Active update: 1.1.0-beta.3
+
+Scott approved push, merge, signing, exact signed-installer verification and
+publication conditional on passing acceptance on October 18, 2026. This
+approval covers Records only. Do not begin Meetings or alter Azure credentials.
+
+The new tag is `townlight-records-v1.1.0-beta.3`; synchronized desktop manifests
+use `1.1.0-3` (WiX ProductVersion `1.1.0.3`). Use these values in the historical
+command examples below. Do not move or overwrite any beta.2 tags/assets.
+Publication still requires the successful main signing run, independently
+verified inner EXE and MSI, and acceptance of those exact bytes. The owner has
+authorized publication if those gates pass; another approval prompt is not
+required. Prior unsigned acceptance is supporting evidence, not permission to
+publish an unsigned file.
+
+This update makes Python/PostgreSQL the active Records authority following
+explicit migration, with no legacy JSON fallback. Upgrade instructions and
+recovery boundaries are in USER-MANUAL.md. Until publication succeeds, the
+public download continues to point to the accepted rc.3 release.
+
+## Historical beta.2 release and retained procedure
+
 The rc.3 public beta was published with owner approval on 2026-10-08 at
 06:47:25 MDT (12:47:25 UTC), using the exact signed, installed-tested bytes.
 [Published release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3).

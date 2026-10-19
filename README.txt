@@ -45,7 +45,14 @@ See [RELEASING.md](RELEASING.md) and
 
 ### Architecture truth
 
-For this beta, the user-facing Records, Notice, and Access workflows execute in
+**Next update, beta.3 (not yet published):** local installed acceptance passed
+for the Records Python/PostgreSQL authority, explicit historical import,
+typed desktop transport, outage handling and database/files recovery. Final
+signed-release verification is still required. The current public rc.3 download
+above remains unchanged until that gate passes. See the beta.3 upgrade section
+of [USER-MANUAL.md](USER-MANUAL.md).
+
+For the published rc.3 beta, the user-facing Records, Notice, and Access workflows execute in
 the Rust desktop application. The Python/FastAPI packages and PostgreSQL
 runtime also ship, but are not yet the desktop's domain execution path.
 Convergence to one Python/PostgreSQL domain path is a blocking gate before

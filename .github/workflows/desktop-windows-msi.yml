@@ -111,7 +111,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48
+          ref: c011e4c7fe95c2a1ec686158cd35cd49fc08f4f0
           path: civicrecords-ai
 
       - name: Check out Townlight Notice runtime source
@@ -482,7 +482,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: ff99d8c7e692ba1f75e1781f517bb54f5c618b48
+          ref: c011e4c7fe95c2a1ec686158cd35cd49fc08f4f0
           path: civicrecords-ai
 
       - name: Check out Townlight Notice runtime source
