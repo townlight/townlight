@@ -1,8 +1,8 @@
 # Townlight FAQ
 
-## Current Townlight Records candidate
+## Current Townlight Records beta
 
-The active product is Townlight Records 1.1.0-beta.2 (rc.3), not a released
+The active product is Townlight Records 1.1.0-beta.3, not a released
 full suite. Fresh Windows setup includes Core, Records, Notice, and Access.
 The model is optional: deterministic Records work can use **Continue without
 local AI**. Successfully changing response text needs fresh human approval
@@ -13,6 +13,11 @@ Install only the exact signed MSI identified by completed acceptance evidence
 after publication approval. Both the MSI and desktop EXE must have valid,
 timestamped signatures matching the publisher identity in the release receipt.
 Older beta.2 drafts are preserved but not accepted releases.
+
+After explicit administrator activation, Records uses bundled Python/PostgreSQL.
+Upgrade preserves historical work through validated import; old JSON becomes
+read-only evidence, not a fallback for new work. See the manual before upgrading.
+Meetings, Code and broader city-core compatibility are not delivered by this update.
 
 ## Historical city-core FAQ
 

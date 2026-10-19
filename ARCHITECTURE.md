@@ -1,10 +1,10 @@
 # Townlight Architecture
 
-## Current Records candidate architecture
+## Current Records architecture
 
-Townlight Records 1.1.0-beta.3 is the update candidate; the published download
-remains beta.2 rc.3 until final signed acceptance and publication complete.
-Both install Core, Records, Notice, and Access, not Meetings or Code.
+Townlight Records 1.1.0-beta.3 passed exact signed-installer acceptance on
+October 19, 2026. Its profile includes Core, Records, Notice, and Access,
+not Meetings or Code.
 
 In beta.3, the desktop's typed Records client calls an authenticated loopback
 Python/FastAPI service. PostgreSQL owns Records state after explicit activation.
@@ -22,7 +22,7 @@ Successfully replacing response text requires fresh human approval. Failed
 generation and unrelated edits preserve approval. Local Ollama/Gemma remains
 optional. These are Records changes, not completion of the wider suite.
 
-![Current Townlight Records candidate architecture](docs/diagrams/suite-architecture.png)
+![Current Townlight Records architecture](docs/diagrams/suite-architecture.png)
 
 The historical suite topology below records intent and earlier package
 relationships. It is not evidence that all catalog products ship today.

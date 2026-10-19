@@ -1,6 +1,28 @@
 # Townlight status
 
-**Last verified:** 2026-10-08
+**Last verified:** 2026-10-19
+
+**Current product:** Townlight Records 1.1.0-beta.3, signed installed acceptance passed.
+
+[Download the beta](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3).
+The exact signed MSI and inner executable passed direct rc.3 upgrade and fresh
+installation, Records/public-privacy workflows, real local AI and renewed
+approval, offline operation, backup/restore, repair, retained-data reinstall,
+explicit profile removal/final backup, and uninstall. Final installed acceptance
+completed October 19 at 02:31:39 MDT (08:31:39 UTC).
+
+Records uses Python/PostgreSQL after explicit administrator activation, with
+validated import and no fallback to legacy JSON. Rust retains native integration
+and unmigrated city-core compatibility; Meetings and Code are not delivered here.
+This is the bounded Records update, not completion of every historical suite feature.
+
+Merged [Records PR #111](https://github.com/townlight/sunshine/pull/111) and
+[desktop PR #260](https://github.com/townlight/townlight/pull/260).
+[Signing run 39211809039](https://github.com/townlight/townlight/actions/runs/39211809039)
+passed all jobs. See the [beta.3 acceptance record](docs/installer/townlight-records-beta3-acceptance.md)
+for exact hashes, tested environments, evidence and limits.
+
+## Historical beta.2 rc.3 release and earlier recovery work
 
 **Active product:** Townlight Records 1.1.0-beta.2 (rc.3), signed installed acceptance passed
 

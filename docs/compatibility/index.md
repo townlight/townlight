@@ -1,6 +1,17 @@
 # CivicCore <-> Module Compatibility Matrix
 
-## Townlight Records beta.2 rc.3 source-pin pairing
+## Townlight Records beta.3 source-pin pairing
+
+The signed Records beta.3 source is `7129b079a9c77b3f21b384c6e5beeb9fc4f45979`.
+Its profile pairs Core `b4d0156bdc6883c1c3ef167abe0379f9ca32b258` with Records
+`62cee04abaec7f908f222e21c5a09b4b7977a575`, Notice
+`79b8d07199ee77cd425b31c0e0a44f3a0832b810`, and Access
+`b9100edc80ca496d6061f1cdb3eb39a60ff5f31a`. MSI metadata is `1.1.0-3` /
+Windows ProductVersion `1.1.0.3`. Exact signed fresh/upgrade acceptance passed
+October 19, 2026. Records uses Python/PostgreSQL after explicit validated import;
+legacy compatibility names and older module tags do not define the active code path.
+
+## Historical Townlight Records beta.2 rc.3 source-pin pairing
 
 Published 2026-10-08 after signing, exact installed acceptance, and owner
 publication approval. The rc.3 tag preserves older draft evidence;

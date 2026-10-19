@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" role="img" aria-labelledby="title desc">
-<title id="title">Townlight Records beta 3 candidate architecture</title>
+<title id="title">Townlight Records beta 3 architecture</title>
 <desc id="desc">The typed desktop client calls authenticated loopback Python services. PostgreSQL owns Records after explicit validated JSON import, without fallback or dual writes. Rust retains native integration and legacy city-core compatibility. Changed response text requires fresh approval. Local AI is optional. Core, Records, Notice and Access form the Records profile.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1a3a52"/></marker></defs>
 <style>text{font-family:Segoe UI,Arial,sans-serif;fill:#1a2330}.box{fill:#e6edf3;stroke:#1a3a52;stroke-width:2}.support{fill:#f5edd6;stroke:#8a6a1f;stroke-width:2}.line{fill:none;stroke:#1a3a52;stroke-width:2;marker-end:url(#arrow)}.head{font-size:18px;font-weight:600}.body{font-size:15px}</style>
 <rect width="1000" height="680" fill="#faf8f3"/>
-<text x="500" y="35" text-anchor="middle" font-size="25" font-weight="600">Townlight Records 1.1.0-beta.3 candidate</text>
-<text x="500" y="62" text-anchor="middle" class="body">Publication conditional on final signed installed acceptance</text>
+<text x="500" y="35" text-anchor="middle" font-size="25" font-weight="600">Townlight Records 1.1.0-beta.3</text>
+<text x="500" y="62" text-anchor="middle" class="body">Exact signed fresh-install and upgrade acceptance passed · 2026-10-19</text>
 <rect class="box" x="300" y="90" width="400" height="80" rx="8"/>
 <text x="500" y="121" text-anchor="middle" class="head">Windows desktop UI</text>
 <text x="500" y="151" text-anchor="middle" class="body">Typed client · authenticated loopback service calls</text>

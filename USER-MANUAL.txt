@@ -1,10 +1,10 @@
 # Townlight Records — User Manual
 
-**Release version:** 1.1.0-beta.2 (rc.3)
+**Release version:** 1.1.0-beta.3
 
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-19
 
-**Publication status:** published public beta — 2026-10-08, 06:47:25 MDT (12:47:25 UTC)
+**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-beta3-acceptance.md) passed 2026-10-19.
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records
@@ -14,14 +14,14 @@ Townlight Notice, and Townlight Access.
 ## Before installing
 
 Do not use an unsigned GitHub Actions artifact as a public release. Download
-Townlight Records 1.1.0-beta.2 (rc.3) from the
-[published public beta](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.2-rc.3),
+Townlight Records 1.1.0-beta.3 from the
+[public beta release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3),
 which includes the verified signed MSI and completed acceptance evidence.
 This is a prerelease for beta evaluation, not a general-availability release.
 
 The original `townlight-records-v1.1.0-beta.2` draft failed clean-machine
-startup acceptance and must not be used. Its replacement candidate uses
-`townlight-records-v1.1.0-beta.2-rc.3` to preserve earlier tags and evidence.
+startup acceptance and must not be used. The accepted rc.3 predecessor and all
+earlier tags/evidence remain preserved; beta.3 is a separate release.
 The rc.2 draft is dormant: replacing an approved response's text could retain
 the earlier approval. The replacement requires fresh approval when manual or
 AI response text changes. Failed generation, identical-text saves, and unrelated
@@ -39,7 +39,7 @@ Before running the MSI:
 
 After installation, confirm the installed desktop executable also has a valid
 signature from the publisher identified in the release evidence and matches the signed hash in the release signing
-receipt. The MSI and executable are both signed in this candidate.
+receipt. The MSI and executable are both signed in this release.
 
 Townlight runs locally. The normal operator path does not require Docker, WSL,
 a terminal, or a hosted vendor account. A local AI model is optional for the
@@ -48,12 +48,12 @@ release.
 
 ## First run
 
-### Records beta.3 update (candidate until published)
+### Records beta.3 activation and upgrade
 
 The beta.3 update moves active Records work to the bundled Python service and
-PostgreSQL database. It does not require Docker or a hosted account. Do not
-install a draft or unsigned candidate; the download above remains the accepted
-public release until beta.3's signed installer passes publication acceptance.
+PostgreSQL database. It does not require Docker or a hosted account. Use only
+the signed release above, not a draft or an unsigned CI artifact. MSI metadata
+is `1.1.0-3` (Windows ProductVersion `1.1.0.3`).
 
 For an existing installation, create a backup before updating. After installing
 beta.3, sign in as the local administrator. In **System Health**, select
