@@ -3864,6 +3864,7 @@ mod tests {
     fn write_test_postgres_payload(payload_root: &Path) {
         for file in [
             "bin/pg_ctl.exe",
+            "bin/pg_controldata.exe",
             "bin/initdb.exe",
             "bin/postgres.exe",
             "bin/zlib1.dll",
@@ -3884,6 +3885,7 @@ mod tests {
             "postgres",
             &[
                 "bin/pg_ctl.exe",
+                "bin/pg_controldata.exe",
                 "bin/initdb.exe",
                 "bin/postgres.exe",
                 "bin/zlib1.dll",
@@ -4365,7 +4367,7 @@ mod tests {
             let result = supervisor_action("install", Some("postgres"))
                 .expect("action response is structured");
 
-            assert!(result.accepted);
+            assert!(result.accepted, "{}: {}", result.status, result.message);
             assert_eq!(result.status, "Installed");
             assert!(root
                 .join("Runtime")
@@ -5299,7 +5301,11 @@ mod tests {
     #[test]
     fn restore_refuses_empty_backup() {
         with_temp_state_dir(|root| {
-            supervisor_action("backup", None).expect("empty backup response");
+            // The public backup action now stops writers and records their
+            // service state, so it no longer produces an empty fixture.
+            let empty_backup = create_backup("manual").expect("empty backup fixture");
+            let manifest = verified_backup_manifest(&empty_backup).expect("valid empty fixture");
+            assert!(!manifest.contains_data && !manifest.contains_config);
             fs::create_dir_all(root.join("Data").join("files")).expect("data folder");
             fs::write(
                 root.join("Data").join("files").join("record.txt"),
