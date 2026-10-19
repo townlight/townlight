@@ -75,7 +75,16 @@ def upgrade_all() -> None:
     # CREATE SCHEMA/create_all bootstrap; failure must fail the release runtime migration.
     from civicaccess.access_review import AccessibilityReviewRepository
 
-    AccessibilityReviewRepository(db_url=sync_url)
+    repository = AccessibilityReviewRepository(db_url=sync_url)
+    from civicsuite_runtime.access_bridge import ensure_native_schema
+    try:
+        ensure_native_schema(repository.engine)
+        from civicsuite_runtime.records_import_store import ensure_schema
+        ensure_schema(repository.engine)
+        from civicsuite_runtime.native_accounts import metadata as account_metadata
+        account_metadata.create_all(repository.engine)
+    finally:
+        repository.engine.dispose()
     print("Townlight Access: schema ensured (civicaccess-windows-local-state-v1)")
 
 

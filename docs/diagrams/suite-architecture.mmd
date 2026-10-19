@@ -1,13 +1,15 @@
 flowchart TB
-    UI["Townlight Records 1.1.0-beta.2 rc.3<br/>Windows desktop — candidate, not published"]
-    Domain["Current Records / Notice / Access actions<br/>Rust desktop domain implementation"]
-    State["Versioned city-work.json + local files<br/>Audit history, verified backup/restore"]
+    UI["Townlight Records 1.1.0-beta.3 candidate<br/>Typed desktop client / authenticated loopback"]
+    Domain["Python/FastAPI Records authority<br/>Notice and Access integrations"]
+    State["PostgreSQL + local export files<br/>Audit history, canonical backup/restore"]
     Review["Changed response text → fresh human approval<br/>Failed generation / unrelated edits preserve approval"]
     Release["Approved export → fulfillment → public status<br/>No automatic release of AI drafts"]
-    Runtime["Supervised Python/FastAPI + PostgreSQL<br/>Not yet the desktop domain execution path"]
+    Runtime["Rust shell: OS integration and supervision<br/>Legacy city-core compatibility retained"]
+    Import["Explicit validated JSON import<br/>Old file read-only; no fallback or dual writes"]
     AI["Optional local Ollama / verified Gemma<br/>On-device drafting"]
     UI --> Domain
     Domain --> State
+    Import --> State
     Domain --> Review --> Release
     UI -. supervises .-> Runtime
     Domain -. optional generation .-> AI

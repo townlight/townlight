@@ -1,0 +1,129 @@
+{
+  "expected": {
+    "counts": {"records": 3, "requests": 1, "sources": 1},
+    "pii": {
+      "expected_findings": [],
+      "record_ids": ["rv-record-council-0001", "rv-record-trails-0001", "rv-record-water-0001"]
+    },
+    "search": [
+      {"query": "trail maintenance schedule", "record_ids": ["rv-record-council-0001", "rv-record-trails-0001"]},
+      {"query": "utility sampling", "record_ids": ["rv-record-water-0001"]}
+    ],
+    "workflow": {
+      "human_approval_required": true,
+      "request_id": "rv-request-2026-0001",
+      "status_sequence": ["received", "assigned", "searching", "in_review", "approved", "fulfilled", "closed"]
+    }
+  },
+  "fixture_sha256": "a9c242a3f2618a69d7effb1d0d17d2df06f6744c8c351bba4065d315c94575b4",
+  "manifest": {
+    "artifact_hashes": {
+      "expected.json": "b3f85fb908b8e4eef8acc44245f25b9fff4680df9469c201bd08f3ab502a01c0",
+      "records.json": "947c3a8d9aec5175c9f19bf6f96fa712195a1080f7d5f1b54108b938828a3520",
+      "requests.json": "403df34becbdbeebef1c497c5cbe2f8e4099ebecf34d82092a2592ecb9dccf39",
+      "sources.json": "2699fa512000826e8aec67f9c5673ef6fa2a1583a17107bbdadf5e3f44ff564b"
+    },
+    "deterministic_seed": "townlight-records-demo-v1",
+    "fixture_id": "redstone-valley-records-demo",
+    "fixture_version": "1.0.0",
+    "generated_at": "2026-08-17T00:00:00Z",
+    "generation_mode": "static-canonical-v1",
+    "generator": "civiccore.testing.mock_city",
+    "municipality": {
+      "fictional": true,
+      "municipality_id": "redstone-valley-fictional",
+      "name": "Town of Redstone Valley (Fictional)",
+      "population_band": "50,000-100,000",
+      "state": "CO",
+      "timezone": "America/Denver"
+    },
+    "network_calls": false,
+    "provenance_modes": ["fully-synthetic"],
+    "schema_version": "1.0.0",
+    "synthetic": true,
+    "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
+  },
+  "records": [
+    {
+      "access_class": "public",
+      "contains_personal_data": false,
+      "content": "The fictional council accepted the prior action summary and approved a demonstration-only trail maintenance schedule. No real vote, person, place, ordinance, or meeting is represented.",
+      "content_sha256": "5646fd2fa99d255a67a90650f7f341754b5e7359e07298008291f5e1e28f9553",
+      "created_at": "2026-08-04T20:00:00Z",
+      "department": "Town Clerk",
+      "derivation": "independently-authored",
+      "ground_truth_tags": ["council", "trail-maintenance", "public"],
+      "record_id": "rv-record-council-0001",
+      "record_type": "meeting-summary",
+      "retention_class": "fictional-permanent",
+      "source_refs": ["townlight-independent-authorship-v1"],
+      "synthetic": true,
+      "title": "Council action summary for the demonstration calendar",
+      "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
+    },
+    {
+      "access_class": "public",
+      "contains_personal_data": false,
+      "content": "A synthetic inspection found two demonstration markers needing replacement and one invented drainage segment scheduled for review.",
+      "content_sha256": "31b4f45fe9d5867efe7397c8204892c3b4a8b274f209d5a79dc5e1c4d5c50b87",
+      "created_at": "2026-08-05T15:30:00Z",
+      "department": "Parks and Open Space",
+      "derivation": "independently-authored",
+      "ground_truth_tags": ["parks", "inspection", "trail-maintenance"],
+      "record_id": "rv-record-trails-0001",
+      "record_type": "inspection-summary",
+      "retention_class": "fictional-operational",
+      "source_refs": ["townlight-independent-authorship-v1"],
+      "synthetic": true,
+      "title": "Demonstration trail inspection summary",
+      "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
+    },
+    {
+      "access_class": "public",
+      "contains_personal_data": false,
+      "content": "All invented samples in this software fixture matched its fictional test thresholds. This statement is not regulatory or safety guidance.",
+      "content_sha256": "0a8de1810679e0c52b03925df36fecbdf56a23fcc16ec2de5aa99d2fa0b8ac59",
+      "created_at": "2026-08-06T14:15:00Z",
+      "department": "Utilities",
+      "derivation": "independently-authored",
+      "ground_truth_tags": ["utilities", "sampling", "public"],
+      "record_id": "rv-record-water-0001",
+      "record_type": "sampling-summary",
+      "retention_class": "fictional-operational",
+      "source_refs": ["townlight-independent-authorship-v1"],
+      "synthetic": true,
+      "title": "Synthetic utility sampling summary",
+      "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
+    }
+  ],
+  "requests": [
+    {
+      "contains_personal_data": false,
+      "description": "Provide the fictional trail maintenance schedule and its related demonstration inspection summary.",
+      "policy_basis": "fictional-demo-policy-v1",
+      "received_at": "2026-08-17T16:00:00Z",
+      "request_id": "rv-request-2026-0001",
+      "requester_category": "synthetic-public-requester",
+      "synthetic": true,
+      "target_record_ids": ["rv-record-council-0001", "rv-record-trails-0001"],
+      "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
+    }
+  ],
+  "sources": [
+    {
+      "acquisition_method": "independent-authorship",
+      "allowed_uses": ["testing", "demonstration", "redistribution"],
+      "canonical_url": null,
+      "contains_personal_data": false,
+      "content": "Independent authorship source for Redstone Valley fixture version 1.0.0",
+      "content_sha256": "8c89740cb0d68fcbb29eb513344f9e333c597fdfcca2904151b91e870a6ec56a",
+      "license_or_permission": "Apache-2.0",
+      "notes": "Project-authored fictional content that is not copied or adapted from any real municipality or media organization.",
+      "provenance_mode": "fully-synthetic",
+      "publisher": "Townlight fixture authors",
+      "redistributable": true,
+      "retrieved_at": null,
+      "source_id": "townlight-independent-authorship-v1"
+    }
+  ]
+}

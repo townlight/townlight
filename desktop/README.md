@@ -1,11 +1,15 @@
 # Townlight desktop
 
-Status: Townlight Records 1.1.0-beta.2 (rc.3) release candidate; not published
+Status: Records 1.1.0-beta.3 release candidate; publication awaits signed acceptance.
 
-The public candidate label is `1.1.0-beta.2`, using replacement tag
-`townlight-records-v1.1.0-beta.2-rc.3`. Its synchronized desktop build
-manifests use the MSI-compatible SemVer prerelease `1.1.0-2`, which Tauri maps
-to WiX ProductVersion `1.1.0.2`. The numeric form is installer metadata; it does
+This working branch builds on the Records beta.2 rc.3 baseline. Unsigned local
+integration acceptance passed; the final signed release bytes have a separate
+publication gate.
+
+The public candidate label is `1.1.0-beta.3`, using tag
+`townlight-records-v1.1.0-beta.3`. Its synchronized desktop build
+manifests use the MSI-compatible SemVer prerelease `1.1.0-3`, which Tauri maps
+to WiX ProductVersion `1.1.0.3`. The numeric form is installer metadata; it does
 not rename or promote the public beta candidate.
 
 This directory contains the Tauri/WebView2 desktop application used by the
@@ -41,11 +45,26 @@ Redstone Valley fixture with its hashes and synthetic-data watermark.
 
 ## Current architecture boundary
 
-The beta's user-facing Records, Notice, and Access workflows execute in the
-Rust desktop application. The installer also carries the existing Python
-packages and local PostgreSQL runtime. Those Python implementations are
-reference/contract packages for this release; the desktop is not yet routing
-these product actions through their FastAPI services.
+The historical beta's user-facing workflows executed in Rust. This local
+convergence candidate explicitly activates Python/PostgreSQL for Records and
+its integrated Access/notification behavior. Typed native transport carries the
+authenticated operations; Rust retains OS/file integration and supervision.
+After activation, current reads and writes do not fall back to the preserved
+JSON snapshot. An unavailable service produces an unavailable state, not an
+empty or competing Records database.
+
+Meetings, Code and meeting-notice operations are not integrated in this Records
+candidate. Their preserved source is not evidence of a shipped connected
+system. Duplicate domain-code retirement remains evidence-gated; this branch
+does not claim that all legacy Rust implementations have been removed.
+
+For this local convergence candidate, upgrading the MSI does not by itself
+activate the new domain authority. In **System Health**, use **Repair** on
+**Townlight Records services** to refresh the existing per-user runtime, then
+use **Finish Records Migration** as the local administrator. The application
+preserves and validates the old evidence before activation. After migration,
+the old JSON is not a rollback source for newer SQL work; use the supported
+database/files backup and restore controls.
 
 Convergence to one Python/PostgreSQL domain execution path is a blocking gate
 before Townlight Meetings. New domain behavior should not be added to the Rust

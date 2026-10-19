@@ -8,6 +8,8 @@
     "requires_terminal": false
   },
   "lifecycle_actions": [
+    "activate-records",
+    "load-records-demo",
     "install",
     "start",
     "stop",

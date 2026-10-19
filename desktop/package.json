@@ -1,6 +1,6 @@
 {
   "name": "@civicsuite/desktop",
-  "version": "1.1.0-2",
+  "version": "1.1.0-3",
   "private": true,
   "description": "Tauri/WebView2 desktop shell for the Townlight Records Windows beta.",
   "type": "module",
@@ -9,7 +9,7 @@
     "build": "vite build",
     "generate-icon": "node scripts/generate-icon.mjs",
     "prepare-runtime-payload": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-runtime-payload.ps1",
-    "test": "node tests/static-smoke.mjs && node tests/xss-and-state.mjs",
+    "test": "node tests/static-smoke.mjs && node tests/xss-and-state.mjs && node tests/records-client.mjs",
     "test:browser": "playwright test",
     "tauri": "tauri"
   },

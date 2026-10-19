@@ -2,12 +2,25 @@
 
 ## Current Records candidate architecture
 
-Townlight Records 1.1.0-beta.2 (rc.3) installs Core, Records, Notice, and Access.
-The current desktop domain actions execute in Rust and persist versioned
-`city-work.json` plus local files. The shell supervises Python/FastAPI,
-PostgreSQL, and optional local Ollama/Gemma; Python is not yet the desktop
-Records domain execution path. Successfully replacing response text requires
-fresh human approval. Failed generation and unrelated edits preserve approval.
+Townlight Records 1.1.0-beta.3 is the update candidate; the published download
+remains beta.2 rc.3 until final signed acceptance and publication complete.
+Both install Core, Records, Notice, and Access, not Meetings or Code.
+
+In beta.3, the desktop's typed Records client calls an authenticated loopback
+Python/FastAPI service. PostgreSQL owns Records state after explicit activation.
+The Rust shell owns native integration, service supervision, and migration
+coordination; it does not silently fall back to JSON when the Records service
+is unavailable. Rust domain handlers remain for the unmigrated city-core
+compatibility profile, not as a second active Records-beta authority.
+
+Existing rc.3 profiles keep their versioned `city-work.json` until the operator
+activates the update. Import backs up and validates legacy state and evidence,
+then marks the source read-only at cutover. That old snapshot cannot restore
+newer PostgreSQL work; use a canonical backup for post-cutover recovery.
+
+Successfully replacing response text requires fresh human approval. Failed
+generation and unrelated edits preserve approval. Local Ollama/Gemma remains
+optional. These are Records changes, not completion of the wider suite.
 
 ![Current Townlight Records candidate architecture](docs/diagrams/suite-architecture.png)
 

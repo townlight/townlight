@@ -1,11 +1,15 @@
 mod atomic_io;
 mod auth;
 mod demo_fixture;
+mod domain_client;
+mod domain_files;
 mod first_run;
 mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod profile_gate;
+mod records_authority;
 #[cfg(test)]
 mod records_golden_contract;
 mod supervisor;
@@ -32,6 +36,7 @@ struct NavigationItem {
 
 #[derive(Serialize)]
 struct AppState {
+    domain_authority: &'static str,
     product_name: &'static str,
     status_label: &'static str,
     local_only: bool,
@@ -384,7 +389,16 @@ fn app_state() -> Result<AppState, String> {
     let access = auth::access_state()?;
     let admin_signed_in = access_is_local_admin(&access);
     let signed_in = access_is_signed_in(&access);
-    let city_work = if signed_in {
+    let authority = records_authority::read()?;
+    let domain_authority = match authority.as_ref().map(|journal| journal.phase.as_str()) {
+        Some("active") => "python-records",
+        Some(_) => "records-migration-pending",
+        None => "legacy",
+    };
+    let city_work = if authority.is_some() {
+        // The typed async client loads canonical state; never read old JSON here.
+        CityWorkState::default()
+    } else if signed_in {
         workflows::city_work_state()?
     } else {
         workflows::public_city_work_state()?
@@ -405,6 +419,7 @@ fn app_state() -> Result<AppState, String> {
         public_runtime_health(supervisor::runtime_health()?)
     };
     Ok(AppState {
+        domain_authority,
         product_name: "Townlight",
         status_label: "Windows Local 1.0 desktop",
         local_only: true,
@@ -750,6 +765,81 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
     }
 }
 
+/// Candidate transport boundary. The domain service remains inactive until
+/// coherent profile activation; the existing workflow dispatcher is unchanged.
+#[tauri::command]
+async fn records_domain_request(
+    request: domain_client::RecordsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "create-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("create-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute(request, proof).await
+}
+
+#[tauri::command]
+async fn records_public_request(
+    request: domain_client::PublicRecordsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    require_enabled_city_modules("submit-public-records-request", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_public_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_public(request, proof).await
+}
+
+#[tauri::command]
+async fn access_domain_request(
+    request: domain_client::AccessRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "accessibility-review", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("accessibility-review", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_access(request, proof).await
+}
+
+#[tauri::command]
+async fn suite_domain_request(
+    request: domain_client::SuiteRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "search-city-knowledge", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("search-city-knowledge", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_suite(request, proof).await
+}
+
+#[tauri::command]
+async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value, String> {
+    let access = auth::require_signed_in_session()?;
+    let payload = serde_json::json!({"folder":request.folder.name()});
+    require_role_for_city_work(&access, "open-exports-folder", Some(&payload))?;
+    require_enabled_city_modules("open-exports-folder", Some(&payload))?;
+    let message =
+        tauri::async_runtime::spawn_blocking(move || domain_files::open_exports(request.folder))
+            .await
+            .map_err(|_| "Could not open the local exports folder.".to_string())??;
+    Ok(serde_json::json!({"message":message}))
+}
+
 fn city_work_action_authorized(
     action: String,
     payload: Option<Value>,
@@ -852,6 +942,11 @@ pub fn run() {
             choose_folder_path,
             module_action,
             get_city_work_state,
+            records_domain_request,
+            records_public_request,
+            access_domain_request,
+            suite_domain_request,
+            open_domain_exports,
             city_work_action
         ])
         .run(tauri::generate_context!())

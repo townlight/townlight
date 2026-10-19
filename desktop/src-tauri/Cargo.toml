@@ -1,6 +1,6 @@
 [package]
 name = "civicsuite-desktop"
-version = "1.1.0-2"
+version = "1.1.0-3"
 description = "Townlight Windows Local desktop shell"
 edition = "2021"
 build = "build.rs"
@@ -11,12 +11,13 @@ tauri-build = { version = "2.5.1", features = [] }
 [dependencies]
 argon2 = "0.5"
 getrandom = "0.2"
+reqwest = { version = "0.13.4", default-features = false, features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sha2 = "0.10"
 tauri = { version = "2.11.2", features = [] }
 tauri-plugin-single-instance = "2"
-uuid = { version = "1", features = ["v4"] }
+uuid = { version = "1", features = ["v4", "serde"] }
 
 [target.'cfg(windows)'.dependencies]
 rfd = "0.17"

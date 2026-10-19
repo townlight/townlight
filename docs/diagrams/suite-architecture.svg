@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" role="img" aria-labelledby="title desc">
-<title id="title">Townlight Records beta 2 rc 3 architecture</title>
-<desc id="desc">Rust desktop domain actions save versioned state. Changed response text requires fresh approval. Python and PostgreSQL are supervised, not the desktop domain path. Local AI is optional. Core, Records, Notice and Access form the fresh profile.</desc>
+<title id="title">Townlight Records beta 3 candidate architecture</title>
+<desc id="desc">The typed desktop client calls authenticated loopback Python services. PostgreSQL owns Records after explicit validated JSON import, without fallback or dual writes. Rust retains native integration and legacy city-core compatibility. Changed response text requires fresh approval. Local AI is optional. Core, Records, Notice and Access form the Records profile.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1a3a52"/></marker></defs>
 <style>text{font-family:Segoe UI,Arial,sans-serif;fill:#1a2330}.box{fill:#e6edf3;stroke:#1a3a52;stroke-width:2}.support{fill:#f5edd6;stroke:#8a6a1f;stroke-width:2}.line{fill:none;stroke:#1a3a52;stroke-width:2;marker-end:url(#arrow)}.head{font-size:18px;font-weight:600}.body{font-size:15px}</style>
 <rect width="1000" height="680" fill="#faf8f3"/>
-<text x="500" y="35" text-anchor="middle" font-size="25" font-weight="600">Townlight Records 1.1.0-beta.2 rc.3</text>
-<text x="500" y="62" text-anchor="middle" class="body">Candidate — signed installed acceptance and publication approval required</text>
+<text x="500" y="35" text-anchor="middle" font-size="25" font-weight="600">Townlight Records 1.1.0-beta.3 candidate</text>
+<text x="500" y="62" text-anchor="middle" class="body">Publication conditional on final signed installed acceptance</text>
 <rect class="box" x="300" y="90" width="400" height="80" rx="8"/>
 <text x="500" y="121" text-anchor="middle" class="head">Windows desktop UI</text>
-<text x="500" y="151" text-anchor="middle" class="body">Tauri / WebView2 · local staff and public surfaces</text>
+<text x="500" y="151" text-anchor="middle" class="body">Typed client · authenticated loopback service calls</text>
 <path class="line" d="M500 170V210"/>
 <rect class="box" x="300" y="210" width="400" height="80" rx="8"/>
-<text x="500" y="242" text-anchor="middle" class="head">Current Rust domain implementation</text>
-<text x="500" y="271" text-anchor="middle" class="body">Records · Notice · Access actions</text>
+<text x="500" y="242" text-anchor="middle" class="head">Python/FastAPI Records authority</text>
+<text x="500" y="271" text-anchor="middle" class="body">Records · Notice / Access integrations</text>
 <rect class="support" x="25" y="210" width="235" height="105" rx="8"/>
-<text x="142" y="242" text-anchor="middle" class="head">Supervised runtime</text>
-<text x="142" y="270" text-anchor="middle" class="body">Python/FastAPI + PostgreSQL</text>
-<text x="142" y="297" text-anchor="middle" class="body">Not the desktop domain path</text>
+<text x="142" y="242" text-anchor="middle" class="head">Rust desktop shell</text>
+<text x="142" y="270" text-anchor="middle" class="body">OS integration · supervision</text>
+<text x="142" y="297" text-anchor="middle" class="body">Legacy city-core retained</text>
 <path class="line" stroke-dasharray="5 5" d="M300 130H142V210"/>
 <rect class="support" x="740" y="210" width="235" height="105" rx="8"/>
 <text x="857" y="242" text-anchor="middle" class="head">Optional local AI</text>
@@ -26,8 +26,9 @@
 <path class="line" d="M400 290V340H240V365"/>
 <path class="line" d="M600 290V340H750V365"/>
 <rect class="box" x="35" y="365" width="410" height="100" rx="8"/>
-<text x="240" y="402" text-anchor="middle" class="head">Versioned local state and files</text>
-<text x="240" y="437" text-anchor="middle" class="body">Audit history · verified backups · restore</text>
+<text x="240" y="392" text-anchor="middle" class="head">PostgreSQL + local export files</text>
+<text x="240" y="420" text-anchor="middle" class="body">Validated import → old JSON read-only</text>
+<text x="240" y="448" text-anchor="middle" class="body">No dual writes · no fallback · canonical backups</text>
 <rect class="box" x="530" y="365" width="440" height="100" rx="8"/>
 <text x="750" y="396" text-anchor="middle" class="head">Changed text needs fresh human approval</text>
 <text x="750" y="424" text-anchor="middle" class="body">Failed generation and unrelated edits preserve approval</text>

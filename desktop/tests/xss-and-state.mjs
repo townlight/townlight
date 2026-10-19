@@ -13,7 +13,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const mainSrc = readFileSync(join(root, "src", "main.js"), "utf8");
@@ -117,6 +117,8 @@ globalThis.matchMedia = windowStub.matchMedia;
 //  - append an internals export for assertions.
 // ---------------------------------------------------------------------------
 let rewritten = mainSrc.replace(/^﻿/, "");
+rewritten = rewritten.replace('"./records/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "records", "view.js")).href));
+rewritten = rewritten.replace('"./records/controller.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "controller.ts")).href));
 rewritten = rewritten.replace(
   /import\s*\{\s*invoke\s*\}\s*from\s*["']@tauri-apps\/api\/core["'];?/,
   "const invoke = (...args) => globalThis.__TEST_INVOKE__(...args);"
@@ -202,6 +204,28 @@ if (appEl.innerHTML.includes("could not open your saved city data")) {
 }
 
 // ===========================================================================
+// Canonical outage must not trap an operator outside System Health after backup.
+const canonicalShell = {...FINISHED_STATE, domain_authority:"python-records"};
+invokeImpl = async (cmd) => {
+  if (cmd === "get_app_state") return canonicalShell;
+  if (cmd === "suite_domain_request") throw new Error("Service stopped after backup");
+  throw new Error(`Unexpected fallback command: ${cmd}`);
+};
+await t.loadAppState();
+if (!t.appStateLoaded || t.state.appLoadError) fail("Canonical outage must preserve the loaded shell");
+t.state.activeArea = "home";
+t.render();
+if (!appEl.innerHTML.includes("Records service is unavailable")) fail("Outage must not claim empty Records");
+t.state.activeArea = "health";
+t.render();
+if (!appEl.innerHTML.includes("System Health") || appEl.innerHTML.includes("could not open your saved city data")) {
+  fail("Canonical outage must leave System Health accessible");
+}
+invokeImpl = async (cmd) => cmd === "get_app_state" ? canonicalShell : {records_requests:[], access:{reviews:[],audit_events:[]}};
+await t.loadAppState();
+if (t.state.domainLoadError) fail("Successful canonical refresh must clear the outage");
+t.state.activeArea = "home";
+
 // T7 — PR#194 first-run cue regression + appStateLoaded gate.
 //   genuine first-run: get_app_state resolves finished:false with a
 //   profile_label + locations -> wizard renders the checklist + all three

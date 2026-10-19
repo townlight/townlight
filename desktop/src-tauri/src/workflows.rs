@@ -907,6 +907,7 @@ fn default_code_sync_status() -> String {
 }
 
 fn read_state() -> Result<CityWorkState, String> {
+    crate::records_authority::legacy_allowed()?;
     let path = workflows_path();
     if !path.is_file() {
         return Ok(CityWorkState::default());
@@ -990,6 +991,7 @@ fn normalize_adopted_legislation_index(state: &mut CityWorkState) -> bool {
 }
 
 fn write_state(state: &CityWorkState) -> Result<(), String> {
+    crate::records_authority::legacy_allowed()?;
     let path = workflows_path();
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)
@@ -7914,6 +7916,20 @@ pub fn search_city_work(state: &CityWorkState, query: &str) -> Vec<SearchResult>
 
 pub fn city_work_state() -> Result<CityWorkState, String> {
     read_state()
+}
+
+pub(crate) fn migration_write_fence() -> Result<std::sync::MutexGuard<'static, ()>, String> {
+    city_work_write_lock()
+        .lock()
+        .map_err(|_| "City workflow lock was poisoned; restart Townlight.".to_string())
+}
+
+pub(crate) fn initialize_empty_migration_source() -> Result<(), String> {
+    // Caller holds migration_write_fence. Preserve existing bytes exactly.
+    if !workflows_path().exists() {
+        write_state(&CityWorkState::default())?;
+    }
+    Ok(())
 }
 
 fn public_comment_projection(comment: &PublicComment) -> Option<PublicComment> {

@@ -2,6 +2,20 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
+## Townlight Records 1.1.0-beta.3 — release candidate
+
+- Active Records workflows now use the bundled Python/PostgreSQL domain path
+  after explicit administrator activation. Typed desktop transport retains the
+  existing workflow and human approval boundaries; no fallback to stale JSON.
+- Transactional import preserves historical requests, audit, Access reviews,
+  export receipts and identifiers, with an intact pre-import backup and writer
+  fence. New intake continues beyond imported tracking numbers.
+- Cold database/files backup and restore, offline use, privacy and installed
+  lifecycle acceptance passed on local candidates. Signed exact-byte release
+  acceptance is still required before publication.
+- New desktop build version `1.1.0-3`; beta.2 releases and draft evidence remain
+  preserved. Meetings and Code are not part of this release.
+
 ## Townlight Records 1.1.0-beta.2 rc.3 public beta — 2026-10-08
 
 - Successfully saving or generating different response text now requires fresh
