@@ -3,8 +3,9 @@
 Release candidate: **Records + Meetings + Code 1.3.0-beta.1**; synchronized
 desktop build 1.3.0-1 (MSI 1.3.0.1). The city-core payload contains all six
 connected capabilities. Default Records selection and application identities
-are unchanged. Final signed-byte verification is pending; local evidence below
-describes earlier candidate bytes, not the final release.
+are unchanged. Publication requires exact signed-byte verification; see the
+[release record](../docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+Local evidence below describes earlier candidate bytes, not the final release.
 
 Status: local Code C4 connected acceptance and bounded source retirement complete
 (October 20, 2026). The published Records–Meetings `1.2.0-beta.1` baseline and its signed
