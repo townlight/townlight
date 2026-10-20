@@ -1,6 +1,6 @@
 # Releasing the Townlight Records Windows MSI
 
-## Connected Records–Meetings candidate: 1.2.0-beta.1
+## Connected Records–Meetings release: 1.2.0-beta.1
 
 Scott approved the connected release sequence on October 19, 2026: push,
 merge after required checks, sign, verify the final installer and the supported
@@ -18,9 +18,12 @@ Notice and Access, not Code.
 The earlier local unsigned M4 candidate passed mapped installed behavior,
 privacy, restart with operator service start, backup/restore, repair and ordinary
 uninstall retention. It is supporting evidence, not a signed release or proof
-of the beta.3-to-connected upgrade. Final signing, exact-byte acceptance and
-publication remain pending. Optional native AI minutes/transcription are not
-claimed. Shared Rust handlers with remaining Code/city-core callers are retained.
+of the beta.3-to-connected upgrade. Final signing and exact-byte fresh workflow,
+populated beta.3 upgrade, recovery and retained-data uninstall acceptance passed
+on October 19, 2026. See the [acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
+for source, hashes, signing run and public-delivery verification. Optional native
+AI minutes/transcription are not claimed. Shared Rust handlers with remaining
+Code/city-core callers are retained.
 
 Use the existing main-only fail-closed signing and draft-attachment workflows
 below. Both EXE and MSI must verify as `CN=Scott Converse`, with timestamps and
@@ -28,7 +31,7 @@ matching source/run/hash receipts. Do not rebuild after accepting the final
 signed bytes or move a published tag. After successful acceptance, the owner has
 already authorized publication; no additional approval prompt is required.
 
-## Active update: 1.1.0-beta.3
+## Historical Records update: 1.1.0-beta.3
 
 Scott approved push, merge, signing, exact signed-installer verification and
 publication conditional on passing acceptance on October 18, 2026. This

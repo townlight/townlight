@@ -1,6 +1,21 @@
 # CivicSuite — Consistency Reference
 
-## Townlight Records beta.2 candidate (2026-10-07)
+## Current connected release: Records + Meetings 1.2.0-beta.1 (2026-10-19)
+
+Public label `1.2.0-beta.1`, desktop build `1.2.0-1`, Windows ProductVersion
+`1.2.0.1`, tag `townlight-records-meetings-v1.2.0-beta.1`. The explicit
+`meetings-beta` profile includes Core, Records, Meetings, Notice and Access;
+`records-beta` remains the default, without Meetings. Code is not included.
+Signed source `8627868bd9d894be90b6ece1ce5ae4dc41e82f2f`, signing run
+`39356961713`. Records pin `2f0b7b755cade85673066fdd59ef3593a3052c83`;
+Meetings pin `3dd73d0619943beb8ce2965abe7a41dfe596e9be`. No pins change in
+this documentation follow-up. Exact signed fresh install, populated beta.3
+upgrade, recovery and retained-data uninstall passed; the
+[acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
+records hashes, environment limits and delivery verification. Earlier references
+below are historical, not current release instructions.
+
+## Historical Townlight Records beta.2 candidate (2026-10-07)
 
 The current candidate uses public label `1.1.0-beta.2`, desktop build version
 `1.1.0-2`, and a Records profile of Core + Records + Notice + Access. The

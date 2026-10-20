@@ -2,7 +2,7 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
-## Townlight Records + Meetings 1.2.0-beta.1 — release candidate
+## Townlight Records + Meetings 1.2.0-beta.1 — 2026-10-19
 
 - Connected `meetings-beta` profile adds Meetings to Core, Records, Notice and
   Access while preserving the existing Records profile and application identity.
@@ -13,9 +13,10 @@ All notable changes to the Townlight umbrella repo are documented here.
 - Records searches permitted archive text and retains selected evidence with
   source IDs, hashes, citations and attributed audit history. Attachment is not
   response approval or publication. Restricted sources remain protected.
-- Local unsigned installed acceptance passed, including persistence, recovery
-  and retained-data uninstall. Final signed-install and predecessor-upgrade
-  acceptance remain pending; this entry does not announce publication.
+- Exact signed fresh installed acceptance and populated Records beta.3 upgrade
+  passed, including persistence, restricted-source protection, recovery and
+  ordinary uninstall with readable retained database and exact source/export
+  evidence. [Acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md).
 - Code and optional native AI minutes/transcription are not part of this update.
 
 ## Townlight Records 1.1.0-beta.3 — 2026-10-19

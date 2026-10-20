@@ -1,10 +1,10 @@
-# Townlight Records — User Manual
+# Townlight Records + Meetings — User Manual
 
-**Release version:** 1.1.0-beta.3
+**Release version:** 1.2.0-beta.1
 
 **Last updated:** 2026-10-19
 
-**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-beta3-acceptance.md) passed 2026-10-19.
+**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-meetings-beta1-acceptance.md) passed 2026-10-19.
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records
@@ -14,8 +14,8 @@ Townlight Notice, and Townlight Access.
 ## Before installing
 
 Do not use an unsigned GitHub Actions artifact as a public release. Download
-Townlight Records 1.1.0-beta.3 from the
-[public beta release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3),
+Townlight Records + Meetings 1.2.0-beta.1 from the
+[public beta release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1),
 which includes the verified signed MSI and completed acceptance evidence.
 This is a prerelease for beta evaluation, not a general-availability release.
 
@@ -47,6 +47,35 @@ deterministic Records demo journey; human review remains mandatory before
 release.
 
 ## First run
+
+### Connected Records + Meetings
+
+The signed `1.2.0-beta.1` installer passed fresh connected workflows, a populated
+Records beta.3 upgrade, backup/restore, and ordinary uninstall with actual
+database/evidence readback. The MSI build is `1.2.0-1`, Windows ProductVersion
+`1.2.0.1`. Earlier installers and acceptance records remain preserved.
+
+For the connected release, choose **Townlight Records + Meetings**
+(`meetings-beta`) during setup. A Records-only installation is still the default.
+The connected choice installs Core, Records, Meetings, Notice and Access, not
+Code. An authorized administrator upgrading an existing Records installation
+chooses that profile in **Settings**, applies the module selection, then uses
+**System Health → City workflow services → Repair** to install the selected payload
+and start its PostgreSQL dependency. If maintenance reports an operation is still
+running, let that operation finish before retrying. A failed repair is not
+acceptance: preserve the data
+and logs rather than deleting the profile or falling back to an old JSON file.
+
+Meetings supports agendas, packets, delivery history, notices and proof,
+proceedings and corrections, manually prepared minutes, and public/restricted
+local archives. Authorized humans may post clearly labeled draft minutes before
+adoption; posting, adoption and signing remain separate decisions recorded in
+history. Optional native AI minutes/transcription are not part of this claim.
+
+Records may attach permitted Meetings archive text with its source identity,
+citation and content hash. Restricted material is not a public Records search
+source, and attaching evidence does not approve or release a response. Local
+public archives do not automatically create a hosted municipal website.
 
 ### Records beta.3 activation and upgrade
 

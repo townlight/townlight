@@ -2,7 +2,14 @@
 
 **Last verified:** 2026-10-19
 
-**Current product:** Townlight Records 1.1.0-beta.3, signed installed acceptance passed.
+**Current connected release:** Townlight Records + Meetings 1.2.0-beta.1,
+signed installed acceptance passed. See its
+[acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
+and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
+
+## Historical Records beta.3
+
+Townlight Records 1.1.0-beta.3 remains preserved with its original evidence.
 
 [Download the beta](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3).
 The exact signed MSI and inner executable passed direct rc.3 upgrade and fresh
@@ -21,6 +28,20 @@ Merged [Records PR #111](https://github.com/townlight/sunshine/pull/111) and
 [Signing run 39211809039](https://github.com/townlight/townlight/actions/runs/39211809039)
 passed all jobs. See the [beta.3 acceptance record](docs/installer/townlight-records-beta3-acceptance.md)
 for exact hashes, tested environments, evidence and limits.
+
+## Connected Records–Meetings 1.2.0-beta.1 acceptance
+
+The `1.2.0-beta.1` release source is merged and signed. Its required PR checks,
+real-runtime integration and installed MSI lifecycle passed. Independent local
+verification of the downloaded MSI confirms the receipt hash and Valid Scott
+Converse signature. Final installed connected-workflow, Records beta.3
+preserved-data upgrade, recovery and retained-data uninstall all passed on
+October 19, 2026. The final guest was released at 22:24:16 MDT.
+
+The explicit `meetings-beta` profile adds Meetings to Core, Records, Notice and
+Access. Records-only remains the default. Code and optional native Meetings AI
+minutes/transcription are outside this release. See the
+[candidate acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md).
 
 ## Historical beta.2 rc.3 release and earlier recovery work
 
