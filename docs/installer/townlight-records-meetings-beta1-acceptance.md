@@ -1,7 +1,8 @@
 # Townlight Records + Meetings 1.2.0-beta.1 — acceptance record
 
 **Status: exact signed fresh workflow, upgrade, recovery and retained-data
-uninstall acceptance passed on 2026-10-19. Public-delivery verification pending.**
+uninstall acceptance passed on 2026-10-19. Public release assets and anonymous
+downloads verified on 2026-10-20.**
 
 The owner authorized conditional publication on October 19, 2026. The connected
 profile contains Core, Records, Meetings, Notice and Access. Code and optional
@@ -71,7 +72,19 @@ protected. This does not certify the final signed bytes or predecessor upgrade.
   hash. PostgreSQL then stopped normally. The retained authority, PostgreSQL 17
   files and source-byte check passed. Both disposable guests were released;
   the final empty Sandbox list was verified at October 19, 22:24:16 MDT.
-- Public release asset and download verification: pending.
+- Public release asset and download verification: **passed**. Published
+  `2026-10-20T06:13:29Z` (October 20, 00:13:29 MDT) as a public prerelease:
+  [Records + Meetings 1.2.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
+  The annotated tag resolves to the exact signed source above. Existing draft
+  staging [run39369994352](https://github.com/townlight/townlight/actions/runs/39369994352)
+  independently verified both signatures and receipt before attaching assets.
+  The public GitHub MSI digest equals the independently measured SHA-256 above;
+  asset size is 1,632,428,032 bytes. Anonymous download HEAD returned HTTP 200
+  and the same byte count. Anonymous public receipt and evidence downloads
+  matched the signed source/run, MSI/EXE hashes, publisher and publication flag.
+  This verifies delivery without unnecessarily downloading the large MSI again.
+  Documentation follow-up [PR263](https://github.com/townlight/townlight/pull/263)
+  does not change the signed source, tag or accepted installer bytes.
 
 ## Evidence and environment limits
 
@@ -87,6 +100,9 @@ not changed. A guest-only test proxy allowed public/restricted HTTP read checks;
 it is not a shipped network-listening configuration. No native Meetings AI or
 transcription verification, new adapter-disabled test, same-MSI reinstall, Code
 release or full-suite completion is claimed by these final-candidate results.
+The existing Records fixture has no personal requester contact; its public/staff
+separation check does not independently certify a new requester-contact privacy
+scenario. Unchanged component privacy checks remain supporting CI evidence.
 
 Preserve the accepted beta.3 predecessor and its release record. Do not move its
 tag, overwrite its assets, discard newer data, or treat historical JSON as a

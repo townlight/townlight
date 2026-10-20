@@ -1,11 +1,14 @@
 # Townlight status
 
-**Last verified:** 2026-10-19
+**Last verified:** 2026-10-20
 
 **Current connected release:** Townlight Records + Meetings 1.2.0-beta.1,
 signed installed acceptance passed. See its
 [acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
 and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
+
+Published October 20 at 00:13:29 MDT. Public MSI asset identity, anonymous download
+response and public signing receipt/evidence were verified after publication.
 
 ## Historical Records beta.3
 

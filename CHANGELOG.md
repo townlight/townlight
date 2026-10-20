@@ -2,7 +2,7 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
-## Townlight Records + Meetings 1.2.0-beta.1 — 2026-10-19
+## Townlight Records + Meetings 1.2.0-beta.1 — 2026-10-20
 
 - Connected `meetings-beta` profile adds Meetings to Core, Records, Notice and
   Access while preserving the existing Records profile and application identity.

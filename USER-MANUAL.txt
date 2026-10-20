@@ -2,7 +2,7 @@
 
 **Release version:** 1.2.0-beta.1
 
-**Last updated:** 2026-10-19
+**Last updated:** 2026-10-20
 
 **Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-meetings-beta1-acceptance.md) passed 2026-10-19.
 
