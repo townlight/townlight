@@ -3,23 +3,27 @@
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
-## Current product: Townlight Records
+## Current product: Townlight Records + Meetings
 
-Townlight Records 1.1.0-beta.3 is a signed, installed-tested public beta. It is a Windows
+Townlight Records + Meetings 1.2.0-beta.1 is a signed, installed-tested public beta. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,
 search with citations, human exemption decisions, accessibility review,
 approval, release packaging, fulfillment, public status, audit history, and
-backup/restore.
+backup/restore, connected to meeting agendas, packets, notices, proceedings,
+manual minutes and local archives. Permitted meeting documents attach to Records
+with source identity, citation, hash and audit history retained.
 
-The beta installs the dependency-closed Records product profile:
+Choose **Townlight Records + Meetings** (`meetings-beta`) for the connected profile:
 
 - Townlight Core
 - Townlight Records (`townlight/sunshine`)
+- Townlight Meetings
 - Townlight Notice
 - Townlight Access
 
-Meetings and Code remain visible in the catalog but are not installed on a new
-Records beta profile. The operator path requires no Docker, WSL, terminal, or
+The default `records-beta` selection remains Records-only with Core, Notice and
+Access; select `meetings-beta` explicitly to add Meetings. Code is not included.
+The operator path requires no Docker, WSL, terminal, or
 developer tooling.
 
 The beta includes an explicit, local-admin-only fictional demo town. Redstone
@@ -28,11 +32,12 @@ watermarked, and never loaded automatically. No Longmont or Longmont Public
 Media content is redistributed in this fixture.
 
 The release pipeline signs the desktop executable before packaging and then
-signs the MSI. Beta.3 passed independent signature/hash verification and both
-fresh-install and direct rc.3-upgrade acceptance on October 19, 2026.
+signs the MSI. This release passed independent signature/hash verification,
+fresh connected-workflow acceptance and a populated Records beta.3 upgrade on
+October 19, 2026, including recovery and retained-data uninstall.
 Install the signed MSI attached to the
-[`townlight-records-v1.1.0-beta.3` release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3)
-with its [completed acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
+[`townlight-records-meetings-v1.2.0-beta.1` release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1)
+with its [completed installed-acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md).
 This is a public beta, not a general-availability release or completion of the
 entire suite specification. Historical releases and dormant drafts are preserved.
 Saving or successfully
@@ -44,6 +49,17 @@ See [RELEASING.md](RELEASING.md) and
 
 ### Architecture truth
 
+### Connected workflow boundaries
+
+Authorized human workflow decisions remain explicit and audited. Draft minutes
+may be posted before adoption and remain labeled as drafts; signing is separate
+from adoption. Restricted archives remain protected. Attaching a permitted
+Meetings source does not approve or publish a Records response. Local archives
+are not an automatically hosted public website. Optional native Meetings AI
+minutes/transcription and Code are not part of this release claim.
+
+### Released Records architecture
+
 After explicit activation, beta.3 routes Records through the bundled Python
 service and PostgreSQL database. Validated import preserves existing requests,
 audit history, Access evidence and exports. The old JSON becomes read-only
@@ -51,9 +67,9 @@ historical evidence, not a fallback or a way to recover newer work.
 See the upgrade and recovery instructions in [USER-MANUAL.md](USER-MANUAL.md).
 
 Rust retains native desktop integration, supervision and unmigrated city-core
-compatibility handlers. This is one active Records path, not a claim that all
-municipal Rust has been deleted. Meetings and Code remain separate, unfinished
-stages under the connected-system plan.
+compatibility handlers. This is one active connected Python/PostgreSQL domain
+path, not a claim that all municipal Rust has been deleted. Code remains a future
+stage under the connected-system plan. Historical Records beta.3 remains preserved.
 
 Public branding is Townlight. Existing `civic*` imports, database names,
 environment variables, MSI identity, and legacy data paths remain compatibility

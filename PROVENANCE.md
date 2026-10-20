@@ -1,6 +1,29 @@
-# Townlight Records — Bundled Module Provenance
+# Townlight Records + Meetings — Bundled Module Provenance
 
-## Records beta.3 public beta provenance
+## Connected 1.2.0-beta.1 provenance
+
+Signed source `8627868bd9d894be90b6ece1ce5ae4dc41e82f2f`, annotated tag
+`townlight-records-meetings-v1.2.0-beta.1`, MSI `1.2.0-1` / ProductVersion
+`1.2.0.1`. [Signing run39356961713](https://github.com/townlight/townlight/actions/runs/39356961713)
+and exact signed fresh workflow, populated Records beta.3 upgrade, recovery and
+retained-data uninstall passed. See the
+[acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md).
+
+| Module | Repository | Accepted source commit |
+|---|---|---|
+| Townlight Core | townlight/core | `b4d0156bdc6883c1c3ef167abe0379f9ca32b258` |
+| Townlight Records | townlight/sunshine | `2f0b7b755cade85673066fdd59ef3593a3052c83` |
+| Townlight Meetings | townlight/meetings | `3dd73d0619943beb8ce2965abe7a41dfe596e9be` |
+| Townlight Notice | townlight/notice | `79b8d07199ee77cd425b31c0e0a44f3a0832b810` |
+| Townlight Access | townlight/access | `b9100edc80ca496d6061f1cdb3eb39a60ff5f31a` |
+
+The connected profile is explicit; Records-only remains the default. Both
+connected domain workflows use Python/PostgreSQL after activation. Rust retains
+native integration, supervision and unmigrated compatibility handlers. Code and
+optional native Meetings AI/transcription are not claimed. Documentation-only
+follow-up commits do not replace the signed source or accepted bytes.
+
+## Historical Records beta.3 public beta provenance
 
 Signed source `7129b079a9c77b3f21b384c6e5beeb9fc4f45979`, tag
 `townlight-records-v1.1.0-beta.3`, MSI version `1.1.0-3` / `1.1.0.3`.

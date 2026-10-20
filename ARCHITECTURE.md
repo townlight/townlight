@@ -1,6 +1,6 @@
 # Townlight Architecture
 
-## Current Records architecture
+## Records foundation: published beta.3
 
 Townlight Records 1.1.0-beta.3 passed exact signed-installer acceptance on
 October 19, 2026. Its profile includes Core, Records, Notice, and Access,
@@ -22,7 +22,33 @@ Successfully replacing response text requires fresh human approval. Failed
 generation and unrelated edits preserve approval. Local Ollama/Gemma remains
 optional. These are Records changes, not completion of the wider suite.
 
-![Current Townlight Records architecture](docs/diagrams/suite-architecture.png)
+![Published Records beta.3 architecture](docs/diagrams/suite-architecture.png)
+
+### Connected Records–Meetings 1.2.0-beta.1
+
+The merged `1.2.0-beta.1` release adds the explicit `meetings-beta` profile.
+Its signed installer lifecycle, fresh connected workflow, predecessor upgrade,
+recovery and retained-data uninstall passed. The default `records-beta`
+selection is unchanged. Code is not included in the connected profile.
+
+```mermaid
+flowchart TD
+    UI[Windows desktop UI] --> Shell[Rust transport and service supervision]
+    Shell --> API[Authenticated loopback Python domain services]
+    API --> Records[Records workflows]
+    API --> Meetings[Meetings workflows]
+    Records --> DB[Local PostgreSQL and managed evidence files]
+    Meetings --> DB
+    Meetings -->|Permitted archive text, source identity and hash| Records
+```
+
+Core supplies shared platform capabilities; Notice and Access support the
+connected workflows. Restricted Meetings material remains protected. Records
+attachment is a cited evidence action, not response approval or publication.
+Posting draft minutes, adopting them and signing remain distinct human actions
+with history retained. Local archives are not an automatically hosted website.
+Existing compatibility handlers and storage identities remain; this release
+does not claim all Rust domain code or legacy city-core work was removed.
 
 The historical suite topology below records intent and earlier package
 relationships. It is not evidence that all catalog products ship today.

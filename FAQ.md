@@ -2,8 +2,16 @@
 
 ## Current Townlight Records beta
 
-The active product is Townlight Records 1.1.0-beta.3, not a released
-full suite. Fresh Windows setup includes Core, Records, Notice, and Access.
+The connected **Records + Meetings 1.2.0-beta.1** release passed final signed
+installed workflows, Records beta.3 upgrade, recovery and retained-data uninstall.
+Its explicit `meetings-beta` choice includes Core,
+Records, Meetings, Notice and Access. Records-only remains the default; Code is
+not part of this update. Follow the [acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md),
+not a version label alone. Earlier Records releases remain preserved.
+
+The active product is a bounded connected beta, not a released full suite.
+Default fresh Windows setup includes Core, Records, Notice, and Access;
+explicitly choose `meetings-beta` to include Meetings.
 The model is optional: deterministic Records work can use **Continue without
 local AI**. Successfully changing response text needs fresh human approval
 before export; failed generation and unrelated edits preserve approval.
@@ -17,7 +25,7 @@ Older beta.2 drafts are preserved but not accepted releases.
 After explicit administrator activation, Records uses bundled Python/PostgreSQL.
 Upgrade preserves historical work through validated import; old JSON becomes
 read-only evidence, not a fallback for new work. See the manual before upgrading.
-Meetings, Code and broader city-core compatibility are not delivered by this update.
+Code and broader city-core convergence are not delivered by this update.
 
 ## Historical city-core FAQ
 

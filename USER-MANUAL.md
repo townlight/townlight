@@ -1,10 +1,10 @@
-# Townlight Records — User Manual
+# Townlight Records + Meetings — User Manual
 
-**Release version:** 1.1.0-beta.3
+**Release version:** 1.2.0-beta.1
 
-**Last updated:** 2026-10-19
+**Last updated:** 2026-10-20
 
-**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-beta3-acceptance.md) passed 2026-10-19.
+**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-meetings-beta1-acceptance.md) passed 2026-10-19.
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records
@@ -14,8 +14,8 @@ Townlight Notice, and Townlight Access.
 ## Before installing
 
 Do not use an unsigned GitHub Actions artifact as a public release. Download
-Townlight Records 1.1.0-beta.3 from the
-[public beta release](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3),
+Townlight Records + Meetings 1.2.0-beta.1 from the
+[public beta release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1),
 which includes the verified signed MSI and completed acceptance evidence.
 This is a prerelease for beta evaluation, not a general-availability release.
 
@@ -48,7 +48,36 @@ release.
 
 ## First run
 
-### Records beta.3 activation and upgrade
+### Connected Records + Meetings
+
+The signed `1.2.0-beta.1` installer passed fresh connected workflows, a populated
+Records beta.3 upgrade, backup/restore, and ordinary uninstall with actual
+database/evidence readback. The MSI build is `1.2.0-1`, Windows ProductVersion
+`1.2.0.1`. Earlier installers and acceptance records remain preserved.
+
+For the connected release, choose **Townlight Records + Meetings**
+(`meetings-beta`) during setup. A Records-only installation is still the default.
+The connected choice installs Core, Records, Meetings, Notice and Access, not
+Code. An authorized administrator upgrading an existing Records installation
+chooses that profile in **Settings**, applies the module selection, then uses
+**System Health → City workflow services → Repair** to install the selected payload
+and start its PostgreSQL dependency. If maintenance reports an operation is still
+running, let that operation finish before retrying. A failed repair is not
+acceptance: preserve the data
+and logs rather than deleting the profile or falling back to an old JSON file.
+
+Meetings supports agendas, packets, delivery history, notices and proof,
+proceedings and corrections, manually prepared minutes, and public/restricted
+local archives. Authorized humans may post clearly labeled draft minutes before
+adoption; posting, adoption and signing remain separate decisions recorded in
+history. Optional native AI minutes/transcription are not part of this claim.
+
+Records may attach permitted Meetings archive text with its source identity,
+citation and content hash. Restricted material is not a public Records search
+source, and attaching evidence does not approve or release a response. Local
+public archives do not automatically create a hosted municipal website.
+
+### Historical Records beta.3 activation and upgrade
 
 The beta.3 update moves active Records work to the bundled Python service and
 PostgreSQL database. It does not require Docker or a hosted account. Use only
@@ -70,15 +99,17 @@ controls, not by reinstalling an old beta over newer work. Restore leaves servic
 stopped until they are started again. Uninstalling normally retains user data;
 explicit profile removal is a separate admin action with a final backup.
 
-Meetings and Code are not enabled by this update. Response approval rules are
+Meetings and Code were not enabled by beta.3; the connected update above adds
+Meetings explicitly. Response approval rules are
 unchanged: changed response text requires renewed approval, unrelated edits do not.
 
 ### Setup steps
 
 1. Choose the local data and backup folders. The application location is owned
    by Windows Installer.
-2. Keep the default **Townlight Records** profile unless you are intentionally
-   testing another profile. Townlight Core cannot be removed.
+2. Keep **Townlight Records** for Records-only work, or explicitly choose
+   **Townlight Records + Meetings** for connected work. Townlight Core cannot
+   be removed.
 3. Enter the municipality name, state, time zone, and records contact.
 4. Create the first Townlight admin and store its passcode in an approved
    password vault.
@@ -141,11 +172,11 @@ Use the fictional request to verify the product end to end:
 
 ## Beta limits and architecture
 
-The Records beta's user-facing domain workflow currently executes in the Rust
-desktop application. The installed Python/FastAPI Records, Notice, and Access
-packages are reference/contract implementations for this release, not the
-desktop execution path. A blocking convergence program moves domain work to a
-single Python/PostgreSQL path before Townlight Meetings ships.
+After explicit activation, Records and Meetings domain workflows execute in
+bundled Python services and PostgreSQL. The desktop uses authenticated loopback
+calls; unavailable services do not silently fall back to old JSON. Rust retains
+native integration, service supervision and unmigrated compatibility handlers.
+This is a bounded connected beta, not completion of Code or the wider suite.
 
 Public names use Townlight. Existing `civic*` package/import IDs, database and
 schema names, environment variables, MSI identity, and legacy local-data paths

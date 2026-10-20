@@ -1,5 +1,22 @@
 # Getting Support
 
+## Current Townlight support
+
+For the published connected Records–Meetings beta, start
+with the current [manual](USER-MANUAL.md), [status](STATUS.md) and the acceptance
+record linked there. The connected `1.2.0-beta.1` installer passed signed
+connected-workflow and predecessor-upgrade acceptance; do not use the
+historical city-core download below as its installer.
+
+Report Records issues at [townlight/sunshine](https://github.com/townlight/sunshine/issues),
+Meetings issues at [townlight/meetings](https://github.com/townlight/meetings/issues),
+and installer or cross-module issues at [townlight/townlight](https://github.com/townlight/townlight/issues).
+Never attach real resident information, passwords, local tokens or unredacted
+database/backup files to public issues. Include the installed version, profile,
+steps and redacted error evidence instead.
+
+## Historical suite support routing
+
 The `civicsuite` umbrella repo is for **suite-wide** orientation, governance, roadmap, ADRs, and the compatibility matrix. Most support questions belong on a specific module's repo. Please use the table below to route your question to the right place.
 
 ## Where to ask
