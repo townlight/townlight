@@ -1,6 +1,6 @@
 # Townlight Architecture
 
-## Current Records architecture
+## Records foundation: published beta.3
 
 Townlight Records 1.1.0-beta.3 passed exact signed-installer acceptance on
 October 19, 2026. Its profile includes Core, Records, Notice, and Access,

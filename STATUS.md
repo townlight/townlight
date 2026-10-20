@@ -33,8 +33,8 @@ for exact hashes, tested environments, evidence and limits.
 
 The `1.2.0-beta.1` release source is merged and signed. Its required PR checks,
 real-runtime integration and installed MSI lifecycle passed. Independent local
-verification of the downloaded MSI confirms the receipt hash and Valid Scott
-Converse signature. Final installed connected-workflow, Records beta.3
+verification of the downloaded MSI confirms the receipt hash and Valid publisher
+signature. Final installed connected-workflow, Records beta.3
 preserved-data upgrade, recovery and retained-data uninstall all passed on
 October 19, 2026. The final guest was released at 22:24:16 MDT.
 

@@ -1,6 +1,14 @@
 # Townlight Troubleshooting
 
-## Townlight Records 1.1.0-beta.3
+## Townlight Records + Meetings 1.2.0-beta.1
+
+For connected work, choose **Townlight Records + Meetings** in setup or Settings.
+After a Records beta.3 upgrade, apply that selection and use **System Health →
+City workflow services → Repair** to refresh the payload and start its database
+dependency. If an operation is still active, let it finish before retrying.
+Do not delete municipal data or revert to legacy JSON to work around a service
+failure. Code and optional native Meetings AI/transcription are not part of this
+release claim. See the [connected acceptance record](installer/townlight-records-meetings-beta1-acceptance.md).
 
 Use the current [Records manual](../USER-MANUAL.md) for installation and setup.
 Earlier beta.2 drafts are not accepted releases. The original beta.2 startup
