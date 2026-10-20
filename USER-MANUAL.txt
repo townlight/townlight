@@ -368,7 +368,7 @@ The full suite architecture, dependency graph, data-flow rules, and CivicCore ex
 <!-- Maintainers: re-run `python scripts/docs/render_topology.py --check` before publishing docs. -->
 Generated from `installer/modules.json`.
 
-- Root installer truth label: `townlight_records_beta_candidate`.
+- Root installer truth label: `townlight_records_meetings_beta_candidate`.
 - Primary product profile: `records-beta` (Townlight Records).
 - Townlight Records profile status: `stabilizing`.
 - Only the Townlight Records modules are represented in this candidate table.
