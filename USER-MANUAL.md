@@ -439,7 +439,7 @@ Generated from `installer/modules.json`.
 | Module | Version | Role | Dependencies | Source commit | Installer status |
 |---|---:|---|---|---|---|
 | Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
-| Townlight Records | 1.7.3 | records workflow | `civiccore` | `2f0b7b755cad` | `v1_7_3_records_beta_candidate` |
+| Townlight Records | 1.7.3 | records workflow | `civiccore` | `0218fa51bb07` | `v1_7_3_records_beta_candidate` |
 | Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
 | Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
 
