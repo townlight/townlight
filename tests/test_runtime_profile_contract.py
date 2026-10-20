@@ -51,6 +51,12 @@ def test_unknown_embedded_runtime_profile_fails_closed(monkeypatch: pytest.Monke
         services._product_profile()
 
 
+def test_meetings_profile_adds_meetings_without_enabling_code(monkeypatch):
+    monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "meetings-beta")
+    modules = services._required_module_imports(services._product_profile())
+    assert modules == services.RECORDS_BETA_MODULE_IMPORTS + [("civicclerk", "civicclerk.main")]
+
+
 def test_runtime_hosts_real_records_app_without_activating_writes(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
 

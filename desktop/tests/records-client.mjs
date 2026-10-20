@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createRecordsClient } from "../src/records/client.ts";
 import { createAccessClient } from "../src/records/access-client.ts";
 import { createRecordsController } from "../src/records/controller.ts";
+import { createMeetingsClient } from "../src/meetings/client.ts";
 
 const calls = [];
 const client = createRecordsClient(async (command, args) => { calls.push({ command, ...args }); return {}; });
@@ -52,3 +53,17 @@ assert.equal(controllerCalls.length, 2); // Explicitly unavailable; never legacy
 const unavailable = createRecordsController(async () => {throw {message:"Backend unavailable", outcome_unknown:true};});
 await assert.rejects(unavailable.action("draft-records-response", {recordsRequestId:"legacy-1"}, current));
 console.log("PASS: Canonical controller refreshes SQL state and never falls back to the legacy writer.");
+
+const meetingCalls = [];
+const meetings = createMeetingsClient(async (command, args) => { meetingCalls.push({command, ...args}); return {}; });
+await meetings.createMeeting({title:"Council", scheduled_start:"2026-10-20T18:00:00-06:00", location:"Hall", actor:"forged"});
+await meetings.createAgendaItem({title:"Trail report", department_name:"Public Works", actor:"forged"});
+await meetings.read("meeting", "a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78");
+assert.equal(meetingCalls[0].command, "meetings_domain_request");
+assert.equal(Object.hasOwn(meetingCalls[0].request.payload, "actor"), false);
+assert.equal(Object.hasOwn(meetingCalls[1].request.payload, "actor"), false);
+assert.equal(meetingCalls[2].request.operation, "get-meeting");
+let meetingAttempts = 0;
+await assert.rejects(createMeetingsClient(async () => { meetingAttempts++; throw new Error("unavailable"); }).createAgendaItem({title:"Report", department_name:"Works"}));
+assert.equal(meetingAttempts, 1);
+console.log("PASS: Meetings uses typed native requests, strips actor input and never retries/falls back.");

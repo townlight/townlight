@@ -10,8 +10,9 @@ param(
     [string]$PayloadRoot = "",
     [string]$RecordsBackendRoot = "",
     [switch]$ReuseInstalledServiceDependencies,
-    [ValidateSet("records-beta", "city-core")]
+    [ValidateSet("records-beta", "city-core", "meetings-beta")]
     [string]$ProductProfile = "records-beta",
+    [string]$MeetingsRoot = "",
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
 )
@@ -704,6 +705,14 @@ function Test-PythonServiceImports {
     if ($ProductProfile -eq "city-core") {
         $ImportNames += @("civicclerk.main", "civiccode.main")
     }
+    if ($ProductProfile -eq "meetings-beta") {
+        $ImportNames += @(
+            "civicclerk.main",
+            "civicclerk.desktop_delivery",
+            "civicclerk.records_sources",
+            "civicsuite_runtime.meetings_bridge"
+        )
+    }
     $ImportCsv = $ImportNames -join ","
     $ImportScript = @"
 import importlib
@@ -764,6 +773,10 @@ function Install-PythonServicePackages {
             (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path
         )
     }
+    if ($ProductProfile -eq "meetings-beta") {
+        $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
+        $ServicePackages += @($CivicClerk)
+    }
     $ServiceInstallArguments = @(
         "-m", "pip", "install",
         "--disable-pip-version-check",
@@ -799,6 +812,9 @@ function Install-PythonServicePackages {
     $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
     if ($ProductProfile -eq "city-core") {
         $InstalledPackages += @("civicclerk", "civiccode")
+    }
+    if ($ProductProfile -eq "meetings-beta") {
+        $InstalledPackages += @("civicclerk")
     }
     return @{
         pip = $PipStatus

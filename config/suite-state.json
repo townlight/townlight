@@ -33,6 +33,7 @@
     "minimal": {"modules": ["core"], "disabled": false},
     "clerk-core": {"modules": ["core", "records", "meetings"], "disabled": false},
     "records-beta": {"modules": ["core", "records", "notice", "access"], "disabled": false},
+    "meetings-beta": {"modules": ["core", "records", "meetings", "notice", "access"], "disabled": false},
     "city-core": {"modules": ["core", "records", "meetings", "code", "notice", "access"], "disabled": false},
     "land-use": {"modules": ["core", "code", "zoning", "planning", "permitting", "inspections"], "disabled": true},
     "full-suite": {

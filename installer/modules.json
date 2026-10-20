@@ -39,6 +39,13 @@
                     ],
     "profiles":  [
                      {
+                         "id": "meetings-beta",
+                         "label": "Townlight Meetings — development candidate",
+                         "description": "Local Records plus Meetings integration; not a published release.",
+                         "modules": ["civiccore", "civicrecords-ai", "civicclerk", "civicnotice", "civicaccess"],
+                         "disabled": false
+                     },
+                     {
                          "id":  "minimal",
                          "label":  "Minimal",
                          "description":  "Install CivicCore only.",
