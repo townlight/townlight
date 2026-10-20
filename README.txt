@@ -213,9 +213,9 @@ The `CivicSuite` GitHub org has two active owners (`scottconverse` and `APirateM
 
 ## Licensing
 
-- Documentation: CC BY 4.0
-- Code snippets in this repo: Apache 2.0
-- Module repos: Apache 2.0 for code, CC BY 4.0 for docs
+Code: AGPL-3.0-only, with the TownLight Public Institution Exception for qualifying deployments. See [LICENSE](LICENSE) and [LICENSE-EXCEPTION.md](LICENSE-EXCEPTION.md).
+Documentation: CC BY 4.0 ([LICENSE-DOCS](LICENSE-DOCS)).
+Module repos: AGPL-3.0-only for code, CC BY 4.0 for docs.
 
 ## Contributing
 

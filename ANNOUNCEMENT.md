@@ -70,7 +70,7 @@ CivicSuite is open-source municipal software designed to run **locally on a city
 - a bundled portable **Ollama** runtime with a pinned **Gemma 4 12B QAT** model (~6.97 GB, downloaded and checksum-verified on first run) — the engine behind the records, minutes, code, and now accessibility AI features,
 - and **six city-core modules**: CivicCore (shared platform), CivicRecords AI (public records / FOIA), CivicClerk (meetings / agendas / minutes), CivicCode (municipal code), CivicNotice (public notices), and **CivicAccess** (accessibility + records-ready export — tab and local-AI drafting new in v1.0.2).
 
-Everything — your data, your documents, your audit trail, the AI model — stays on the machine. There is no vendor cloud, no per-seat licensing, and no telemetry by design. Code is Apache-2.0; docs are CC BY 4.0.
+Everything — your data, your documents, your audit trail, the AI model — stays on the machine. There is no vendor cloud, no per-seat licensing, and no telemetry by design. Code is AGPL-3.0; docs are CC BY 4.0.
 
 ## Why "GA candidate" *and* "public beta"
 

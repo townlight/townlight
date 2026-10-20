@@ -9,7 +9,7 @@ Modeled on the v3.0 CivicRecords AI unified spec • Built on CivicCore
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
-Open source · Apache License 2.0 · Gemma 4 default · airgappable
+Open source · AGPL-3.0 · Gemma 4 default · airgappable
 
 **Document Metadata**
 
@@ -20,7 +20,7 @@ Open source · Apache License 2.0 · Gemma 4 default · airgappable
   **Primary owner**     Planning & Development / Community Development
   **Depends on**        CivicCore (auth, RBAC, audit, LLM, ingest, search, notifications), CivicCode (shares ordinance infrastructure and version tracking). Optional: CivicPlan (comp plan cross-references), CivicClerk (variance hearing minutes).
   **Default model**     Gemma 4 via Ollama. Local inference only. Embeddings via nomic-embed-text.
-  **License**           Apache License 2.0 (code). CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
+  **License**           AGPL-3.0-only (code), with the TownLight Public Institution Exception for qualifying deployments. CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
   **Supersedes**        Nothing. First CivicZone spec. Fills the Land Use gap identified in the CivicSuiteAI Module Catalog.
   **Grounded in**       CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). CivicCore v0.1 Extraction Spec (platform dependency).
   **Completion bar**    Every user-facing state designed and tested. Every AI output cites source. Every parcel lookup discloses data freshness. Every answer declines to opine on approval outcomes and routes to a planner for determinations.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 """Policy: generated USER-MANUAL PDF and DOCX must be current with markdown."""
 
 from __future__ import annotations

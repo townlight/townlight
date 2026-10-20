@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 """Policy: reserve "audited" claims for independent audit evidence."""
 
 from __future__ import annotations

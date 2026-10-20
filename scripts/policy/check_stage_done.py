@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 """STAGE_DONE marker enforcement.
 
 v1.1.1 open followup #1 (now closed by v1.2.0): role files describe

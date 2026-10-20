@@ -122,7 +122,7 @@ If a future doc says "Phase 0 inventory" or names the branch `civiccore-phase-0-
 
 | Asset | License | Source of phrasing |
 |---|---|---|
-| Code (every repo) | Apache License 2.0 | `02_CivicCore.md` Appendix D |
+| Code (every repo) | AGPL-3.0-only | `02_CivicCore.md` Appendix D |
 | Documentation | CC BY 4.0 | `02_CivicCore.md` Appendix D |
 | Prompt libraries (if separated) | CC BY-SA 4.0 | `02_CivicCore.md` Appendix D |
 | Third-party deps | Permissive or weak-copyleft only; AGPL and GPL-3.0 blocked | `02_CivicCore.md` Appendix D |
@@ -189,7 +189,7 @@ These specific drifts have been introduced and fixed in this workspace's history
 2. **"§17" vs "§18" for the bug-filing decision tree** — the decision tree is described in §18 (Risks table). Any reference to §17 has drifted.
 3. **"Phase 0 inventory" labeling** — Phase 0 in the spec is repo skeleton only. Inventory is preparation for Phase 1, not part of Phase 0.
 4. **`.docx` vs `.md` filename references** — markdown is canonical in this workspace. Any reference to `.docx` filenames as the primary read target has drifted.
-5. **MIT vs. Apache 2.0** — project standardized on Apache 2.0 on 2026-04-23. Any new text claiming MIT for code has drifted from the current decision. The umbrella's documentation license (CC BY 4.0) and the optional prompt-library license (CC BY-SA 4.0) are unchanged.
+5. **MIT vs. AGPL-3.0-only** — project standardized on AGPL-3.0-only on 2026-10-20. Any new text claiming MIT or Apache 2.0 for code has drifted from the current decision. The umbrella's documentation license (CC BY 4.0) and the optional prompt-library license (CC BY-SA 4.0) are unchanged.
 6. **Spec-vs-reality path drift** — Day-3 inventory (2026-04-23) found 6 places where spec 02 §8/§9 named paths in civicrecords-ai that didn't exist or had moved. Spec was updated to match reality. Future drift in either direction (renaming files in civicrecords-ai or rewriting spec paths) needs to be reconciled in the same PR.
 
 7. **27 product modules plus CivicCore** - older text drifted between incompatible suite counts. The reconciled current suite has 27 product modules plus the CivicCore shared platform. Do not collapse those into a single ambiguous count.

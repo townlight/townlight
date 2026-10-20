@@ -2,7 +2,7 @@
 
 Status: active planning document  
 Applies after: all 26 catalog modules have runtime-foundation releases and the v0.1.1 CivicCore alignment lane is complete  
-License: Apache-2.0
+License: AGPL-3.0-only
 
 ## Purpose
 
@@ -30,7 +30,7 @@ Goal: make the current 26-module foundation set easier to verify, transfer, inst
 Deliverables:
 
 1. A suite-wide release inventory that checks every repo for:
-   - Apache-2.0 license files.
+   - AGPL-3.0-only license files.
    - README, README.txt, CHANGELOG, user manual, landing page, support/security/contributing docs, issue template, PR template, and discussion seed posts.
    - Current version surfaces.
    - Branch protection.

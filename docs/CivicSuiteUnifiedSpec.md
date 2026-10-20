@@ -5,7 +5,7 @@
 Spec revision: 1.1  
 Status: Canonical planning specification (architectural intent only; STATUS.md is current-shipped truth)  
 Last revised: 2026-06-13
-License: Apache License 2.0 for code; CC BY 4.0 for documentation unless a repository-specific LICENSE says otherwise.  
+License: AGPL-3.0-only for code; CC BY 4.0 for documentation unless a repository-specific LICENSE says otherwise.  
 Supersedes: `CivicSuiteAI_Module_Catalog_v1`, `Open Source AI for Municipalities`, and module-specific draft specs where they conflict with this document.  
 Preserves: Feature, workflow, schema, prompt, testing, and product requirements from the source documents unless explicitly marked superseded, deferred, or corrected here.
 
@@ -38,11 +38,11 @@ These corrections override older source documents.
 
 ### 2.1 License
 
-All CivicSuite code repositories use **Apache License 2.0**.
+All CivicSuite code repositories use **AGPL-3.0-only**.
 
-Documentation uses **CC BY 4.0** unless a repository-specific LICENSE says otherwise. Code snippets inside documentation are governed by Apache License 2.0.
+Documentation uses **CC BY 4.0** unless a repository-specific LICENSE says otherwise. Code snippets inside documentation are governed by AGPL-3.0-only.
 
-Older drafts referenced MIT. That language is superseded. Apache 2.0 is the civic/municipal default because it remains permissive while giving public-sector legal/procurement reviewers clearer patent and contribution language.
+Older drafts referenced MIT, and releases before 2026-10-20 used Apache 2.0; both are superseded. Code is AGPL-3.0-only so improvements to public software stay public and no vendor can take it closed, with the TownLight Public Institution Exception so public institutions can keep their own deployment changes private. Third-party dependencies stay permissive or weak-copyleft so the exception remains useful to them.
 
 ### 2.2 Module Count And Tiers
 

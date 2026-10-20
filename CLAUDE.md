@@ -50,7 +50,7 @@ CivicSuite work flows: **branch from main → produce a manifest that names the 
 - **Documentation rendering:** MkDocs Material (docs site); Pandoc (USER-MANUAL.pdf / .docx).
 - **Commit convention:** Conventional Commits + DCO sign-off (every commit ends with `Signed-off-by: Name <email>`). For CivicSuite commits, Scott Converse is the primary author. The `Signed-off-by:` trailer credits whoever did the work, for example `Signed-off-by: Codex <codex@openai.com>` when Codex implemented. Do not use a `Co-Authored-By:` trailer; it is not the CivicSuite convention.
 - **Pre-commit hooks:** ruff, mypy, trailing-whitespace, end-of-file-fixer, conventional-commit-message check.
-- **License header:** `# SPDX-License-Identifier: Apache-2.0` on every source file; `# Copyright (c) The CivicSuite Authors`.
+- **License header:** `# SPDX-License-Identifier: AGPL-3.0-only` on every source file; `# Copyright (c) The CivicSuite Authors`.
 
 ## Local workspace root
 

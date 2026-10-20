@@ -9,7 +9,7 @@ Modeled on the v3.0 CivicRecords AI unified spec • Built on CivicCore
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
-Open source · Apache License 2.0 · Gemma 4 default · Whisper-local
+Open source · AGPL-3.0 · Gemma 4 default · Whisper-local
 transcription · airgappable
 
 **Document Metadata**
@@ -22,7 +22,7 @@ transcription · airgappable
   **Depends on**             CivicCore (auth, RBAC, audit, LLM, ingest, search, notifications). Optional: CivicCode (ordinance handoff on adoption), CivicAccess (public-facing accessibility review), CivicRecords (search integration for prior-meeting FOIA responses).
   **Note on dependencies**   The original CivicSuiteAI catalog listed "depends on CivicCore, CivicRecords." That dependency was an artifact of shared document/search infrastructure living inside the CivicRecords AI repo. Once CivicCore v0.1 ships, that shared infra moves to CivicCore and CivicClerk depends only on CivicCore.
   **Default model**          Gemma 4 via Ollama for drafting and extraction. Whisper (local) for meeting transcription. Embeddings via nomic-embed-text.
-  **License**                Apache License 2.0 (code). CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
+  **License**                AGPL-3.0-only (code), with the TownLight Public Institution Exception for qualifying deployments. CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
   **Supersedes**             Nothing. First CivicClerk spec. Implements the Tier 1 Clerk Core module defined in CivicSuiteAI\_Module\_Catalog\_v1.
   **Grounded in**            CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). CivicCore v0.1 Extraction Spec (platform dependency).
   **Completion bar**         Every statutory notice requirement surfaced with deadline enforcement. Every AI-drafted minute sentence cites source. Every closed-session boundary enforced at the API layer. Every public-portal surface meets WCAG 2.2 AA.

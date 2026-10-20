@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 """Manager decision rigor.
 
 The manager produces `manager-decision.md` with one of three verdicts:

@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 <#
 Installs the CivicSuite local Git hooks for this checkout.
 
