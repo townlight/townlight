@@ -50,6 +50,7 @@ DEFAULT_SELECTED_MODULES = (MODULE_RECORDS, MODULE_CLERK)
 EXPECTED_CIVICCORE_VERSION = "1.2.0"
 EXPECTED_RECORDS_VERSION = "1.7.3"
 EXPECTED_CLERK_VERSION = "1.0.4"
+EXPECTED_CLERK_CIVICCORE_VERSION = "1.2.1"
 EXPECTED_CODE_VERSION = "1.0.8"
 EXPECTED_NOTICE_VERSION = "0.2.0"
 EXPECTED_ACCESS_VERSION = "0.4.0"
@@ -1401,7 +1402,7 @@ def verify_civiccore_contract(
             clerk_status == 200
             and clerk_health.get("service") == "civicclerk"
             and clerk_health.get("version") == EXPECTED_CLERK_VERSION
-            and clerk_health.get("civiccore") == EXPECTED_CIVICCORE_VERSION
+            and clerk_health.get("civiccore") == EXPECTED_CLERK_CIVICCORE_VERSION
         )
     if MODULE_CODE in modules:
         checks.append({"name": "civiccode_health", "status_code": code_status, "payload": code_health})
@@ -1431,7 +1432,7 @@ def verify_civiccore_contract(
     if MODULE_RECORDS in modules:
         expected[MODULE_RECORDS] = {"version": EXPECTED_RECORDS_VERSION}
     if MODULE_CLERK in modules:
-        expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "civiccore": EXPECTED_CIVICCORE_VERSION}
+        expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "civiccore": EXPECTED_CLERK_CIVICCORE_VERSION}
     if MODULE_CODE in modules:
         expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "civiccore": EXPECTED_CIVICCORE_VERSION}
     if MODULE_NOTICE in modules:
