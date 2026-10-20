@@ -55,7 +55,7 @@ RECOVERY_CIVICCORE = "1.0.1"
 LEGACY_FOUNDATION_CIVICCORE = "0.3.0"
 PLANNED_SPEC_MODULES = ("civicregwatch", "civicapi")
 CURRENT_CLERK_CORE_INSTALLER_TAG = "installer-clerk-core-v0.1.0"
-CURRENT_INSTALLER_STATUS = "townlight_records_beta_candidate"
+CURRENT_INSTALLER_STATUS = "townlight_records_meetings_beta_candidate"
 EXPECTED_CITY_CORE_PROFILE_STATUS = "beta_ready_truth_reconciled"
 EXPECTED_RECORDS_BETA_PROFILE_STATUS = "stabilizing"
 CITY_CORE_SOURCE_PIN_RECOVERY = (
@@ -420,7 +420,7 @@ def check_city_core_profile_truth() -> list[str]:
     if installer_data.get("installer_status") != CURRENT_INSTALLER_STATUS:
         errors.append(
             fail(
-                "installer/modules.json root installer_status must record the Townlight Records beta candidate"
+                "installer/modules.json root installer_status must record the Townlight Records–Meetings beta candidate"
             )
         )
     if city_core.get("status") != EXPECTED_CITY_CORE_PROFILE_STATUS:
