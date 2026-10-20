@@ -2,6 +2,22 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
+## Townlight Records + Meetings 1.2.0-beta.1 — release candidate
+
+- Connected `meetings-beta` profile adds Meetings to Core, Records, Notice and
+  Access while preserving the existing Records profile and application identity.
+- Meetings supports canonical agenda and meeting records, packet delivery,
+  editable notices and proof history, transcript/vote corrections, manual minutes
+  decisions and local public/restricted archives. Human-directed sequencing
+  remains unblocked; posting an unadopted draft retains its draft label.
+- Records searches permitted archive text and retains selected evidence with
+  source IDs, hashes, citations and attributed audit history. Attachment is not
+  response approval or publication. Restricted sources remain protected.
+- Local unsigned installed acceptance passed, including persistence, recovery
+  and retained-data uninstall. Final signed-install and predecessor-upgrade
+  acceptance remain pending; this entry does not announce publication.
+- Code and optional native AI minutes/transcription are not part of this update.
+
 ## Townlight Records 1.1.0-beta.3 — 2026-10-19
 
 - Active Records workflows now use the bundled Python/PostgreSQL domain path

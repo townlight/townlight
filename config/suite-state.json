@@ -64,7 +64,7 @@
       "compatibility": {"development_core": "1.2.0", "installer_core": "1.2.1", "public_status_core": "1.2.1"},
       "dependencies": ["core"],
       "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 1, "legacy_grade": "released", "public_status_released_at": "2026-05-24"},
-      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "62cee04abaec7f908f222e21c5a09b4b7977a575"}
+      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "2f0b7b755cade85673066fdd59ef3593a3052c83"}
     },
     "meetings": {
       "public_name": "Townlight Meetings", "public_slug": "meetings",
@@ -75,7 +75,7 @@
       "compatibility": {"development_core": "1.2.1", "installer_core": "1.2.0", "public_status_core": "1.2.0"},
       "dependencies": ["core"],
       "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 1, "legacy_grade": "released", "public_status_released_at": "2026-06-13"},
-      "installer": {"tier": 1, "role": "meetings workflow", "status": "v1_0_4_city_core_release_car", "source_commit": "fa1874edfe977bfc36ddea2939df6464b5bc16be"}
+      "installer": {"tier": 1, "role": "meetings workflow", "status": "v1_0_4_city_core_release_car", "source_commit": "3dd73d0619943beb8ce2965abe7a41dfe596e9be"}
     },
     "code": {
       "public_name": "Townlight Code", "public_slug": "code",

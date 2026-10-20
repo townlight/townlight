@@ -78,7 +78,9 @@ pub struct NoticeProof {
 
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct NoticeDocument { text: String }
+pub struct NoticeDocument {
+    text: String,
+}
 
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -183,8 +185,16 @@ pub async fn execute_meetings(
     proof: String,
 ) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
-        MeetingsRequest::GetNoticeTemplate { id } => (Method::GET,format!("/desktop/v1/meetings/notices/{id}/template"),None),
-        MeetingsRequest::DeliverNotice { id, payload } => (Method::POST,format!("/desktop/v1/meetings/notices/{id}/document"),Some(serde_json::json!(payload))),
+        MeetingsRequest::GetNoticeTemplate { id } => (
+            Method::GET,
+            format!("/desktop/v1/meetings/notices/{id}/template"),
+            None,
+        ),
+        MeetingsRequest::DeliverNotice { id, payload } => (
+            Method::POST,
+            format!("/desktop/v1/meetings/notices/{id}/document"),
+            Some(serde_json::json!(payload)),
+        ),
         MeetingsRequest::CaptureTranscript { id, payload } => (
             Method::POST,
             format!("/desktop/v1/meetings/meetings/{id}/transcripts"),
@@ -588,8 +598,14 @@ pub async fn execute_public(
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum RecordsRequest {
-    SearchMeetings { query: String },
-    AttachMeetingsSource { request_id: Uuid, source_id: String, expected_sha256: String },
+    SearchMeetings {
+        query: String,
+    },
+    AttachMeetingsSource {
+        request_id: Uuid,
+        source_id: String,
+        expected_sha256: String,
+    },
     State {},
     MarkNotification {
         notification_id: Uuid,
@@ -721,9 +737,20 @@ impl RecordsRequest {
             })
         };
         Ok(match self {
-            Self::SearchMeetings { query } => (Method::POST,"/desktop/v1/meetings-sources/search".into(),Some(serde_json::json!({"query":query}))),
-            Self::AttachMeetingsSource { request_id, source_id, expected_sha256 } => (Method::POST,
-                format!("/desktop/v1/requests/{request_id}/meetings-sources"),Some(serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256}))),
+            Self::SearchMeetings { query } => (
+                Method::POST,
+                "/desktop/v1/meetings-sources/search".into(),
+                Some(serde_json::json!({"query":query})),
+            ),
+            Self::AttachMeetingsSource {
+                request_id,
+                source_id,
+                expected_sha256,
+            } => (
+                Method::POST,
+                format!("/desktop/v1/requests/{request_id}/meetings-sources"),
+                Some(serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256})),
+            ),
             Self::Export { .. } | Self::Suggest { .. } => {
                 return Err(DomainError::transport(false))
             }
