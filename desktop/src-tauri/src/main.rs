@@ -828,6 +828,29 @@ async fn suite_domain_request(
 }
 
 #[tauri::command]
+async fn meetings_domain_request(
+    request: domain_client::MeetingsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    if module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?
+        .profile_id
+        != "meetings-beta"
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "create-meeting", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("create-meeting", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    domain_client::execute_meetings(request, proof).await
+}
+
+#[tauri::command]
 async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value, String> {
     let access = auth::require_signed_in_session()?;
     let payload = serde_json::json!({"folder":request.folder.name()});
@@ -874,6 +897,11 @@ fn city_work_action_authorized(
         require_role_for_city_work(&access, &action, payload.as_ref())?;
     }
     require_enabled_city_modules(&action, payload.as_ref())?;
+    if module_registry::module_selection_state()?.profile_id == "meetings-beta" {
+        // This development profile has a single Python Meetings authority.
+        // Unmigrated shared actions stay unavailable, never write old JSON.
+        return Err("Use the typed Python product workflow in this Meetings candidate; legacy actions are unavailable.".into());
+    }
     let mut result = workflows::city_work_action(&action, payload.as_ref())?;
     if action == "search-city-knowledge" {
         filter_search_results_for_enabled_modules(&mut result)?;
@@ -946,6 +974,7 @@ pub fn run() {
             records_public_request,
             access_domain_request,
             suite_domain_request,
+            meetings_domain_request,
             open_domain_exports,
             city_work_action
         ])

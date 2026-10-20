@@ -44,6 +44,22 @@ See [RELEASING.md](RELEASING.md) and
 
 ### Architecture truth
 
+### Local connected Records–Meetings candidate (not a release)
+
+The uncommitted October 19 M4 build adds an explicit **Townlight Records +
+Meetings** setup choice (`meetings-beta`): Core, Records, Meetings, Notice and
+Access. The default Records profile and published beta.3 are unchanged.
+The unsigned local MSI has passed the mapped installed Records and Meetings
+journeys in Windows Sandbox, including permissioned archive-text attachment
+to Records with retained citation, source hash and audit attribution.
+This does not install Code, publish a Meetings release, or claim native AI
+minutes/transcription verification. Shared legacy handlers with remaining
+Code/city-core callers have not been deleted. Use the workspace M4 evidence,
+not the public beta.3 acceptance record, for this candidate's exact identity
+and individual recovery results.
+
+### Released Records architecture
+
 After explicit activation, beta.3 routes Records through the bundled Python
 service and PostgreSQL database. Validated import preserves existing requests,
 audit history, Access evidence and exports. The old JSON becomes read-only

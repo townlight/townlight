@@ -2092,7 +2092,11 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
         ("PORTAL_MODE".to_string(), "private".to_string()),
         (
             "TOWNLIGHT_PRODUCT_PROFILE".to_string(),
-            "records-beta".to_string(),
+            if crate::module_registry::module_selection_state()?.profile_id == "meetings-beta" {
+                "meetings-beta".to_string()
+            } else {
+                "records-beta".to_string()
+            },
         ),
         (
             "OLLAMA_BASE_URL".to_string(),

@@ -1024,8 +1024,8 @@ for (const excludedFromRecordsBeta of [
     throw new Error(`Legacy city-core payload must retain ${excludedFromRecordsBeta}`);
   }
 }
-if (desktopMsiWorkflow.includes("repository: townlight/meetings") || desktopMsiWorkflow.includes("repository: townlight/ordinances")) {
-  throw new Error("Townlight Records MSI workflow must not check out Meetings or Code runtime sources");
+if (!desktopMsiWorkflow.includes("repository: townlight/meetings") || !desktopMsiWorkflow.includes("-ProductProfile meetings-beta") || desktopMsiWorkflow.includes("repository: townlight/ordinances")) {
+  throw new Error("Townlight Records MSI workflow must check out Meetings with -ProductProfile meetings-beta and must not check out Code runtime sources");
 }
 
 if (tauriConfigJson.productName !== "Townlight" || tauriConfigJson.bundle.publisher !== "Townlight") {

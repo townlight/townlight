@@ -569,6 +569,7 @@ fn selection_from_installed_and_enabled(
     };
     if let Some(profile) = registry.profiles.iter().find(|profile| {
         !profile.disabled
+            && profile.id != "meetings-beta"
             && profile.modules.len() == ordered_module_ids.len()
             && profile.modules.iter().all(|module_id| {
                 ordered_module_ids
@@ -595,7 +596,13 @@ fn selection_from_installed_and_enabled(
     let (profile_id, profile_label) = registry
         .profiles
         .iter()
-        .find(|profile| !profile.disabled && profile.modules == ordered_module_ids)
+        // A matching module set must not silently activate the Python Meetings
+        // candidate when an operator merely removes Code from city-core.
+        .find(|profile| {
+            !profile.disabled
+                && profile.id != "meetings-beta"
+                && profile.modules == ordered_module_ids
+        })
         .map(|profile| (profile.id.clone(), profile.label.clone()))
         .unwrap_or_else(|| ("custom".to_string(), "Custom".to_string()));
     let disabled_module_ids = registry
@@ -1156,6 +1163,30 @@ mod tests {
             );
             assert_eq!(selection.enabled_module_ids, selection.installed_module_ids);
             assert!(root.join("config").join("module-selection.json").is_file());
+        });
+    }
+
+    #[test]
+    fn meetings_candidate_requires_explicit_profile_selection() {
+        with_temp_state_dir(|_| {
+            let selected = persist_profile_selection("meetings-beta").unwrap();
+            assert_eq!(selected.profile_id, "meetings-beta");
+            assert!(selected
+                .installed_module_ids
+                .iter()
+                .any(|id| id == "civicclerk"));
+            assert!(!selected
+                .installed_module_ids
+                .iter()
+                .any(|id| id == "civiccode"));
+            assert_eq!(
+                module_selection_state().unwrap().profile_id,
+                "meetings-beta"
+            );
+            assert_eq!(
+                set_module_enabled("civicclerk", false).unwrap().profile_id,
+                "meetings-beta"
+            );
         });
     }
 

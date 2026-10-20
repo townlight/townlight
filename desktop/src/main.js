@@ -2,14 +2,18 @@
 import "./styles.css";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
+import { createMeetingsView } from "./meetings/view.js";
+import { bindMeetingsSources } from "./records/meetings-sources.ts";
 
 const recordsController = createRecordsController(invoke);
+const meetingsView = createMeetingsView(invoke);
 
 const LOCKED_FOUNDATION_MODULE_ID = "civiccore";
 const RECORDS_BETA_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicnotice", "civicaccess"];
 const CITY_CORE_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"];
 const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "records-beta": RECORDS_BETA_PRODUCT_MODULE_IDS,
+  "meetings-beta": [...RECORDS_BETA_PRODUCT_MODULE_IDS, "civicclerk"],
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS
 };
 const MODULE_AREA_BY_ID = {
@@ -1249,6 +1253,11 @@ function renderModuleSelectionControls() {
       id: "records-beta",
       label: "Townlight Records",
       description: "Installs Townlight Records, Townlight Notice, and Townlight Access with Townlight Core."
+    },
+    {
+      id: "meetings-beta",
+      label: "Townlight Records + Meetings",
+      description: "Installs connected Townlight Records and Meetings with Core, Notice, and Access."
     },
     {
       id: "city-core",
@@ -5036,6 +5045,7 @@ function renderActiveArea() {
   }
   switch (state.activeArea) {
     case "meetings":
+      if (state.app?.module_selection?.profile_id === "meetings-beta") return meetingsView.render();
       return renderMeetingsWorkflow();
     case "records":
       return renderRecordsWorkflow();
@@ -5154,6 +5164,8 @@ function render() {
 }
 
 function bindEvents() {
+  bindMeetingsSources(invoke, async () => { await loadAppState(); render(); });
+  meetingsView.bind();
   document.querySelector('[data-action="retry-domain-state"]')?.addEventListener("click", async () => {
     await loadAppState();
     render();

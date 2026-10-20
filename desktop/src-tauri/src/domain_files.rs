@@ -13,6 +13,7 @@ pub enum ExportFolder {
     All,
     Records,
     Access,
+    Meetings,
 }
 
 #[derive(Deserialize)]
@@ -27,6 +28,7 @@ impl ExportFolder {
             Self::All => "all",
             Self::Records => "records",
             Self::Access => "access",
+            Self::Meetings => "meetings",
         }
     }
 }
@@ -160,6 +162,22 @@ mod tests {
 }
 
 pub fn stage(source: &str, title: &str, note: &str) -> Result<ManagedFileReceipt, String> {
+    stage_module(source, title, note, "records")
+}
+
+pub fn stage_meetings(source: &str) -> Result<ManagedFileReceipt, String> {
+    if !Path::new(source.trim()).is_file() {
+        return Err("Select an existing Meetings source file; no placeholder was created.".into());
+    }
+    stage_module(source, "Meetings packet source", "", "meetings")
+}
+
+fn stage_module(
+    source: &str,
+    title: &str,
+    note: &str,
+    module: &str,
+) -> Result<ManagedFileReceipt, String> {
     let source = source.trim();
     if source.is_empty() {
         return Err("Enter a local file path or reference before saving.".into());
@@ -167,7 +185,7 @@ pub fn stage(source: &str, title: &str, note: &str) -> Result<ManagedFileReceipt
     let root = local_paths::effective_locations()
         .map(|locations| std::path::PathBuf::from(locations.data_root))?
         .join("files")
-        .join("records")
+        .join(module)
         .join("staged");
     fs::create_dir_all(&root).map_err(|_| "Could not create the Records evidence folder.")?;
     let original = Path::new(source);

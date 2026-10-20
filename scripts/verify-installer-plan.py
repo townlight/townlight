@@ -697,10 +697,11 @@ def check_manifest(data: dict[str, object]) -> list[str]:
         "city_core_implemented_pending_browser_qa_and_audit_full",
         "city_core_implemented_pending_audit_full",
         "townlight_records_beta_candidate",
+        "townlight_records_meetings_beta_candidate",
     }:
         errors.append(
             fail(
-                "installer_status must describe an accepted published, implementation, or Townlight Records beta candidate state"
+                "installer_status must describe an accepted published, implementation, or Townlight Records–Meetings beta candidate state"
             )
         )
 

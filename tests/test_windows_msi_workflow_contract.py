@@ -18,14 +18,18 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_records_checkout_pins_match_the_accepted_installer_source() -> None:
+@pytest.mark.parametrize(
+    ("module_id", "repository"),
+    [("civicrecords-ai", "townlight/sunshine"), ("civicclerk", "townlight/meetings")],
+)
+def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repository: str) -> None:
     manifest = json.loads(_read(ROOT / "installer" / "modules.json"))
-    records = next(module for module in manifest["modules"] if module["id"] == "civicrecords-ai")
-    pin = records["source_commit"]
+    module = next(module for module in manifest["modules"] if module["id"] == module_id)
+    pin = module["source_commit"]
     for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
         workflow = _read(path)
-        checkouts = workflow.split("repository: townlight/sunshine")[1:]
-        assert checkouts, f"No Records checkout in {path.name}"
+        checkouts = workflow.split(f"repository: {repository}")[1:]
+        assert checkouts, f"No {module_id} checkout in {path.name}"
         for checkout in checkouts:
             checkout_inputs = checkout.split("\n      - ", 1)[0]
             assert f"ref: {pin}" in checkout_inputs, path.name

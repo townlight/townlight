@@ -1,5 +1,33 @@
 # Releasing the Townlight Records Windows MSI
 
+## Connected Records–Meetings candidate: 1.2.0-beta.1
+
+Scott approved the connected release sequence on October 19, 2026: push,
+merge after required checks, sign, verify the final installer and the supported
+Records beta.3 upgrade, then publish only if acceptance passes. This is not
+authorization to begin Code or change Azure credentials.
+
+Use tag `townlight-records-meetings-v1.2.0-beta.1` and synchronized desktop
+version `1.2.0-1` (MSI ProductVersion `1.2.0.1`). Preserve the existing upgrade
+code and application/data identities. Both build and real-runtime CI prepare
+the `meetings-beta` payload from exact Records and Meetings source commits.
+The default Records setup remains available; operators choose **Townlight
+Records + Meetings** explicitly. The profile includes Core, Records, Meetings,
+Notice and Access, not Code.
+
+The earlier local unsigned M4 candidate passed mapped installed behavior,
+privacy, restart with operator service start, backup/restore, repair and ordinary
+uninstall retention. It is supporting evidence, not a signed release or proof
+of the beta.3-to-connected upgrade. Final signing, exact-byte acceptance and
+publication remain pending. Optional native AI minutes/transcription are not
+claimed. Shared Rust handlers with remaining Code/city-core callers are retained.
+
+Use the existing main-only fail-closed signing and draft-attachment workflows
+below. Both EXE and MSI must verify as `CN=Scott Converse`, with timestamps and
+matching source/run/hash receipts. Do not rebuild after accepting the final
+signed bytes or move a published tag. After successful acceptance, the owner has
+already authorized publication; no additional approval prompt is required.
+
 ## Active update: 1.1.0-beta.3
 
 Scott approved push, merge, signing, exact signed-installer verification and

@@ -60,6 +60,18 @@
         "city-core": [
           "Lib/site-packages/civicclerk/main.py",
           "Lib/site-packages/civiccode/main.py"
+        ],
+        "meetings-beta": [
+          "Lib/site-packages/civicclerk/desktop_delivery.py",
+          "Lib/site-packages/civicclerk/records_sources.py",
+          "Lib/site-packages/civicclerk/transcripts.py",
+          "Lib/site-packages/civicsuite_runtime/meetings_bridge.py",
+          "Lib/site-packages/app/requests/meeting_sources.py",
+          "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0017_meeting_authority.py",
+          "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0018_agenda_authority.py",
+          "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0019_minutes_decisions.py",
+          "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0020_delivery_history.py",
+          "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0021_sources_archive.py"
         ]
       }
     },

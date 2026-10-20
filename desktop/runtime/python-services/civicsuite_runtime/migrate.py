@@ -65,10 +65,11 @@ def upgrade_all() -> None:
         records_root / "alembic",
         database_url,
     )
-    if profile == "city-core":
+    if profile in {"city-core", "meetings-beta"}:
         clerk_root = _package_root("civicclerk") / "migrations"
-        code_root = _package_root("civiccode") / "migrations"
         _run_alembic("Townlight Meetings", clerk_root / "alembic.ini", clerk_root, sync_url)
+    if profile == "city-core":
+        code_root = _package_root("civiccode") / "migrations"
         _run_alembic("Townlight Code", code_root / "alembic.ini", code_root, sync_url)
 
     # Townlight Access is part of Records beta. Its constructor performs an idempotent

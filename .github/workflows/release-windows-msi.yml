@@ -17,6 +17,7 @@ on:
     tags:
       - "civicsuite-windows-local-v*"
       - "townlight-records-v*"
+      - "townlight-records-meetings-v*"
 
 permissions:
   contents: write
@@ -115,7 +116,7 @@ jobs:
           # signed clean-machine acceptance.
           gh release view $tag *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --draft --prerelease --title "Townlight Records $tag" --notes "Automated signed Townlight Records MSI attach from main build run $($run.databaseId). Finalize notes and publish only after signed clean-machine validation."
+            gh release create $tag --draft --prerelease --title "Townlight Records + Meetings $tag" --notes "Automated signed Townlight Records + Meetings MSI attach from main build run $($run.databaseId). Finalize notes and publish only after signed clean-machine validation."
             if ($LASTEXITCODE -ne 0) { throw "Failed to create the draft prerelease." }
           }
           gh release upload $tag $msi.FullName $evidenceFiles[0].FullName $receiptFiles[0].FullName --clobber

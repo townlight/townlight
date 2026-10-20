@@ -30,7 +30,7 @@ CITY_CORE_EXTRA_MODULE_IMPORTS = [
 
 def _product_profile() -> str:
     profile = os.environ.get(PRODUCT_PROFILE_ENV, "records-beta")
-    if profile not in {"records-beta", "city-core"}:
+    if profile not in {"records-beta", "meetings-beta", "city-core"}:
         raise RuntimeError(f"Unsupported Townlight product profile: {profile}")
     return profile
 
@@ -39,6 +39,8 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
     imports = list(RECORDS_BETA_MODULE_IMPORTS)
     if profile == "city-core":
         imports.extend(CITY_CORE_EXTRA_MODULE_IMPORTS)
+    elif profile == "meetings-beta":
+        imports.append(("civicclerk", "civicclerk.main"))
     return imports
 
 
@@ -244,6 +246,18 @@ def create_runtime_app(*, domain_enabled: bool = False):
     domain_app.include_router(access_router)
     from civicsuite_runtime.records_snapshot import router as snapshot_router
     domain_app.include_router(snapshot_router)
+    if _product_profile() == "meetings-beta":
+        from civicsuite_runtime.meetings_bridge import router as meetings_router
+        domain_app.include_router(meetings_router)
+        from civicsuite_runtime.meetings_bridge import public_router as meetings_public_router
+        domain_app.include_router(meetings_public_router)
+        from civicclerk.records_sources import public_documents
+        from civicsuite_runtime.meetings_bridge import database_url, readiness
+        def meetings_sources(query="", source_id=None):
+            if not readiness():
+                raise RuntimeError("Meetings schema unavailable.")
+            return public_documents(database_url(), query=query, source_id=source_id)
+        domain_app.state.desktop_meetings_sources = meetings_sources
     async def demo_marker(session):
         from sqlalchemy import select
         from civicsuite_runtime.records_import_store import imports
@@ -272,6 +286,10 @@ def create_runtime_app(*, domain_enabled: bool = False):
         if not domain_app.state.desktop_domain_enabled:
             return JSONResponse({"status": "not-ready", "reason": "domain-inactive"}, status_code=503)
         database = _domain_database_status()
+        if database["ok"] and _product_profile() == "meetings-beta":
+            from civicsuite_runtime.meetings_bridge import readiness
+            if not readiness():
+                database = {"ok": False, "reason": "meetings-schema-unready"}
         return JSONResponse(
             {"status": "ready" if database["ok"] else "not-ready", "reason": database["reason"]},
             status_code=200 if database["ok"] else 503,
