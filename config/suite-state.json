@@ -83,10 +83,10 @@
       "repository": {"name": "townlight/ordinances", "aliases": ["CivicSuite/civiccode"], "default_branch": "main", "manifest_path": "pyproject.toml"},
       "versions": {"development": "1.0.8", "released": "1.0.8", "installer": "1.0.8", "public_status": "1.0.8"},
       "release": {"tag": "v1.0.8", "published_at": "2026-05-23", "asset_policy": "python-attested"},
-      "compatibility": {"development_core": "1.2.1", "installer_core": "1.2.0", "public_status_core": "1.2.0"},
+      "compatibility": {"development_core": "1.2.1", "installer_core": "1.2.1", "public_status_core": "1.2.0"},
       "dependencies": ["core", "meetings"],
       "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 1, "legacy_grade": "released", "public_status_released_at": "2026-05-23"},
-      "installer": {"tier": 1, "role": "municipal code", "status": "v1_0_8_city_core_release_car", "source_commit": "a960bba0a2249d118b593dd61bee3a65a69a9d77"}
+      "installer": {"tier": 1, "role": "municipal code", "status": "v1_0_8_city_core_release_car", "source_commit": "868891bd990588a8337832915e4d91af39ea22cd"}
     },
     "access": {
       "public_name": "Townlight Access", "public_slug": "access",

@@ -3,10 +3,24 @@ import "./styles.css";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
+import { createCodeView } from "./code/view.js";
 import { bindMeetingsSources } from "./records/meetings-sources.ts";
+import { bindCodeSources } from "./records/code-sources.ts";
 
 const recordsController = createRecordsController(invoke);
-const meetingsView = createMeetingsView(invoke);
+const meetingsView = createMeetingsView(invoke, openConnectedWork);
+const codeView = createCodeView(invoke, openConnectedWork);
+
+function openConnectedWork(area, id) {
+  if (!areaIsEnabled(area)) return;
+  state.activeArea = area;
+  render();
+  const target = document.querySelector(area === 'code' ? '[data-code-action="connection"]' : '[data-meetings-action="codeConnection"]');
+  if (!target || !target.elements) return;
+  const idField = target.elements.namedItem('id');
+  if (idField) idField.value = id;
+  target.requestSubmit();
+}
 
 const LOCKED_FOUNDATION_MODULE_ID = "civiccore";
 const RECORDS_BETA_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicnotice", "civicaccess"];
@@ -5045,11 +5059,21 @@ function renderActiveArea() {
   }
   switch (state.activeArea) {
     case "meetings":
-      if (state.app?.module_selection?.profile_id === "meetings-beta") return meetingsView.render();
+      if (
+        state.app?.module_selection?.profile_id === "meetings-beta" ||
+        (state.app?.module_selection?.profile_id === "city-core" &&
+          state.app?.domain_authority === "python-records")
+      )
+        return meetingsView.render();
       return renderMeetingsWorkflow();
     case "records":
       return renderRecordsWorkflow();
     case "code":
+      if (
+        state.app?.module_selection?.profile_id === "city-core" &&
+        state.app?.domain_authority === "python-records"
+      )
+        return codeView.render();
       return renderCodeWorkflow();
     case "notice":
       return renderNoticeWorkflow();
@@ -5165,7 +5189,9 @@ function render() {
 
 function bindEvents() {
   bindMeetingsSources(invoke, async () => { await loadAppState(); render(); });
+  bindCodeSources(invoke, async () => { await loadAppState(); render(); });
   meetingsView.bind();
+  codeView.bind();
   document.querySelector('[data-action="retry-domain-state"]')?.addEventListener("click", async () => {
     await loadAppState();
     render();

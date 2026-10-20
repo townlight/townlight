@@ -1410,7 +1410,7 @@ mod tests {
                 .find(|module| module.id == "civiccode")
                 .expect("civiccode module");
             assert!(civiccode.installed);
-            assert_eq!(civiccode.civiccore_requirement.as_deref(), Some("1.2.0"));
+            assert_eq!(civiccode.civiccore_requirement.as_deref(), Some("1.2.1"));
             assert_eq!(
                 civiccode.lifecycle_uninstall.as_deref(),
                 Some("backup-first-module-data-removal")

@@ -417,7 +417,7 @@
                         "role":  "municipal code",
                         "selectable":  true,
                         "required":  false,
-                        "civiccore_requirement":  "1.2.0",
+                        "civiccore_requirement":  "1.2.1",
                         "dependencies":  [
                                              "civiccore",
                                              "civicclerk"
@@ -434,7 +434,7 @@
                                                "release_attestation"
                                            ],
                         "current_version":  "1.0.8",
-                        "source_commit":  "a960bba0a2249d118b593dd61bee3a65a69a9d77",
+                        "source_commit":  "868891bd990588a8337832915e4d91af39ea22cd",
                         "routes":  [
                                        {
                                            "id":  "code-ordinances",

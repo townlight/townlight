@@ -1,7 +1,7 @@
 import { createMeetingsClient } from "./client.ts";
 
 /** Integrated controls only; later workflow steps remain explicitly unavailable. */
-export function createMeetingsView(invoke) {
+export function createMeetingsView(invoke, navigate = () => {}) {
   const client = createMeetingsClient(invoke);
   return {
     render() {
@@ -130,6 +130,22 @@ export function createMeetingsView(invoke) {
           <label>Record type <select name="kind"><option value="meeting">Meeting</option><option value="agenda-item">Agenda item</option><option value="proceedings">Proceedings and drafts</option></select></label>
           <label>Saved record ID <input name="id" required></label>
           <button type="submit">Read from database</button></form>
+        <h3>Code proposals and recorded decisions</h3>
+        <p>Your explicit decision is recorded without requiring a motion, minutes, or a suggested meeting stage. Optional supporting references are human-supplied, not independently verified. Nothing here codifies or publishes law.</p>
+        <form data-meetings-action="codeConnections"><button type="submit">List Code proposals</button></form>
+        <form data-meetings-action="codeConnection"><label>Connection ID <input name="id" required></label><button type="submit">Read Code connection</button></form>
+        <form data-meetings-action="recordCodeDecision">
+          <label>Connection ID <input name="id" required></label>
+          <label>Stable decision key <input name="decision_id" required></label>
+          <label>Outcome <select name="outcome"><option value="adopted">Adopted</option><option value="not_adopted">Not adopted</option><option value="deferred">Deferred</option><option value="withdrawn">Withdrawn</option></select></label>
+          <label>Decision date/time (optional; include time zone) <input name="decided_at" placeholder="2026-10-20T18:30:00-06:00"></label>
+          <label>Decision text <textarea name="decision_text" required></textarea></label>
+          <label>Supporting references (optional; one per line) <textarea name="supporting_references"></textarea></label>
+          <label>Supersedes decision ID (optional) <input name="supersedes_decision_id"></label>
+          <label>Reconciliation note <textarea name="reconciliation_note"></textarea></label>
+          <button type="submit">Record Code decision</button>
+        </form>
+        <div data-meetings-links></div>
         <pre data-meetings-result role="status" aria-live="polite">No operation requested.</pre>
       </section>`;
     },
@@ -145,13 +161,30 @@ export function createMeetingsView(invoke) {
           output.textContent = "Waiting for the local service…";
           const data = Object.fromEntries(new FormData(form));
           try {
-            const result = form.hasAttribute("data-meetings-action")
+            const result = form.dataset.meetingsAction === 'recordCodeDecision'
+              ? await client.recordCodeDecision(data.id, {
+                  id: data.decision_id, outcome: data.outcome, decided_at: data.decided_at || null,
+                  decision_text: data.decision_text,
+                  supporting_references: (data.supporting_references || '').split('\n').map(s => s.trim()).filter(Boolean),
+                  supersedes_decision_id: data.supersedes_decision_id || null,
+                  reconciliation_note: data.reconciliation_note || null,
+                })
+              : form.hasAttribute("data-meetings-action")
               ? await client[form.dataset.meetingsAction](data.id, data)
               : form.hasAttribute("data-meetings-read")
               ? await client.read(data.kind, data.id)
               : form.dataset.meetingsCreate === "meeting"
                 ? await client.createMeeting(data) : await client.createAgendaItem(data);
             output.textContent = JSON.stringify(result, null, 2);
+            const links = root.querySelector('[data-meetings-links]');
+            links?.replaceChildren();
+            if (links && result && result.id && result.proposal) {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.textContent = 'Open this connection in Code';
+              btn.addEventListener('click', () => navigate('code', result.id));
+              links.appendChild(btn);
+            }
             if (form.dataset.meetingsAction === "getNoticeTemplate") {
               const target=root.querySelector('[data-meetings-action="deliverNotice"]');
               target.elements.namedItem("id").value=data.id;

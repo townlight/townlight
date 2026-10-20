@@ -1,9 +1,15 @@
 /** Native transport only. No actor, service URL, retries or JSON fallback. */
+import type { CodeDecision, ConnectionView } from '../code/client';
 type Invoke = <T>(command: string, args: {request: object}) => Promise<T>;
 export interface MeetingInput {title: string; scheduled_start: string; location: string; meeting_type?: string}
 export interface AgendaInput {title: string; department_name: string}
 export function createMeetingsClient(invoke: Invoke) {
   return {
+    codeConnections(_id?: string, _data?: unknown): Promise<ConnectionView[]> {
+      return invoke('meetings_domain_request', {request: {operation: 'code-connections'}});
+    },
+    codeConnection: (id: string): Promise<ConnectionView> => invoke('meetings_domain_request', {request: {operation: 'code-connection', id}}),
+    recordCodeDecision: (id: string, data: CodeDecision): Promise<unknown> => invoke('meetings_domain_request', {request: {operation: 'record-code-decision', id, payload: data}}),
     getNoticeTemplate(id:string) { return invoke("meetings_domain_request",{request:{operation:"get-notice-template",id}}); },
     deliverNotice(id:string,data:{text:string}) {
       return invoke("meetings_domain_request",{request:{operation:"deliver-notice",id,payload:{text:data.text}}});

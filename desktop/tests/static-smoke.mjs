@@ -632,36 +632,27 @@ for (const phrase of [
   }
 }
 
-for (const phrase of [
-  "Notice Checklist",
-  "calculate-notice-deadline",
-  "complete-notice-checklist",
-  "noticeStatutoryBasis",
-  "noticeLeadDays",
-  "noticeDayType",
-  "noticeTimeZone",
-  "Notice Posting Evidence",
-  "postingLocation",
-  "postingConfirmation",
-  "postingDate",
-  "suggest-minutes-draft",
-  "suggest-records-response",
-  "suggest-code-guidance",
-  "set-records-deadline",
-  "calculate-records-deadline",
-  "deadlineBasis",
-  "Generated local AI minutes draft",
-  "Generated local AI records response draft",
-  "Generated local AI code guidance draft",
-  "Local AI plain-language draft",
-  "ai-draft-translation",
-  "local AI analysis added",
-  "AI engine not ready",
-  "Rewrite the following public-facing city text in plain language",
-  "Translate the following public-facing city text into"
-]) {
-  if (!workflowRust.includes(phrase)) {
-    throw new Error(`desktop workflow missing local AI action phrase: ${phrase}`);
+const retiredFnPattern = /^(?:pub\s+)?fn (create_records_request|approve_records_response|create_meeting|record_adopted_legislation|import_code_source|accessibility_review|search_city_work)\b/m;
+for (const s of ['fn create_records_request() {}','pub fn search_city_work() {}']) {
+  retiredFnPattern.lastIndex=0;
+  if (!retiredFnPattern.test(s)) throw Error(`missed forbidden fixture: ${s}`);
+}
+retiredFnPattern.lastIndex=0;
+if (retiredFnPattern.test('fn open_local_exports_folder() {}')) throw Error('matched shell fixture');
+const retiredMatch = workflowRust.match(retiredFnPattern);
+if (retiredMatch) {
+  throw new Error(`workflows.rs still defines retired JSON action implementation: ${retiredMatch[0].trim()}`);
+}
+const requiredStaticMarkers = [
+  'Legacy municipal workflow actions are retired',
+  'migration_write_fence',
+  'initialize_empty_migration_source',
+  'legacy_allowed()?',
+  'Unsupported city-work schema version',
+];
+for (const marker of requiredStaticMarkers) {
+  if (!workflowRust.includes(marker)) {
+    throw new Error(`workflows.rs missing required static marker: ${JSON.stringify(marker)}`);
   }
 }
 
