@@ -52,6 +52,7 @@ EXPECTED_RECORDS_VERSION = "1.7.3"
 EXPECTED_CLERK_VERSION = "1.0.4"
 EXPECTED_CLERK_CIVICCORE_VERSION = "1.2.1"
 EXPECTED_CODE_VERSION = "1.0.8"
+EXPECTED_CODE_CIVICCORE_VERSION = "1.2.1"
 EXPECTED_NOTICE_VERSION = "0.2.0"
 EXPECTED_ACCESS_VERSION = "0.4.0"
 SELECTED_MODULES_FILE = "selected-modules.json"
@@ -1410,7 +1411,7 @@ def verify_civiccore_contract(
             code_status == 200
             and code_health.get("service") == "civiccode"
             and code_health.get("version") == EXPECTED_CODE_VERSION
-            and code_health.get("civiccore") == EXPECTED_CIVICCORE_VERSION
+            and code_health.get("civiccore") == EXPECTED_CODE_CIVICCORE_VERSION
         )
     if MODULE_NOTICE in modules:
         checks.append({"name": "civicnotice_health", "status_code": notice_status, "payload": notice_health})
@@ -1434,7 +1435,7 @@ def verify_civiccore_contract(
     if MODULE_CLERK in modules:
         expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "civiccore": EXPECTED_CLERK_CIVICCORE_VERSION}
     if MODULE_CODE in modules:
-        expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "civiccore": EXPECTED_CIVICCORE_VERSION}
+        expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "civiccore": EXPECTED_CODE_CIVICCORE_VERSION}
     if MODULE_NOTICE in modules:
         expected[MODULE_NOTICE] = {
             "version": EXPECTED_NOTICE_VERSION,
@@ -1937,7 +1938,7 @@ def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
             health_status != 200
             or health.get("service") != "civiccode"
             or health.get("version") != EXPECTED_CODE_VERSION
-            or health.get("civiccore") != EXPECTED_CIVICCORE_VERSION
+            or health.get("civiccore") != EXPECTED_CODE_CIVICCORE_VERSION
         ):
             return {"name": "civiccode_workflow", "status": "failed", "checks": checks}
         public_status, _public = get_json(f"{base}/api/v1/civiccode/sections/lookup?section_number=13.40.020")
