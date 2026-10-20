@@ -698,6 +698,7 @@ def check_manifest(data: dict[str, object]) -> list[str]:
         "city_core_implemented_pending_audit_full",
         "townlight_records_beta_candidate",
         "townlight_records_meetings_beta_candidate",
+        "townlight_records_meetings_code_beta_candidate",
     }:
         errors.append(
             fail(

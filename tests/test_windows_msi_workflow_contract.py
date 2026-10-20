@@ -20,7 +20,7 @@ def _read(path: Path) -> str:
 
 @pytest.mark.parametrize(
     ("module_id", "repository"),
-    [("civicrecords-ai", "townlight/sunshine"), ("civicclerk", "townlight/meetings")],
+    [("civicrecords-ai", "townlight/sunshine"), ("civicclerk", "townlight/meetings"), ("civiccode", "townlight/ordinances")],
 )
 def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repository: str) -> None:
     manifest = json.loads(_read(ROOT / "installer" / "modules.json"))

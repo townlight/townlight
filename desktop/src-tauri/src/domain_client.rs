@@ -188,9 +188,27 @@ pub async fn execute_meetings(
     proof: String,
 ) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
-        MeetingsRequest::CodeConnections {} => (Method::GET, "/desktop/v1/meetings/code-connections".to_string(), None),
-        MeetingsRequest::CodeConnection { id } => (Method::GET, format!("/desktop/v1/meetings/code-connections/{}", crate::code_client::encode_segment(&id)?), None),
-        MeetingsRequest::RecordCodeDecision { id, payload } => (Method::POST, format!("/desktop/v1/meetings/code-connections/{}/decisions", crate::code_client::encode_segment(&id)?), Some(serde_json::json!(payload))),
+        MeetingsRequest::CodeConnections {} => (
+            Method::GET,
+            "/desktop/v1/meetings/code-connections".to_string(),
+            None,
+        ),
+        MeetingsRequest::CodeConnection { id } => (
+            Method::GET,
+            format!(
+                "/desktop/v1/meetings/code-connections/{}",
+                crate::code_client::encode_segment(&id)?
+            ),
+            None,
+        ),
+        MeetingsRequest::RecordCodeDecision { id, payload } => (
+            Method::POST,
+            format!(
+                "/desktop/v1/meetings/code-connections/{}/decisions",
+                crate::code_client::encode_segment(&id)?
+            ),
+            Some(serde_json::json!(payload)),
+        ),
         MeetingsRequest::GetNoticeTemplate { id } => (
             Method::GET,
             format!("/desktop/v1/meetings/notices/{id}/template"),
@@ -758,10 +776,17 @@ impl RecordsRequest {
                 "/desktop/v1/code-sources/search".into(),
                 Some(serde_json::json!({"query":query,"as_of":as_of})),
             ),
-            Self::AttachCodeSource { request_id, source_id, expected_sha256, as_of } => (
+            Self::AttachCodeSource {
+                request_id,
+                source_id,
+                expected_sha256,
+                as_of,
+            } => (
                 Method::POST,
                 format!("/desktop/v1/requests/{request_id}/code-sources"),
-                Some(serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256,"as_of":as_of})),
+                Some(
+                    serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256,"as_of":as_of}),
+                ),
             ),
             Self::SearchMeetings { query } => (
                 Method::POST,

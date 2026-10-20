@@ -1,17 +1,18 @@
 {
     "schema_version":  1,
     "module_contract_version":  1,
-    "installer_status":  "townlight_records_meetings_beta_candidate",
+    "installer_status":  "townlight_records_meetings_code_beta_candidate",
     "primary_profile":  "records-beta",
     "workflow_proof_status":  {
-                                  "profile":  "meetings-beta",
+                                  "profile":  "city-core",
                                   "scope":  [
                                                 "civicrecords-ai request/search/review/response/release",
                                                 "civicclerk agenda/packet/notice/proceedings/minutes/archive and permitted Records sources",
+                                                "civiccode proposals/agenda links/explicit adoption/separate codification and current/historical permitted Records sources",
                                                 "civicnotice deadline/proof/archive",
                                                 "civicaccess accessibility/release review"
                                             ],
-                                  "boundary":  "The connected Records and Meetings profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration and supervision; shared handlers with remaining Code/city-core callers are retained but are not a second active Records authority. Optional native AI minutes/transcription and Code delivery are not certified by this profile."
+                                  "boundary":  "The connected Records, Meetings and Code profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration, supervision and historical migration/recovery support; obsolete JSON business actions are retired. Optional native AI minutes/transcription and completion of the wider suite are not certified by this profile."
                               },
     "public_use_gate_status":  {
                                    "profile":  "records-beta",

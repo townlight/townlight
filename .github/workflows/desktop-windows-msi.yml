@@ -121,6 +121,13 @@ jobs:
           ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
           path: civicclerk
 
+      - name: Check out Townlight Code runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/ordinances
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          path: civiccode
+
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
@@ -235,7 +242,7 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile meetings-beta
+        run: npm run prepare-runtime-payload -- -ProductProfile city-core
 
       - name: Run Tauri Rust tests
         working-directory: civicsuite/desktop/src-tauri
@@ -442,7 +449,7 @@ jobs:
             "NoDockerPrerequisite=true"
             "NoWslPrerequisite=true"
             "RuntimePayload=desktop/runtime/payload"
-            "ProductProfile=meetings-beta"
+            "ProductProfile=city-core"
           )
           $evidence | Set-Content -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi/Townlight-msi-evidence.txt" -Encoding UTF8
 
@@ -500,6 +507,13 @@ jobs:
           ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
           path: civicclerk
 
+      - name: Check out Townlight Code runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/ordinances
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          path: civiccode
+
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
@@ -538,7 +552,7 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile meetings-beta
+        run: npm run prepare-runtime-payload -- -ProductProfile city-core
 
       - name: Run desktop<->CivicCore real-runtime integration test
         working-directory: civicsuite/desktop/src-tauri

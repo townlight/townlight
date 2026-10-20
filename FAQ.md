@@ -1,6 +1,16 @@
 # Townlight FAQ
 
-## Current Townlight Records beta
+## Connected Records + Meetings + Code candidate
+
+The 1.3.0-beta.1 candidate adds Code to the explicit city-core profile: Core,
+Records, Meetings, Code, Notice and Access. It connects agenda links, explicit
+human adoption and separate codification to permitted Records source attachments.
+Historical versions, citations, source hashes and restricted access are retained.
+Rust JSON business actions are retired; migration/recovery support is preserved.
+Final signed installer and upgrade acceptance are pending. The previous public
+release below remains the download until the new acceptance passes.
+
+## Previous published Townlight beta
 
 The connected **Records + Meetings 1.2.0-beta.1** release passed final signed
 installed workflows, Records beta.3 upgrade, recovery and retained-data uninstall.
