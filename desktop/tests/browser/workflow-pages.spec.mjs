@@ -950,7 +950,8 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.getByText("Backup includes: notice workflow history, notice exports, notice proof files")).toBeVisible();
   await expect(page.getByRole("button", { name: "Disable Townlight Notice" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Townlight Zoning" })).toBeVisible();
-  await expect(page.getByText("Package waiting")).toBeVisible();
+  const zoningRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Zoning" }) });
+  await expect(zoningRow.getByText("Available", { exact: true })).toBeVisible();
   await expect(page.getByText("Scaffold")).toHaveCount(0);
 });
 
