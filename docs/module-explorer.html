@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>CivicSuite — Module Explorer</title>
+<title>Townlight — Module Explorer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <!-- No webfont CDN: CivicSuite makes no outbound calls. Renders in the token
      stack's local/fallback faces. -->
@@ -81,8 +81,9 @@
 <body>
 <div class="wrap">
   <header class="doc">
-    <div class="kick">CivicSuite · Suite Status</div>
+    <div class="kick">Townlight · Suite Status</div>
     <h1>Module Explorer</h1>
+    <p class="lede">The connected public beta is <a href="index.html">Townlight Records + Meetings + Code 1.3.0-beta.1</a>. Choose city-core explicitly; the Records-only default remains available. The wider catalog below is not a claim that all products are complete.</p>
     <p class="lede">Every module in the suite and its honest status today. One machine source of truth — filter by tier, by maturity, or search. What ships in the current city-core build, what's queued, and what's still spec.</p>
     <p class="src-note">Rendered from <span class="mono">installer/modules.json</span> (the <span class="mono">public_status</span> block). This page is generated, not hand-maintained — a CI <span class="mono">--check</span> gate fails the build if it drifts from the source.</p>
   </header>
@@ -164,12 +165,12 @@
     "grade": "released",
     "released_date": "2026-05-24",
     "release_url_state": "published",
-    "note": "Public-records intake, cited search, human exemption review, release packaging, fulfillment, and public status. The beta desktop currently executes its native Rust workflow."
+    "note": "Public-records intake, cited search, human review, release packaging, fulfillment and public status. The connected 1.3.0-beta.1 desktop uses Python/PostgreSQL and can attach permitted Meetings and Code sources with history, citations and hashes."
    }
   },
   {
    "id": "civicclerk",
-   "name": "CivicClerk",
+   "name": "Townlight Meetings",
    "tier": 1,
    "current_version": "1.0.4",
    "civiccore_requirement": "1.2.0",
@@ -177,12 +178,12 @@
     "grade": "released",
     "released_date": "2026-06-13",
     "release_url_state": "published",
-    "note": "Meetings, agendas, packets, minutes, and votes. Ships in v1.0.2."
+    "note": "Agendas, packets, delivery, notices, proceedings and manual minutes. Connected 1.3.0-beta.1 supports explicit Code agenda/adoption links and permitted source attachments to Records; optional native AI minutes/transcription is not claimed."
    }
   },
   {
    "id": "civiccode",
-   "name": "CivicCode",
+   "name": "Townlight Code",
    "tier": 1,
    "current_version": "1.0.8",
    "civiccore_requirement": "1.2.1",
@@ -190,7 +191,7 @@
     "grade": "released",
     "released_date": "2026-05-23",
     "release_url_state": "published",
-    "note": "Searchable municipal code and ordinances with AI-assisted guidance. Ships in v1.0.2."
+    "note": "Current and historical ordinance versions, meeting-linked proposals, explicit human adoption and separate codification. Connected 1.3.0-beta.1 supplies permitted cited source copies to Records without exposing restricted material."
    }
   },
   {

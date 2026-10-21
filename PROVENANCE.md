@@ -1,6 +1,30 @@
-# Townlight Records + Meetings — Bundled Module Provenance
+# Townlight Records + Meetings + Code — Bundled Module Provenance
 
-## Connected 1.2.0-beta.1 provenance
+## Connected 1.3.0-beta.1 provenance
+
+Signed source `0c0e098dd3db8bb3f0b55af8f3095bfa3bd3520c`, annotated tag
+`townlight-records-meetings-code-v1.3.0-beta.1`, MSI 1.3.0-1 / ProductVersion 1.3.0.1.
+[Signing run 39520756994](https://github.com/townlight/townlight/actions/runs/39520756994)
+and independent MSI/actual installed EXE verification passed. Exact signed fresh
+connected workflows, populated signed Records–Meetings 1.2 upgrade, recovery,
+offline operation and retained-data uninstall passed. See the
+[acceptance record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+
+| Module | Repository | Accepted source commit |
+|---|---|---|
+| Townlight Core | townlight/core | `b4d0156bdc6883c1c3ef167abe0379f9ca32b258` |
+| Townlight Records | townlight/sunshine | `0218fa51bb0707e0ac63f58475308a77eb8e45ee` |
+| Townlight Meetings | townlight/meetings | `3dd73d0619943beb8ce2965abe7a41dfe596e9be` |
+| Townlight Code | townlight/ordinances | `868891bd990588a8337832915e4d91af39ea22cd` |
+| Townlight Notice | townlight/notice | `79b8d07199ee77cd425b31c0e0a44f3a0832b810` |
+| Townlight Access | townlight/access | `b9100edc80ca496d6061f1cdb3eb39a60ff5f31a` |
+
+Explicit city-core uses one Python/PostgreSQL domain path. Rust retains native
+integration, supervision and historical import/recovery, not the retired JSON
+business writer. Optional native Meetings AI minutes/transcription is not
+claimed. Later documentation commits do not replace signed source or bytes.
+
+## Historical connected 1.2.0-beta.1 provenance
 
 Signed source `8627868bd9d894be90b6ece1ce5ae4dc41e82f2f`, annotated tag
 `townlight-records-meetings-v1.2.0-beta.1`, MSI `1.2.0-1` / ProductVersion

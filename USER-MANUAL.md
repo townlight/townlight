@@ -1,12 +1,15 @@
 # Townlight Records + Meetings + Code — User Manual
 
-**Release version:** 1.3.0-beta.1 candidate (desktop 1.3.0-1; MSI 1.3.0.1)
+**Release version:** 1.3.0-beta.1 public beta (desktop 1.3.0-1; MSI 1.3.0.1)
 
 **Last updated:** 2026-10-20
 
-**Release status:** final signed installer acceptance pending. The previous
-Records–Meetings 1.2.0-beta.1 remains the published release until the new
-[exact-installer acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md) passes.
+**Release status:** exact signed fresh and populated Records–Meetings 1.2 upgrade
+acceptance passed, including connected Code, preserved work/files, recovery,
+offline operation and retained-data uninstall. See the
+[exact-installer acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+Download the MSI, signing receipt and evidence from the
+[1.3.0-beta.1 public beta](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
 
 ## Connected Records + Meetings + Code
 
@@ -35,7 +38,16 @@ After activation, Python/PostgreSQL is the sole domain writer. Old JSON business
 actions are retired; historical schema/import/backup support remains. Use
 canonical backups for newer work, never a pre-cutover JSON snapshot.
 
-The earlier instructions below describe the preserved predecessor releases.
+Verify both MSI and installed EXE signatures against the published signer identity and compare their
+hashes with the release receipt. Do not use an unsigned CI artifact. The accepted
+Sandbox environment used a Microsoft-signed per-user WebView prerequisite and
+the documented guest baseline; it does not establish default Smart App Control
+compatibility on every Windows machine. See the acceptance record for limits.
+
+## Historical predecessor instructions (1.2 and earlier)
+
+The earlier instructions below describe the preserved predecessor releases,
+not the current download or connected Code profile.
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records

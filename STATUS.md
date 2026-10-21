@@ -2,12 +2,17 @@
 
 **Last verified:** 2026-10-20
 
-**Connected Records + Meetings + Code candidate:** 1.3.0-beta.1. Local connected
-acceptance and bounded retirement passed. Release preparation is authorized;
-final signed installer, upgrade acceptance and public delivery remain pending.
-See [the candidate record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+**Connected Records + Meetings + Code public beta:** 1.3.0-beta.1. Exact signed
+fresh installation and populated signed 1.2 upgrade passed, including preserved
+Records/proceedings/file hashes, the new Code connection, recovery, offline use
+and retained-data uninstall. See the
+[acceptance record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md)
+and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
 
-**Current published predecessor:** Townlight Records + Meetings 1.2.0-beta.1,
+Published October 20, 2026 at 20:13:28 MDT (October 21 at 02:13:28 UTC).
+Public MSI digest/size, anonymous download response and receipt bytes verified.
+
+**Preserved predecessor:** Townlight Records + Meetings 1.2.0-beta.1,
 signed installed acceptance passed. See its
 [acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
 and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
@@ -185,9 +190,9 @@ Status labels below are the suite's shared status set, generated from
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
 | Townlight Core | 1.2.1 | Shared platform | 2026-07-04 | Shared platform for identity, audit, retention, local tasks, and document ingestion. Version 1.2.1 is always installed with Townlight Records. |
-| Townlight Records | 1.7.3 | Released · city-core | 2026-05-24 | Public-records intake, cited search, human exemption review, release packaging, fulfillment, and public status. The beta desktop currently executes its native Rust workflow. |
-| CivicClerk | 1.0.4 | Released · city-core | 2026-06-13 | Meetings, agendas, packets, minutes, and votes. Ships in v1.0.2. |
-| CivicCode | 1.0.8 | Released · city-core | 2026-05-23 | Searchable municipal code and ordinances with AI-assisted guidance. Ships in v1.0.2. |
+| Townlight Records | 1.7.3 | Released · city-core | 2026-05-24 | Public-records intake, cited search, human review, release packaging, fulfillment and public status. The connected 1.3.0-beta.1 desktop uses Python/PostgreSQL and can attach permitted Meetings and Code sources with history, citations and hashes. |
+| Townlight Meetings | 1.0.4 | Released · city-core | 2026-06-13 | Agendas, packets, delivery, notices, proceedings and manual minutes. Connected 1.3.0-beta.1 supports explicit Code agenda/adoption links and permitted source attachments to Records; optional native AI minutes/transcription is not claimed. |
+| Townlight Code | 1.0.8 | Released · city-core | 2026-05-23 | Current and historical ordinance versions, meeting-linked proposals, explicit human adoption and separate codification. Connected 1.3.0-beta.1 supplies permitted cited source copies to Records without exposing restricted material. |
 | Townlight Access | 0.4.0 | Released · city-core | 2026-06-28 | Accessibility and records-release review, including plain-language, translation, and WCAG-oriented checks. Bundled with Townlight Records beta. |
 | CivicZone | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Parcel-aware zoning and land-use Q&A. Early scaffold; full build queued as the next Tier 2 lane. |
 | CivicPlan | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Comprehensive-plan policy lookup. Early scaffold; full build queued. |

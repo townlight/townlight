@@ -2,7 +2,7 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
-## Townlight Records + Meetings + Code 1.3.0-beta.1 — candidate
+## Townlight Records + Meetings + Code 1.3.0-beta.1 — 2026-10-20
 
 - city-core connects Core, Records, Meetings, Code, Notice and Access on the
   authenticated Python/PostgreSQL domain path; default Records-only selection
@@ -13,8 +13,10 @@ All notable changes to the Townlight umbrella repo are documented here.
   with source history, citations, effective dates and content hashes retained.
 - Retire obsolete Rust JSON business actions and temporary parity adapter;
   preserve schema upgrades, historical privacy, migration and recovery support.
-- Desktop version 1.3.0-1 (MSI 1.3.0.1). Final signed-byte acceptance and
-  publication remain pending; earlier C4 evidence is not relabeled.
+- Desktop version 1.3.0-1 (MSI 1.3.0.1). Exact signed fresh and populated signed 1.2
+  upgrade passed, including connected Code, preserved data/files, recovery,
+  offline operation and retained-data uninstall. Earlier C4 evidence remains
+  separate; it is not relabeled as final signed proof.
 
 
 ## Townlight Records + Meetings 1.2.0-beta.1 — 2026-10-20

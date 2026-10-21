@@ -1,5 +1,18 @@
 # Townlight Troubleshooting
 
+## Townlight Records + Meetings + Code 1.3.0-beta.1
+
+Choose city-core explicitly in setup or Settings for the three connected
+products plus Core, Notice and Access. Upgrades preserve the prior module
+selection. After selecting city-core, apply it and use **System Health → City
+workflow services → Repair** to refresh the per-user Python payload/migrations.
+Let outstanding operations finish; do not delete data or bypass maintenance.
+The [current acceptance record](installer/townlight-records-meetings-code-beta1-acceptance.md)
+identifies the exact signed MSI/EXE and environment limits. Optional native
+Meetings AI minutes/transcription and the wider suite are not claimed complete.
+
+The following 1.2 and earlier notes describe preserved predecessor releases.
+
 ## Townlight Records + Meetings 1.2.0-beta.1
 
 For connected work, choose **Townlight Records + Meetings** in setup or Settings.
