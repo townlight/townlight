@@ -1,11 +1,11 @@
-**CivicClerk**
+**Townlight Meetings**
 
 **Module Spec v0.1**
 
 *Meetings, agendas, packets, minutes, voting, and public-notice
 workflows --- clerk-first, sunshine-law compliant, citation-grounded*
 
-Modeled on the v3.0 CivicRecords AI unified spec • Built on CivicCore
+Modeled on the v3.0 Townlight Records unified spec • Built on Townlight Core
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
@@ -15,16 +15,16 @@ transcription · airgappable
 **Document Metadata**
 
   -------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Module**                 CivicClerk --- Tier 1 Clerk Core
+  **Module**                 Townlight Meetings --- Tier 1 Clerk Core
   **Document status**        v0.1 spec draft. Module itself is PLANNED (no code written). This doc is the buildable spec.
   **Purpose**                Agenda intake, packet assembly, staff report normalization, ordinance and resolution extraction, motion and vote capture, minute drafting, searchable meeting archive, statutory notice compliance, and public meeting portal --- all with citations back to source material.
   **Primary owner**          City Clerk / Council Support / City Manager's Office
-  **Depends on**             CivicCore (auth, RBAC, audit, LLM, ingest, search, notifications). Optional: CivicCode (ordinance handoff on adoption), CivicAccess (public-facing accessibility review), CivicRecords (search integration for prior-meeting FOIA responses).
-  **Note on dependencies**   The original CivicSuiteAI catalog listed "depends on CivicCore, CivicRecords." That dependency was an artifact of shared document/search infrastructure living inside the CivicRecords AI repo. Once CivicCore v0.1 ships, that shared infra moves to CivicCore and CivicClerk depends only on CivicCore.
+  **Depends on**             Townlight Core (auth, RBAC, audit, LLM, ingest, search, notifications). Optional: Townlight Code (ordinance handoff on adoption), Townlight Access (public-facing accessibility review), Townlight Records (search integration for prior-meeting FOIA responses).
+  **Note on dependencies**   The original CivicSuiteAI catalog listed "depends on Townlight Core, Townlight Records." That dependency was an artifact of shared document/search infrastructure living inside the Townlight Records repo. Once Townlight Core v0.1 ships, that shared infra moves to Townlight Core and Townlight Meetings depends only on Townlight Core.
   **Default model**          Gemma 4 via Ollama for drafting and extraction. Whisper (local) for meeting transcription. Embeddings via nomic-embed-text.
   **License**                Apache License 2.0 (code). CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
-  **Supersedes**             Nothing. First CivicClerk spec. Implements the Tier 1 Clerk Core module defined in CivicSuiteAI\_Module\_Catalog\_v1.
-  **Grounded in**            CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). CivicCore v0.1 Extraction Spec (platform dependency).
+  **Supersedes**             Nothing. First Townlight Meetings spec. Implements the Tier 1 Clerk Core module defined in CivicSuiteAI\_Module\_Catalog\_v1.
+  **Grounded in**            CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). Townlight Core v0.1 Extraction Spec (platform dependency).
   **Completion bar**         Every statutory notice requirement surfaced with deadline enforcement. Every AI-drafted minute sentence cites source. Every closed-session boundary enforced at the API layer. Every public-portal surface meets WCAG 2.2 AA.
   -------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ transcription · airgappable
 
 **Part I. Purpose & Strategic Context**
 
-**1. Why CivicClerk**
+**1. Why Townlight Meetings**
 
 Meetings are how a city makes decisions. Every ordinance, every budget,
 every land-use approval, every appointment, every policy change starts
@@ -52,7 +52,7 @@ NovusAGENDA in a notable public RFP. The replacement cycle is real, and
 the incumbent products are vulnerable on sovereignty, cost, and
 usability at the same time.
 
-CivicClerk is the module that replaces them. It is clerk-first, locally
+Townlight Meetings is the module that replaces them. It is clerk-first, locally
 deployed, grounded in citations to source material, and built around the
 reality that the clerk's workflow --- not the vendor's feature list ---
 is what matters. It inherits the suite's sovereignty stance: no outbound
@@ -61,7 +61,7 @@ local.
 
 **2. The scope decision**
 
-CivicClerk does nine things and explicitly refuses to do several others.
+Townlight Meetings does nine things and explicitly refuses to do several others.
 It covers:
 
 -   Agenda item intake from every department, with item-type templates.
@@ -78,7 +78,7 @@ It covers:
     sentence-level citations.
 
 -   Ordinance and resolution extraction, diffing, and handoff to
-    CivicCode.
+    Townlight Code.
 
 -   Meeting archive search across years of packets, minutes, and
     transcripts.
@@ -93,37 +93,37 @@ before it lands).
 
 **3. Where it fits in the suite**
 
--   Depends on CivicCore: auth, RBAC, audit chain, LLM abstraction,
+-   Depends on Townlight Core: auth, RBAC, audit chain, LLM abstraction,
     document ingestion, hybrid search, connector framework,
     notifications, admin shell.
 
--   Optional handoff to CivicCode: when an ordinance or resolution is
-    adopted, CivicClerk emits a structured event that CivicCode consumes
-    to update the authoritative code. Without CivicCode, CivicClerk
+-   Optional handoff to Townlight Code: when an ordinance or resolution is
+    adopted, Townlight Meetings emits a structured event that Townlight Code consumes
+    to update the authoritative code. Without Townlight Code, Townlight Meetings
     records the adoption and exports it for any downstream codifier.
 
--   Optional integration with CivicAccess: public-facing materials
+-   Optional integration with Townlight Access: public-facing materials
     (agendas, minutes, plain-English summaries) are reviewed for
     accessibility before publishing.
 
--   Optional integration with CivicRecords AI: meeting materials are
+-   Optional integration with Townlight Records: meeting materials are
     discoverable through the records search index. A records request for
     "all communications about the 12th Street project" will surface
     relevant meeting packets alongside emails and files.
 
--   Optional integration with CivicBoards (future): when CivicBoards
-    lands, CivicClerk's meeting infrastructure is reused for Planning
+-   Optional integration with Townlight Boards (future): when Townlight Boards
+    lands, Townlight Meetings's meeting infrastructure is reused for Planning
     Commission, Board of Adjustment, Historic Preservation, etc.
-    CivicBoards adds roster, term, and vacancy management on top.
+    Townlight Boards adds roster, term, and vacancy management on top.
 
 **4. Tiering and compliance posture**
 
-CivicClerk sits in Tier 1 --- Clerk Core, alongside CivicRecords AI,
-CivicCode, and CivicAccess. It is one of the first two or three modules
+Townlight Meetings sits in Tier 1 --- Clerk Core, alongside Townlight Records,
+Townlight Code, and Townlight Access. It is one of the first two or three modules
 a city should install. Its compliance posture is the heaviest of any
 Clerk Core module: Open Meetings Act / sunshine law violations are the
 most common reason a municipal decision is legally challenged, and the
-statutes vary significantly by state. CivicClerk treats the
+statutes vary significantly by state. Townlight Meetings treats the
 notice-and-posting workflow as a first-class compliance surface, not a
 bolt-on.
 
@@ -147,7 +147,7 @@ bolt-on.
 
 **6. The agenda-item lifecycle**
 
-Every agenda item moves through a state machine. CivicClerk enforces the
+Every agenda item moves through a state machine. Townlight Meetings enforces the
 transitions at the API layer. Nothing short-circuits the workflow.
 
 DRAFTED → SUBMITTED → DEPT\_APPROVED → LEGAL\_REVIEWED → CLERK\_ACCEPTED
@@ -215,7 +215,7 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 -   Each item shows its attachments, staff report, recommendation, and
     fiscal impact at a glance.
 
--   The clerk clicks "assemble packet" and CivicClerk generates a single
+-   The clerk clicks "assemble packet" and Townlight Meetings generates a single
     PDF (with tagged headings for accessibility), a public HTML version,
     and a per-item JSON feed.
 
@@ -244,7 +244,7 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 -   Post-meeting, the clerk opens the minute drafter for the completed
     meeting.
 
--   CivicClerk composes a first draft from: the packet (authoritative
+-   Townlight Meetings composes a first draft from: the packet (authoritative
     agenda), the transcript (from Whisper or uploaded), the clerk's
     notes, and the motion/vote capture.
 
@@ -264,7 +264,7 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 -   At the adoption meeting, the minutes are an agenda item. The body
     adopts them (with or without amendments).
 
--   CivicClerk records the adoption reference (meeting date, motion id)
+-   Townlight Meetings records the adoption reference (meeting date, motion id)
     and moves the minutes to MINUTES\_ADOPTED.
 
 -   The clerk adds their signature (image or digital) and the minutes
@@ -283,7 +283,7 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 -   The form presents the template for that type: required fields, staff
     report sections, attachment categories, legal-review flag.
 
--   CivicClerk's staff-report normalizer reviews the draft and suggests
+-   Townlight Meetings's staff-report normalizer reviews the draft and suggests
     missing sections, fiscal-impact omissions, or
     recommendation-phrasing issues. Nothing is auto-changed; the staff
     accepts or rejects each suggestion.
@@ -349,13 +349,13 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 
 **11.3 Plain-English agenda summaries**
 
--   For each public meeting, CivicClerk generates a plain-English
+-   For each public meeting, Townlight Meetings generates a plain-English
     summary of the agenda (draft; clerk approves before publishing).
 
 -   Each summary item links to the full packet item and to the relevant
-    code sections (via CivicCode integration).
+    code sections (via Townlight Code integration).
 
--   Summaries are reviewed by CivicAccess for readability where that
+-   Summaries are reviewed by Townlight Access for readability where that
     integration is enabled.
 
 **11.4 Archive search**
@@ -372,28 +372,28 @@ MINUTES\_ADOPTED → MINUTES\_SIGNED → ARCHIVED
 
 **12. Entity overview**
 
-CivicClerk introduces fifteen module-specific tables in the civicclerk
-schema. Every table sits alongside CivicCore's shared tables. Shared
+Townlight Meetings introduces fifteen module-specific tables in the civicclerk
+schema. Every table sits alongside Townlight Core's shared tables. Shared
 references (users, departments, documents, audit\_log) point to
 civiccore.\*.
 
   ---------------------- --------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------- ---------------
   **Entity**             **Purpose**                                                     **Key fields**                                                                                                                                       **Ownership**
-  meeting\_bodies        Bodies that hold meetings: Council, Planning Commission, etc.   code, name, type (legislative/advisory), statutory\_basis, meeting\_cadence, default\_notice\_days, quorum\_rule                                     CivicClerk
-  members                Current and historical members of bodies                        id, name, body\_code, role, term\_start, term\_end, email, photo                                                                                     CivicClerk
-  meetings               Individual meeting instances                                    id, body\_code, meeting\_type (regular/special/emergency/work\_session), scheduled\_at, location, status, livestream\_url, recording\_url            CivicClerk
-  agenda\_items          Individual items on a meeting agenda                            id, meeting\_id, section, order, item\_type, title, submitter\_id, department\_id, status, disposition, attachments\[\], staff\_report\_id           CivicClerk
-  staff\_reports         Structured staff analysis                                       id, item\_id, recommendation, background, analysis, fiscal\_impact, alternatives, prior\_actions                                                     CivicClerk
-  motions                Motions made during a meeting                                   id, meeting\_id, item\_id, text, moved\_by, seconded\_by, result (passed/failed/withdrawn/tabled), timestamp                                         CivicClerk
-  votes                  Individual member votes on a motion                             id, motion\_id, member\_id, vote (aye/nay/abstain/absent/recused)                                                                                    CivicClerk
-  public\_comments       Public comment on agenda items                                  id, item\_id, meeting\_id, commenter\_name, mode (in\_person/written/remote), text, position (for/against/neutral), redactions\[\]                   CivicClerk
-  notices                Statutory notices for meetings                                  id, meeting\_id, notice\_type, published\_at, method, location, confirmation\_ref, statutory\_basis, compliance\_status                              CivicClerk
-  minutes                Minutes for a meeting                                           id, meeting\_id, status (drafting/review/adopted/signed), content\_html, sentence\_citations\[\], adopted\_at\_meeting\_id, signed\_by, signed\_at   CivicClerk
-  transcripts            Meeting transcripts                                             id, meeting\_id, source (whisper/manual/uploaded), segments\[\], language, confidence, duration\_seconds                                             CivicClerk
-  action\_items          Follow-up assignments from a meeting                            id, meeting\_id, item\_id, description, owner, due\_date, status, closed\_at                                                                         CivicClerk
-  ordinances\_adopted    Adopted ordinances awaiting handoff to CivicCode                id, item\_id, motion\_id, title, text, effective\_date, codification\_section\_hint, handoff\_status                                                 CivicClerk
-  resolutions\_adopted   Adopted resolutions                                             id, item\_id, motion\_id, title, text, effective\_date, handoff\_status                                                                              CivicClerk
-  closed\_sessions       Executive / closed session blocks with statutory basis          id, meeting\_id, statutory\_basis, topics\[\], attendees\[\], notes\_ref (staff-only), entered\_at, exited\_at, reconvene\_statement                 CivicClerk
+  meeting\_bodies        Bodies that hold meetings: Council, Planning Commission, etc.   code, name, type (legislative/advisory), statutory\_basis, meeting\_cadence, default\_notice\_days, quorum\_rule                                     Townlight Meetings
+  members                Current and historical members of bodies                        id, name, body\_code, role, term\_start, term\_end, email, photo                                                                                     Townlight Meetings
+  meetings               Individual meeting instances                                    id, body\_code, meeting\_type (regular/special/emergency/work\_session), scheduled\_at, location, status, livestream\_url, recording\_url            Townlight Meetings
+  agenda\_items          Individual items on a meeting agenda                            id, meeting\_id, section, order, item\_type, title, submitter\_id, department\_id, status, disposition, attachments\[\], staff\_report\_id           Townlight Meetings
+  staff\_reports         Structured staff analysis                                       id, item\_id, recommendation, background, analysis, fiscal\_impact, alternatives, prior\_actions                                                     Townlight Meetings
+  motions                Motions made during a meeting                                   id, meeting\_id, item\_id, text, moved\_by, seconded\_by, result (passed/failed/withdrawn/tabled), timestamp                                         Townlight Meetings
+  votes                  Individual member votes on a motion                             id, motion\_id, member\_id, vote (aye/nay/abstain/absent/recused)                                                                                    Townlight Meetings
+  public\_comments       Public comment on agenda items                                  id, item\_id, meeting\_id, commenter\_name, mode (in\_person/written/remote), text, position (for/against/neutral), redactions\[\]                   Townlight Meetings
+  notices                Statutory notices for meetings                                  id, meeting\_id, notice\_type, published\_at, method, location, confirmation\_ref, statutory\_basis, compliance\_status                              Townlight Meetings
+  minutes                Minutes for a meeting                                           id, meeting\_id, status (drafting/review/adopted/signed), content\_html, sentence\_citations\[\], adopted\_at\_meeting\_id, signed\_by, signed\_at   Townlight Meetings
+  transcripts            Meeting transcripts                                             id, meeting\_id, source (whisper/manual/uploaded), segments\[\], language, confidence, duration\_seconds                                             Townlight Meetings
+  action\_items          Follow-up assignments from a meeting                            id, meeting\_id, item\_id, description, owner, due\_date, status, closed\_at                                                                         Townlight Meetings
+  ordinances\_adopted    Adopted ordinances awaiting handoff to Townlight Code                id, item\_id, motion\_id, title, text, effective\_date, codification\_section\_hint, handoff\_status                                                 Townlight Meetings
+  resolutions\_adopted   Adopted resolutions                                             id, item\_id, motion\_id, title, text, effective\_date, handoff\_status                                                                              Townlight Meetings
+  closed\_sessions       Executive / closed session blocks with statutory basis          id, meeting\_id, statutory\_basis, topics\[\], attendees\[\], notes\_ref (staff-only), entered\_at, exited\_at, reconvene\_statement                 Townlight Meetings
   ---------------------- --------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------- ---------------
 
 **13. Versioning**
@@ -432,7 +432,7 @@ civiccore.\*.
 
 -   ordinances\_adopted.motion\_id + .item\_id → motions +
     agenda\_items. ordinances\_adopted.handoff\_status tracks export to
-    CivicCode.
+    Townlight Code.
 
 -   closed\_sessions.meeting\_id → meetings.id.
     closed\_sessions.notes\_ref points to a staff-only document in
@@ -470,7 +470,7 @@ civicclerk.resolutions\_adopted
 
 civicclerk.closed\_sessions
 
-\-- Inherited from CivicCore (civiccore schema)
+\-- Inherited from Townlight Core (civiccore schema)
 
 civiccore.users, .roles, .audit\_log, .documents,
 
@@ -602,11 +602,11 @@ closed-session topics, public comment procedures, and recordkeeping. The
 rules are not uniform, and they evolve (e.g., post-COVID remote-meeting
 amendments in most states).
 
-CivicClerk treats these rules as data, not as code. The
+Townlight Meetings treats these rules as data, not as code. The
 civiccore.city\_profile captures the jurisdiction's rule set during
 onboarding; the rule set drives notice workflows, closed-session
 classification, public comment handling, and retention. A state-rules
-update ships as a data release, not a CivicClerk code release.
+update ships as a data release, not a Townlight Meetings code release.
 
 **22. Notice workflow**
 
@@ -640,7 +640,7 @@ update ships as a data release, not a CivicClerk code release.
 -   Closed-session notes are staff-only. The ACL on civiccore.documents
     enforces this at the database level.
 
--   CivicClerk's executive\_session\_classifier prompt evaluates each
+-   Townlight Meetings's executive\_session\_classifier prompt evaluates each
     proposed closure against the jurisdiction's statutory bases and
     flags requests that appear out of scope for attorney review.
 
@@ -688,7 +688,7 @@ update ships as a data release, not a CivicClerk code release.
 
 **26. Role model**
 
-CivicClerk defines nine roles on top of CivicCore's RBAC primitives.
+Townlight Meetings defines nine roles on top of Townlight Core's RBAC primitives.
 Every role is a collection of scope strings; scope strings are
 module-prefixed so they compose with records, code, zone, and future
 modules.
@@ -708,7 +708,7 @@ modules.
 
 **27. Packet visibility enforcement**
 
-Packet visibility is more nuanced than simple public/staff. CivicClerk
+Packet visibility is more nuanced than simple public/staff. Townlight Meetings
 enforces five levels:
 
 -   Public-published: visible to anyone, on the public portal, after
@@ -778,7 +778,7 @@ enforces five levels:
   PUT          /api/v1/civicclerk/admin/statutory-rules               Update jurisdiction rule set                admin
   ------------ ------------------------------------------------------ ------------------------------------------- ------------------------------------
 
-All endpoints follow CivicCore's standard error envelope, authentication
+All endpoints follow Townlight Core's standard error envelope, authentication
 headers, and audit middleware. OpenAPI spec is emitted automatically
 from FastAPI route handlers.
 
@@ -808,8 +808,8 @@ from FastAPI route handlers.
   Admin         /admin/clerk/prompts          Prompt library management                                  PLANNED
   ------------- ----------------------------- ---------------------------------------------------------- ------------
 
-Public surfaces inherit the CivicCore resident portal shell. Staff
-surfaces inherit the CivicCore admin shell. Design tokens are shared.
+Public surfaces inherit the Townlight Core resident portal shell. Staff
+surfaces inherit the Townlight Core admin shell. Design tokens are shared.
 Member surfaces use a tablet-optimized layout for meeting-day use.
 
 **31. States every page must handle**
@@ -838,7 +838,7 @@ Member surfaces use a tablet-optimized layout for meeting-day use.
 
 **32. Accessibility**
 
--   WCAG 2.2 AA across every public surface. CivicAccess reviews copy
+-   WCAG 2.2 AA across every public surface. Townlight Access reviews copy
     before publishing.
 
 -   Tagged-heading PDF output for assembled packets (not just an
@@ -858,22 +858,22 @@ Member surfaces use a tablet-optimized layout for meeting-day use.
 
   -------------------------------------------------------------------------------------- ----------------- ---------------------------------------------------------------------------------- ------------------------------------------------
   **Connector**                                                                          **Direction**     **Purpose**                                                                        **Priority**
-  Local SMTP                                                                             Write             Meeting notifications, agenda-posted emails, adoption notifications                P0 --- inherited from CivicCore
+  Local SMTP                                                                             Write             Meeting notifications, agenda-posted emails, adoption notifications                P0 --- inherited from Townlight Core
   Local SMB / shared drive                                                               Read/Write        Department staff report drafting, attachment ingestion, permanent minute archive   P0 --- required
   Granicus / Legistar / PrimeGov / NovusAGENDA export                                    Read (one-time)   Historical packet and minute migration during install                              P0 --- required for cities replacing incumbent
   Whisper (local)                                                                        Local process     Meeting transcription on-device                                                    P0 --- required for transcription feature
   Livestream platforms (YouTube Live, Facebook Live, custom)                             Link-only         Embed livestream URL on meeting detail; no replacement                             P1 --- recommended
   Captioning / caption file ingest                                                       Read              Import pre-existing caption files alongside transcripts                            P1 --- recommended
   City website CMS                                                                       Write             Post meeting notices and packets to the city's primary site                        P1 --- per-city
-  CivicCode handoff API                                                                  Write             Emit adopted ordinance/resolution events for CivicCode to consume                  P1 --- once CivicCode ships
-  CivicRecords AI search integration                                                     Read              Include meeting archive in records-request search index                            P2 --- optional
-  Codification system direct (Municode, American Legal, Code Publishing, General Code)   Write             Direct codification feed if city does not use CivicCode                            P2 --- optional
-  CKAN (via CivicData Bridge)                                                            Write             Publish anonymized meeting metadata for transparency                               P3 --- future
+  Townlight Code handoff API                                                                  Write             Emit adopted ordinance/resolution events for Townlight Code to consume                  P1 --- once Townlight Code ships
+  Townlight Records search integration                                                     Read              Include meeting archive in records-request search index                            P2 --- optional
+  Codification system direct (Municode, American Legal, Code Publishing, General Code)   Write             Direct codification feed if city does not use Townlight Code                            P2 --- optional
+  CKAN (via Townlight Data)                                                            Write             Publish anonymized meeting metadata for transparency                               P3 --- future
   -------------------------------------------------------------------------------------- ----------------- ---------------------------------------------------------------------------------- ------------------------------------------------
 
 **34. Migration from incumbent platforms**
 
-Cities migrating to CivicClerk typically arrive with years of historical
+Cities migrating to Townlight Meetings typically arrive with years of historical
 meeting data in Granicus, Legistar, PrimeGov, or NovusAGENDA. The
 migration connector handles:
 
@@ -896,21 +896,21 @@ which records came from where.
 
 **35. Connector contract**
 
-Every CivicClerk connector implements CivicCore's four-method connector
+Every Townlight Meetings connector implements Townlight Core's four-method connector
 protocol: authenticate(), discover(), fetch(), health\_check().
-CivicClerk does not define its own connector abstraction.
+Townlight Meetings does not define its own connector abstraction.
 
 **Part IX. Deployment**
 
 **36. Profiles**
 
 -   Single-workstation: small city, one clerk, one to three bodies.
-    CivicClerk + CivicCore on a Docker Compose stack. Whisper on CPU is
+    Townlight Meetings + Townlight Core on a Docker Compose stack. Whisper on CPU is
     slower but usable (overnight transcription for a 3-hour meeting is
     realistic).
 
--   Small on-prem server: expected default. CivicClerk + CivicCore +
-    CivicCode + CivicRecords AI on a dedicated box with consumer GPU.
+-   Small on-prem server: expected default. Townlight Meetings + Townlight Core +
+    Townlight Code + Townlight Records on a dedicated box with consumer GPU.
     Whisper transcription completes in roughly real-time.
 
 -   Segmented / air-gapped: supported. All features work; migration
@@ -948,7 +948,7 @@ CivicClerk does not define its own connector abstraction.
 
 **39. Coverage expectations**
 
-CivicClerk targets the same 36-module baseline discipline CivicRecords
+Townlight Meetings targets the same 36-module baseline discipline Townlight Records
 AI established. Every area below has at least one dedicated test module.
 
   ------------------------------- ------------------------------------------------------------------------------------------ ---------------------------------
@@ -967,7 +967,7 @@ AI established. Every area below has at least one dedicated test module.
   Archive search                  Hybrid search across packets, minutes, transcripts, ordinances; permission-aware results   Integration
   Accessibility                   WCAG 2.2 AA on every public and staff page; tagged-heading PDF output; transcript player   Axe + manual
   Air-gap behavior                No outbound calls with air-gap enabled; migration connector runs on staging only           End-to-end with egress monitor
-  Regression vs. CivicCore        CivicCore version bump does not break CivicClerk                                           CI matrix build
+  Regression vs. Townlight Core        Townlight Core version bump does not break Townlight Meetings                                           CI matrix build
   ------------------------------- ------------------------------------------------------------------------------------------ ---------------------------------
 
 **40. Statutory-rule test suite**
@@ -999,14 +999,14 @@ blocked.
 
 -   Does not test against every state's open-meetings statute --- the
     evaluation harness uses a representative sample; a city opting into
-    CivicClerk provides their rule set during onboarding.
+    Townlight Meetings provides their rule set during onboarding.
 
 -   Manual clerk review of AI-drafted minutes is the real quality
     signal; automated tests approximate it.
 
 **Part XI. Scope Boundaries**
 
-**43. What CivicClerk is NOT**
+**43. What Townlight Meetings is NOT**
 
 -   Not voting software. It records votes; it does not conduct them.
     In-chamber hardware voting integrates as a data source, not as a
@@ -1023,12 +1023,12 @@ blocked.
     supports redaction with statutory basis; it does not decide what is
     allowed speech.
 
--   Not a codifier. CivicCode owns the authoritative code. CivicClerk
-    emits adoption events; CivicCode picks them up.
+-   Not a codifier. Townlight Code owns the authoritative code. Townlight Meetings
+    emits adoption events; Townlight Code picks them up.
 
--   Not a board-management system. CivicBoards (future) handles roster,
+-   Not a board-management system. Townlight Boards (future) handles roster,
     term, vacancy, and attendance tracking for bodies beyond Council.
-    CivicClerk handles the meetings themselves.
+    Townlight Meetings handles the meetings themselves.
 
 -   Not a campaign-finance or ethics-filing system. Those belong
     elsewhere.
@@ -1052,7 +1052,7 @@ blocked.
     --- city-specific; revisit.
 
 -   Automatic cross-reference from minutes to ordinance code --- handoff
-    goes to CivicCode; the reverse link comes from CivicCode.
+    goes to Townlight Code; the reverse link comes from Townlight Code.
 
 **Part XII. Repo-Aligned Status**
 
@@ -1069,21 +1069,21 @@ blocked.
 -   PLANNED --- intent committed, no implementation, no dependencies
     resolved.
 
--   INHERITED --- provided by CivicCore; not implemented in CivicClerk.
+-   INHERITED --- provided by Townlight Core; not implemented in Townlight Meetings.
 
 **46. Honest assessment**
 
-CivicClerk is entirely PLANNED at the code level. This spec is v0.1 of
-the design document. Nothing ships until CivicCore v0.1 Phase 1 is
-complete (shared models + audit chain live in CivicCore). CivicCode
-handoff ships in a later minor release once CivicCode v0.1 exposes its
-acceptance API. The CivicSuite umbrella repo's compatibility matrix will
+Townlight Meetings is entirely PLANNED at the code level. This spec is v0.1 of
+the design document. Nothing ships until Townlight Core v0.1 Phase 1 is
+complete (shared models + audit chain live in Townlight Core). Townlight Code
+handoff ships in a later minor release once Townlight Code v0.1 exposes its
+acceptance API. The Townlight umbrella repo's compatibility matrix will
 reflect this explicitly.
 
   ---------------------------- ---------------------------------------- --------------------------------------------------------
   **Area**                     **Repo-aligned status**                  **Notes**
   Spec document                DRAFTED --- this document                v0.1
-  CivicCore dependency         PLANNED (CivicCore v0.1 in extraction)   Cannot begin before CivicCore v0.1 Phase 1 ships
+  Townlight Core dependency         PLANNED (Townlight Core v0.1 in extraction)   Cannot begin before Townlight Core v0.1 Phase 1 ships
   Data model                   SPECIFIED                                No migrations written
   Prompt library               DESIGNED --- 9 prompts sketched          No YAML committed
   REST API                     DESIGNED --- 25 endpoints specified      No routers implemented
@@ -1091,11 +1091,11 @@ reflect this explicitly.
   Whisper integration          PLANNED                                  Model choice: whisper large-v3 default
   Statutory rule sets          PLANNED --- seed data for \~10 states    Community contributions expected for additional states
   Migration connectors         PLANNED                                  Granicus/Legistar/PrimeGov/NovusAGENDA export readers
-  CivicCode handoff            DESIGNED --- event contract specified    Depends on CivicCode v0.1
+  Townlight Code handoff            DESIGNED --- event contract specified    Depends on Townlight Code v0.1
   Test matrix                  DESIGNED --- 15 areas specified          No tests written
   Evaluation harness           PLANNED                                  Sample recordings + labeled transcripts to be curated
-  Deployment                   INHERITED from CivicCore                 No module-specific deploy surface
-  Accessibility verification   PLANNED                                  Follows CivicAccess integration
+  Deployment                   INHERITED from Townlight Core                 No module-specific deploy surface
+  Accessibility verification   PLANNED                                  Follows Townlight Access integration
   ---------------------------- ---------------------------------------- --------------------------------------------------------
 
 **Appendices**
@@ -1103,7 +1103,7 @@ reflect this explicitly.
 **A. Example end-to-end: an ordinance from intake to adoption**
 
 Illustrative walkthrough of a department-proposed ordinance moving
-through CivicClerk.
+through Townlight Meetings.
 
 -   1\. Week T-4: Planning staff drafts a zoning text amendment in Word,
     uploads to /staff/items/new with item\_type=ordinance. Staff-report
@@ -1137,8 +1137,8 @@ through CivicClerk.
 -   9\. Next meeting: minutes adopted. Clerk signs. Ordinance is now in
     ordinances\_adopted with handoff\_status=pending.
 
--   10\. CivicCode (when available) consumes the adoption event, updates
-    the authoritative code, and surfaces the new section to CivicZone
+-   10\. Townlight Code (when available) consumes the adoption event, updates
+    the authoritative code, and surfaces the new section to Townlight Zoning
     via normal code-ingestion flow.
 
 **B. Prompt skeleton (minutes\_draft.v1)**
@@ -1209,10 +1209,10 @@ refusal\_conditions:
     plain-English summaries.
 
 -   Records retention: adopted minutes are typically retained
-    permanently. CivicCore retention engine executes per the
+    permanently. Townlight Core retention engine executes per the
     jurisdiction's schedule.
 
--   CJIS: no CJIS data passes through CivicClerk.
+-   CJIS: no CJIS data passes through Townlight Meetings.
     Law-enforcement-related agenda items are handled under general
     rules; closed-session handling covers personnel-specific exceptions.
 
@@ -1222,11 +1222,11 @@ refusal\_conditions:
 
 **D. Verification log (to be completed when v0.1 ships)**
 
-\#\# Verification Log --- CivicClerk v0.1
+\#\# Verification Log --- Townlight Meetings v0.1
 
 \#\#\# What Was Changed
 
-First release of CivicClerk. PLANNED → SHIPPED.
+First release of Townlight Meetings. PLANNED → SHIPPED.
 
 \#\#\# Data Provenance Check
 
@@ -1267,7 +1267,7 @@ paths
 
 \[ \] Notice copy reviewed against jurisdiction's statutory requirements
 
-\[ \] Public-facing language reviewed by CivicAccess
+\[ \] Public-facing language reviewed by Townlight Access
 
 \[ \] Refusal and deadline-missed messages are clear and actionable
 
@@ -1294,11 +1294,11 @@ deliberative material
 
 \#\#\# Regression Check
 
-\[ \] CivicCore compatibility matrix updated
+\[ \] Townlight Core compatibility matrix updated
 
-\[ \] CivicRecords AI search integration unchanged
+\[ \] Townlight Records search integration unchanged
 
-\[ \] CivicCode handoff contract honored (if CivicCode present)
+\[ \] Townlight Code handoff contract honored (if Townlight Code present)
 
 \#\#\# Test Suite Blind Spots
 

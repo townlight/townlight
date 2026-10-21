@@ -1,46 +1,50 @@
-# CivicCode Next Module Plan
+<a id="civiccode-next-module-plan"></a>
+
+# Townlight Code Next Module Plan
 
 Status: v0.1.7 shipped; historical planning baseline retained
 Date: 2026-05-03  
-Applies to: `CivicSuite/civiccode` v0.1.7 and follow-on planning
+Applies to: `townlight/ordinances` v0.1.7 and follow-on planning
 
-## Why CivicCode Next
+<a id="why-civiccode-next"></a>
 
-CivicCode is the next suite lane because the canonical spec names it as a
-critical Tier 1 gap and says it should be planned before CivicZone runtime
-work begins. CivicZone answers parcel-aware zoning questions, but zoning
+## Why Townlight Code Next
+
+Townlight Code is the next suite lane because the canonical spec names it as a
+critical Tier 1 gap and says it should be planned before Townlight Zoning runtime
+work begins. Townlight Zoning answers parcel-aware zoning questions, but zoning
 answers still need authoritative code sections, version history, and
-ordinance-adoption context. CivicCode provides that municipal-code layer.
+ordinance-adoption context. Townlight Code provides that municipal-code layer.
 
-This does not mean CivicZone is less important. It means CivicCode is the
-dependency that lets CivicZone avoid becoming its own partial codifier.
+This does not mean Townlight Zoning is less important. It means Townlight Code is the
+dependency that lets Townlight Zoning avoid becoming its own partial codifier.
 
 ## Product Promise
 
-CivicCode helps residents, staff, clerks, planners, and attorneys ask what
+Townlight Code helps residents, staff, clerks, planners, and attorneys ask what
 the municipal code says about a topic and receive cited, date-aware answers
 tied to authoritative code sections. Plain-language summaries are allowed,
 but they are never authoritative legal advice.
 
 ## Current Truth
 
-- `CivicSuite/civiccode` ships v0.1.7 as an active municipal-code productization release.
-- CivicCode v0.1.7 includes source registry persistence, section/version lifecycle,
+- `townlight/ordinances` ships v0.1.7 as an active municipal-code productization release.
+- Townlight Code v0.1.7 includes source registry persistence, section/version lifecycle,
   search/permalinks, deterministic citations, citation-grounded Q&A, staff
-  notes, plain-language summaries, CivicClerk handoff intake, resident public
+  notes, plain-language summaries, Townlight Meetings handoff intake, resident public
   lookup pages, local import connectors, records-ready exports, reusable
   mock-city codifier contracts, and staff-controlled codifier live-sync readiness.
-- CivicCode still does not ship legal advice, live LLM calls, bundled vendor
-  credentials, CivicAccess runtime integration, or automatic ordinance codification.
+- Townlight Code still does not ship legal advice, live LLM calls, bundled vendor
+  credentials, Townlight Access runtime integration, or automatic ordinance codification.
 - The authoritative requirements live in `docs/CivicSuiteUnifiedSpec.md`
-  section 11 and `specs/01_catalog.md` under "CivicCode - Municipal Code &
+  section 11 and `specs/01_catalog.md` under "Townlight Code - Municipal Code &
   Ordinance Access."
-- CivicClerk v0.1.0 already defines ordinance/resolution handoff concepts, and
-  CivicCode v0.1.7 has a receiving intake foundation for those events.
+- Townlight Meetings v0.1.0 already defines ordinance/resolution handoff concepts, and
+  Townlight Code v0.1.7 has a receiving intake foundation for those events.
 
 ## MVP Scope
 
-The CivicCode v0.1.0 MVP is narrow, useful, and legally cautious:
+The Townlight Code v0.1.0 MVP is narrow, useful, and legally cautious:
 
 1. Municipal code import registry with source URL/file metadata.
 2. Code title/chapter/section/subsection model with version dates.
@@ -49,7 +53,7 @@ The CivicCode v0.1.0 MVP is narrow, useful, and legally cautious:
 5. Citation-grounded Q&A over the code.
 6. Plain-language section summaries with explicit non-authoritative labels.
 7. Staff-only interpretation notes.
-8. Ordinance/adoption-event intake contract from CivicClerk.
+8. Ordinance/adoption-event intake contract from Townlight Meetings.
 9. Public code lookup page with source citations and staff-contact routing.
 10. Audit-log seams and visible audit events where the v0.1.0 in-memory
     foundation already exposes them.
@@ -61,7 +65,7 @@ The CivicCode v0.1.0 MVP is narrow, useful, and legally cautious:
 - Not legal advice.
 - Not automatic ordinance codification.
 - Not automatic legal interpretation.
-- Not CivicZone runtime work.
+- Not Townlight Zoning runtime work.
 - Not a resident portal shell.
 
 ## UX-First Acceptance Criteria
@@ -79,9 +83,9 @@ The CivicCode v0.1.0 MVP is narrow, useful, and legally cautious:
 
 ## Technical Starting Architecture
 
-CivicCode should follow the same separate-module pattern as CivicClerk:
+Townlight Code should follow the same separate-module pattern as Townlight Meetings:
 
-- Standalone repo under `CivicSuite/civiccode`.
+- Standalone repo under `townlight/ordinances`.
 - FastAPI backend.
 - React staff/public surfaces behind nginx when frontend work begins.
 - PostgreSQL 17 + pgvector.
@@ -89,7 +93,7 @@ CivicCode should follow the same separate-module pattern as CivicClerk:
 - `civiccore==0.2.0` as the initial dependency target unless civiccore ships a
   new release before scaffold.
 - Local LLM only through `civiccore.llm`; default provider is Ollama.
-- No imports from planned CivicCore placeholder packages unless the capability
+- No imports from planned Townlight Core placeholder packages unless the capability
   is released in a versioned civiccore artifact.
 
 ## Initial Data Model Sketch
@@ -105,21 +109,21 @@ CivicCode should follow the same separate-module pattern as CivicClerk:
 - `civiccode.code_questions`
 - `civiccode.ordinance_events`
 
-The implemented table list lives in the CivicCode repo's tested SQLAlchemy
+The implemented table list lives in the Townlight Code repo's tested SQLAlchemy
 metadata and migration chain.
 
 ## First Sprint Sequence
 
-1. Keep `CivicSuite/civiccode` shipped truth current after v0.1.0.
+1. Keep `townlight/ordinances` shipped truth current after v0.1.0.
 2. Maintain professional repo docs, Apache 2.0 code license, CC BY 4.0 docs
    license, issue templates, PR template, support/security/contributing docs,
    landing page, user manual, and seed discussion posts.
-3. Add `AGENTS.md` operating contract for CivicCode with the same test-first,
-   docs-first, browser-QA gate used by CivicClerk.
+3. Add `AGENTS.md` operating contract for Townlight Code with the same test-first,
+   docs-first, browser-QA gate used by Townlight Meetings.
 4. Preserve Milestone 0 reconciliation against `docs/CivicSuiteUnifiedSpec.md`,
-   suite ADRs, and the catalog CivicCode spec.
+   suite ADRs, and the catalog Townlight Code spec.
 5. Queue ADRs for official-source precedence, codifier integration strategy,
-   public disclaimer wording, and CivicClerk handoff contract.
+   public disclaimer wording, and Townlight Meetings handoff contract.
 6. Build runtime foundation only after Milestone 0 is reviewed. (Complete as of
    v0.1.0.)
 
@@ -128,13 +132,13 @@ metadata and migration chain.
 - Official source precedence and what happens when sources disagree.
 - Codifier import strategy: file upload, URL scrape, API, or all three.
 - Section versioning model and historical effective-date semantics.
-- CivicClerk ordinance/adoption-event handoff contract.
+- Townlight Meetings ordinance/adoption-event handoff contract.
 - Legal-disclaimer wording and resident-facing refusal policy.
 - Staff-only interpretation-note visibility and retention policy.
 
 ## QA And Documentation Gate
 
-Every CivicCode PR must update affected documentation and verification
+Every Townlight Code PR must update affected documentation and verification
 scripts. Frontend PRs must include browser evidence for every rendered state.
 Code-answer behavior must be tested with exact citations, stale-source
 refusals, ambiguous-source refusals, and no-legal-advice language.

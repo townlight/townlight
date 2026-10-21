@@ -9,7 +9,7 @@ rules for finishing them.
 
 ## Goal
 
-All 27 product modules plus CivicCore finished as genuine products — not
+All 27 product modules plus Townlight Core finished as genuine products — not
 specs, not scaffolds, not labels — installable end to end by a non-technical
 municipal operator via a double-click installer, with every claim backed by
 replayable evidence. There is no pilot city; the program generates its own
@@ -38,32 +38,32 @@ claim-without-proof is structurally impossible.
 ## Execution order (approved 2026-06-10)
 
 One module in flight at a time. Per module: build to real product depth →
-wire into CivicCore and sibling modules → installer integration → clean-VM
+wire into Townlight Core and sibling modules → installer integration → clean-VM
 evidence run → honest release tag → next module.
 
-1. **Core hardening:** CivicClerk persistence (motions, votes, minutes,
-   archive to its migrated schema, database as default), CivicCode
-   persistence-by-default plus a real frontend, CivicCore exemptions engine
-   (first statutory seed: Colorado CORA) consumed by CivicRecords AI,
-   CivicRecords AI notification wiring.
+1. **Core hardening:** Townlight Meetings persistence (motions, votes, minutes,
+   archive to its migrated schema, database as default), Townlight Code
+   persistence-by-default plus a real frontend, Townlight Core exemptions engine
+   (first statutory seed: Colorado CORA) consumed by Townlight Records,
+   Townlight Records notification wiring.
 2. **Installer rebuild** per [ADR-0008](../architecture/ADR-0008-portable-native-windows-runtime.md)
    and [ADR-0009](../architecture/ADR-0009-postgres-backed-queue-windows-profile.md):
    portable-native Windows runtime, unsigned-beta trust screens, lifecycle
    (install/start/health/repair/backup/restore/uninstall).
 3. **First clean-VM gate:** the core four pass the Definition of Done as one
    package. This is the program's first honest "beta" claim.
-4. **Starter Set:** CivicNotice, CivicBudget, CivicLegal, CivicData, CivicHR
-   — with the CivicAccess re-probe and gap closure folded in during this
+4. **Starter Set:** Townlight Notice, Townlight Budget, Townlight Legal, Townlight Data, Townlight HR
+   — with the Townlight Access re-probe and gap closure folded in during this
    block.
-5. **Land use:** CivicZone, CivicPlan, CivicPermit, CivicInspect.
-6. **Administrative:** CivicGrants, CivicProcure, CivicContracts,
-   CivicBoards.
-7. **Operations:** Civic311, CivicComms, CivicRegWatch (repo to be created
-   from `specs/05_civicregwatch.md`), CivicAPI (repo to be created from
+5. **Land use:** Townlight Zoning, Townlight Planning, Townlight Permitting, Townlight Inspections.
+6. **Administrative:** Townlight Grants, Townlight Procurement, Townlight Contracts,
+   Townlight Boards.
+7. **Operations:** Townlight 311, Townlight Communications, Townlight Regulatory Watch (repo to be created
+   from `specs/05_civicregwatch.md`), Townlight API (repo to be created from
    `specs/06_civicapi.md`).
-8. **Internal business:** CivicElections.
-9. **Specialized:** CivicUtility, CivicCourt, CivicSafety, CivicLibrary,
-   CivicParks.
+8. **Internal business:** Townlight Elections.
+9. **Specialized:** Townlight Utilities, Townlight Courts, Townlight Safety, Townlight Library,
+   Townlight Parks.
 
 Module labels are never promoted ahead of their evidence kit. Demotion-truth
 labels stay until the gate passes.

@@ -88,7 +88,7 @@ REQUIRED_MODULES = {
 PLANNED_NON_SELECTABLE_MODULES = {"civicregwatch", "civicapi"}
 REQUIRED_DOC_PHRASES = (
     "zero-baseline machine",
-    "CivicCore",
+    "Townlight Core",
     "module selector",
     "menu style",
     "readiness",
@@ -196,13 +196,13 @@ def check_docs() -> list[str]:
     else:
         contract = STARTER_SET_CONTRACT.read_text(encoding="utf-8")
         for phrase in (
-            "CivicCore installs first",
-            "CivicSunshine and CivicMeetings are selectable",
+            "Townlight Core installs first",
+            "Townlight Records and Townlight Meetings are selectable",
             "Windows and Linux package lifecycle proof are required",
             "macOS archives and wrapper manifests are generated and supported at beta",
             "before any macOS lifecycle certification claim",
-            "CivicSunshine reports v1.7.3",
-            "CivicMeetings reports v1.0.4 with CivicCore v1.2.0",
+            "Townlight Records reports v1.7.3",
+            "Townlight Meetings reports v1.0.4 with Townlight Core v1.2.0",
             "install --staff-mode bearer --workflow-proof",
             "first-admin JWT auth",
             "bearer-protected staff auth",
@@ -210,13 +210,13 @@ def check_docs() -> list[str]:
             "submit the request for review",
             "motion/vote capture",
             "automatic-minutes-posting",
-            "Reports must not persist the CivicSunshine admin password or bearer token",
+            "Reports must not persist the Townlight Records admin password or bearer token",
             "Package Cleanroom Contract",
             "run-installer-package-cleanroom.py --archive installer\\dist\\CivicSuite-clerk-core-windows-0.1.0.zip --platform windows --staff-mode bearer --workflow-proof",
             "workflow_proof_requested=true",
             "civicclerk_staff_mode=bearer",
             "Windows package workflow proof has been run on a Windows 11 host with",
-            "not yet a claim that CivicSunshine and CivicMeetings exchange workflow records",
+            "not yet a claim that Townlight Records and Townlight Meetings exchange workflow records",
         ):
             if phrase not in contract:
                 errors.append(
@@ -235,13 +235,13 @@ def check_docs() -> list[str]:
             "macOS archives are built",
             "SmartScreen or Unknown Publisher warnings are normal",
             "SHA256 checksum matches",
-            "official CivicSuite release source",
+            "official Townlight release source",
             "Install",
             "Verify",
             "Repair",
             "Uninstall",
-            "CivicSunshine API health returns `status=ok` and `version=1.7.3`",
-            "CivicMeetings API health returns `status=ok`, `version=1.0.4`, and",
+            "Townlight Records API health returns `status=ok` and `version=1.7.3`",
+            "Townlight Meetings API health returns `status=ok`, `version=1.0.4`, and",
             "anonymous staff writes are",
             "submits review",
             "staff-reviewable response",
@@ -2506,7 +2506,7 @@ def check_launchers() -> list[str]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Verify the CivicSuite suite-installer design contract."
+        description="Verify the Townlight suite-installer design contract."
     )
     parser.add_argument(
         "--require-package-cleanroom-evidence",
@@ -2518,7 +2518,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    print("==> CivicSuite installer plan verification")
+    print("==> Townlight installer plan verification")
     before_files, before_directories = snapshot_generated_artifacts()
     errors = []
     try:

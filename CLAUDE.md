@@ -1,23 +1,25 @@
-# CivicSuite — project instructions for Claude Code
+<a id="civicsuite--project-instructions-for-claude-code"></a>
 
-CivicSuite is an open-source, local-first municipal operations suite. The umbrella repo at `CivicSuite/civicsuite` holds suite-level documentation, governance, compatibility tracking, the release ladder, and the verification scripts that keep 27 module repos in lockstep. Module products (CivicCore, CivicRecords AI, CivicClerk, CivicZone, CivicCode, CivicAccess, and 21+ more) live in sibling repos under the same GitHub org.
+# Townlight — project instructions for Claude Code
+
+Townlight is an open-source, local-first municipal operations suite. The umbrella repo at `townlight/townlight` holds suite-level documentation, governance, compatibility tracking, the release ladder, and the verification scripts that keep 27 module repos in lockstep. Module products (Townlight Core, Townlight Records, Townlight Meetings, Townlight Zoning, Townlight Code, Townlight Access, and 21+ more) live in sibling repos under the same GitHub org.
 
 Read this file before doing anything. The "Pipeline drafter notes" section is the load-bearing part for `agent-pipeline-claude:run` — it tells the manifest-drafter where everything lives.
 
 ## Pipeline drafter notes
 
-When `agent-pipeline-claude:run` produces a manifest for CivicSuite work, the drafter must pull from these sources (in this order):
+When `agent-pipeline-claude:run` produces a manifest for Townlight work, the drafter must pull from these sources (in this order):
 
 1. **`docs/CivicSuiteUnifiedSpec.md`** — canonical product spec. Always cite the relevant section number when the manifest invokes a closed architectural decision, a module's canonical scope, or a non-negotiable.
    - §4 — suite-wide non-negotiables (product / AI / sovereignty / docs+QA principles)
    - §5 — standard module architecture (§5.1 backend, §5.2 frontend, §5.3 AI, §5.4 data+search, §5.5 connectors)
-   - §8 CivicRecords, §9 CivicClerk, §10 CivicZone, §11 CivicCode, §12 CivicAccess — canonical scopes
+   - §8 Townlight Records, §9 Townlight Meetings, §10 Townlight Zoning, §11 Townlight Code, §12 Townlight Access — canonical scopes
    - §15.4 — accessibility (WCAG 2.2 AA load-bearing)
    - §17 — documentation standard
    - §22 — open and closed decisions
 
 2. **`docs/design/ui-ux-prototype/`** — **canonical UI/UX specification** (interactive React+Babel prototype built by Claude Design). Any manifest touching user-visible code, copy, or layout must:
-   - Pull in the relevant `*.jsx` file(s) (e.g., `clerk.jsx` for CivicClerk UI work, `records.jsx` for CivicRecords work, `shell.jsx` for app-shell or topbar changes).
+   - Pull in the relevant `*.jsx` file(s) (e.g., `clerk.jsx` for Townlight Meetings UI work, `records.jsx` for Townlight Records work, `shell.jsx` for app-shell or topbar changes).
    - Cite `styles.css` design tokens (typography: Inter / Source Serif 4 / JetBrains Mono; color tokens like `--paper-2`, `--rule`; spacing scale) when verifying a visual change.
    - Respect the three architectural commitments captured in `docs/design/ui-ux-prototype/README.md`: three surfaces (Staff/Resident/IT-Admin), audit drawer always one click away, ⌘K palette as primary navigation.
    - **If a PR's UI work conflicts with the prototype, the prototype is authoritative.** A design-change PR must update the prototype in the same change set.
@@ -26,17 +28,17 @@ When `agent-pipeline-claude:run` produces a manifest for CivicSuite work, the dr
 
 4. **`.agent-workflows/ACTIVE_WORK_QUEUE.md`** — current target tracking. The active target plus queued targets live here. A manifest claiming to advance the queue must name the queue entry it advances.
 
-5. **`.agent-workflows/HANDOFF_*.md`** — historical handoffs. Read the latest dated handoff at session start. The most recent B2 completion handoff is `HANDOFF_2026-05-12_B2_COMPLETE.md` (B2 closed, CivicRecords AI v1.6.0, suite-truth reconciled); current release truth has since advanced to CivicRecords AI v1.6.1.
+5. **`.agent-workflows/HANDOFF_*.md`** — historical handoffs. Read the latest dated handoff at session start. The most recent B2 completion handoff is `HANDOFF_2026-05-12_B2_COMPLETE.md` (B2 closed, Townlight Records v1.6.0, suite-truth reconciled); current release truth has since advanced to Townlight Records v1.6.1.
 
 6. **`docs/adr/`** — architectural decision records. `0001-canonical-decisions-live-in-unified-spec.md` is the bridge document that activates the ADR policy gate while per-decision ADRs are extracted over time.
 
 7. **`scripts/verify-suite-state.py`** — the suite-truth verifier. Any manifest that changes module versions or compatibility claims must run this script as part of its acceptance and paste the output.
 
-8. **Module-specific specs.** For work that lives primarily inside a single sibling repo (CivicRecords AI, CivicClerk, etc.), the module's own `README.md`, `CHANGELOG.md`, and the relevant unified-spec section are sources of truth. Manifests targeting module work must reference both.
+8. **Module-specific specs.** For work that lives primarily inside a single sibling repo (Townlight Records, Townlight Meetings, etc.), the module's own `README.md`, `CHANGELOG.md`, and the relevant unified-spec section are sources of truth. Manifests targeting module work must reference both.
 
 ## Order of operations
 
-CivicSuite work flows: **branch from main → produce a manifest that names the target from `ACTIVE_WORK_QUEUE.md` (or a queued target with explicit promotion) → APPROVE in chat → pipeline runs research / plan / execute / verify / drift / critic → manager decision → admin-merge → update `ACTIVE_WORK_QUEUE.md` → close the handoff in `.agent-workflows/`.** No silent scope expansion. Findings dispatch by severity per the §22.5 overflow rule (Blocker stops work; Critical only if it fits; Major queues for next; Minor/Nit collects in `next-cleanup.md`).
+Townlight work flows: **branch from main → produce a manifest that names the target from `ACTIVE_WORK_QUEUE.md` (or a queued target with explicit promotion) → APPROVE in chat → pipeline runs research / plan / execute / verify / drift / critic → manager decision → admin-merge → update `ACTIVE_WORK_QUEUE.md` → close the handoff in `.agent-workflows/`.** No silent scope expansion. Findings dispatch by severity per the §22.5 overflow rule (Blocker stops work; Critical only if it fits; Major queues for next; Minor/Nit collects in `next-cleanup.md`).
 
 ## Tooling
 
@@ -48,20 +50,20 @@ CivicSuite work flows: **branch from main → produce a manifest that names the 
 - **AI runtime:** Ollama for LLMs, faster-whisper (CTranslate2) for ASR.
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind + shadcn/ui (per unified spec §5.2).
 - **Documentation rendering:** MkDocs Material (docs site); Pandoc (USER-MANUAL.pdf / .docx).
-- **Commit convention:** Conventional Commits + DCO sign-off (every commit ends with `Signed-off-by: Name <email>`). For CivicSuite commits, Scott Converse is the primary author. The `Signed-off-by:` trailer credits whoever did the work, for example `Signed-off-by: Codex <codex@openai.com>` when Codex implemented. Do not use a `Co-Authored-By:` trailer; it is not the CivicSuite convention.
+- **Commit convention:** Conventional Commits + DCO sign-off (every commit ends with `Signed-off-by: Name <email>`). For Townlight commits, Scott Converse is the primary author. The `Signed-off-by:` trailer credits whoever did the work, for example `Signed-off-by: Codex <codex@openai.com>` when Codex implemented. Do not use a `Co-Authored-By:` trailer; it is not the Townlight convention.
 - **Pre-commit hooks:** ruff, mypy, trailing-whitespace, end-of-file-fixer, conventional-commit-message check.
 - **License header:** `# SPDX-License-Identifier: Apache-2.0` on every source file; `# Copyright (c) The CivicSuite Authors`.
 
 ## Local workspace root
 
-Active CivicSuite work must use a local, non-cloud-synced workspace root. The current Windows root is:
+Active Townlight work must use a local, non-cloud-synced workspace root. The current Windows root is:
 
 `C:\dev\Codex`
 
 (The former `C:\dev\Claude` root is historical — `STATUS.md` already records those references as
 historical, and the current machine's new-machine handoff provisions repos under `C:\dev\Codex`.)
 
-Do not create, clone, write, branch, commit, push, or run CivicSuite product workflows from cloud-synced user-profile folders. If evidence or handoff text points at an older cloud-synced workspace path, repair the reference before relying on it for current work.
+Do not create, clone, write, branch, commit, push, or run Townlight product workflows from cloud-synced user-profile folders. If evidence or handoff text points at an older cloud-synced workspace path, repair the reference before relying on it for current work.
 
 ## Non-negotiables
 

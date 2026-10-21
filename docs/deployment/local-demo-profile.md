@@ -1,19 +1,19 @@
 # Local Demo Deployment Profile
 
-Status: evaluation profile, not production packaging  
-Stack target: CivicSunshine + CivicMeetings + CivicCode + CivicZone  
+Status: evaluation profile, not production packaging
+Stack target: Townlight Records + Townlight Meetings + Townlight Code + Townlight Zoning
 Default network posture: local-first, no cloud LLM requirement
 
 ## What This Profile Is
 
 This profile gives a city evaluator or developer one bounded way to run the first post-foundation stack:
 
-- CivicSunshine for records intake/search workflows.
-- CivicMeetings for agenda, meeting, packet, notice, vote, minutes, archive, and staff workflow foundations.
-- CivicCode for municipal-code lookup, citations, plain-language summaries, and clerk handoff foundations.
-- CivicZone for parcel/zoning lookup, rule prechecks, cited sample Q&A, and planner escalation foundations.
-- PostgreSQL 17 with pgvector for CivicSunshine.
-- Redis 7.2 for CivicSunshine background-work dependencies.
+- Townlight Records for records intake/search workflows.
+- Townlight Meetings for agenda, meeting, packet, notice, vote, minutes, archive, and staff workflow foundations.
+- Townlight Code for municipal-code lookup, citations, plain-language summaries, and clerk handoff foundations.
+- Townlight Zoning for parcel/zoning lookup, rule prechecks, cited sample Q&A, and planner escalation foundations.
+- PostgreSQL 17 with pgvector for Townlight Records.
+- Redis 7.2 for Townlight Records background-work dependencies.
 - Optional Ollama for local LLM experiments.
 
 It intentionally does not claim production deployment readiness. Production pilot packaging still needs environment hardening, secrets handling, backup/restore guidance, reverse proxy guidance, TLS, auth/RBAC policy, and operator runbooks.
@@ -28,11 +28,11 @@ It intentionally does not claim production deployment readiness. Production pilo
 
 | Service | URL | Purpose |
 |---|---|---|
-| CivicSunshine frontend | `http://localhost:8080` | Records AI browser UI |
-| CivicSunshine API | `http://localhost:8000/health` | Records AI API health |
-| CivicMeetings | `http://localhost:8010/health` | CivicMeetings module API health |
-| CivicCode | `http://localhost:8020/health` | CivicCode module API health |
-| CivicZone | `http://localhost:8030/health` | CivicZone module API health |
+| Townlight Records frontend | `http://localhost:8080` | Records AI browser UI |
+| Townlight Records API | `http://localhost:8000/health` | Records AI API health |
+| Townlight Meetings | `http://localhost:8010/health` | Townlight Meetings module API health |
+| Townlight Code | `http://localhost:8020/health` | Townlight Code module API health |
+| Townlight Zoning | `http://localhost:8030/health` | Townlight Zoning module API health |
 
 ## Prerequisites
 
@@ -42,7 +42,7 @@ It intentionally does not claim production deployment readiness. Production pilo
   - `../civicclerk`
   - `../civiccode`
   - `../civiczone`
-- CivicSunshine `.env` file in `../civicrecords-ai/.env`.
+- Townlight Records `.env` file in `../civicrecords-ai/.env`.
 - Internet access during first image/wheel download.
 - Optional: Ollama model already pulled if testing LLM-backed behavior.
 
@@ -79,11 +79,11 @@ This checks that:
 - The compose file exists and parses through Docker Compose in full local mode.
 - The expected services are present.
 - Published module wheel URLs are pinned to the compatibility matrix versions.
-- Published module wheel metadata requires the same CivicCore wheel pinned in the compose file.
+- Published module wheel metadata requires the same Townlight Core wheel pinned in the compose file.
 - Local in-process smoke checks use the current sibling-clone `civiccore` checkout and therefore verify local import compatibility, not only the compose wheel pins.
 - Module services set `CIVICCORE_LLM_PROVIDER=ollama`.
 - No cloud LLM provider is configured by default.
-- Local no-network smoke checks can import CivicMeetings, CivicCode, and CivicZone and call their `/health` endpoints in process.
+- Local no-network smoke checks can import Townlight Meetings, Townlight Code, and Townlight Zoning and call their `/health` endpoints in process.
 
 The `--static-only` mode is for CI and skips the Docker Compose config execution plus the local sibling-clone `/health` imports. It still verifies compose shape, wheel pins, local-first LLM defaults, and this guide.
 
@@ -91,8 +91,8 @@ The `--static-only` mode is for CI and skips the Docker Compose config execution
 
 The default local deployment profile must not require outbound runtime calls for core behavior. In this profile:
 
-- CivicMeetings, CivicCode, and CivicZone expose deterministic foundation APIs that can be smoke-tested in process without network calls.
-- CivicSunshine uses local PostgreSQL, Redis, and optional Ollama.
+- Townlight Meetings, Townlight Code, and Townlight Zoning expose deterministic foundation APIs that can be smoke-tested in process without network calls.
+- Townlight Records uses local PostgreSQL, Redis, and optional Ollama.
 - Cloud LLM providers are not configured by default.
 - The compose profile may need internet access to download images or release wheels before the stack is cached locally.
 

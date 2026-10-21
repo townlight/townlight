@@ -1,4 +1,4 @@
-**CivicSuite AI**
+**Townlight AI**
 
 A Clerk-First, Airgappable, Local-LLM Municipal Operations Suite
 
@@ -9,18 +9,18 @@ Version 1.0 --- April 23, 2026
 Open source · Apache License 2.0 · 100% local inference · Gemma 4 first,
 model-pluggable
 
-Architecture pattern: CivicRecords AI
+Architecture pattern: Townlight Records
 
 Document Metadata
 
   ---------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **Status**                   Strategic product catalog --- v1.0 initial draft
-  **Supersedes**               Open\_Source\_AI\_for\_Municipalities.docx (internal strategy draft), CivicRecords-AI\_Suite.docx (market framing draft)
+  **Supersedes**               Open\_Source\_AI\_for\_Municipalities.docx (internal strategy draft), Townlight Records-AI\_Suite.docx (market framing draft)
   **Grounded in**              CivicRecordsAI-UnifiedSpec-v3.0 (April 13, 2026) --- the canonical Module 1 specification
-  **Purpose**                  Define the full suite of modules that a small or mid-sized city can install, one at a time, all inheriting the CivicRecords AI architecture
+  **Purpose**                  Define the full suite of modules that a small or mid-sized city can install, one at a time, all inheriting the Townlight Records architecture
   **License**                  Apache License 2.0 for code. Suite documentation under CC BY 4.0 (recommended; configurable).
   **License note**             Code license is Apache License 2.0 (SPDX: Apache-2.0). Documentation is CC BY 4.0. Earlier drafts referenced MIT; the project standardized on Apache 2.0 on 2026-04-23 to align with civicrecords-ai.
-  **Architecture authority**   CivicRecords AI is the architectural template. Every module inherits CivicCore (auth, RBAC, audit, LLM abstraction, connectors, search, notifications).
+  **Architecture authority**   Townlight Records is the architectural template. Every module inherits Townlight Core (auth, RBAC, audit, LLM abstraction, connectors, search, notifications).
   **Default model**            Gemma 4 via Ollama (local). Model registry + context\_window\_size enables drop-in replacement.
   **Deployment profiles**      single-workstation · small on-prem server · segmented/air-gapped for sensitive modules
   ---------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -31,24 +31,24 @@ Part I. Strategic Framing
 
 1\. Executive Summary
 
-CivicSuite AI is an open-source, Apache-2.0-licensed, airgappable, local-LLM
+Townlight AI is an open-source, Apache-2.0-licensed, airgappable, local-LLM
 municipal operations suite for small and mid-sized cities. It is
 clerk-first: it starts where the records live, where the meetings
 happen, and where the code gets adopted --- then expands outward to
 every function a city actually runs day-to-day.
 
-Module 1 --- CivicRecords AI --- is already shipping and serves as the
+Module 1 --- Townlight Records --- is already shipping and serves as the
 architectural template for every subsequent module. Every module
 inherits the same foundation: FastAPI, PostgreSQL with pgvector, Redis,
 Celery, Ollama with Gemma 4, hash-chained audit logging, connector
 framework, onboarding wizard, role-based access control, and sovereignty
-guarantees. Cities install CivicCore once and add modules as needs
+guarantees. Cities install Townlight Core once and add modules as needs
 demand.
 
 The suite is positioned against an incumbent landscape dominated by
 CivicPlus, OpenGov, Tyler, Granicus, and Accela --- proprietary SaaS
 suites that hold municipal data in the cloud and charge per-seat pricing
-that small cities cannot sustain. CivicSuite AI offers a sovereign
+that small cities cannot sustain. Townlight AI offers a sovereign
 alternative: local data, local inference, and modular adoption. It does
 not attempt to replace ERP, utility billing, permitting systems of
 record, CAD/RMS, or courts on day one. It wins where municipal AI is
@@ -57,9 +57,9 @@ grants, procurement authoring, contracts, boards, HR policy, and
 accessibility.
 
 This document defines the full module catalog. The April 23 catalog plus the
-2026-04-30 CivicRegWatch and CivicAPI addendum establish CivicCore plus 27
+2026-04-30 Townlight Regulatory Watch and Townlight API addendum establish Townlight Core plus 27
 product modules across 7 tiers. The current suite therefore has 27 product
-modules plus the CivicCore shared platform. It
+modules plus the Townlight Core shared platform. It
 assesses where the current v3.0 spec is thin, establishes the
 shared design principles and architecture pattern, and proposes a
 four-phase rollout sequence. It is intended as a working strategic
@@ -84,15 +84,15 @@ indexed rather than first-class product surfaces:
 
   --------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------
   **Missing surface**                     **Why it matters**                                                                                                                                                                                                                                                                           **Module that fills it**
-  Municipal code / ordinance Q&A          The single highest-volume civic question after \'when is trash pickup.\' Chickens, short-term rentals, noise, parking, signs, fences, setbacks, business licenses, food trucks, garage sales, snow removal --- every clerk and front-desk staffer answers these same questions constantly.   CivicCode
-  Zoning code / parcel-aware lookups      The current spec mentions \'Land Use & Permitting\' only as a connector domain in the Municipal Knowledge Graph. But zoning Q&A (\'what zone is my property, what can I build, what are setbacks\') consumes planner time at every city in America.                                          CivicZone
-  Comprehensive plan / long-range plans   Not addressed. Comp plans are 150-300 page documents that nobody reads and that should inform every land-use decision. RAG over them is genuinely high-value.                                                                                                                                CivicPlan
-  Boards & commissions beyond Council     The spec assumes \'Council meetings\' but most cities have 5-20 boards: Planning Commission, Board of Adjustment, Historic Preservation, Parks, Library, Housing Authority. Each has its own meetings, members, terms, vacancies, attendance.                                                CivicBoards
-  Public & statutory notice publication   Missing a hearing notice deadline can void an ordinance. Most cities track this in a clerk\'s notebook. This is a compliance workflow, not a content type.                                                                                                                                   CivicNotice
-  Contracts repository with Q&A           Contracts live as PDFs in shared drives. Staff hunt for specific clauses constantly. Local-LLM Q&A over the contract library is obvious, and contracts contain commercially sensitive pricing.                                                                                               CivicContracts
-  Internal legal research                 City attorneys ask \'when did we last consider this?\' or \'what did the prior Council decide?\' --- currently an email to the clerk. Local-LLM over the city\'s own legal record with access-controlled privileged tiers is a natural fit.                                                  CivicLegal
-  HR policy Q&A                           One of the highest-volume internal queries. Personnel policy, handbook, job descriptions, FMLA, ADA questions. Cloud AI is non-viable (HIPAA, background checks, comp data).                                                                                                                 CivicHR
-  Elections administration                Many home-rule and charter cities run their own elections. Voter info, candidate filing, ballot questions, election worker training. Extremely sensitive --- cloud AI is a non-starter.                                                                                                      CivicElections
+  Municipal code / ordinance Q&A          The single highest-volume civic question after \'when is trash pickup.\' Chickens, short-term rentals, noise, parking, signs, fences, setbacks, business licenses, food trucks, garage sales, snow removal --- every clerk and front-desk staffer answers these same questions constantly.   Townlight Code
+  Zoning code / parcel-aware lookups      The current spec mentions \'Land Use & Permitting\' only as a connector domain in the Municipal Knowledge Graph. But zoning Q&A (\'what zone is my property, what can I build, what are setbacks\') consumes planner time at every city in America.                                          Townlight Zoning
+  Comprehensive plan / long-range plans   Not addressed. Comp plans are 150-300 page documents that nobody reads and that should inform every land-use decision. RAG over them is genuinely high-value.                                                                                                                                Townlight Planning
+  Boards & commissions beyond Council     The spec assumes \'Council meetings\' but most cities have 5-20 boards: Planning Commission, Board of Adjustment, Historic Preservation, Parks, Library, Housing Authority. Each has its own meetings, members, terms, vacancies, attendance.                                                Townlight Boards
+  Public & statutory notice publication   Missing a hearing notice deadline can void an ordinance. Most cities track this in a clerk\'s notebook. This is a compliance workflow, not a content type.                                                                                                                                   Townlight Notice
+  Contracts repository with Q&A           Contracts live as PDFs in shared drives. Staff hunt for specific clauses constantly. Local-LLM Q&A over the contract library is obvious, and contracts contain commercially sensitive pricing.                                                                                               Townlight Contracts
+  Internal legal research                 City attorneys ask \'when did we last consider this?\' or \'what did the prior Council decide?\' --- currently an email to the clerk. Local-LLM over the city\'s own legal record with access-controlled privileged tiers is a natural fit.                                                  Townlight Legal
+  HR policy Q&A                           One of the highest-volume internal queries. Personnel policy, handbook, job descriptions, FMLA, ADA questions. Cloud AI is non-viable (HIPAA, background checks, comp data).                                                                                                                 Townlight HR
+  Elections administration                Many home-rule and charter cities run their own elections. Voter info, candidate filing, ballot questions, election worker training. Extremely sensitive --- cloud AI is a non-starter.                                                                                                      Townlight Elections
   --------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------
 
 2.2 Structural observations about the current spec
@@ -102,7 +102,7 @@ indexed rather than first-class product surfaces:
     city needs. The 12 functional domains in §13.3 of the v3.0 spec
     correspond roughly to the module tiers in this catalog.
 
--   The \'public portal\' is scoped as a future add-on to CivicRecords.
+-   The \'public portal\' is scoped as a future add-on to Townlight Records.
     But the public-facing use cases are so varied (request a record,
     look up code, check zoning, find a meeting, submit a 311 request,
     read the comp plan) that each module needs its own public surface,
@@ -115,7 +115,7 @@ indexed rather than first-class product surfaces:
 
 -   The v3.0 spec\'s 50-state exemption compliance effort is re-usable
     across every module that handles public records. It should be
-    promoted to CivicCore so every module inherits it.
+    promoted to Townlight Core so every module inherits it.
 
 2.3 What the current spec gets right
 
@@ -128,7 +128,7 @@ indexed rather than first-class product surfaces:
     the entire suite.
 
 -   The human-in-the-loop enforcement at the API layer is the right
-    architectural choice. It should be a CivicCore primitive, not a
+    architectural choice. It should be a Townlight Core primitive, not a
     per-module reimplementation.
 
 -   The onboarding/city-profile/catalog work in v3.0 is genuinely
@@ -136,8 +136,8 @@ indexed rather than first-class product surfaces:
 
 3\. Design Principles (Suite-Wide Non-Negotiables)
 
-Every module in CivicSuite AI inherits these rules. They are not
-negotiable at the module level; they are enforced at CivicCore.
+Every module in Townlight AI inherits these rules. They are not
+negotiable at the module level; they are enforced at Townlight Core.
 
 3.1 Product principles
 
@@ -145,7 +145,7 @@ negotiable at the module level; they are enforced at CivicCore.
     features land after staff workflows are stable.
 
 -   Modular install, no forced monolith. Cities pick what they need.
-    CivicCore is the only prerequisite.
+    Townlight Core is the only prerequisite.
 
 -   Calm government UI, not startup UI. Aesthetic target: trust through
     clarity.
@@ -195,7 +195,7 @@ negotiable at the module level; they are enforced at CivicCore.
     modules.
 
 -   Common schema patterns --- modules that extend one another
-    (CivicCode → CivicLegal → CivicClerk) share conventions.
+    (Townlight Code → Townlight Legal → Townlight Meetings) share conventions.
 
 -   API-first. Every module exposes a stable, documented API.
 
@@ -2487,61 +2487,61 @@ integrations are expected over time, in priority order:
   **Category**          **Incumbent systems**                                     **Integration mode**
   Document management   Laserfiche, OnBase, SharePoint, Google Drive              Read (via REST or SMB); primary ingest source
   Email                 Microsoft 365, Google Workspace                           IMAP journal read; primary source for records requests
-  Meeting platforms     Granicus, Legistar, PrimeGov (legacy)                     Import for historical packets; CivicClerk replaces ongoing
-  Codifier              Municode, American Legal, Code Publishing, General Code   Read (XML or web); CivicCode stays alongside
-  GIS                   Esri ArcGIS, open-source GIS                              Read (REST or GeoJSON); critical for CivicZone and Civic311
-  Permitting            Tyler EnerGov, Accela, CityWorks                          Read (mirror status); CivicPermit Assist sits on top
-  ERP / Finance         Tyler Munis, OpenGov, Caselle, Workday                    Read (line-item data for CivicBudget and CivicGrants)
-  HR / Payroll          NEOGOV, Workday, ADP, Paylocity                           Read (non-PII metadata); CivicHR policy stays separate
+  Meeting platforms     Granicus, Legistar, PrimeGov (legacy)                     Import for historical packets; Townlight Meetings replaces ongoing
+  Codifier              Municode, American Legal, Code Publishing, General Code   Read (XML or web); Townlight Code stays alongside
+  GIS                   Esri ArcGIS, open-source GIS                              Read (REST or GeoJSON); critical for Townlight Zoning and Townlight 311
+  Permitting            Tyler EnerGov, Accela, CityWorks                          Read (mirror status); Townlight Permitting sits on top
+  ERP / Finance         Tyler Munis, OpenGov, Caselle, Workday                    Read (line-item data for Townlight Budget and Townlight Grants)
+  HR / Payroll          NEOGOV, Workday, ADP, Paylocity                           Read (non-PII metadata); Townlight HR policy stays separate
   Utility billing       CIS Infinity, Cartegraph, Lucity, Munis                   Read (CSR copilot context)
   CAD / RMS             Mark43, Spillman, Axon, Genetec                           No integration (CJIS gated out of scope)
-  Court CMS             Tyler Odyssey, Journal Technologies                       No integration first wave; CivicCourt Assist is separate and isolated
-  Open data             CKAN                                                      Write (publication target); CivicData Bridge
+  Court CMS             Tyler Odyssey, Journal Technologies                       No integration first wave; Townlight Courts is separate and isolated
+  Open data             CKAN                                                      Write (publication target); Townlight Data
   --------------------- --------------------------------------------------------- -----------------------------------------------------------------------
 
 Appendix A. Naming & Identity
 
-Umbrella: CivicSuite AI. Alternative umbrellas considered: CivicOS,
-CivicStack. CivicSuite AI is preferred because \'suite\' signals
+Umbrella: Townlight AI. Alternative umbrellas considered: CivicOS,
+CivicStack. Townlight AI is preferred because \'suite\' signals
 modularity without committing the reader to an operating-system
 metaphor, and \'AI\' distinguishes the product from generic municipal
 SaaS in every search result and procurement document.
 
 Module naming convention: \'Civic\' + capability. Keep one word where
-possible (CivicClerk, CivicCode, CivicZone, CivicGrants). Two-word names
-only where disambiguation requires (Civic311, CivicCourt Assist,
-CivicData Bridge). Never more than two words.
+possible (Townlight Meetings, Townlight Code, Townlight Zoning, Townlight Grants). Two-word names
+only where disambiguation requires (Townlight 311, Townlight Courts,
+Townlight Data). Never more than two words.
 
-CivicRecords AI retains its current name (no hyphen removal, \'AI\'
+Townlight Records retains its current name (no hyphen removal, \'AI\'
 suffix kept) to preserve continuity with the v3.0 spec and the existing
 repository. Subsequent modules drop the \'AI\' suffix because it is
-redundant once the suite identity is established --- \'CivicSuite AI\'
+redundant once the suite identity is established --- \'Townlight AI\'
 carries it.
 
 Appendix B. Mapping Current Spec Features → Modules
 
-Where does each feature in the current CivicRecords AI repo belong in
+Where does each feature in the current Townlight Records repo belong in
 the suite model? This mapping is not a rewrite plan --- it is a guide
-for factoring shared infrastructure into CivicCore incrementally over
+for factoring shared infrastructure into Townlight Core incrementally over
 time.
 
   ------------------------------------------------------------------------- -------------------------------------------------------------------------------
   **Current repo feature (v3.0)**                                           **Destination in suite model**
-  fastapi-users auth, JWT, RBAC, service accounts                           CivicCore
-  Hash-chained audit log                                                    CivicCore
-  LLM abstraction (Ollama wrapper, model registry, context\_window\_size)   CivicCore
-  Hybrid search (pgvector + tsvector, source attribution)                   CivicCore
-  Document ingestion (PDF/DOCX/XLSX/CSV/email/HTML/text + OCR fallback)     CivicCore
-  Notification service and templates                                        CivicCore
-  Connector framework (authenticate/discover/fetch/health\_check)           CivicCore
-  Onboarding wizard, city profile, municipal systems catalog                CivicCore
-  50-state exemption rules engine                                           CivicCore (so CivicLegal, CivicContracts, CivicRecords all inherit)
-  Request lifecycle, queue, detail, workflow transitions                    CivicRecords AI (module-specific)
-  Response letter generation with templates                                 CivicRecords AI (module-specific)
-  Fee tracking, fee schedules, fee line items, waivers                      CivicRecords AI (module-specific)
-  Exemption dashboard (accuracy, export)                                    CivicRecords AI (module-specific, using CivicCore engine)
-  Tiered redaction engine (when built)                                      CivicCore (shared across CivicRecords, CivicLegal, CivicData Bridge)
-  Public request portal (when built)                                        CivicRecords AI (module-specific) + shared resident portal shell in CivicCore
+  fastapi-users auth, JWT, RBAC, service accounts                           Townlight Core
+  Hash-chained audit log                                                    Townlight Core
+  LLM abstraction (Ollama wrapper, model registry, context\_window\_size)   Townlight Core
+  Hybrid search (pgvector + tsvector, source attribution)                   Townlight Core
+  Document ingestion (PDF/DOCX/XLSX/CSV/email/HTML/text + OCR fallback)     Townlight Core
+  Notification service and templates                                        Townlight Core
+  Connector framework (authenticate/discover/fetch/health\_check)           Townlight Core
+  Onboarding wizard, city profile, municipal systems catalog                Townlight Core
+  50-state exemption rules engine                                           Townlight Core (so Townlight Legal, Townlight Contracts, Townlight Records all inherit)
+  Request lifecycle, queue, detail, workflow transitions                    Townlight Records (module-specific)
+  Response letter generation with templates                                 Townlight Records (module-specific)
+  Fee tracking, fee schedules, fee line items, waivers                      Townlight Records (module-specific)
+  Exemption dashboard (accuracy, export)                                    Townlight Records (module-specific, using Townlight Core engine)
+  Tiered redaction engine (when built)                                      Townlight Core (shared across Townlight Records, Townlight Legal, Townlight Data)
+  Public request portal (when built)                                        Townlight Records (module-specific) + shared resident portal shell in Townlight Core
   ------------------------------------------------------------------------- -------------------------------------------------------------------------------
 
 Appendix C. Prompt Library Governance
@@ -2560,7 +2560,7 @@ prompt-licensing pattern:
 -   Cities can override any prompt locally via the admin panel; the
     override is audit-logged and never silently synced.
 
--   Sensitive module prompts (CivicLegal, CivicSafety, CivicElections)
+-   Sensitive module prompts (Townlight Legal, Townlight Safety, Townlight Elections)
     require attorney or department head review before any change lands.
 
 Appendix D. Deployment Profiles
@@ -2576,31 +2576,31 @@ module, not per suite.
     Dedicated server with 32-128GB RAM and either a consumer GPU or
     sufficient CPU headroom.
 
--   Segmented / air-gapped: for sensitive modules (CivicCourt,
-    CivicSafety non-CJIS administrative, CivicLegal privileged tiers).
+-   Segmented / air-gapped: for sensitive modules (Townlight Courts,
+    Townlight Safety non-CJIS administrative, Townlight Legal privileged tiers).
     Isolated host, no network egress whatsoever, physical access
     controls.
 
 Appendix E. Bottom-Line Recommendation
 
-Build CivicSuite AI as an open-source, Apache-2.0-licensed, airgappable,
-local-LLM municipal suite with CivicRecords AI as Module 1 and the
-following four modules as the Clerk Core: CivicClerk, CivicCode,
-CivicAccess, and CivicCore as the shared platform underneath. Then
-expand into CivicZone, CivicPlan, CivicGrants, and CivicProcure. That
+Build Townlight AI as an open-source, Apache-2.0-licensed, airgappable,
+local-LLM municipal suite with Townlight Records as Module 1 and the
+following four modules as the Clerk Core: Townlight Meetings, Townlight Code,
+Townlight Access, and Townlight Core as the shared platform underneath. Then
+expand into Townlight Zoning, Townlight Planning, Townlight Grants, and Townlight Procurement. That
 gives you a coherent \'day-to-day city operations\' platform without the
 ERP, utilities, courts, or CAD/RMS fights that would sink an open-source
 project.
 
 The v3.0 spec is a strong Module 1 specification. It is not a suite
-specification. Promoting its shared infrastructure into CivicCore,
-filling the CivicCode and CivicZone gaps with purpose-built modules, and
+specification. Promoting its shared infrastructure into Townlight Core,
+filling the Townlight Code and Townlight Zoning gaps with purpose-built modules, and
 adopting the consistent module anatomy described here converts
-\'CivicRecords AI\' into \'CivicSuite AI, with CivicRecords AI as Module
+\'Townlight Records\' into \'Townlight AI, with Townlight Records as Module
 1\' --- with almost no changes to the existing code, just a packaging
 and architecture refactor that can happen incrementally.
 
-The strongest near-term move: author a short CivicCore v0.1 spec that
-identifies which files move out of the CivicRecords AI repo and into a
-shared package, ship it as a non-breaking refactor, and begin CivicClerk
-and CivicCode on top of it in parallel.
+The strongest near-term move: author a short Townlight Core v0.1 spec that
+identifies which files move out of the Townlight Records repo and into a
+shared package, ship it as a non-breaking refactor, and begin Townlight Meetings
+and Townlight Code on top of it in parallel.

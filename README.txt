@@ -1,29 +1,36 @@
 # Townlight
 
-## Unreleased connected Zoning candidate — 1.4.0-1
+## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
-The local Z4 candidate adds the explicit `zoning-beta` profile: Records,
-Meetings, Code and Zoning with Core, Notice and Access. Records-only remains
-the installation default; saved selections and installer identity are preserved.
-Planning, Permitting and Inspections are not enabled by this profile.
+Published October 21, 2026. Four connected Townlight products run locally through
+bundled Python services and PostgreSQL, with Core, Notice and Access supporting
+them. This is a bounded Windows public beta, not general availability or completion
+of the full municipal suite.
 
-Zoning uses bundled PostgreSQL 17.10/PostGIS 3.6.2 and the shared Python domain
-service. Authorized staff can import an EPSG:4326 GeoJSON bundle from the Zoning
-screen, inspect parcel provenance, configure cited rules, preserve human
-corrections, link permitted public Meetings history and attach explicitly public
-immutable Zoning snapshots to Records. Private notes are excluded. Information
-is not a zoning determination, permit approval or legal advice.
+[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
+[Signed acceptance and limits](docs/installer/townlight-zoning-beta1-signed-acceptance.md) · [User manual](USER-MANUAL.md)
 
-This is an unsigned, unpublished local candidate. Fresh-install, populated
-1.3 upgrade and recovery evidence is tracked in
-`docs/installer/townlight-zoning-beta1-acceptance.md`; pending checks are not passes.
-The existing public 1.3.0-beta.1 download is unchanged.
+Records-only remains the installation default. Explicitly select **zoning-beta**
+for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
+**city-core** continues to select Records, Meetings and Code without Zoning.
+Planning, Permitting and Inspections are not enabled by zoning-beta.
 
+Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
+17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
+explicitly public immutable Zoning snapshots connect to Records with source
+history and hashes preserved. Private notes remain protected. Answers are
+informational, not zoning determinations, permit approvals or legal advice.
+
+The exact signed MSI and embedded EXE passed independent signature/hash checks,
+fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
+retained-data uninstall. Optional local AI is not required for these deterministic
+workflows. Human response approval and final export remain separate from attaching
+a source; no automatic public publication is introduced.
 
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
-## Connected Records + Meetings + Code — 1.3.0-beta.1 public beta
+## Historical Records + Meetings + Code — 1.3.0-beta.1 public beta
 
 This release connects three products on one local Python/PostgreSQL
 domain path. Select **city-core** during setup or in Settings: Core, Records,
@@ -216,13 +223,13 @@ If you are orienting yourself for the first time, read in this order:
 
 ## Architecture
 
-CivicSuite uses a deliberately boring stack. Every module inherits these defaults:
+Townlight uses a deliberately boring stack. Every module inherits these defaults:
 
 | Layer | Choice | Pin / Notes |
 |---|---|---|
 | Backend | FastAPI on Uvicorn | — |
 | Database | PostgreSQL 17 + `pgvector` | Required for vector search |
-| Queue | PostgreSQL-backed CivicCore task queue | Windows Local profile |
+| Queue | PostgreSQL-backed Townlight Core task queue | Windows Local profile |
 | Workers | Bundled CPython city services | Windows Local profile |
 | LLM runtime | Ollama (local) | Default Gemma 4 family |
 | Embeddings | `nomic-embed-text` | Local |
@@ -271,7 +278,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the bug-routing decision tree. By par
 ## Support
 
 See [SUPPORT.md](SUPPORT.md) for support paths and [SECURITY.md](SECURITY.md) for vulnerability reporting.
-## Unreleased connected Zoning Z2
+## Historical Z2 development checkpoint (superseded by 1.4)
 
 The local development branch adds parcel-scoped allowed/conditional/prohibited-use
 and dimensional answers bound to actual Townlight Code section, version, effective
@@ -290,7 +297,7 @@ This is not a released or installed Zoning candidate. The published
 Records–Meetings–Code 1.3.0-beta.1 is unchanged. The Z2 operator guide is
 zone/docs/Z2-CITED-WORKFLOWS.md.
 
-## Unreleased connected Zoning Z3
+## Historical Z3 development checkpoint (superseded by 1.4)
 
 Authorized staff can explicitly link a permitted public Meetings archive document
 to a Zoning question as hearing context, context or precedent. This is historical

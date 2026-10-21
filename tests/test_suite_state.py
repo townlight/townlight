@@ -36,13 +36,15 @@ def test_catalog_has_28_stable_townlight_names_with_unique_legacy_ids() -> None:
     assert len(technical_ids) == len(set(technical_ids))
 
 
-def test_records_product_is_a_system_and_publication_is_deferred() -> None:
+def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     state = _load(suite_state.STATE_PATH)
     records = state["products"]["records"]
     assert records["public_name"] == "Townlight Records"
     assert records["modules"] == ["core", "records", "notice", "access"]
-    assert records["status"] == "stabilizing"
-    assert records["public_website_status"] == "deferred-until-public-beta-ready"
+    assert records["status"] == "public-beta"
+    assert records["public_website_status"] == "published"
+    assert state["desktop_release"]["tag"] == "townlight-records-meetings-code-zoning-v1.4.0-beta.1"
+    assert state["desktop_release"]["commit"] == "5b22235f88a45da6e33fe7075654f724609a3921"
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 

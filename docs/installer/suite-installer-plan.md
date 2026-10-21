@@ -1,4 +1,6 @@
-# CivicSuite Suite Installer Plan
+<a id="civicsuite-suite-installer-plan"></a>
+
+# Townlight Suite Installer Plan
 
 Status: design contract plus first working clerk-core lifecycle; city-core profile is beta-ready truth-reconciled with current Linux/Windows matching-host lifecycle evidence, first-run browser QA, green PR CI, and audit-full evidence in the active run record.
 
@@ -6,14 +8,14 @@ This document defines the first suite-level installer target. The current
 umbrella repo has deployment documentation and a bounded demo compose profile.
 The installer work began as a design contract, not implementation; the current
 beta now adds a real `clerk-core` package lifecycle for the first distributable
-profile. The current city-core work extends that surface to CivicCore,
-CivicRecords AI, CivicClerk, and CivicCode without changing published module
+profile. The current city-core work extends that surface to Townlight Core,
+Townlight Records, Townlight Meetings, and Townlight Code without changing published module
 release artifacts.
 
 ## Why This Exists
 
 Module-specific installers and scripts are useful, but they do not answer the
-operator question: "How do I install CivicSuite from nothing, choose the modules
+operator question: "How do I install Townlight from nothing, choose the modules
 I want, and end with a working local deployment?"
 
 The suite installer is therefore its own delivery surface.
@@ -34,7 +36,7 @@ The installer must guide an operator through:
 1. Welcome and license posture.
 2. Operating system and hardware checks.
 3. Baseline dependency checks.
-4. CivicCore foundation setup.
+4. Townlight Core foundation setup.
 5. Profile selection.
 6. Menu style selection.
 7. Module selector flow for custom installs.
@@ -48,10 +50,10 @@ into an operator-facing menu. The dry-run selector model must expose the profile
 choices, selectable modules, and selected menu style before any install behavior
 exists.
 
-Module v1.0.0 release gates now depend on this selector. A CivicSuite module is
+Module v1.0.0 release gates now depend on this selector. A Townlight module is
 not a complete v1.0.0 product unless it is represented in the
 installer/module-selection path and the planner verifies that the selected
-module can be resolved with its dependencies, CivicCore requirement, and proof
+module can be resolved with its dependencies, Townlight Core requirement, and proof
 requirements. If macOS remains beta/YELLOW, Windows/Linux installer integration
 evidence plus an explicit macOS limitation note is acceptable until the macOS
 installer lifecycle gate is solved on a real Darwin host.
@@ -87,7 +89,7 @@ start, repair, or configure anything.
 
 The first generated install kit is intentionally narrower than the full suite:
 `python scripts/plan-installer.py --profile minimal --generate-install-kit`
-writes a CivicCore-only kit under `installer/generated/minimal`. The generator
+writes a Townlight Core-only kit under `installer/generated/minimal`. The generator
 itself does not mutate host state. The generated scripts are real install
 artifacts, but they mutate only when an operator explicitly runs them.
 
@@ -105,7 +107,7 @@ The generated package lifecycle now includes a real `clerk-core` installer
 runner:
 `python scripts/run-clerk-core-installer.py install|verify|repair|uninstall`.
 The platform package launchers call that runner for lifecycle modes. Install
-builds and starts CivicRecords AI plus CivicClerk from bundled source trees,
+builds and starts Townlight Records plus Townlight Meetings from bundled source trees,
 verify checks four live endpoints, repair preserves generated `.env` secrets
 and rebuilds/restarts services, and uninstall tears down the profile containers
 and volumes. The runner derives Docker Compose project names and host ports from
@@ -119,11 +121,11 @@ wrapper manifests under `installer/generated/native`, `SHA256SUMS.txt`, and a
 release manifest.
 The generated native manifests cover Windows Inno Setup, macOS pkgbuild /
 productbuild, and Linux Debian metadata. Building native wrappers remains a
-release-infrastructure step, not a hidden host mutation; public CivicSuite
+release-infrastructure step, not a hidden host mutation; public Townlight
 installer artifacts remain intentionally unsigned.
 
 Installer artifacts are distributable as unsigned OSS beta builds. Every
-generated package and release manifest must state that CivicSuite is an
+generated package and release manifest must state that Townlight is an
 open-source public-use starter release with intentionally unsigned public
 installers, that Windows/macOS/Linux trust warnings are expected, and that
 SHA256 verification plus official-source verification is the current trust path
@@ -133,11 +135,11 @@ The first cleanroom proof uses
 `python scripts/run-minimal-cleanroom.py --run-id manual-minimal-linux-cleanroom-2`
 to run the generated kit inside a disposable Linux container. That proof is not
 a replacement for full Windows/macOS/Linux VM lifecycle evidence, but it is the
-fastest repeatable clean baseline for the CivicCore-only package layer.
+fastest repeatable clean baseline for the Townlight Core-only package layer.
 
 The first service cleanroom proof uses
 `python scripts/run-civicrecords-cleanroom.py --run-id manual-civicrecords-service-cleanroom-4`
-to copy CivicRecords AI into an evidence workspace, start an isolated Docker
+to copy Townlight Records into an evidence workspace, start an isolated Docker
 Compose project on high ports, verify API and frontend health, run live
 Playwright desktop/mobile smoke checks, save screenshots, and tear the stack
 down with volumes removed.
@@ -160,7 +162,7 @@ It extracts a release archive for the duration of the run, removes the extracted
 bundle before evidence upload, runs readiness, plan, install, repair, verify,
 and uninstall from the extracted bundle, and records pass/fail evidence. The
 runner supports Windows, macOS, and Linux archives through the platform
-launchers. CivicSuite's core runtime path is Linux/container-first; Windows and
+launchers. Townlight's core runtime path is Linux/container-first; Windows and
 macOS are wrapper platforms around that core. Each package report classifies the
 evidence as archive/readiness, matching-host lifecycle, host-platform mismatch,
 or unsupported lifecycle. Linux and Windows matching-host lifecycle proof are
@@ -185,21 +187,21 @@ because hosted CI does not provide the same Docker Desktop baseline.
 
 The initial profile set is defined in `installer/modules.json`:
 
-- Minimal: CivicCore only.
-- Clerk Core: CivicCore, CivicRecords AI, CivicClerk.
-- City Core: CivicCore, CivicRecords AI, CivicClerk, CivicCode.
-- Land Use: queued and disabled until CivicZone, CivicPlan, CivicPermit, and CivicInspect complete their own release turns.
-- Full Suite: all 26 tracked CivicSuite repos, ordered by dependencies.
+- Minimal: Townlight Core only.
+- Clerk Core: Townlight Core, Townlight Records, Townlight Meetings.
+- City Core: Townlight Core, Townlight Records, Townlight Meetings, Townlight Code.
+- Land Use: queued and disabled until Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections complete their own release turns.
+- Full Suite: all 26 tracked Townlight repos, ordered by dependencies.
 - Custom: operator-selected modules with dependency validation.
 
 Demoted recovery-label selector integrations:
 
-- CivicInspect: queued Tier 2 module; custom selection remains disabled until its release turn.
-- CivicGrants: custom selection resolves CivicCore, CivicRecords AI, and
-  CivicGrants with CivicCore 1.1.0 and recovery proof requirements.
-- CivicProcure: custom selection resolves CivicCore and CivicProcure with
-  CivicCore 1.1.0 and recovery proof requirements. CivicContracts remains a
-  context relationship, not an installer dependency, until CivicContracts has
+- Townlight Inspections: queued Tier 2 module; custom selection remains disabled until its release turn.
+- Townlight Grants: custom selection resolves Townlight Core, Townlight Records, and
+  Townlight Grants with Townlight Core 1.1.0 and recovery proof requirements.
+- Townlight Procurement: custom selection resolves Townlight Core and Townlight Procurement with
+  Townlight Core 1.1.0 and recovery proof requirements. Townlight Contracts remains a
+  context relationship, not an installer dependency, until Townlight Contracts has
   its own productized release path.
 
 Initial menu styles:
@@ -227,7 +229,7 @@ Before the installer can be called usable, each supported OS needs evidence for:
 
 - fresh machine or clean VM baseline
 - prerequisite detection
-- CivicCore install
+- Townlight Core install
 - each profile's module resolution
 - selected module install
 - health checks

@@ -1,6 +1,8 @@
-# CivicSuite Continuity And Succession
+<a id="civicsuite-continuity-and-succession"></a>
 
-This document is the continuity gate for CivicSuite. It exists to make sure the suite can continue operating if the founding maintainer is unavailable.
+# Townlight Continuity And Succession
+
+This document is the continuity gate for Townlight. It exists to make sure the suite can continue operating if the founding maintainer is unavailable.
 
 `Phase 1` platform expansion begins only after the `Phase 0` continuity requirements described here are satisfied.
 

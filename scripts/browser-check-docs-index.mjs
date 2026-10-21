@@ -52,7 +52,7 @@ try {
       .getByRole("heading", { name: "Connected municipal work, accountable and local." })
       .isVisible();
     const candidateStatusVisible = await page
-      .getByText("1.3.0-beta.1 · public beta", { exact: true })
+      .getByText("1.4.0-beta.1 · public beta", { exact: true })
       .isVisible();
     const productModulesVisible = await Promise.all(
       ["Townlight Core", "Townlight Records", "Townlight Meetings", "Townlight Code", "Townlight Notice", "Townlight Access"].map((name) =>
@@ -89,7 +89,7 @@ try {
 const failed = results.some(
   (result) =>
     result.status !== 200 ||
-    result.title !== "Townlight Records + Meetings + Code | local-first municipal workflows" ||
+    result.title !== "Townlight Records + Meetings + Code + Zoning | local-first municipal workflows" ||
     !result.recordsHeadingVisible ||
     !result.candidateStatusVisible ||
     result.productModulesVisible.some((visible) => !visible) ||

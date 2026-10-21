@@ -37,7 +37,7 @@ async def actor(
 
     if not _zoning_database_status()["ok"]:
         raise HTTPException(
-            503, "CivicZone database/schema is not ready; no work accepted."
+            503, "Townlight Zoning database/schema is not ready; no work accepted."
         )
     actor_id = str(user.id)
     await session.commit()
@@ -82,7 +82,7 @@ def _resolve_citation(section_number):
     try:
         return public_citation(section_number, date.today())
     except SQLAlchemyError:
-        raise HTTPException(503, "CivicCode persistence unavailable.") from None
+        raise HTTPException(503, "Townlight Code persistence unavailable.") from None
 
 
 @router.post("/parcels/lookup")
@@ -109,7 +109,7 @@ async def parcel_lookup(body: _ParcelLookupIn, _actor: str = Depends(actor)):
 
     if not _code_database_status()["ok"]:
         raise HTTPException(
-            503, "CivicCode database/schema is not ready; no determination."
+            503, "Townlight Code database/schema is not ready; no determination."
         )
 
     zone = result.get("zone") or {}

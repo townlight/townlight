@@ -1,4 +1,6 @@
-# CivicSuite Suite Launcher
+<a id="civicsuite-suite-launcher"></a>
+
+# Townlight Suite Launcher
 
 This directory contains the first suite-level static launcher for the
 city-core installer runtime. It is intentionally static and self-contained:

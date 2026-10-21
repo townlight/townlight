@@ -1,18 +1,31 @@
-# Townlight Records + Meetings + Code 1.3.0-beta.1 public beta
+# Townlight 1.4.0-beta.1 public beta
 
-Three connected products run locally through bundled Python services and
-PostgreSQL. Choose city-core for Records, Meetings and Code, with Core, Notice
-and Access included. Link a Code proposal to a meeting agenda, record authorized
-adoption and separate codification, then attach permitted public source evidence
-to Records with versions, citations and hashes preserved. Human decisions remain
-explicit and audited; restricted material stays protected.
+## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
-The exact signed installer passed fresh connected workflows and a populated
-signed 1.2 upgrade, with preserved work and managed files, recovery, offline use
-and retained-data uninstall. Download the
-[public beta](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
-See the [release record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
-This is a bounded beta, not the entire suite or optional AI minutes/transcription.
+Published October 21, 2026. Four connected Townlight products run locally through
+bundled Python services and PostgreSQL, with Core, Notice and Access supporting
+them. This is a bounded Windows public beta, not general availability or completion
+of the full municipal suite.
+
+[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
+[Signed acceptance and limits](docs/installer/townlight-zoning-beta1-signed-acceptance.md) · [User manual](USER-MANUAL.md)
+
+Records-only remains the installation default. Explicitly select **zoning-beta**
+for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
+**city-core** continues to select Records, Meetings and Code without Zoning.
+Planning, Permitting and Inspections are not enabled by zoning-beta.
+
+Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
+17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
+explicitly public immutable Zoning snapshots connect to Records with source
+history and hashes preserved. Private notes remain protected. Answers are
+informational, not zoning determinations, permit approvals or legal advice.
+
+The exact signed MSI and embedded EXE passed independent signature/hash checks,
+fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
+retained-data uninstall. Optional local AI is not required for these deterministic
+workflows. Human response approval and final export remain separate from attaching
+a source; no automatic public publication is introduced.
 
 ## Historical Records 1.1.0-beta.3 announcement
 
@@ -56,7 +69,7 @@ Get it: <https://github.com/townlight/townlight/releases/latest>
 
 Three things, in plain English.
 
-**1. The Accessibility tab is here, and it uses the local AI.** The **Accessibility** primary-nav tab now ships in the desktop app (v1.0.1 bundled the CivicAccess module's code and database under the hood, but no on-screen tab). Three of its seven tools run on the suite's local AI engine:
+**1. The Accessibility tab is here, and it uses the local AI.** The **Accessibility** primary-nav tab now ships in the desktop app (v1.0.1 bundled the Townlight Access module's code and database under the hood, but no on-screen tab). Three of its seven tools run on the suite's local AI engine:
 
 - **Plain-Language Rewrite** — drafts a real plain-language version of the text you paste.
 - **Multilingual Variant** — drafts a translation of your actual text into any language you name.
@@ -65,26 +78,26 @@ Three things, in plain English.
 
 Everything runs on the model already on your machine — nothing leaves it. Every AI output is labeled as a draft; a human reviews before anything publishes; translations must go to a qualified human translator. The review's pass/fail status comes only from the deterministic checks — the AI never adds, removes, or reclassifies a finding. If the local model is ever missing or broken, the tab shows an explicit **"AI engine not ready"** banner with a one-click path to model setup, and every tool keeps working in clearly-labeled sample mode — the deterministic checks and checklist tools don't depend on the AI at all. Persisted reviews are advisory clerk support, not a certified accessibility audit; that disclaimer is on every page. The other four tools (accessible form planning, publishing-workflow checklist, ADA Title II review-support, tagged-PDF heading checks) are checklist-shaped on purpose and stay deterministic.
 
-**2. Every AI feature in the suite got better.** While wiring the Accessibility tools we found and fixed a bug in the suite's shared text-generation path that had been quietly degrading output quality. Because the fix is in the shared engine, it improves **all** the AI features — CivicClerk meeting-minutes drafts, CivicRecords AI response drafts, CivicCode guidance, and the three new Accessibility tools alike. Same model, same machine, noticeably better drafts.
+**2. Every AI feature in the suite got better.** While wiring the Accessibility tools we found and fixed a bug in the suite's shared text-generation path that had been quietly degrading output quality. Because the fix is in the shared engine, it improves **all** the AI features — Townlight Meetings meeting-minutes drafts, Townlight Records response drafts, Townlight Code guidance, and the three new Accessibility tools alike. Same model, same machine, noticeably better drafts.
 
 **3. First-run setup now works on a truly fresh PC.** On a factory-fresh Windows machine with no other software installed, the bundled database could fail to start on the very first launch (a standard Microsoft runtime component that most PCs already have was missing). v1.0.2 bundles that component alongside the database, so setup completes on a clean machine with no extra downloads or installs. This affected every v1.0.x build, not just this one — v1.0.2 fixes it.
 
-The two-month CivicAccess city-core integration runway is complete: Phase A (module hardening to v0.4.0) done, Phase B (desktop runtime wiring) done, Phase C (city-core registry flip 5→6) done, and **Phase D (clean-machine acceptance) — PASS**. Phase D was two full runs of the real MSI in a clean Windows Sandbox — the canonical "fresh clerk PC." Run 1 verified the whole chain end to end — install → the full 10-step first-run wizard → admin sign-in → the ~6.97 GB model download with the app's own streamed SHA-256 verification and all six readiness checks green → all three Accessibility AI features producing clean, correctly-labeled output through the real app bridge — **and** caught the clean-machine database bug described above. The fix shipped in this release, and run 2 proved it: on a clean machine with no system runtime present, the bundled PostgreSQL initializes a full working database. The full Phase D story is in the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2).
+The two-month Townlight Access city-core integration runway is complete: Phase A (module hardening to v0.4.0) done, Phase B (desktop runtime wiring) done, Phase C (city-core registry flip 5→6) done, and **Phase D (clean-machine acceptance) — PASS**. Phase D was two full runs of the real MSI in a clean Windows Sandbox — the canonical "fresh clerk PC." Run 1 verified the whole chain end to end — install → the full 10-step first-run wizard → admin sign-in → the ~6.97 GB model download with the app's own streamed SHA-256 verification and all six readiness checks green → all three Accessibility AI features producing clean, correctly-labeled output through the real app bridge — **and** caught the clean-machine database bug described above. The fix shipped in this release, and run 2 proved it: on a clean machine with no system runtime present, the bundled PostgreSQL initializes a full working database. The full Phase D story is in the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2).
 
 ### For IT: the technical specifics
 
 - **Shared generation fix ([PR #220](https://github.com/townlight/townlight/pull/220), merge `0b0170a`).** The shared helper `generate_local_text` posted to Ollama's `/api/generate` with `raw: true` and a hand-built `<start_of_turn>` turn-format prompt. The pinned model loads with a `gemma4` renderer/parser, and `raw: true` bypasses it, so internal control tokens leaked and generation degenerated. The fix switches the helper to **`/api/chat`** with a single user message, letting Ollama apply the model's own template and parser — one shared-helper change that repairs every AI feature suite-wide. Generation config: temperature 0.2, `num_predict` 512, `num_ctx` 8192, 180 s timeout.
-- **Clean-machine fix ([PR #221](https://github.com/townlight/townlight/pull/221), merge `0b797c4`).** The portable PostgreSQL 17 binaries link against the Microsoft VC++ runtime, which a factory-fresh Windows doesn't have (CI never saw it — GitHub's `windows-latest` runners ship the redistributable preinstalled; only the clean-sandbox Phase D could catch it: `initdb.exe` died with "VCRUNTIME140.dll was not found"). The runtime payload now stages `vcruntime140.dll`, `vcruntime140_1.dll`, and `msvcp140.dll` into `postgres\bin` next to the binaries, and those DLLs are in the payload's required-files manifest, so any regression fails the build loudly. Pre-existing across v1.0.x, not a CivicAccess regression.
-- **Dual-path AI design.** CivicAccess is the suite's first dual-path AI module: a per-call readiness probe, an explicit "AI engine not ready" state, and deterministic fallbacks for every tool (the three older AI callers hard-stop when the model is absent). The Accessibility tab is a native Rust port with full audit-chain and cross-module-search integration.
+- **Clean-machine fix ([PR #221](https://github.com/townlight/townlight/pull/221), merge `0b797c4`).** The portable PostgreSQL 17 binaries link against the Microsoft VC++ runtime, which a factory-fresh Windows doesn't have (CI never saw it — GitHub's `windows-latest` runners ship the redistributable preinstalled; only the clean-sandbox Phase D could catch it: `initdb.exe` died with "VCRUNTIME140.dll was not found"). The runtime payload now stages `vcruntime140.dll`, `vcruntime140_1.dll`, and `msvcp140.dll` into `postgres\bin` next to the binaries, and those DLLs are in the payload's required-files manifest, so any regression fails the build loudly. Pre-existing across v1.0.x, not a Townlight Access regression.
+- **Dual-path AI design.** Townlight Access is the suite's first dual-path AI module: a per-call readiness probe, an explicit "AI engine not ready" state, and deterministic fallbacks for every tool (the three older AI callers hard-stop when the model is absent). The Accessibility tab is a native Rust port with full audit-chain and cross-module-search integration.
 - **Release build.** The MSI is built by public GitHub Actions run `28626482190` on main merge commit `0b797c4` and passed the CI install → first-run → backup-restore → uninstall lifecycle before publication. SHA-256 and size are in the install section below.
 
 ## What this is
 
-CivicSuite is open-source municipal software designed to run **locally on a city's own hardware**. The Windows Local "city-core" build is one MSI installer (~1.65 GB) that sets up, with no terminal and no developer tooling:
+Townlight is open-source municipal software designed to run **locally on a city's own hardware**. The Windows Local "city-core" build is one MSI installer (~1.65 GB) that sets up, with no terminal and no developer tooling:
 
 - a bundled portable **PostgreSQL 17 + pgvector** data store,
 - a bundled portable **Ollama** runtime with a pinned **Gemma 4 12B QAT** model (~6.97 GB, downloaded and checksum-verified on first run) — the engine behind the records, minutes, code, and now accessibility AI features,
-- and **six city-core modules**: CivicCore (shared platform), CivicRecords AI (public records / FOIA), CivicClerk (meetings / agendas / minutes), CivicCode (municipal code), CivicNotice (public notices), and **CivicAccess** (accessibility + records-ready export — tab and local-AI drafting new in v1.0.2).
+- and **six city-core modules**: Townlight Core (shared platform), Townlight Records (public records / FOIA), Townlight Meetings (meetings / agendas / minutes), Townlight Code (municipal code), Townlight Notice (public notices), and **Townlight Access** (accessibility + records-ready export — tab and local-AI drafting new in v1.0.2).
 
 Everything — your data, your documents, your audit trail, the AI model — stays on the machine. There is no vendor cloud, no per-seat licensing, and no telemetry by design. Code is Apache-2.0; docs are CC BY 4.0.
 
@@ -99,7 +112,7 @@ Same posture as v1.0.1; the bundled scope grew:
 
 1. Download `CivicSuite_1.0.2_x64_en-US.msi` **and** `CivicSuite-msi-evidence.txt` from the [latest release](https://github.com/townlight/townlight/releases/latest).
 2. Verify the SHA-256 checksum in PowerShell: run `Get-FileHash CivicSuite_1.0.2_x64_en-US.msi -Algorithm SHA256` and check it matches the `SHA256=` line in the evidence file (and the value below). Matching hash = the file you have is byte-for-byte the file the public CI run built. If it doesn't match, delete and re-download from the official release page only.
-3. Follow the installer, open CivicSuite, and complete first-run setup (city profile, first admin, backup folder).
+3. Follow the installer, open Townlight, and complete first-run setup (city profile, first admin, backup folder).
 4. On first run the app downloads and verifies the ~6.97 GB model. After that it's fully local — including all the AI features.
 
 **Recommended machine:** 64-bit Windows 10/11 with WebView2, **32 GB RAM** recommended (16 GB is a workable minimum; the model needs ~6.7 GB resident, plus headroom for the local database, services, and generation context), **~15 GB free disk**. No Docker, no WSL, no terminal.
@@ -116,7 +129,7 @@ Being honest about the edges matters more than the launch:
 
 - Not production-ready, not city-ready, not procurement-ready. It's a beta.
 - Not a compliance tool. AI drafts are labeled drafts; humans decide; nothing in the Accessibility tab is a certified audit, legal determination, or certified translation.
-- Not the full suite. City-core is six modules; **CivicZone / CivicPlan / CivicPermit / CivicInspect** remain queued Tier 2.
+- Not the full suite. City-core is six modules; **Townlight Zoning / Townlight Planning / Townlight Permitting / Townlight Inspections** remain queued Tier 2.
 - macOS lifecycle is not certified; Windows Local is the supported operator path.
 - The MSI bundles module source pinned by commit; for two modules the bundled commit is *ahead* of the latest published release tag. The trust path is the `source_commit` pin plus the MSI checksum — see [PROVENANCE.md](PROVENANCE.md).
 
@@ -127,4 +140,4 @@ Being honest about the edges matters more than the launch:
 - Security issues: open a private advisory — see [SECURITY.md](SECURITY.md).
 - Found a bug? Open an issue. This is exactly what a public beta is for.
 
-CivicSuite is unfunded, volunteer-maintained open source. If it's useful to your city, the best thanks is to try it and tell us what broke.
+Townlight is unfunded, volunteer-maintained open source. If it's useful to your city, the best thanks is to try it and tell us what broke.

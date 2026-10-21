@@ -1,12 +1,12 @@
 # Suite-Wide Design Principles
 
-The five non-negotiables every module inherits from CivicCore (verbatim
+The five non-negotiables every module inherits from Townlight Core (verbatim
 from `specs/01_catalog.md` section 3):
 
 1. **Clerk-first, staff-first** before flashy resident features. Resident
    features land after staff workflows are stable.
 2. **Modular install, no forced monolith.** Cities pick what they need.
-   CivicCore is the only prerequisite.
+   Townlight Core is the only prerequisite.
 3. **Calm government UI, not startup UI.** Aesthetic target: trust through
    clarity.
 4. **Public-facing features only where they clearly help trust and

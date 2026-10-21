@@ -786,7 +786,7 @@ function Copy-CivicRecordsMigrations {
     $DestinationRoot = [System.IO.Path]::GetFullPath((Join-Path $PythonRoot "Lib\site-packages\civicsuite_runtime"))
     $DestinationPath = [System.IO.Path]::GetFullPath($Destination)
     if (-not $DestinationPath.StartsWith($DestinationRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "Refusing to reset CivicRecords migration payload outside embedded runtime: $DestinationPath"
+        throw "Refusing to reset Townlight Records migration payload outside embedded runtime: $DestinationPath"
     }
     if (Test-Path -LiteralPath $DestinationPath) {
         Remove-Item -LiteralPath $DestinationPath -Recurse -Force

@@ -1,3 +1,63 @@
+# Townlight Windows Operator Walkthrough
+
+## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
+
+Published October 21, 2026. Four connected Townlight products run locally through
+bundled Python services and PostgreSQL, with Core, Notice and Access supporting
+them. This is a bounded Windows public beta, not general availability or completion
+of the full municipal suite.
+
+[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
+[Signed acceptance and limits](townlight-zoning-beta1-signed-acceptance.md) · [User manual](../../USER-MANUAL.md)
+
+Records-only remains the installation default. Explicitly select **zoning-beta**
+for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
+**city-core** continues to select Records, Meetings and Code without Zoning.
+Planning, Permitting and Inspections are not enabled by zoning-beta.
+
+Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
+17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
+explicitly public immutable Zoning snapshots connect to Records with source
+history and hashes preserved. Private notes remain protected. Answers are
+informational, not zoning determinations, permit approvals or legal advice.
+
+The exact signed MSI and embedded EXE passed independent signature/hash checks,
+fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
+retained-data uninstall. Optional local AI is not required for these deterministic
+workflows. Human response approval and final export remain separate from attaching
+a source; no automatic public publication is introduced.
+
+## Install, upgrade and recover
+
+1. Download `Townlight_1.4.0-1_x64_en-US.msi` and its signing receipt/evidence from
+   the linked 1.4 release. Desktop version is **1.4.0-1**; Windows ProductVersion
+   is **1.4.0.1**. Verify the published checksum and timestamped publisher signature.
+2. For an upgrade, back up existing work, close Townlight and run the MSI. The
+   populated signed 1.3 upgrade was verified; that result does not certify every
+   possible older-version upgrade. Preserve the existing profile and data.
+3. Choose the profile explicitly. Records-only remains default; enable
+   **zoning-beta** for all four connected products. Complete administrator setup
+   and explicit Python/PostgreSQL activation. Optional model setup can be deferred
+   with **Continue without local AI**.
+4. After applying zoning-beta during a 1.3 upgrade, open System Health. Stop City
+   workflow services and Task queue, then PostgreSQL. Run City workflow services
+   → Repair to refresh the PostgreSQL/PostGIS and Python runtime. Wait for services
+   to finish warming up. This upgrade requires these manual service steps.
+5. If Repair reports locked `icudt67.dll`, stop those services before retrying.
+   Do not delete the database or profile. Use canonical backup/restore for current
+   work; historical JSON is migration evidence, not a fallback writer.
+
+For Zoning, use **Import parcel dataset** with the documented complete GeoJSON
+envelope, configure rules against authoritative public Code sources, inspect
+provenance and retain human corrections. Only explicitly public immutable source
+snapshots may attach to Records. Review the response and approve it before export.
+
+Use System Health for backup, restore and support bundles. Ordinary uninstall
+preserves data; export and back up before removing the app. Keep real resident
+data, credentials and unredacted backups out of public issues.
+
+## Historical city-core walkthrough — original predecessor guidance
+
 # City-Core Windows Local Operator Walkthrough
 
 **Historical city-core walkthrough.** For Townlight Records 1.1.0-beta.3,
@@ -17,16 +77,16 @@ The clerk path does not require Docker, WSL, a terminal, or a developer account.
 
 The Windows Local city-core package installs:
 
-- CivicCore `1.2.0`
-- CivicRecords AI `1.7.3`
-- CivicClerk `1.0.4`
-- CivicCode `1.0.8`
-- CivicNotice `0.2.0`
-- CivicAccess `0.4.0`
-- CivicSuite desktop shell using Tauri/WebView2
+- Townlight Core `1.2.0`
+- Townlight Records `1.7.3`
+- Townlight Meetings `1.0.4`
+- Townlight Code `1.0.8`
+- Townlight Notice `0.2.0`
+- Townlight Access `0.4.0`
+- Townlight desktop shell using Tauri/WebView2
 - Portable local runtime payload for storage, services, file exports, backup/restore, and the local AI model runtime
 
-CivicCore is always installed. CivicRecords AI, CivicClerk, CivicCode, CivicNotice, and CivicAccess are selected as the City Core profile. Future modules remain visible only through the module manager contract until their package and proof gates pass.
+Townlight Core is always installed. Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access are selected as the City Core profile. Future modules remain visible only through the module manager contract until their package and proof gates pass.
 
 ## Before You Start
 
@@ -39,15 +99,15 @@ Have these ready:
 - A stable internet connection for first install/model download unless the model file has already been staged by IT (see "Offline / Air-Gapped Model Pre-Staging").
 - A city name, records contact, clerk contact, first local administrator name/email, and a backup folder location.
 
-Do not install Docker Desktop or WSL for this product path. If the app asks for Docker, WSL, a terminal, or manual environment edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
+Do not install Docker Desktop or WSL for this product path. If the app asks for Docker, WSL, a terminal, or manual environment edits, this is a bug — please report it on the Townlight GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
 
 ## Install
 
-1. Open the CivicSuite Windows installer file.
+1. Open the Townlight Windows installer file.
 
 2. Follow the installer screens. The installer places the app and portable runtime on the local machine and adds normal Windows uninstall support.
 
-3. Open CivicSuite after install.
+3. Open Townlight after install.
 
 4. Complete first-run setup:
    - Confirm local install/data/backup folders.
@@ -108,7 +168,7 @@ After first-run setup, open System Health. Verify:
 
 - Desktop shell is running locally.
 - Local data store is installed and healthy.
-- Task queue schema explains whether the PostgreSQL-backed CivicCore queue is
+- Task queue schema explains whether the PostgreSQL-backed Townlight Core queue is
   ready, needs migrations, or cannot be checked because workflow services are
   not running.
 - Local AI model file is present, checksum-verified, loaded, and registered.
@@ -120,7 +180,7 @@ After first-run setup, open System Health. Verify:
 Use the module manager in Settings to confirm:
 
 - City Core profile is selected.
-- CivicCore, CivicRecords AI, CivicClerk, CivicCode, CivicNotice, and CivicAccess are installed.
+- Townlight Core, Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access are installed.
 - Each installed module shows install, update, disable, remove, backup coverage, and export access state.
 - Future modules are not presented as installed.
 
@@ -145,8 +205,8 @@ or code source file, use **Choose File** from the desktop app. Staff may still
 type a path when IT has supplied one, but clerks should not have to browse
 Windows folders manually for normal file evidence work.
 
-- Meetings & Notices: create a meeting body with statutory basis/cadence/notice/quorum details, save meeting body roster members with roles/terms/contact details, submit an agenda intake item with department/source evidence, review it as ready for agenda, promote it into a meeting agenda, create a meeting for that body, add a manual agenda item when needed, record a structured staff report with recommendation/background/analysis/fiscal impact/alternatives/prior actions/preparer details, attach public packet files and closed-session addenda with citations and SHA-256 evidence, finalize the packet with prepared-by and review-note evidence before export, record closed-session basis/topics/timing/reconvene evidence with staff-only notes separated, calculate the notice deadline from meeting date/lead days/day type with the city/state holiday review warning, complete or confirm the notice checklist with meeting type/statutory basis/deadline/time zone/clerk approval, record notice posting date/location/method/confirmation, mark notice ready, export a records-ready packet/notice bundle with checksums, source references, public/staff classification, and export counts, generate or type minutes, add minute citation evidence for the current draft, record attendance from the saved member roster, save a quorum check from the attendance evidence, record a motion, record individual roll-call votes from the saved member roster, record vote/outcome summaries, record action items with owner/due/status/source details, adopt minutes, sign the adopted minutes with attestation evidence, record adopted ordinances/resolutions for CivicCode sync, and archive the public record without exposing closed-session files, staff-only minute citations, staff-only closed-session notes, intake queue records, or local paths.
-- Public Notices: open the Public Notices screen, enter the meeting date and legal basis, calculate the posting deadline, complete the notice checklist with clerk approval, record posting proof with date/location/method/confirmation, export the notice archive packet, and confirm the exported bundle appears in module exports and Search City Knowledge with the public-notice module label. CivicNotice helps staff preserve checklist, posting, and archive evidence; it does not replace the city attorney or clerk's statutory judgment.
+- Meetings & Notices: create a meeting body with statutory basis/cadence/notice/quorum details, save meeting body roster members with roles/terms/contact details, submit an agenda intake item with department/source evidence, review it as ready for agenda, promote it into a meeting agenda, create a meeting for that body, add a manual agenda item when needed, record a structured staff report with recommendation/background/analysis/fiscal impact/alternatives/prior actions/preparer details, attach public packet files and closed-session addenda with citations and SHA-256 evidence, finalize the packet with prepared-by and review-note evidence before export, record closed-session basis/topics/timing/reconvene evidence with staff-only notes separated, calculate the notice deadline from meeting date/lead days/day type with the city/state holiday review warning, complete or confirm the notice checklist with meeting type/statutory basis/deadline/time zone/clerk approval, record notice posting date/location/method/confirmation, mark notice ready, export a records-ready packet/notice bundle with checksums, source references, public/staff classification, and export counts, generate or type minutes, add minute citation evidence for the current draft, record attendance from the saved member roster, save a quorum check from the attendance evidence, record a motion, record individual roll-call votes from the saved member roster, record vote/outcome summaries, record action items with owner/due/status/source details, adopt minutes, sign the adopted minutes with attestation evidence, record adopted ordinances/resolutions for Townlight Code sync, and archive the public record without exposing closed-session files, staff-only minute citations, staff-only closed-session notes, intake queue records, or local paths.
+- Public Notices: open the Public Notices screen, enter the meeting date and legal basis, calculate the posting deadline, complete the notice checklist with clerk approval, record posting proof with date/location/method/confirmation, export the notice archive packet, and confirm the exported bundle appears in module exports and Search City Knowledge with the public-notice module label. Townlight Notice helps staff preserve checklist, posting, and archive evidence; it does not replace the city attorney or clerk's statutory judgment.
 - Records Requests: create or submit a request, calculate the response deadline from received date/rule/day-count/day-type with staff review, manually override the response deadline and basis when needed, review the Request Timeline, public-safe Status Updates, Request Messages, Search Sessions, Request Documents, Exemption Decisions, Release Packages, and Notification Outbox, log generated notifications as sent after staff sends them, record search/citation notes, save durable search sessions with query/location/result evidence, attach local source documents with hash/citation evidence, attach release-ready or redacted copies with their own hash/reviewer/note evidence before package build, save release/redact/exempt decisions with source and basis evidence, build a checksummed release package manifest, add fee line items with the fee schedule or policy basis, record a fee waiver reason, generate or type a response draft, approve, export, mark fulfilled, and close.
 - Resident/Public Records Requests: submit a public request, keep the returned request number, check status with the same submitted contact, and confirm Status Updates show safe progress without staff notes, search details, exemption reasoning, local paths, or internal audit details.
 - Code & Ordinances: import a code source with title/citation/searchable text, preserve the source file as local evidence when available, verify the saved source shows filename/hash evidence without publishing local workstation paths, record sync state, generate or type guidance, approve guidance, publish source, answer a code question with citations, and create a clerk handoff.
@@ -167,7 +227,7 @@ Backups are local files. Keep backup folders somewhere the city can retain and p
 
 ## Support Bundle
 
-Use **Create Support Bundle** in System Health when city IT or CivicSuite
+Use **Create Support Bundle** in System Health when city IT or Townlight
 support asks for local runtime evidence. The app creates a timestamped folder
 under the configured backup location with a README, support-manifest.json,
 health-summary.json, runtime-state.json, and selected service logs. It does not
@@ -175,13 +235,13 @@ copy city records, uploaded documents, backup contents, or local secrets.
 
 ## Uninstall
 
-Use **Prepare Uninstall** in System Health before removing CivicSuite:
+Use **Prepare Uninstall** in System Health before removing Townlight:
 
 - The app creates a final uninstall backup.
 - The app stops local services.
 - The app removes local data and setup/config state.
 - After preparation succeeds, choose **Open Windows Uninstall** or use Windows
-  Settings > Installed apps, find CivicSuite, and choose Uninstall.
+  Settings > Installed apps, find Townlight, and choose Uninstall.
 - The Windows uninstall entry removes program files.
 
 Reinstall should be able to restore from the final backup when the backup folder is available.
@@ -198,4 +258,4 @@ If disk space is low, free space and run health verification again.
 
 If the app cannot write backups, choose a folder the local user can write and run backup again.
 
-If the app asks for Docker, WSL, terminal commands, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
+If the app asks for Docker, WSL, terminal commands, or manual config-file edits, this is a bug — please report it on the Townlight GitHub issue tracker (<https://github.com/townlight/townlight/issues>).

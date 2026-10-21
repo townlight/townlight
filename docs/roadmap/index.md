@@ -1,4 +1,6 @@
-﻿# CivicSuite Roadmap
+<a id="civicsuite-roadmap"></a>
+
+# Townlight Roadmap
 
 This roadmap starts from a hard truth: **"all repos have releases" is not the same thing as "a city can run on this suite."** The destination is a deployable, operable, supportable municipal product suite with shared security, identity, upgrade, governance, and integration patterns. The path has to be staged, with hard exit criteria and explicit ownership of the seams where suite projects usually fail.
 
@@ -14,7 +16,7 @@ Current phase: **`Phase 1: Platform And Security Extraction` is underway.** `Pha
 New module scope added on 2026-04-30:
 
 - `CivicRegWatch`: planned federal regulatory intelligence module. Detailed implementation contract: [`../../specs/05_civicregwatch.md`](../../specs/05_civicregwatch.md).
-- `CivicAPI`: planned public read-only data gateway over human-approved CivicSuite publication records. Detailed implementation contract: [`../../specs/06_civicapi.md`](../../specs/06_civicapi.md).
+- `CivicAPI`: planned public read-only data gateway over human-approved Townlight publication records. Detailed implementation contract: [`../../specs/06_civicapi.md`](../../specs/06_civicapi.md).
 
 ## Phase 0: Continuity
 
@@ -100,7 +102,7 @@ Required work for `civicclerk`:
 
 Identity and security requirements:
 
-- treat the shipped CivicClerk OIDC browser-session foundation as the baseline, not as unbuilt work
+- treat the shipped Townlight Meetings OIDC browser-session foundation as the baseline, not as unbuilt work
 - prove a real municipal IdP configuration story before production pilot use
 - ensure both products satisfy the shared security baseline from Phase 1
 
@@ -186,8 +188,8 @@ Cross-module integration scope:
 - shared identity and role semantics
 - shared audit and provenance expectations
 - shared retention and export semantics
-- CivicAPI publication-gate contracts for public read-only records
-- CivicRegWatch escalation contracts into CivicLegal and CivicClerk
+- Townlight API publication-gate contracts for public read-only records
+- Townlight Regulatory Watch escalation contracts into Townlight Legal and Townlight Meetings
 - shared deployment assumptions
 - shared admin/operator conventions
 - defined upgrade order and compatibility rules across modules
@@ -212,7 +214,7 @@ Integration order:
 - mail/SMS/print integrations
 - backup targets, observability, and operational hooks
 
-This phase assumes CivicClerk's OIDC browser-session foundation is already present and that production work now means municipal IdP configuration proof, operator docs, and deployment hardening.
+This phase assumes Townlight Meetings's OIDC browser-session foundation is already present and that production work now means municipal IdP configuration proof, operator docs, and deployment hardening.
 
 Exit criteria:
 
@@ -296,7 +298,7 @@ Exit criteria:
 3. Use `civicclerk v1.0.1` as the second-product reference for mock-city contracts, integration-depth contracts, unsigned-installer operator guidance, and site-specific deployment proof slots.
 4. Define the shared upgrade-path pattern before broadening more platform dependency fan-out.
 5. Stand up the explicit cross-module integration ownership model for the starter set.
-6. Resolve the CivicAPI and CivicRegWatch ADRs before scaffolding runtime repos.
+6. Resolve the Townlight API and Townlight Regulatory Watch ADRs before scaffolding runtime repos.
 7. Continue keeping umbrella status, taxonomy, and continuity docs current as the roadmap advances.
 
 The current consumer rollout pattern is documented in [shared-extraction-consumer-rollout.md](shared-extraction-consumer-rollout.md).

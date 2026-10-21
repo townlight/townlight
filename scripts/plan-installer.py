@@ -3754,7 +3754,7 @@ def build_install_plan(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Create a non-mutating CivicSuite installer plan."
+        description="Create a non-mutating Townlight installer plan."
     )
     parser.add_argument(
         "--profile", required=True, help="Profile id from installer/modules.json."
@@ -3824,7 +3824,7 @@ def main() -> int:
     parser.add_argument(
         "--generate-install-kit",
         action="store_true",
-        help="Write the minimal CivicCore install kit under installer/generated/minimal.",
+        help="Write the minimal Townlight Core install kit under installer/generated/minimal.",
     )
     parser.add_argument(
         "--generate-profile-package",

@@ -1,18 +1,20 @@
-# CivicClerk Production-Depth Workflow Sprint
+<a id="civicclerk-production-depth-workflow-sprint"></a>
+
+# Townlight Meetings Production-Depth Workflow Sprint
 
 Status: planned next production-depth lane
 
 Governing ADR: `docs/architecture/ADR-0007-first-production-depth-workflow.md`
 
-Primary repo: `CivicSuite/civicclerk`
+Primary repo: `townlight/meetings`
 
-Supporting repos: `CivicSuite/civiccore`, `CivicSuite/civicrecords-ai`,
-`CivicSuite/civiccode`, `CivicSuite/civiczone`, `CivicSuite/civicsuite`
+Supporting repos: `townlight/core`, `townlight/sunshine`,
+`townlight/ordinances`, `townlight/zone`, `townlight/townlight`
 
 ## Purpose
 
-This sprint turns CivicClerk from a strong v0.1.0 foundation into the first
-operator-usable production-depth CivicSuite workflow.
+This sprint turns Townlight Meetings from a strong v0.1.0 foundation into the first
+operator-usable production-depth Townlight workflow.
 
 The workflow is deliberately narrow:
 
@@ -28,7 +30,7 @@ publishes.
 
 ## Current Starting Point
 
-CivicClerk v0.1.0 already ships:
+Townlight Meetings v0.1.0 already ships:
 
 - Schema and Alembic foundation.
 - Agenda item lifecycle enforcement.
@@ -54,9 +56,11 @@ Still planned:
 
 ## Sprint Sequence
 
-### Phase 1 - CivicCore v0.3.0 Primitives
+<a id="phase-1---civiccore-v030-primitives"></a>
 
-Repo: `CivicSuite/civiccore`
+### Phase 1 - Townlight Core v0.3.0 Primitives
+
+Repo: `townlight/core`
 
 Deliver:
 
@@ -75,9 +79,11 @@ Acceptance:
 - Manifest tests prove checksums and file counts are validated.
 - Docs clearly say what v0.3.0 ships and what remains planned.
 
-### Phase 2 - CivicClerk Data And Service Depth
+<a id="phase-2---civicclerk-data-and-service-depth"></a>
 
-Repo: `CivicSuite/civicclerk`
+### Phase 2 - Townlight Meetings Data And Service Depth
+
+Repo: `townlight/meetings`
 
 Deliver:
 
@@ -86,7 +92,7 @@ Deliver:
 - Packet assembly records tied to source files and citations.
 - Notice checklist records tied to meeting type, statutory basis, deadlines, and
   posting proof.
-- Export bundle generation using CivicCore v0.3.0 manifest utilities.
+- Export bundle generation using Townlight Core v0.3.0 manifest utilities.
 - Audit events for every consequential clerk action.
 
 Acceptance:
@@ -100,7 +106,7 @@ Acceptance:
 
 ### Phase 3 - Staff Workflow UI
 
-Repo: `CivicSuite/civicclerk`
+Repo: `townlight/meetings`
 
 Deliver:
 
@@ -122,16 +128,16 @@ Acceptance:
 
 ### Phase 4 - Cross-Module Source Context
 
-Repos: `CivicSuite/civicrecords-ai`, `CivicSuite/civiccode`,
-`CivicSuite/civiczone`, `CivicSuite/civicclerk`
+Repos: `townlight/sunshine`, `townlight/ordinances`,
+`townlight/zone`, `townlight/meetings`
 
 Deliver:
 
 - Read-only source reference adapters or export fixtures for:
-  - records request/source files from CivicRecords AI,
-  - code sections and ordinance references from CivicCode,
-  - parcel/zoning context from CivicZone.
-- CivicClerk consumes these as source/provenance references, not system-of-record
+  - records request/source files from Townlight Records,
+  - code sections and ordinance references from Townlight Code,
+  - parcel/zoning context from Townlight Zoning.
+- Townlight Meetings consumes these as source/provenance references, not system-of-record
   writes.
 
 Acceptance:
@@ -143,7 +149,7 @@ Acceptance:
 
 ### Phase 5 - Demo Profile And Operator Docs
 
-Repos: `CivicSuite/civicsuite`, `CivicSuite/civicclerk`, supporting modules
+Repos: `townlight/townlight`, `townlight/meetings`, supporting modules
 
 Deliver:
 
@@ -185,8 +191,8 @@ The staff workflow must follow `docs/ux/shared-shell-inventory.md`:
 
 This production-depth lane is complete when:
 
-- CivicCore v0.3.0 is released if its primitives are used.
-- CivicClerk ships a new release with database-backed packet/notice workflow
+- Townlight Core v0.3.0 is released if its primitives are used.
+- Townlight Meetings ships a new release with database-backed packet/notice workflow
   depth.
 - Supporting module references are read-only and degraded-state safe.
 - The local demo profile can exercise the workflow without outbound calls.

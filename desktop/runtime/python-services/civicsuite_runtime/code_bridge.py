@@ -1,4 +1,4 @@
-"""Native identity/transport adapter to CivicCode staff operations."""
+"""Native identity/transport adapter to Townlight Code staff operations."""
 from datetime import date
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -21,7 +21,7 @@ async def actor(
     from civicsuite_runtime.services import _code_database_status
 
     if not _code_database_status()["ok"]:
-        raise HTTPException(503, "CivicCode database/schema is not ready; no work accepted.")
+        raise HTTPException(503, "Townlight Code database/schema is not ready; no work accepted.")
     actor_id = str(user.id)
     await session.commit()
     return actor_id
@@ -31,7 +31,7 @@ async def _call(awaitable):
     try:
         return await awaitable
     except SQLAlchemyError:
-        raise HTTPException(503, "CivicCode persistence unavailable.") from None
+        raise HTTPException(503, "Townlight Code persistence unavailable.") from None
     except (
         code.CivicCodeImportError,
         code.SourceRegistryError,
@@ -61,7 +61,7 @@ async def workspace(actor_id: str = Depends(actor)):
     try:
         return code._staff_code_payload()
     except SQLAlchemyError:
-        raise HTTPException(503, "CivicCode persistence unavailable.") from None
+        raise HTTPException(503, "Townlight Code persistence unavailable.") from None
 
 
 @router.get("/lookup")

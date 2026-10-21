@@ -1,6 +1,40 @@
 # Townlight Architecture
 
-## Connected Records–Meetings–Code 1.3.0-beta.1 public beta
+## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
+
+Published October 21, 2026. Four connected Townlight products run locally through
+bundled Python services and PostgreSQL, with Core, Notice and Access supporting
+them. This is a bounded Windows public beta, not general availability or completion
+of the full municipal suite.
+
+[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
+[Signed acceptance and limits](docs/installer/townlight-zoning-beta1-signed-acceptance.md) · [User manual](USER-MANUAL.md)
+
+Records-only remains the installation default. Explicitly select **zoning-beta**
+for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
+**city-core** continues to select Records, Meetings and Code without Zoning.
+Planning, Permitting and Inspections are not enabled by zoning-beta.
+
+Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
+17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
+explicitly public immutable Zoning snapshots connect to Records with source
+history and hashes preserved. Private notes remain protected. Answers are
+informational, not zoning determinations, permit approvals or legal advice.
+
+The exact signed MSI and embedded EXE passed independent signature/hash checks,
+fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
+retained-data uninstall. Optional local AI is not required for these deterministic
+workflows. Human response approval and final export remain separate from attaching
+a source; no automatic public publication is introduced.
+
+The active connected domain path is authenticated loopback Python services with
+PostgreSQL and managed local files. Zoning uses PostGIS; Rust owns native desktop
+integration, supervision and supported migration/recovery. Retired Rust JSON
+business actions are not active fallback writers. Repository package/API names
+remain compatibility identifiers. The diagrams and older release descriptions
+below are useful predecessor context; they do not expand the 1.4 acceptance scope.
+
+## Historical Records–Meetings–Code 1.3.0-beta.1 architecture
 
 The explicit city-core profile connects Records, Meetings and Code, supported by
 Core, Notice and Access. Typed desktop clients use authenticated loopback Python
@@ -82,7 +116,7 @@ This document is the suite-level architecture reference. For detailed per-module
 
 **Modules depend on `civiccore`. `civiccore` never depends on modules.**
 
-This rule is non-negotiable. Every other architectural decision in CivicSuite serves it. Without it, modules become coupled, the suite becomes a monorepo by accident, and cities cannot deploy modules independently.
+This rule is non-negotiable. Every other architectural decision in Townlight serves it. Without it, modules become coupled, the suite becomes a monorepo by accident, and cities cannot deploy modules independently.
 
 ---
 
@@ -221,9 +255,9 @@ Every module inherits the same deliberately boring stack unless an ADR explicitl
 | LLM runtime | Ollama (local) | Default Gemma 4 family |
 | Embeddings | `nomic-embed-text` | Local |
 | Frontend | React behind nginx | — |
-| Migrations | Alembic | CivicCore baseline first, then per-module |
+| Migrations | Alembic | Townlight Core baseline first, then per-module |
 
-The shipped Windows Local desktop profile overrides three of these rows per [ADR-0008](docs/architecture/ADR-0008-portable-native-windows-runtime.md) and [ADR-0009](docs/architecture/ADR-0009-postgres-backed-queue-windows-profile.md): cache/queue → the PostgreSQL-backed CivicCore task queue, workers → bundled CPython city services, frontend → the Tauri/WebView2 desktop shell (see "Windows Local desktop distribution" below).
+The shipped Windows Local desktop profile overrides three of these rows per [ADR-0008](docs/architecture/ADR-0008-portable-native-windows-runtime.md) and [ADR-0009](docs/architecture/ADR-0009-postgres-backed-queue-windows-profile.md): cache/queue → the PostgreSQL-backed Townlight Core task queue, workers → bundled CPython city services, frontend → the Tauri/WebView2 desktop shell (see "Windows Local desktop distribution" below).
 
 This stack is local-first by design. No outbound calls in the default deployment profile. External LLM providers and external connectors are **opt-in adapters**, never default.
 
@@ -231,7 +265,7 @@ This stack is local-first by design. No outbound calls in the default deployment
 
 ## Per-module architecture pattern
 
-Every runtime module follows the CivicRecords AI template:
+Every runtime module follows the Townlight Records template:
 
 ```
 modulename/
@@ -268,14 +302,14 @@ The repo skeleton is enforced by `scripts/verify-docs.sh` in the umbrella; modul
 
 ### Within a module
 - Per-module schema or clearly bounded table namespace (e.g., `civicclerk.meetings`, `civiczone.parcels`).
-- Foreign keys into CivicCore shared tables (e.g., `civiccore.users`, `civiccore.audit_log`) where needed.
-- Hash-chained audit logging via CivicCore primitives.
+- Foreign keys into Townlight Core shared tables (e.g., `civiccore.users`, `civiccore.audit_log`) where needed.
+- Hash-chained audit logging via Townlight Core primitives.
 
 ### Across modules
 - Modules **may not** read each other's database directly. Cross-module reads go through internal HTTP APIs.
 - The "internal API" between modules is governed by the unified spec §13–14 and the per-module specs.
 - Examples:
-  - `civicclerk` writes adopted ordinances → `civiccode` ingests via the CivicClerk handoff API.
+  - `civicclerk` writes adopted ordinances → `civiccode` ingests via the Townlight Meetings handoff API.
   - `civiczone` reads code text from `civiccode` via the section resolution API.
   - `civicgrants` searches `civicrecords-ai` for grant context via records-ai's query API.
 
@@ -286,9 +320,11 @@ The repo skeleton is enforced by `scripts/verify-docs.sh` in the umbrella; modul
 
 ---
 
-## CivicCore extraction phasing
+<a id="civiccore-extraction-phasing"></a>
 
-CivicCore is built incrementally. The extraction model is from the v0.1 spec (`specs/02_CivicCore.md`):
+## Townlight Core extraction phasing
+
+Townlight Core is built incrementally. The extraction model is from the v0.1 spec (`specs/02_CivicCore.md`):
 
 - **Phase 0** — repo skeletons and baseline LICENSE / CHANGELOG / CONTRIBUTING.
 - **Phase 1** — User, Role, Department, audit_log models + Alembic baseline. Shipped at civiccore v0.1.0.
@@ -297,13 +333,13 @@ CivicCore is built incrementally. The extraction model is from the v0.1 spec (`s
 - **Phase 4** — Auth/RBAC extraction (in progress).
 - **Phase 5** — Document storage, full search engine, exemption rules, sovereignty verification, scaffolding generators (planned).
 
-Reserved namespaces (`civiccore.catalog`, `civiccore.exemptions`, `civiccore.scaffold`, full `civiccore.notifications` runtime, sovereignty verification) are placeholder packages. Downstream modules **must not depend on planned CivicCore behavior** unless that behavior is released in a versioned CivicCore artifact.
+Reserved namespaces (`civiccore.catalog`, `civiccore.exemptions`, `civiccore.scaffold`, full `civiccore.notifications` runtime, sovereignty verification) are placeholder packages. Downstream modules **must not depend on planned Townlight Core behavior** unless that behavior is released in a versioned Townlight Core artifact.
 
 ---
 
 ## Compatibility versioning
 
-Modules pin to CivicCore as a released dependency. The exact form (example shown against an older CivicCore release) is:
+Modules pin to Townlight Core as a released dependency. The exact form (example shown against an older Townlight Core release) is:
 
 ```toml
 [project]
@@ -315,15 +351,15 @@ dependencies = [
 
 The pin is to a published release wheel, not a Git SHA. This keeps installs reproducible and removes the need for `git` in the runtime image.
 
-When CivicCore ships a backward-compatible change:
-1. CivicCore releases the new version.
+When Townlight Core ships a backward-compatible change:
+1. Townlight Core releases the new version.
 2. The compatibility matrix is updated.
 3. Consumer modules adopt the new version using the standard rollout playbook in `docs/roadmap/shared-extraction-consumer-rollout.md`.
 4. Compatibility matrix records the new pairing.
 
-When CivicCore ships a breaking change:
+When Townlight Core ships a breaking change:
 1. The change is documented in advance via an ADR.
-2. CivicCore releases first.
+2. Townlight Core releases first.
 3. Consumers ship paired changes.
 4. Compatibility matrix records the new pairing.
 
@@ -343,11 +379,11 @@ These are architectural commitments, not aspirational marketing. The clean-machi
 
 ## Suite installer architecture
 
-The suite-level installer (in beta — the Docker-based multi-module path, separate from the shipped Windows Local MSI described below) is module-aware and CivicCore-first:
+The suite-level installer (in beta — the Docker-based multi-module path, separate from the shipped Windows Local MSI described below) is module-aware and Townlight Core-first:
 
 1. Detect host OS and capacity.
 2. Verify baseline dependencies (Docker, WSL on Windows, etc.).
-3. Install CivicCore matching the selected modules' compatibility pins.
+3. Install Townlight Core matching the selected modules' compatibility pins.
 4. Present a menu-style module selector driven by `installer/modules.json`.
 5. Install selected modules in dependency order.
 6. Run health checks and record a proof bundle.
@@ -356,13 +392,13 @@ See [installer/README.md](installer/README.md) for the contract and [docs/instal
 
 ### Windows Local desktop distribution
 
-Separate from the Docker-based installer above, the shipped Windows artifact is a single MSI (CivicSuite Windows Local, currently v1.0.2) built around a Tauri/WebView2 desktop shell. It bundles its full runtime rather than assuming host dependencies:
+Separate from the Docker-based installer above, the shipped Windows artifact is a single MSI (Townlight Windows Local, currently v1.0.2) built around a Tauri/WebView2 desktop shell. It bundles its full runtime rather than assuming host dependencies:
 
 - **PostgreSQL 17 + `pgvector`** as portable binaries, with the Microsoft VC++ runtime DLLs (`vcruntime140.dll`, `vcruntime140_1.dll`, `msvcp140.dll`) staged into `postgres\bin` so the database starts on a factory-fresh Windows machine with no system VC++ redistributable installed.
 - **Embedded CPython** running the module services.
 - **Bundled Ollama** on `127.0.0.1:15434` serving the pinned `gemma-4-12b-it-qat-q4_0` model; the suite's shared local-generation helper calls it via `/api/chat`. The model itself (~7 GB) is downloaded and SHA-256-verified on first run, with a pre-staged path for air-gapped installs.
 
-One MSI installs the six-module city-core profile: CivicCore, CivicRecords AI, CivicClerk, CivicCode, CivicNotice, and CivicAccess. Module source is pinned by `source_commit` in [installer/modules.json](installer/modules.json); see [PROVENANCE.md](PROVENANCE.md) for how the bundled commits relate to each module's published releases.
+One MSI installs the six-module city-core profile: Townlight Core, Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access. Module source is pinned by `source_commit` in [installer/modules.json](installer/modules.json); see [PROVENANCE.md](PROVENANCE.md) for how the bundled commits relate to each module's published releases.
 
 ---
 
@@ -370,9 +406,9 @@ One MSI installs the six-module city-core profile: CivicCore, CivicRecords AI, C
 
 These are explicitly out of scope for the suite:
 
-- **Monorepo.** CivicSuite is a multi-repo product family. Each module ships independently.
+- **Monorepo.** Townlight is a multi-repo product family. Each module ships independently.
 - **System-of-record replacements.** Not first-wave ERP, utility billing, permitting, CAD/RMS, or courts.
-- **Cloud-only.** Cloud is not a deployment mode CivicSuite optimizes for.
+- **Cloud-only.** Cloud is not a deployment mode Townlight optimizes for.
 - **Per-seat pricing.** The license forecloses this option.
 - **Vendor write-back without audit.** All write-back connectors must wait until read paths are stable and auditable.
 - **Auto-determination.** No auto-release, auto-denial, auto-redaction, auto-enforcement, or auto-codification. AI drafts; humans decide.

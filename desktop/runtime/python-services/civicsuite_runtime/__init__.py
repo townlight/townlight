@@ -1,4 +1,4 @@
-"""CivicSuite local Windows runtime service bridge."""
+"""Townlight local Windows runtime service bridge."""
 
 from __future__ import annotations
 

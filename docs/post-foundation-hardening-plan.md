@@ -1,12 +1,12 @@
 # Post-Foundation Hardening Plan
 
-Status: active planning document  
-Applies after: all 26 catalog modules have runtime-foundation releases and the v0.1.1 CivicCore alignment lane is complete  
+Status: active planning document
+Applies after: all 26 catalog modules have runtime-foundation releases and the v0.1.1 Townlight Core alignment lane is complete
 License: Apache-2.0
 
 ## Purpose
 
-The foundation and v0.1.1 alignment lanes proved that every CivicSuite catalog module can live in the CivicSuite organization, depend on released CivicCore, ship documentation and browser-visible UI, and pass an auditable release gate.
+The foundation and v0.1.1 alignment lanes proved that every Townlight catalog module can live in the Townlight organization, depend on released Townlight Core, ship documentation and browser-visible UI, and pass an auditable release gate.
 
 The next phase is not "build another module." The next phase is making the suite easier to deploy, operate, integrate, and deepen into real municipal workflows without weakening the boundaries that made the foundation lane safe.
 
@@ -21,7 +21,7 @@ This plan follows the canonical rules in `docs/CivicSuiteUnifiedSpec.md`:
 - No module may require outbound runtime calls in the default local deployment profile.
 - Connectors start with file drop, CSV, and export/import paths before vendor write-back.
 - Current-state truth must stay separate from roadmap aspiration.
-- CivicCore extracts shared capabilities only when active module work proves the need.
+- Townlight Core extracts shared capabilities only when active module work proves the need.
 
 ## Lane 1 - Suite Integrity And Release Reliability
 
@@ -35,18 +35,18 @@ Deliverables:
    - Current version surfaces.
    - Branch protection.
    - Release assets and checksums.
-   - Current CivicCore compatibility where applicable, with `civiccore==0.3.0` as the active foundation pin except for historical releases recorded in the compatibility matrix.
+   - Current Townlight Core compatibility where applicable, with `civiccore==0.3.0` as the active foundation pin except for historical releases recorded in the compatibility matrix.
 2. A suite-wide verification script in the umbrella repo that calls each module's docs/release gate without hiding failures.
 3. A stale-state scanner that catches planned-vs-shipped drift across README files, landing pages, manuals, compatibility matrix rows, and the unified spec.
 4. A single post-foundation status report that replaces per-module sprint fragments as the operator-facing summary.
 
 Recommended first task:
 
-Create `scripts/verify-suite-state.py` in the umbrella repo. It should read a declarative module inventory and verify local clone paths, default branches, tags, release versions, CivicCore pins, docs artifacts, and compatibility-matrix rows.
+Create `scripts/verify-suite-state.py` in the umbrella repo. It should read a declarative module inventory and verify local clone paths, default branches, tags, release versions, Townlight Core pins, docs artifacts, and compatibility-matrix rows.
 
 Initial status:
 
-`scripts/verify-suite-state.py` now exists as the first Lane 1 artifact. The default run verifies local clone paths, version truth, docs artifacts, CivicCore pins, and compatibility-matrix rows. Passing `--remote` also verifies GitHub release tags and uploaded assets through `gh release view`.
+`scripts/verify-suite-state.py` now exists as the first Lane 1 artifact. The default run verifies local clone paths, version truth, docs artifacts, Townlight Core pins, and compatibility-matrix rows. Passing `--remote` also verifies GitHub release tags and uploaded assets through `gh release view`.
 
 Why first:
 
@@ -59,8 +59,8 @@ Goal: make the suite installable as a real local municipal stack without pretend
 Deliverables:
 
 1. A documented local deployment profile covering:
-   - CivicCore.
-   - CivicRecords AI.
+   - Townlight Core.
+   - Townlight Records AI.
    - One or more runtime modules.
    - PostgreSQL 17 with pgvector where needed.
    - Redis and Celery where needed.
@@ -74,7 +74,7 @@ Deliverables:
 
 Recommended first deployment target:
 
-CivicRecords AI + CivicClerk + CivicCode + CivicZone.
+Townlight Records + Townlight Meetings + Townlight Code + Townlight Zoning.
 
 Why:
 
@@ -82,7 +82,7 @@ Those modules form the most obvious clerk/planning records workflow: records int
 
 Initial status:
 
-`deploy/post-foundation-demo.compose.yml`, `docs/deployment/local-demo-profile.md`, and `scripts/verify-deployment-profile.py` define the first bounded local demo profile for CivicRecords AI, CivicClerk, CivicCode, and CivicZone. The verifier checks compose shape, local-first LLM defaults, version-pinned module wheels, deployment docs, and no-network in-process health smoke checks for CivicClerk, CivicCode, and CivicZone.
+`deploy/post-foundation-demo.compose.yml`, `docs/deployment/local-demo-profile.md`, and `scripts/verify-deployment-profile.py` define the first bounded local demo profile for Townlight Records, Townlight Meetings, Townlight Code, and Townlight Zoning. The verifier checks compose shape, local-first LLM defaults, version-pinned module wheels, deployment docs, and no-network in-process health smoke checks for Townlight Meetings, Townlight Code, and Townlight Zoning.
 
 ## Lane 3 - Shared Staff And Resident Shell Boundaries
 
@@ -92,7 +92,7 @@ Deliverables:
 
 1. A shell-boundary ADR describing what belongs in:
    - Each module.
-   - A shared CivicCore or CivicSuite shell package.
+   - A shared Townlight Core or Townlight shell package.
    - The umbrella documentation site.
 2. A design-system inventory covering:
    - Navigation.
@@ -125,10 +125,10 @@ Deliverables:
 
 1. A connector-template ADR defining read/import/export phases.
 2. File drop and CSV import patterns for:
-   - CivicRecords AI records exports.
-   - CivicClerk agenda/meeting packet source imports.
-   - CivicCode code-section import.
-   - CivicZone zoning/parcel sample import.
+   - Townlight Records records exports.
+   - Townlight Meetings agenda/meeting packet source imports.
+   - Townlight Code code-section import.
+   - Townlight Zoning zoning/parcel sample import.
 3. Export-bundle conventions with manifest files and checksums.
 4. No write-back connector work until import/export paths are stable and audited.
 
@@ -147,7 +147,9 @@ Initial status:
 connector boundary. The accepted sequence is read/import first, export bundles
 second, and vendor write-back only after a later ADR approves it.
 
-## Lane 5 - CivicCore v0.3.0 Extraction Candidate
+<a id="lane-5---civiccore-v030-extraction-candidate"></a>
+
+## Lane 5 - Townlight Core v0.3.0 Extraction Candidate
 
 Goal: extract only shared capabilities that active hardening work actually needs.
 
@@ -181,7 +183,7 @@ boundary.
 
 Recommended first workflow:
 
-CivicClerk agenda packet and notice workflow, integrated with CivicRecords AI source records, CivicCode citations, and CivicZone references.
+Townlight Meetings agenda packet and notice workflow, integrated with Townlight Records source records, Townlight Code citations, and Townlight Zoning references.
 
 Why:
 
@@ -199,19 +201,19 @@ Initial status:
 
 `docs/architecture/ADR-0007-first-production-depth-workflow.md` and
 `docs/roadmap/civicclerk-production-depth-workflow.md` define the first
-production-depth sprint: CivicClerk agenda packet and notice workflow,
-integrated through read-only source/provenance paths with CivicRecords AI,
-CivicCode, and CivicZone, and dependent on CivicCore v0.3.0 primitives if those
+production-depth sprint: Townlight Meetings agenda packet and notice workflow,
+integrated through read-only source/provenance paths with Townlight Records,
+Townlight Code, and Townlight Zoning, and dependent on Townlight Core v0.3.0 primitives if those
 primitives are used.
 
 ## Execution Order
 
 1. Suite integrity script and report.
-2. Deployment profile for CivicRecords AI + CivicClerk + CivicCode + CivicZone.
+2. Deployment profile for Townlight Records + Townlight Meetings + Townlight Code + Townlight Zoning.
 3. Shared shell boundary ADR and UX inventory.
 4. Connector/import/export template ADR plus file-drop/CSV patterns.
-5. CivicCore v0.3.0 extraction proposal.
-6. CivicClerk-centered production-depth workflow sprint.
+5. Townlight Core v0.3.0 extraction proposal.
+6. Townlight Meetings-centered production-depth workflow sprint.
 
 ## Done Definition For This Plan
 

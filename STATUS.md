@@ -1,24 +1,33 @@
 # Townlight status
 
-**Last verified:** 2026-10-20
+**Current release verified:** October 21, 2026
 
-**Connected Records + Meetings + Code public beta:** 1.3.0-beta.1. Exact signed
-fresh installation and populated signed 1.2 upgrade passed, including preserved
-Records/proceedings/file hashes, the new Code connection, recovery, offline use
-and retained-data uninstall. See the
-[acceptance record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md)
-and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
+## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
-Published October 20, 2026 at 20:13:28 MDT (October 21 at 02:13:28 UTC).
-Public MSI digest/size, anonymous download response and receipt bytes verified.
+Published October 21, 2026. Four connected Townlight products run locally through
+bundled Python services and PostgreSQL, with Core, Notice and Access supporting
+them. This is a bounded Windows public beta, not general availability or completion
+of the full municipal suite.
 
-**Preserved predecessor:** Townlight Records + Meetings 1.2.0-beta.1,
-signed installed acceptance passed. See its
-[acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
-and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
+[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
+[Signed acceptance and limits](docs/installer/townlight-zoning-beta1-signed-acceptance.md) · [User manual](USER-MANUAL.md)
 
-Published October 20 at 00:13:29 MDT. Public MSI asset identity, anonymous download
-response and public signing receipt/evidence were verified after publication.
+Records-only remains the installation default. Explicitly select **zoning-beta**
+for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
+**city-core** continues to select Records, Meetings and Code without Zoning.
+Planning, Permitting and Inspections are not enabled by zoning-beta.
+
+Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
+17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
+explicitly public immutable Zoning snapshots connect to Records with source
+history and hashes preserved. Private notes remain protected. Answers are
+informational, not zoning determinations, permit approvals or legal advice.
+
+The exact signed MSI and embedded EXE passed independent signature/hash checks,
+fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
+retained-data uninstall. Optional local AI is not required for these deterministic
+workflows. Human response approval and final export remain separate from attaching
+a source; no automatic public publication is introduced.
 
 ## Historical Records beta.3
 
@@ -42,7 +51,7 @@ Merged [Records PR #111](https://github.com/townlight/sunshine/pull/111) and
 passed all jobs. See the [beta.3 acceptance record](docs/installer/townlight-records-beta3-acceptance.md)
 for exact hashes, tested environments, evidence and limits.
 
-## Connected Records–Meetings 1.2.0-beta.1 acceptance
+## Historical Records–Meetings 1.2.0-beta.1 acceptance
 
 The `1.2.0-beta.1` release source is merged and signed. Its required PR checks,
 real-runtime integration and installed MSI lifecycle passed. Independent local
@@ -179,7 +188,7 @@ Status labels below are the suite's shared status set, generated from
 [`installer/modules.public-status.json`](installer/modules.public-status.json) — the same source the [module explorer](docs/module-explorer.html) renders.
 
 - **Shared platform:** The shared platform every module depends on; always installed.
-- **Released · city-core:** Released city-core module — ships in the current Windows Local release.
+- **Published beta capability:** Available in a published bounded Townlight desktop beta or recorded standalone release; select the documented profile and read its limits.
 - **Queued · Tier 2:** Early scaffold with a corrected version label; full build queued for Tier 2.
 - **Early scaffold:** Early scaffold; not city-ready.
 - **Foundation:** Package/schema/sample-depth foundation only; not product-ready.
@@ -190,33 +199,33 @@ Status labels below are the suite's shared status set, generated from
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
 | Townlight Core | 1.2.1 | Shared platform | 2026-07-04 | Shared platform for identity, audit, retention, local tasks, and document ingestion. Version 1.2.1 is always installed with Townlight Records. |
-| Townlight Records | 1.7.3 | Released · city-core | 2026-05-24 | Public-records intake, cited search, human review, release packaging, fulfillment and public status. The connected 1.3.0-beta.1 desktop uses Python/PostgreSQL and can attach permitted Meetings and Code sources with history, citations and hashes. |
-| Townlight Meetings | 1.0.4 | Released · city-core | 2026-06-13 | Agendas, packets, delivery, notices, proceedings and manual minutes. Connected 1.3.0-beta.1 supports explicit Code agenda/adoption links and permitted source attachments to Records; optional native AI minutes/transcription is not claimed. |
-| Townlight Code | 1.0.8 | Released · city-core | 2026-05-23 | Current and historical ordinance versions, meeting-linked proposals, explicit human adoption and separate codification. Connected 1.3.0-beta.1 supplies permitted cited source copies to Records without exposing restricted material. |
-| Townlight Access | 0.4.0 | Released · city-core | 2026-06-28 | Accessibility and records-release review, including plain-language, translation, and WCAG-oriented checks. Bundled with Townlight Records beta. |
-| CivicZone | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Parcel-aware zoning and land-use Q&A. Early scaffold; full build queued as the next Tier 2 lane. |
-| CivicPlan | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Comprehensive-plan policy lookup. Early scaffold; full build queued. |
-| CivicPermit Assist | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Permit pre-application and development-review intake. Early scaffold; full build queued. |
-| CivicInspect | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Inspection assistant foundation. Early scaffold; full build queued. |
-| CivicGrants | 0.2.0 | Early scaffold | 2026-05-10 | Grant-opportunity triage and compliance support. Early scaffold; not city-ready. |
-| CivicProcure Assist | 0.2.0 | Early scaffold | 2026-05-10 | Procurement RFP drafting and award-packet support. Early scaffold; not city-ready. |
-| CivicContracts | 0.1.1 | Foundation | 2026-04-28 | Contract repository and renewal visibility. Schema/spec foundation; not city-ready. |
-| CivicBoards | 0.1.1 | Foundation | 2026-04-28 | Board and commission administration. Schema/spec foundation; not city-ready. |
-| Townlight Notice | 0.2.0 | Released · city-core | 2026-07-03 | Deterministic deadline, proof, and archive support bundled with Townlight Records beta. |
-| Civic311 | 0.1.1 | Foundation | 2026-04-28 | Resident service-request intake and Open311 export. Schema/spec foundation; not city-ready. |
-| CivicComms | 0.1.1 | Foundation | 2026-04-28 | Source-backed public explainers and communications support. Schema/spec foundation; not city-ready. |
-| CivicData Bridge | 0.1.2 | Foundation | 2026-04-29 | Open-data and transparency publishing. Schema/spec foundation; not city-ready. |
-| CivicRegWatch | — | Planned | — | Federal regulatory-intelligence module. Detailed spec exists; no runtime repo yet. |
-| CivicAPI | — | Planned | — | Public read-only data gateway. Detailed spec exists; no runtime repo yet. |
-| CivicHR Assist | 0.1.1 | Foundation | 2026-04-28 | Personnel-policy and HR knowledge support. Schema/spec foundation; not city-ready. |
-| CivicBudget Assist | 0.1.2 | Foundation | 2026-04-29 | Budget-narrative and transparency support. Schema/spec foundation; not city-ready. |
-| CivicLegal Research | 0.1.2 | Foundation | 2026-04-29 | Internal legal-record research support. Schema/spec foundation; not city-ready. |
-| CivicElections Assist | 0.1.1 | Foundation | 2026-04-28 | Election-administration support. Schema/spec foundation; not city-ready. |
-| CivicUtility Assist | 0.1.1 | Foundation | 2026-04-28 | Utility-operations support. Schema/spec foundation; not city-ready. |
-| CivicCourt Assist | 0.1.2 | Foundation | 2026-04-29 | Municipal-court support. Schema/spec foundation; not city-ready. |
-| CivicSafety Assist | 0.1.1 | Foundation | 2026-04-28 | Public-safety administrative support. Schema/spec foundation; not city-ready. |
-| CivicLibrary | 0.1.1 | Foundation | 2026-04-28 | Library-operations support. Schema/spec foundation; not city-ready. |
-| CivicParks | 0.1.1 | Foundation | 2026-04-28 | Parks-and-recreation support. Schema/spec foundation; not city-ready. |
+| Townlight Records | 1.7.3 | Published beta capability | 2026-05-24 | Public-records intake, cited search, human review, release packaging, fulfillment and public status. The connected 1.4.0-beta.1 desktop uses Python/PostgreSQL and can attach permitted Meetings and Code sources with history, citations and hashes. |
+| Townlight Meetings | 1.0.4 | Published beta capability | 2026-06-13 | Agendas, packets, delivery, notices, proceedings and manual minutes. Connected 1.4.0-beta.1 supports explicit Code agenda/adoption links and permitted source attachments to Records; optional native AI minutes/transcription is not claimed. |
+| Townlight Code | 1.0.8 | Published beta capability | 2026-05-23 | Current and historical ordinance versions, meeting-linked proposals, explicit human adoption and separate codification. Connected 1.4.0-beta.1 supplies permitted cited source copies to Records without exposing restricted material. |
+| Townlight Access | 0.4.0 | Published beta capability | 2026-06-28 | Accessibility and records-release review, including plain-language, translation, and WCAG-oriented checks. Bundled with Townlight Records beta. |
+| Townlight Zoning | 0.2.2 | Published beta capability | 2026-05-23 | Connected desktop 1.4.0-beta.1 includes opt-in Zoning: staff GeoJSON import, PostGIS lookup, cited rules, human corrections and public immutable Records sources. Standalone package version 0.2.2 is historical; live GIS ingestion, determinations and the wider land-use suite are not delivered. |
+| Townlight Planning | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Comprehensive-plan policy lookup. Early scaffold; full build queued. |
+| Townlight Permitting | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Permit pre-application and development-review intake. Early scaffold; full build queued. |
+| Townlight Inspections | 0.2.2 | Queued · Tier 2 | 2026-05-23 | Inspection assistant foundation. Early scaffold; full build queued. |
+| Townlight Grants | 0.2.0 | Early scaffold | 2026-05-10 | Grant-opportunity triage and compliance support. Early scaffold; not city-ready. |
+| Townlight Procurement | 0.2.0 | Early scaffold | 2026-05-10 | Procurement RFP drafting and award-packet support. Early scaffold; not city-ready. |
+| Townlight Contracts | 0.1.1 | Foundation | 2026-04-28 | Contract repository and renewal visibility. Schema/spec foundation; not city-ready. |
+| Townlight Boards | 0.1.1 | Foundation | 2026-04-28 | Board and commission administration. Schema/spec foundation; not city-ready. |
+| Townlight Notice | 0.2.0 | Published beta capability | 2026-07-03 | Deterministic deadline, proof, and archive support bundled with Townlight Records beta. |
+| Townlight 311 | 0.1.1 | Foundation | 2026-04-28 | Resident service-request intake and Open311 export. Schema/spec foundation; not city-ready. |
+| Townlight Communications | 0.1.1 | Foundation | 2026-04-28 | Source-backed public explainers and communications support. Schema/spec foundation; not city-ready. |
+| Townlight Data | 0.1.2 | Foundation | 2026-04-29 | Open-data and transparency publishing. Schema/spec foundation; not city-ready. |
+| Townlight Regulatory Watch | — | Planned | — | Federal regulatory-intelligence module. Detailed spec exists; no runtime repo yet. |
+| Townlight API | — | Planned | — | Public read-only data gateway. Detailed spec exists; no runtime repo yet. |
+| Townlight HR | 0.1.1 | Foundation | 2026-04-28 | Personnel-policy and HR knowledge support. Schema/spec foundation; not city-ready. |
+| Townlight Budget | 0.1.2 | Foundation | 2026-04-29 | Budget-narrative and transparency support. Schema/spec foundation; not city-ready. |
+| Townlight Legal | 0.1.2 | Foundation | 2026-04-29 | Internal legal-record research support. Schema/spec foundation; not city-ready. |
+| Townlight Elections | 0.1.1 | Foundation | 2026-04-28 | Election-administration support. Schema/spec foundation; not city-ready. |
+| Townlight Utilities | 0.1.1 | Foundation | 2026-04-28 | Utility-operations support. Schema/spec foundation; not city-ready. |
+| Townlight Courts | 0.1.2 | Foundation | 2026-04-29 | Municipal-court support. Schema/spec foundation; not city-ready. |
+| Townlight Safety | 0.1.1 | Foundation | 2026-04-28 | Public-safety administrative support. Schema/spec foundation; not city-ready. |
+| Townlight Library | 0.1.1 | Foundation | 2026-04-28 | Library-operations support. Schema/spec foundation; not city-ready. |
+| Townlight Parks | 0.1.1 | Foundation | 2026-04-28 | Parks-and-recreation support. Schema/spec foundation; not city-ready. |
 
 <!-- END GENERATED MODULE STATUS -->
 
@@ -229,11 +238,11 @@ As of 2026-05-14, the release-integrity decision is:
 | Repo | Correct label | Status |
 |---|---:|---|
 | civiccore | v1.2.0 shipped | Real shared platform; v1.2.0 shipped the shared document-ingestion pipeline and now includes the Windows-local platform contracts plus PostgreSQL-backed task queue/worker. |
-| civicclerk | v1.0.4 shipped | Real meeting workflow module release pinned to CivicCore v1.2.0; protected staff auth defaults remain required. |
-| civicrecords-ai | v1.7.3 shipped | Developer preview records module release pinned to CivicCore v1.2.0 and consuming shared CivicCore ingestion; v1.7.3 adds release-asset convention bring-up without functional installer behavior changes. |
-| civiccode | v1.0.8 shipped | City-core module release pinned to CivicCore v1.2.0; v1.0.8 supersedes the earlier v1.0.0 posture and carries release attestation. |
-| civicnotice | v0.2.0 shipped | City-core public-notice workflow module release pinned to CivicCore v1.2.0; installed through the Windows Local city-core profile with checklist, posting proof, archive export, backup/restore, and search wiring. |
-| civicaccess | v0.4.0 city-core module release | Sixth city-core module on CivicCore v1.2.0; accessibility + records-ready export; ships in the six-module CivicSuite Windows Local v1.0.2 release with three features on the suite's shared local AI engine. Phase D `clean_vm_dod_passed` PASS; `accessibility_passed` FAIL on v1.0.2 (the Accessibility tab was unreachable in the shipped shell and records-export wrote no artifact; both fixed on main). |
+| civicclerk | v1.0.4 shipped | Real meeting workflow module release pinned to Townlight Core v1.2.0; protected staff auth defaults remain required. |
+| civicrecords-ai | v1.7.3 shipped | Developer preview records module release pinned to Townlight Core v1.2.0 and consuming shared Townlight Core ingestion; v1.7.3 adds release-asset convention bring-up without functional installer behavior changes. |
+| civiccode | v1.0.8 shipped | City-core module release pinned to Townlight Core v1.2.0; v1.0.8 supersedes the earlier v1.0.0 posture and carries release attestation. |
+| civicnotice | v0.2.0 shipped | City-core public-notice workflow module release pinned to Townlight Core v1.2.0; installed through the Windows Local city-core profile with checklist, posting proof, archive export, backup/restore, and search wiring. |
+| civicaccess | v0.4.0 city-core module release | Sixth city-core module on Townlight Core v1.2.0; accessibility + records-ready export; ships in the six-module Townlight Windows Local v1.0.2 release with three features on the suite's shared local AI engine. Phase D `clean_vm_dod_passed` PASS; `accessibility_passed` FAIL on v1.0.2 (the Accessibility tab was unreachable in the shipped shell and records-export wrote no artifact; both fixed on main). |
 | civiczone | v0.2.2 | Narrow corrective release that lowered the version label to match actual maturity; no functional upgrade; queued for Tier 2 real work. |
 | civicplan | v0.2.2 | Narrow corrective release that lowered the version label to match actual maturity; no functional upgrade; queued for Tier 2 real work. |
 | civicpermit | v0.2.2 | Narrow corrective release that lowered the version label to match actual maturity; no functional upgrade; queued for Tier 2 real work. |
@@ -246,18 +255,18 @@ All other modules remain foundation-only unless their own repo evidence says oth
 ## What Works Today
 
 - `civiccore` v1.2.0 is the current shared platform release and includes the shared document-ingestion pipeline, Windows-local platform contracts, and PostgreSQL-backed local task queue/worker used by the city-core module releases.
-- `civicrecords-ai` v1.7.3 remains developer preview, consumes CivicCore v1.2.0 shared ingestion, and keeps the city-core installer on the vendored-source path.
+- `civicrecords-ai` v1.7.3 remains developer preview, consumes Townlight Core v1.2.0 shared ingestion, and keeps the city-core installer on the vendored-source path.
 - `civicclerk` v1.0.4 is the current meeting workflow module release for city-core.
 - `civiccode` v1.0.8 is the current municipal-code module release for city-core.
 - `civicnotice` v0.2.0 is the current public-notice workflow module release for city-core.
-- The active Windows Local city-core desktop path now covers first-run local folders, module profile selection, city profile, first CivicSuite admin sign-in, Gemma 4 12B QAT model setup, local users/RBAC, city-core workflows, task queue health, local file evidence, exports, backup/restore, repair, support bundle, and uninstall handoff. The clean-machine Windows Local lifecycle test passed end-to-end on a fresh Windows Sandbox for the 1.0.1 MSI, and the released 1.0.2 MSI passed Phase D clean-VM acceptance across two full Windows Sandbox runs (install → full wizard → admin sign-in → model download/verify → live AI output through the real app bridge).
-- v1.0.2 fixed the suite's shared local-AI generation helper: it now calls the bundled Ollama's `/api/chat` instead of `/api/generate` with raw hand-built prompts (which bypassed the pinned model's own template/parser and produced unusable output against the real model). Because the helper is shared, the fix repaired output quality for every AI feature in the suite — CivicClerk minutes, CivicRecords responses, CivicCode guidance, and the three CivicAccess features (generation config: temperature 0.2, num_predict 512, num_ctx 8192, 180 s timeout). Caught by the Phase D clean-VM dress rehearsal against the real model; fixed in [PR #220](https://github.com/townlight/townlight/pull/220) (merge `0b0170a`).
-- v1.0.2 also fixed a clean-machine defect pre-existing across v1.0.x (not a CivicAccess regression): the runtime payload now stages the Microsoft VC++ runtime DLLs (`vcruntime140.dll`, `vcruntime140_1.dll`, `msvcp140.dll`) into `postgres\bin`, so the bundled PostgreSQL starts on a factory-fresh Windows PC with no VC++ redistributable installed. Found by Phase D clean-sandbox acceptance (`initdb.exe` failed with "VCRUNTIME140.dll was not found"); proven fixed in the second clean-sandbox run, where initdb built a full PostgreSQL 17.10 cluster with no system runtime present. Fixed in [PR #221](https://github.com/townlight/townlight/pull/221) (merge `0b797c4`).
+- The active Windows Local city-core desktop path now covers first-run local folders, module profile selection, city profile, first Townlight admin sign-in, Gemma 4 12B QAT model setup, local users/RBAC, city-core workflows, task queue health, local file evidence, exports, backup/restore, repair, support bundle, and uninstall handoff. The clean-machine Windows Local lifecycle test passed end-to-end on a fresh Windows Sandbox for the 1.0.1 MSI, and the released 1.0.2 MSI passed Phase D clean-VM acceptance across two full Windows Sandbox runs (install → full wizard → admin sign-in → model download/verify → live AI output through the real app bridge).
+- v1.0.2 fixed the suite's shared local-AI generation helper: it now calls the bundled Ollama's `/api/chat` instead of `/api/generate` with raw hand-built prompts (which bypassed the pinned model's own template/parser and produced unusable output against the real model). Because the helper is shared, the fix repaired output quality for every AI feature in the suite — Townlight Meetings minutes, Townlight Records responses, Townlight Code guidance, and the three Townlight Access features (generation config: temperature 0.2, num_predict 512, num_ctx 8192, 180 s timeout). Caught by the Phase D clean-VM dress rehearsal against the real model; fixed in [PR #220](https://github.com/townlight/townlight/pull/220) (merge `0b0170a`).
+- v1.0.2 also fixed a clean-machine defect pre-existing across v1.0.x (not a Townlight Access regression): the runtime payload now stages the Microsoft VC++ runtime DLLs (`vcruntime140.dll`, `vcruntime140_1.dll`, `msvcp140.dll`) into `postgres\bin`, so the bundled PostgreSQL starts on a factory-fresh Windows PC with no VC++ redistributable installed. Found by Phase D clean-sandbox acceptance (`initdb.exe` failed with "VCRUNTIME140.dll was not found"); proven fixed in the second clean-sandbox run, where initdb built a full PostgreSQL 17.10 cluster with no system runtime present. Fixed in [PR #221](https://github.com/townlight/townlight/pull/221) (merge `0b797c4`).
 - The suite-level `clerk-core` installer beta now records its verification evidence: clean-environment package testing, isolated test ports/projects, proof that workflows run on the installed stack, and full install-lifecycle testing on Linux itself covering install, repair, verify, backup, restore, and uninstall. For Windows and macOS, the earlier Docker-based wrapper profile's claims remain limited to archive/readiness checks until the same install-lifecycle testing passes on those operating systems.
-- CivicAccess is the sixth city-core module at v0.4.0, with three of its tools running on the suite's shared local AI engine — real drafts, labeled fallbacks, human review always required. Its Accessibility workflow tab was built for v1.0.2 but a navigation omission left it unreachable in the shipped shell; that fix and the records-export fix land in the next release (see the CivicAccess section above).
-- CivicZone, CivicPlan, CivicPermit, and CivicInspect carry v0.2.2 corrected version labels, not public-use release status.
+- Townlight Access is the sixth city-core module at v0.4.0, with three of its tools running on the suite's shared local AI engine — real drafts, labeled fallbacks, human review always required. Its Accessibility workflow tab was built for v1.0.2 but a navigation omission left it unreachable in the shipped shell; that fix and the records-export fix land in the next release (see the Townlight Access section above).
+- Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections carry v0.2.2 corrected version labels, not public-use release status.
 - `civicgrants` and `civicprocure` contain useful scaffolds and local mocks, but they are not city-ready products.
 
 ## What Does Not Work Yet
 
-A municipality should not treat CivicSuite as a finished full-suite procurement product today. The released beta is the Windows Local city-core package only: CivicCore, CivicRecords AI, CivicClerk, CivicCode, CivicNotice, CivicAccess, and the desktop installer shell. Missing proof is module-by-module feature completion for the rest of the unified spec; the clean-machine gates for the Windows Local package have passed (the clean-machine install test on the v1.0.1 MSI, Phase D clean-VM acceptance on the v1.0.2 MSI). the Windows MSI is Authenticode code-signed via Azure Trusted Signing as of `v1.0.3`; macOS remains readiness-only, Tier 2 modules remain queued, and everything still runs fully local — no cloud calls, no telemetry.
+A municipality should not treat Townlight as a finished full-suite procurement product today. The released beta is the Windows Local city-core package only: Townlight Core, Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, Townlight Access, and the desktop installer shell. Missing proof is module-by-module feature completion for the rest of the unified spec; the clean-machine gates for the Windows Local package have passed (the clean-machine install test on the v1.0.1 MSI, Phase D clean-VM acceptance on the v1.0.2 MSI). the Windows MSI is Authenticode code-signed via Azure Trusted Signing as of `v1.0.3`; macOS remains readiness-only, Tier 2 modules remain queued, and everything still runs fully local — no cloud calls, no telemetry.

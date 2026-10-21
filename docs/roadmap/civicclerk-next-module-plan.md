@@ -1,24 +1,28 @@
-# CivicClerk Next Module Plan
+<a id="civicclerk-next-module-plan"></a>
+
+# Townlight Meetings Next Module Plan
 
 Status: Active planning baseline  
 Date: 2026-04-26  
-Applies to: `CivicSuite/civicclerk` initial scaffold and MVP sprint
+Applies to: `townlight/meetings` initial scaffold and MVP sprint
 
-## Why CivicClerk next
+<a id="why-civicclerk-next"></a>
 
-CivicClerk is the right next product after CivicRecords AI because it
+## Why Townlight Meetings next
+
+Townlight Meetings is the right next product after Townlight Records because it
 stays inside the clerk-first operating surface while expanding from
 records requests into public meeting administration. It reuses the same
 sovereign local-LLM posture, the same civiccore dependency, the same
 document/search/notification patterns, and the same public-trust design
 language. It also creates source material future modules will need:
-ordinance adoption events for CivicCode, board meeting records for
-CivicBoards, statutory notice primitives for CivicNotice, and public
-accessibility workflows for CivicAccess.
+ordinance adoption events for Townlight Code, board meeting records for
+Townlight Boards, statutory notice primitives for Townlight Notice, and public
+accessibility workflows for Townlight Access.
 
 ## Product promise
 
-CivicClerk helps a city clerk run the legal record of public meetings:
+Townlight Meetings helps a city clerk run the legal record of public meetings:
 agenda intake, packet assembly, notice compliance, minutes, votes,
 ordinances/resolutions, and searchable public meeting archives. AI may
 draft or extract, but humans approve every consequential action.
@@ -43,7 +47,7 @@ enough to feel like a real clerk workflow:
 - No electronic voting system.
 - No automated legal decisions.
 - No closed-session content leakage into public views.
-- No CivicCode handoff until CivicCode exists; export structured
+- No Townlight Code handoff until Townlight Code exists; export structured
   adoption events instead.
 - No cloud inference, telemetry, or external runtime API dependency.
 
@@ -66,9 +70,9 @@ enough to feel like a real clerk workflow:
 ## Technical starting architecture
 
 Initial scaffold should be a standalone module repo under
-`CivicSuite/civicclerk`, with the same professional documentation
+`townlight/meetings`, with the same professional documentation
 baseline as the existing repos. Runtime implementation should follow
-the CivicRecords AI pattern unless a written ADR says otherwise:
+the Townlight Records pattern unless a written ADR says otherwise:
 
 - FastAPI backend
 - React frontend
@@ -101,10 +105,10 @@ upgrade/fresh-install gate before release.
 
 ## First sprint sequence
 
-1. Scaffold `CivicSuite/civicclerk` with professional docs, CI, license,
+1. Scaffold `townlight/meetings` with professional docs, CI, license,
    issue templates, PR template, docs landing page, user manual, and seed
    discussion posts.
-2. Add a scope document and ADR-0001 for the CivicClerk MVP boundary.
+2. Add a scope document and ADR-0001 for the Townlight Meetings MVP boundary.
 3. Build the first vertical slice: meeting bodies + meeting calendar +
    empty/success/error UX states.
 4. Add agenda item intake and clerk review queue.
@@ -122,9 +126,9 @@ mobile, loading, success, empty, error, and partial states.
 
 ## Open questions for future ADRs
 
-- Whether CivicClerk should reuse CivicRecords AI's full stack initially
+- Whether Townlight Meetings should reuse Townlight Records's full stack initially
   or start from a thinner dedicated scaffold.
 - Whether statutory notice rules live in civiccore long-term or start
-  local to CivicClerk.
+  local to Townlight Meetings.
 - How public comment intake should authenticate residents.
 - How transcript ingestion should handle Whisper-local model packaging.

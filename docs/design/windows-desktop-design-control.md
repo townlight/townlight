@@ -1,7 +1,9 @@
-# CivicSuite Windows Desktop Design Control
+<a id="civicsuite-windows-desktop-design-control"></a>
+
+# Townlight Windows Desktop Design Control
 
 Status: active design control for Windows Local 1.0
-Applies to: CivicSuite desktop shell, installer, first-run, city-core modules, and future module manager
+Applies to: Townlight desktop shell, installer, first-run, city-core modules, and future module manager
 Source anchors:
 
 - `docs/CivicSuiteUnifiedSpec.md`
@@ -18,7 +20,7 @@ Source anchors:
 
 ## Product Promise
 
-CivicSuite Windows Local 1.0 is a real Windows desktop application for
+Townlight Windows Local 1.0 is a real Windows desktop application for
 non-technical municipal staff. A city clerk should be able to install it, create
 the first city profile, use the city-core workflows, verify system health, back
 up and restore local data, and uninstall without Docker, WSL, a terminal, or
@@ -55,16 +57,16 @@ The shell owns these top-level areas:
 
 | Area | User framing | Owner |
 |---|---|---|
-| Home | Work that needs attention | CivicSuite shell |
-| Meetings & Notices | agendas, packets, notices, minutes, votes, archive | CivicClerk |
-| Records Requests | intake, search, review, response, exports | CivicRecords AI |
-| Code & Ordinances | code search, source imports, guidance, handoffs | CivicCode |
-| Search City Knowledge | cross-module local search with citations | CivicCore + modules |
-| System Health | local services, model, storage, backup, support bundle, repair | CivicCore |
-| Settings | city profile, users, modules, data location, updates | CivicCore |
+| Home | Work that needs attention | Townlight shell |
+| Meetings & Notices | agendas, packets, notices, minutes, votes, archive | Townlight Meetings |
+| Records Requests | intake, search, review, response, exports | Townlight Records |
+| Code & Ordinances | code search, source imports, guidance, handoffs | Townlight Code |
+| Search City Knowledge | cross-module local search with citations | Townlight Core + modules |
+| System Health | local services, model, storage, backup, support bundle, repair | Townlight Core |
+| Settings | city profile, users, modules, data location, updates | Townlight Core |
 
 The module names remain visible for trust and support, but primary navigation is
-task-first. A clerk sees "Meetings & Notices" before "CivicClerk".
+task-first. A clerk sees "Meetings & Notices" before "Townlight Meetings".
 
 ## Surfaces
 
@@ -96,7 +98,7 @@ Required installer steps:
 
 1. Welcome screen.
 2. Local install location and data location.
-3. Module selection: City Core by default, Custom available, CivicCore locked.
+3. Module selection: City Core by default, Custom available, Townlight Core locked.
 4. City profile: city name, state, time zone, records contact, clerk contact.
 5. First admin user. The first admin signs in before model, backup, health,
    module-manager, repair, restore, or runtime changes continue.
@@ -155,7 +157,7 @@ It shows:
 - Required disk/model/runtime resources
 - Install, disable, repair, update, backup, export, and uninstall states
 
-CivicCore is always installed and cannot be deselected. Product modules can be
+Townlight Core is always installed and cannot be deselected. Product modules can be
 installed one at a time when their manifest and proof gates pass.
 
 Future modules plug into the same shell by declaring their manifest contract.

@@ -191,7 +191,7 @@ def check_docs() -> list[str]:
     text = DOC_FILE.read_text(encoding="utf-8")
     required_phrases = (
         "evaluation profile, not production packaging",
-        "CivicSunshine + CivicMeetings + CivicCode + CivicZone",
+        "Townlight Records + Townlight Meetings + Townlight Code + Townlight Zoning",
         "No-Network Meaning",
         "Production Pilot Install",
         "Do not treat this compose file as production pilot packaging",

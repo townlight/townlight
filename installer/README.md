@@ -1,4 +1,6 @@
-# CivicSuite Installer Contract
+<a id="civicsuite-installer-contract"></a>
+
+# Townlight Installer Contract
 
 ## Current Townlight Records candidate
 
@@ -43,7 +45,7 @@ From a zero-baseline machine, the installer must:
 
 1. Detect the host operating system and hardware capacity.
 2. Detect, install, or guide the setup of baseline software.
-3. Install and configure CivicCore as the shared foundation.
+3. Install and configure Townlight Core as the shared foundation.
 4. Present a menu-style module selector.
 5. Install and configure selected modules.
 6. Bring the selected profile to a working local state.
@@ -65,12 +67,14 @@ The installer must treat these as explicit baseline checks:
 The installer may guide the user to install privileged dependencies when silent
 installation would be unsafe, unsupported, or outside the operator's control.
 
-## CivicCore First
+<a id="civiccore-first"></a>
 
-Every install profile starts with CivicCore. The installer must verify the
-selected module's CivicCore compatibility before installing that module.
+## Townlight Core First
 
-No module may depend on planned CivicCore behavior unless the behavior is
+Every install profile starts with Townlight Core. The installer must verify the
+selected module's Townlight Core compatibility before installing that module.
+
+No module may depend on planned Townlight Core behavior unless the behavior is
 released and recorded in the compatibility matrix.
 
 ## Module Selection
@@ -82,7 +86,7 @@ Each module entry records:
 - display name
 - tier
 - current installer status
-- CivicCore requirement
+- Townlight Core requirement
 - selectable flag
 - dependencies
 - default port, when relevant
@@ -101,8 +105,8 @@ selected menu style without changing host state.
 
 The first city-core static launcher lives at
 `installer/runtime/suite-launcher`. It is a static, self-contained runtime with
-Staff, Resident, and IT-Admin surfaces, local tiles for CivicRecords AI,
-CivicClerk, and CivicCode, a one-click audit drawer, and a Ctrl-K/Cmd-K command
+Staff, Resident, and IT-Admin surfaces, local tiles for Townlight Records,
+Townlight Meetings, and Townlight Code, a one-click audit drawer, and a Ctrl-K/Cmd-K command
 palette. It uses the prototype paper/navy/gold tokens and local font fallback
 stack only; it does not fetch network fonts or mutate host state.
 
@@ -123,10 +127,10 @@ Initial menu styles:
 
 Initial profiles:
 
-- `minimal`: CivicCore only.
-- `clerk-core`: CivicCore, CivicRecords AI, CivicClerk.
-- `land-use`: CivicCore, CivicCode, CivicZone, CivicPlan, CivicPermit.
-- `full-suite`: every tracked CivicSuite repo after CivicCore dependency ordering.
+- `minimal`: Townlight Core only.
+- `clerk-core`: Townlight Core, Townlight Records, Townlight Meetings.
+- `land-use`: Townlight Core, Townlight Code, Townlight Zoning, Townlight Planning, Townlight Permitting.
+- `full-suite`: every tracked Townlight repo after Townlight Core dependency ordering.
 - `custom`: operator-selected modules with dependency validation.
 
 ## Dry-Run Launchers
@@ -174,7 +178,7 @@ Initial readiness scenarios:
 - `windows-missing-wsl`: Windows WSL 2 prerequisites are unavailable.
 - `low-resources`: the selected profile may not have enough disk or memory.
 - `ollama-missing`: local LLM features may be unavailable.
-- `civiccore-mismatch`: selected modules require a different CivicCore version.
+- `civiccore-mismatch`: selected modules require a different Townlight Core version.
 
 Every failed readiness check must include a clear message, concrete fix steps,
 and a next action. "Something failed" is not an acceptable installer state.
@@ -208,7 +212,7 @@ Required phases:
 
 - `preflight`: validate plan, readiness, and evidence paths.
 - `approval`: require explicit operator approval before mutation.
-- `execute`: future mutating install phase for CivicCore and selected modules.
+- `execute`: future mutating install phase for Townlight Core and selected modules.
 - `verify`: health, restart, and failure-copy verification.
 - `repair`: future mutating repair phase.
 - `rollback`: future mutating rollback or uninstall phase.
@@ -263,12 +267,12 @@ The generated `clerk-core` package entrypoints support:
 - `plan`: print the selected profile and module order without mutating host
   state.
 - `install`: build and start the selected bundled module sources. The default
-  `clerk-core` selection starts CivicRecords AI and CivicClerk.
-- `verify`: check CivicRecords API, CivicRecords web, CivicClerk API, and
-  CivicClerk web endpoints.
+  `clerk-core` selection starts Townlight Records and Townlight Meetings.
+- `verify`: check Townlight Records API, Townlight Records web, Townlight Meetings API, and
+  Townlight Meetings web endpoints.
 - `verify --workflow-proof`: run mutating starter-set workflow proof checks
   against the selected live modules. Use with `--staff-mode bearer` during
-  install or repair so CivicClerk staff writes stay protected.
+  install or repair so Townlight Meetings staff writes stay protected.
 - `repair`: preserve generated `.env` secrets, rebuild/restart the services,
   and verify health again.
 - `backup`: write per-module PostgreSQL custom dumps and a backup manifest
@@ -285,7 +289,7 @@ package run id by default. Operators can override that isolation with
 `--compose-project-suffix` when invoking `scripts/run-clerk-core-installer.py`
 directly. Reports record the resolved ports and Compose project names used for
 health checks.
-For CivicRecords AI, the installer writes the resolved API and web ports into
+For Townlight Records, the installer writes the resolved API and web ports into
 the copied `.env` as `CIVICRECORDS_API_PORT` and `CIVICRECORDS_WEB_PORT` before
 Docker Compose starts, so the base Compose file and suite override both bind to
 the isolated runtime ports instead of the module defaults.
@@ -314,7 +318,7 @@ package runs from Linux or Windows hosts are archive/readiness evidence only.
 
 `--workflow-proof` is intentionally mutating. Use it with
 `--staff-mode bearer` when the extracted package should create real
-CivicRecords AI request/search/review/response proof records and CivicClerk
+Townlight Records request/search/review/response proof records and Townlight Meetings
 agenda/packet/minutes/vote/notice/archive proof records during install,
 repair, and verify. The proof keeps AI-generated or AI-assisted output in
 draft/human-review states and does not claim autonomous release, denial,
@@ -360,8 +364,8 @@ packaging tools in release infrastructure.
 
 ## unsigned OSS beta Distribution
 
-Current CivicSuite installer artifacts are distributable but unsigned.
-CivicSuite is an open-source beta project, and signing certificates are not
+Current Townlight installer artifacts are distributable but unsigned.
+Townlight is an open-source beta project, and signing certificates are not
 available yet. This means operating systems may show trust warnings even when
 the artifact is legitimate.
 
@@ -380,7 +384,7 @@ Current trust path:
 
 Windows users should choose **More info** and then **Run anyway** only after the
 checksum matches the published SHA256 value and the artifact came from the
-official CivicSuite release source. This warning is expected for the public
+official Townlight release source. This warning is expected for the public
 free/open-source beta. There is no committed signed-installer path for the
 public beta; SHA256 plus official-source verification is the trust path.
 
@@ -405,9 +409,11 @@ The current preflight surface is intentionally blocked with
 `executor_not_implemented`. It exists to show what must be true before a future
 mutating executor can be trusted.
 
-## Minimal CivicCore Install Kit
+<a id="minimal-civiccore-install-kit"></a>
 
-The first real generated installer artifact is the minimal CivicCore install
+## Minimal Townlight Core Install Kit
+
+The first real generated installer artifact is the minimal Townlight Core install
 kit:
 
 ```powershell
@@ -431,7 +437,7 @@ The generated install kit includes:
 - `reset-civiccore.ps1`
 - `reset-civiccore.sh`
 
-The generated install scripts install CivicCore from the local wheel artifact
+The generated install scripts install Townlight Core from the local wheel artifact
 into a `.venv` inside the generated kit. They do not install Docker, WSL,
 Python, or any baseline system dependency.
 
@@ -441,14 +447,14 @@ plan files.
 
 ## Minimal Cleanroom Proof
 
-The minimal CivicCore kit can be exercised in a disposable Linux cleanroom
+The minimal Townlight Core kit can be exercised in a disposable Linux cleanroom
 container:
 
 ```powershell
 python scripts\run-minimal-cleanroom.py --run-id manual-minimal-linux-cleanroom-2
 ```
 
-The runner copies the generated kit and CivicCore wheel into
+The runner copies the generated kit and Townlight Core wheel into
 `installer/reports/{run_id}/cleanroom`, rewrites the Linux artifact path for the
 container mount, runs reset/install/verify inside `python:3.12-slim`, and writes
 `cleanroom-proof.json`.
@@ -457,9 +463,11 @@ This cleanroom proof mutates the disposable container and the evidence directory
 only. It does not install host dependencies, start host services, or change
 module source code.
 
-## CivicRecords Service Cleanroom Proof
+<a id="civicrecords-service-cleanroom-proof"></a>
 
-The first service-profile cleanroom runner exercises CivicRecords AI from a
+## Townlight Records Service Cleanroom Proof
+
+The first service-profile cleanroom runner exercises Townlight Records from a
 copied source tree:
 
 ```powershell
@@ -505,7 +513,7 @@ the Docker proof for a read-only plan.
 Each operating system must eventually have evidence for:
 
 - dependency detection
-- CivicCore install
+- Townlight Core install
 - module selection
 - selected module installation
 - service start
@@ -523,7 +531,7 @@ Each operating system must eventually have evidence for:
 - service/profile config evidence before host mutation
 - health-check plan evidence before host mutation
 - executor preflight evidence before host mutation
-- minimal CivicCore install kit evidence before module installers
+- minimal Townlight Core install kit evidence before module installers
 
 ## Implementation Boundary
 

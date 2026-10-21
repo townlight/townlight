@@ -1,6 +1,8 @@
-# CivicSuite UI/UX prototype
+<a id="civicsuite-uiux-prototype"></a>
 
-This directory holds the **canonical UI/UX specification for CivicSuite**, built by Claude Design at Scott's request.
+# Townlight UI/UX prototype
+
+This directory holds the **canonical UI/UX specification for Townlight**, built by Claude Design at Scott's request.
 
 It is a runnable React + Babel single-page prototype — no build step required. Open `CivicSuite.html` in a browser to interact with the design.
 
@@ -18,8 +20,8 @@ This prototype is that visual spec. Any pull request that touches user-visible c
 | `app.jsx` | App-level routing + state. |
 | `shell.jsx` | App shell: topbar, ⌘K search palette, audit drawer, density toggle, surface switch (Staff / Resident / IT-Admin). |
 | `staff-dashboard.jsx` | Default staff landing surface. |
-| `clerk.jsx` | CivicClerk module screens (meetings, agendas, minutes). |
-| `records.jsx` | CivicRecords AI module screens (request lifecycle). |
+| `clerk.jsx` | Townlight Meetings module screens (meetings, agendas, minutes). |
+| `records.jsx` | Townlight Records module screens (request lifecycle). |
 | `resident.jsx` | Resident-facing surface. |
 | `admin.jsx` | IT/Admin surface. Includes the canonical first-run setup checklist: a three-state step list (done / current / upcoming) where the current step is the single, unmistakable action point — gold accent + `aria-current="step"` + an "Action needed" banner + auto-focused first empty field. The same pattern appears in the desktop app via `.first-run-action-needed` (amber) and a persistent `aria-live` region; the two surfaces express one pattern in each codebase's class vocabulary. |
 | `modules-stub.jsx` | Placeholder shape for unbuilt modules (used as the canonical "module not yet implemented" pattern). |
