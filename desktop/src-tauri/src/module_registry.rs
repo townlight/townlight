@@ -1453,7 +1453,7 @@ mod tests {
             assert!(!civiczone.installed);
             assert_eq!(
                 civiczone.installer_status.as_deref(),
-                Some("local_z4_candidate_UNVERIFIED")
+                Some("v0_2_2_connected_beta_candidate")
             );
             assert!(civiczone.contract_ready);
             assert!(civiczone.blocked_reason.is_none());
