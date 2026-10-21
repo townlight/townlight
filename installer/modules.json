@@ -1,17 +1,18 @@
 {
     "schema_version":  1,
     "module_contract_version":  1,
-    "installer_status":  "townlight_records_meetings_beta_candidate",
+    "installer_status":  "townlight_records_meetings_code_beta_candidate",
     "primary_profile":  "records-beta",
     "workflow_proof_status":  {
-                                  "profile":  "meetings-beta",
+                                  "profile":  "city-core",
                                   "scope":  [
                                                 "civicrecords-ai request/search/review/response/release",
                                                 "civicclerk agenda/packet/notice/proceedings/minutes/archive and permitted Records sources",
+                                                "civiccode proposals/agenda links/explicit adoption/separate codification and current/historical permitted Records sources",
                                                 "civicnotice deadline/proof/archive",
                                                 "civicaccess accessibility/release review"
                                             ],
-                                  "boundary":  "The connected Records and Meetings profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration and supervision; shared handlers with remaining Code/city-core callers are retained but are not a second active Records authority. Optional native AI minutes/transcription and Code delivery are not certified by this profile."
+                                  "boundary":  "The connected Records, Meetings and Code profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration, supervision and historical migration/recovery support; obsolete JSON business actions are retired. Optional native AI minutes/transcription and completion of the wider suite are not certified by this profile."
                               },
     "public_use_gate_status":  {
                                    "profile":  "records-beta",
@@ -263,7 +264,7 @@
                                                "restore"
                                            ],
                         "current_version":  "1.7.3",
-                        "source_commit":  "2f0b7b755cade85673066fdd59ef3593a3052c83",
+                        "source_commit":  "0218fa51bb0707e0ac63f58475308a77eb8e45ee",
                         "routes":  [
                                        {
                                            "id":  "records-requests",
@@ -417,7 +418,7 @@
                         "role":  "municipal code",
                         "selectable":  true,
                         "required":  false,
-                        "civiccore_requirement":  "1.2.0",
+                        "civiccore_requirement":  "1.2.1",
                         "dependencies":  [
                                              "civiccore",
                                              "civicclerk"
@@ -434,7 +435,7 @@
                                                "release_attestation"
                                            ],
                         "current_version":  "1.0.8",
-                        "source_commit":  "a960bba0a2249d118b593dd61bee3a65a69a9d77",
+                        "source_commit":  "868891bd990588a8337832915e4d91af39ea22cd",
                         "routes":  [
                                        {
                                            "id":  "code-ordinances",

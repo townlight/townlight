@@ -84,6 +84,9 @@ def upgrade_all() -> None:
         ensure_schema(repository.engine)
         from civicsuite_runtime.native_accounts import metadata as account_metadata
         account_metadata.create_all(repository.engine)
+        if profile == "city-core":
+            from civicsuite_runtime.code_meetings import ensure_schema as ensure_connections
+            ensure_connections(repository.engine)
     finally:
         repository.engine.dispose()
     print("Townlight Access: schema ensured (civicaccess-windows-local-state-v1)")

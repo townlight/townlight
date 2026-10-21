@@ -120,7 +120,9 @@ let rewritten = mainSrc.replace(/^﻿/, "");
 rewritten = rewritten.replace('"./records/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "records", "view.js")).href));
 rewritten = rewritten.replace('"./records/controller.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "controller.ts")).href));
 rewritten = rewritten.replace('"./meetings/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "meetings", "view.js")).href));
+rewritten = rewritten.replace('"./code/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "code", "view.js")).href));
 rewritten = rewritten.replace('"./records/meetings-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "meetings-sources.ts")).href));
+rewritten = rewritten.replace('"./records/code-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "code-sources.ts")).href));
 rewritten = rewritten.replace(
   /import\s*\{\s*invoke\s*\}\s*from\s*["']@tauri-apps\/api\/core["'];?/,
   "const invoke = (...args) => globalThis.__TEST_INVOKE__(...args);"

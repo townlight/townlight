@@ -49,7 +49,7 @@ try {
     const response = await page.goto(target, { waitUntil: "load" });
     const title = await page.title();
     const recordsHeadingVisible = await page
-      .getByRole("heading", { name: "Connected records and meetings, accountable and local." })
+      .getByRole("heading", { name: "Connected municipal work, accountable and local." })
       .isVisible();
     const candidateStatusVisible = await page
       .getByText("1.2.0-beta.1 · public beta", { exact: true })

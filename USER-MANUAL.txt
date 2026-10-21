@@ -1,10 +1,41 @@
-# Townlight Records + Meetings — User Manual
+# Townlight Records + Meetings + Code — User Manual
 
-**Release version:** 1.2.0-beta.1
+**Release version:** 1.3.0-beta.1 candidate (desktop 1.3.0-1; MSI 1.3.0.1)
 
 **Last updated:** 2026-10-20
 
-**Release status:** signed public beta; [exact-installer acceptance](docs/installer/townlight-records-meetings-beta1-acceptance.md) passed 2026-10-19.
+**Release status:** final signed installer acceptance pending. The previous
+Records–Meetings 1.2.0-beta.1 remains the published release until the new
+[exact-installer acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md) passes.
+
+## Connected Records + Meetings + Code
+
+Choose **city-core** in setup or Settings for Core, Records, Meetings, Code,
+Notice and Access. Records-only remains the default. The installer does not
+silently change an existing saved module selection.
+
+For an upgrade, back up existing work, close the application normally, install
+the new MSI, select city-core in Settings and apply. Use **System Health →
+City workflow services → Repair** to refresh the cached Python payload and run
+the selected profile migrations. If an operation is outstanding, let it finish
+before retrying. Do not delete data or bypass the maintenance guard.
+
+In Code, create a proposal and link it to a Meetings agenda item. Record an
+authorized human's adoption decision explicitly; motion and minutes completion
+are not prerequisites. Codify separately when appropriate. Preserve corrections
+and their audit history rather than replacing the original decision.
+
+In Records, search permitted public Code and Meetings sources and attach the
+selected evidence. Current and historical Code text retain version, effective
+date, provenance and content hash. Restricted/private material is not exposed
+as a public source. Attachment does not approve or publish a response: existing
+human response review, approval and export remain separate.
+
+After activation, Python/PostgreSQL is the sole domain writer. Old JSON business
+actions are retired; historical schema/import/backup support remains. Use
+canonical backups for newer work, never a pre-cutover JSON snapshot.
+
+The earlier instructions below describe the preserved predecessor releases.
 
 Townlight Records is a local-first Windows system for receiving, searching,
 reviewing, approving, releasing, and tracking municipal public-records
@@ -399,7 +430,7 @@ The full suite architecture, dependency graph, data-flow rules, and CivicCore ex
 <!-- Maintainers: re-run `python scripts/docs/render_topology.py --check` before publishing docs. -->
 Generated from `installer/modules.json`.
 
-- Root installer truth label: `townlight_records_meetings_beta_candidate`.
+- Root installer truth label: `townlight_records_meetings_code_beta_candidate`.
 - Primary product profile: `records-beta` (Townlight Records).
 - Townlight Records profile status: `stabilizing`.
 - Only the Townlight Records modules are represented in this candidate table.
@@ -408,7 +439,7 @@ Generated from `installer/modules.json`.
 | Module | Version | Role | Dependencies | Source commit | Installer status |
 |---|---:|---|---|---|---|
 | Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
-| Townlight Records | 1.7.3 | records workflow | `civiccore` | `2f0b7b755cad` | `v1_7_3_records_beta_candidate` |
+| Townlight Records | 1.7.3 | records workflow | `civiccore` | `0218fa51bb07` | `v1_7_3_records_beta_candidate` |
 | Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
 | Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
 

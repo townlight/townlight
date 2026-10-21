@@ -3,7 +3,30 @@
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
-## Current product: Townlight Records + Meetings
+## Connected Records + Meetings + Code — 1.3.0-beta.1 candidate
+
+This release candidate connects three products on one local Python/PostgreSQL
+domain path. Select **city-core** during setup or in Settings: Core, Records,
+Meetings, Code, Notice and Access. Records-only remains the default; existing
+saved selections are preserved.
+
+Code proposals can link to Meetings agenda items. An authorized human records
+adoption explicitly; a motion or adopted minutes is not a mandatory prerequisite.
+Codification is a separate decision. Records can attach permitted public Code
+and Meetings documents with source history, version/effective-date citations
+and content hashes preserved. Restricted material remains protected.
+
+The obsolete Rust JSON business implementation is retired; Rust retains native
+integration, supervision and migration/recovery support. Historical snapshots
+remain available for supported migration, not fallback or dual writing.
+
+**Release status:** final signed installer and upgrade verification pending.
+The completed local C4 evidence is not a claim about final release bytes.
+See [release acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md)
+and [the manual](USER-MANUAL.md). Optional Meetings AI minutes/transcription and
+the remaining suite products are not part of this bounded release.
+
+## Previous public release: Townlight Records + Meetings
 
 Townlight Records + Meetings 1.2.0-beta.1 is a signed, installed-tested public beta. It is a Windows
 desktop system for public-records intake, deadline calculation, assignment,

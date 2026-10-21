@@ -1,5 +1,81 @@
 import { expect, test } from "@playwright/test";
 
+test('Code C3 source controls', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const { renderCodeSources, bindCodeSources } = await import('/src/records/code-sources.ts');
+    document.body.innerHTML = renderCodeSources('a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78');
+    window.__calls = [];
+    bindCodeSources(async (command, args) => {
+      window.__calls.push({ command, request: args.request });
+      return {results: [{
+        source_id: 'synthetic-code', title: 'Code <img src=x>', sha256: 'a'.repeat(64),
+        excerpt: 'Four chickens', citation: 'Exact citation', as_of: args.request.as_of,
+        version_context: {version_id: 'historic-2025', version_label: '2025',
+          effective_start: '2025-01-01', effective_end: '2025-12-31'},
+      }], truncated: false};
+    }, async () => {window.__refreshed = true;});
+  });
+  await page.locator('[name=query]').fill('6.12.040');
+  await page.locator('[name=as_of]').fill('2025-06-01');
+  await page.getByRole('button', {name: 'Search Code', exact: true}).click();
+  await expect(page.locator('[data-code-results]')).toContainText('historic-2025');
+  await expect(page.locator('img')).toHaveCount(0);
+  await page.getByRole('button', {name: 'Attach to selected Records request', exact: true}).click();
+  await expect.poll(() => page.evaluate(() => window.__refreshed)).toBe(true);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls[0]).toEqual({command: 'records_domain_request',
+    request: {operation: 'search-code', query: '6.12.040', as_of: '2025-06-01'}});
+  expect(calls[1].request).toMatchObject({operation: 'attach-code-source', source_id: 'synthetic-code',
+    expected_sha256: 'a'.repeat(64), as_of: '2025-06-01',
+    request_id: 'a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78'});
+});
+
+test("Code C1 component renders exact citations and treats source HTML as text", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const { createCodeView } = await import("/src/code/view.js");
+    const calls = [];
+    const invoke = async (command, args) => {
+      const request = args.request;
+      calls.push({ command, request });
+      if (request.operation === "lookup") return {
+        section: { section_number: "1.01", section_id: "section-one", section_heading: "Synthetic" },
+        version: { version_label: "v2", body: "<img src=x onerror=alert(1)> synthetic source", effective_start: "2026-01-01" }
+      };
+      if (request.operation === "citation") return {
+        status: "ok", citation: { citation_text: "Title 1, Chapter 1, Section 1.01, version v2", source_id: "synthetic-source" }
+      };
+      throw new Error(`Unexpected operation: ${request.operation}`);
+    };
+    window.__calls = calls;
+    const view = createCodeView(invoke);
+    document.body.innerHTML = view.render();
+    view.bind();
+  });
+  const output = page.locator("[data-code-output]");
+  const lookupForm = page.locator('form[data-code-action="lookup"]');
+  await lookupForm.locator('input[name="section"]').fill("1.01");
+  await lookupForm.locator('input[name="date"]').fill("2026-02-01");
+  await lookupForm.locator('button[type="submit"]').click();
+  await expect(output).toContainText("version_label: v2");
+  await expect(output).toContainText("effective_start: 2026-01-01");
+  await expect(output).toContainText("<img src=x onerror=alert(1)> synthetic source");
+  await expect(page.locator("img")).toHaveCount(0);
+  const citationForm = page.locator('form[data-code-action="citation"]');
+  await citationForm.locator('input[name="section"]').fill("1.01");
+  await citationForm.locator('button[type="submit"]').click();
+  await expect(output).toContainText("status: ok");
+  await expect(output).toContainText("citation_text: Title 1, Chapter 1, Section 1.01, version v2");
+  await expect(output).toContainText("source_id: synthetic-source");
+  await expect(page.locator("img")).toHaveCount(0);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls.map(c => c.request.operation)).toEqual(["lookup", "citation"]);
+  expect(calls.every(c => c.command === "code_domain_request")).toBe(true);
+  expect(calls[0].request).toMatchObject({ operation: "lookup", section_number: "1.01", as_of: "2026-02-01" });
+  expect(calls[1].request).toMatchObject({ operation: "citation", section_number: "1.01", as_of: null });
+});
+
 // The three Townlight Access AI-capable actions (accessibility-review,
 // civicaccess-plain-language, civicaccess-language-variant) go through the
 // guided-review confirm panel before dispatching -- when the model is ready

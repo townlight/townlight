@@ -13,6 +13,7 @@ param(
     [ValidateSet("records-beta", "city-core", "meetings-beta")]
     [string]$ProductProfile = "records-beta",
     [string]$MeetingsRoot = "",
+    [string]$CodeRoot = "",
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
 )
@@ -768,10 +769,9 @@ function Install-PythonServicePackages {
         $ServicePackages += @($CivicNotice, $CivicAccess)
     }
     if ($ProductProfile -eq "city-core") {
-        $ServicePackages += @(
-            (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path,
-            (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path
-        )
+        $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
+        $CivicCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path }
+        $ServicePackages += @($CivicClerk, $CivicCode)
     }
     if ($ProductProfile -eq "meetings-beta") {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }

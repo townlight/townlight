@@ -1,14 +1,17 @@
 flowchart TB
-    UI["Townlight Records 1.1.0-beta.3<br/>Typed desktop client / authenticated loopback"]
-    Domain["Python/FastAPI Records authority<br/>Notice and Access integrations"]
+    UI["Records + Meetings + Code 1.3.0-beta.1 candidate<br/>Typed desktop clients / authenticated loopback"]
+    Domain["Python/FastAPI domain authority<br/>Records + Meetings + Code / Notice + Access"]
     State["PostgreSQL + local export files<br/>Audit history, canonical backup/restore"]
     Review["Changed response text → fresh human approval<br/>Failed generation / unrelated edits preserve approval"]
     Release["Approved export → fulfillment → public status<br/>No automatic release of AI drafts"]
-    Runtime["Rust shell: OS integration and supervision<br/>Legacy city-core compatibility retained"]
+    Runtime["Rust shell: OS integration and supervision<br/>Historical import/recovery retained; JSON actions retired"]
     Import["Explicit validated JSON import<br/>Old file read-only; no fallback or dual writes"]
     AI["Optional local Ollama / verified Gemma<br/>On-device drafting"]
     UI --> Domain
     Domain --> State
+    Meetings["Meeting agendas and proceedings"] --> Decisions["Explicit adoption → separate codification"]
+    Decisions --> Sources["Permitted current/historical Code and Meetings sources"]
+    Sources --> Domain
     Import --> State
     Domain --> Review --> Release
     UI -. supervises .-> Runtime

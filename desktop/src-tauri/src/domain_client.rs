@@ -12,6 +12,9 @@ const MAX_RESPONSE_BYTES: usize = 16 * 1024 * 1024;
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum MeetingsRequest {
+    CodeConnections {},
+    CodeConnection { id: String },
+    RecordCodeDecision { id: String, payload: Value },
     RecordMeetingStage { id: Uuid, payload: MeetingStage },
     CapturePacket { id: Uuid, payload: PacketInput },
     DeliverPacket { id: Uuid },
@@ -185,6 +188,27 @@ pub async fn execute_meetings(
     proof: String,
 ) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
+        MeetingsRequest::CodeConnections {} => (
+            Method::GET,
+            "/desktop/v1/meetings/code-connections".to_string(),
+            None,
+        ),
+        MeetingsRequest::CodeConnection { id } => (
+            Method::GET,
+            format!(
+                "/desktop/v1/meetings/code-connections/{}",
+                crate::code_client::encode_segment(&id)?
+            ),
+            None,
+        ),
+        MeetingsRequest::RecordCodeDecision { id, payload } => (
+            Method::POST,
+            format!(
+                "/desktop/v1/meetings/code-connections/{}/decisions",
+                crate::code_client::encode_segment(&id)?
+            ),
+            Some(serde_json::json!(payload)),
+        ),
         MeetingsRequest::GetNoticeTemplate { id } => (
             Method::GET,
             format!("/desktop/v1/meetings/notices/{id}/template"),
@@ -598,6 +622,16 @@ pub async fn execute_public(
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum RecordsRequest {
+    SearchCode {
+        query: String,
+        as_of: Option<String>,
+    },
+    AttachCodeSource {
+        request_id: Uuid,
+        source_id: String,
+        expected_sha256: String,
+        as_of: Option<String>,
+    },
     SearchMeetings {
         query: String,
     },
@@ -737,6 +771,23 @@ impl RecordsRequest {
             })
         };
         Ok(match self {
+            Self::SearchCode { query, as_of } => (
+                Method::POST,
+                "/desktop/v1/code-sources/search".into(),
+                Some(serde_json::json!({"query":query,"as_of":as_of})),
+            ),
+            Self::AttachCodeSource {
+                request_id,
+                source_id,
+                expected_sha256,
+                as_of,
+            } => (
+                Method::POST,
+                format!("/desktop/v1/requests/{request_id}/code-sources"),
+                Some(
+                    serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256,"as_of":as_of}),
+                ),
+            ),
             Self::SearchMeetings { query } => (
                 Method::POST,
                 "/desktop/v1/meetings-sources/search".into(),
@@ -880,7 +931,7 @@ pub async fn execute(request: RecordsRequest, proof: String) -> Result<Value, Do
     send(method, path, body, &proof).await
 }
 
-async fn send(
+pub(crate) async fn send(
     method: Method,
     path: String,
     body: Option<Value>,

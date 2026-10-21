@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 2f0b7b755cade85673066fdd59ef3593a3052c83
+          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
           path: modules/civicrecords-ai
 
       - name: Check out CivicClerk bundle source
@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: a960bba0a2249d118b593dd61bee3a65a69a9d77
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
           path: modules/civiccode
 
       - name: Check out Townlight Notice bundle source
@@ -158,7 +158,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 2f0b7b755cade85673066fdd59ef3593a3052c83
+          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
           path: modules/civicrecords-ai
 
       - name: Check out CivicClerk bundle source
@@ -172,7 +172,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: a960bba0a2249d118b593dd61bee3a65a69a9d77
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
           path: modules/civiccode
 
       - name: Check out Townlight Notice bundle source

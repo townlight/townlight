@@ -2,7 +2,12 @@
 
 **Last verified:** 2026-10-20
 
-**Current connected release:** Townlight Records + Meetings 1.2.0-beta.1,
+**Connected Records + Meetings + Code candidate:** 1.3.0-beta.1. Local connected
+acceptance and bounded retirement passed. Release preparation is authorized;
+final signed installer, upgrade acceptance and public delivery remain pending.
+See [the candidate record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+
+**Current published predecessor:** Townlight Records + Meetings 1.2.0-beta.1,
 signed installed acceptance passed. See its
 [acceptance record](docs/installer/townlight-records-meetings-beta1-acceptance.md)
 and [release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-v1.2.0-beta.1).
