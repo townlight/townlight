@@ -1,6 +1,57 @@
 # Releasing the Townlight Records Windows MSI
 
-## Connected Records–Meetings release: 1.2.0-beta.1
+## Connected Records–Meetings–Code–Zoning: 1.4.0-beta.1
+
+Scott authorized push, merge after required checks, existing Azure signing,
+final exact signed fresh/upgrade/recovery verification, and publication only on
+passing acceptance on October 21, 2026. No further product scope is authorized.
+
+Use tag `townlight-records-meetings-code-zoning-v1.4.0-beta.1`, desktop version
+`1.4.0-1`, MSI ProductVersion `1.4.0.1`. Preserve application/upgrade identity.
+The payload is `zoning-beta`; Records remains the default and existing saved
+selections are not changed. Release source pins are recorded in the canonical
+suite state and both desktop CI jobs. Do not reprovision Azure or change signer.
+
+The existing main-only workflow signs the EXE before MSI bundling and signs the
+MSI afterward, verifying the embedded EXE against the signing receipt. Use
+`--no-binary-patching` to preserve the signature. The tag/draft workflow attaches
+that exact successful main signing run, never an unsigned PR artifact.
+
+Reuse applicable Z4 evidence but verify the final signed bytes installed fresh
+and over populated signed 1.3, with connected sources and recovery. Stop workflow
+consumers and PostgreSQL before Repair refreshes the changed runtime; preserve
+data. This is not an unattended upgrade. See
+[Zoning acceptance](docs/installer/townlight-zoning-beta1-acceptance.md).
+
+The published 1.3 release remains the public download until this sequence passes.
+
+## Connected Records–Meetings–Code: 1.3.0-beta.1
+
+Scott authorized push, merge after required checks, signing, final installed and
+upgrade verification, then publication only on passing acceptance, October 20,
+2026. No further product scope is authorized.
+
+Use tag `townlight-records-meetings-code-v1.3.0-beta.1`, desktop version
+`1.3.0-1`, MSI ProductVersion `1.3.0.1`. Preserve application identity and
+upgrade code. Build and real-runtime CI prepare `city-core` from exact merged
+Records, Meetings and Code pins. Operators explicitly choose city-core; the
+Records-only default and existing saved selections remain unchanged.
+
+Use the existing main-only signing and draft-attachment procedures below,
+substituting the new tag. Verify inner EXE and MSI signatures and hashes and
+the exact final installed fresh/upgrade behavior. Accepted pre-retirement C4
+evidence supports unchanged behavior but is not proof of new signed bytes.
+Publication is already authorized if these gates pass. Do not reprovision Azure,
+overwrite predecessor releases or introduce new approval policy.
+
+Evidence: [connected Code acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+
+Final signed source is `0c0e098dd3db8bb3f0b55af8f3095bfa3bd3520c`, signing
+run 39520756994. Exact signed fresh and populated signed 1.2 upgrade acceptance
+passed on October 20, 2026. Documentation-only release follow-ups do not change
+the tag target, installer identity, signed bytes or accepted runtime evidence.
+
+## Historical connected Records–Meetings release: 1.2.0-beta.1
 
 Scott approved the connected release sequence on October 19, 2026: push,
 merge after required checks, sign, verify the final installer and the supported

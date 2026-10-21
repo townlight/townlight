@@ -2,6 +2,32 @@
 
 All notable changes to the Townlight umbrella repo are documented here.
 
+## Unreleased — connected Zoning local candidate1.4.0-1
+
+- Opt-in zoning-beta connects Records, Meetings, Code and Zoning; Records-only
+  remains default. The wider land-use profile remains disabled.
+- Bundled PostGIS3.6.2 for PostgreSQL17 and current local Python services.
+- Staff parcel-bundle import, cited rules, human corrections, protected source
+  history and permitted immutable Zoning sources for Records.
+- Installed fresh/upgrade/recovery acceptance remains pending; no release claim.
+
+## Townlight Records + Meetings + Code 1.3.0-beta.1 — 2026-10-20
+
+- city-core connects Core, Records, Meetings, Code, Notice and Access on the
+  authenticated Python/PostgreSQL domain path; default Records-only selection
+  and stable installer/data identities are preserved.
+- Code proposals link to meeting agendas, authorized adoption remains explicit
+  and unblocked by optional proceedings, and codification is separate.
+- Records attaches permitted current/historical Code and Meetings documents
+  with source history, citations, effective dates and content hashes retained.
+- Retire obsolete Rust JSON business actions and temporary parity adapter;
+  preserve schema upgrades, historical privacy, migration and recovery support.
+- Desktop version 1.3.0-1 (MSI 1.3.0.1). Exact signed fresh and populated signed 1.2
+  upgrade passed, including connected Code, preserved data/files, recovery,
+  offline operation and retained-data uninstall. Earlier C4 evidence remains
+  separate; it is not relabeled as final signed proof.
+
+
 ## Townlight Records + Meetings 1.2.0-beta.1 — 2026-10-20
 
 - Connected `meetings-beta` profile adds Meetings to Core, Records, Notice and

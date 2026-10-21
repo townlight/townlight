@@ -111,7 +111,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 2f0b7b755cade85673066fdd59ef3593a3052c83
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -120,6 +120,20 @@ jobs:
           repository: townlight/meetings
           ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
           path: civicclerk
+
+      - name: Check out Townlight Code runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/ordinances
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          path: civiccode
+
+      - name: Check out Townlight Zoning runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/zone
+          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
+          path: zone
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
@@ -235,7 +249,7 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile meetings-beta
+        run: npm run prepare-runtime-payload -- -ProductProfile zoning-beta
 
       - name: Run Tauri Rust tests
         working-directory: civicsuite/desktop/src-tauri
@@ -442,7 +456,7 @@ jobs:
             "NoDockerPrerequisite=true"
             "NoWslPrerequisite=true"
             "RuntimePayload=desktop/runtime/payload"
-            "ProductProfile=meetings-beta"
+            "ProductProfile=zoning-beta"
           )
           $evidence | Set-Content -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi/Townlight-msi-evidence.txt" -Encoding UTF8
 
@@ -490,7 +504,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 2f0b7b755cade85673066fdd59ef3593a3052c83
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -499,6 +513,20 @@ jobs:
           repository: townlight/meetings
           ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
           path: civicclerk
+
+      - name: Check out Townlight Code runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/ordinances
+          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          path: civiccode
+
+      - name: Check out Townlight Zoning runtime source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/zone
+          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
+          path: zone
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
@@ -538,7 +566,7 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile meetings-beta
+        run: npm run prepare-runtime-payload -- -ProductProfile zoning-beta
 
       - name: Run desktop<->CivicCore real-runtime integration test
         working-directory: civicsuite/desktop/src-tauri

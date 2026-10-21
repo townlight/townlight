@@ -30,17 +30,19 @@ CITY_CORE_EXTRA_MODULE_IMPORTS = [
 
 def _product_profile() -> str:
     profile = os.environ.get(PRODUCT_PROFILE_ENV, "records-beta")
-    if profile not in {"records-beta", "meetings-beta", "city-core"}:
+    if profile not in {"records-beta", "meetings-beta", "city-core", "zoning-beta"}:
         raise RuntimeError(f"Unsupported Townlight product profile: {profile}")
     return profile
 
 
 def _required_module_imports(profile: str) -> list[tuple[str, str]]:
     imports = list(RECORDS_BETA_MODULE_IMPORTS)
-    if profile == "city-core":
+    if profile in {"city-core", "zoning-beta"}:
         imports.extend(CITY_CORE_EXTRA_MODULE_IMPORTS)
     elif profile == "meetings-beta":
         imports.append(("civicclerk", "civicclerk.main"))
+    if profile == "zoning-beta":
+        imports.append(("civiczone", "civiczone.geo_import"))
     return imports
 
 
@@ -96,6 +98,12 @@ def _set_local_defaults() -> None:
         "DATABASE_URL",
         "postgresql+asyncpg://civicsuite:civicsuite@127.0.0.1:15432/civicsuite",
     )
+    if _product_profile() in {"city-core", "zoning-beta"}:
+        if not os.environ["DATABASE_URL"].startswith("postgresql"):
+            raise RuntimeError("DATABASE_URL must be a PostgreSQL URL")
+        os.environ["CIVICCODE_SOURCE_REGISTRY_DB_URL"] = _sync_database_url(
+            os.environ["DATABASE_URL"]
+        )
     if not os.environ.get("TESTING"):
         _set_local_secrets()
 
@@ -220,6 +228,93 @@ def _domain_database_status() -> dict[str, Any]:
         database.dispose()
 
 
+def _code_database_status() -> dict[str, Any]:
+    engine = None
+    try:
+        database_url = os.environ.get("CIVICCODE_SOURCE_REGISTRY_DB_URL", "")
+        if not database_url.startswith("postgresql"):
+            raise ValueError("Code requires PostgreSQL.")
+        from civiccode.models import Base
+        from civiccode import (
+            import_connectors,
+            operational_state,
+            ordinance_handoff,
+            plain_language,
+            public_discovery,
+            section_lifecycle,
+            source_registry,
+            staff_workbench,
+        )
+        from sqlalchemy import select
+
+        keyed_tables: dict[str, Any] = {}
+        for table in Base.metadata.tables.values():
+            if table.schema == "civiccode":
+                keyed_tables[table.fullname] = table
+        for module in (
+            source_registry,
+            section_lifecycle,
+            staff_workbench,
+            plain_language,
+            import_connectors,
+            operational_state,
+            ordinance_handoff,
+            public_discovery,
+        ):
+            metadata = getattr(module, "metadata", None)
+            if metadata is None:
+                continue
+            for table in metadata.tables.values():
+                if table.schema == "civiccode":
+                    keyed_tables[table.fullname] = table
+        tables = list(keyed_tables.values())
+        if not tables:
+            raise RuntimeError("Code schema unavailable.")
+        engine = create_engine(
+            database_url,
+            pool_pre_ping=True,
+            connect_args={"connect_timeout": 5},
+        )
+        with engine.connect() as connection:
+            for table in tables:
+                connection.execute(select(table).limit(0))
+            from civicsuite_runtime.code_meetings import connections
+            connection.execute(select(connections).limit(0))
+        return {"ok": True, "reason": "code-schema-ready"}
+    except Exception:
+        return {"ok": False, "reason": "code-schema-unavailable"}
+    finally:
+        if engine is not None:
+            engine.dispose()
+
+
+def _zoning_database_status() -> dict[str, Any]:
+    engine = None
+    try:
+        database_url = os.environ.get("DATABASE_URL")
+        if not database_url:
+            return {"ok": False, "reason": "zoning-schema-unavailable"}
+        from civiczone.geo_import import readiness
+
+        engine = create_engine(_sync_database_url(database_url), pool_pre_ping=True)
+        result = readiness(engine)
+        if isinstance(result, dict):
+            return {
+                "ok": bool(result.get("ok")),
+                "reason": result.get("reason", "zoning-schema-ready"),
+            }
+        ok = bool(result)
+        return {
+            "ok": ok,
+            "reason": "zoning-schema-ready" if ok else "zoning-schema-unavailable",
+        }
+    except Exception:
+        return {"ok": False, "reason": "zoning-schema-unavailable"}
+    finally:
+        if engine is not None:
+            engine.dispose()
+
+
 def create_runtime_app(*, domain_enabled: bool = False):
     """Mount the existing application; packaged migrations are explicit.
 
@@ -246,7 +341,7 @@ def create_runtime_app(*, domain_enabled: bool = False):
     domain_app.include_router(access_router)
     from civicsuite_runtime.records_snapshot import router as snapshot_router
     domain_app.include_router(snapshot_router)
-    if _product_profile() == "meetings-beta":
+    if _product_profile() in ("meetings-beta", "city-core", "zoning-beta"):
         from civicsuite_runtime.meetings_bridge import router as meetings_router
         domain_app.include_router(meetings_router)
         from civicsuite_runtime.meetings_bridge import public_router as meetings_public_router
@@ -258,6 +353,33 @@ def create_runtime_app(*, domain_enabled: bool = False):
                 raise RuntimeError("Meetings schema unavailable.")
             return public_documents(database_url(), query=query, source_id=source_id)
         domain_app.state.desktop_meetings_sources = meetings_sources
+    if _product_profile() in ("city-core", "zoning-beta"):
+        from civicsuite_runtime.code_bridge import router as code_router
+        domain_app.include_router(code_router)
+        from civicsuite_runtime.code_meetings_bridge import code_router as code_connections, meetings_router as meeting_connections
+        domain_app.include_router(code_connections)
+        domain_app.include_router(meeting_connections)
+        from civicsuite_runtime.code_public import router as code_public_router
+        domain_app.include_router(code_public_router)
+        from civicsuite_runtime.code_records import public_documents as code_documents
+        def code_sources(query="", source_id=None, as_of=None):
+            if not _code_database_status()["ok"]:
+                raise RuntimeError("Code source registry unavailable.")
+            return code_documents(os.environ["CIVICCODE_SOURCE_REGISTRY_DB_URL"],
+                                  query=query, source_id=source_id, as_of=as_of)
+        domain_app.state.desktop_code_sources = code_sources
+    if _product_profile() == "zoning-beta":
+        from civicsuite_runtime.zoning_bridge import public_router, router as zoning_router
+        domain_app.include_router(zoning_router)
+        domain_app.include_router(public_router)
+        from civicsuite_runtime import zoning_records
+        def zoning_sources(query="", source_id=None):
+            if not (_zoning_database_status()["ok"] and _code_database_status()["ok"]):
+                raise RuntimeError("Zoning sources unavailable.")
+            return zoning_records.public_documents(
+                _sync_database_url(os.environ["DATABASE_URL"]),
+                domain_app.state.desktop_meetings_sources, query=query, source_id=source_id)
+        domain_app.state.desktop_zoning_sources = zoning_sources
     async def demo_marker(session):
         from sqlalchemy import select
         from civicsuite_runtime.records_import_store import imports
@@ -286,10 +408,14 @@ def create_runtime_app(*, domain_enabled: bool = False):
         if not domain_app.state.desktop_domain_enabled:
             return JSONResponse({"status": "not-ready", "reason": "domain-inactive"}, status_code=503)
         database = _domain_database_status()
-        if database["ok"] and _product_profile() == "meetings-beta":
+        if database["ok"] and _product_profile() in ("meetings-beta", "city-core", "zoning-beta"):
             from civicsuite_runtime.meetings_bridge import readiness
             if not readiness():
                 database = {"ok": False, "reason": "meetings-schema-unready"}
+        if database["ok"] and _product_profile() in ("city-core", "zoning-beta"):
+            database = _code_database_status()
+        if database["ok"] and _product_profile() == "zoning-beta":
+            database = _zoning_database_status()
         return JSONResponse(
             {"status": "ready" if database["ok"] else "not-ready", "reason": database["reason"]},
             status_code=200 if database["ok"] else 503,

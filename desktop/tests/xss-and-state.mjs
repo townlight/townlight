@@ -120,7 +120,11 @@ let rewritten = mainSrc.replace(/^﻿/, "");
 rewritten = rewritten.replace('"./records/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "records", "view.js")).href));
 rewritten = rewritten.replace('"./records/controller.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "controller.ts")).href));
 rewritten = rewritten.replace('"./meetings/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "meetings", "view.js")).href));
+rewritten = rewritten.replace('"./code/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "code", "view.js")).href));
+rewritten = rewritten.replace('"./zoning/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "zoning", "view.js")).href));
+rewritten = rewritten.replace('"./records/zoning-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "zoning-sources.ts")).href));
 rewritten = rewritten.replace('"./records/meetings-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "meetings-sources.ts")).href));
+rewritten = rewritten.replace('"./records/code-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "code-sources.ts")).href));
 rewritten = rewritten.replace(
   /import\s*\{\s*invoke\s*\}\s*from\s*["']@tauri-apps\/api\/core["'];?/,
   "const invoke = (...args) => globalThis.__TEST_INVOKE__(...args);"
@@ -535,6 +539,7 @@ function finishedBase() {
   }));
   const app = {
     ...t.fallbackState,
+    modules: t.fallbackState.modules.map(module => module.id === "civiczone" ? {...module, contract_ready:false, blocked_reason:"Module civiczone must target Townlight Core 1.2.0 for Windows Local 1.0"} : module),
     first_run: {
       ...t.fallbackState.first_run,
       finished: false,

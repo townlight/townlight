@@ -145,7 +145,7 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --module)
       if [[ "$#" -lt 2 ]]; then
-        echo "--module requires civicrecords-ai, civicclerk, civiccode, or civicnotice" >&2
+        echo "--module requires civicrecords-ai, civicclerk, civiccode, civicnotice, or civicaccess" >&2
         exit 2
       fi
       SELECTED_MODULES+=("$2")
@@ -314,7 +314,7 @@ case "${MODE}" in
     python3 "${PLANNER}" "${PLANNER_ARGS[@]}" --show-readiness --detect-host
     ;;
   *)
-    echo "Usage: $0 [first-run|bootstrap-prerequisites|readiness|plan|launcher|install|verify|repair|backup|restore|uninstall] [--staff-mode protected|bearer|open] [--workflow-proof] [--module civicrecords-ai] [--module civicclerk] [--module civiccode] [--module civicnotice]" >&2
+    echo "Usage: $0 [first-run|bootstrap-prerequisites|readiness|plan|launcher|install|verify|repair|backup|restore|uninstall] [--staff-mode protected|bearer|open] [--workflow-proof] [--module civicrecords-ai] [--module civicclerk] [--module civiccode] [--module civicnotice] [--module civicaccess]" >&2
     exit 2
     ;;
 esac

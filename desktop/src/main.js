@@ -3,10 +3,28 @@ import "./styles.css";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
+import { createCodeView } from "./code/view.js";
+import { createZoningView } from "./zoning/view.js";
 import { bindMeetingsSources } from "./records/meetings-sources.ts";
+import { bindCodeSources } from "./records/code-sources.ts";
+import { bindZoningSources } from "./records/zoning-sources.ts";
 
 const recordsController = createRecordsController(invoke);
-const meetingsView = createMeetingsView(invoke);
+const meetingsView = createMeetingsView(invoke, openConnectedWork);
+const codeView = createCodeView(invoke, openConnectedWork);
+const zoningView = createZoningView(invoke);
+const publicZoningView = createZoningView(invoke, true);
+
+function openConnectedWork(area, id) {
+  if (!areaIsEnabled(area)) return;
+  state.activeArea = area;
+  render();
+  const target = document.querySelector(area === 'code' ? '[data-code-action="connection"]' : '[data-meetings-action="codeConnection"]');
+  if (!target || !target.elements) return;
+  const idField = target.elements.namedItem('id');
+  if (idField) idField.value = id;
+  target.requestSubmit();
+}
 
 const LOCKED_FOUNDATION_MODULE_ID = "civiccore";
 const RECORDS_BETA_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicnotice", "civicaccess"];
@@ -14,12 +32,14 @@ const CITY_CORE_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicclerk", "civiccod
 const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "records-beta": RECORDS_BETA_PRODUCT_MODULE_IDS,
   "meetings-beta": [...RECORDS_BETA_PRODUCT_MODULE_IDS, "civicclerk"],
-  "city-core": CITY_CORE_PRODUCT_MODULE_IDS
+  "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
+  "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone"]
 };
 const MODULE_AREA_BY_ID = {
   meetings: "civicclerk",
   records: "civicrecords-ai",
   code: "civiccode",
+  zoning: "civiczone",
   notice: "civicnotice",
   access: "civicaccess"
 };
@@ -33,6 +53,7 @@ const fallbackState = {
     ["meetings", "Meetings & Notices", "Agendas, notices, minutes, votes"],
     ["records", "Records Requests", "Intake, review, response, exports"],
     ["code", "Code & Ordinances", "Search, imports, guidance, handoffs"],
+    ["zoning", "Zoning", "Parcel information and cited rules"],
     ["notice", "Public Notices", "Deadlines, proof, archive packets"],
     ["access", "Accessibility", "WCAG review, plain language, multilingual, exports"],
     ["search", "Search City Knowledge", "Cross-module search with citations"],
@@ -177,19 +198,19 @@ const fallbackState = {
     },
     {
       id: "civiczone",
-      display_name: "CivicZone",
+      display_name: "Townlight Zoning",
       role: "zoning workflow",
       version: "0.2.2",
       required: false,
       selectable: true,
       installed: false,
       enabled: false,
-      contract_ready: false,
-      blocked_reason: "Module civiczone must target Townlight Core 1.2.0 for Windows Local 1.0",
-      route_count: 0,
-      service_count: 0,
-      task_count: 0,
-      model_required: true
+      contract_ready: true,
+      blocked_reason: null,
+      route_count: 1,
+      service_count: 2,
+      task_count: 3,
+      model_required: false
     }
   ],
   module_profiles: [
@@ -1263,6 +1284,11 @@ function renderModuleSelectionControls() {
       id: "city-core",
       label: "City Core",
       description: "Installs Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access with Townlight Core."
+    },
+    {
+      id: "zoning-beta",
+      label: "Townlight Records + Meetings + Code + Zoning",
+      description: "Opt-in connected Zoning candidate with Core, Notice, and Access. Not a published release."
     },
     {
       id: "custom",
@@ -2903,7 +2929,7 @@ function isPublicSurface() {
 }
 
 function isPublicReadableArea() {
-  return isPublicSurface() && ["home", "meetings", "records", "code", "search"].includes(state.activeArea);
+  return isPublicSurface() && ["home", "meetings", "records", "code", "zoning", "search"].includes(state.activeArea);
 }
 
 function publicCommentView(comment) {
@@ -5044,12 +5070,26 @@ function renderActiveArea() {
       <button type="button" data-action="retry-domain-state">Retry Records</button></section>`;
   }
   switch (state.activeArea) {
+    case "zoning":
+      return isPublicSurface() ? publicZoningView.render() : zoningView.render();
     case "meetings":
-      if (state.app?.module_selection?.profile_id === "meetings-beta") return meetingsView.render();
+      if (
+        state.app?.module_selection?.profile_id === "meetings-beta" ||
+        ((state.app?.module_selection?.profile_id === "city-core" ||
+          state.app?.module_selection?.profile_id === "zoning-beta") &&
+          state.app?.domain_authority === "python-records")
+      )
+        return meetingsView.render();
       return renderMeetingsWorkflow();
     case "records":
       return renderRecordsWorkflow();
     case "code":
+      if (
+        (state.app?.module_selection?.profile_id === "city-core" ||
+          state.app?.module_selection?.profile_id === "zoning-beta") &&
+        state.app?.domain_authority === "python-records"
+      )
+        return codeView.render();
       return renderCodeWorkflow();
     case "notice":
       return renderNoticeWorkflow();
@@ -5165,7 +5205,15 @@ function render() {
 
 function bindEvents() {
   bindMeetingsSources(invoke, async () => { await loadAppState(); render(); });
+  bindCodeSources(invoke, async () => { await loadAppState(); render(); });
+  if (state.app.module_selection?.enabled_module_ids?.includes('civiczone')) {
+    bindZoningSources(invoke, async () => { await loadAppState(); render(); });
+  }
   meetingsView.bind();
+  codeView.bind();
+  if (state.activeArea === "zoning") {
+    (isPublicSurface() ? publicZoningView : zoningView).bind();
+  }
   document.querySelector('[data-action="retry-domain-state"]')?.addEventListener("click", async () => {
     await loadAppState();
     render();

@@ -1,5 +1,23 @@
 # Townlight Architecture
 
+## Connected Records–Meetings–Code 1.3.0-beta.1 public beta
+
+The explicit city-core profile connects Records, Meetings and Code, supported by
+Core, Notice and Access. Typed desktop clients use authenticated loopback Python
+services. PostgreSQL and managed local files own domain state, audit history and
+source evidence. Code proposals link to meeting agendas; adoption and codification
+are separate human decisions. Records attaches permitted public source copies
+without changing their history, effective dates, hashes or access boundaries.
+
+Obsolete Rust JSON business actions and the temporary parity adapter are retired.
+Rust retains OS/file integration, service supervision, authority coordination and
+historical import/recovery support. Old snapshots are not fallback writers.
+The exact signed fresh and populated 1.2 upgrade acceptance passed; see the
+[release evidence](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
+Earlier sections below are history.
+
+![Connected system architecture](docs/diagrams/suite-architecture.svg)
+
 ## Records foundation: published beta.3
 
 Townlight Records 1.1.0-beta.3 passed exact signed-installer acceptance on

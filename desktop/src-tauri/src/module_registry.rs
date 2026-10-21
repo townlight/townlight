@@ -1373,7 +1373,7 @@ mod tests {
                 .expect_err("planned module selection fails")
                 .contains("cannot be selected"));
 
-            let not_ready = persist_custom_selection(&["civiczone".to_string()]);
+            let not_ready = persist_custom_selection(&["civicplan".to_string()]);
             assert!(not_ready
                 .expect_err("not-ready module selection fails")
                 .contains("compatible with 1.2.1"));
@@ -1410,7 +1410,7 @@ mod tests {
                 .find(|module| module.id == "civiccode")
                 .expect("civiccode module");
             assert!(civiccode.installed);
-            assert_eq!(civiccode.civiccore_requirement.as_deref(), Some("1.2.0"));
+            assert_eq!(civiccode.civiccore_requirement.as_deref(), Some("1.2.1"));
             assert_eq!(
                 civiccode.lifecycle_uninstall.as_deref(),
                 Some("backup-first-module-data-removal")
@@ -1453,14 +1453,10 @@ mod tests {
             assert!(!civiczone.installed);
             assert_eq!(
                 civiczone.installer_status.as_deref(),
-                Some("demoted_v0_2_2_truth_repair_no_functional_upgrade")
+                Some("v0_2_2_connected_beta_candidate")
             );
-            assert!(!civiczone.contract_ready);
-            assert!(civiczone
-                .blocked_reason
-                .as_deref()
-                .unwrap_or_default()
-                .contains("compatible with 1.2.1"));
+            assert!(civiczone.contract_ready);
+            assert!(civiczone.blocked_reason.is_none());
         });
     }
 }

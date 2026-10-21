@@ -18,6 +18,8 @@ on:
       - "civicsuite-windows-local-v*"
       - "townlight-records-v*"
       - "townlight-records-meetings-v*"
+      - "townlight-records-meetings-code-v*"
+      - "townlight-records-meetings-code-zoning-v*"
 
 permissions:
   contents: write

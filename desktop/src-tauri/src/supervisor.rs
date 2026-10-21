@@ -2092,10 +2092,14 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
         ("PORTAL_MODE".to_string(), "private".to_string()),
         (
             "TOWNLIGHT_PRODUCT_PROFILE".to_string(),
-            if crate::module_registry::module_selection_state()?.profile_id == "meetings-beta" {
-                "meetings-beta".to_string()
-            } else {
-                "records-beta".to_string()
+            match crate::module_registry::module_selection_state()?
+                .profile_id
+                .as_str()
+            {
+                "city-core" => "city-core".to_string(),
+                "meetings-beta" => "meetings-beta".to_string(),
+                "zoning-beta" => "zoning-beta".to_string(),
+                _ => "records-beta".to_string(),
             },
         ),
         (
@@ -4180,6 +4184,25 @@ mod tests {
     }
 
     #[test]
+    fn service_environment_preserves_explicit_connected_profiles() {
+        with_temp_state_dir(|_| {
+            let manifest = parse_manifest().unwrap();
+            let service = manifest
+                .services
+                .iter()
+                .find(|s| s.id == "python-services")
+                .unwrap();
+            for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
+                crate::module_registry::persist_profile_selection(profile).unwrap();
+                let env = service_environment(service).unwrap();
+                assert!(env
+                    .iter()
+                    .any(|(name, value)| name == "TOWNLIGHT_PRODUCT_PROFILE" && value == profile));
+            }
+        });
+    }
+
+    #[test]
     fn service_environment_pins_city_modules_to_local_gemma_runtime_model() {
         with_temp_state_dir(|_| {
             let manifest = parse_manifest().expect("manifest parses");
@@ -4535,12 +4558,9 @@ mod tests {
         });
     }
 
-    // Proves the real "AI engine not ready" plumbing the CivicAccess dual-path
-    // handlers depend on: a genuine Ollama server (from the prepared payload)
-    // with ZERO models installed serves /api/tags health fine, model readiness
-    // still reports not-ready (weights/checksum/registry absent), and a
-    // CivicAccess AI-capable action returns the labeled deterministic fallback
-    // through the real HTTP probe path -- not the compile-time test stub.
+    // The real empty model runtime can be healthy while generation is not ready.
+    // Access fallback behavior remains covered on the canonical Python path;
+    // retired JSON domain actions are not a runtime-readiness test seam.
     #[test]
     fn real_ollama_runtime_with_no_model_serves_the_not_ready_contract_when_enabled() {
         if env::var("CIVICSUITE_RUN_REAL_RUNTIME_TEST").ok().as_deref() != Some("1") {
@@ -4590,21 +4610,10 @@ mod tests {
                 .checks
                 .iter()
                 .any(|check| check.id == "artifact-file" && !check.ok));
-            let fallback = crate::workflows::city_work_action(
-                "civicaccess-plain-language",
-                Some(&serde_json::json!({
-                    "text": "Residents must remit payment prior to the deadline."
-                })),
-            )
-            .expect("fallback rewrite succeeds against a model-less runtime");
-            assert!(
-                fallback.message.contains("AI engine not ready"),
-                "fallback result carries the explicit marker through the real probe path"
-            );
-            // "must pay before" only exists if the jargon-map rewrite really
-            // ran ("remit payment" -> "pay", "prior to" -> "before"); a bare
-            // "pay" would be satisfied by the input's own "payment".
-            assert!(fallback.message.contains("must pay before"));
+            let err = crate::model::generate_local_text("Synthetic readiness probe")
+                .err()
+                .expect("no model must refuse generation");
+            assert!(err.contains("not ready"));
         });
     }
 

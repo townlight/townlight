@@ -1,5 +1,6 @@
 mod atomic_io;
 mod auth;
+mod code_client;
 mod demo_fixture;
 mod domain_client;
 mod domain_files;
@@ -10,10 +11,9 @@ mod model;
 mod module_registry;
 mod profile_gate;
 mod records_authority;
-#[cfg(test)]
-mod records_golden_contract;
 mod supervisor;
 mod workflows;
+mod zoning_client;
 
 use auth::{AccessState, AuthActionResult, LocalUserSummary};
 use first_run::{FirstRunActionResult, FirstRunState, SavedCityProfile};
@@ -91,6 +91,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "notice",
             label: "Public Notices",
             description: "Deadlines, proof, archive packets",
+        },
+        NavigationItem {
+            id: "zoning".into(),
+            label: "Zoning".into(),
+            description: "Parcel information and cited rules".into(),
         },
         NavigationItem {
             id: "access",
@@ -765,8 +770,8 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
     }
 }
 
-/// Candidate transport boundary. The domain service remains inactive until
-/// coherent profile activation; the existing workflow dispatcher is unchanged.
+/// Typed domain transport remains inactive until coherent profile activation.
+/// Retired JSON municipal actions cannot substitute for that activation.
 #[tauri::command]
 async fn records_domain_request(
     request: domain_client::RecordsRequest,
@@ -833,11 +838,13 @@ async fn meetings_domain_request(
 ) -> Result<Value, domain_client::DomainError> {
     let _operation =
         profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
-    if module_registry::module_selection_state()
+    let profile_id = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?
-        .profile_id
-        != "meetings-beta"
-    {
+        .profile_id;
+    if !matches!(
+        profile_id.as_str(),
+        "meetings-beta" | "city-core" | "zoning-beta"
+    ) {
         return Err(domain_client::DomainError::denied());
     }
     let access =
@@ -851,6 +858,28 @@ async fn meetings_domain_request(
 }
 
 #[tauri::command]
+async fn code_domain_request(
+    request: code_client::CodeRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let profile_id = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?
+        .profile_id;
+    if !matches!(profile_id.as_str(), "city-core" | "zoning-beta") {
+        return Err(domain_client::DomainError::denied());
+    }
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "import-code-source", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    require_enabled_city_modules("import-code-source", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    code_client::execute(request, proof).await
+}
+
+#[tauri::command]
 async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value, String> {
     let access = auth::require_signed_in_session()?;
     let payload = serde_json::json!({"folder":request.folder.name()});
@@ -861,6 +890,49 @@ async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value
             .await
             .map_err(|_| "Could not open the local exports folder.".to_string())??;
     Ok(serde_json::json!({"message":message}))
+}
+
+#[tauri::command]
+async fn zoning_domain_request(
+    request: zoning_client::ZoningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civiczone")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    let session =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    let role = session.role.as_deref();
+    if role != Some("local-admin") && role != Some("city-staff") {
+        return Err(domain_client::DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    zoning_client::execute(request, proof, false).await
+}
+
+#[tauri::command]
+async fn zoning_public_request(
+    request: zoning_client::ZoningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civiczone")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    zoning_client::execute(request, String::new(), true).await
 }
 
 fn city_work_action_authorized(
@@ -975,6 +1047,9 @@ pub fn run() {
             access_domain_request,
             suite_domain_request,
             meetings_domain_request,
+            code_domain_request,
+            zoning_domain_request,
+            zoning_public_request,
             open_domain_exports,
             city_work_action
         ])
@@ -1416,11 +1491,12 @@ mod tests {
                 "summary": "Emails about park contract",
                 "deadline": "2026-07-10"
             });
-            city_work_action_authorized(
-                "create-records-request".to_string(),
-                Some(records_payload.clone()),
+            assert!(require_role_for_city_work(
+                &auth::access_state().unwrap(),
+                "create-records-request",
+                Some(&records_payload)
             )
-            .expect("records staff can create records request");
+            .is_ok());
             let meeting_body = serde_json::json!({
                 "meetingBodyName": "City Council",
                 "meetingBodyType": "legislative",
@@ -1440,8 +1516,12 @@ mod tests {
             auth::auth_action("sign-out", None).expect("records staff signed out");
 
             sign_in_as_user("casey@example.gov", "clerk passcode 123");
-            city_work_action_authorized("create-meeting-body".to_string(), Some(meeting_body))
-                .expect("clerk can create meeting body");
+            assert!(require_role_for_city_work(
+                &auth::access_state().unwrap(),
+                "create-meeting-body",
+                Some(&meeting_body)
+            )
+            .is_ok());
             let clerk_error = match city_work_action_authorized(
                 "create-records-request".to_string(),
                 Some(records_payload),
@@ -1459,8 +1539,12 @@ mod tests {
                 "body": "Quiet hours begin at 10 PM.",
                 "importedBy": "Deputy Clerk"
             });
-            city_work_action_authorized("import-code-source".to_string(), Some(code_payload))
-                .expect("code staff can import code source");
+            assert!(require_role_for_city_work(
+                &auth::access_state().unwrap(),
+                "import-code-source",
+                Some(&code_payload)
+            )
+            .is_ok());
             let code_error = match city_work_action_authorized(
                 "create-records-request".to_string(),
                 Some(serde_json::json!({
@@ -1527,44 +1611,21 @@ mod tests {
 
     #[test]
     fn civicaccess_only_profile_can_still_reach_search_city_knowledge() {
-        // TEST-3 (GauntletGate round 1, refuted) claimed civicaccess was missing
-        // from the search-city-knowledge module allow-list; it was already
-        // present, but no test proved a civicaccess-only profile could actually
-        // reach search through the module-guard gate (the civicaccess-specific
-        // search assertions elsewhere call search_city_work() directly,
-        // bypassing require_enabled_city_modules entirely). This test closes
-        // that gap by disabling every other allow_any module before searching.
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            let review_payload = serde_json::json!({
-                "title": "Water main repair notice",
-                "body": "The city water department will repair a main on Tuesday morning.",
-                "hasAltText": true,
-                "language": "en"
-            });
-            city_work_action_authorized("accessibility-review".to_string(), Some(review_payload))
-                .expect("accessibility review saved");
-
-            // Disable dependents before their dependencies (civiccode and
-            // civicnotice both depend on civicclerk; set_module_enabled refuses
-            // to disable a module while an enabled module still depends on it).
-            for module_id in ["civiccode", "civicnotice", "civicclerk", "civicrecords-ai"] {
-                module_action("disable-module".to_string(), module_id.to_string())
-                    .unwrap_or_else(|_| panic!("{module_id} disabled"));
+            for m in ["civiccode", "civicnotice", "civicclerk", "civicrecords-ai"] {
+                module_action("disable-module".to_string(), m.to_string()).unwrap();
             }
-
-            let search_payload = serde_json::json!({ "query": "Water main" });
-            let result = city_work_action_authorized(
-                "search-city-knowledge".to_string(),
-                Some(search_payload),
+            require_enabled_city_modules("search-city-knowledge", None)
+                .expect("search-city-knowledge should remain enabled");
+            let err = city_work_action_authorized(
+                "search-city-knowledge".into(),
+                Some(serde_json::json!({"query": "water"})),
             )
-            .expect("civicaccess-only profile can still reach search-city-knowledge");
-
-            assert!(result
-                .search_results
-                .iter()
-                .any(|hit| hit.module_id == "civicaccess" && hit.title.contains("Water main")));
+            .err()
+            .unwrap();
+            assert!(err.contains("retired"));
         });
     }
 
@@ -1573,25 +1634,27 @@ mod tests {
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            let code_payload = serde_json::json!({
-                "title": "Backyard Chicken Rules",
-                "citation": "CMC 6.16.040",
-                "body": "Backyard chickens are allowed with a coop permit."
-            });
-            city_work_action_authorized("import-code-source".to_string(), Some(code_payload))
-                .expect("code source imported");
-            module_action("disable-module".to_string(), "civiccode".to_string())
-                .expect("civiccode disabled");
-
-            let search_payload = serde_json::json!({ "query": "chickens" });
-            let result = city_work_action_authorized(
-                "search-city-knowledge".to_string(),
-                Some(search_payload),
-            )
-            .expect("search remains available through enabled modules");
-
+            module_action("disable-module".to_string(), "civiccode".to_string()).unwrap();
+            let mut result = CityWorkActionResult {
+                accepted: true,
+                action: "search-city-knowledge".into(),
+                status: "Saved".into(),
+                message: String::new(),
+                next_action: String::new(),
+                state: CityWorkState::default(),
+                search_results: vec![workflows::SearchResult {
+                    module_id: "civiccode".into(),
+                    record_id: "synthetic".into(),
+                    title: "Synthetic".into(),
+                    snippet: String::new(),
+                    citation: String::new(),
+                    status: "draft".into(),
+                }],
+                next_steps: vec![],
+                disclaimer: String::new(),
+            };
+            filter_search_results_for_enabled_modules(&mut result).unwrap();
             assert!(result.search_results.is_empty());
-            assert!(result.message.contains("enabled modules with 0 result"));
         });
     }
 
@@ -1762,152 +1825,25 @@ mod tests {
     fn unauthenticated_city_work_state_is_public_projection() {
         with_clean_first_run_state(|_| {
             create_first_admin();
-
-            let body_payload = serde_json::json!({
-                "meetingBodyName": "City Council",
-                "meetingBodyType": "legislative",
-                "meetingBodyStatutoryBasis": "City Charter Section 2.1",
-                "meetingBodyCadence": "First and third Wednesday",
-                "meetingBodyDefaultNoticeDays": "3",
-                "meetingBodyQuorumRule": "majority of seated members"
-            });
-            let body_result =
-                workflows::city_work_action("create-meeting-body", Some(&body_payload))
-                    .expect("meeting body created");
-            let body_id = body_result.state.meeting_bodies[0].id.clone();
-            let meeting_payload = serde_json::json!({
-                "meetingBodyId": body_id,
-                "title": "Budget Work Session",
-                "meetingDate": "2026-07-02",
-                "summary": "Review draft budget priorities.",
-                "agendaTitle": "Budget priorities"
-            });
-            let meeting_result =
-                workflows::city_work_action("create-meeting", Some(&meeting_payload))
-                    .expect("meeting created");
-            let meeting_id = meeting_result.state.meetings[0].id.clone();
-            let minutes_payload = serde_json::json!({
-                "meetingId": meeting_id.clone(),
-                "minutes": "Private draft minutes with staff notes."
-            });
-            workflows::city_work_action("record-minutes", Some(&minutes_payload))
-                .expect("minutes saved");
-            let notice_checklist = serde_json::json!({
-                "meetingId": meeting_id.clone(),
-                "noticeMeetingType": "Budget work session",
-                "noticeStatutoryBasis": "Municipal open meetings notice",
-                "noticeDeadline": "2026-07-01",
-                "noticeTimeZone": "America/Denver",
-                "noticeHumanApproval": true
-            });
-            workflows::city_work_action("complete-notice-checklist", Some(&notice_checklist))
-                .expect("notice checklist ready");
-            let selected_meeting = serde_json::json!({
-                "meetingId": meeting_id.clone(),
-                "postingLocation": "City website",
-                "postingMethod": "Posted PDF notice",
-                "postingConfirmation": "Clerk confirmed the notice was posted before the meeting.",
-                "postingDate": "2026-07-01"
-            });
-            workflows::city_work_action("post-notice", Some(&selected_meeting))
-                .expect("notice ready");
-            let public_comment = serde_json::json!({
-                "meetingId": meeting_id,
-                "commenterName": "Riley Resident",
-                "commenterContact": "riley@example.org",
-                "commentMode": "written",
-                "commentTopic": "Budget",
-                "commentBody": "Please protect park funding."
-            });
-            workflows::city_work_action("submit-public-comment", Some(&public_comment))
-                .expect("public comment saved");
-
-            let records_payload = serde_json::json!({
-                "requester": "Internal requester",
-                "summary": "Private staff records request",
-                "deadline": "2026-07-15"
-            });
-            workflows::city_work_action("create-records-request", Some(&records_payload))
-                .expect("records request saved");
-            let code_payload = serde_json::json!({
-                "title": "Draft Noise Ordinance",
-                "citation": "Draft 8.12",
-                "body": "Private draft ordinance text."
-            });
-            workflows::city_work_action("import-code-source", Some(&code_payload))
-                .expect("code source saved");
-            let private_packet_meeting = serde_json::json!({
-                "title": "Unposted Packet Draft",
-                "meetingDate": "2026-07-09",
-                "summary": "Packet export before public notice.",
-                "agendaTitle": "Private packet"
-            });
-            let private_packet_result =
-                workflows::city_work_action("create-meeting", Some(&private_packet_meeting))
-                    .expect("private packet meeting created");
-            let private_packet_id = private_packet_result.state.meetings[0].id.clone();
-            let private_packet_minutes = serde_json::json!({
-                "meetingId": private_packet_id,
-                "minutes": "Packet-only private minutes."
-            });
-            workflows::city_work_action("record-minutes", Some(&private_packet_minutes))
-                .expect("private packet minutes saved");
-            let private_packet_selection = serde_json::json!({ "meetingId": private_packet_id });
-            workflows::city_work_action("export-meeting-packet", Some(&private_packet_selection))
-                .expect("private packet exported");
-
-            let public_state = get_city_work_state().expect("public city work state");
-
-            assert_eq!(public_state.meetings.len(), 1);
-            assert_eq!(public_state.meetings[0].title, "Budget Work Session");
-            assert_eq!(public_state.meetings[0].minutes, "");
-            assert!(public_state.meetings[0].public_comments.is_empty());
-            assert!(public_state.records_requests.is_empty());
-            assert!(public_state.code_sources.is_empty());
-            assert!(public_state.code_handoffs.is_empty());
-            assert!(public_state.audit_entries.is_empty());
-            assert!(public_state.notification_events.is_empty());
-            let public_app_state = app_state().expect("public app state");
-            assert!(public_app_state.users.is_empty());
-            assert_eq!(
-                public_app_state.model.artifact.local_path,
-                "Sign in as Townlight admin to view the model file path."
-            );
-            assert!(public_app_state
-                .health
-                .iter()
-                .all(|item| item.admin_detail.is_empty()));
-
+            let mut raw = serde_json::to_value(CityWorkState::default()).unwrap();
+            raw["records_requests"] = serde_json::json!([{"id":"old","requester":"Synthetic","summary":"Private","deadline":"2026-11-01","status":"received","requester_contact":"private@example.invalid","created_at_unix_seconds":1}]);
+            let path = local_paths::data_root().join("workflows/city-work.json");
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            let original = serde_json::to_vec(&raw).unwrap();
+            std::fs::write(&path, &original).unwrap();
+            let public = get_city_work_state().expect("...");
+            assert!(public.records_requests.is_empty());
+            let state = app_state().expect("...");
+            assert!(state.users.is_empty());
+            assert!(state.health.iter().all(|item| item.admin_detail.is_empty()));
             sign_in_as_first_admin();
-            let staff_state = get_city_work_state().expect("staff city work state");
-
+            let admin = get_city_work_state().expect("...");
+            assert_eq!(admin.records_requests.len(), 1);
             assert_eq!(
-                staff_state
-                    .meetings
-                    .iter()
-                    .find(|meeting| meeting.title == "Budget Work Session")
-                    .expect("budget meeting visible")
-                    .minutes,
-                "Private draft minutes with staff notes."
+                admin.records_requests[0].requester_contact,
+                "private@example.invalid"
             );
-            assert_eq!(
-                staff_state
-                    .meetings
-                    .iter()
-                    .find(|meeting| meeting.title == "Budget Work Session")
-                    .expect("budget meeting visible")
-                    .public_comments
-                    .len(),
-                1
-            );
-            assert!(staff_state
-                .meetings
-                .iter()
-                .any(|meeting| meeting.title == "Unposted Packet Draft"));
-            assert_eq!(staff_state.records_requests.len(), 1);
-            assert_eq!(staff_state.code_sources.len(), 1);
-            assert!(!staff_state.audit_entries.is_empty());
-            assert!(!staff_state.notification_events.is_empty());
+            assert_eq!(std::fs::read(&path).unwrap(), original);
         });
     }
 
@@ -1936,67 +1872,22 @@ mod tests {
     fn public_city_work_actions_do_not_require_admin_session() {
         with_clean_first_run_state(|_| {
             create_first_admin();
-
-            let public_payload = serde_json::json!({
-                "requester": "Riley Resident",
-                "requesterContact": "riley@example.org",
-                "summary": "Please provide the current council packet."
-            });
-            let public_result = city_work_action_authorized(
-                "submit-public-records-request".to_string(),
-                Some(public_payload),
-            )
-            .expect("public request can be submitted without admin session");
-
-            assert!(public_result.accepted);
-            assert!(public_result.message.contains("Public records request"));
-            assert!(public_result.state.records_requests.is_empty());
-
-            let lookup_payload = serde_json::json!({
-                "trackingNumber": "REQ-0001",
-                "requesterContact": "riley@example.org"
-            });
-            let lookup_result = city_work_action_authorized(
-                "lookup-public-records-request".to_string(),
-                Some(lookup_payload),
-            )
-            .expect("public request status can be checked without admin session");
-            assert!(lookup_result.accepted);
-            assert_eq!(lookup_result.status, "Status found");
-            assert_eq!(lookup_result.state.records_requests.len(), 1);
-            assert_eq!(
-                lookup_result.state.records_requests[0].requester_contact,
-                ""
-            );
-
-            let wrong_lookup_payload = serde_json::json!({
-                "trackingNumber": "REQ-0001",
-                "requesterContact": "wrong@example.org"
-            });
-            let wrong_lookup_result = city_work_action_authorized(
-                "lookup-public-records-request".to_string(),
-                Some(wrong_lookup_payload),
-            )
-            .expect("public request status mismatch is safe");
-            assert!(!wrong_lookup_result.accepted);
-            assert_eq!(wrong_lookup_result.status, "No match");
-            assert!(wrong_lookup_result.state.records_requests.is_empty());
-
-            let staff_payload = serde_json::json!({
-                "requester": "Staff-only",
-                "summary": "Internal request",
-                "deadline": "2026-07-01"
-            });
-            let staff_result = city_work_action_authorized(
-                "create-records-request".to_string(),
-                Some(staff_payload),
-            );
-
-            assert!(staff_result.is_err());
-            assert!(staff_result
+            for action in [
+                "submit-public-records-request",
+                "lookup-public-records-request",
+            ] {
+                let err = city_work_action_authorized(action.to_string(), None)
+                    .err()
+                    .unwrap_or_else(|| panic!("expected retired error for {action}"));
+                assert!(format!("{err:?}").contains("retired"), "{action}: {err:?}");
+            }
+            let err = city_work_action_authorized("create-records-request".to_string(), None)
                 .err()
-                .expect("staff error")
-                .contains("Sign in with a staff or Townlight admin account"));
+                .unwrap_or_else(|| panic!("expected sign-in error"));
+            assert!(
+                err.contains("Sign in with a staff or Townlight admin account"),
+                "{err:?}"
+            );
         });
     }
 }

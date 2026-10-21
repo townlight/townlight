@@ -1,5 +1,173 @@
 import { expect, test } from "@playwright/test";
 
+test('Z3 Records Zoning sources', async ({ page }) => {
+  await page.route('http://127.0.0.1:5174/', route => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><html><body></body></html>',
+  }));
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const mod = await import('/src/records/zoning-sources.ts');
+    document.body.innerHTML = mod.renderZoningSources('record-1');
+    window.__calls = [];
+    window.__refreshed = false;
+    await mod.bindZoningSources(async (command, args) => {
+      window.__calls.push({ command, request: args.request });
+      if (args.request.operation === 'search-zoning') {
+        return {results: [{source_id: 'source-1', title: '<img src=x>', excerpt: 'Fictional snapshot',
+          citation: 'Citation', sha256: 'a'.repeat(64)}], truncated: false};
+      }
+      return {};
+    }, async () => { window.__refreshed = true; });
+  });
+  await page.locator('input[name="query"]').fill('snapshot');
+  await page.getByRole('button', { name: 'Search Zoning' }).click();
+  await expect(page.locator('[data-source-results] h4')).toHaveText('<img src=x>');
+  await expect(page.locator('[data-source-results] img')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Attach to selected Records request' }).click();
+  await expect.poll(() => page.evaluate(() => window.__refreshed)).toBe(true);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls).toEqual([
+    { command: 'records_domain_request', request: { operation: 'search-zoning', query: 'snapshot' } },
+    { command: 'records_domain_request', request: { operation: 'attach-zoning-source',
+      request_id: 'record-1', source_id: 'source-1', expected_sha256: 'a'.repeat(64) } },
+  ]);
+});
+
+test('Z2 Zoning component', async ({ page }) => {
+  const result = {id:'z1',answer:'allowed',parcel:{address:'1 Fictional Way',zone:{code:'R2'},
+    source:{source_date:'2026-10-20',version:'v1',content_sha256:'a'.repeat(64)}},
+    citations:[{section_number:'20.10',version_id:'law-v1',source_id:'official',effective_start:'2026-01-01',body_text:'<img src=x onerror=alert(1)>'}]};
+  const mount = async ({publicMode=false,fail=false}={}) => {
+    await page.evaluate(async ({publicMode,fail,result}) => {
+      const {createZoningView}=await import('/src/zoning/view.js');
+      const calls=[];
+      window.__calls=calls;
+      const invoke=async(command,args)=>{
+        calls.push({command,request:args.request});
+        if(fail) throw new Error('Service unavailable');
+        return result;
+      };
+      const view=createZoningView(invoke,publicMode);
+      document.body.innerHTML=view.render();
+      view.bind(document.body);
+    },{publicMode,fail,result});
+  };
+  const callsText=()=>page.evaluate(()=>JSON.stringify(window.__calls));
+  await page.route('http://127.0.0.1:5174/', r => r.fulfill({ contentType: 'text/html', body: '<!doctype html><html><body></body></html>' }));
+  await page.goto('/');
+  await mount();
+  const question=page.locator('form[data-zone-action="question"]');
+  await question.locator('[name="jurisdiction"]').fill('Fictionville');
+  await question.locator('[name="query"]').fill('P1');
+  await question.locator('[name="question"]').fill('Can I build an ADU?');
+  await question.locator('[name="key"]').fill('ADU');
+  await question.locator('button[type="submit"]').click();
+  await expect(page.locator('body')).toContainText('law-v1');
+  await expect(page.locator('body')).toContainText('2026-10-20');
+  await expect(page.locator('body')).toContainText('<img src=x onerror=alert(1)>');
+  await expect(page.locator('img')).toHaveCount(0);
+  await expect.poll(async()=>{const t=await callsText();return t.includes('zoning_domain_request')&&t.includes('question');}).toBe(true);
+  const snapshotForm = page.locator('form[data-zone-action="snapshot"]');
+  await snapshotForm.locator('[name="id"]').fill('11111111-1111-4111-8111-111111111111');
+  await snapshotForm.locator('[name="visibility"]').selectOption('public');
+  await snapshotForm.locator('button[type="submit"]').click();
+  await expect.poll(async()=>{const t=await callsText();return t.includes('"operation":"snapshot"')&&t.includes('"meeting_event_ids":[]');}).toBe(true);
+  await mount({publicMode:true});
+  await expect(page.locator('form[data-zone-action="review"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="workspace"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="registerRule"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="searchMeetings"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="linkMeeting"]')).toHaveCount(0);
+  const publicLookup=page.locator('form[data-zone-action="lookup"]');
+  await publicLookup.locator('[name="jurisdiction"]').fill('Fictionville');
+  await publicLookup.locator('[name="query"]').fill('P1');
+  await publicLookup.locator('button[type="submit"]').click();
+  await expect.poll(async()=>(await callsText()).includes('zoning_public_request')).toBe(true);
+  await mount({fail:true});
+  const failureLookup=page.locator('form[data-zone-action="lookup"]');
+  await failureLookup.locator('[name="jurisdiction"]').fill('Fictionville');
+  await failureLookup.locator('[name="query"]').fill('P1');
+  await failureLookup.locator('button[type="submit"]').click();
+  await expect(page.locator('body')).toContainText('Result not confirmed');
+  await expect(failureLookup.locator('button[type="submit"]')).toBeEnabled();
+});
+
+test('Code C3 source controls', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const { renderCodeSources, bindCodeSources } = await import('/src/records/code-sources.ts');
+    document.body.innerHTML = renderCodeSources('a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78');
+    window.__calls = [];
+    bindCodeSources(async (command, args) => {
+      window.__calls.push({ command, request: args.request });
+      return {results: [{
+        source_id: 'synthetic-code', title: 'Code <img src=x>', sha256: 'a'.repeat(64),
+        excerpt: 'Four chickens', citation: 'Exact citation', as_of: args.request.as_of,
+        version_context: {version_id: 'historic-2025', version_label: '2025',
+          effective_start: '2025-01-01', effective_end: '2025-12-31'},
+      }], truncated: false};
+    }, async () => {window.__refreshed = true;});
+  });
+  await page.locator('[name=query]').fill('6.12.040');
+  await page.locator('[name=as_of]').fill('2025-06-01');
+  await page.getByRole('button', {name: 'Search Code', exact: true}).click();
+  await expect(page.locator('[data-code-results]')).toContainText('historic-2025');
+  await expect(page.locator('img')).toHaveCount(0);
+  await page.getByRole('button', {name: 'Attach to selected Records request', exact: true}).click();
+  await expect.poll(() => page.evaluate(() => window.__refreshed)).toBe(true);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls[0]).toEqual({command: 'records_domain_request',
+    request: {operation: 'search-code', query: '6.12.040', as_of: '2025-06-01'}});
+  expect(calls[1].request).toMatchObject({operation: 'attach-code-source', source_id: 'synthetic-code',
+    expected_sha256: 'a'.repeat(64), as_of: '2025-06-01',
+    request_id: 'a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78'});
+});
+
+test("Code C1 component renders exact citations and treats source HTML as text", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const { createCodeView } = await import("/src/code/view.js");
+    const calls = [];
+    const invoke = async (command, args) => {
+      const request = args.request;
+      calls.push({ command, request });
+      if (request.operation === "lookup") return {
+        section: { section_number: "1.01", section_id: "section-one", section_heading: "Synthetic" },
+        version: { version_label: "v2", body: "<img src=x onerror=alert(1)> synthetic source", effective_start: "2026-01-01" }
+      };
+      if (request.operation === "citation") return {
+        status: "ok", citation: { citation_text: "Title 1, Chapter 1, Section 1.01, version v2", source_id: "synthetic-source" }
+      };
+      throw new Error(`Unexpected operation: ${request.operation}`);
+    };
+    window.__calls = calls;
+    const view = createCodeView(invoke);
+    document.body.innerHTML = view.render();
+    view.bind();
+  });
+  const output = page.locator("[data-code-output]");
+  const lookupForm = page.locator('form[data-code-action="lookup"]');
+  await lookupForm.locator('input[name="section"]').fill("1.01");
+  await lookupForm.locator('input[name="date"]').fill("2026-02-01");
+  await lookupForm.locator('button[type="submit"]').click();
+  await expect(output).toContainText("version_label: v2");
+  await expect(output).toContainText("effective_start: 2026-01-01");
+  await expect(output).toContainText("<img src=x onerror=alert(1)> synthetic source");
+  await expect(page.locator("img")).toHaveCount(0);
+  const citationForm = page.locator('form[data-code-action="citation"]');
+  await citationForm.locator('input[name="section"]').fill("1.01");
+  await citationForm.locator('button[type="submit"]').click();
+  await expect(output).toContainText("status: ok");
+  await expect(output).toContainText("citation_text: Title 1, Chapter 1, Section 1.01, version v2");
+  await expect(output).toContainText("source_id: synthetic-source");
+  await expect(page.locator("img")).toHaveCount(0);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls.map(c => c.request.operation)).toEqual(["lookup", "citation"]);
+  expect(calls.every(c => c.command === "code_domain_request")).toBe(true);
+  expect(calls[0].request).toMatchObject({ operation: "lookup", section_number: "1.01", as_of: "2026-02-01" });
+  expect(calls[1].request).toMatchObject({ operation: "citation", section_number: "1.01", as_of: null });
+});
+
 // The three Townlight Access AI-capable actions (accessibility-review,
 // civicaccess-plain-language, civicaccess-language-variant) go through the
 // guided-review confirm panel before dispatching -- when the model is ready
@@ -728,7 +896,9 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.locator('[data-module-toggle="civiccode"]')).toBeChecked();
   await expect(page.locator('[data-module-toggle="civicaccess"]')).toBeChecked();
   await expect(page.locator('[data-module-toggle="civiczone"]')).toBeDisabled();
-  await expect(page.getByText("Not ready for Windows Local 1.0")).toBeVisible();
+  const civiczoneChoice = page.locator('label.module-choice').filter({ has: page.locator('[data-module-toggle="civiczone"]') });
+  await expect(civiczoneChoice.locator('[data-module-toggle="civiczone"]')).not.toBeChecked();
+  await expect(civiczoneChoice).toContainText("Ready for Windows Local 1.0");
   await page.getByLabel(/Custom/).check();
   await expect(page.getByText("Custom selection will install Townlight Core plus 5 selected product modules.")).toBeVisible();
   await page.locator('[data-module-toggle="civicrecords-ai"]').uncheck();
@@ -779,8 +949,9 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.getByRole("heading", { name: "Townlight Notice" })).toBeVisible();
   await expect(page.getByText("Backup includes: notice workflow history, notice exports, notice proof files")).toBeVisible();
   await expect(page.getByRole("button", { name: "Disable Townlight Notice" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "CivicZone" })).toBeVisible();
-  await expect(page.getByText("Package waiting")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Townlight Zoning" })).toBeVisible();
+  const zoningRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Zoning" }) });
+  await expect(zoningRow.getByText("Available", { exact: true })).toBeVisible();
   await expect(page.getByText("Scaffold")).toHaveCount(0);
 });
 
