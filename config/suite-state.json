@@ -115,9 +115,9 @@
       "public_name": "Townlight Planning", "public_slug": "planning",
       "legacy": {"technical_id": "civicplan", "product_names": ["CivicPlan"], "package_names": ["civicplan"]},
       "repository": {"name": "townlight/plan", "aliases": ["CivicSuite/civicplan"], "default_branch": "main", "manifest_path": "pyproject.toml"},
-      "versions": {"development": "0.2.2", "released": "0.2.2", "installer": "0.2.2", "public_status": "0.2.2"},
+      "versions": {"development": "0.3.0+dev.0", "released": "0.2.2", "installer": "0.2.2", "public_status": "0.2.2"},
       "release": {"tag": "v0.2.2", "published_at": "2026-05-23", "asset_policy": "python-package"},
-      "compatibility": {"development_core": "1.1.0", "installer_core": "1.1.0", "public_status_core": "1.1.0"},
+      "compatibility": {"development_core": "1.2.1", "installer_core": "1.1.0", "public_status_core": "1.1.0"},
       "dependencies": ["core", "zoning", "meetings"],
       "maturity": {"state": "queued", "availability": "runtime", "arch_tier": 2, "legacy_grade": "queued", "public_status_released_at": "2026-05-23"},
       "installer": {"tier": 2, "role": "planning policy lookup", "status": "demoted_v0_2_2_truth_repair_no_functional_upgrade", "source_commit": null}
