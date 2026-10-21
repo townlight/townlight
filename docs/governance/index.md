@@ -20,7 +20,7 @@ Community contributions are welcomed via pull request to any repository. See [`.
 
 The full license matrix is documented in [`../../CONSISTENCY.md`](../../CONSISTENCY.md) section 6. Summary:
 
-- Code: Apache License 2.0
+- Code: AGPL-3.0-only
 - Documentation: CC BY 4.0
 - Prompt libraries, if separated: CC BY-SA 4.0
 - Third-party dependencies: permissive or weak-copyleft only; AGPL and GPL-3.0 are blocked

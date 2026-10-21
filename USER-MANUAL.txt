@@ -300,7 +300,7 @@ A municipality should evaluate the Windows Local city-core package as a beta pac
 
 - **No vendor lock-in.** You run the software on your own hardware.
 - **No mandatory cloud dependency.** Local-first by design.
-- **No per-seat billing.** The Apache 2.0 license forecloses metering.
+- **No per-seat billing.** The AGPL-3.0 license forecloses metering.
 - **You can evaluate one module at a time.** No need to adopt the whole suite.
 - **You still own operations.** Not a managed SaaS. Your IT team, or a contractor you choose, runs install / upgrades / recovery.
 

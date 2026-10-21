@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 # DRAFT - awaiting Scott's APPROVE before the pipeline runs. Predecessor: Phase C (6-module profile).
 # Phase D: prove the 6-module city-core on a CLEAN VM per the program Definition of Done, with a
 # FULL accessibility acceptance pass, then commit the evidence kit and flip release truth.

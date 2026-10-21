@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 # DRAFT - awaiting Scott's APPROVE before the pipeline runs. Predecessor: Phase A (v0.4.0 cut).
 # Phase B: wire CivicAccess into the desktop runtime and author a runtime-VALID module record,
 # WITHOUT adding it to the city-core profile yet. The shipped 5-module profile stays untouched.

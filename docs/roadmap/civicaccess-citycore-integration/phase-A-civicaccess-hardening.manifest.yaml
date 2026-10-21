@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 # DRAFT - awaiting Scott's APPROVE before the pipeline runs.
 # Phase A of CivicAccess city-core integration: harden the MODULE (Postgres default + authz + audit
 # + backup/restore), close probe gaps #2/#3/#4, and cut CivicAccess v0.4.0. Module-repo work only.

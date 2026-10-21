@@ -9,7 +9,7 @@ Companion artifact: CivicSuite meta-repo definition
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
-Open source · Apache License 2.0 · Gemma 4 default · model-pluggable
+Open source · AGPL-3.0 · Gemma 4 default · model-pluggable
 
 **Document Metadata**
 
@@ -19,7 +19,7 @@ Open source · Apache License 2.0 · Gemma 4 default · model-pluggable
   **Grounded in**        CivicRecordsAI-UnifiedSpec-v3.0 (April 13, 2026) --- the canonical Module 1 spec, whose shared plumbing is the source of the extraction.
   **Scope**              Identify what moves from the CivicRecords AI repo into a shared CivicCore package; define the new CivicSuite umbrella repo; specify a phased, non-breaking rollout.
   **Out of scope**       New CivicCore features. Product decisions about future modules. Changes to CivicRecords AI product behavior.
-  **License**            Code: Apache License 2.0. Docs: CC BY 4.0.
+  **License**            Code: AGPL-3.0-only, with the TownLight Public Institution Exception for qualifying deployments. Docs: CC BY 4.0.
   **Default model**      Gemma 4 via Ollama. Model registry + context\_window\_size driving per-module token budgets.
   **Primary audience**   CivicRecords AI maintainers; future CivicClerk, CivicCode, CivicZone contributors; city IT evaluators.
   **Completion bar**     No regressions in CivicRecords AI. Import paths migrated with shim fallback. Every extracted subsystem has its own unit-test suite living in CivicCore.
@@ -152,7 +152,7 @@ surface." The name should reflect that.
     "CivicCore v0.2 compatible with all modules"). Not a substitute for
     per-module changelogs.
 
--   LICENSE --- CC BY 4.0 for docs. A second LICENSE-CODE file with Apache 2.0
+-   LICENSE --- CC BY 4.0 for docs. A second LICENSE-CODE file with AGPL-3.0
     for any example snippets.
 
 **5.2 Why a dedicated umbrella repo (not a monorepo)**
@@ -173,12 +173,12 @@ single place to talk about the whole suite --- without any of its costs.
 
   ------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------ --------------------------------------------------------------------------------------
   **Repo**                        **Contains**                                                                                                                                       **License**                                **Published as**
-  CivicSuite (new)                Umbrella docs: catalog, roadmap, strategy, design principles, cross-module ADRs, suite-wide changelog, governance.                                 CC BY 4.0 (docs) + Apache 2.0 (example configs)   GitHub org landing repo; not installable
-  CivicCore (new)                 Shared platform: auth, RBAC, audit chain, LLM abstraction, connector framework, ingestion, search, notifications, admin shell, exemption engine.   Apache 2.0                                        pip wheel: civiccore ; container base image: civiccore-base
-  CivicRecords AI (existing)      Records-module code only: request lifecycle, letter generation, fee schedules, public portal (planned), exemption dashboard.                       Apache 2.0                                        pip wheel: civicrecords ; docker-compose: existing stack, now pulling civiccore-base
-  CivicClerk (future)             Meeting, agenda, minutes, voting module. Depends on civiccore.                                                                                     Apache 2.0                                        pip wheel: civicclerk
-  CivicCode (future)              Municipal code / ordinance Q&A. Depends on civiccore, civicclerk.                                                                                  Apache 2.0                                        pip wheel: civiccode
-  CivicZone (future)              Zoning Q&A, parcel-aware lookups, overlay districts. Depends on civiccore, civiccode.                                                              Apache 2.0                                        pip wheel: civiczone
+  CivicSuite (new)                Umbrella docs: catalog, roadmap, strategy, design principles, cross-module ADRs, suite-wide changelog, governance.                                 CC BY 4.0 (docs) + AGPL-3.0 (example configs)     GitHub org landing repo; not installable
+  CivicCore (new)                 Shared platform: auth, RBAC, audit chain, LLM abstraction, connector framework, ingestion, search, notifications, admin shell, exemption engine.   AGPL-3.0-only                                     pip wheel: civiccore ; container base image: civiccore-base
+  CivicRecords AI (existing)      Records-module code only: request lifecycle, letter generation, fee schedules, public portal (planned), exemption dashboard.                       AGPL-3.0-only                                     pip wheel: civicrecords ; docker-compose: existing stack, now pulling civiccore-base
+  CivicClerk (future)             Meeting, agenda, minutes, voting module. Depends on civiccore.                                                                                     AGPL-3.0-only                                     pip wheel: civicclerk
+  CivicCode (future)              Municipal code / ordinance Q&A. Depends on civiccore, civicclerk.                                                                                  AGPL-3.0-only                                     pip wheel: civiccode
+  CivicZone (future)              Zoning Q&A, parcel-aware lookups, overlay districts. Depends on civiccore, civiccode.                                                              AGPL-3.0-only                                     pip wheel: civiczone
   CivicSuite-prompts (optional)   Prompt libraries for every module. Versioned YAML. Separate repo so cities can fork prompts without forking code.                                  CC BY-SA 4.0                               pip wheel: civicsuite-prompts (reference copy)
   ------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------ --------------------------------------------------------------------------------------
 
@@ -450,7 +450,7 @@ verifiably true:
   CivicCore API surface ossifies around records-only assumptions   Medium           Medium       v0.1 is deliberately lean. Any API change prompted by records-only needs requires a second module's maintainer review before merge.
   Circular imports between modules and CivicCore                   Medium           Medium       CivicCore never imports from modules. One-way dependency. Enforced by a CI lint rule that greps for module names inside CivicCore.
   Shared table schema change breaks an already-deployed module     Low              High         Shared-table changes are major CivicCore releases. Minor/patch releases never alter shared schema.
-  License confusion (MIT vs. CC BY vs. CC BY-SA)                   Low              Low          LICENSE file in every repo: Apache License 2.0 for code, CC BY 4.0 for docs (LICENSE-DOCS or LICENSE in docs-only repos).
+  License confusion (MIT vs. CC BY vs. CC BY-SA)                   Low              Low          LICENSE file in every repo: AGPL-3.0-only for code, CC BY 4.0 for docs (LICENSE-DOCS or LICENSE in docs-only repos).
   Contributor confusion about where to file a bug                  Medium           Low          Each repo's CONTRIBUTING.md has a "where does this bug go" decision tree. CivicSuite umbrella repo redirects issues to the right module.
   Shim layer leaks into long-term technical debt                   Medium           Low          Phase 5 is scheduled at the time phase 1 ships. Shims have a documented sunset date, not a vague "someday."
   ---------------------------------------------------------------- ---------------- ------------ ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -589,7 +589,7 @@ civiccore/
 
 ├── CONTRIBUTING.md
 
-├── LICENSE \# Apache 2.0
+├── LICENSE \# AGPL-3.0
 
 └── README.md
 
@@ -617,11 +617,11 @@ civicsuite/
 
 ├── LICENSE \# CC BY 4.0 for docs
 
-└── LICENSE-CODE \# Apache 2.0, covers any example snippets in docs/
+└── LICENSE-CODE \# AGPL-3.0, covers any example snippets in docs/
 
 **D. Licensing clarifications**
 
--   Code (every civicsuite/\* repo): Apache License 2.0 (SPDX: Apache-2.0). Use the canonical text from https://www.apache.org/licenses/LICENSE-2.0.txt unmodified. Project standardized on Apache 2.0 on 2026-04-23 to align with civicrecords-ai.
+-   Code (every civicsuite/\* repo): AGPL-3.0-only (SPDX: AGPL-3.0-only), with the TownLight Public Institution Exception for qualifying deployments. Use the official text from https://www.gnu.org/licenses/agpl-3.0.txt unmodified. Project standardized on Apache 2.0 on 2026-04-23 to align with civicrecords-ai, then moved to AGPL-3.0-only on 2026-10-20.
 
 -   Documentation: CC BY 4.0 --- cities and vendors can fork, adapt,
     rebrand. Attribution required.

@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 <#
 Blocks pushes when the CivicSuite stage branch is in an unsafe state.
 

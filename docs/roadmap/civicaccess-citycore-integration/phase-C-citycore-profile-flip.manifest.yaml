@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 # DRAFT - awaiting Scott's APPROVE before the pipeline runs. Predecessors: Phase A (v0.4.0) + Phase B (runtime wired).
 # Phase C: flip city-core from 5 to 6 modules in ONE lockstep changeset, after a fresh re-probe PASS.
 # This is the merge that must keep the required `verify` gate green.

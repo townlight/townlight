@@ -333,7 +333,7 @@ When CivicCore ships a breaking change:
 
 - **No telemetry.** No outbound runtime calls in the default profile.
 - **No vendor cloud dependency.** External LLM providers (OpenAI, Anthropic) are optional adapters.
-- **No per-seat metering.** Apache 2.0 + CC BY 4.0 licensing.
+- **No per-seat metering.** AGPL-3.0 + CC BY 4.0 licensing.
 - **Air-gapped deployment** is a first-class operational mode, not a checkbox feature.
 - **Operator owns data.** Connectors are read-first; write-back connectors only after audited read paths are stable.
 

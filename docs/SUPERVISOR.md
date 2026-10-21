@@ -41,7 +41,7 @@ This is coordination work, not implementation. Five concrete actions:
 6. **Work incrementally** — one spec / ADR / matrix row per commit; don't bulk-edit four specs in one pass without a CONSISTENCY.md reconciliation.
 7. **No wasteful operations** — don't re-scaffold, don't regenerate whole specs when a section edit suffices.
 8. **Stay in scope** — fires constantly; this repo attracts drive-by "while we're here" edits to modules that belong in their own repos.
-9. **coder-ui-qa-test Documentation Gate** — 6 artifacts present before any push: `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE` (note: project uses `LICENSE` for docs CC-BY-4.0 + `LICENSE-CODE` for code Apache 2.0), `.gitignore`, `docs/index.html`. All currently present — do not let anyone remove one.
+9. **coder-ui-qa-test Documentation Gate** — 6 artifacts present before any push: `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE` (note: `LICENSE` is the AGPL-3.0 code license, with `LICENSE-EXCEPTION.md`, a `LICENSE-CODE` pointer, and `LICENSE-DOCS` for CC BY 4.0 docs), `.gitignore`, `docs/index.html`. All currently present — do not let anyone remove one.
 10. **Subagent Obligation** — fires any time a change touches 2+ non-overlapping docs (e.g., update a spec, its CONSISTENCY row, and an ADR). Dispatch parallel subagents for disjoint files. 3rd distinct inline edit is hook-blocked.
 11. **Commit-Size Acknowledgment Gate** — >800 lines needs a bracketed token (`[MVP]`, `[LARGE-CHANGE]`, `[REFACTOR]`, `[INITIAL]`, `[MERGE]`, `[REVERT]`, `[SCOPE-EXPANSION: reason]`). The Phase 0 scaffold commit already used this pattern; later multi-spec passes may trigger it too.
 

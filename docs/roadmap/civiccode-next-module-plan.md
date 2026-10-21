@@ -111,7 +111,7 @@ metadata and migration chain.
 ## First Sprint Sequence
 
 1. Keep `CivicSuite/civiccode` shipped truth current after v0.1.0.
-2. Maintain professional repo docs, Apache 2.0 code license, CC BY 4.0 docs
+2. Maintain professional repo docs, AGPL-3.0 code license, CC BY 4.0 docs
    license, issue templates, PR template, support/security/contributing docs,
    landing page, user manual, and seed discussion posts.
 3. Add `AGENTS.md` operating contract for CivicCode with the same test-first,

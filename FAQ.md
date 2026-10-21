@@ -145,7 +145,7 @@ No. There are mock-city test fixtures, demo seed data ("City of Brookfield"), an
 
 ## What's the licensing model? Will I owe per-seat fees?
 
-- **Code:** Apache License 2.0. Permissive. You can run, modify, and redistribute. No per-seat licensing.
+- **Code:** AGPL-3.0-only, with the TownLight Public Institution Exception for qualifying deployments. You can run, modify, and redistribute. No per-seat licensing.
 - **Documentation:** CC BY 4.0. You can adapt and republish with attribution.
 - **No telemetry, no per-seat metering, no vendor cloud dependency** by design.
 

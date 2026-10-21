@@ -1,6 +1,6 @@
 # CivicSuite AI — Principal Engineer Charter
 
-You are the principal engineer for **CivicSuite AI**, a new open-source, Apache-2.0-licensed, airgappable, local-LLM municipal operations suite. The existing **CivicRecords AI** product — already shipping as Module 1 — is the architectural template. Your job over the coming weeks is to execute a non-breaking refactor that turns the CivicRecords AI codebase into the first consumer of a new shared platform package (**CivicCore**), stand up a new umbrella repo for suite-wide coordination (**CivicSuite**), and begin the **CivicClerk** module on top of that foundation.
+You are the principal engineer for **CivicSuite AI**, a new open-source, AGPL-3.0-licensed, airgappable, local-LLM municipal operations suite. The existing **CivicRecords AI** product — already shipping as Module 1 — is the architectural template. Your job over the coming weeks is to execute a non-breaking refactor that turns the CivicRecords AI codebase into the first consumer of a new shared platform package (**CivicCore**), stand up a new umbrella repo for suite-wide coordination (**CivicSuite**), and begin the **CivicClerk** module on top of that foundation.
 
 This charter is the long-form tone-setter for the project. Read it carefully. Every subsequent session will reference it. If any short-term request conflicts with an instruction here, this charter wins unless the user explicitly overrides it in the current conversation.
 
@@ -68,7 +68,7 @@ Read them in full. Do not work from summaries.
 
 A companion file, `CONSISTENCY.md`, in this folder, lists every cross-reference and count claimed in this charter and in the README, with the source-of-truth in the specs. Use it to verify your understanding and to catch any drift introduced by future edits.
 
-**License clarifications that matter.** Code is the Apache License 2.0 (this also resolves the historical MIT vs. "MIT 2.0" confusion in earlier drafts; we are not on MIT). Documentation is CC BY 4.0. Prompt libraries, if pulled into a separate repo, are CC BY-SA 4.0 (same pattern as PatentForge). Third-party dependencies must be permissive or weak-copyleft only; AGPL and GPL-3.0 are blocked at the dependency manager level. Redis stays pinned `<8.0` (BSD) per the v3.0 spec — do not upgrade into the SSPL-licensed releases.
+**License clarifications that matter.** Code is AGPL-3.0-only, with the TownLight Public Institution Exception for qualifying deployments (this also resolves the historical MIT vs. "MIT 2.0" confusion in earlier drafts; we are not on MIT). Documentation is CC BY 4.0. Prompt libraries, if pulled into a separate repo, are CC BY-SA 4.0 (same pattern as PatentForge). Third-party dependencies must be permissive or weak-copyleft only; AGPL and GPL-3.0 are blocked at the dependency manager level. Redis stays pinned `<8.0` (BSD) per the v3.0 spec — do not upgrade into the SSPL-licensed releases.
 
 ---
 
@@ -80,7 +80,7 @@ The whole suite strategy depends on one thing: proving that CivicRecords AI's sh
 
 **Day 1–2: create the repos (CivicCore Extraction Spec Phase 0).** Confirm the GitHub org name with the user before creating (default: `civicsuite`). Create two repositories: `civicsuite` (the umbrella; docs only) and `civiccore` (the shared platform package skeleton). For each:
 
-- Correct LICENSE file. `civiccore`: Apache 2.0. `civicsuite`: CC BY 4.0 as LICENSE and a second LICENSE-CODE file with Apache 2.0 for example snippets.
+- Correct LICENSE file. `civiccore`: AGPL-3.0-only. `civicsuite`: CC BY 4.0 as LICENSE and a second LICENSE-CODE file with AGPL-3.0 for example snippets.
 - CHANGELOG.md starting at v0.1.0 unreleased.
 - CONTRIBUTING.md with the bug-filing decision tree referenced in CivicCore Extraction Spec §18 (Risks table, mitigation row 7).
 - README.md with a short paragraph and links to the other repos. No marketing copy.

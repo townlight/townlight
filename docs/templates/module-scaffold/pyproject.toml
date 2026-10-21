@@ -2,6 +2,7 @@
 name = "{{MODULE_PACKAGE_NAME}}"
 version = "0.1.0"
 description = "{{MODULE_DISPLAY_NAME}} CivicSuite module"
+license = { text = "AGPL-3.0-only" }
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115",

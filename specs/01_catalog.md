@@ -6,7 +6,7 @@ A Clerk-First, Airgappable, Local-LLM Municipal Operations Suite
 
 Version 1.0 --- April 23, 2026
 
-Open source · Apache License 2.0 · 100% local inference · Gemma 4 first,
+Open source · AGPL-3.0 · 100% local inference · Gemma 4 first,
 model-pluggable
 
 Architecture pattern: CivicRecords AI
@@ -18,8 +18,8 @@ Document Metadata
   **Supersedes**               Open\_Source\_AI\_for\_Municipalities.docx (internal strategy draft), CivicRecords-AI\_Suite.docx (market framing draft)
   **Grounded in**              CivicRecordsAI-UnifiedSpec-v3.0 (April 13, 2026) --- the canonical Module 1 specification
   **Purpose**                  Define the full suite of modules that a small or mid-sized city can install, one at a time, all inheriting the CivicRecords AI architecture
-  **License**                  Apache License 2.0 for code. Suite documentation under CC BY 4.0 (recommended; configurable).
-  **License note**             Code license is Apache License 2.0 (SPDX: Apache-2.0). Documentation is CC BY 4.0. Earlier drafts referenced MIT; the project standardized on Apache 2.0 on 2026-04-23 to align with civicrecords-ai.
+  **License**                  AGPL-3.0-only for code. Suite documentation under CC BY 4.0 (recommended; configurable).
+  **License note**             Code license is AGPL-3.0-only (SPDX: AGPL-3.0-only), with the TownLight Public Institution Exception for qualifying deployments. Documentation is CC BY 4.0. Earlier drafts referenced MIT; the project standardized on Apache 2.0 on 2026-04-23 to align with civicrecords-ai, then moved to AGPL-3.0-only on 2026-10-20.
   **Architecture authority**   CivicRecords AI is the architectural template. Every module inherits CivicCore (auth, RBAC, audit, LLM abstraction, connectors, search, notifications).
   **Default model**            Gemma 4 via Ollama (local). Model registry + context\_window\_size enables drop-in replacement.
   **Deployment profiles**      single-workstation · small on-prem server · segmented/air-gapped for sensitive modules
@@ -31,7 +31,7 @@ Part I. Strategic Framing
 
 1\. Executive Summary
 
-CivicSuite AI is an open-source, Apache-2.0-licensed, airgappable, local-LLM
+CivicSuite AI is an open-source, AGPL-3.0-licensed, airgappable, local-LLM
 municipal operations suite for small and mid-sized cities. It is
 clerk-first: it starts where the records live, where the meetings
 happen, and where the code gets adopted --- then expands outward to
@@ -209,7 +209,7 @@ negotiable at the module level; they are enforced at CivicCore.
 
 3.5 Licensing & open-source principles
 
--   Code: Apache License 2.0. One license file, unchanged, in every module repository.
+-   Code: AGPL-3.0-only. One license file, unchanged, in every module repository.
 
 -   Documentation: CC BY 4.0 recommended so cities and vendors can fork
     and adapt their own materials.
@@ -2547,7 +2547,7 @@ time.
 Appendix C. Prompt Library Governance
 
 Every module ships a versioned prompt library as YAML files in the
-module repository. Prompts are code artifacts under the Apache License 2.0 (or CC BY-SA 4.0 if shipped as a separate prompt repository per the suite's prompt-licensing pattern); a
+module repository. Prompts are code artifacts under AGPL-3.0-only (or CC BY-SA 4.0 if shipped as a separate prompt repository per the suite's prompt-licensing pattern); a
 city can fork them. The governance model borrows from PatentForge\'s
 prompt-licensing pattern:
 
@@ -2583,7 +2583,7 @@ module, not per suite.
 
 Appendix E. Bottom-Line Recommendation
 
-Build CivicSuite AI as an open-source, Apache-2.0-licensed, airgappable,
+Build CivicSuite AI as an open-source, AGPL-3.0-licensed, airgappable,
 local-LLM municipal suite with CivicRecords AI as Module 1 and the
 following four modules as the Clerk Core: CivicClerk, CivicCode,
 CivicAccess, and CivicCore as the shared platform underneath. Then
