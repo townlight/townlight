@@ -3,9 +3,9 @@
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
-## Connected Records + Meetings + Code — 1.3.0-beta.1 candidate
+## Connected Records + Meetings + Code — 1.3.0-beta.1 public beta
 
-This release candidate connects three products on one local Python/PostgreSQL
+This release connects three products on one local Python/PostgreSQL
 domain path. Select **city-core** during setup or in Settings: Core, Records,
 Meetings, Code, Notice and Access. Records-only remains the default; existing
 saved selections are preserved.
@@ -20,8 +20,12 @@ The obsolete Rust JSON business implementation is retired; Rust retains native
 integration, supervision and migration/recovery support. Historical snapshots
 remain available for supported migration, not fallback or dual writing.
 
-**Release status:** final signed installer and upgrade verification pending.
-The completed local C4 evidence is not a claim about final release bytes.
+**Release status:** the exact signed MSI and embedded EXE passed independent
+signature/hash verification, fresh connected installed acceptance and a populated
+signed Records–Meetings 1.2 upgrade on October 20, 2026. Recovery, offline use and
+retained-data uninstall passed. This is a public beta, not general availability.
+Download the signed MSI from the
+[1.3.0-beta.1 release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
 See [release acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md)
 and [the manual](USER-MANUAL.md). Optional Meetings AI minutes/transcription and
 the remaining suite products are not part of this bounded release.
@@ -70,7 +74,7 @@ approval; historical approval notes and exported files remain intact.
 See [RELEASING.md](RELEASING.md) and
 [USER-MANUAL.md](USER-MANUAL.md).
 
-### Architecture truth
+### Historical predecessor architecture (1.2 and earlier)
 
 ### Connected workflow boundaries
 

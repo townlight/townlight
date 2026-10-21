@@ -1,4 +1,4 @@
-# Townlight Records + Meetings + Code 1.3.0-beta.1 candidate
+# Townlight Records + Meetings + Code 1.3.0-beta.1 public beta
 
 Three connected products run locally through bundled Python services and
 PostgreSQL. Choose city-core for Records, Meetings and Code, with Core, Notice
@@ -7,7 +7,10 @@ adoption and separate codification, then attach permitted public source evidence
 to Records with versions, citations and hashes preserved. Human decisions remain
 explicit and audited; restricted material stays protected.
 
-Final signed installer acceptance and conditional publication are pending.
+The exact signed installer passed fresh connected workflows and a populated
+signed 1.2 upgrade, with preserved work and managed files, recovery, offline use
+and retained-data uninstall. Download the
+[public beta](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-v1.3.0-beta.1).
 See the [release record](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
 This is a bounded beta, not the entire suite or optional AI minutes/transcription.
 

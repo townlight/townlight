@@ -21,6 +21,11 @@ overwrite predecessor releases or introduce new approval policy.
 
 Evidence: [connected Code acceptance](docs/installer/townlight-records-meetings-code-beta1-acceptance.md).
 
+Final signed source is `0c0e098dd3db8bb3f0b55af8f3095bfa3bd3520c`, signing
+run 39520756994. Exact signed fresh and populated signed 1.2 upgrade acceptance
+passed on October 20, 2026. Documentation-only release follow-ups do not change
+the tag target, installer identity, signed bytes or accepted runtime evidence.
+
 ## Historical connected Records–Meetings release: 1.2.0-beta.1
 
 Scott approved the connected release sequence on October 19, 2026: push,
