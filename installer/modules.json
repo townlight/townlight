@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "module_contract_version": 1,
-  "installer_status": "townlight_records_meetings_code_zoning_public_beta",
+  "installer_status": "townlight_records_meetings_code_beta_candidate",
   "primary_profile": "records-beta",
   "workflow_proof_status": {
     "profile": "city-core",
@@ -16,7 +16,7 @@
   },
   "public_use_gate_status": {
     "profile": "records-beta",
-    "status": "public-beta",
+    "status": "candidate",
     "path": "RELEASING.md",
     "route_state_matrix": "desktop/tests/browser/records-public-beta.spec.mjs",
     "restore_precondition_evidence": ".github/workflows/desktop-windows-msi.yml",
@@ -96,7 +96,7 @@
         "civicnotice",
         "civicaccess"
       ],
-      "status": "public-beta"
+      "status": "stabilizing"
     },
     {
       "id": "city-core",

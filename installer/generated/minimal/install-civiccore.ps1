@@ -12,7 +12,7 @@ function Invoke-Step {
 }
 
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
-    throw "Python 3.11+ is required before installing Townlight Core. Install Python, reopen this terminal, then rerun this script."
+    throw "Python 3.11+ is required before installing CivicCore. Install Python, reopen this terminal, then rerun this script."
 }
 
 Invoke-Step { python -m venv $VenvPath }

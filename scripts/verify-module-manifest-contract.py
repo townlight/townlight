@@ -206,7 +206,7 @@ def _validate_docs(contract: dict[str, Any]) -> list[str]:
         text = path.read_text(encoding="utf-8")
         for phrase in (
             "Tauri/WebView2",
-            "CivicCore is always installed",
+            "Townlight Core is always installed" if path == DESIGN_CONTROL else "CivicCore is always installed",
             "module manager",
             "Docker",
             "WSL",

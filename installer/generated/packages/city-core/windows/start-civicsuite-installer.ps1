@@ -78,7 +78,7 @@ function Write-CivicSuiteBootstrapLog([string]$Name, [string]$Content) {
 function Register-CivicSuiteRunOnce {
     $Command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -FirstRun"
     New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name "CivicSuiteInstallerResume" -Value $Command -PropertyType String -Force | Out-Null
-    Write-Host "Townlight will resume after reboot using Windows RunOnce."
+    Write-Host "CivicSuite will resume after reboot using Windows RunOnce."
 }
 
 function Get-CivicSuiteInstallRoot {
@@ -100,7 +100,7 @@ function Read-CivicSuiteWizardValue([string]$Label, [string]$Default = "", [swit
         $Value = Read-Host "$Label$Suffix"
         if (-not $Value -and $Default) { $Value = $Default }
         if ($Value -or -not $Required) { return $Value }
-        Write-Host "This field is required so Townlight can finish first-run setup."
+        Write-Host "This field is required so CivicSuite can finish first-run setup."
     }
 }
 
@@ -161,20 +161,20 @@ function Invoke-CivicSuiteFirstRunWizard {
 function Show-CivicSuitePostInstallDashboard([hashtable]$Wizard) {
     $CredentialPath = Join-Path $Wizard.install_root "sources\civicrecords-ai\data\secrets\first_admin_password"
     Write-Host ""
-    Write-Host "Townlight staff dashboard is installed."
+    Write-Host "CivicSuite staff dashboard is installed."
     Write-Host "Admin email: $($Wizard.admin_email)"
     Write-Host "Initial administrator credential file: $CredentialPath"
     Write-Host "Open that file once, sign in, rotate the credential immediately, then store the rotated value in your municipal vault."
     Write-Host "Suite launcher: http://127.0.0.1:18082/"
     Write-Host "Shared staff session check: CIVICCORE_SUITE_SESSION_SECRET is generated during install if missing."
     Write-Host "Records AI staff dashboard: http://127.0.0.1:18080/"
-    Write-Host "Townlight Meetings staff dashboard: http://127.0.0.1:18081/"
-    Write-Host "Townlight Code API/search: http://127.0.0.1:18820/"
+    Write-Host "CivicClerk staff dashboard: http://127.0.0.1:18081/"
+    Write-Host "CivicCode API/search: http://127.0.0.1:18820/"
 }
 
 function Invoke-CivicSuiteGuidedSetup {
     if (-not (Test-CivicSuiteAdmin)) {
-        Write-Host "Townlight needs Windows administrator consent to install WSL/Docker prerequisites."
+        Write-Host "CivicSuite needs Windows administrator consent to install WSL/Docker prerequisites."
         Start-Process powershell.exe -Verb RunAs -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $PSCommandPath, "-GuidedSetup")
         exit 0
     }
@@ -198,7 +198,7 @@ function Invoke-CivicSuiteGuidedSetup {
         $WslInstall = (& wsl --install 2>&1 | Out-String)
         Write-CivicSuiteBootstrapLog "windows-wsl-install.txt" $WslInstall
         Register-CivicSuiteRunOnce
-        Write-Host "If Windows asks to reboot, reboot now. Townlight will resume automatically."
+        Write-Host "If Windows asks to reboot, reboot now. CivicSuite will resume automatically."
         exit $LASTEXITCODE
     }
 
@@ -217,11 +217,11 @@ function Invoke-CivicSuiteGuidedSetup {
             Write-Error "Docker Desktop installer exited with $($Proc.ExitCode). Review $InstallLog and $InstallLog.err, then ask IT for help."
             exit $Proc.ExitCode
         }
-        Write-Host "Docker Desktop installed. Start Docker Desktop, accept Docker's license at first start, then rerun Townlight if it does not resume automatically."
+        Write-Host "Docker Desktop installed. Start Docker Desktop, accept Docker's license at first start, then rerun CivicSuite if it does not resume automatically."
         exit 0
     }
 
-    Write-Host "Guided setup prerequisites are present. Continuing with Townlight readiness."
+    Write-Host "Guided setup prerequisites are present. Continuing with CivicSuite readiness."
 }
 
 function Invoke-CivicSuiteLifecycle([string]$Mode, [string[]]$LifecycleArgs, [switch]$ReturnAfter) {
@@ -269,9 +269,9 @@ function Invoke-CivicSuiteLifecycle([string]$Mode, [string[]]$LifecycleArgs, [sw
     exit $ExitCode
 }
 
-Write-Host "Townlight city-core unsigned beta installer package"
+Write-Host "CivicSuite city-core unsigned beta installer package"
 Write-Host "Signing status: unsigned. Windows may show SmartScreen or unknown publisher warnings."
-Write-Host "Trust path: verify the SHA256 checksum from installer\dist and the official Townlight release source before running lifecycle commands."
+Write-Host "Trust path: verify the SHA256 checksum from installer\dist and the official CivicSuite release source before running lifecycle commands."
 Write-Host "Project status: city-core beta; Linux and Windows matching-host lifecycle proof is required before promotion."
 
 $PlannerArgs = @("--menu-style", "guided", "--dry-run")
