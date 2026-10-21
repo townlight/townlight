@@ -108,6 +108,7 @@ CivicCore base contract. Operators can choose one module or the whole profile:
 .\start-civicsuite-installer.ps1 -Plan -Module civicclerk
 .\start-civicsuite-installer.ps1 -Plan -Module civiccode
 .\start-civicsuite-installer.ps1 -Plan -Module civicnotice
+.\start-civicsuite-installer.ps1 -Plan -Module civicaccess
 .\start-civicsuite-installer.ps1 -Install -Module civicrecords-ai -Module civicclerk -Module civiccode -Module civicnotice -Module civicaccess
 ```
 
@@ -130,8 +131,9 @@ protected while the proof creates real starter-set test records:
 - Verify mode checks live service endpoints. `--workflow-proof` /
   `-WorkflowProof` also creates live CivicRecords AI request/search/review/
   response proof records, CivicClerk agenda/packet/minutes/vote/notice/
-  archive proof records, and CivicCode health/public lookup proof when
-  CivicCode is selected.
+  archive proof records, CivicCode health/public lookup proof when
+  CivicCode is selected, and a CivicAccess accessibility-review record
+  round-trip proof when CivicAccess is selected.
 - Backup mode writes per-module PostgreSQL custom dumps plus a manifest under
   the installer runtime backup directory.
 - Restore mode verifies the latest backup by restoring each dump into a

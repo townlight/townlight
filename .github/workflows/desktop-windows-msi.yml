@@ -111,7 +111,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: d57e1872e9dd60ce580ed71f665413415bb0b717
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -504,7 +504,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: d57e1872e9dd60ce580ed71f665413415bb0b717
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
