@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: modules/civicrecords-ai
 
       - name: Check out CivicClerk bundle source
@@ -158,7 +158,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
+          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
           path: modules/civicrecords-ai
 
       - name: Check out CivicClerk bundle source

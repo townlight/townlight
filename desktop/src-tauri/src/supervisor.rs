@@ -2098,6 +2098,7 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
             {
                 "city-core" => "city-core".to_string(),
                 "meetings-beta" => "meetings-beta".to_string(),
+                "zoning-beta" => "zoning-beta".to_string(),
                 _ => "records-beta".to_string(),
             },
         ),
@@ -4191,7 +4192,7 @@ mod tests {
                 .iter()
                 .find(|s| s.id == "python-services")
                 .unwrap();
-            for profile in ["records-beta", "meetings-beta", "city-core"] {
+            for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
                 crate::module_registry::persist_profile_selection(profile).unwrap();
                 let env = service_environment(service).unwrap();
                 assert!(env

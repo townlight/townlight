@@ -11,6 +11,9 @@
       "services": ["postgres"],
       "source_dir": "postgres",
       "destination_dir": "runtime/postgres",
+      "profile_required_files": {
+        "zoning-beta": ["share/extension/postgis.control", "lib/postgis-3.dll"]
+      },
       "required_files": [
         "bin/pg_ctl.exe",
         "bin/pg_controldata.exe",
@@ -57,6 +60,15 @@
       ],
       "profile_required_files": {
         "records-beta": [],
+        "zoning-beta": [
+          "Lib/site-packages/civiczone/geo_import.py",
+          "Lib/site-packages/civiczone/connected_sources.py",
+          "Lib/site-packages/civiczone/migrations/versions/civiczone_0006_cited_questions.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_bridge.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_records.py",
+          "Lib/site-packages/civicclerk/main.py",
+          "Lib/site-packages/civiccode/main.py"
+        ],
         "city-core": [
           "Lib/site-packages/civicclerk/main.py",
           "Lib/site-packages/civiccode/main.py"

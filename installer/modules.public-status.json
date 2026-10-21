@@ -113,7 +113,7 @@
       "name": "CivicZone",
       "arch_tier": 2,
       "current_version": "0.2.2",
-      "civiccore_requirement": "1.1.0",
+      "civiccore_requirement": "1.2.1",
       "public_status": {
         "grade": "queued",
         "released_date": "2026-05-23",

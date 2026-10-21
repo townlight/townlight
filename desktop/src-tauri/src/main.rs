@@ -13,6 +13,7 @@ mod profile_gate;
 mod records_authority;
 mod supervisor;
 mod workflows;
+mod zoning_client;
 
 use auth::{AccessState, AuthActionResult, LocalUserSummary};
 use first_run::{FirstRunActionResult, FirstRunState, SavedCityProfile};
@@ -90,6 +91,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "notice",
             label: "Public Notices",
             description: "Deadlines, proof, archive packets",
+        },
+        NavigationItem {
+            id: "zoning".into(),
+            label: "Zoning".into(),
+            description: "Parcel information and cited rules".into(),
         },
         NavigationItem {
             id: "access",
@@ -835,7 +841,10 @@ async fn meetings_domain_request(
     let profile_id = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?
         .profile_id;
-    if !matches!(profile_id.as_str(), "meetings-beta" | "city-core") {
+    if !matches!(
+        profile_id.as_str(),
+        "meetings-beta" | "city-core" | "zoning-beta"
+    ) {
         return Err(domain_client::DomainError::denied());
     }
     let access =
@@ -857,7 +866,7 @@ async fn code_domain_request(
     let profile_id = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?
         .profile_id;
-    if profile_id != "city-core" {
+    if !matches!(profile_id.as_str(), "city-core" | "zoning-beta") {
         return Err(domain_client::DomainError::denied());
     }
     let access =
@@ -881,6 +890,49 @@ async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value
             .await
             .map_err(|_| "Could not open the local exports folder.".to_string())??;
     Ok(serde_json::json!({"message":message}))
+}
+
+#[tauri::command]
+async fn zoning_domain_request(
+    request: zoning_client::ZoningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civiczone")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    let session =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    let role = session.role.as_deref();
+    if role != Some("local-admin") && role != Some("city-staff") {
+        return Err(domain_client::DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    zoning_client::execute(request, proof, false).await
+}
+
+#[tauri::command]
+async fn zoning_public_request(
+    request: zoning_client::ZoningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civiczone")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    zoning_client::execute(request, String::new(), true).await
 }
 
 fn city_work_action_authorized(
@@ -996,6 +1048,8 @@ pub fn run() {
             suite_domain_request,
             meetings_domain_request,
             code_domain_request,
+            zoning_domain_request,
+            zoning_public_request,
             open_domain_exports,
             city_work_action
         ])
