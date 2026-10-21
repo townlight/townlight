@@ -1,6 +1,6 @@
 {
   "name": "@civicsuite/desktop",
-  "version": "1.3.0-1",
+  "version": "1.4.0-1",
   "private": true,
   "description": "Tauri/WebView2 desktop shell for the Townlight Records Windows beta.",
   "type": "module",

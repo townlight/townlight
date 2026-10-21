@@ -3,6 +3,11 @@
   "profile": "windows-local-1.0",
   "payload_root": "desktop/runtime/payload",
   "sources": {
+    "postgis": {
+      "version": "3.6.2",
+      "download_url": "https://download.osgeo.org/postgis/windows/pg17/postgis-bundle-pg17-3.6.2x64.zip",
+      "download_sha256": "7ba180ee2a352987b9a2f194673652c59483b55852295ccf401dceccd8765425"
+    },
     "postgres": {
       "id": "postgres-17",
       "label": "PostgreSQL 17 Windows x86-64 binaries",

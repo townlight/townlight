@@ -1,1147 +1,1204 @@
 {
-    "schema_version":  1,
-    "module_contract_version":  1,
-    "installer_status":  "townlight_records_meetings_code_beta_candidate",
-    "primary_profile":  "records-beta",
-    "workflow_proof_status":  {
-                                  "profile":  "city-core",
-                                  "scope":  [
-                                                "civicrecords-ai request/search/review/response/release",
-                                                "civicclerk agenda/packet/notice/proceedings/minutes/archive and permitted Records sources",
-                                                "civiccode proposals/agenda links/explicit adoption/separate codification and current/historical permitted Records sources",
-                                                "civicnotice deadline/proof/archive",
-                                                "civicaccess accessibility/release review"
-                                            ],
-                                  "boundary":  "The connected Records, Meetings and Code profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration, supervision and historical migration/recovery support; obsolete JSON business actions are retired. Optional native AI minutes/transcription and completion of the wider suite are not certified by this profile."
-                              },
-    "public_use_gate_status":  {
-                                   "profile":  "records-beta",
-                                   "status":  "candidate",
-                                   "path":  "RELEASING.md",
-                                   "route_state_matrix":  "desktop/tests/browser/records-public-beta.spec.mjs",
-                                   "restore_precondition_evidence":  ".github/workflows/desktop-windows-msi.yml",
-                                   "boundary":  "Publication remains blocked until the exact signed MSI passes the main-only Authenticode gate and clean-machine install, launch, workflow, backup/restore, repair, and uninstall evidence."
-                               },
-    "menu_styles":  [
-                        {
-                            "id":  "guided",
-                            "label":  "Guided Setup",
-                            "description":  "Step-by-step setup for operators who want recommendations."
-                        },
-                        {
-                            "id":  "department",
-                            "label":  "Department Menu",
-                            "description":  "Group modules by municipal department or workflow area."
-                        },
-                        {
-                            "id":  "advanced",
-                            "label":  "Advanced",
-                            "description":  "Compact profile and module controls for technical operators."
-                        }
-                    ],
-    "profiles":  [
-                     {
-                         "id": "meetings-beta",
-                         "label": "Townlight Meetings — development candidate",
-                         "description": "Local Records plus Meetings integration; not a published release.",
-                         "modules": ["civiccore", "civicrecords-ai", "civicclerk", "civicnotice", "civicaccess"],
-                         "disabled": false
-                     },
-                     {
-                         "id":  "minimal",
-                         "label":  "Minimal",
-                         "description":  "Install CivicCore only.",
-                         "modules":  [
-                                         "civiccore"
-                                     ]
-                     },
-                     {
-                         "id":  "clerk-core",
-                         "label":  "Clerk Core",
-                         "description":  "Install the clerk-centered starter profile.",
-                         "modules":  [
-                                         "civiccore",
-                                         "civicrecords-ai",
-                                         "civicclerk"
-                                     ]
-                     },
-                     {
-                         "id":  "records-beta",
-                         "label":  "Townlight Records",
-                         "description":  "Install the Records public-beta system: Core, Records, Notice, and Access.",
-                         "modules":  [
-                                         "civiccore",
-                                         "civicrecords-ai",
-                                         "civicnotice",
-                                         "civicaccess"
-                                     ],
-                         "status":  "stabilizing"
-                     },
-                     {
-                         "id":  "city-core",
-                         "label":  "City Core",
-                        "description":  "Install the beta-ready city-core profile: records, clerk, municipal code, public notices, and accessibility on CivicCore.",
-                         "modules":  [
-                                         "civiccore",
-                                         "civicrecords-ai",
-                                         "civicclerk",
-                                         "civiccode",
-                                         "civicnotice",
-                                         "civicaccess"
-                                     ],
-                         "status":  "beta_ready_truth_reconciled"
-                     },
-                     {
-                         "id":  "land-use",
-                         "label":  "Land Use",
-                         "description":  "Queued Tier 2 profile; disabled until CivicZone, CivicPlan, CivicPermit, and CivicInspect complete real release turns.",
-                         "modules":  [
-                                         "civiccore",
-                                         "civiccode",
-                                         "civiczone",
-                                         "civicplan",
-                                         "civicpermit",
-                                         "civicinspect"
-                                     ],
-                         "disabled":  true,
-                         "disabled_reason":  "queued - depends on Tier 2 module work after city-core ships"
-                     },
-                     {
-                         "id":  "full-suite",
-                         "label":  "Full Suite",
-                         "description":  "Plan every tracked CivicSuite module after CivicCore.",
-                         "modules":  [
-                                         "civiccore",
-                                         "civicrecords-ai",
-                                         "civicclerk",
-                                         "civiccode",
-                                         "civiczone",
-                                         "civicaccess",
-                                         "civicplan",
-                                         "civicpermit",
-                                         "civicinspect",
-                                         "civicgrants",
-                                         "civicprocure",
-                                         "civiccontracts",
-                                         "civicboards",
-                                         "civicnotice",
-                                         "civic311",
-                                         "civiccomms",
-                                         "civicdata",
-                                         "civicregwatch",
-                                         "civicapi",
-                                         "civichr",
-                                         "civicbudget",
-                                         "civiclegal",
-                                         "civicelections",
-                                         "civicutility",
-                                         "civiccourt",
-                                         "civicsafety",
-                                         "civiclibrary",
-                                         "civicparks"
-                                     ],
-                         "disabled":  true,
-                         "disabled_reason":  "14 modules remain pre-1.0 scaffolds pinned to older CivicCore lines; not installable as a coherent suite"
-                     },
-                     {
-                         "id":  "custom",
-                         "label":  "Custom",
-                         "description":  "Let the operator choose selectable modules.",
-                         "modules":  [
-
-                                     ]
-                     }
-                 ],
-    "modules":  [
-                    {
-                        "id":  "civiccore",
-                        "display_name":  "Townlight Core",
-                        "repo":  "townlight/core",
-                        "tier":  0,
-                        "role":  "shared platform",
-                        "selectable":  false,
-                        "required":  true,
-                        "civiccore_requirement":  null,
-                        "dependencies":  [
-
-                                         ],
-                        "installer_status":  "v1_2_1_records_beta_platform",
-                        "proof_required":  [
-                                               "install",
-                                               "version_check",
-                                               "compatibility_matrix_check",
-                                               "windows_local_contracts",
-                                               "task_queue_worker"
-                                           ],
-                        "current_version":  "1.2.1",
-                        "source_commit":  "b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
-                        "routes":  [
-                                       {
-                                           "id":  "system-health",
-                                           "label":  "System Health",
-                                           "path":  "/health",
-                                           "surface":  "IT/Admin"
-                                       },
-                                       {
-                                           "id":  "settings",
-                                           "label":  "Settings",
-                                           "path":  "/settings",
-                                           "surface":  "IT/Admin"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "system.admin",
-                                            "audit.read",
-                                            "backup.manage",
-                                            "module.manage"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "desktop-shell",
-                                             "kind":  "tauri-webview",
-                                             "health_check":  "desktop-shell"
-                                         },
-                                         {
-                                             "id":  "postgres",
-                                             "kind":  "portable-postgres",
-                                             "health_check":  "postgres"
-                                         },
-                                         {
-                                             "id":  "task-queue",
-                                             "kind":  "local-worker",
-                                             "health_check":  "task-queue"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civiccore-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "audit-chain",
-                                      "module-registry",
-                                      "backup-restore",
-                                      "health-checks"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "config",
-                                                     "Data",
-                                                     "audit-log",
-                                                     "model-registry"
-                                                 ],
-                        "model_needs":  [
-                                            {
-                                                "id":  "gemma-4-12b-it-qat-q4_0",
-                                                "required":  false,
-                                                "purpose":  "local model registry and readiness"
-                                            }
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "always-installed-with-profile",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "not-allowed-required-foundation",
-                                          "uninstall":  "backup-first-profile-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civicrecords-ai",
-                        "display_name":  "Townlight Records",
-                        "repo":  "townlight/sunshine",
-                        "tier":  1,
-                        "role":  "records workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.2.1",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8000,
-                        "installer_status":  "v1_7_3_records_beta_candidate",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart",
-                                               "repair",
-                                               "backup",
-                                               "restore"
-                                           ],
-                        "current_version":  "1.7.3",
-                        "source_commit":  "0218fa51bb0707e0ac63f58475308a77eb8e45ee",
-                        "routes":  [
-                                       {
-                                           "id":  "records-requests",
-                                           "label":  "Records Requests",
-                                           "path":  "/records",
-                                           "surface":  "Staff"
-                                       },
-                                       {
-                                           "id":  "search-city-knowledge",
-                                           "label":  "Search City Knowledge",
-                                           "path":  "/search",
-                                           "surface":  "Staff"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "records.intake",
-                                            "records.review",
-                                            "records.export",
-                                            "records.audit"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "python-services",
-                                             "kind":  "bundled-python",
-                                             "health_check":  "python-services"
-                                         },
-                                         {
-                                             "id":  "file-storage",
-                                             "kind":  "local-file-store",
-                                             "health_check":  "file-storage"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civicrecords-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "records-intake",
-                                      "records-search",
-                                      "response-draft",
-                                      "response-export"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "Data/workflows/records",
-                                                     "Data/exports/records",
-                                                     "Data/files/records"
-                                                 ],
-                        "model_needs":  [
-                                            {
-                                                "id":  "gemma-4-12b-it-qat-q4_0",
-                                                "required":  true,
-                                                "purpose":  "records search assistance and response drafting"
-                                            }
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "profile-selected",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "allowed-after-backup",
-                                          "uninstall":  "backup-first-module-data-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civicclerk",
-                        "display_name":  "CivicClerk",
-                        "repo":  "townlight/meetings",
-                        "tier":  1,
-                        "role":  "meetings workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.2.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8010,
-                        "installer_status":  "v1_0_4_city_core_release_car",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart",
-                                               "repair",
-                                               "backup",
-                                               "restore"
-                                           ],
-                        "current_version":  "1.0.4",
-                        "source_commit":  "3dd73d0619943beb8ce2965abe7a41dfe596e9be",
-                        "routes":  [
-                                       {
-                                           "id":  "meetings-notices",
-                                           "label":  "Meetings & Notices",
-                                           "path":  "/meetings",
-                                           "surface":  "Staff"
-                                       },
-                                       {
-                                           "id":  "audit-trail",
-                                           "label":  "Audit Trail",
-                                           "path":  "/audit",
-                                           "surface":  "IT/Admin"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "clerk.meetings",
-                                            "clerk.notices",
-                                            "clerk.minutes",
-                                            "clerk.archive"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "python-services",
-                                             "kind":  "bundled-python",
-                                             "health_check":  "python-services"
-                                         },
-                                         {
-                                             "id":  "file-storage",
-                                             "kind":  "local-file-store",
-                                             "health_check":  "file-storage"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civicclerk-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "meeting-agenda",
-                                      "public-notice",
-                                      "minutes-draft",
-                                      "vote-record",
-                                      "packet-export"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "Data/workflows/meetings",
-                                                     "Data/exports/meetings",
-                                                     "Data/files/meetings"
-                                                 ],
-                        "model_needs":  [
-                                            {
-                                                "id":  "gemma-4-12b-it-qat-q4_0",
-                                                "required":  false,
-                                                "purpose":  "minutes drafting assistance after local model readiness"
-                                            }
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "profile-selected",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "allowed-after-backup",
-                                          "uninstall":  "backup-first-module-data-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civiccode",
-                        "display_name":  "CivicCode",
-                        "repo":  "townlight/ordinances",
-                        "tier":  1,
-                        "role":  "municipal code",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.2.1",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicclerk"
-                                         ],
-                        "default_port":  8020,
-                        "installer_status":  "v1_0_8_city_core_release_car",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "release_artifacts",
-                                               "release_attestation"
-                                           ],
-                        "current_version":  "1.0.8",
-                        "source_commit":  "868891bd990588a8337832915e4d91af39ea22cd",
-                        "routes":  [
-                                       {
-                                           "id":  "code-ordinances",
-                                           "label":  "Code & Ordinances",
-                                           "path":  "/code",
-                                           "surface":  "Staff"
-                                       },
-                                       {
-                                           "id":  "search-city-knowledge",
-                                           "label":  "Search City Knowledge",
-                                           "path":  "/search",
-                                           "surface":  "Staff"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "code.import",
-                                            "code.search",
-                                            "code.guidance",
-                                            "code.handoff"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "python-services",
-                                             "kind":  "bundled-python",
-                                             "health_check":  "python-services"
-                                         },
-                                         {
-                                             "id":  "file-storage",
-                                             "kind":  "local-file-store",
-                                             "health_check":  "file-storage"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civiccode-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "code-source-import",
-                                      "code-search",
-                                      "staff-guidance",
-                                      "clerk-handoff"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "Data/workflows/code",
-                                                     "Data/exports/code",
-                                                     "Data/files/code"
-                                                 ],
-                        "model_needs":  [
-                                            {
-                                                "id":  "gemma-4-12b-it-qat-q4_0",
-                                                "required":  true,
-                                                "purpose":  "municipal code guidance and citation-aware search"
-                                            }
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "profile-selected",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "allowed-after-backup",
-                                          "uninstall":  "backup-first-module-data-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civiczone",
-                        "display_name":  "CivicZone",
-                        "repo":  "townlight/zone",
-                        "tier":  2,
-                        "role":  "zoning and land use",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civiccode"
-                                         ],
-                        "default_port":  8030,
-                        "installer_status":  "demoted_v0_2_2_truth_repair_no_functional_upgrade",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "release_artifacts",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.2"
-                    },
-                    {
-                        "id":  "civicplan",
-                        "display_name":  "CivicPlan",
-                        "repo":  "townlight/plan",
-                        "tier":  2,
-                        "role":  "planning policy lookup",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civiczone",
-                                             "civicclerk"
-                                         ],
-                        "default_port":  8040,
-                        "installer_status":  "demoted_v0_2_2_truth_repair_no_functional_upgrade",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "release_artifacts",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.2"
-                    },
-                    {
-                        "id":  "civicpermit",
-                        "display_name":  "CivicPermit",
-                        "repo":  "townlight/permit",
-                        "tier":  2,
-                        "role":  "permit intake readiness",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civiccode",
-                                             "civiczone"
-                                         ],
-                        "default_port":  8050,
-                        "installer_status":  "demoted_v0_2_2_truth_repair_no_functional_upgrade",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "release_artifacts",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.2"
-                    },
-                    {
-                        "id":  "civicaccess",
-                        "display_name":  "Townlight Access",
-                        "repo":  "townlight/access",
-                        "tier":  3,
-                        "role":  "accessibility + records-ready export",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.2.1",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8060,
-                        "installer_status":  "v0_4_0_records_beta_candidate",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "backup",
-                                               "restore",
-                                               "release_artifacts",
-                                               "accessibility_audit",
-                                               "export_correctness"
-                                           ],
-                        "current_version":  "0.4.0",
-                        "source_commit":  "b9100edc80ca496d6061f1cdb3eb39a60ff5f31a",
-                        "routes":  [
-                                       {
-                                           "id":  "accessibility-staff",
-                                           "label":  "Accessibility",
-                                           "path":  "/civicaccess/staff",
-                                           "surface":  "Staff"
-                                       },
-                                       {
-                                           "id":  "accessibility-public",
-                                           "label":  "Accessible Content",
-                                           "path":  "/civicaccess",
-                                           "surface":  "Public"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "access.review",
-                                            "access.plainlanguage",
-                                            "access.export",
-                                            "access.audit"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "python-services",
-                                             "kind":  "bundled-python",
-                                             "health_check":  "python-services"
-                                         },
-                                         {
-                                             "id":  "file-storage",
-                                             "kind":  "local-file-store",
-                                             "health_check":  "file-storage"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civicaccess-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "accessibility-review",
-                                      "records-export"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "Data/workflows/access",
-                                                     "Data/exports/access",
-                                                     "Data/files/access"
-                                                 ],
-                        "model_needs":  [
-                                            {
-                                                "id":  "gemma-4-12b-it-qat-q4_0",
-                                                "required":  true,
-                                                "purpose":  "plain-language rewrite drafts, multilingual variant drafts, accessibility review analysis"
-                                            }
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "profile-selected",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "allowed-after-backup",
-                                          "uninstall":  "backup-first-module-data-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civicinspect",
-                        "display_name":  "CivicInspect",
-                        "repo":  "townlight/inspect",
-                        "tier":  2,
-                        "role":  "inspection workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civiccode",
-                                             "civicpermit"
-                                         ],
-                        "default_port":  8061,
-                        "installer_status":  "demoted_v0_2_2_truth_repair_no_functional_upgrade",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "release_artifacts",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.2"
-                    },
-                    {
-                        "id":  "civicgrants",
-                        "display_name":  "CivicGrants",
-                        "repo":  "townlight/grants",
-                        "tier":  3,
-                        "role":  "grants workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicrecords-ai"
-                                         ],
-                        "default_port":  8062,
-                        "installer_status":  "demoted_v0_2_0_recovery_label",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.0"
-                    },
-                    {
-                        "id":  "civicprocure",
-                        "display_name":  "CivicProcure",
-                        "repo":  "townlight/procure",
-                        "tier":  3,
-                        "role":  "procurement workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.1.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8063,
-                        "installer_status":  "demoted_v0_2_0_recovery_label",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "version_label_matches_recovery_status"
-                                           ],
-                        "current_version":  "0.2.0"
-                    },
-                    {
-                        "id":  "civiccontracts",
-                        "display_name":  "CivicContracts",
-                        "repo":  "townlight/contracts",
-                        "tier":  3,
-                        "role":  "contract workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicprocure"
-                                         ],
-                        "default_port":  8064,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicboards",
-                        "display_name":  "CivicBoards",
-                        "repo":  "townlight/boards",
-                        "tier":  3,
-                        "role":  "boards and commissions workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicclerk"
-                                         ],
-                        "default_port":  8065,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicnotice",
-                        "display_name":  "Townlight Notice",
-                        "repo":  "townlight/notice",
-                        "tier":  3,
-                        "role":  "public notice workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "1.2.1",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8066,
-                        "installer_status":  "v0_2_0_records_beta_candidate",
-                        "proof_required":  [
-                                               "module_selection",
-                                               "install_plan",
-                                               "artifact_resolution",
-                                               "health_check",
-                                               "restart",
-                                               "backup",
-                                               "restore",
-                                               "release_artifacts"
-                                           ],
-                        "current_version":  "0.2.0",
-                        "source_commit":  "79b8d07199ee77cd425b31c0e0a44f3a0832b810",
-                        "routes":  [
-                                       {
-                                           "id":  "notice-workbench",
-                                           "label":  "Public Notices",
-                                           "path":  "/notice",
-                                           "surface":  "Staff"
-                                       },
-                                       {
-                                           "id":  "search-city-knowledge",
-                                           "label":  "Search City Knowledge",
-                                           "path":  "/search",
-                                           "surface":  "Staff"
-                                       }
-                                   ],
-                        "permissions":  [
-                                            "notice.registry",
-                                            "notice.deadline",
-                                            "notice.proof",
-                                            "notice.archive"
-                                        ],
-                        "services":  [
-                                         {
-                                             "id":  "python-services",
-                                             "kind":  "bundled-python",
-                                             "health_check":  "python-services"
-                                         },
-                                         {
-                                             "id":  "file-storage",
-                                             "kind":  "local-file-store",
-                                             "health_check":  "file-storage"
-                                         }
-                                     ],
-                        "migrations":  [
-                                           "civicnotice-windows-local-state-v1"
-                                       ],
-                        "tasks":  [
-                                      "notice-deadline",
-                                      "notice-checklist",
-                                      "publication-proof",
-                                      "notice-archive"
-                                  ],
-                        "backup_restore_hooks":  [
-                                                     "Data/workflows/notice",
-                                                     "Data/exports/notice",
-                                                     "Data/files/notice"
-                                                 ],
-                        "model_needs":  [
-
-                                        ],
-                        "lifecycle":  {
-                                          "install":  "profile-selected",
-                                          "update":  "manifest-versioned",
-                                          "disable":  "allowed-after-backup",
-                                          "uninstall":  "backup-first-module-data-removal"
-                                      }
-                    },
-                    {
-                        "id":  "civic311",
-                        "display_name":  "Civic311",
-                        "repo":  "townlight/311",
-                        "tier":  3,
-                        "role":  "resident request workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8067,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civiccomms",
-                        "display_name":  "CivicComms",
-                        "repo":  "townlight/comms",
-                        "tier":  3,
-                        "role":  "communications workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicnotice"
-                                         ],
-                        "default_port":  8068,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicdata",
-                        "display_name":  "CivicData",
-                        "repo":  "townlight/data",
-                        "tier":  3,
-                        "role":  "open data workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.4.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8069,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicregwatch",
-                        "display_name":  "CivicRegWatch",
-                        "repo":  null,
-                        "tier":  4,
-                        "role":  "federal regulatory intelligence",
-                        "selectable":  false,
-                        "required":  false,
-                        "civiccore_requirement":  null,
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "installer_status":  "planned_spec_module_no_runtime_repo",
-                        "proof_required":  [
-                                               "spec_inventory",
-                                               "runtime_repo_creation",
-                                               "installer_proof"
-                                           ]
-                    },
-                    {
-                        "id":  "civicapi",
-                        "display_name":  "CivicAPI",
-                        "repo":  null,
-                        "tier":  4,
-                        "role":  "public read-only data gateway",
-                        "selectable":  false,
-                        "required":  false,
-                        "civiccore_requirement":  null,
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "installer_status":  "planned_spec_module_no_runtime_repo",
-                        "proof_required":  [
-                                               "spec_inventory",
-                                               "runtime_repo_creation",
-                                               "installer_proof"
-                                           ]
-                    },
-                    {
-                        "id":  "civichr",
-                        "display_name":  "CivicHR",
-                        "repo":  "townlight/hr",
-                        "tier":  3,
-                        "role":  "human resources workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8070,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicbudget",
-                        "display_name":  "CivicBudget",
-                        "repo":  "townlight/budget",
-                        "tier":  3,
-                        "role":  "budget workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.4.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8071,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civiclegal",
-                        "display_name":  "CivicLegal",
-                        "repo":  "townlight/legal",
-                        "tier":  3,
-                        "role":  "legal workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.11.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civicclerk"
-                                         ],
-                        "default_port":  8072,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicelections",
-                        "display_name":  "CivicElections",
-                        "repo":  "townlight/elections",
-                        "tier":  3,
-                        "role":  "elections workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8073,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicutility",
-                        "display_name":  "CivicUtility",
-                        "repo":  "townlight/utility",
-                        "tier":  3,
-                        "role":  "utility billing workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8074,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civiccourt",
-                        "display_name":  "CivicCourt",
-                        "repo":  "townlight/court",
-                        "tier":  3,
-                        "role":  "court workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.4.0",
-                        "dependencies":  [
-                                             "civiccore",
-                                             "civiclegal"
-                                         ],
-                        "default_port":  8075,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicsafety",
-                        "display_name":  "CivicSafety",
-                        "repo":  "townlight/safety",
-                        "tier":  3,
-                        "role":  "public safety workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8076,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civiclibrary",
-                        "display_name":  "CivicLibrary",
-                        "repo":  "townlight/library",
-                        "tier":  3,
-                        "role":  "library workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8077,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    },
-                    {
-                        "id":  "civicparks",
-                        "display_name":  "CivicParks",
-                        "repo":  "townlight/parks",
-                        "tier":  3,
-                        "role":  "parks and recreation workflow",
-                        "selectable":  true,
-                        "required":  false,
-                        "civiccore_requirement":  "0.3.0",
-                        "dependencies":  [
-                                             "civiccore"
-                                         ],
-                        "default_port":  8078,
-                        "installer_status":  "tracked_suite_module_needs_installer_proof",
-                        "proof_required":  [
-                                               "install",
-                                               "health_check",
-                                               "restart"
-                                           ]
-                    }
-                ]
+  "schema_version": 1,
+  "module_contract_version": 1,
+  "installer_status": "townlight_records_meetings_code_beta_candidate",
+  "primary_profile": "records-beta",
+  "workflow_proof_status": {
+    "profile": "city-core",
+    "scope": [
+      "civicrecords-ai request/search/review/response/release",
+      "civicclerk agenda/packet/notice/proceedings/minutes/archive and permitted Records sources",
+      "civiccode proposals/agenda links/explicit adoption/separate codification and current/historical permitted Records sources",
+      "civicnotice deadline/proof/archive",
+      "civicaccess accessibility/release review"
+    ],
+    "boundary": "The connected Records, Meetings and Code profile executes the mapped municipal workflows through authenticated Python services and PostgreSQL. Rust retains desktop transport, OS integration, supervision and historical migration/recovery support; obsolete JSON business actions are retired. Optional native AI minutes/transcription and completion of the wider suite are not certified by this profile."
+  },
+  "public_use_gate_status": {
+    "profile": "records-beta",
+    "status": "candidate",
+    "path": "RELEASING.md",
+    "route_state_matrix": "desktop/tests/browser/records-public-beta.spec.mjs",
+    "restore_precondition_evidence": ".github/workflows/desktop-windows-msi.yml",
+    "boundary": "Publication remains blocked until the exact signed MSI passes the main-only Authenticode gate and clean-machine install, launch, workflow, backup/restore, repair, and uninstall evidence."
+  },
+  "menu_styles": [
+    {
+      "id": "guided",
+      "label": "Guided Setup",
+      "description": "Step-by-step setup for operators who want recommendations."
+    },
+    {
+      "id": "department",
+      "label": "Department Menu",
+      "description": "Group modules by municipal department or workflow area."
+    },
+    {
+      "id": "advanced",
+      "label": "Advanced",
+      "description": "Compact profile and module controls for technical operators."
+    }
+  ],
+  "profiles": [
+    {
+      "id": "zoning-beta",
+      "label": "Townlight Records + Meetings + Code + Zoning",
+      "description": "Opt-in connected Zoning development candidate; not a published release.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civicnotice",
+        "civicaccess",
+        "civiczone"
+      ],
+      "disabled": false
+    },
+    {
+      "id": "meetings-beta",
+      "label": "Townlight Meetings — development candidate",
+      "description": "Local Records plus Meetings integration; not a published release.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civicnotice",
+        "civicaccess"
+      ],
+      "disabled": false
+    },
+    {
+      "id": "minimal",
+      "label": "Minimal",
+      "description": "Install CivicCore only.",
+      "modules": [
+        "civiccore"
+      ]
+    },
+    {
+      "id": "clerk-core",
+      "label": "Clerk Core",
+      "description": "Install the clerk-centered starter profile.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk"
+      ]
+    },
+    {
+      "id": "records-beta",
+      "label": "Townlight Records",
+      "description": "Install the Records public-beta system: Core, Records, Notice, and Access.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicnotice",
+        "civicaccess"
+      ],
+      "status": "stabilizing"
+    },
+    {
+      "id": "city-core",
+      "label": "City Core",
+      "description": "Install the beta-ready city-core profile: records, clerk, municipal code, public notices, and accessibility on CivicCore.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civicnotice",
+        "civicaccess"
+      ],
+      "status": "beta_ready_truth_reconciled"
+    },
+    {
+      "id": "land-use",
+      "label": "Land Use",
+      "description": "Queued Tier 2 profile; disabled until CivicZone, CivicPlan, CivicPermit, and CivicInspect complete real release turns.",
+      "modules": [
+        "civiccore",
+        "civiccode",
+        "civiczone",
+        "civicplan",
+        "civicpermit",
+        "civicinspect"
+      ],
+      "disabled": true,
+      "disabled_reason": "queued - depends on Tier 2 module work after city-core ships"
+    },
+    {
+      "id": "full-suite",
+      "label": "Full Suite",
+      "description": "Plan every tracked CivicSuite module after CivicCore.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civiczone",
+        "civicaccess",
+        "civicplan",
+        "civicpermit",
+        "civicinspect",
+        "civicgrants",
+        "civicprocure",
+        "civiccontracts",
+        "civicboards",
+        "civicnotice",
+        "civic311",
+        "civiccomms",
+        "civicdata",
+        "civicregwatch",
+        "civicapi",
+        "civichr",
+        "civicbudget",
+        "civiclegal",
+        "civicelections",
+        "civicutility",
+        "civiccourt",
+        "civicsafety",
+        "civiclibrary",
+        "civicparks"
+      ],
+      "disabled": true,
+      "disabled_reason": "14 modules remain pre-1.0 scaffolds pinned to older CivicCore lines; not installable as a coherent suite"
+    },
+    {
+      "id": "custom",
+      "label": "Custom",
+      "description": "Let the operator choose selectable modules.",
+      "modules": []
+    }
+  ],
+  "modules": [
+    {
+      "id": "civiccore",
+      "display_name": "Townlight Core",
+      "repo": "townlight/core",
+      "tier": 0,
+      "role": "shared platform",
+      "selectable": false,
+      "required": true,
+      "civiccore_requirement": null,
+      "dependencies": [],
+      "installer_status": "v1_2_1_records_beta_platform",
+      "proof_required": [
+        "install",
+        "version_check",
+        "compatibility_matrix_check",
+        "windows_local_contracts",
+        "task_queue_worker"
+      ],
+      "current_version": "1.2.1",
+      "source_commit": "b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
+      "routes": [
+        {
+          "id": "system-health",
+          "label": "System Health",
+          "path": "/health",
+          "surface": "IT/Admin"
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "path": "/settings",
+          "surface": "IT/Admin"
+        }
+      ],
+      "permissions": [
+        "system.admin",
+        "audit.read",
+        "backup.manage",
+        "module.manage"
+      ],
+      "services": [
+        {
+          "id": "desktop-shell",
+          "kind": "tauri-webview",
+          "health_check": "desktop-shell"
+        },
+        {
+          "id": "postgres",
+          "kind": "portable-postgres",
+          "health_check": "postgres"
+        },
+        {
+          "id": "task-queue",
+          "kind": "local-worker",
+          "health_check": "task-queue"
+        }
+      ],
+      "migrations": [
+        "civiccore-windows-local-state-v1"
+      ],
+      "tasks": [
+        "audit-chain",
+        "module-registry",
+        "backup-restore",
+        "health-checks"
+      ],
+      "backup_restore_hooks": [
+        "config",
+        "Data",
+        "audit-log",
+        "model-registry"
+      ],
+      "model_needs": [
+        {
+          "id": "gemma-4-12b-it-qat-q4_0",
+          "required": false,
+          "purpose": "local model registry and readiness"
+        }
+      ],
+      "lifecycle": {
+        "install": "always-installed-with-profile",
+        "update": "manifest-versioned",
+        "disable": "not-allowed-required-foundation",
+        "uninstall": "backup-first-profile-removal"
+      }
+    },
+    {
+      "id": "civicrecords-ai",
+      "display_name": "Townlight Records",
+      "repo": "townlight/sunshine",
+      "tier": 1,
+      "role": "records workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.1",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8000,
+      "installer_status": "v1_7_3_records_beta_candidate",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart",
+        "repair",
+        "backup",
+        "restore"
+      ],
+      "current_version": "1.7.3",
+      "source_commit": "0218fa51bb0707e0ac63f58475308a77eb8e45ee",
+      "routes": [
+        {
+          "id": "records-requests",
+          "label": "Records Requests",
+          "path": "/records",
+          "surface": "Staff"
+        },
+        {
+          "id": "search-city-knowledge",
+          "label": "Search City Knowledge",
+          "path": "/search",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "records.intake",
+        "records.review",
+        "records.export",
+        "records.audit"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civicrecords-windows-local-state-v1"
+      ],
+      "tasks": [
+        "records-intake",
+        "records-search",
+        "response-draft",
+        "response-export"
+      ],
+      "backup_restore_hooks": [
+        "Data/workflows/records",
+        "Data/exports/records",
+        "Data/files/records"
+      ],
+      "model_needs": [
+        {
+          "id": "gemma-4-12b-it-qat-q4_0",
+          "required": true,
+          "purpose": "records search assistance and response drafting"
+        }
+      ],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      }
+    },
+    {
+      "id": "civicclerk",
+      "display_name": "CivicClerk",
+      "repo": "townlight/meetings",
+      "tier": 1,
+      "role": "meetings workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8010,
+      "installer_status": "v1_0_4_city_core_release_car",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart",
+        "repair",
+        "backup",
+        "restore"
+      ],
+      "current_version": "1.0.4",
+      "source_commit": "3dd73d0619943beb8ce2965abe7a41dfe596e9be",
+      "routes": [
+        {
+          "id": "meetings-notices",
+          "label": "Meetings & Notices",
+          "path": "/meetings",
+          "surface": "Staff"
+        },
+        {
+          "id": "audit-trail",
+          "label": "Audit Trail",
+          "path": "/audit",
+          "surface": "IT/Admin"
+        }
+      ],
+      "permissions": [
+        "clerk.meetings",
+        "clerk.notices",
+        "clerk.minutes",
+        "clerk.archive"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civicclerk-windows-local-state-v1"
+      ],
+      "tasks": [
+        "meeting-agenda",
+        "public-notice",
+        "minutes-draft",
+        "vote-record",
+        "packet-export"
+      ],
+      "backup_restore_hooks": [
+        "Data/workflows/meetings",
+        "Data/exports/meetings",
+        "Data/files/meetings"
+      ],
+      "model_needs": [
+        {
+          "id": "gemma-4-12b-it-qat-q4_0",
+          "required": false,
+          "purpose": "minutes drafting assistance after local model readiness"
+        }
+      ],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      }
+    },
+    {
+      "id": "civiccode",
+      "display_name": "CivicCode",
+      "repo": "townlight/ordinances",
+      "tier": 1,
+      "role": "municipal code",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.1",
+      "dependencies": [
+        "civiccore",
+        "civicclerk"
+      ],
+      "default_port": 8020,
+      "installer_status": "v1_0_8_city_core_release_car",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "release_artifacts",
+        "release_attestation"
+      ],
+      "current_version": "1.0.8",
+      "source_commit": "868891bd990588a8337832915e4d91af39ea22cd",
+      "routes": [
+        {
+          "id": "code-ordinances",
+          "label": "Code & Ordinances",
+          "path": "/code",
+          "surface": "Staff"
+        },
+        {
+          "id": "search-city-knowledge",
+          "label": "Search City Knowledge",
+          "path": "/search",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "code.import",
+        "code.search",
+        "code.guidance",
+        "code.handoff"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civiccode-windows-local-state-v1"
+      ],
+      "tasks": [
+        "code-source-import",
+        "code-search",
+        "staff-guidance",
+        "clerk-handoff"
+      ],
+      "backup_restore_hooks": [
+        "Data/workflows/code",
+        "Data/exports/code",
+        "Data/files/code"
+      ],
+      "model_needs": [
+        {
+          "id": "gemma-4-12b-it-qat-q4_0",
+          "required": true,
+          "purpose": "municipal code guidance and citation-aware search"
+        }
+      ],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      }
+    },
+    {
+      "id": "civiczone",
+      "display_name": "Townlight Zoning",
+      "repo": "townlight/zone",
+      "tier": 2,
+      "role": "zoning and land use",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.1",
+      "dependencies": [
+        "civiccore",
+        "civiccode"
+      ],
+      "default_port": 8030,
+      "installer_status": "local_z4_candidate_UNVERIFIED",
+      "current_version": "0.2.2",
+      "routes": [
+        {
+          "id": "zoning",
+          "label": "Zoning",
+          "path": "/zoning",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "zoning.read",
+        "zoning.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civiczone_0006_cited_questions"
+      ],
+      "tasks": [
+        "zoning-import",
+        "zoning-lookup",
+        "zoning-question-history"
+      ],
+      "backup_restore_hooks": [
+        "Data/database",
+        "Data/files/zoning"
+      ],
+      "model_needs": [],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      },
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "health_check",
+        "restart",
+        "backup_restore",
+        "installed_workflow"
+      ]
+    },
+    {
+      "id": "civicplan",
+      "display_name": "CivicPlan",
+      "repo": "townlight/plan",
+      "tier": 2,
+      "role": "planning policy lookup",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.1.0",
+      "dependencies": [
+        "civiccore",
+        "civiczone",
+        "civicclerk"
+      ],
+      "default_port": 8040,
+      "installer_status": "demoted_v0_2_2_truth_repair_no_functional_upgrade",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "release_artifacts",
+        "version_label_matches_recovery_status"
+      ],
+      "current_version": "0.2.2"
+    },
+    {
+      "id": "civicpermit",
+      "display_name": "CivicPermit",
+      "repo": "townlight/permit",
+      "tier": 2,
+      "role": "permit intake readiness",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.1.0",
+      "dependencies": [
+        "civiccore",
+        "civiccode",
+        "civiczone"
+      ],
+      "default_port": 8050,
+      "installer_status": "demoted_v0_2_2_truth_repair_no_functional_upgrade",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "release_artifacts",
+        "version_label_matches_recovery_status"
+      ],
+      "current_version": "0.2.2"
+    },
+    {
+      "id": "civicaccess",
+      "display_name": "Townlight Access",
+      "repo": "townlight/access",
+      "tier": 3,
+      "role": "accessibility + records-ready export",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.1",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8060,
+      "installer_status": "v0_4_0_records_beta_candidate",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "backup",
+        "restore",
+        "release_artifacts",
+        "accessibility_audit",
+        "export_correctness"
+      ],
+      "current_version": "0.4.0",
+      "source_commit": "b9100edc80ca496d6061f1cdb3eb39a60ff5f31a",
+      "routes": [
+        {
+          "id": "accessibility-staff",
+          "label": "Accessibility",
+          "path": "/civicaccess/staff",
+          "surface": "Staff"
+        },
+        {
+          "id": "accessibility-public",
+          "label": "Accessible Content",
+          "path": "/civicaccess",
+          "surface": "Public"
+        }
+      ],
+      "permissions": [
+        "access.review",
+        "access.plainlanguage",
+        "access.export",
+        "access.audit"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civicaccess-windows-local-state-v1"
+      ],
+      "tasks": [
+        "accessibility-review",
+        "records-export"
+      ],
+      "backup_restore_hooks": [
+        "Data/workflows/access",
+        "Data/exports/access",
+        "Data/files/access"
+      ],
+      "model_needs": [
+        {
+          "id": "gemma-4-12b-it-qat-q4_0",
+          "required": true,
+          "purpose": "plain-language rewrite drafts, multilingual variant drafts, accessibility review analysis"
+        }
+      ],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      }
+    },
+    {
+      "id": "civicinspect",
+      "display_name": "CivicInspect",
+      "repo": "townlight/inspect",
+      "tier": 2,
+      "role": "inspection workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.1.0",
+      "dependencies": [
+        "civiccore",
+        "civiccode",
+        "civicpermit"
+      ],
+      "default_port": 8061,
+      "installer_status": "demoted_v0_2_2_truth_repair_no_functional_upgrade",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "release_artifacts",
+        "version_label_matches_recovery_status"
+      ],
+      "current_version": "0.2.2"
+    },
+    {
+      "id": "civicgrants",
+      "display_name": "CivicGrants",
+      "repo": "townlight/grants",
+      "tier": 3,
+      "role": "grants workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.1.0",
+      "dependencies": [
+        "civiccore",
+        "civicrecords-ai"
+      ],
+      "default_port": 8062,
+      "installer_status": "demoted_v0_2_0_recovery_label",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "version_label_matches_recovery_status"
+      ],
+      "current_version": "0.2.0"
+    },
+    {
+      "id": "civicprocure",
+      "display_name": "CivicProcure",
+      "repo": "townlight/procure",
+      "tier": 3,
+      "role": "procurement workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.1.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8063,
+      "installer_status": "demoted_v0_2_0_recovery_label",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "version_label_matches_recovery_status"
+      ],
+      "current_version": "0.2.0"
+    },
+    {
+      "id": "civiccontracts",
+      "display_name": "CivicContracts",
+      "repo": "townlight/contracts",
+      "tier": 3,
+      "role": "contract workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore",
+        "civicprocure"
+      ],
+      "default_port": 8064,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicboards",
+      "display_name": "CivicBoards",
+      "repo": "townlight/boards",
+      "tier": 3,
+      "role": "boards and commissions workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore",
+        "civicclerk"
+      ],
+      "default_port": 8065,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicnotice",
+      "display_name": "Townlight Notice",
+      "repo": "townlight/notice",
+      "tier": 3,
+      "role": "public notice workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "1.2.1",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8066,
+      "installer_status": "v0_2_0_records_beta_candidate",
+      "proof_required": [
+        "module_selection",
+        "install_plan",
+        "artifact_resolution",
+        "health_check",
+        "restart",
+        "backup",
+        "restore",
+        "release_artifacts"
+      ],
+      "current_version": "0.2.0",
+      "source_commit": "79b8d07199ee77cd425b31c0e0a44f3a0832b810",
+      "routes": [
+        {
+          "id": "notice-workbench",
+          "label": "Public Notices",
+          "path": "/notice",
+          "surface": "Staff"
+        },
+        {
+          "id": "search-city-knowledge",
+          "label": "Search City Knowledge",
+          "path": "/search",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "notice.registry",
+        "notice.deadline",
+        "notice.proof",
+        "notice.archive"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        },
+        {
+          "id": "file-storage",
+          "kind": "local-file-store",
+          "health_check": "file-storage"
+        }
+      ],
+      "migrations": [
+        "civicnotice-windows-local-state-v1"
+      ],
+      "tasks": [
+        "notice-deadline",
+        "notice-checklist",
+        "publication-proof",
+        "notice-archive"
+      ],
+      "backup_restore_hooks": [
+        "Data/workflows/notice",
+        "Data/exports/notice",
+        "Data/files/notice"
+      ],
+      "model_needs": [],
+      "lifecycle": {
+        "install": "profile-selected",
+        "update": "manifest-versioned",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-module-data-removal"
+      }
+    },
+    {
+      "id": "civic311",
+      "display_name": "Civic311",
+      "repo": "townlight/311",
+      "tier": 3,
+      "role": "resident request workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8067,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civiccomms",
+      "display_name": "CivicComms",
+      "repo": "townlight/comms",
+      "tier": 3,
+      "role": "communications workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore",
+        "civicnotice"
+      ],
+      "default_port": 8068,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicdata",
+      "display_name": "CivicData",
+      "repo": "townlight/data",
+      "tier": 3,
+      "role": "open data workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.4.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8069,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicregwatch",
+      "display_name": "CivicRegWatch",
+      "repo": null,
+      "tier": 4,
+      "role": "federal regulatory intelligence",
+      "selectable": false,
+      "required": false,
+      "civiccore_requirement": null,
+      "dependencies": [
+        "civiccore"
+      ],
+      "installer_status": "planned_spec_module_no_runtime_repo",
+      "proof_required": [
+        "spec_inventory",
+        "runtime_repo_creation",
+        "installer_proof"
+      ]
+    },
+    {
+      "id": "civicapi",
+      "display_name": "CivicAPI",
+      "repo": null,
+      "tier": 4,
+      "role": "public read-only data gateway",
+      "selectable": false,
+      "required": false,
+      "civiccore_requirement": null,
+      "dependencies": [
+        "civiccore"
+      ],
+      "installer_status": "planned_spec_module_no_runtime_repo",
+      "proof_required": [
+        "spec_inventory",
+        "runtime_repo_creation",
+        "installer_proof"
+      ]
+    },
+    {
+      "id": "civichr",
+      "display_name": "CivicHR",
+      "repo": "townlight/hr",
+      "tier": 3,
+      "role": "human resources workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8070,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicbudget",
+      "display_name": "CivicBudget",
+      "repo": "townlight/budget",
+      "tier": 3,
+      "role": "budget workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.4.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8071,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civiclegal",
+      "display_name": "CivicLegal",
+      "repo": "townlight/legal",
+      "tier": 3,
+      "role": "legal workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.11.0",
+      "dependencies": [
+        "civiccore",
+        "civicclerk"
+      ],
+      "default_port": 8072,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicelections",
+      "display_name": "CivicElections",
+      "repo": "townlight/elections",
+      "tier": 3,
+      "role": "elections workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8073,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicutility",
+      "display_name": "CivicUtility",
+      "repo": "townlight/utility",
+      "tier": 3,
+      "role": "utility billing workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8074,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civiccourt",
+      "display_name": "CivicCourt",
+      "repo": "townlight/court",
+      "tier": 3,
+      "role": "court workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.4.0",
+      "dependencies": [
+        "civiccore",
+        "civiclegal"
+      ],
+      "default_port": 8075,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicsafety",
+      "display_name": "CivicSafety",
+      "repo": "townlight/safety",
+      "tier": 3,
+      "role": "public safety workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8076,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civiclibrary",
+      "display_name": "CivicLibrary",
+      "repo": "townlight/library",
+      "tier": 3,
+      "role": "library workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8077,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    },
+    {
+      "id": "civicparks",
+      "display_name": "CivicParks",
+      "repo": "townlight/parks",
+      "tier": 3,
+      "role": "parks and recreation workflow",
+      "selectable": true,
+      "required": false,
+      "civiccore_requirement": "0.3.0",
+      "dependencies": [
+        "civiccore"
+      ],
+      "default_port": 8078,
+      "installer_status": "tracked_suite_module_needs_installer_proof",
+      "proof_required": [
+        "install",
+        "health_check",
+        "restart"
+      ]
+    }
+  ]
 }

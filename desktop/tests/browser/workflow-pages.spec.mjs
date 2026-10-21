@@ -1,5 +1,97 @@
 import { expect, test } from "@playwright/test";
 
+test('Z3 Records Zoning sources', async ({ page }) => {
+  await page.route('http://127.0.0.1:5174/', route => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><html><body></body></html>',
+  }));
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const mod = await import('/src/records/zoning-sources.ts');
+    document.body.innerHTML = mod.renderZoningSources('record-1');
+    window.__calls = [];
+    window.__refreshed = false;
+    await mod.bindZoningSources(async (command, args) => {
+      window.__calls.push({ command, request: args.request });
+      if (args.request.operation === 'search-zoning') {
+        return {results: [{source_id: 'source-1', title: '<img src=x>', excerpt: 'Fictional snapshot',
+          citation: 'Citation', sha256: 'a'.repeat(64)}], truncated: false};
+      }
+      return {};
+    }, async () => { window.__refreshed = true; });
+  });
+  await page.locator('input[name="query"]').fill('snapshot');
+  await page.getByRole('button', { name: 'Search Zoning' }).click();
+  await expect(page.locator('[data-source-results] h4')).toHaveText('<img src=x>');
+  await expect(page.locator('[data-source-results] img')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Attach to selected Records request' }).click();
+  await expect.poll(() => page.evaluate(() => window.__refreshed)).toBe(true);
+  const calls = await page.evaluate(() => window.__calls);
+  expect(calls).toEqual([
+    { command: 'records_domain_request', request: { operation: 'search-zoning', query: 'snapshot' } },
+    { command: 'records_domain_request', request: { operation: 'attach-zoning-source',
+      request_id: 'record-1', source_id: 'source-1', expected_sha256: 'a'.repeat(64) } },
+  ]);
+});
+
+test('Z2 Zoning component', async ({ page }) => {
+  const result = {id:'z1',answer:'allowed',parcel:{address:'1 Fictional Way',zone:{code:'R2'},
+    source:{source_date:'2026-10-20',version:'v1',content_sha256:'a'.repeat(64)}},
+    citations:[{section_number:'20.10',version_id:'law-v1',source_id:'official',effective_start:'2026-01-01',body_text:'<img src=x onerror=alert(1)>'}]};
+  const mount = async ({publicMode=false,fail=false}={}) => {
+    await page.evaluate(async ({publicMode,fail,result}) => {
+      const {createZoningView}=await import('/src/zoning/view.js');
+      const calls=[];
+      window.__calls=calls;
+      const invoke=async(command,args)=>{
+        calls.push({command,request:args.request});
+        if(fail) throw new Error('Service unavailable');
+        return result;
+      };
+      const view=createZoningView(invoke,publicMode);
+      document.body.innerHTML=view.render();
+      view.bind(document.body);
+    },{publicMode,fail,result});
+  };
+  const callsText=()=>page.evaluate(()=>JSON.stringify(window.__calls));
+  await page.route('http://127.0.0.1:5174/', r => r.fulfill({ contentType: 'text/html', body: '<!doctype html><html><body></body></html>' }));
+  await page.goto('/');
+  await mount();
+  const question=page.locator('form[data-zone-action="question"]');
+  await question.locator('[name="jurisdiction"]').fill('Fictionville');
+  await question.locator('[name="query"]').fill('P1');
+  await question.locator('[name="question"]').fill('Can I build an ADU?');
+  await question.locator('[name="key"]').fill('ADU');
+  await question.locator('button[type="submit"]').click();
+  await expect(page.locator('body')).toContainText('law-v1');
+  await expect(page.locator('body')).toContainText('2026-10-20');
+  await expect(page.locator('body')).toContainText('<img src=x onerror=alert(1)>');
+  await expect(page.locator('img')).toHaveCount(0);
+  await expect.poll(async()=>{const t=await callsText();return t.includes('zoning_domain_request')&&t.includes('question');}).toBe(true);
+  const snapshotForm = page.locator('form[data-zone-action="snapshot"]');
+  await snapshotForm.locator('[name="id"]').fill('11111111-1111-4111-8111-111111111111');
+  await snapshotForm.locator('[name="visibility"]').selectOption('public');
+  await snapshotForm.locator('button[type="submit"]').click();
+  await expect.poll(async()=>{const t=await callsText();return t.includes('"operation":"snapshot"')&&t.includes('"meeting_event_ids":[]');}).toBe(true);
+  await mount({publicMode:true});
+  await expect(page.locator('form[data-zone-action="review"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="workspace"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="registerRule"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="searchMeetings"]')).toHaveCount(0);
+  await expect(page.locator('form[data-zone-action="linkMeeting"]')).toHaveCount(0);
+  const publicLookup=page.locator('form[data-zone-action="lookup"]');
+  await publicLookup.locator('[name="jurisdiction"]').fill('Fictionville');
+  await publicLookup.locator('[name="query"]').fill('P1');
+  await publicLookup.locator('button[type="submit"]').click();
+  await expect.poll(async()=>(await callsText()).includes('zoning_public_request')).toBe(true);
+  await mount({fail:true});
+  const failureLookup=page.locator('form[data-zone-action="lookup"]');
+  await failureLookup.locator('[name="jurisdiction"]').fill('Fictionville');
+  await failureLookup.locator('[name="query"]').fill('P1');
+  await failureLookup.locator('button[type="submit"]').click();
+  await expect(page.locator('body')).toContainText('Result not confirmed');
+  await expect(failureLookup.locator('button[type="submit"]')).toBeEnabled();
+});
+
 test('Code C3 source controls', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => {

@@ -1,5 +1,25 @@
 # Townlight
 
+## Unreleased connected Zoning candidate — 1.4.0-1
+
+The local Z4 candidate adds the explicit `zoning-beta` profile: Records,
+Meetings, Code and Zoning with Core, Notice and Access. Records-only remains
+the installation default; saved selections and installer identity are preserved.
+Planning, Permitting and Inspections are not enabled by this profile.
+
+Zoning uses bundled PostgreSQL 17.10/PostGIS 3.6.2 and the shared Python domain
+service. Authorized staff can import an EPSG:4326 GeoJSON bundle from the Zoning
+screen, inspect parcel provenance, configure cited rules, preserve human
+corrections, link permitted public Meetings history and attach explicitly public
+immutable Zoning snapshots to Records. Private notes are excluded. Information
+is not a zoning determination, permit approval or legal advice.
+
+This is an unsigned, unpublished local candidate. Fresh-install, populated
+1.3 upgrade and recovery evidence is tracked in
+`docs/installer/townlight-zoning-beta1-acceptance.md`; pending checks are not passes.
+The existing public 1.3.0-beta.1 download is unchanged.
+
+
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
@@ -251,3 +271,39 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the bug-routing decision tree. By par
 ## Support
 
 See [SUPPORT.md](SUPPORT.md) for support paths and [SECURITY.md](SECURITY.md) for vulnerability reporting.
+## Unreleased connected Zoning Z2
+
+The local development branch adds parcel-scoped allowed/conditional/prohibited-use
+and dimensional answers bound to actual Townlight Code section, version, effective
+date and source identities. Unsupported, conflicting or stale bindings are shown
+as needing planner attention, not invented determinations. This is structured
+staff-configured lookup, not AI interpretation or legal advice.
+
+The separate Zoning desktop component has resident lookup/question controls and
+an authenticated staff workspace: cited rule registration, persisted question
+history, planner queue, corrections, basic counts/repeated questions and draft
+report outlines. Human corrections do not require an earlier automated flag,
+nonempty justification or an extra approval. Original answers and audit history
+remain intact. Staff notes/reviews are not included in resident responses.
+
+This is not a released or installed Zoning candidate. The published
+Records–Meetings–Code 1.3.0-beta.1 is unchanged. The Z2 operator guide is
+zone/docs/Z2-CITED-WORKFLOWS.md.
+
+## Unreleased connected Zoning Z3
+
+Authorized staff can explicitly link a permitted public Meetings archive document
+to a Zoning question as hearing context, context or precedent. This is historical
+context, not a Code amendment or binding determination. Links retain source IDs,
+archive/version identities, content hashes and actor history.
+
+Staff can create a separate immutable Zoning source snapshot and select eligible
+snapshots from Records. Staff-only snapshots and private review notes are not
+offered as public Records sources. Permissions and content hashes are rechecked
+when retrieving or attaching sources; a saved link does not bypass later access
+restrictions. Existing stored evidence is preserved rather than rewritten.
+
+Creating or attaching a snapshot does not approve a response or publish anything.
+Human corrections remain available without an automatic flag or mandatory
+justification. Packaged/installed acceptance and opt-in profile delivery remain
+Z4. See zone/docs/Z3-CONNECTED-SOURCES.md. No new public release is claimed.

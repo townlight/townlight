@@ -10,10 +10,11 @@ param(
     [string]$PayloadRoot = "",
     [string]$RecordsBackendRoot = "",
     [switch]$ReuseInstalledServiceDependencies,
-    [ValidateSet("records-beta", "city-core", "meetings-beta")]
+    [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta")]
     [string]$ProductProfile = "records-beta",
     [string]$MeetingsRoot = "",
     [string]$CodeRoot = "",
+    [string]$ZoningRoot = "",
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
 )
@@ -41,6 +42,49 @@ function Write-JsonFile {
     $Json = $Value | ConvertTo-Json -Depth 12
     $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
     [System.IO.File]::WriteAllText($Path, "$Json`r`n", $Utf8NoBom)
+}
+
+function Install-PostgisPayload {
+    param(
+        [Parameter(Mandatory=$true)][object]$Source,
+        [Parameter(Mandatory=$true)][string]$CacheRoot,
+        [Parameter(Mandatory=$true)][string]$PayloadRoot
+    )
+
+    if (-not $Source -or -not $Source.download_url) {
+        throw "Source.download_url is required."
+    }
+    if (-not $Source.download_sha256) {
+        throw "Source.download_sha256 is required and must be nonempty."
+    }
+
+    $zipPath = Join-Path $CacheRoot 'postgis-bundle-pg17-3.6.2x64.zip'
+    $ExpectedSha256 = $Source.download_sha256
+
+    Invoke-CivicDownload -Url $Source.download_url -Destination $zipPath -ExpectedSha256 $ExpectedSha256
+    $Hash = Test-CivicDownloadHash -Path $zipPath -ExpectedSha256 $ExpectedSha256 -Url $Source.download_url
+
+    $expandRoot = Join-Path $CacheRoot 'postgis-3.6.2'
+    Expand-Archive -Path $zipPath -DestinationPath $expandRoot -Force
+
+    $bundleRoot = Join-Path $expandRoot 'postgis-bundle-pg17-3.6.2x64'
+    $payloadPostgres = Join-Path $PayloadRoot 'postgres'
+
+    foreach ($name in @('bin', 'lib', 'share')) {
+        $srcDir = Join-Path $bundleRoot $name
+        if (-not (Test-Path -LiteralPath $srcDir -PathType Container)) {
+            throw "Missing PostGIS source directory: $srcDir"
+        }
+    }
+
+    foreach ($name in @('bin', 'lib', 'share')) {
+        $srcDir = Join-Path $bundleRoot $name
+        $destDir = Join-Path $payloadPostgres $name
+        New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+        Get-ChildItem -LiteralPath $srcDir -Force | Copy-Item -Destination $destDir -Recurse -Force
+    }
+
+    return @{ status = 'installed'; sha256 = $Hash; version = '3.6.2' }
 }
 
 function Get-Sha256 {
@@ -703,8 +747,11 @@ function Test-PythonServiceImports {
         "civicsuite_runtime.services",
         "civicsuite_runtime.migrate"
     )
-    if ($ProductProfile -eq "city-core") {
+    if ($ProductProfile -in @("city-core", "zoning-beta")) {
         $ImportNames += @("civicclerk.main", "civiccode.main")
+    }
+    if ($ProductProfile -eq "zoning-beta") {
+        $ImportNames += @("civiczone.connected_sources", "civicsuite_runtime.zoning_bridge", "civicsuite_runtime.zoning_records")
     }
     if ($ProductProfile -eq "meetings-beta") {
         $ImportNames += @(
@@ -768,10 +815,14 @@ function Install-PythonServicePackages {
         $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
         $ServicePackages += @($CivicNotice, $CivicAccess)
     }
-    if ($ProductProfile -eq "city-core") {
+    if ($ProductProfile -in @("city-core", "zoning-beta")) {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
         $CivicCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path }
         $ServicePackages += @($CivicClerk, $CivicCode)
+    }
+    if ($ProductProfile -eq "zoning-beta") {
+        $CivicZone = if ($ZoningRoot) { (Resolve-Path $ZoningRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\zone")).Path }
+        $ServicePackages += @($CivicZone)
     }
     if ($ProductProfile -eq "meetings-beta") {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
@@ -810,8 +861,11 @@ function Install-PythonServicePackages {
     Copy-CivicRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
-    if ($ProductProfile -eq "city-core") {
+    if ($ProductProfile -in @("city-core", "zoning-beta")) {
         $InstalledPackages += @("civicclerk", "civiccode")
+    }
+    if ($ProductProfile -eq "zoning-beta") {
+        $InstalledPackages += @("civiczone")
     }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("civicclerk")
@@ -934,8 +988,25 @@ $Report = [ordered]@{
     ollama = Install-OllamaPayload -Source $Manifest.sources.ollama -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
 }
 $Report.pgvector = Install-PgvectorPayload -Source $Manifest.sources.pgvector -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
+if ($ProductProfile -eq "zoning-beta") {
+    $Report.postgis = Install-PostgisPayload -Source $Manifest.sources.postgis -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
+}
 $Report.postgres_vcruntime = Copy-PostgresVcRuntime -PostgresRoot (Join-Path $PayloadRoot "postgres")
 $Report.python_vcruntime = Copy-PythonVcRuntime -PythonRoot (Join-Path $PayloadRoot "python")
+# Python imports generate __pycache__ paths that can exceed the WiX linker limit.
+# They are regenerable bytecode and must not be shipped; remove only those directories before hashing.
+$PythonRoot = Join-Path $PayloadRoot "python"
+$PythonRootFull = [System.IO.Path]::GetFullPath($PythonRoot)
+$PythonRootBoundary = $PythonRootFull.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+Get-ChildItem -LiteralPath $PythonRoot -Directory -Recurse -Filter __pycache__ |
+    Sort-Object FullName -Descending |
+    ForEach-Object {
+        $CachePath = [System.IO.Path]::GetFullPath($_.FullName)
+        if (-not $CachePath.StartsWith($PythonRootBoundary, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove __pycache__ outside Python payload root: $CachePath"
+        }
+        Remove-Item -LiteralPath $CachePath -Recurse -Force
+    }
 $PayloadLock = New-RuntimePayloadLock -PayloadManifest $PayloadManifest -PayloadRoot $PayloadRoot -ProductProfile $ProductProfile
 $Report.payloads = $PayloadLock.payloads
 

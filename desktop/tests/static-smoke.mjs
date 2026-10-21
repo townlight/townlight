@@ -205,6 +205,15 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  '["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources',
+  '["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources'
+]) {
+  if (!main.includes(phrase)) {
+    throw new Error(`desktop zoning-beta source panel guard missing phrase: ${phrase}`);
+  }
+}
+
+for (const phrase of [
   "function adminOnlyControlLocked",
   "return access.configured && access.role !== \"local-admin\";",
   "function modelSetupControlLocked",
@@ -510,7 +519,7 @@ for (const phrase of [
   "System.Security.Cryptography.SHA256",
   "PayloadManifestPath",
   '[string]$ProductProfile = "records-beta"',
-  'if ($ProductProfile -eq "city-core")',
+  'if ($ProductProfile -in @("city-core", "zoning-beta"))',
   "TOWNLIGHT_PRODUCT_PROFILE",
   "New-RuntimePayloadLock",
   "required_files",
@@ -1015,8 +1024,14 @@ for (const excludedFromRecordsBeta of [
     throw new Error(`Legacy city-core payload must retain ${excludedFromRecordsBeta}`);
   }
 }
-if (!desktopMsiWorkflow.includes("repository: townlight/meetings") || !desktopMsiWorkflow.includes("repository: townlight/ordinances") || !desktopMsiWorkflow.includes("-ProductProfile city-core")) {
-  throw new Error("Townlight Records MSI workflow must check out Meetings and ordinances with -ProductProfile city-core");
+if (
+  !desktopMsiWorkflow.includes("repository: townlight/meetings") ||
+  !desktopMsiWorkflow.includes("repository: townlight/ordinances") ||
+  !desktopMsiWorkflow.includes("repository: townlight/zone") ||
+  !desktopMsiWorkflow.includes("ref: 3e4413c35c213b036c431a8949e2bfa011c8c1d4") ||
+  !desktopMsiWorkflow.includes("-ProductProfile zoning-beta")
+) {
+  throw new Error("Connected Zoning MSI workflow requires pinned sources/profile.");
 }
 
 if (tauriConfigJson.productName !== "Townlight" || tauriConfigJson.bundle.publisher !== "Townlight") {
