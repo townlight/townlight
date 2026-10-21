@@ -896,7 +896,9 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.locator('[data-module-toggle="civiccode"]')).toBeChecked();
   await expect(page.locator('[data-module-toggle="civicaccess"]')).toBeChecked();
   await expect(page.locator('[data-module-toggle="civiczone"]')).toBeDisabled();
-  await expect(page.getByText("Not ready for Windows Local 1.0")).toBeVisible();
+  const civiczoneChoice = page.locator('label.module-choice').filter({ has: page.locator('[data-module-toggle="civiczone"]') });
+  await expect(civiczoneChoice.locator('[data-module-toggle="civiczone"]')).not.toBeChecked();
+  await expect(civiczoneChoice).toContainText("Ready for Windows Local 1.0");
   await page.getByLabel(/Custom/).check();
   await expect(page.getByText("Custom selection will install Townlight Core plus 5 selected product modules.")).toBeVisible();
   await page.locator('[data-module-toggle="civicrecords-ai"]').uncheck();

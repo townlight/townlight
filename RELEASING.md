@@ -1,5 +1,30 @@
 # Releasing the Townlight Records Windows MSI
 
+## Connected Records–Meetings–Code–Zoning: 1.4.0-beta.1
+
+Scott authorized push, merge after required checks, existing Azure signing,
+final exact signed fresh/upgrade/recovery verification, and publication only on
+passing acceptance on October 21, 2026. No further product scope is authorized.
+
+Use tag `townlight-records-meetings-code-zoning-v1.4.0-beta.1`, desktop version
+`1.4.0-1`, MSI ProductVersion `1.4.0.1`. Preserve application/upgrade identity.
+The payload is `zoning-beta`; Records remains the default and existing saved
+selections are not changed. Release source pins are recorded in the canonical
+suite state and both desktop CI jobs. Do not reprovision Azure or change signer.
+
+The existing main-only workflow signs the EXE before MSI bundling and signs the
+MSI afterward, verifying the embedded EXE against the signing receipt. Use
+`--no-binary-patching` to preserve the signature. The tag/draft workflow attaches
+that exact successful main signing run, never an unsigned PR artifact.
+
+Reuse applicable Z4 evidence but verify the final signed bytes installed fresh
+and over populated signed 1.3, with connected sources and recovery. Stop workflow
+consumers and PostgreSQL before Repair refreshes the changed runtime; preserve
+data. This is not an unattended upgrade. See
+[Zoning acceptance](docs/installer/townlight-zoning-beta1-acceptance.md).
+
+The published 1.3 release remains the public download until this sequence passes.
+
 ## Connected Records–Meetings–Code: 1.3.0-beta.1
 
 Scott authorized push, merge after required checks, signing, final installed and
