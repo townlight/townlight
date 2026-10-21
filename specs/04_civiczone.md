@@ -1,11 +1,11 @@
-**CivicZone**
+**Townlight Zoning**
 
 **Module Spec v0.1**
 
 *Zoning code, parcel-aware lookups, overlay districts, and planner
 workflows --- as a first-class civic product*
 
-Modeled on the v3.0 CivicRecords AI unified spec • Built on CivicCore
+Modeled on the v3.0 Townlight Records unified spec • Built on Townlight Core
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
@@ -14,15 +14,15 @@ Open source · Apache License 2.0 · Gemma 4 default · airgappable
 **Document Metadata**
 
   --------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Module**            CivicZone --- Tier 2 Land Use & Development
+  **Module**            Townlight Zoning --- Tier 2 Land Use & Development
   **Document status**   v0.1 spec draft. Module itself is PLANNED (no code written). This doc is the buildable spec.
   **Purpose**           Zoning and land-use code as a first-class product with parcel-level awareness. Answers "what zone is my property, what can I build there, what are the setbacks" --- with citations, parcel-scoped answers, and optional GIS integration.
   **Primary owner**     Planning & Development / Community Development
-  **Depends on**        CivicCore (auth, RBAC, audit, LLM, ingest, search, notifications), CivicCode (shares ordinance infrastructure and version tracking). Optional: CivicPlan (comp plan cross-references), CivicClerk (variance hearing minutes).
+  **Depends on**        Townlight Core (auth, RBAC, audit, LLM, ingest, search, notifications), Townlight Code (shares ordinance infrastructure and version tracking). Optional: Townlight Planning (comp plan cross-references), Townlight Meetings (variance hearing minutes).
   **Default model**     Gemma 4 via Ollama. Local inference only. Embeddings via nomic-embed-text.
   **License**           Apache License 2.0 (code). CC BY 4.0 (docs). CC BY-SA 4.0 (prompt library, optional separate repo).
-  **Supersedes**        Nothing. First CivicZone spec. Fills the Land Use gap identified in the CivicSuiteAI Module Catalog.
-  **Grounded in**       CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). CivicCore v0.1 Extraction Spec (platform dependency).
+  **Supersedes**        Nothing. First Townlight Zoning spec. Fills the Land Use gap identified in the CivicSuiteAI Module Catalog.
+  **Grounded in**       CivicRecordsAI-UnifiedSpec-v3.0 (stylistic and structural template). CivicSuiteAI\_Module\_Catalog\_v1 (module card and tier placement). Townlight Core v0.1 Extraction Spec (platform dependency).
   **Completion bar**    Every user-facing state designed and tested. Every AI output cites source. Every parcel lookup discloses data freshness. Every answer declines to opine on approval outcomes and routes to a planner for determinations.
   --------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ Open source · Apache License 2.0 · Gemma 4 default · airgappable
 
 **Part I. Purpose & Strategic Context**
 
-**1. Why CivicZone**
+**1. Why Townlight Zoning**
 
 Zoning counter questions consume an absurd share of planner time at
 every city in America. A resident walks in, calls, or emails with a
@@ -43,56 +43,56 @@ the map, still writes the email, still answers the phone. Multiplied
 across a year, this is a career's worth of time spent on the same 50
 questions.
 
-The v3.0 CivicRecords AI spec treats Land Use & Permitting as a
+The v3.0 Townlight Records spec treats Land Use & Permitting as a
 connector domain. That is the correct framing inside a records module.
 It is the wrong framing for the suite. Zoning is its own product surface
 with its own users, its own compliance boundaries, and its own data
-shape. CivicZone is that product.
+shape. Townlight Zoning is that product.
 
 **2. The 80/20 bet**
 
-CivicZone is explicitly scoped around the 80% case: residents and staff
+Townlight Zoning is explicitly scoped around the 80% case: residents and staff
 asking routine questions about specific parcels. The 20% --- variance
 interpretation, conditional use outcomes, nonconforming-use arguments,
 novel interpretations of overlay intent --- always routes to a planner.
-CivicZone does not attempt to make determinations. It makes information
+Townlight Zoning does not attempt to make determinations. It makes information
 accessible. The planner's judgment stays where it belongs: in the
 office, with a record.
 
 That scoping is not a limitation; it is the whole design. The moment an
 automated system appears to make a zoning determination, a city has a
 liability problem, a due-process problem, and a public-trust problem.
-CivicZone sidesteps all three by never crossing that line, and by making
+Townlight Zoning sidesteps all three by never crossing that line, and by making
 the line visible to users at every turn.
 
 **3. Where it fits in the suite**
 
--   Depends on CivicCore: auth, RBAC, audit chain, LLM abstraction,
+-   Depends on Townlight Core: auth, RBAC, audit chain, LLM abstraction,
     document ingestion, hybrid search, connector framework,
     notifications, admin shell.
 
--   Depends on CivicCode: the zoning code is an ordinance. The
-    authoritative text lives in CivicCode's store. CivicZone reads,
-    structures, and parcel-scopes; CivicCode owns the source of truth.
+-   Depends on Townlight Code: the zoning code is an ordinance. The
+    authoritative text lives in Townlight Code's store. Townlight Zoning reads,
+    structures, and parcel-scopes; Townlight Code owns the source of truth.
 
--   Optional integration with CivicPlan: shows comprehensive plan policy
+-   Optional integration with Townlight Planning: shows comprehensive plan policy
     context next to zoning answers. "The code allows this; the comp plan
     says it's a compatible infill use."
 
--   Optional integration with CivicClerk: ingests variance and
+-   Optional integration with Townlight Meetings: ingests variance and
     conditional-use hearing minutes as precedent context for staff Q&A
     (never resident-facing).
 
--   Optional integration with CivicPermit Assist (Tier 2):
+-   Optional integration with Townlight Permitting (Tier 2):
     pre-application pre-check --- given a described project, what
     permits and approvals does this parcel trigger.
 
 **4. Tiering and compliance posture**
 
-CivicZone sits in Tier 2 --- Land Use & Development. It is safe for any
-city to install once the Clerk Core (CivicCore + CivicRecords +
-CivicClerk + CivicCode + CivicAccess) is running. It inherits
-CivicCore's sovereignty stance: no outbound network calls at runtime, no
+Townlight Zoning sits in Tier 2 --- Land Use & Development. It is safe for any
+city to install once the Clerk Core (Townlight Core + Townlight Records +
+Townlight Meetings + Townlight Code + Townlight Access) is running. It inherits
+Townlight Core's sovereignty stance: no outbound network calls at runtime, no
 telemetry, all LLM inference local. The planning department owns the
 configuration.
 
@@ -115,7 +115,7 @@ configuration.
 
 **6.1 Parcel lookup**
 
-The resident enters an address or clicks a parcel on a map. CivicZone
+The resident enters an address or clicks a parcel on a map. Townlight Zoning
 returns:
 
 -   Base zone (e.g., R-1, MU-3, I-2) with a plain-English one-sentence
@@ -173,7 +173,7 @@ Three entry points:
 **6.4 Variance / CUP explainer**
 
 For 80% cases the answer is clear. For the 20% where a variance or CUP
-is needed, CivicZone:
+is needed, Townlight Zoning:
 
 -   Explains the standards the applicant would have to meet (hardship,
     compatibility, etc.) in plain English with citations.
@@ -237,30 +237,30 @@ is needed, CivicZone:
 
 **8. Entity overview**
 
-CivicZone introduces eleven module-specific tables. All sit alongside
-CivicCore's shared tables (users, documents, document\_chunks,
-audit\_log, connectors, etc.). Every CivicZone table is stored in the
+Townlight Zoning introduces eleven module-specific tables. All sit alongside
+Townlight Core's shared tables (users, documents, document\_chunks,
+audit\_log, connectors, etc.). Every Townlight Zoning table is stored in the
 civiczone schema to keep the boundary visible in the database.
 
   ----------------------- ------------------------------------------------------------------------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------
   **Entity**              **Purpose**                                                              **Key fields**                                                                                                                                                      **Ownership**
-  zones                   Base zones (R-1, MU-3, I-2, etc.)                                        code, name, plain\_english, description\_html, effective\_date, source\_section\_ref                                                                                CivicZone
-  overlays                Overlay districts (floodplain, historic, transit, hillside)              code, name, plain\_english, description\_html, effective\_date, source\_section\_ref, map\_layer\_ref                                                               CivicZone
-  parcels                 Parcel geometry + metadata from GIS                                      parcel\_id, assessor\_id, address, geom (geography), zone\_code, overlay\_codes\[\], lot\_size\_sqft, frontage\_ft, last\_synced\_at, source\_layer\_id             CivicZone (mirrored from GIS)
-  use\_rules              Allowed-use rules per zone/overlay                                       zone\_code, overlay\_code (nullable), use\_category, status (permitted / permitted\_with\_conditions / conditional / prohibited), conditions\_text, citation\_ref   CivicZone
-  use\_categories         Canonical use taxonomy with synonyms and embeddings for fuzzy matching   code, name, description, parent\_code, synonyms\[\], embedding                                                                                                      CivicZone
-  dimensional\_rules      Setback, height, coverage, density, parking                              zone\_code, overlay\_code (nullable), rule\_type, value, unit, conditions\_text, citation\_ref                                                                      CivicZone
-  code\_sections          Zoning code section text, ingested                                       ord\_section\_ref, title, text, effective\_date, superseded\_by, chunk\_ids\[\]                                                                                     CivicCode (CivicZone reads)
-  citations               Atomic citation targets used by every AI answer                          id, code\_section\_ref, anchor\_text, url, excerpt, effective\_date                                                                                                 CivicZone
-  precedents              Variance / CUP decisions with context                                    id, parcel\_id, decision\_type, decision\_date, body, outcome, summary, minutes\_ref, staff\_only (bool)                                                            CivicZone (optional, reads CivicClerk)
-  interpretation\_notes   Staff-curated notes: "when residents ask X, we usually respond Y"        topic, note\_text, staff\_author, last\_reviewed\_at, resident\_visible (bool)                                                                                      CivicZone
-  zone\_questions         Question log for analytics, dashboard, accuracy review                   id, parcel\_id (nullable), question\_text, answer\_text, citation\_refs\[\], confidence, channel (public/staff), flagged\_for\_review (bool), reviewer\_notes       CivicZone
+  zones                   Base zones (R-1, MU-3, I-2, etc.)                                        code, name, plain\_english, description\_html, effective\_date, source\_section\_ref                                                                                Townlight Zoning
+  overlays                Overlay districts (floodplain, historic, transit, hillside)              code, name, plain\_english, description\_html, effective\_date, source\_section\_ref, map\_layer\_ref                                                               Townlight Zoning
+  parcels                 Parcel geometry + metadata from GIS                                      parcel\_id, assessor\_id, address, geom (geography), zone\_code, overlay\_codes\[\], lot\_size\_sqft, frontage\_ft, last\_synced\_at, source\_layer\_id             Townlight Zoning (mirrored from GIS)
+  use\_rules              Allowed-use rules per zone/overlay                                       zone\_code, overlay\_code (nullable), use\_category, status (permitted / permitted\_with\_conditions / conditional / prohibited), conditions\_text, citation\_ref   Townlight Zoning
+  use\_categories         Canonical use taxonomy with synonyms and embeddings for fuzzy matching   code, name, description, parent\_code, synonyms\[\], embedding                                                                                                      Townlight Zoning
+  dimensional\_rules      Setback, height, coverage, density, parking                              zone\_code, overlay\_code (nullable), rule\_type, value, unit, conditions\_text, citation\_ref                                                                      Townlight Zoning
+  code\_sections          Zoning code section text, ingested                                       ord\_section\_ref, title, text, effective\_date, superseded\_by, chunk\_ids\[\]                                                                                     Townlight Code (Townlight Zoning reads)
+  citations               Atomic citation targets used by every AI answer                          id, code\_section\_ref, anchor\_text, url, excerpt, effective\_date                                                                                                 Townlight Zoning
+  precedents              Variance / CUP decisions with context                                    id, parcel\_id, decision\_type, decision\_date, body, outcome, summary, minutes\_ref, staff\_only (bool)                                                            Townlight Zoning (optional, reads Townlight Meetings)
+  interpretation\_notes   Staff-curated notes: "when residents ask X, we usually respond Y"        topic, note\_text, staff\_author, last\_reviewed\_at, resident\_visible (bool)                                                                                      Townlight Zoning
+  zone\_questions         Question log for analytics, dashboard, accuracy review                   id, parcel\_id (nullable), question\_text, answer\_text, citation\_refs\[\], confidence, channel (public/staff), flagged\_for\_review (bool), reviewer\_notes       Townlight Zoning
   ----------------------- ------------------------------------------------------------------------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------
 
 **9. Versioning**
 
 Zoning code changes. Ordinances amend sections. Overlays get added.
-Parcels resubdivide. CivicZone versions carefully:
+Parcels resubdivide. Townlight Zoning versions carefully:
 
 -   zones, overlays, use\_rules, dimensional\_rules carry
     effective\_date and superseded\_by. A historical query ("what did
@@ -293,7 +293,7 @@ Parcels resubdivide. CivicZone versions carefully:
     --- same pattern.
 
 -   Every rule references a citation in citations; every citation
-    references a code\_section in CivicCode.
+    references a code\_section in Townlight Code.
 
 -   precedents.parcel\_id is nullable (some precedents apply to a zone,
     not a parcel).
@@ -320,7 +320,7 @@ civiczone.interpretation\_notes
 
 civiczone.zone\_questions \-- analytics log
 
-\-- Inherited from CivicCore (civiccore schema)
+\-- Inherited from Townlight Core (civiccore schema)
 
 civiccore.users, .roles, .audit\_log, .documents,
 
@@ -356,7 +356,7 @@ civiccore.notification\_templates, .city\_profile
   use\_matrix\_lookup.v1                   Determine permitted status for a proposed use at a zone                                zone\_code, overlay\_codes\[\], proposed\_use (free text), top-k use-category matches                                 status enum, conditions\_text, citation, confidence, next\_steps
   dimensional\_precheck.v1                 Given a described project, check dimensional compliance                                parcel record, project\_description (height, setback distances, coverage, etc.), dimensional\_rules subset            compliance\_flag per dimension, citation, overall verdict (compliant / noncompliant / ambiguous / requires\_planner)
   variance\_cup\_explainer.v1              Plain-English explanation of variance or CUP standards and process                     zone\_code, variance\_type (variance / CUP / minor mod), top-k retrieved standards, recent process data               plain\_english\_explanation, standards\_list, process\_steps, historical\_timeline\_summary, planner\_contact
-  staff\_report\_outline.v1 (staff-only)   Draft a structured staff-report outline for a pending application                      application metadata, parcel, proposed use, top-k code chunks, top-k precedents, comp plan policies (via CivicPlan)   section outlines, cited code + comp plan refs, unresolved\_flags\[\]
+  staff\_report\_outline.v1 (staff-only)   Draft a structured staff-report outline for a pending application                      application metadata, parcel, proposed use, top-k code chunks, top-k precedents, comp plan policies (via Townlight Planning)   section outlines, cited code + comp plan refs, unresolved\_flags\[\]
   plain\_english\_rewrite.v1               Plain-English summary of a specific code section (staff approves before publishing)    code\_section\_ref, section\_text, target reading level                                                               rewrite\_text, retained\_citations\[\], review\_required (bool)
   ambiguity\_detector.v1                   Identify sections with likely ambiguity based on question volume and staff overrides   question log sample, staff override log sample                                                                        ranked list of candidate sections with rationale
   ---------------------------------------- -------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------
@@ -366,7 +366,7 @@ civiccore.notification\_templates, .city\_profile
 Every answer surfaces citations as structured objects, not as free-text
 mentions. The frontend renders each citation as a clickable chip that
 expands to show the section excerpt, effective date, and a link to the
-authoritative text in CivicCode. The backend refuses to display an
+authoritative text in Townlight Code. The backend refuses to display an
 answer whose citation array is empty.
 
 {
@@ -986,7 +986,7 @@ refusal\_conditions:
 -   ADA Title II public-facing compliance dates (April 24, 2026 for
     cities \>50k; April 26, 2027 for smaller) apply. Every public page meets WCAG 2.2 AA.
 
--   Fair Housing Act considerations: CivicZone avoids any feature that
+-   Fair Housing Act considerations: Townlight Zoning avoids any feature that
     could be used to screen parcels by protected class (e.g., "how many
     of these zones are majority-renter" is out of scope).
 
@@ -999,15 +999,15 @@ refusal\_conditions:
 
 **D. Verification log (to be completed when v0.1 ships)**
 
-\#\# Verification Log --- CivicZone v0.1
+\#\# Verification Log --- Townlight Zoning v0.1
 
 \#\#\# What Was Changed
 
-First release of CivicZone. PLANNED → SHIPPED.
+First release of Townlight Zoning. PLANNED → SHIPPED.
 
 \#\#\# Data Provenance Check
 
-\[ \] Every displayed zone, overlay, citation traces to CivicCode
+\[ \] Every displayed zone, overlay, citation traces to Townlight Code
 section
 
 \[ \] Every parcel answer traces to civiczone.parcels synced from
@@ -1062,11 +1062,11 @@ confidence-too-low, determination-requested
 
 \#\#\# Regression Check
 
-\[ \] CivicCore version compatibility matrix updated
+\[ \] Townlight Core version compatibility matrix updated
 
-\[ \] CivicCode API compatibility verified
+\[ \] Townlight Code API compatibility verified
 
-\[ \] CivicRecords AI unaffected
+\[ \] Townlight Records unaffected
 
 \#\#\# Test Suite Blind Spots
 

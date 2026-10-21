@@ -1,6 +1,6 @@
 # Shared Extraction Consumer Rollout
 
-This playbook documents the standard way to carry a newly shipped `civiccore` capability into downstream CivicSuite modules without bespoke work. It exists so a shared-platform extraction does not become a one-off migration every time a consumer adopts it.
+This playbook documents the standard way to carry a newly shipped `civiccore` capability into downstream Townlight modules without bespoke work. It exists so a shared-platform extraction does not become a one-off migration every time a consumer adopts it.
 
 ## Use This Playbook When
 

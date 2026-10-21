@@ -1,14 +1,16 @@
-# CivicRegWatch Module Specification
+<a id="civicregwatch-module-specification"></a>
+
+# Townlight Regulatory Watch Module Specification
 
 Status: future implementation specification
 Source: `C:/Users/scott/Downloads/CivicAPI and CivicRegWatch modules.docx`
 
 ## Purpose
 
-CivicRegWatch is the CivicSuite module that monitors federal regulatory
+Townlight Regulatory Watch is the Townlight module that monitors federal regulatory
 activity and surfaces the subset of rules, proposed rules, guidance documents,
 and congressional actions that may carry operational, legal, or financial
-consequences for the city running CivicSuite.
+consequences for the city running Townlight.
 
 It is an intelligence layer, not a compliance system. It tells staff something
 changed and someone should look at it. It does not make compliance
@@ -16,7 +18,7 @@ determinations, interpret legal obligations, or take action for the city.
 
 ## Product Promise
 
-City staff should be able to open CivicRegWatch and know, within five minutes,
+City staff should be able to open Townlight Regulatory Watch and know, within five minutes,
 whether federal regulatory activity from the last 24 to 72 hours requires
 attention. Every alert must explain what changed, which city department or
 operation it may touch, whether a deadline exists, and what follow-up action is
@@ -27,7 +29,7 @@ decisions.
 
 - No legal compliance determinations.
 - No city-specific legal interpretation.
-- No automatic action in other CivicSuite modules.
+- No automatic action in other Townlight modules.
 - No replacement for the city attorney, compliance officer, or municipal league legal advisory.
 - No completeness guarantee across all federal regulatory activity.
 - No live LLM calls in v0.1.x.
@@ -68,23 +70,23 @@ Every incoming document is classified against a fixed municipal domain taxonomy.
 Classification is deterministic in v0.1.x using keyword and CFR-title matching.
 LLM-assisted classification is planned for v0.2.x and remains staff-reviewable.
 
-| Domain ID | Label | Example CFR Titles | Primary CivicSuite Module |
+| Domain ID | Label | Example CFR Titles | Primary Townlight Module |
 |---|---|---|---|
-| ENV_WATER | Water and wastewater | 40 CFR 122-147 | CivicPermit, Civic311 |
-| ENV_AIR | Air quality | 40 CFR 50-99 | CivicPermit |
-| ENV_FLOOD | Floodplain / NFIP | 44 CFR 59-78 | CivicZone, CivicPermit |
-| LAND_USE | Land use and development | HUD 24 CFR, SBA regs | CivicZone, CivicPlan |
-| HOUSING | Housing programs | 24 CFR 5, 91, 570 | CivicGrants |
-| LABOR | Employment and labor | 29 CFR | CivicHR |
-| FINANCE | Grants and fiscal | 2 CFR 200 | CivicGrants, CivicBudget |
-| SAFETY | Public safety | DHS, FEMA | CivicSafety |
-| TRANSPORT | Transportation | 23 CFR, 49 CFR | Civic311 |
-| ELECTIONS | Elections | 52 USC, EAC guidance | CivicElections |
+| ENV_WATER | Water and wastewater | 40 CFR 122-147 | Townlight Permitting, Townlight 311 |
+| ENV_AIR | Air quality | 40 CFR 50-99 | Townlight Permitting |
+| ENV_FLOOD | Floodplain / NFIP | 44 CFR 59-78 | Townlight Zoning, Townlight Permitting |
+| LAND_USE | Land use and development | HUD 24 CFR, SBA regs | Townlight Zoning, Townlight Planning |
+| HOUSING | Housing programs | 24 CFR 5, 91, 570 | Townlight Grants |
+| LABOR | Employment and labor | 29 CFR | Townlight HR |
+| FINANCE | Grants and fiscal | 2 CFR 200 | Townlight Grants, Townlight Budget |
+| SAFETY | Public safety | DHS, FEMA | Townlight Safety |
+| TRANSPORT | Transportation | 23 CFR, 49 CFR | Townlight 311 |
+| ELECTIONS | Elections | 52 USC, EAC guidance | Townlight Elections |
 | TELECOM | Broadband / telecom | 47 CFR | Future integration |
-| COURTS | Municipal courts | DOJ guidance | CivicCourt |
-| ADA | Accessibility / ADA | 28 CFR 35 | CivicAccess |
-| PROCUREMENT | Procurement | FAR supplements | CivicProcure |
-| ENVIRONMENT | General environmental | Mixed | CivicPermit |
+| COURTS | Municipal courts | DOJ guidance | Townlight Courts |
+| ADA | Accessibility / ADA | 28 CFR 35 | Townlight Access |
+| PROCUREMENT | Procurement | FAR supplements | Townlight Procurement |
+| ENVIRONMENT | General environmental | Mixed | Townlight Permitting |
 
 ## Alert Architecture
 
@@ -136,19 +138,19 @@ breaker pauses a source after five consecutive failures and notifies admins.
 
 - Alert review: acknowledge, escalate, dismiss with note, reopen, or archive.
 - Comment deadline tracking: show deadlines and allow local notes/reminders.
-- Escalation to CivicLegal: create a linked attorney-review record.
-- Escalation to CivicClerk: create an agenda item draft stub requiring review.
+- Escalation to Townlight Legal: create a linked attorney-review record.
+- Escalation to Townlight Meetings: create an agenda item draft stub requiring review.
 - Search and history: filter alerts by keyword, domain, agency, date, and status.
 
 ## Notifications
 
-CivicRegWatch uses the CivicCore notification surface when available.
+Townlight Regulatory Watch uses the Townlight Core notification surface when available.
 
 - In-app alert badge: always.
 - Email digest: configurable.
 - Webhook delivery: planned v0.3.x.
 
-Notifications link back to CivicRegWatch and do not include the full alert
+Notifications link back to Townlight Regulatory Watch and do not include the full alert
 record.
 
 ## Data Model
@@ -195,9 +197,9 @@ avoid asserting that the city must act, and record prompt/model provenance.
 
 ## Dependencies
 
-- CivicCore: migrations, audit, LLM abstraction, notifications, provenance.
-- CivicLegal: optional escalation target.
-- CivicClerk: optional ordinance-amendment agenda-item stub target.
+- Townlight Core: migrations, audit, LLM abstraction, notifications, provenance.
+- Townlight Legal: optional escalation target.
+- Townlight Meetings: optional ordinance-amendment agenda-item stub target.
 
 ## Test Matrix
 
@@ -212,7 +214,7 @@ avoid asserting that the city must act, and record prompt/model provenance.
 - Search and filter correctness.
 - Admin-only poll trigger enforcement.
 - Air-gap behavior with outbound calls disabled.
-- CivicCore compatibility matrix.
+- Townlight Core compatibility matrix.
 
 ## Shipped Vs Planned
 
@@ -226,7 +228,7 @@ Planned v0.1.x foundation:
 - Accessible public module overview.
 - Health endpoint.
 - Alert list/detail/review APIs.
-- Documentation gates and CivicCore alignment.
+- Documentation gates and Townlight Core alignment.
 
 Not shipped in v0.1.x:
 
@@ -234,7 +236,7 @@ Not shipped in v0.1.x:
 - LLM-generated summaries.
 - Regulations.gov, Congress.gov, and USASPENDING polling.
 - Comment reminders.
-- Escalation to CivicLegal or CivicClerk.
+- Escalation to Townlight Legal or Townlight Meetings.
 - Notification delivery.
 - Webhooks.
 - State regulatory monitoring.

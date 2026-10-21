@@ -1,6 +1,6 @@
 # New Module Checklist
 
-Use this checklist before creating or promoting any new CivicSuite module repo. The goal is boring consistency: a new module should enter the org with the same release truth, docs, installer, and verification surfaces as the existing suite.
+Use this checklist before creating or promoting any new Townlight module repo. The goal is boring consistency: a new module should enter the org with the same release truth, docs, installer, and verification surfaces as the existing suite.
 
 ## 1. Authority Read
 
@@ -35,11 +35,13 @@ Create the repo under the `CivicSuite` GitHub org with these baseline paths:
 
 Use `docs/templates/module-scaffold/` as the starting shape, then replace placeholders before the first commit.
 
-## 3. CivicCore Dependency
+<a id="3-civiccore-dependency"></a>
 
-- Pin CivicCore through the current released wheel URL and sha256 when the module is part of a release train.
+## 3. Townlight Core Dependency
+
+- Pin Townlight Core through the current released wheel URL and sha256 when the module is part of a release train.
 - Do not use unreleased archive URLs except as explicitly documented audit evidence.
-- Do not duplicate CivicCore-owned document ingestion, embeddings, or shared vector storage. Modules may keep domain-specific ranking, structuring, and query logic on top of `civiccore.ingest`.
+- Do not duplicate Townlight Core-owned document ingestion, embeddings, or shared vector storage. Modules may keep domain-specific ranking, structuring, and query logic on top of `civiccore.ingest`.
 
 ## 4. Release Truth
 
@@ -64,7 +66,7 @@ Update the umbrella repo in the same release train or a dedicated suite-truth PR
 - `ARCHITECTURE.md`
 - `docs/CivicSuiteUnifiedSpec.md` shipped-state notes, if any
 
-The module is not `v1.0.0` if it is not installable or selectable through the appropriate CivicSuite installer path.
+The module is not `v1.0.0` if it is not installable or selectable through the appropriate Townlight installer path.
 
 ## 6. Documentation
 

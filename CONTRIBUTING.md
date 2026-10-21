@@ -1,7 +1,9 @@
-# Contributing to CivicSuite
+<a id="contributing-to-civicsuite"></a>
+
+# Contributing to Townlight
 
 The civicsuite umbrella repo holds suite-wide documentation, design principles,
-cross-module ADRs, the roadmap, governance, and the CivicCore <-> module
+cross-module ADRs, the roadmap, governance, and the Townlight Core <-> module
 compatibility matrix. It does not hold code.
 
 ## Where to file your bug
@@ -12,11 +14,11 @@ the most common contributor friction.
 - **Shared platform bug** (auth, RBAC, audit chain, LLM abstraction, document
   ingestion, hybrid search, connector framework, notifications, onboarding,
   city profile, exemption engine, sovereignty verification) -> file at
-  `CivicSuite/civiccore`.
+  `townlight/core`.
 - **Records-module bug** (request lifecycle, response letters, fee schedules,
   exemption dashboard, public request portal) -> file at
-  `CivicSuite/civicrecords-ai` (the records repo now lives in the CivicSuite org; the canonical home is `CivicSuite/civicrecords-ai`).
-- **CivicClerk / CivicCode / CivicZone bug** -> file at the matching module
+  `townlight/sunshine` (the records repo now lives in the Townlight org; the canonical home is `townlight/sunshine`).
+- **Townlight Meetings / Townlight Code / Townlight Zoning bug** -> file at the matching module
   repo. If the module repo doesn't exist yet, file in this umbrella with the
   `module:<name>` label.
 - **Cross-module strategy or roadmap question, docs typo, ADR proposal, suite

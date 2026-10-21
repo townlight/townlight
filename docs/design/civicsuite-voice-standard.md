@@ -1,4 +1,6 @@
-# CivicSuite voice standard
+<a id="civicsuite-voice-standard"></a>
+
+# Townlight voice standard
 
 > **Targets** `docs/design/` in the umbrella repo, alongside
 > `windows-desktop-design-control.md` and `civicsuite-ui-patterns.md`. This is
@@ -100,7 +102,7 @@ The project's honesty is an asset. Phrase it so it reads as confidence, not as a
 red flag.
 
 - **Lead with the positive current state.** State what a thing *is* now, then
-  (optionally) link the history. The CivicAccess note leads "Sixth city-core
+  (optionally) link the history. The Townlight Access note leads "Sixth city-core
   module, shipped in v1.0.2 with local-AI accessibility features," not
   "a re-probe reversed the 2026-05-23 demotion."
 - **Don't put a warning where a positive claim belongs.** A headline, a hero, an

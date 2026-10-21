@@ -8,11 +8,11 @@
     "legacy_organizations": ["CivicSuite"]
   },
   "desktop_release": {
-    "version": "1.0.4",
-    "tag": "civicsuite-windows-local-v1.0.4",
-    "commit": "e596da3a81b3f4f35ea9a9019221cc0e62b7124b",
+    "version": "1.4.0-1",
+    "tag": "townlight-records-meetings-code-zoning-v1.4.0-beta.1",
+    "commit": "5b22235f88a45da6e33fe7075654f724609a3921",
     "channel": "public-beta",
-    "published_at": "2026-07-13",
+    "published_at": "2026-10-21",
     "asset_policy": "windows-msi"
   },
   "asset_policies": {
@@ -24,9 +24,9 @@
   "products": {
     "records": {
       "public_name": "Townlight Records",
-      "status": "stabilizing",
+      "status": "public-beta",
       "modules": ["core", "records", "notice", "access"],
-      "public_website_status": "deferred-until-public-beta-ready"
+      "public_website_status": "published"
     }
   },
   "profiles": {
@@ -108,7 +108,7 @@
       "release": {"tag": "v0.2.2", "published_at": "2026-05-23", "asset_policy": "python-package"},
       "compatibility": {"development_core": "1.2.1", "installer_core": "1.2.1", "public_status_core": "1.2.1"},
       "dependencies": ["core", "code"],
-      "maturity": {"state": "queued", "availability": "runtime", "arch_tier": 2, "legacy_grade": "queued", "public_status_released_at": "2026-05-23"},
+      "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 2, "legacy_grade": "released", "public_status_released_at": "2026-05-23"},
       "installer": {"tier": 2, "role": "zoning and land use", "status": "v0_2_2_connected_beta_candidate", "source_commit": "6ff3af1039e248c0dcd596f9abe2db7f58adaa7d"}
     },
     "planning": {

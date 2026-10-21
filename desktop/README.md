@@ -1,5 +1,21 @@
 # Townlight desktop
 
+Current published desktop: **Records + Meetings + Code + Zoning 1.4.0-beta.1**,
+desktop version 1.4.0-1 / Windows ProductVersion 1.4.0.1. The exact signed installer
+passed fresh and populated signed 1.3 upgrade, connected workflow, recovery and
+retained-data uninstall acceptance on October 21, 2026. Select zoning-beta for all
+four products; Records-only remains default. Package names and installer identity
+are compatibility contracts. Source-copy changes do not rebuild or replace the
+accepted installer.
+
+See the [current manual](../USER-MANUAL.md),
+[signed acceptance](../docs/installer/townlight-zoning-beta1-signed-acceptance.md)
+and [published release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1).
+
+## Historical desktop development checkpoints (original text)
+
+# Townlight desktop
+
 Release candidate: **Records + Meetings + Code 1.3.0-beta.1**; synchronized
 desktop build 1.3.0-1 (MSI 1.3.0.1). The city-core payload contains all six
 connected capabilities. Default Records selection and application identities

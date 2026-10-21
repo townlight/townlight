@@ -1,17 +1,17 @@
 # Starter-Set Release Contract
 
-Status: maintained installer contract for the CivicCore + CivicSunshine +
-CivicMeetings starter set.
+Status: maintained installer contract for the Townlight Core + Townlight Records +
+Townlight Meetings starter set.
 
 Last verified: 2026-05-21.
 
 ## Scope
 
-The starter set is the first operator-facing CivicSuite install target:
+The starter set is the first operator-facing Townlight install target:
 
-- CivicCore installs first and remains non-selectable because every module
+- Townlight Core installs first and remains non-selectable because every module
   depends on it.
-- CivicSunshine and CivicMeetings are selectable modules in the custom profile
+- Townlight Records and Townlight Meetings are selectable modules in the custom profile
   and are both included by default in the `clerk-core` profile.
 - Windows and Linux package lifecycle proof are required for the Clerk-Core public-use gate.
 - macOS archives and wrapper manifests are generated and supported at beta
@@ -31,13 +31,13 @@ The maintained starter-set pair for this slice is:
 
 | Component | Release | Contract |
 |---|---:|---|
-| CivicCore | 1.2.0 current platform release | Installs first in the umbrella installer and provides the shared platform baseline. |
-| CivicSunshine | 1.7.3 | Selectable records module; runtime line consumes CivicCore 1.2.0 shared ingestion. |
-| CivicMeetings | 1.0.4 | Selectable meetings module; `/health` must report `version=1.0.4` and `civiccore=1.2.0`. |
+| Townlight Core | 1.2.0 current platform release | Installs first in the umbrella installer and provides the shared platform baseline. |
+| Townlight Records | 1.7.3 | Selectable records module; runtime line consumes Townlight Core 1.2.0 shared ingestion. |
+| Townlight Meetings | 1.0.4 | Selectable meetings module; `/health` must report `version=1.0.4` and `civiccore=1.2.0`. |
 
-The CivicCore 1.2.0 release is the current shared-platform release for new
-suite planning. CivicSunshine v1.7.3 and CivicMeetings v1.0.4 consume the
-published CivicCore v1.2.0 wheel, so their runtime proof must verify the module
+The Townlight Core 1.2.0 release is the current shared-platform release for new
+suite planning. Townlight Records v1.7.3 and Townlight Meetings v1.0.4 consume the
+published Townlight Core v1.2.0 wheel, so their runtime proof must verify the module
 health surfaces instead of assuming the umbrella platform version is the same as
 the module dependency pin.
 
@@ -49,7 +49,7 @@ The umbrella installer contract is enforced by
 - `clerk-core` resolves to `civiccore`, `civicrecords-ai`, `civicclerk` in that
   order.
 - `custom --module civicrecords-ai --module civicclerk` still resolves
-  CivicCore first.
+  Townlight Core first.
 - Generated Linux, Windows, and macOS archives exclude local state such as
   virtual environments, test reports, `.agent-runs`, `.env`, build outputs, and
   module-local generated artifacts.
@@ -65,14 +65,14 @@ The maintained runtime proof path is
 
 The `verify` mode must check:
 
-- CivicSunshine API health.
-- CivicSunshine web health.
-- CivicMeetings API health.
-- CivicMeetings web health.
-- CivicMeetings protected-default staff auth, including denied anonymous staff
+- Townlight Records API health.
+- Townlight Records web health.
+- Townlight Meetings API health.
+- Townlight Meetings web health.
+- Townlight Meetings protected-default staff auth, including denied anonymous staff
   writes.
-- Starter-set CivicCore contract: CivicSunshine reports v1.7.3, and
-  CivicMeetings reports v1.0.4 with CivicCore v1.2.0.
+- Starter-set Townlight Core contract: Townlight Records reports v1.7.3, and
+  Townlight Meetings reports v1.0.4 with Townlight Core v1.2.0.
 
 The maintained mutating workflow proof path is:
 
@@ -84,17 +84,17 @@ python scripts\run-clerk-core-installer.py restore
 python scripts\run-clerk-core-installer.py uninstall
 ```
 
-That proof must create and fetch a real CivicSunshine records request through
+That proof must create and fetch a real Townlight Records records request through
 first-admin JWT auth, exercise the search surface, submit the request for review, draft
 a response letter that remains staff-reviewable, and mark the request ready for
-release. It must also prove the CivicMeetings agenda intake/review/promotion,
+release. It must also prove the Townlight Meetings agenda intake/review/promotion,
 meeting, packet assembly/finalization, notice checklist/posting proof,
 motion/vote capture, citation-gated minutes draft, automatic-minutes-posting
 guardrail, and public archive calendar/search path through bearer-protected
-staff auth. Reports must not persist the CivicSunshine admin password or bearer
+staff auth. Reports must not persist the Townlight Records admin password or bearer
 token.
 
-Proof phrase lock: bearer-protected staff auth. Reports must not persist the CivicSunshine admin password or bearer token.
+Proof phrase lock: bearer-protected staff auth. Reports must not persist the Townlight Records admin password or bearer token.
 
 Backup proof must create PostgreSQL custom dump files for each selected starter
 module and a `backup-manifest.json` with SHA256 digests. Restore proof must
@@ -129,7 +129,7 @@ Docker Desktop and WSL 2. macOS remains archive/readiness only until a
 Darwin/macOS Docker Desktop host runs the same lifecycle class.
 
 This is a release contract for the starter-set installer and module runtime
-pairing. It is not yet a claim that CivicSunshine and CivicMeetings exchange workflow records with each other through a live cross-module business API.
+pairing. It is not yet a claim that Townlight Records and Townlight Meetings exchange workflow records with each other through a live cross-module business API.
 That workflow-level handoff remains a follow-on productization slice after the
 installer can reliably install, verify, repair, and remove the starter set on
 Linux and Windows.

@@ -1,6 +1,37 @@
 # Townlight Troubleshooting
 
-## Townlight Records + Meetings + Code 1.3.0-beta.1
+## Current 1.4 installation and recovery
+
+1. Download `Townlight_1.4.0-1_x64_en-US.msi` and its signing receipt/evidence from
+   the linked 1.4 release. Desktop version is **1.4.0-1**; Windows ProductVersion
+   is **1.4.0.1**. Verify the published checksum and timestamped publisher signature.
+2. For an upgrade, back up existing work, close Townlight and run the MSI. The
+   populated signed 1.3 upgrade was verified; that result does not certify every
+   possible older-version upgrade. Preserve the existing profile and data.
+3. Choose the profile explicitly. Records-only remains default; enable
+   **zoning-beta** for all four connected products. Complete administrator setup
+   and explicit Python/PostgreSQL activation. Optional model setup can be deferred
+   with **Continue without local AI**.
+4. After applying zoning-beta during a 1.3 upgrade, open System Health. Stop City
+   workflow services and Task queue, then PostgreSQL. Run City workflow services
+   → Repair to refresh the PostgreSQL/PostGIS and Python runtime. Wait for services
+   to finish warming up. This upgrade requires these manual service steps.
+5. If Repair reports locked `icudt67.dll`, stop those services before retrying.
+   Do not delete the database or profile. Use canonical backup/restore for current
+   work; historical JSON is migration evidence, not a fallback writer.
+
+For Zoning, use **Import parcel dataset** with the documented complete GeoJSON
+envelope, configure rules against authoritative public Code sources, inspect
+provenance and retain human corrections. Only explicitly public immutable source
+snapshots may attach to Records. Review the response and approve it before export.
+
+Use System Health for backup, restore and support bundles. Ordinary uninstall
+preserves data; export and back up before removing the app. Keep real resident
+data, credentials and unredacted backups out of public issues.
+
+[Current signed release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) · [Manual](../USER-MANUAL.md).
+
+## Historical Records + Meetings + Code 1.3.0-beta.1
 
 Choose city-core explicitly in setup or Settings for the three connected
 products plus Core, Notice and Access. Upgrades preserve the prior module
@@ -63,11 +94,11 @@ The Windows Local clerk path is a Tauri/WebView2 desktop app installed from an M
 ## City-Core App Will Not Start
 
 1. Confirm the workstation is 64-bit Windows 10/11 with WebView2 installed and has the recommended 32 GB RAM (16 GB is a workable minimum; the local model needs about 6.7 GB resident at runtime on top of Windows, Postgres, and services).
-2. Download the MSI from the official CivicSuite release page and verify its SHA-256 checksum matches the published hash.
-3. After install, open CivicSuite from the Start menu or desktop shortcut.
+2. Download the MSI from the official Townlight release page and verify its SHA-256 checksum matches the published hash.
+3. After install, open Townlight from the Start menu or desktop shortcut.
 4. If the app opens but a local service is unhealthy, open System Health, run **Check**, then **Repair** after reviewing the repair panel.
 
-If the app asks for Docker, WSL, a terminal, or manual config-file edits, this is a bug — please report it on the CivicSuite GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
+If the app asks for Docker, WSL, a terminal, or manual config-file edits, this is a bug — please report it on the Townlight GitHub issue tracker (<https://github.com/townlight/townlight/issues>).
 
 ## Model Download, Resume, Or Checksum Fails
 
@@ -90,9 +121,9 @@ The Gemma 4 12B QAT model (about 6.97 GB) is downloaded at first run from Huggin
 Use the live trust path:
 
 1. Verify the generated `SHA256SUMS` or release manifest that belongs to the package you are running.
-2. Confirm the package came from the official CivicSuite source or the recorded active run evidence path.
-3. Confirm `installer/modules.json` `source_commit` values match the vendored source commits for all six city-core modules (CivicCore, CivicRecords AI, CivicClerk, CivicCode, CivicNotice, and CivicAccess).
-4. For CivicCode module release assets, compare the published SHA256 and attestation bundle recorded in module release evidence.
+2. Confirm the package came from the official Townlight source or the recorded active run evidence path.
+3. Confirm `installer/modules.json` `source_commit` values match the vendored source commits for all six city-core modules (Townlight Core, Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access).
+4. For Townlight Code module release assets, compare the published SHA256 and attestation bundle recorded in module release evidence.
 
 Do not reuse old installer artifacts; always download the current release from the official GitHub Releases page and verify its SHA-256.
 
@@ -100,7 +131,7 @@ Do not reuse old installer artifacts; always download the current release from t
 
 The Windows MSI is Authenticode code-signed via Azure Trusted Signing. To verify a download came from an authorized source:
 
-1. Compare the MSI's SHA-256 checksum with the hash published on the official CivicSuite releases page.
+1. Compare the MSI's SHA-256 checksum with the hash published on the official Townlight releases page.
 2. Right-click the MSI file, select **Properties**, open the **Digital Signatures** tab, and confirm it lists a **verified publisher** (not "Unknown Publisher").
 
 ## Windows SmartScreen When You Run The Installer
@@ -121,9 +152,11 @@ Backups are local files written under the configured backup folder.
 2. If writes fail, choose a folder the signed-in local user can write to and run **Backup Now** again.
 3. Keep backup folders somewhere the city can retain and protect according to its records and IT policy.
 
-## CivicAccess City-Core Status
+<a id="civicaccess-city-core-status"></a>
 
-CivicAccess v0.4.0 is the sixth city-core module. The current v1.0.2 MSI installs all six city-core modules, including CivicAccess with its on-screen Accessibility tab. If a doc or status surface says otherwise, check the current truth surfaces below.
+## Townlight Access City-Core Status
+
+Townlight Access v0.4.0 is the sixth city-core module. The current v1.0.2 MSI installs all six city-core modules, including Townlight Access with its on-screen Accessibility tab. If a doc or status surface says otherwise, check the current truth surfaces below.
 
 ## Where To Check Current Truth
 

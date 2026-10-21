@@ -395,7 +395,7 @@ def create_runtime_app(*, domain_enabled: bool = False):
         yield
         await domain_engine.dispose()
 
-    app = FastAPI(title="Townlight local runtime", lifespan=runtime_lifespan)
+    app = FastAPI(title='Townlight local runtime', lifespan=runtime_lifespan)
 
     @app.get("/health")
     @app.get("/modules")

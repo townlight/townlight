@@ -1,23 +1,25 @@
-# CivicSuite Unified Specification
+<a id="civicsuite-unified-specification"></a>
 
-**Canonical suite specification for CivicSuite, CivicCore, CivicRecords AI, CivicClerk, CivicZone, CivicRegWatch, CivicAPI, and future modules**
+# Townlight Unified Specification
 
-Spec revision: 1.1  
-Status: Canonical planning specification (architectural intent only; STATUS.md is current-shipped truth)  
+**Canonical suite specification for Townlight, Townlight Core, Townlight Records, Townlight Meetings, Townlight Zoning, Townlight Regulatory Watch, Townlight API, and future modules**
+
+Spec revision: 1.1
+Status: Canonical planning specification (architectural intent only; STATUS.md is current-shipped truth)
 Last revised: 2026-06-13
-License: Apache License 2.0 for code; CC BY 4.0 for documentation unless a repository-specific LICENSE says otherwise.  
-Supersedes: `CivicSuiteAI_Module_Catalog_v1`, `Open Source AI for Municipalities`, and module-specific draft specs where they conflict with this document.  
+License: Apache License 2.0 for code; CC BY 4.0 for documentation unless a repository-specific LICENSE says otherwise.
+Supersedes: `CivicSuiteAI_Module_Catalog_v1`, `Open Source AI for Municipalities`, and module-specific draft specs where they conflict with this document.
 Preserves: Feature, workflow, schema, prompt, testing, and product requirements from the source documents unless explicitly marked superseded, deferred, or corrected here.
 
 ---
 
-> **Release recovery banner (updated 2026-06-13).** This spec describes the architectural intent of CivicSuite: the suite structure, dependency rules, principles, and module roadmap. It does not by itself describe what is shipped today. Current shipped/recovery truth lives in [STATUS.md](../STATUS.md), [docs/release-recovery-status.md](release-recovery-status.md), the compatibility matrix, and `scripts/verify-suite-state.py`. The city-core release-train cars are CivicCore v1.2.0, CivicRecords AI v1.7.3, CivicClerk v1.0.4, CivicCode v1.0.8, CivicNotice v0.2.0, and CivicAccess v0.4.0. CivicZone, CivicPlan, CivicPermit, and CivicInspect are on v0.2.2 no-functional-upgrade demotion labels until their Tier 2 release turns.
+> **Release recovery banner (updated 2026-06-13).** This spec describes the architectural intent of Townlight: the suite structure, dependency rules, principles, and module roadmap. It does not by itself describe what is shipped today. Current shipped/recovery truth lives in [STATUS.md](../STATUS.md), [docs/release-recovery-status.md](release-recovery-status.md), the compatibility matrix, and `scripts/verify-suite-state.py`. The city-core release-train cars are Townlight Core v1.2.0, Townlight Records v1.7.3, Townlight Meetings v1.0.4, Townlight Code v1.0.8, Townlight Notice v0.2.0, and Townlight Access v0.4.0. Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections are on v0.2.2 no-functional-upgrade demotion labels until their Tier 2 release turns.
 
 ---
 
 ## 1. Purpose
 
-This document is the working source of truth for the CivicSuite product family.
+This document is the working source of truth for the Townlight product family.
 
 It consolidates the useful content from:
 
@@ -27,8 +29,8 @@ It consolidates the useful content from:
 - `CivicClerk_Module_Spec_v0_1`
 - `CivicZone_Module_Spec_v0_1`
 - `Open Source AI for Municipalities`
-- Current repository truth in `CivicSuite/civicsuite`, `CivicSuite/civiccore`, `CivicSuite/civicrecords-ai`, and `CivicSuite/civicclerk`
-- CivicRegWatch and CivicAPI product requirements from `C:/Users/scott/Downloads/CivicAPI and CivicRegWatch modules.docx`
+- Current repository truth in `townlight/townlight`, `townlight/core`, `townlight/sunshine`, and `townlight/meetings`
+- Townlight Regulatory Watch and Townlight API product requirements from `C:/Users/scott/Downloads/CivicAPI and CivicRegWatch modules.docx`
 
 The goal is not to reduce the suite to a pitch. The goal is to preserve the full product surface while removing drift, stale licensing language, stale module counts, ambiguous dependency claims, and inconsistent shipped/planned labels.
 
@@ -38,7 +40,7 @@ These corrections override older source documents.
 
 ### 2.1 License
 
-All CivicSuite code repositories use **Apache License 2.0**.
+All Townlight code repositories use **Apache License 2.0**.
 
 Documentation uses **CC BY 4.0** unless a repository-specific LICENSE says otherwise. Code snippets inside documentation are governed by Apache License 2.0.
 
@@ -46,7 +48,7 @@ Older drafts referenced MIT. That language is superseded. Apache 2.0 is the civi
 
 ### 2.2 Module Count And Tiers
 
-The suite catalog now contains **27 product modules plus CivicCore as the Tier 0 shared platform across 7 tiers**:
+The suite catalog now contains **27 product modules plus Townlight Core as the Tier 0 shared platform across 7 tiers**:
 
 - Tier 0: Foundation
 - Tier 1: Clerk Core
@@ -56,37 +58,39 @@ The suite catalog now contains **27 product modules plus CivicCore as the Tier 0
 - Tier 5: Internal Business
 - Tier 6: Specialized
 
-Older drafts said "26 modules across 6 tiers." That was an arithmetic/category drift. This document standardizes on 7 tiers, counting Tier 0 through Tier 6, and adds CivicRegWatch plus CivicAPI as planned product modules in the operations/transparency lane. The reconciled catalog enumerates 27 product modules after CivicCore; live GitHub org state and installer metadata match that count.
+Older drafts said "26 modules across 6 tiers." That was an arithmetic/category drift. This document standardizes on 7 tiers, counting Tier 0 through Tier 6, and adds Townlight Regulatory Watch plus Townlight API as planned product modules in the operations/transparency lane. The reconciled catalog enumerates 27 product modules after Townlight Core; live GitHub org state and installer metadata match that count.
 
 ### 2.3 Repository Placement
 
-All CivicSuite module repositories live under the `CivicSuite` GitHub organization. Personal-account repositories are transitional only and should not be used for canonical project links.
+All Townlight module repositories live under the `CivicSuite` GitHub organization. Personal-account repositories are transitional only and should not be used for canonical project links.
 
 Current canonical repositories:
 
-- `CivicSuite/civicsuite` - umbrella documentation, governance, compatibility, roadmap.
-- `CivicSuite/civiccore` - shared platform library.
-- `CivicSuite/civicrecords-ai` - public records / FOIA product.
-- `CivicSuite/civicclerk` - meeting/agendas/minutes product.
-- `CivicSuite/civiccode` - municipal code and ordinance access product.
-- `CivicSuite/civicaccess` - accessibility, plain-language, multilingual, and ADA support product.
-- `CivicSuite/civiczone` - parcel-aware zoning and land-use support product.
-- `CivicSuite/civicplan` - comprehensive-plan policy lookup and planning analysis support product.
-- `CivicSuite/civicpermit` - permit pre-application and intake-readiness support product.
-- `CivicSuite/civicinspect` - inspection support product.
-- `CivicSuite/civicgrants` - grant opportunity and compliance support product.
-- `CivicSuite/civicprocure` - procurement drafting and award-packet support product.
-- `CivicSuite/civiccontracts` - contract repository and renewal visibility support product.
-- `CivicSuite/civicboards` - board and commission administration support product.
-- `CivicSuite/civicnotice` - public notice compliance support product.
+- `townlight/townlight` - umbrella documentation, governance, compatibility, roadmap.
+- `townlight/core` - shared platform library.
+- `townlight/sunshine` - public records / FOIA product.
+- `townlight/meetings` - meeting/agendas/minutes product.
+- `townlight/ordinances` - municipal code and ordinance access product.
+- `townlight/access` - accessibility, plain-language, multilingual, and ADA support product.
+- `townlight/zone` - parcel-aware zoning and land-use support product.
+- `townlight/plan` - comprehensive-plan policy lookup and planning analysis support product.
+- `townlight/permit` - permit pre-application and intake-readiness support product.
+- `townlight/inspect` - inspection support product.
+- `townlight/grants` - grant opportunity and compliance support product.
+- `townlight/procure` - procurement drafting and award-packet support product.
+- `townlight/contracts` - contract repository and renewal visibility support product.
+- `townlight/boards` - board and commission administration support product.
+- `townlight/notice` - public notice compliance support product.
 
 Future module repositories should be created under `CivicSuite/` from the start.
 
-### 2.4 CivicCore Capability Truth
+<a id="24-civiccore-capability-truth"></a>
 
-The long-term CivicCore responsibility set includes auth, RBAC, audit, LLM abstraction, document ingestion, hybrid search, connectors, notifications, onboarding, city profile, catalog, exemption rules, sovereignty controls, and shared module shell conventions.
+### 2.4 Townlight Core Capability Truth
 
-Current shipped CivicCore v1.2.0 is narrower than the long-term platform vision, but broader than the v0.2.0 LLM-only extraction. The v1.2.0 release adds the shared document-ingestion pipeline used by the city-core release cars and retains the v1.1.0 timing-safe staff-key gate plus the v1.0.1 security hardening for auth error payloads:
+The long-term Townlight Core responsibility set includes auth, RBAC, audit, LLM abstraction, document ingestion, hybrid search, connectors, notifications, onboarding, city profile, catalog, exemption rules, sovereignty controls, and shared module shell conventions.
+
+Current shipped Townlight Core v1.2.0 is narrower than the long-term platform vision, but broader than the v0.2.0 LLM-only extraction. The v1.2.0 release adds the shared document-ingestion pipeline used by the city-core release cars and retains the v1.1.0 timing-safe staff-key gate plus the v1.0.1 security hardening for auth error payloads:
 
 - `civiccore.migrations`
 - `civiccore.db.Base`
@@ -112,7 +116,7 @@ Placeholder packages are not implementation. Any public-facing document must say
 
 ## 3. Strategic Thesis
 
-CivicSuite is an open-source, local-first municipal operations suite for small and mid-sized cities.
+Townlight is an open-source, local-first municipal operations suite for small and mid-sized cities.
 
 It is designed around four realities:
 
@@ -121,7 +125,7 @@ It is designed around four realities:
 3. Clerks, planners, attorneys, finance staff, and department leads need practical workflow tools, not novelty chatbots.
 4. AI output must be cited, reviewable, locally governed, and subordinate to human decision-making.
 
-CivicSuite is **not** an ERP replacement, utility billing system, CAD/RMS, court case-management system, or permitting system of record on day one. It is designed to add value in the layer around municipal knowledge work: records, meetings, ordinances, zoning, notices, contracts, grants, procurement writing, public communication, accessibility, and internal policy Q&A.
+Townlight is **not** an ERP replacement, utility billing system, CAD/RMS, court case-management system, or permitting system of record on day one. It is designed to add value in the layer around municipal knowledge work: records, meetings, ordinances, zoning, notices, contracts, grants, procurement writing, public communication, accessibility, and internal policy Q&A.
 
 ## 4. Suite-Wide Non-Negotiables
 
@@ -132,7 +136,7 @@ Every module inherits these rules.
 - Staff workflows come before flashy resident features.
 - Resident-facing features ship when they improve trust, transparency, and self-service without creating legal ambiguity.
 - Each module degrades gracefully when the LLM is unavailable.
-- Modules are installable independently; CivicCore is the only required foundation.
+- Modules are installable independently; Townlight Core is the only required foundation.
 - Interfaces must be calm, accessible, government-appropriate, and actionable.
 - Every error, empty state, warning, and compliance flag must tell the user what happened and what to do next.
 
@@ -164,7 +168,7 @@ Every module inherits these rules.
 
 ## 5. Standard Module Architecture
 
-Every runtime module follows the CivicRecords AI pattern unless an ADR explicitly overrides it.
+Every runtime module follows the Townlight Records pattern unless an ADR explicitly overrides it.
 
 ### 5.1 Backend
 
@@ -173,10 +177,10 @@ Every runtime module follows the CivicRecords AI pattern unless an ADR explicitl
 - Redis 7.2
 - Celery and Celery Beat for background work
 - Alembic migrations
-- CivicCore dependency pinned to a compatible released version
+- Townlight Core dependency pinned to a compatible released version
 - Per-module schema or clearly bounded table namespace
-- Foreign keys into CivicCore shared tables where needed
-- Hash-chained audit logging once CivicCore audit extraction lands
+- Foreign keys into Townlight Core shared tables where needed
+- Hash-chained audit logging once Townlight Core audit extraction lands
 
 ### 5.2 Frontend
 
@@ -192,14 +196,14 @@ Every runtime module follows the CivicRecords AI pattern unless an ADR explicitl
 ### 5.3 AI And Prompting
 
 - Module-specific YAML prompt library, never hardcoded prompt strings for policy-bearing workflows
-- CivicCore LLM provider abstraction
-- CivicCore template resolver with civiccore defaults, code overrides, and module/city overrides
+- Townlight Core LLM provider abstraction
+- Townlight Core template resolver with civiccore defaults, code overrides, and module/city overrides
 - Citation requirements enforced in prompt contracts and output validation
 - Evaluation harness for prompt behavior before release
 
 ### 5.4 Data And Search
 
-- Documents and chunks eventually belong in CivicCore shared infrastructure.
+- Documents and chunks eventually belong in Townlight Core shared infrastructure.
 - Module-specific tables belong in the module schema/namespace.
 - Search must be permission-aware.
 - Public search must never leak staff-only or closed-session content.
@@ -215,13 +219,15 @@ Connector support should follow this priority:
 4. Vendor-specific integrations only where high-value.
 5. Write-back connectors only after read/import paths are stable and auditable.
 
-## 6. CivicCore Roadmap
+<a id="6-civiccore-roadmap"></a>
 
-CivicCore is the shared platform, not a user-facing product.
+## 6. Townlight Core Roadmap
+
+Townlight Core is the shared platform, not a user-facing product.
 
 ### 6.1 Shipped
 
-Current shipped CivicCore v1.1.0 includes:
+Current shipped Townlight Core v1.1.0 includes:
 
 - Migration runner and baseline migration strategy
 - Shared SQLAlchemy `Base`
@@ -246,12 +252,12 @@ Current shipped CivicCore v1.1.0 includes:
 - Notice deadline and compliance helpers
 - Cron schedule validation and next-run helpers
 - Connector host validation, startup config validation, encrypted JSON envelope helpers, and release-provenance verification
-- Live-sync retry/circuit primitives shared by CivicRecords AI and CivicClerk
-- Reusable vendor-delta planning and mock-city vendor, municipal IdP, and backup-retention contracts shared by CivicRecords AI, CivicClerk, and future modules
+- Live-sync retry/circuit primitives shared by Townlight Records and Townlight Meetings
+- Reusable vendor-delta planning and mock-city vendor, municipal IdP, and backup-retention contracts shared by Townlight Records, Townlight Meetings, and future modules
 
 ### 6.2 Planned Extractions
 
-Future CivicCore phases must extract shared capabilities from module implementations in disciplined increments:
+Future Townlight Core phases must extract shared capabilities from module implementations in disciplined increments:
 
 - Full auth/RBAC, user administration, department administration, and service-account administration
 - Web onboarding wizard
@@ -265,225 +271,283 @@ Future CivicCore phases must extract shared capabilities from module implementat
 - Shared staff app-shell conventions
 - Module registry / installed-module catalog
 
-No module may depend on planned CivicCore behavior unless that behavior is released in a versioned CivicCore artifact.
+No module may depend on planned Townlight Core behavior unless that behavior is released in a versioned Townlight Core artifact.
 
 ## 7. Canonical Module Catalog
 
 ### Tier 0 - Foundation
 
-#### CivicCore
+<a id="civiccore"></a>
 
-Owner: IT / platform team  
-Depends on: none  
+#### Townlight Core
+
+Owner: IT / platform team
+Depends on: none
 Status: v1.2.0 shipped with the shared document-ingestion pipeline; v1.1.0 `staff_key_gate` and v1.0.1 auth-error-payload hardening remain included. Architectural target: shared-platform release with many planned extractions.
-Purpose: shared infrastructure layer for every module. CivicCore owns the common libraries, migrations, LLM abstraction, shared schema conventions, audit/provenance/manifest/export primitives, city profile configuration, auth helpers, search/access helpers, connector primitives, ingest contracts, scheduling helpers, verification helpers, and future full document/search/catalog/exemption/scaffold primitives.
+Purpose: shared infrastructure layer for every module. Townlight Core owns the common libraries, migrations, LLM abstraction, shared schema conventions, audit/provenance/manifest/export primitives, city profile configuration, auth helpers, search/access helpers, connector primitives, ingest contracts, scheduling helpers, verification helpers, and future full document/search/catalog/exemption/scaffold primitives.
 
 ### Tier 1 - Clerk Core
 
-#### CivicRecords
+<a id="civicrecords"></a>
 
-Owner: City Clerk / Records Officer / Legal reviewer  
-Depends on: CivicCore  
-Status: v1.7.3 developer-preview release car shipped on CivicCore v1.2.0 with shared-ingestion consumption and release-asset convention bring-up. B2 Docker secret extraction shipped in v1.6.0 and the ingestion worker event-loop patch shipped in v1.6.1.
+#### Townlight Records
+
+Owner: City Clerk / Records Officer / Legal reviewer
+Depends on: Townlight Core
+Status: v1.7.3 developer-preview release car shipped on Townlight Core v1.2.0 with shared-ingestion consumption and release-asset convention bring-up. B2 Docker secret extraction shipped in v1.6.0 and the ingestion worker event-loop patch shipped in v1.6.1.
 Purpose: open-records intake, workflow, search, exemption review, response drafting, fee tracking, audit trail, and planned public request portal.
 
-#### CivicClerk
+<a id="civicclerk"></a>
 
-Owner: City Clerk / Council Support / City Manager's Office  
-Depends on: CivicCore. Optional integration with CivicRecords for records-search visibility.  
-Status: v1.0.4 city-core release car shipped on CivicCore v1.2.0; anonymous staff writes are denied by default.
+#### Townlight Meetings
+
+Owner: City Clerk / Council Support / City Manager's Office
+Depends on: Townlight Core. Optional integration with Townlight Records for records-search visibility.
+Status: v1.0.4 city-core release car shipped on Townlight Core v1.2.0; anonymous staff writes are denied by default.
 Purpose: agenda intake, packet assembly, staff report normalization, notice compliance, motion/vote capture, minute drafting, ordinance/resolution extraction, searchable meeting archive, and public meeting portal.
 
-Dependency note: older catalog text listed CivicRecords because shared document/search infrastructure was still inside CivicRecords. The corrected dependency is CivicCore once that infrastructure is extracted; CivicRecords integration remains optional.
+Dependency note: older catalog text listed Townlight Records because shared document/search infrastructure was still inside Townlight Records. The corrected dependency is Townlight Core once that infrastructure is extracted; Townlight Records integration remains optional.
 
-#### CivicCode
+<a id="civiccode"></a>
 
-Owner: City Clerk / Legal / Codification Department  
-Depends on: CivicCore, CivicClerk  
-Status: v1.0.8 city-core release car on CivicCore v1.2.0; supersedes the earlier v1.0.0 posture.
-Purpose: municipal code as a first-class product. Residents and staff ask what the code says about a topic and receive cited answers tied to authoritative code sections. CivicClerk feeds adopted ordinance/resolution events into CivicCode.
+#### Townlight Code
 
-#### CivicAccess
+Owner: City Clerk / Legal / Codification Department
+Depends on: Townlight Core, Townlight Meetings
+Status: v1.0.8 city-core release car on Townlight Core v1.2.0; supersedes the earlier v1.0.0 posture.
+Purpose: municipal code as a first-class product. Residents and staff ask what the code says about a topic and receive cited answers tied to authoritative code sections. Townlight Meetings feeds adopted ordinance/resolution events into Townlight Code.
 
-Owner: Clerk / Communications / IT / ADA Coordinator  
-Depends on: CivicCore  
-Status: v0.4.0 city-core release car on CivicCore v1.2.0; sixth city-core module (re-probe reversed the 2026-05-23 NEEDS-WORK demotion).
+<a id="civicaccess"></a>
+
+#### Townlight Access
+
+Owner: Clerk / Communications / IT / ADA Coordinator
+Depends on: Townlight Core
+Status: v0.4.0 city-core release car on Townlight Core v1.2.0; sixth city-core module (re-probe reversed the 2026-05-23 NEEDS-WORK demotion).
 Purpose: accessible forms, accessible publishing workflows, multilingual and plain-language rewrites, ADA Title II review, records-ready exports, and accessibility support reused by every module.
 
 ### Tier 2 - Land Use & Development
 
-#### CivicZone
+<a id="civiczone"></a>
 
-Owner: Planning & Development / Community Development  
-Depends on: CivicCore, CivicCode  
+#### Townlight Zoning
+
+Owner: Planning & Development / Community Development
+Depends on: Townlight Core, Townlight Code
 Status: v0.2.2 no-functional-upgrade demotion label; queued for Tier 2 real work.
-Purpose: parcel-aware zoning and land-use Q&A. Residents ask what zone a property is in, what uses are allowed, what setbacks apply, and when planner review is required. CivicZone never makes a zoning determination.
+Purpose: parcel-aware zoning and land-use Q&A. Residents ask what zone a property is in, what uses are allowed, what setbacks apply, and when planner review is required. Townlight Zoning never makes a zoning determination.
 
-#### CivicPlan
+<a id="civicplan"></a>
 
-Owner: Planning & Development / City Manager's Office  
-Depends on: CivicCore, CivicZone, CivicClerk  
+#### Townlight Planning
+
+Owner: Planning & Development / City Manager's Office
+Depends on: Townlight Core, Townlight Zoning, Townlight Meetings
 Status: v0.2.2 no-functional-upgrade demotion label; queued for Tier 2 real work.
 Purpose: comprehensive plans, small-area plans, transportation plans, parks plans, and sustainability plans become searchable, cited, and usable in staff analysis.
 
-#### CivicPermit
+<a id="civicpermit"></a>
 
-Owner: Planning / Building / Community Development  
-Depends on: CivicCore, CivicCode, CivicZone  
+#### Townlight Permitting
+
+Owner: Planning / Building / Community Development
+Depends on: Townlight Core, Townlight Code, Townlight Zoning
 Status: v0.2.2 no-functional-upgrade demotion label; queued for Tier 2 real work.
 Purpose: pre-application and intake copilot for permits and development review. Not a permitting system of record.
 
-#### CivicInspect
+<a id="civicinspect"></a>
 
-Owner: Code Enforcement / Building / Fire Prevention  
-Depends on: CivicCore, CivicCode  
+#### Townlight Inspections
+
+Owner: Code Enforcement / Building / Fire Prevention
+Depends on: Townlight Core, Townlight Code
 Status: v0.2.2 no-functional-upgrade demotion label; queued for Tier 2 real work.
 Purpose: inspection assistant for photo/voice-to-report drafting, repeat-case lookup, and notice generation. Inspectors own every decision.
 
 ### Tier 3 - Administrative Expansion
 
-#### CivicGrants
+<a id="civicgrants"></a>
 
-Owner: City Manager / Finance / Administration / Economic Development  
-Depends on: CivicCore, CivicRecords  
+#### Townlight Grants
+
+Owner: City Manager / Finance / Administration / Economic Development
+Depends on: Townlight Core, Townlight Records
 Status: demoted recovery label v0.2.0; false v1.0.0 tag created against the recovery halt.
 Purpose: opportunity triage, eligibility matching, application drafting, compliance calendars, and audit-ready grant files.
 
-#### CivicProcure
+<a id="civicprocure"></a>
 
-Owner: Finance / Purchasing / Clerk / Legal  
-Depends on: CivicCore, CivicClerk, CivicContracts  
+#### Townlight Procurement
+
+Owner: Finance / Purchasing / Clerk / Legal
+Depends on: Townlight Core, Townlight Meetings, Townlight Contracts
 Status: demoted recovery label v0.2.0; false v1.0.0 tag created against the recovery halt.
 Purpose: RFP drafting, proposal comparison, exception extraction, scoring summaries, board memos, and award packets.
 
-#### CivicContracts
+<a id="civiccontracts"></a>
 
-Owner: Clerk / Legal / Finance / Department contract managers  
-Depends on: CivicCore, CivicProcure, CivicRecords  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Contracts
+
+Owner: Clerk / Legal / Finance / Department contract managers
+Depends on: Townlight Core, Townlight Procurement, Townlight Records
+Status: foundation surface; not v1.0 product-ready.
 Purpose: central contract repository with clause Q&A, expiration tracking, renewal visibility, and public-records-aware exports.
 
-#### CivicBoards
+<a id="civicboards"></a>
 
-Owner: City Clerk / Board liaisons  
-Depends on: CivicCore, CivicClerk  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Boards
+
+Owner: City Clerk / Board liaisons
+Depends on: Townlight Core, Townlight Meetings
+Status: foundation surface; not v1.0 product-ready.
 Purpose: non-Council boards and commissions: members, terms, vacancies, attendance, agendas, packets, minutes, and public notices.
 
-#### CivicNotice
+<a id="civicnotice"></a>
 
-Owner: City Clerk / Communications  
-Depends on: CivicCore, CivicAccess, CivicClerk, CivicProcure, CivicBoards  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Notice
+
+Owner: City Clerk / Communications
+Depends on: Townlight Core, Townlight Access, Townlight Meetings, Townlight Procurement, Townlight Boards
+Status: foundation surface; not v1.0 product-ready.
 Purpose: compliance workflow for public hearings, legal notices, bid notices, vacancies, and statutory publication deadlines.
 
 ### Tier 4 - Operations
 
-#### Civic311
+<a id="civic311"></a>
 
-Owner: Public Works / Utilities / Neighborhood Services / Code Enforcement  
-Depends on: CivicCore, CivicAccess, CivicCode  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight 311
+
+Owner: Public Works / Utilities / Neighborhood Services / Code Enforcement
+Depends on: Townlight Core, Townlight Access, Townlight Code
+Status: foundation surface; not v1.0 product-ready.
 Purpose: resident service request intake with AI triage, deduplication, routing, and Open311-compatible export.
 
-#### CivicComms
+<a id="civiccomms"></a>
 
-Owner: Clerk / Communications / Administration / Mayor & Manager's Office  
-Depends on: CivicCore, CivicClerk, CivicCode, CivicAccess  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Communications
+
+Owner: Clerk / Communications / Administration / Mayor & Manager's Office
+Depends on: Townlight Core, Townlight Meetings, Townlight Code, Townlight Access
+Status: foundation surface; not v1.0 product-ready.
 Purpose: source-backed public explainers, meeting summaries, ordinance summaries, newsletters, FAQ generation, and multilingual public notices.
 
-#### CivicData
+<a id="civicdata"></a>
 
-Owner: IT / Clerk / Administration / Analysts  
-Depends on: CivicCore  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Data
+
+Owner: IT / Clerk / Administration / Analysts
+Depends on: Townlight Core
+Status: foundation surface; not v1.0 product-ready.
 Purpose: municipal system normalization, open-data-ready packages, searchable archive bundles, CKAN integration, and records retention exports. v0.1.1 ships dataset normalization, data-dictionary drafts, CKAN metadata drafts, PII/exemption preflight, archive-bundle checklists, publication planning, an accessible public sample UI, and civiccore==0.3.0 alignment. Live CKAN publishing, BI dashboards, data warehouse storage, autonomous redaction, and external connector runtime are not shipped.
 
-#### CivicRegWatch
+<a id="civicregwatch"></a>
+
+#### Townlight Regulatory Watch
 
 Owner: City Manager / City Attorney / Department heads
-Depends on: CivicCore. Optional escalation targets: CivicLegal and CivicClerk.
+Depends on: Townlight Core. Optional escalation targets: Townlight Legal and Townlight Meetings.
 Status: planned foundation module; detailed implementation spec in `specs/05_civicregwatch.md`
-Purpose: federal regulatory intelligence for municipal operators. CivicRegWatch monitors documented public federal APIs, narrows new regulatory activity to city-relevant domains, and creates human-reviewable alerts with deadlines, domains, source hashes, and escalation paths. It is not a compliance system and never emits legal opinions or automatic actions.
+Purpose: federal regulatory intelligence for municipal operators. Townlight Regulatory Watch monitors documented public federal APIs, narrows new regulatory activity to city-relevant domains, and creates human-reviewable alerts with deadlines, domains, source hashes, and escalation paths. It is not a compliance system and never emits legal opinions or automatic actions.
 
-#### CivicAPI
+<a id="civicapi"></a>
+
+#### Townlight API
 
 Owner: IT / Clerk / Open data administrator
-Depends on: CivicCore and module-owned publication contracts; optional CivicData relationship for dataset packages.
+Depends on: Townlight Core and module-owned publication contracts; optional Townlight Data relationship for dataset packages.
 Status: planned foundation module; detailed implementation spec in `specs/06_civicapi.md`
-Purpose: the city's public read-only data gateway over structured, human-approved, published CivicSuite records. CivicAPI exposes versioned, rate-limited, provenance-stamped API responses for records explicitly published by originating modules. It is not a write API, scraper, vendor aggregator, or replacement for CivicData bulk publication.
+Purpose: the city's public read-only data gateway over structured, human-approved, published Townlight records. Townlight API exposes versioned, rate-limited, provenance-stamped API responses for records explicitly published by originating modules. It is not a write API, scraper, vendor aggregator, or replacement for Townlight Data bulk publication.
 
 ### Tier 5 - Internal Business
 
-#### CivicHR
+<a id="civichr"></a>
 
-Owner: Human Resources  
-Depends on: CivicCore  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight HR
+
+Owner: Human Resources
+Depends on: Townlight Core
+Status: foundation surface; not v1.0 product-ready.
 Purpose: personnel policy Q&A, job description drafting, onboarding packet generation, and internal HR knowledge support. Not an HRIS. v0.1.1 ships policy lookup outlines, handbook summaries, job-description drafts, classification references, onboarding/training checklists, intake templates, source review, sensitive-topic preflight, an accessible public sample UI, and civiccore==0.3.0 alignment. HRIS, payroll, benefits administration, personnel records management, employment-law advice, personnel-file ingestion, live LLM calls, and external HR/payroll connector runtime are not shipped.
 
-#### CivicBudget
+<a id="civicbudget"></a>
 
-Owner: Finance / City Manager / Department budget leads  
-Depends on: CivicCore, CivicClerk, CivicData  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Budget
+
+Owner: Finance / City Manager / Department budget leads
+Depends on: Townlight Core, Townlight Meetings, Townlight Data
+Status: foundation surface; not v1.0 product-ready.
 Purpose: budget memo drafting, departmental budget narratives, line-item analysis, and hearing packet prep. Not a budgeting system.
 
-#### CivicLegal
+<a id="civiclegal"></a>
 
-Owner: City Attorney / Paralegal / Clerk  
-Depends on: CivicCore, CivicCode, CivicClerk, CivicContracts  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Legal
+
+Owner: City Attorney / Paralegal / Clerk
+Depends on: Townlight Core, Townlight Code, Townlight Meetings, Townlight Contracts
+Status: foundation surface; not v1.0 product-ready.
 Purpose: Q&A over the city's own legal corpus, including ordinances, resolutions, contracts, legal opinions, litigation history, statutes, and prior Council actions.
 
-#### CivicElections
+<a id="civicelections"></a>
 
-Owner: City Clerk / Election Official  
-Depends on: CivicCore, CivicCode, CivicAccess  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Elections
+
+Owner: City Clerk / Election Official
+Depends on: Townlight Core, Townlight Code, Townlight Access
+Status: foundation surface; not v1.0 product-ready.
 Purpose: support for cities running their own elections: candidate filing guidance, voter information Q&A, ballot question drafting support, election worker training, and accessible materials.
 
 ### Tier 6 - Specialized
 
-#### CivicUtility
+<a id="civicutility"></a>
 
-Owner: Utilities / Customer Service  
-Depends on: CivicCore, Civic311  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Utilities
+
+Owner: Utilities / Customer Service
+Depends on: Townlight Core, Townlight 311
+Status: foundation surface; not v1.0 product-ready.
 Purpose: utility customer-service copilot for account lookup, billing Q&A, payment arrangement drafting, and service request intake. Not a billing system.
 
-#### CivicCourt
+<a id="civiccourt"></a>
 
-Owner: Court Clerk / Municipal Court  
-Depends on: CivicCore in isolated profile  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Courts
+
+Owner: Court Clerk / Municipal Court
+Depends on: Townlight Core in isolated profile
+Status: foundation surface; not v1.0 product-ready.
 Purpose: document preparation and search support for municipal court clerks. Sensitive deployment; tight scoping required.
 
-#### CivicSafety
+<a id="civicsafety"></a>
 
-Owner: Public Safety administration  
-Depends on: CivicCore in isolated CJIS-aware profile  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Safety
+
+Owner: Public Safety administration
+Depends on: Townlight Core in isolated CJIS-aware profile
+Status: foundation surface; not v1.0 product-ready.
 Purpose: policy/procedure Q&A, non-CJIS administrative workflows, and public-information-officer support. Explicitly excludes operational dispatch and CJIS-bound data unless a future CJIS compliance program exists.
 
-#### CivicLibrary
+<a id="civiclibrary"></a>
 
-Owner: Library Director / Reference Librarians  
-Depends on: CivicCore  
-Status: foundation surface; not v1.0 product-ready.  
+#### Townlight Library
+
+Owner: Library Director / Reference Librarians
+Depends on: Townlight Core
+Status: foundation surface; not v1.0 product-ready.
 Purpose: library policy Q&A, program and event Q&A, collection-metadata reference assistance, collection-development guidance, and accessibility support. Explicitly excludes patron records, ILS integration, circulation actions, professional-reference replacement, legal advice, live LLM calls, and connector runtime.
 
-#### CivicParks
+<a id="civicparks"></a>
 
-Owner: Parks & Recreation Director  
-Depends on: CivicCore, Civic311  
+#### Townlight Parks
+
+Owner: Parks & Recreation Director
+Depends on: Townlight Core, Townlight 311
 Status: foundation surface; not v1.0 product-ready.
 Purpose: parks/facility/program Q&A, registration-link assistance, policy lookup, maintenance request triage, and resident-facing parks information. Explicitly excludes payment processing, registration writes, participant records, reservation writes, crew dispatch, live LLM calls, and connector runtime.
 
-## 8. CivicRecords Canonical Scope
+<a id="8-civicrecords-canonical-scope"></a>
 
-CivicRecords is Module 1 and the architectural template.
+## 8. Townlight Records Canonical Scope
+
+Townlight Records is Module 1 and the architectural template.
 
 ### 8.1 Product Promise
 
@@ -533,17 +597,21 @@ Canonical lifecycle:
 - Federation workflows where appropriate
 - Accessibility fixes from the v3.0 audit: touch targets, focus visibility, skip navigation, non-color-only badges, keyboard completion, form-error focus, screen-reader validation
 
-## 9. CivicClerk Canonical Scope
+<a id="9-civicclerk-canonical-scope"></a>
 
-CivicClerk is Module 2. Current release truth is CivicClerk v1.0.4 with the protected-default staff-auth recovery line retained; current shipped CivicCore compatibility remains recorded in the compatibility matrix and installer metadata. The canonical scope below describes the product target that must be proven before any city-deployable clerk-core claim.
+## 9. Townlight Meetings Canonical Scope
+
+Townlight Meetings is Module 2. Current release truth is Townlight Meetings v1.0.4 with the protected-default staff-auth recovery line retained; current shipped Townlight Core compatibility remains recorded in the compatibility matrix and installer metadata. The canonical scope below describes the product target that must be proven before any city-deployable clerk-core claim.
 
 ### 9.1 Product Promise
 
-CivicClerk replaces brittle meeting-management workflows with a clerk-first, locally deployed system for agendas, packets, minutes, voting, notices, and public meeting records. It is citation-grounded and sunshine-law aware.
+Townlight Meetings replaces brittle meeting-management workflows with a clerk-first, locally deployed system for agendas, packets, minutes, voting, notices, and public meeting records. It is citation-grounded and sunshine-law aware.
 
-### 9.2 The Nine CivicClerk Functions
+<a id="92-the-nine-civicclerk-functions"></a>
 
-CivicClerk covers:
+### 9.2 The Nine Townlight Meetings Functions
+
+Townlight Meetings covers:
 
 1. Agenda item intake
 2. Packet assembly
@@ -551,11 +619,13 @@ CivicClerk covers:
 4. Meeting notice and posting compliance
 5. Motion, vote, and action-item capture
 6. Minute drafting from packet/transcript/notes with sentence citations
-7. Ordinance/resolution extraction, diffing, and handoff to CivicCode
+7. Ordinance/resolution extraction, diffing, and handoff to Townlight Code
 8. Meeting archive search across packets/minutes/transcripts
 9. Public meeting portal with accessible posting
 
-### 9.3 CivicClerk Does Not
+<a id="93-civicclerk-does-not"></a>
+
+### 9.3 Townlight Meetings Does Not
 
 - Replace the clerk.
 - Make legal compliance determinations without human review.
@@ -622,9 +692,11 @@ Additional paths:
 - Searchable meeting archive.
 - Accessible posting and plain-language summaries where approved.
 
-### 9.10 CivicClerk Data Model
+<a id="910-civicclerk-data-model"></a>
 
-CivicClerk introduces module-specific tables in the `civicclerk` schema. The runtime implementation should use this list as the starting point and must document any ADR-approved deviation.
+### 9.10 Townlight Meetings Data Model
+
+Townlight Meetings introduces module-specific tables in the `civicclerk` schema. The runtime implementation should use this list as the starting point and must document any ADR-approved deviation.
 
 Canonical tables:
 
@@ -648,12 +720,14 @@ Required cross-cutting properties:
 - Versioned packet snapshots.
 - Immutable motion/vote records after capture; corrections reference originals.
 - Staff-only ACL for closed-session material.
-- Document references into CivicCore document tables once those tables are fully extracted.
+- Document references into Townlight Core document tables once those tables are fully extracted.
 - Permission-aware archive search.
 
-### 9.11 CivicClerk Prompt Library
+<a id="911-civicclerk-prompt-library"></a>
 
-CivicClerk prompts ship as versioned YAML. Minimum prompt set:
+### 9.11 Townlight Meetings Prompt Library
+
+Townlight Meetings prompts ship as versioned YAML. Minimum prompt set:
 
 - Agenda item summary
 - Staff report normalizer
@@ -667,9 +741,11 @@ CivicClerk prompts ship as versioned YAML. Minimum prompt set:
 
 Public-facing output prompts require clerk and attorney approval before deployment.
 
-### 9.12 CivicClerk REST/API Scope
+<a id="912-civicclerk-restapi-scope"></a>
 
-The CivicClerk module spec designs approximately 25 endpoints. Implementation should cover:
+### 9.12 Townlight Meetings REST/API Scope
+
+The Townlight Meetings module spec designs approximately 25 endpoints. Implementation should cover:
 
 - Meeting bodies
 - Meetings
@@ -687,9 +763,11 @@ The CivicClerk module spec designs approximately 25 endpoints. Implementation sh
 - Archive search
 - Admin prompt/config surfaces
 
-### 9.13 CivicClerk Frontend Scope
+<a id="913-civicclerk-frontend-scope"></a>
 
-The CivicClerk module spec designs approximately 20 pages. Runtime planning should include:
+### 9.13 Townlight Meetings Frontend Scope
+
+The Townlight Meetings module spec designs approximately 20 pages. Runtime planning should include:
 
 - Staff dashboard
 - Meeting calendar
@@ -712,7 +790,9 @@ The CivicClerk module spec designs approximately 20 pages. Runtime planning shou
 - Prompt library admin
 - Connector/import admin
 
-### 9.14 CivicClerk Integrations
+<a id="914-civicclerk-integrations"></a>
+
+### 9.14 Townlight Meetings Integrations
 
 Priority integrations:
 
@@ -720,11 +800,13 @@ Priority integrations:
 - Video/livestream link embedding
 - Caption/transcript ingest
 - City website CMS posting
-- CivicCode handoff API for adopted ordinances/resolutions
-- CivicRecords search integration
-- Codification-system export where CivicCode is absent
+- Townlight Code handoff API for adopted ordinances/resolutions
+- Townlight Records search integration
+- Codification-system export where Townlight Code is absent
 
-### 9.15 CivicClerk Test Matrix
+<a id="915-civicclerk-test-matrix"></a>
+
+### 9.15 Townlight Meetings Test Matrix
 
 Required test areas:
 
@@ -742,15 +824,17 @@ Required test areas:
 - Archive search permissions
 - Accessibility
 - Air-gap behavior
-- CivicCore compatibility matrix
+- Townlight Core compatibility matrix
 
-## 10. CivicZone Canonical Scope
+<a id="10-civiczone-canonical-scope"></a>
 
-CivicZone is the first major Tier 2 product after Clerk Core.
+## 10. Townlight Zoning Canonical Scope
+
+Townlight Zoning is the first major Tier 2 product after Clerk Core.
 
 ### 10.1 Product Promise
 
-CivicZone answers routine parcel-aware zoning questions with citations while never making a zoning determination. It gives residents and planners the 80% answer and routes the 20% judgment cases to staff.
+Townlight Zoning answers routine parcel-aware zoning questions with citations while never making a zoning determination. It gives residents and planners the 80% answer and routes the 20% judgment cases to staff.
 
 ### 10.2 Resident Workflows
 
@@ -768,9 +852,11 @@ CivicZone answers routine parcel-aware zoning questions with citations while nev
 - Draft staff-report outline support.
 - Review and improve flagged answers.
 
-### 10.4 CivicZone Data Model
+<a id="104-civiczone-data-model"></a>
 
-Canonical CivicZone tables:
+### 10.4 Townlight Zoning Data Model
+
+Canonical Townlight Zoning tables:
 
 - `civiczone.zones`
 - `civiczone.overlays`
@@ -783,7 +869,9 @@ Canonical CivicZone tables:
 - `civiczone.interpretation_notes`
 - `civiczone.zone_questions`
 
-### 10.5 CivicZone Prompt And Safety Rules
+<a id="105-civiczone-prompt-and-safety-rules"></a>
+
+### 10.5 Townlight Zoning Prompt And Safety Rules
 
 - Every answer says it is not a zoning determination.
 - Answers cite zoning code sections.
@@ -792,20 +880,24 @@ Canonical CivicZone tables:
 - Low-confidence results escalate to planner review.
 - Staff-only precedent context is never exposed to residents.
 
-### 10.6 CivicZone Integrations
+<a id="106-civiczone-integrations"></a>
+
+### 10.6 Townlight Zoning Integrations
 
 Priority integrations:
 
 - Esri ArcGIS REST Feature Service
 - GeoJSON fallback for offline/non-Esri cities
-- CivicCode internal API for authoritative code text
-- CivicClerk internal API for variance/CUP hearing minutes as staff-only precedent context
-- CivicPlan internal API for comprehensive-plan policy context
-- CivicAccess internal API for plain-language rewrites
+- Townlight Code internal API for authoritative code text
+- Townlight Meetings internal API for variance/CUP hearing minutes as staff-only precedent context
+- Townlight Planning internal API for comprehensive-plan policy context
+- Townlight Access internal API for plain-language rewrites
 - County assessor data import
 - CKAN publication for anonymized trends
 
-### 10.7 CivicZone Test Matrix
+<a id="107-civiczone-test-matrix"></a>
+
+### 10.7 Townlight Zoning Test Matrix
 
 Required test areas:
 
@@ -821,20 +913,22 @@ Required test areas:
 - Air-gap behavior
 - Accessibility
 - Performance
-- CivicCore compatibility matrix
+- Townlight Core compatibility matrix
 
-## 11. CivicCode Canonical Scope
+<a id="11-civiccode-canonical-scope"></a>
 
-CivicCode is a critical Tier 1 dependency for CivicZone and shipped before CivicZone runtime work began.
+## 11. Townlight Code Canonical Scope
+
+Townlight Code is a critical Tier 1 dependency for Townlight Zoning and shipped before Townlight Zoning runtime work began.
 
 Purpose:
 
 - Authoritative municipal code store.
 - Cited code Q&A for staff and residents.
 - Plain-language explanations alongside authoritative text.
-- Ordinance adoption feed from CivicClerk.
+- Ordinance adoption feed from Townlight Meetings.
 - Amendment/version history.
-- Section resolution service for CivicZone, CivicLegal, CivicAccess, and CivicComms.
+- Section resolution service for Townlight Zoning, Townlight Legal, Townlight Access, and Townlight Communications.
 
 Non-negotiables:
 
@@ -843,9 +937,11 @@ Non-negotiables:
 - It must distinguish adopted law from pending ordinance language.
 - It must preserve code version/date context.
 
-## 12. CivicAccess Canonical Scope
+<a id="12-civicaccess-canonical-scope"></a>
 
-CivicAccess is the suite-wide accessibility and plain-language layer.
+## 12. Townlight Access Canonical Scope
+
+Townlight Access is the suite-wide accessibility and plain-language layer.
 
 Purpose:
 
@@ -862,23 +958,23 @@ It should be treated as horizontal infrastructure that every public-facing modul
 
 ## 13. Resident Portal Strategy
 
-The old CivicRecords-only "public portal" concept is too narrow.
+The old Townlight Records-only "public portal" concept is too narrow.
 
 Each module needs its own public surface, unified by a shared resident portal shell:
 
-- Request a record: CivicRecords
-- Find a meeting: CivicClerk
-- Read code: CivicCode
-- Ask zoning questions: CivicZone
-- Submit service request: Civic311
-- Read notices: CivicNotice
-- View accessibility-friendly content: CivicAccess
+- Request a record: Townlight Records
+- Find a meeting: Townlight Meetings
+- Read code: Townlight Code
+- Ask zoning questions: Townlight Zoning
+- Submit service request: Townlight 311
+- Read notices: Townlight Notice
+- View accessibility-friendly content: Townlight Access
 
 The resident portal should not become a forced monolith. It is a shell and routing layer over module-owned public surfaces.
 
 ## 14. Universal Discovery And Municipal Systems Catalog
 
-The CivicRecords discovery architecture is a suite-level asset, not merely a records feature.
+The Townlight Records discovery architecture is a suite-level asset, not merely a records feature.
 
 The Municipal Systems Catalog should become:
 
@@ -1002,9 +1098,9 @@ As of 2026-05-10, current shipped/recovery truth lives in these single sources:
 
 This section previously enumerated per-module shipping prose. That prose drifted faster than the spec could be edited and conflicted with recovery framing. It is replaced by this compact recovery table. Any per-module shipping claim in section 6.1, section 7, or sections 11-12 must be cross-checked against STATUS.md before it is repeated externally.
 
-As of 2026-05-21, the clerk-core installer evidence includes installed-stack workflow proof for CivicRecords AI request/search-surface/review/response handling and CivicClerk agenda/packet/minutes/vote/notice/archive handling. That proof is starter-profile lifecycle evidence only; it does not supersede queued per-module release gates and does not prove live cross-module records exchange. `installer-clerk-core-v0.1.0` is the current public-use starter release after release-lockstep, suite verification, installer verification, docs verification, release-gate audit, and main CI passed. The release is bounded to CivicCore, CivicRecords AI, CivicClerk, and the `clerk-core` installer profile; it does not create a full-suite, procurement, production hosting, airgap, city-ready full-suite, or macOS lifecycle certification claim.
+As of 2026-05-21, the clerk-core installer evidence includes installed-stack workflow proof for Townlight Records request/search-surface/review/response handling and Townlight Meetings agenda/packet/minutes/vote/notice/archive handling. That proof is starter-profile lifecycle evidence only; it does not supersede queued per-module release gates and does not prove live cross-module records exchange. `installer-clerk-core-v0.1.0` is the current public-use starter release after release-lockstep, suite verification, installer verification, docs verification, release-gate audit, and main CI passed. The release is bounded to Townlight Core, Townlight Records, Townlight Meetings, and the `clerk-core` installer profile; it does not create a full-suite, procurement, production hosting, airgap, city-ready full-suite, or macOS lifecycle certification claim.
 
-As of 2026-06-13, the city-core profile has implementation evidence for non-technical Windows and Linux installability with CivicCore v1.2.0, CivicRecords AI v1.7.3, CivicClerk v1.0.4, and CivicCode v1.0.8. The vendored-source installer artifacts remain installer version `0.1.2`; the evidence covers one-click wrapper smoke, the local suite launcher, Guided/Manual Docker prerequisite setup paths, Linux Docker signed-repository bootstrap where supported, first-run wizard smoke, first-run browser QA, 60 GB cleanroom hygiene, local Windows/Linux matching-host lifecycle runs, green PR CI, and audit-full with zero unresolved Blocker or Critical findings under `C:\dev\Claude\CivicSuite-city-core-caboose-item1\.agent-runs\2026-05-26-city-core-non-technical-installable\`. PR #183 has green verify, release-lockstep-gate, and installer-cleanroom checks; exact volatile run IDs are recorded in the PR body and run evidence. CivicClerk v1.0.4 supersedes v1.0.3 as the clerk package/source truth, but the honest suite state remains beta-ready truth-reconciled. This does not create public-use readiness, city-ready status, procurement readiness, production readiness, macOS lifecycle certification, or a full-suite release claim.
+As of 2026-06-13, the city-core profile has implementation evidence for non-technical Windows and Linux installability with Townlight Core v1.2.0, Townlight Records v1.7.3, Townlight Meetings v1.0.4, and Townlight Code v1.0.8. The vendored-source installer artifacts remain installer version `0.1.2`; the evidence covers one-click wrapper smoke, the local suite launcher, Guided/Manual Docker prerequisite setup paths, Linux Docker signed-repository bootstrap where supported, first-run wizard smoke, first-run browser QA, 60 GB cleanroom hygiene, local Windows/Linux matching-host lifecycle runs, green PR CI, and audit-full with zero unresolved Blocker or Critical findings under `C:\dev\Claude\CivicSuite-city-core-caboose-item1\.agent-runs\2026-05-26-city-core-non-technical-installable\`. PR #183 has green verify, release-lockstep-gate, and installer-cleanroom checks; exact volatile run IDs are recorded in the PR body and run evidence. Townlight Meetings v1.0.4 supersedes v1.0.3 as the clerk package/source truth, but the honest suite state remains beta-ready truth-reconciled. This does not create public-use readiness, city-ready status, procurement readiness, production readiness, macOS lifecycle certification, or a full-suite release claim.
 
 As of 2026-05-27, `installer/modules.json` is also the source-of-truth for city-core vendored-source commit pins. The installer generator must verify each local sibling checkout against that module's `source_commit` before packaging, and the lifecycle runner must verify bundled source through `SOURCE_COMMIT.txt` or a git HEAD match before use. This makes the vendored-source model reproducible without switching to published wheels. The operator trust path is live regenerated artifact evidence: generated `SHA256SUMS` or release-manifest hashes for the installer package, `source_commit` verification for vendored source, and published module hashes/attestations where applicable. Old committed `installer/dist` artifacts are not canonical unless Scott explicitly confirms restoration.
 
@@ -1012,20 +1108,20 @@ As of 2026-08-20, the active release lane is the Townlight Records beta candidat
 
 The suite launcher currently records local browser/runtime session state for installed services. That shared launcher session is an operator orientation and QA surface, not a completed municipal SSO, identity-federation, or managed cloud-session claim.
 
-| Repo | Current recovery label | CivicCore pin | Source commit pin | Status summary |
+| Repo | Current recovery label | Townlight Core pin | Source commit pin | Status summary |
 |---|---:|---:|---:|---|
 | civiccore | 1.2.1 | n/a | b4d0156bdc6883c1c3ef167abe0379f9ca32b258 | Townlight Core platform pinned for the Records beta candidate, including the Windows-local contracts and PostgreSQL-backed local task queue/worker. |
 | civicrecords-ai | 1.7.3 | 1.2.1 | edf1c8d8078c85baff691030a599b8eef670bca6 | Townlight Records beta source with deterministic demonstration fixtures and connector provenance; the published package release remains 1.7.3. |
 | civicclerk | 1.0.4 | 1.2.0 | fa1874edfe977bfc36ddea2939df6464b5bc16be | Real meeting workflow release car with protected staff auth defaults retained, persistence refresh, and a workflow-only release-upload repair on the pinned default-branch source head. |
-| civiccode | 1.0.8 | 1.2.0 | a960bba0a2249d118b593dd61bee3a65a69a9d77 | City-core municipal-code release car; v1.0.8 supersedes v1.0.0, consumes CivicCore shared ingestion, and post-PR-#76 uses `gemma4:e4b` as the suite installer default local model. |
+| civiccode | 1.0.8 | 1.2.0 | a960bba0a2249d118b593dd61bee3a65a69a9d77 | City-core municipal-code release car; v1.0.8 supersedes v1.0.0, consumes Townlight Core shared ingestion, and post-PR-#76 uses `gemma4:e4b` as the suite installer default local model. |
 | civicaccess | 0.4.0 | 1.2.1 | b9100edc80ca496d6061f1cdb3eb39a60ff5f31a | Townlight Access accessibility and records-release review capability pinned for the Records beta candidate. |
 | civicnotice | 0.2.0 | 1.2.1 | 79b8d07199ee77cd425b31c0e0a44f3a0832b810 | Townlight Notice deadline, publication-proof, and archive capability pinned for the Records beta candidate. |
 | civiczone | 0.2.2 | 1.1.0 | n/a | No-functional-upgrade demotion label; queued for Tier 2 real work. |
 | civicplan | 0.2.2 | 1.1.0 | n/a | No-functional-upgrade demotion label; queued for Tier 2 real work. |
 | civicpermit | 0.2.2 | 1.1.0 | n/a | No-functional-upgrade demotion label; queued for Tier 2 real work. |
 | civicinspect | 0.2.2 | 1.1.0 | n/a | No-functional-upgrade demotion label; queued for Tier 2 real work. |
-| civicgrants | 0.2.0 | 1.1.0 | n/a | Demoted from false v1.0.0; consumes CivicCore v1.1.0 shared `staff_key_gate`. |
-| civicprocure | 0.2.0 | 1.1.0 | n/a | Demoted from false v1.0.0; consumes CivicCore v1.1.0 shared `staff_key_gate`. |
+| civicgrants | 0.2.0 | 1.1.0 | n/a | Demoted from false v1.0.0; consumes Townlight Core v1.1.0 shared `staff_key_gate`. |
+| civicprocure | 0.2.0 | 1.1.0 | n/a | Demoted from false v1.0.0; consumes Townlight Core v1.1.0 shared `staff_key_gate`. |
 
 The Townlight Records candidate now exercises an end-to-end Records workflow, but it is not a published municipal release until its exact signed MSI passes the publication gates. Broader suite productization continues one module at a time.
 ## 19. Post-Foundation Build Sequence
@@ -1035,45 +1131,47 @@ The v0.1.x foundation lane created real repository surfaces and release artifact
 1. Complete Sprint A release-integrity demotion and lockstep gates.
 2. Keep the installer profile and per-module version pin strategy aligned with released artifacts.
 3. Resume productization one module at a time from the active queue; no lateral v1.0 sweeps.
-4. Continue CivicCore shared-extraction depth only where an active module needs the shared capability.
+4. Continue Townlight Core shared-extraction depth only where an active module needs the shared capability.
 5. Add cross-module tests before advertising suite-level workflows.
 6. Update the compatibility matrix, spec, verifier, installer metadata, downstream pins, changelog, tag, and release notes together whenever a release label changes.
 
-Parallel CivicCore work should extract only the shared capabilities needed by the active module and should not invent unused abstractions.
+Parallel Townlight Core work should extract only the shared capabilities needed by the active module and should not invent unused abstractions.
 ## 20. Open Questions Requiring ADRs
 
 These are not blockers to this spec, but they require explicit ADRs before implementation choices harden:
 
-- Exact CivicClerk MVP table list if reduced from the canonical table set.
-- Whether CivicClerk v0.1 includes public comments.
+- Exact Townlight Meetings MVP table list if reduced from the canonical table set.
+- Whether Townlight Meetings v0.1 includes public comments.
 - Whether transcription is v0.1 or v0.2.
 - Post-foundation module depth and integration sequencing after the v0.1.1 civiccore alignment lane.
 - Shared resident portal shell boundaries.
-- CivicCore auth/RBAC extraction order.
-- CivicCore document/search extraction order.
+- Townlight Core auth/RBAC extraction order.
+- Townlight Core document/search extraction order.
 - Prompt-library repository strategy.
 - Data-release strategy for state statutory rules.
-- CivicRegWatch polling-source terms, rate-limit floors, and source disablement policy.
-- CivicRegWatch escalation contract into CivicLegal and CivicClerk.
-- CivicAPI inter-module read contract protocol: shared database, internal HTTP API, or event queue.
-- CivicAPI public payload storage strategy: originating module snapshot vs live fetch.
-- CivicAPI request-log visibility and default rate-limit tier policy.
+- Townlight Regulatory Watch polling-source terms, rate-limit floors, and source disablement policy.
+- Townlight Regulatory Watch escalation contract into Townlight Legal and Townlight Meetings.
+- Townlight API inter-module read contract protocol: shared database, internal HTTP API, or event queue.
+- Townlight API public payload storage strategy: originating module snapshot vs live fetch.
+- Townlight API request-log visibility and default rate-limit tier policy.
 
-## 21. CivicRegWatch Canonical Scope
+<a id="21-civicregwatch-canonical-scope"></a>
 
-CivicRegWatch is the planned federal regulatory intelligence module. It monitors public federal regulatory sources and creates staff-reviewable alerts for activity that may affect municipal operations, finances, grants, labor, land use, housing, courts, elections, accessibility, public safety, procurement, utilities, or environmental programs.
+## 21. Townlight Regulatory Watch Canonical Scope
+
+Townlight Regulatory Watch is the planned federal regulatory intelligence module. It monitors public federal regulatory sources and creates staff-reviewable alerts for activity that may affect municipal operations, finances, grants, labor, land use, housing, courts, elections, accessibility, public safety, procurement, utilities, or environmental programs.
 
 Detailed implementation specification: `specs/05_civicregwatch.md`.
 
 ### 21.1 Product Promise
 
-City staff should be able to open CivicRegWatch and quickly understand whether federal regulatory activity from the last 24 to 72 hours deserves attention. Every alert must say what changed, which municipal domains may be touched, whether a deadline exists, and what follow-up is appropriate.
+City staff should be able to open Townlight Regulatory Watch and quickly understand whether federal regulatory activity from the last 24 to 72 hours deserves attention. Every alert must say what changed, which municipal domains may be touched, whether a deadline exists, and what follow-up is appropriate.
 
 ### 21.2 Non-Negotiables
 
-- CivicRegWatch is not a compliance system.
-- CivicRegWatch does not issue legal opinions or applicability determinations.
-- CivicRegWatch does not take automatic action in any other module.
+- Townlight Regulatory Watch is not a compliance system.
+- Townlight Regulatory Watch does not issue legal opinions or applicability determinations.
+- Townlight Regulatory Watch does not take automatic action in any other module.
 - All source access must use documented public APIs only; scraping and unofficial endpoints are prohibited.
 - Source calls are logged with timestamp, endpoint, and response hash.
 - Any status transition, dismissal, escalation, or archival action requires a human actor.
@@ -1081,26 +1179,28 @@ City staff should be able to open CivicRegWatch and quickly understand whether f
 
 ### 21.3 Planned v0.1.x Foundation
 
-Planned v0.1.x scope is schema, migrations, deterministic domain classification, Federal Register polling, alert list/detail/review APIs, poll-run logging, circuit breaker behavior, accessible module overview, documentation gates, and CivicCore alignment.
+Planned v0.1.x scope is schema, migrations, deterministic domain classification, Federal Register polling, alert list/detail/review APIs, poll-run logging, circuit breaker behavior, accessible module overview, documentation gates, and Townlight Core alignment.
 
 Not shipped in v0.1.x: LLM-assisted classification, LLM summaries, Regulations.gov/Congress.gov/USASPENDING polling, comment reminders, CivicLegal/CivicClerk escalation writes, notification delivery, webhooks, and state regulatory monitoring.
 
-## 22. CivicAPI Canonical Scope
+<a id="22-civicapi-canonical-scope"></a>
 
-CivicAPI is the planned public read-only data gateway over structured, human-approved, published CivicSuite records. It exposes city-controlled, versioned, rate-limited API responses with provenance and citation metadata.
+## 22. Townlight API Canonical Scope
+
+Townlight API is the planned public read-only data gateway over structured, human-approved, published Townlight records. It exposes city-controlled, versioned, rate-limited API responses with provenance and citation metadata.
 
 Detailed implementation specification: `specs/06_civicapi.md`.
 
 ### 22.1 Product Promise
 
-Developers, journalists, researchers, oversight agencies, neighboring municipalities, and residents should be able to access a city's published operational records through a single documented REST API. No record appears in CivicAPI unless a human explicitly approved its publication in the originating module.
+Developers, journalists, researchers, oversight agencies, neighboring municipalities, and residents should be able to access a city's published operational records through a single documented REST API. No record appears in Townlight API unless a human explicitly approved its publication in the originating module.
 
 ### 22.2 Non-Negotiables
 
-- CivicAPI is read-only without exception.
-- CivicAPI only serves public-safe projections approved by originating modules.
-- CivicAPI never exposes staff-only, closed-session, privileged, exempt, or PII-containing data.
-- CivicAPI does not scrape or aggregate third-party government APIs.
+- Townlight API is read-only without exception.
+- Townlight API only serves public-safe projections approved by originating modules.
+- Townlight API never exposes staff-only, closed-session, privileged, exempt, or PII-containing data.
+- Townlight API does not scrape or aggregate third-party government APIs.
 - Every response includes a consistent envelope and citation/provenance block.
 - Originating modules define publication gates; modules without a gate cannot contribute records.
 - API keys are hashed at rest, rate-limited, and audit-logged.
@@ -1123,5 +1223,5 @@ When documents conflict:
 
 ## 24. Working Rule
 
-No future CivicSuite implementation sprint should begin from memory or from an isolated module scaffold. It should begin by reading this document, the relevant module-specific spec, current repo state, and the current compatibility matrix.
+No future Townlight implementation sprint should begin from memory or from an isolated module scaffold. It should begin by reading this document, the relevant module-specific spec, current repo state, and the current compatibility matrix.
 

@@ -20,11 +20,11 @@ This file contains the seed content for enabling GitHub Discussions on the `civi
 
 ## Announcements — Welcome and current suite status (PIN this)
 
-**Title:** CivicSuite — current status (May 2026)
+**Title:** Townlight — current status (May 2026)
 
 **Body:**
 
-Welcome to the CivicSuite community space. This post is a snapshot of where the suite stands right now. We'll update it (or pin a new one) when major status changes.
+Welcome to the Townlight community space. This post is a snapshot of where the suite stands right now. We'll update it (or pin a new one) when major status changes.
 
 **Shipping today:**
 
@@ -35,7 +35,7 @@ Welcome to the CivicSuite community space. This post is a snapshot of where the 
 
 **Planned or queued:**
 
-- The city-core profile is active but still beta-ready pending Linux/Windows one-click lifecycle and integration proof. CivicAccess v0.4.0 is now the sixth city-core module (ships in the next MSI build); Tier 2 modules remain queued.
+- The city-core profile is active but still beta-ready pending Linux/Windows one-click lifecycle and integration proof. Townlight Access v0.4.0 is now the sixth city-core module (ships in the next MSI build); Tier 2 modules remain queued.
 
 **What's this umbrella for?**
 
@@ -55,7 +55,7 @@ We're glad you're here.
 
 **Body:**
 
-The reconciled catalog lists 27 product modules across 7 tiers, plus CivicCore as the shared platform. We are not going to build them in order, and we are not going to build them all at once. The active city-core target focuses on CivicCore, CivicRecords AI, CivicClerk, CivicCode, and the suite installer; later modules stay queued until that package closes with real evidence.
+The reconciled catalog lists 27 product modules across 7 tiers, plus Townlight Core as the shared platform. We are not going to build them in order, and we are not going to build them all at once. The active city-core target focuses on Townlight Core, Townlight Records, Townlight Meetings, Townlight Code, and the suite installer; later modules stay queued until that package closes with real evidence.
 
 **Two leading candidates:**
 
@@ -72,7 +72,7 @@ We'll use this thread to gather signal before locking the next-module decision.
 
 ## Architecture — How is civiccore designed, and why is it not a monorepo?
 
-**Title:** Why CivicSuite is a multi-repo, not a monorepo
+**Title:** Why Townlight is a multi-repo, not a monorepo
 
 **Body:**
 
@@ -90,7 +90,7 @@ If you're considering contributing a new module or are evaluating the architectu
 
 ## Governance — Open-source posture and the records-ai org transfer
 
-**Title:** Plan to transfer civicrecords-ai to the CivicSuite GitHub org
+**Title:** Plan to transfer civicrecords-ai to the Townlight GitHub org
 
 **Body:**
 
@@ -98,7 +98,7 @@ A status note on a piece of governance some readers may have noticed:
 
 `civicrecords-ai` currently lives at `github.com/townlight/sunshine`. The intent is to transfer the repo to the `CivicSuite` org so all modules live under the same umbrella. This is intentionally not yet done — we want the suite-wide documentation, governance, and contribution standards to settle first so the transfer is a clean handoff rather than a scramble.
 
-Until the transfer happens, every link to records-ai in our docs uses `CivicSuite/civicrecords-ai`. After the transfer, links will be updated and old links will redirect via GitHub's automatic forwarding.
+Until the transfer happens, every link to records-ai in our docs uses `townlight/sunshine`. After the transfer, links will be updated and old links will redirect via GitHub's automatic forwarding.
 
 **No action needed from contributors.** Existing forks and PRs continue to work normally during and after the transfer. We'll announce the transfer with a heads-up post here when the date is set.
 

@@ -1,11 +1,11 @@
 # {{MODULE_DISPLAY_NAME}}
 
-{{MODULE_DISPLAY_NAME}} is a CivicSuite module scaffold. Replace this text with the real municipal workflow, current release status, and installation path before the first PR.
+{{MODULE_DISPLAY_NAME}} is a Townlight module scaffold. Replace this text with the real municipal workflow, current release status, and installation path before the first PR.
 
 ## Status
 
 - Version: `0.1.0`
-- CivicCore pin: `{{CIVICCORE_RELEASE_WHEEL_URL}}#sha256={{CIVICCORE_SHA256}}`
+- Townlight Core pin: `{{CIVICCORE_RELEASE_WHEEL_URL}}#sha256={{CIVICCORE_SHA256}}`
 - Release posture: developer preview until the full public-use gate and independent audit clear.
 
 ## Local Development
@@ -18,5 +18,5 @@ python -m venv .venv
 
 ## Release Rules
 
-Do not tag `v1.0.0` until the module is installable through CivicSuite, browser-tested, documented, and independently audited.
+Do not tag `v1.0.0` until the module is installable through Townlight, browser-tested, documented, and independently audited.
 

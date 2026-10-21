@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-We as members, contributors, and leaders pledge to make participation in the CivicSuite community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
+We as members, contributors, and leaders pledge to make participation in the Townlight community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
 
 We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
@@ -30,7 +30,7 @@ Community leaders are responsible for clarifying and enforcing our standards of 
 
 ## Scope
 
-This Code of Conduct applies within all CivicSuite community spaces, including the umbrella repo (`civicsuite`), every module repo (`civiccore`, `civicrecords-ai`, future module repos), GitHub Discussions, issue trackers, pull request reviews, and any official communication channels.
+This Code of Conduct applies within all Townlight community spaces, including the umbrella repo (`civicsuite`), every module repo (`civiccore`, `civicrecords-ai`, future module repos), GitHub Discussions, issue trackers, pull request reviews, and any official communication channels.
 
 ## Enforcement
 

@@ -1,8 +1,10 @@
-# CivicSuite Connector Import/Export Template
+<a id="civicsuite-connector-importexport-template"></a>
+
+# Townlight Connector Import/Export Template
 
 Status: active suite template
 
-Applies to: all CivicSuite module repos
+Applies to: all Townlight module repos
 
 Governing ADR: `docs/architecture/ADR-0005-connector-import-export-boundaries.md`
 
@@ -110,10 +112,10 @@ in plain language suitable for a clerk, records officer, or IT reviewer.
 
 | Module | First import/export pattern | Notes |
 |---|---|---|
-| CivicRecords AI | Records export bundle import/export | Preserve request IDs, exemption notes, search evidence, and response package checksums. |
-| CivicClerk | Agenda packet source import | Start with agenda item CSV, staff report folder, packet PDF folder, and prior system export ZIPs. |
-| CivicCode | Code-section CSV/JSON import | Preserve adopted date, effective date, section path, ordinance source, and version context. |
-| CivicZone | GeoJSON and parcel CSV import | GeoJSON file drop is the offline fallback before any live GIS connector. |
+| Townlight Records | Records export bundle import/export | Preserve request IDs, exemption notes, search evidence, and response package checksums. |
+| Townlight Meetings | Agenda packet source import | Start with agenda item CSV, staff report folder, packet PDF folder, and prior system export ZIPs. |
+| Townlight Code | Code-section CSV/JSON import | Preserve adopted date, effective date, section path, ordinance source, and version context. |
+| Townlight Zoning | GeoJSON and parcel CSV import | GeoJSON file drop is the offline fallback before any live GIS connector. |
 
 ## Operator Error Requirements
 
@@ -152,9 +154,11 @@ Each module import/export implementation must include:
 - Documentation tests or grep gates that prevent planned connectors from being
   described as shipped.
 
-## CivicCore Extraction Candidate
+<a id="civiccore-extraction-candidate"></a>
 
-After at least two modules implement this template, CivicCore v0.3.0 may extract
+## Townlight Core Extraction Candidate
+
+After at least two modules implement this template, Townlight Core v0.3.0 may extract
 shared utilities for:
 
 - Manifest schema validation.

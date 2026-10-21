@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "module_contract_version": 1,
-  "installer_status": "townlight_records_meetings_code_beta_candidate",
+  "installer_status": "townlight_records_meetings_code_zoning_public_beta",
   "primary_profile": "records-beta",
   "workflow_proof_status": {
     "profile": "city-core",
@@ -16,11 +16,11 @@
   },
   "public_use_gate_status": {
     "profile": "records-beta",
-    "status": "candidate",
+    "status": "public-beta",
     "path": "RELEASING.md",
     "route_state_matrix": "desktop/tests/browser/records-public-beta.spec.mjs",
     "restore_precondition_evidence": ".github/workflows/desktop-windows-msi.yml",
-    "boundary": "Publication remains blocked until the exact signed MSI passes the main-only Authenticode gate and clean-machine install, launch, workflow, backup/restore, repair, and uninstall evidence."
+    "boundary": "Exact signed desktop 1.4.0-beta.1 passed fresh and populated signed 1.3 upgrade, connected workflows, backup/restore and retained-data uninstall. Future candidates must independently pass the required signing and installed gates; this does not certify later builds."
   },
   "menu_styles": [
     {
@@ -43,7 +43,7 @@
     {
       "id": "zoning-beta",
       "label": "Townlight Records + Meetings + Code + Zoning",
-      "description": "Opt-in connected Zoning development candidate; not a published release.",
+      "description": "Opt-in Records, Meetings, Code and Zoning in published desktop 1.4.0-beta.1; see signed acceptance and manual runtime upgrade steps.",
       "modules": [
         "civiccore",
         "civicrecords-ai",
@@ -57,8 +57,8 @@
     },
     {
       "id": "meetings-beta",
-      "label": "Townlight Meetings — development candidate",
-      "description": "Local Records plus Meetings integration; not a published release.",
+      "label": "Townlight Records + Meetings",
+      "description": "Connected Records and Meetings profile, preserved in the published desktop beta.",
       "modules": [
         "civiccore",
         "civicrecords-ai",
@@ -71,7 +71,7 @@
     {
       "id": "minimal",
       "label": "Minimal",
-      "description": "Install CivicCore only.",
+      "description": "Install Townlight Core only.",
       "modules": [
         "civiccore"
       ]
@@ -96,7 +96,7 @@
         "civicnotice",
         "civicaccess"
       ],
-      "status": "stabilizing"
+      "status": "public-beta"
     },
     {
       "id": "city-core",
@@ -115,7 +115,7 @@
     {
       "id": "land-use",
       "label": "Land Use",
-      "description": "Queued Tier 2 profile; disabled until CivicZone, CivicPlan, CivicPermit, and CivicInspect complete real release turns.",
+      "description": "Queued Tier 2 profile; disabled until Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections complete real release turns.",
       "modules": [
         "civiccore",
         "civiccode",
@@ -130,7 +130,7 @@
     {
       "id": "full-suite",
       "label": "Full Suite",
-      "description": "Plan every tracked CivicSuite module after CivicCore.",
+      "description": "Plan every tracked Townlight module after CivicCore.",
       "modules": [
         "civiccore",
         "civicrecords-ai",
@@ -344,7 +344,7 @@
     },
     {
       "id": "civicclerk",
-      "display_name": "CivicClerk",
+      "display_name": "Townlight Meetings",
       "repo": "townlight/meetings",
       "tier": 1,
       "role": "meetings workflow",
@@ -429,7 +429,7 @@
     },
     {
       "id": "civiccode",
-      "display_name": "CivicCode",
+      "display_name": "Townlight Code",
       "repo": "townlight/ordinances",
       "tier": 1,
       "role": "municipal code",
@@ -584,7 +584,7 @@
     },
     {
       "id": "civicplan",
-      "display_name": "CivicPlan",
+      "display_name": "Townlight Planning",
       "repo": "townlight/plan",
       "tier": 2,
       "role": "planning policy lookup",
@@ -611,7 +611,7 @@
     },
     {
       "id": "civicpermit",
-      "display_name": "CivicPermit",
+      "display_name": "Townlight Permitting",
       "repo": "townlight/permit",
       "tier": 2,
       "role": "permit intake readiness",
@@ -724,7 +724,7 @@
     },
     {
       "id": "civicinspect",
-      "display_name": "CivicInspect",
+      "display_name": "Townlight Inspections",
       "repo": "townlight/inspect",
       "tier": 2,
       "role": "inspection workflow",
@@ -751,7 +751,7 @@
     },
     {
       "id": "civicgrants",
-      "display_name": "CivicGrants",
+      "display_name": "Townlight Grants",
       "repo": "townlight/grants",
       "tier": 3,
       "role": "grants workflow",
@@ -776,7 +776,7 @@
     },
     {
       "id": "civicprocure",
-      "display_name": "CivicProcure",
+      "display_name": "Townlight Procurement",
       "repo": "townlight/procure",
       "tier": 3,
       "role": "procurement workflow",
@@ -800,7 +800,7 @@
     },
     {
       "id": "civiccontracts",
-      "display_name": "CivicContracts",
+      "display_name": "Townlight Contracts",
       "repo": "townlight/contracts",
       "tier": 3,
       "role": "contract workflow",
@@ -821,7 +821,7 @@
     },
     {
       "id": "civicboards",
-      "display_name": "CivicBoards",
+      "display_name": "Townlight Boards",
       "repo": "townlight/boards",
       "tier": 3,
       "role": "boards and commissions workflow",
@@ -922,7 +922,7 @@
     },
     {
       "id": "civic311",
-      "display_name": "Civic311",
+      "display_name": "Townlight 311",
       "repo": "townlight/311",
       "tier": 3,
       "role": "resident request workflow",
@@ -942,7 +942,7 @@
     },
     {
       "id": "civiccomms",
-      "display_name": "CivicComms",
+      "display_name": "Townlight Communications",
       "repo": "townlight/comms",
       "tier": 3,
       "role": "communications workflow",
@@ -963,7 +963,7 @@
     },
     {
       "id": "civicdata",
-      "display_name": "CivicData",
+      "display_name": "Townlight Data",
       "repo": "townlight/data",
       "tier": 3,
       "role": "open data workflow",
@@ -983,7 +983,7 @@
     },
     {
       "id": "civicregwatch",
-      "display_name": "CivicRegWatch",
+      "display_name": "Townlight Regulatory Watch",
       "repo": null,
       "tier": 4,
       "role": "federal regulatory intelligence",
@@ -1002,7 +1002,7 @@
     },
     {
       "id": "civicapi",
-      "display_name": "CivicAPI",
+      "display_name": "Townlight API",
       "repo": null,
       "tier": 4,
       "role": "public read-only data gateway",
@@ -1021,7 +1021,7 @@
     },
     {
       "id": "civichr",
-      "display_name": "CivicHR",
+      "display_name": "Townlight HR",
       "repo": "townlight/hr",
       "tier": 3,
       "role": "human resources workflow",
@@ -1041,7 +1041,7 @@
     },
     {
       "id": "civicbudget",
-      "display_name": "CivicBudget",
+      "display_name": "Townlight Budget",
       "repo": "townlight/budget",
       "tier": 3,
       "role": "budget workflow",
@@ -1061,7 +1061,7 @@
     },
     {
       "id": "civiclegal",
-      "display_name": "CivicLegal",
+      "display_name": "Townlight Legal",
       "repo": "townlight/legal",
       "tier": 3,
       "role": "legal workflow",
@@ -1082,7 +1082,7 @@
     },
     {
       "id": "civicelections",
-      "display_name": "CivicElections",
+      "display_name": "Townlight Elections",
       "repo": "townlight/elections",
       "tier": 3,
       "role": "elections workflow",
@@ -1102,7 +1102,7 @@
     },
     {
       "id": "civicutility",
-      "display_name": "CivicUtility",
+      "display_name": "Townlight Utilities",
       "repo": "townlight/utility",
       "tier": 3,
       "role": "utility billing workflow",
@@ -1122,7 +1122,7 @@
     },
     {
       "id": "civiccourt",
-      "display_name": "CivicCourt",
+      "display_name": "Townlight Courts",
       "repo": "townlight/court",
       "tier": 3,
       "role": "court workflow",
@@ -1143,7 +1143,7 @@
     },
     {
       "id": "civicsafety",
-      "display_name": "CivicSafety",
+      "display_name": "Townlight Safety",
       "repo": "townlight/safety",
       "tier": 3,
       "role": "public safety workflow",
@@ -1163,7 +1163,7 @@
     },
     {
       "id": "civiclibrary",
-      "display_name": "CivicLibrary",
+      "display_name": "Townlight Library",
       "repo": "townlight/library",
       "tier": 3,
       "role": "library workflow",
@@ -1183,7 +1183,7 @@
     },
     {
       "id": "civicparks",
-      "display_name": "CivicParks",
+      "display_name": "Townlight Parks",
       "repo": "townlight/parks",
       "tier": 3,
       "role": "parks and recreation workflow",

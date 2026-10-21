@@ -1,6 +1,6 @@
 # Security Policy
 
-The `civicsuite` repository is the umbrella/orientation repo for the CivicSuite product family. It does not contain runtime code. Security vulnerabilities in **runtime code** belong on the affected module's repo, not here.
+The `townlight/townlight` repository contains the Townlight desktop shell, installer and cross-product integration as well as suite documentation. Report vulnerabilities in those surfaces privately here; report module-specific runtime vulnerabilities privately to the affected module repository.
 
 ## Reporting a vulnerability
 

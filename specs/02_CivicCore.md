@@ -1,11 +1,11 @@
-**CivicCore v0.1**
+**Townlight Core v0.1**
 
 **Extraction Spec**
 
-*A non-breaking refactor of the CivicRecords AI repo into a shared
+*A non-breaking refactor of the Townlight Records repo into a shared
 platform package*
 
-Companion artifact: CivicSuite meta-repo definition
+Companion artifact: Townlight meta-repo definition
 
 Version 0.1 --- Draft for review --- April 23, 2026
 
@@ -14,15 +14,15 @@ Open source · Apache License 2.0 · Gemma 4 default · model-pluggable
 **Document Metadata**
 
   ---------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Document status**    v0.1 --- draft for review. Ships as a non-breaking refactor; no user-visible change to CivicRecords AI.
-  **Supersedes**         Nothing. This is the first CivicCore spec. Complements CivicSuiteAI\_Module\_Catalog\_v1 and CivicRecordsAI-UnifiedSpec-v3.0.
+  **Document status**    v0.1 --- draft for review. Ships as a non-breaking refactor; no user-visible change to Townlight Records AI.
+  **Supersedes**         Nothing. This is the first Townlight Core spec. Complements CivicSuiteAI\_Module\_Catalog\_v1 and CivicRecordsAI-UnifiedSpec-v3.0.
   **Grounded in**        CivicRecordsAI-UnifiedSpec-v3.0 (April 13, 2026) --- the canonical Module 1 spec, whose shared plumbing is the source of the extraction.
-  **Scope**              Identify what moves from the CivicRecords AI repo into a shared CivicCore package; define the new CivicSuite umbrella repo; specify a phased, non-breaking rollout.
-  **Out of scope**       New CivicCore features. Product decisions about future modules. Changes to CivicRecords AI product behavior.
+  **Scope**              Identify what moves from the Townlight Records repo into a shared Townlight Core package; define the new Townlight umbrella repo; specify a phased, non-breaking rollout.
+  **Out of scope**       New Townlight Core features. Product decisions about future modules. Changes to Townlight Records product behavior.
   **License**            Code: Apache License 2.0. Docs: CC BY 4.0.
   **Default model**      Gemma 4 via Ollama. Model registry + context\_window\_size driving per-module token budgets.
-  **Primary audience**   CivicRecords AI maintainers; future CivicClerk, CivicCode, CivicZone contributors; city IT evaluators.
-  **Completion bar**     No regressions in CivicRecords AI. Import paths migrated with shim fallback. Every extracted subsystem has its own unit-test suite living in CivicCore.
+  **Primary audience**   Townlight Records maintainers; future Townlight Meetings, Townlight Code, Townlight Zoning contributors; city IT evaluators.
+  **Completion bar**     No regressions in Townlight Records AI. Import paths migrated with shim fallback. Every extracted subsystem has its own unit-test suite living in Townlight Core.
   ---------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Table of Contents**
@@ -31,33 +31,33 @@ Open source · Apache License 2.0 · Gemma 4 default · model-pluggable
 
 **1. Why this spec exists**
 
-The CivicRecords AI v3.0 spec is an excellent Module 1 specification.
+The Townlight Records v3.0 spec is an excellent Module 1 specification.
 Read as a suite spec, it is thin: it treats municipal code, zoning,
 comprehensive plans, boards, notices, contracts, legal research, HR, and
 elections as either connector domains or generic documents. The
-CivicSuite module catalog fills those gaps at the product layer. This
+Townlight module catalog fills those gaps at the product layer. This
 spec fills them at the architecture layer.
 
-The repo that shipped CivicRecords AI already contains most of the
+The repo that shipped Townlight Records already contains most of the
 infrastructure a second module would need: auth, RBAC, audit, LLM
 abstraction, document ingestion, connector framework, notification
 service, onboarding wizard, the 50-state exemption engine, and the
-sovereignty verification scripts. Building CivicClerk or CivicCode means
+sovereignty verification scripts. Building Townlight Meetings or Townlight Code means
 either forking that code (fatal long-term) or extracting it into a
 package (the right move).
 
-CivicCore is that package. This spec defines what it is, what moves into
+Townlight Core is that package. This spec defines what it is, what moves into
 it, what stays out, how the move is staged without breaking the existing
 product, and what the resulting repository topology looks like ---
-including a new CivicSuite umbrella repo for suite-wide coordination.
+including a new Townlight umbrella repo for suite-wide coordination.
 
 **2. Non-goals**
 
--   No new CivicCore features. Every capability that appears in
-    CivicCore v0.1 already exists in CivicRecords AI today. This is
+-   No new Townlight Core features. Every capability that appears in
+    Townlight Core v0.1 already exists in Townlight Records today. This is
     packaging, not engineering.
 
--   No changes to CivicRecords AI product behavior. The web UI, the API
+-   No changes to Townlight Records product behavior. The web UI, the API
     contracts, the database schema as visible to the records module, and
     the user-visible wording all stay exactly the same.
 
@@ -65,15 +65,15 @@ including a new CivicSuite umbrella repo for suite-wide coordination.
     abstraction, or anything else in the extraction. We move files,
     adjust imports, and write backward-compat shims. That is all.
 
--   No new language. CivicCore stays Python/FastAPI/SQLAlchemy.
-    CivicCore's React primitives (if any are extracted) stay React + the
+-   No new language. Townlight Core stays Python/FastAPI/SQLAlchemy.
+    Townlight Core's React primitives (if any are extracted) stay React + the
     same design tokens.
 
--   No cloud anything. CivicCore inherits CivicRecords AI's sovereignty
+-   No cloud anything. Townlight Core inherits Townlight Records's sovereignty
     stance unmodified: no outbound calls at runtime, no telemetry, all
     LLM inference local.
 
-**3. What CivicCore is (one sentence per role)**
+**3. What Townlight Core is (one sentence per role)**
 
 -   For a new module author: the package you pip-install to get auth,
     RBAC, audit, LLM access, document ingestion, hybrid search,
@@ -86,45 +86,45 @@ including a new CivicSuite umbrella repo for suite-wide coordination.
 -   For a maintainer: the shared codebase that stops each new module
     from reimplementing the same 20 files badly.
 
--   For a skeptic: not a framework. CivicCore is a library of
+-   For a skeptic: not a framework. Townlight Core is a library of
     deliberately small, documented subsystems with stable interfaces.
     Modules depend on its public API. They do not subclass its
     internals.
 
 **4. Strategic rationale**
 
-The risk of not doing this is concrete and predictable. If CivicClerk
-starts as a fork of CivicRecords AI, every subsequent module forks the
+The risk of not doing this is concrete and predictable. If Townlight Meetings
+starts as a fork of Townlight Records, every subsequent module forks the
 fork. Audit-log fixes happen in three places. Exemption-engine rules
 drift between modules. A security patch touches ten repos. We have seen
 this movie in municipal software before --- it is why CivicPlus owns
 eleven disconnected products behind one logo.
 
-The value of doing it now is equally concrete. CivicRecords AI is the
+The value of doing it now is equally concrete. Townlight Records is the
 only module today. Every file we extract now is a file we don't have to
 retrofit across five modules later. Every import path we shim now is a
-migration we don't have to negotiate with five teams. CivicCore v0.1 is
+migration we don't have to negotiate with five teams. Townlight Core v0.1 is
 cheapest at v0.1.
 
 **Part II. Repository Topology**
 
-**5. The CivicSuite umbrella repo**
+**5. The Townlight umbrella repo**
 
-A deliberate choice: CivicSuite is not an AI product. It is the
+A deliberate choice: Townlight is not an AI product. It is the
 meta-repo that makes the suite coherent. It ships no code. It owns
 shared narrative: the module catalog, the roadmap, the suite-wide design
 principles, cross-module architecture decision records, the suite-wide
 changelog, and the governance that every contributing module agrees to.
 
-The name drops the AI suffix on purpose. CivicRecords AI keeps its
+The name drops the AI suffix on purpose. Townlight Records keeps its
 suffix for continuity with the existing repo and v3.0 spec. Future
-modules drop it (CivicClerk, CivicCode, CivicZone) because suite
-identity carries it. And the umbrella --- CivicSuite --- drops it
+modules drop it (Townlight Meetings, Townlight Code, Townlight Zoning) because suite
+identity carries it. And the umbrella --- Townlight --- drops it
 hardest, because the suite's value is not "it uses AI." The suite's
 value is "it runs locally, on your hardware, across every civic
 surface." The name should reflect that.
 
-**5.1 CivicSuite repo contents**
+**5.1 Townlight repo contents**
 
 -   README.md --- the one-page pitch, links to every module, the
     60-second answer to "what is this."
@@ -136,7 +136,7 @@ surface." The name should reflect that.
     (clerk-first, calm UI, human-in-the-loop, local LLM, no telemetry).
 
 -   docs/architecture/ --- ADRs spanning modules. Decisions like
-    "CivicCore owns the audit chain" or "modules are independently
+    "Townlight Core owns the audit chain" or "modules are independently
     versioned" live here.
 
 -   docs/roadmap/ --- phased rollout, module dependency graph, release
@@ -145,11 +145,11 @@ surface." The name should reflect that.
 -   docs/governance/ --- contribution model, maintainer roles, licensing
     posture, security disclosure.
 
--   docs/compatibility/ --- the CivicCore compatibility matrix: which
-    CivicCore version each module supports.
+-   docs/compatibility/ --- the Townlight Core compatibility matrix: which
+    Townlight Core version each module supports.
 
--   CHANGELOG.md --- suite-wide milestones ("CivicClerk v0.1 released",
-    "CivicCore v0.2 compatible with all modules"). Not a substitute for
+-   CHANGELOG.md --- suite-wide milestones ("Townlight Meetings v0.1 released",
+    "Townlight Core v0.2 compatible with all modules"). Not a substitute for
     per-module changelogs.
 
 -   LICENSE --- CC BY 4.0 for docs. A second LICENSE-CODE file with Apache 2.0
@@ -159,8 +159,8 @@ surface." The name should reflect that.
 
 Three reasons. First, cities install modules selectively; a monorepo
 forces the whole suite on anyone who wants to read the code. Second,
-modules ship on independent cadences --- CivicRecords AI is at v3.x
-while CivicZone might be pre-v0.1 for a year. A monorepo either ties
+modules ship on independent cadences --- Townlight Records is at v3.x
+while Townlight Zoning might be pre-v0.1 for a year. A monorepo either ties
 them together artificially or ends up with awkward internal versioning.
 Third, contributors work on one module at a time; the cognitive and CI
 overhead of a monorepo is not worth paying for independent modules with
@@ -173,21 +173,21 @@ single place to talk about the whole suite --- without any of its costs.
 
   ------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------ --------------------------------------------------------------------------------------
   **Repo**                        **Contains**                                                                                                                                       **License**                                **Published as**
-  CivicSuite (new)                Umbrella docs: catalog, roadmap, strategy, design principles, cross-module ADRs, suite-wide changelog, governance.                                 CC BY 4.0 (docs) + Apache 2.0 (example configs)   GitHub org landing repo; not installable
-  CivicCore (new)                 Shared platform: auth, RBAC, audit chain, LLM abstraction, connector framework, ingestion, search, notifications, admin shell, exemption engine.   Apache 2.0                                        pip wheel: civiccore ; container base image: civiccore-base
-  CivicRecords AI (existing)      Records-module code only: request lifecycle, letter generation, fee schedules, public portal (planned), exemption dashboard.                       Apache 2.0                                        pip wheel: civicrecords ; docker-compose: existing stack, now pulling civiccore-base
-  CivicClerk (future)             Meeting, agenda, minutes, voting module. Depends on civiccore.                                                                                     Apache 2.0                                        pip wheel: civicclerk
-  CivicCode (future)              Municipal code / ordinance Q&A. Depends on civiccore, civicclerk.                                                                                  Apache 2.0                                        pip wheel: civiccode
-  CivicZone (future)              Zoning Q&A, parcel-aware lookups, overlay districts. Depends on civiccore, civiccode.                                                              Apache 2.0                                        pip wheel: civiczone
-  CivicSuite-prompts (optional)   Prompt libraries for every module. Versioned YAML. Separate repo so cities can fork prompts without forking code.                                  CC BY-SA 4.0                               pip wheel: civicsuite-prompts (reference copy)
+  Townlight (new)                Umbrella docs: catalog, roadmap, strategy, design principles, cross-module ADRs, suite-wide changelog, governance.                                 CC BY 4.0 (docs) + Apache 2.0 (example configs)   GitHub org landing repo; not installable
+  Townlight Core (new)                 Shared platform: auth, RBAC, audit chain, LLM abstraction, connector framework, ingestion, search, notifications, admin shell, exemption engine.   Apache 2.0                                        pip wheel: civiccore ; container base image: civiccore-base
+  Townlight Records (existing)      Records-module code only: request lifecycle, letter generation, fee schedules, public portal (planned), exemption dashboard.                       Apache 2.0                                        pip wheel: civicrecords ; docker-compose: existing stack, now pulling civiccore-base
+  Townlight Meetings (future)             Meeting, agenda, minutes, voting module. Depends on civiccore.                                                                                     Apache 2.0                                        pip wheel: civicclerk
+  Townlight Code (future)              Municipal code / ordinance Q&A. Depends on civiccore, civicclerk.                                                                                  Apache 2.0                                        pip wheel: civiccode
+  Townlight Zoning (future)              Zoning Q&A, parcel-aware lookups, overlay districts. Depends on civiccore, civiccode.                                                              Apache 2.0                                        pip wheel: civiczone
+  Townlight-prompts (optional)   Prompt libraries for every module. Versioned YAML. Separate repo so cities can fork prompts without forking code.                                  CC BY-SA 4.0                               pip wheel: civicsuite-prompts (reference copy)
   ------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------ --------------------------------------------------------------------------------------
 
 Every module has its own repository, its own changelog, its own release
-cadence, and its own version. Every module depends on a CivicCore
+cadence, and its own version. Every module depends on a Townlight Core
 version. Every module is installable on its own --- a city running only
-CivicRecords AI does not accidentally install CivicClerk.
+Townlight Records does not accidentally install Townlight Meetings.
 
-**7. CivicSuite GitHub organization layout**
+**7. Townlight GitHub organization layout**
 
 github.com/civicsuite/
 
@@ -218,12 +218,12 @@ collapses into civiccore.
 **8. The extraction inventory**
 
 Every line in the table below is an auditable move. A contributor
-executing this spec should be able to open the CivicRecords AI repo,
-open a CivicCore branch, and translate each row into a concrete git mv +
+executing this spec should be able to open the Townlight Records repo,
+open a Townlight Core branch, and translate each row into a concrete git mv +
 import rewrite.
 
   ----------------------------- ------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------- ------------------------------------------------------------------------------------------
-  **Subsystem**                 **Current path in CivicRecords AI repo**                                                                      **Target path in CivicCore**                                            **Public API surface**
+  **Subsystem**                 **Current path in Townlight Records repo**                                                                      **Target path in Townlight Core**                                            **Public API surface**
   Auth / RBAC                   backend/app/auth/\*, backend/app/models/user.py, backend/app/models/role.py                                   civiccore/auth/\*, civiccore/models/user.py, civiccore/models/role.py   civiccore.auth.require\_role, civiccore.auth.current\_user, civiccore.models.User
   Audit chain                   backend/app/audit/\*, backend/app/models/audit\_log.py                                                        civiccore/audit/\*, civiccore/models/audit\_log.py                      civiccore.audit.record(), civiccore.audit.export\_csv(), civiccore.audit.verify\_chain()
   LLM abstraction               backend/app/llm/client.py, backend/app/llm/context\_manager.py (ModelRegistry currently lives in backend/app/models/document.py --- moved out by F.6 precursor PR)     civiccore/llm/\*                                                        civiccore.llm.chat(), civiccore.llm.embed(), civiccore.llm.budget\_for(model)
@@ -239,27 +239,27 @@ import rewrite.
   Shared tables (users, docs)   alembic/versions/\*\_users.py, alembic/versions/\*\_docs.py, alembic/versions/\*\_audit.py                    civiccore/migrations/\*                                                 civiccore.migrations.run() called by each module's migration runner
   ----------------------------- ------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------- ------------------------------------------------------------------------------------------
 
-**Spec-vs-reality alignment (2026-04-23):** Day-3 extraction inventory (`civicrecords-ai/docs/civiccore-extraction-inventory.md` commit `5304a47`) found that the original spec text named a few CivicRecords AI paths that did not match the shipping repo. The "Current path" column above has been updated to reflect actual filenames (LLM client/context_manager, combined sovereignty verification script, app-shell.tsx instead of AdminShell.tsx, no top-level design-tokens directory). Section 9 likewise was updated where it named directories that don't yet exist as their own modules — see Day-3 inventory Section F.5 for the records-side restructuring decision (deferred to a separate refactor PR; not bundled with extraction).
+**Spec-vs-reality alignment (2026-04-23):** Day-3 extraction inventory (`civicrecords-ai/docs/civiccore-extraction-inventory.md` commit `5304a47`) found that the original spec text named a few Townlight Records paths that did not match the shipping repo. The "Current path" column above has been updated to reflect actual filenames (LLM client/context_manager, combined sovereignty verification script, app-shell.tsx instead of AdminShell.tsx, no top-level design-tokens directory). Section 9 likewise was updated where it named directories that don't yet exist as their own modules — see Day-3 inventory Section F.5 for the records-side restructuring decision (deferred to a separate refactor PR; not bundled with extraction).
 
-**9. What stays in CivicRecords AI**
+**9. What stays in Townlight Records**
 
 Equally important: the things that do not move. These are
 records-specific concerns that would be wrong to generalize before a
-second module demands it. CivicCore v0.1 extracts only what is already
+second module demands it. Townlight Core v0.1 extracts only what is already
 proven to be shared --- not what might be shared one day.
 
   ---------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------
-  **Stays in CivicRecords AI**                                                       **Why**
+  **Stays in Townlight Records**                                                       **Why**
   backend/app/requests/\*, backend/app/models/request\_workflow.py (request lifecycle, state machine, queue)                  Records-module-specific workflow. No other module has a "request" of the same shape.
-  backend/app/models/request\_workflow.py (letter rendering embedded in workflow module; no top-level backend/app/letters/ or backend/app/templates/letters/ directory exists yet)                     Records-specific output format. CivicCode will have its own answer rendering; the two are not one abstraction.
-  backend/app/models/fees.py, backend/app/schemas/fee\_schedule.py, backend/app/admin/router.py (fee endpoints) (no top-level backend/app/fees/ directory)                           Records-request fee rules are ORR/FOIA-specific. CivicPermit will need fees; that is a different fee schema.
-  backend/app/exemptions/dashboard.py (exemption accuracy metrics for this module)   Uses CivicCore's exemption engine but renders module-specific dashboards. Stays module-side.
-  Public request portal (planned)                                                    Records-specific UX. Shared resident portal shell lives in CivicCore; the portal content is module-specific.
+  backend/app/models/request\_workflow.py (letter rendering embedded in workflow module; no top-level backend/app/letters/ or backend/app/templates/letters/ directory exists yet)                     Records-specific output format. Townlight Code will have its own answer rendering; the two are not one abstraction.
+  backend/app/models/fees.py, backend/app/schemas/fee\_schedule.py, backend/app/admin/router.py (fee endpoints) (no top-level backend/app/fees/ directory)                           Records-request fee rules are ORR/FOIA-specific. Townlight Permitting will need fees; that is a different fee schema.
+  backend/app/exemptions/dashboard.py (exemption accuracy metrics for this module)   Uses Townlight Core's exemption engine but renders module-specific dashboards. Stays module-side.
+  Public request portal (planned)                                                    Records-specific UX. Shared resident portal shell lives in Townlight Core; the portal content is module-specific.
   frontend/src/pages/Requests/\*, Exemptions/\*, Sources/\*, etc.                    Records-specific UI. Shares the AdminShell from core-ui but the pages themselves are module code.
   alembic/versions/\*\_records\_\*.py                                                Records-schema migrations stay module-side; only shared-table migrations move to core.
-  Module-specific prompts (data/prompts/\*.yaml)                                     Records-specific prompt library. CivicCode, CivicZone, CivicClerk each ship their own.
+  Module-specific prompts (data/prompts/\*.yaml)                                     Records-specific prompt library. Townlight Code, Townlight Zoning, Townlight Meetings each ship their own.
   Records-specific connectors (Laserfiche records adapter, etc.)                     Any connector that only makes sense for records stays module-side. General connectors (SMB, IMAP, ODBC) move to core.
-  36 test modules covering records behavior                                          Module behavior tests stay. Core tests get duplicated into CivicCore and trimmed from the records repo.
+  36 test modules covering records behavior                                          Module behavior tests stay. Core tests get duplicated into Townlight Core and trimmed from the records repo.
   ---------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------
 
 **10. Database schema ownership**
@@ -267,7 +267,7 @@ proven to be shared --- not what might be shared one day.
 The extraction splits the database into two ownership zones. Each has a
 single source-of-truth migrations directory.
 
-**10.1 CivicCore-owned tables**
+**10.1 Townlight Core-owned tables**
 
 -   users --- user identity, hashed passwords, MFA state, last login.
 
@@ -280,7 +280,7 @@ single source-of-truth migrations directory.
     federation.
 
 -   audit\_log --- hash-chained append-only. Every module writes; only
-    CivicCore controls schema.
+    Townlight Core controls schema.
 
 -   documents, document\_chunks --- shared ingestion store. Every module
     reads. Module-specific metadata lives in a JSONB column, not a new
@@ -303,13 +303,13 @@ single source-of-truth migrations directory.
 **10.2 Module-owned tables**
 
 -   records\_requests, records\_request\_events, response\_letters,
-    fee\_schedules, fee\_line\_items, waivers --- CivicRecords only.
+    fee\_schedules, fee\_line\_items, waivers --- Townlight Records only.
 
 -   Future module tables live in their own module's migrations.
-    CivicClerk owns meetings, agendas, votes, etc. Modules never touch
+    Townlight Meetings owns meetings, agendas, votes, etc. Modules never touch
     each other's tables directly; they use each other's APIs.
 
-Migration ordering: CivicCore's migrations run first, then each module's
+Migration ordering: Townlight Core's migrations run first, then each module's
 migrations. alembic's depends\_on metadata makes the dependency explicit
 so a fresh install can't race.
 
@@ -317,17 +317,17 @@ so a fresh install can't race.
 
 **11. The non-breaking principle**
 
-Every phase below leaves CivicRecords AI shippable. At no point is the
-records repo half-migrated or blocked on CivicCore work. Each phase is
+Every phase below leaves Townlight Records shippable. At no point is the
+records repo half-migrated or blocked on Townlight Core work. Each phase is
 either done and released, or not started. Partial states do not exist in
 production.
 
 **12. The six phases**
 
   --------------------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------- ------------------------------------------------------------------------
-  **Phase**                                           **Scope**                                                                                                                                                                                               **Non-breaking?**                         **Shippable as a CivicRecords release?**
+  **Phase**                                           **Scope**                                                                                                                                                                                               **Non-breaking?**                         **Shippable as a Townlight Records release?**
   0\. Preparation                                     Create civiccore repo skeleton. Create civicsuite umbrella repo. Copy LICENSE, README, CI scaffolding. Agree on public API surface.                                                                     Yes --- no code changes                   No --- setup only
-  1\. Shared models + audit chain                     Move user, role, department, audit\_log models and their migrations into CivicCore. Records imports via shim: from civiccore.models import User as \_U ; User = \_U.                                    Yes --- identical behavior                Yes --- patch release
+  1\. Shared models + audit chain                     Move user, role, department, audit\_log models and their migrations into Townlight Core. Records imports via shim: from civiccore.models import User as \_U ; User = \_U.                                    Yes --- identical behavior                Yes --- patch release
   2\. LLM + ingestion + search                        Move LLM abstraction, document ingestion, search, and their tests. Records imports via shim. Verify end-to-end records workflow unchanged.                                                              Yes --- identical behavior                Yes --- minor release
   3\. Connectors + notifications + exemption engine   Move connector framework, notification service, exemption engine + seed data. Records-specific connectors stay module-side.                                                                             Yes --- identical behavior                Yes --- minor release
   4\. Onboarding + admin shell + verification         Move onboarding wizard, city profile, municipal systems catalog, admin shell UI components, sovereignty scripts.                                                                                        Yes --- identical behavior                Yes --- minor release
@@ -336,9 +336,9 @@ production.
 
 **13. Import shim pattern**
 
-During phases 1--4, CivicRecords AI retains its original import paths so
+During phases 1--4, Townlight Records retains its original import paths so
 any external caller --- a test, a script, a downstream integration ---
-continues to work. Internally, those paths forward to CivicCore. The
+continues to work. Internally, those paths forward to Townlight Core. The
 shim is a 3-line file per moved symbol.
 
 \# backend/app/models/user.py (shim file, remains during phases 1-4)
@@ -357,15 +357,15 @@ across the records repo in one reviewable PR.
 **14. Database migration strategy**
 
 The shared tables (users, roles, audit\_log, documents,
-document\_chunks, etc.) already exist in CivicRecords AI's Alembic
+document\_chunks, etc.) already exist in Townlight Records's Alembic
 history. Phase 1 does not re-create them. Instead:
 
--   CivicCore ships its Alembic env.py but seeds its version history
-    starting from the latest CivicRecords AI migration that touched a
-    shared table. That migration is marked as the CivicCore baseline.
+-   Townlight Core ships its Alembic env.py but seeds its version history
+    starting from the latest Townlight Records migration that touched a
+    shared table. That migration is marked as the Townlight Core baseline.
 
--   CivicRecords AI's Alembic env.py is modified to skip migrations that
-    now live in CivicCore --- it asks CivicCore to bring shared tables
+-   Townlight Records's Alembic env.py is modified to skip migrations that
+    now live in Townlight Core --- it asks Townlight Core to bring shared tables
     up to date, then applies only records-specific migrations.
 
 -   For a fresh install, the sequence is: (1) civiccore\_migrate upgrade
@@ -373,16 +373,16 @@ history. Phase 1 does not re-create them. Instead:
     alembic's depends\_on.
 
 -   Every module's migration runner is a thin wrapper around Alembic
-    that calls CivicCore's runner first.
+    that calls Townlight Core's runner first.
 
 **15. Test strategy**
 
--   Phase 0: ratchet existing CivicRecords AI test suite to record the
+-   Phase 0: ratchet existing Townlight Records test suite to record the
     baseline. 36 test modules, known pass count, known coverage. This is
     the regression bar.
 
 -   Phase 1--4: each extracted subsystem gets its own test module in
-    CivicCore. Records-repo tests stay and continue to pass --- they
+    Townlight Core. Records-repo tests stay and continue to pass --- they
     become integration tests that verify the shim layer behaves
     identically.
 
@@ -390,13 +390,13 @@ history. Phase 1 does not re-create them. Instead:
     suite. Any test that fails is a real bug, not a migration artifact,
     and must be fixed before merge.
 
--   CI gate: CivicRecords AI's CI pins a specific CivicCore version.
-    Upgrading the pin is a separate PR with its own review. CivicCore
-    never breaks CivicRecords AI in a background update.
+-   CI gate: Townlight Records's CI pins a specific Townlight Core version.
+    Upgrading the pin is a separate PR with its own review. Townlight Core
+    never breaks Townlight Records in a background update.
 
 **16. Versioning & compatibility**
 
-CivicCore uses semantic versioning. Major versions are breaking; minor
+Townlight Core uses semantic versioning. Major versions are breaking; minor
 and patch are not. Every module's README carries a compatibility block:
 
 Compatibility: civiccore \>= 0.1, \< 0.2
@@ -637,14 +637,14 @@ civicsuite/
 
 **E. Verification log (to be completed when v0.1 ships)**
 
-This is the template every CivicCore release fills out. v0.1 is not done
+This is the template every Townlight Core release fills out. v0.1 is not done
 until the log is complete.
 
-\#\# Verification Log --- CivicCore v0.1
+\#\# Verification Log --- Townlight Core v0.1
 
 \#\#\# What Was Changed
 
-Extracted shared infrastructure from CivicRecords AI into a new
+Extracted shared infrastructure from Townlight Records into a new
 civiccore package.
 
 Created civicsuite umbrella repo. No product behavior changes.
@@ -654,7 +654,7 @@ Created civicsuite umbrella repo. No product behavior changes.
 \[ \] Shared tables (users, audit\_log, documents, etc.) confirmed
 readable from
 
-CivicCore. Records module reads unchanged. Audit chain verified.
+Townlight Core. Records module reads unchanged. Audit chain verified.
 
 \#\#\# States Verified
 
@@ -684,7 +684,7 @@ CivicCore. Records module reads unchanged. Audit chain verified.
 
 \#\#\# Regression Check
 
-\[ \] Full CivicRecords AI test suite green (baseline pass count)
+\[ \] Full Townlight Records test suite green (baseline pass count)
 
 \[ \] Coverage not reduced
 

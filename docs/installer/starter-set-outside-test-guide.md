@@ -1,13 +1,13 @@
 # Starter-Set Outside Test Guide
 
-Status: outside-party test path for the CivicCore + CivicSunshine +
-CivicMeetings starter set.
+Status: outside-party test path for the Townlight Core + Townlight Records +
+Townlight Meetings starter set.
 
 Last verified: 2026-05-19.
 
 This guide is for outside testers who want to install, verify, repair, and
 remove the current starter set on Linux or Windows. It is not a procurement or
-production-readiness claim. CivicSuite is still in recovery/productization, but
+production-readiness claim. Townlight is still in recovery/productization, but
 this path is the maintained installable package for real-world testing.
 
 ## Supported Test Targets
@@ -28,20 +28,20 @@ Install or enable these first:
 - Optional Ollama/model setup if the tester wants local LLM behavior beyond
   basic service health.
 
-Download the release archive from the official CivicSuite release source,
+Download the release archive from the official Townlight release source,
 `installer-clerk-core-v0.1.0` on this repo's Releases page, then verify
 the SHA256 checksum from the published `SHA256SUMS.txt` before running any
 launcher.
 
 ## Unsigned Windows Warning
 
-The public CivicSuite beta installer is intentionally unsigned because this is a
+The public Townlight beta installer is intentionally unsigned because this is a
 small free open-source project. On Windows, SmartScreen or Unknown Publisher warnings are normal even for a legitimate archive.
 
 Only bypass the warning after both checks pass:
 
 1. The SHA256 checksum matches the published checksum.
-2. The archive came from the official CivicSuite release source.
+2. The archive came from the official Townlight release source.
 
 After that, use **More info** and **Run anyway** when Windows prompts. This is
 the expected trust path for the public beta.
@@ -108,20 +108,20 @@ bash ./start-civicsuite-installer.sh verify --staff-mode bearer --workflow-proof
 
 ## Expected Proof
 
-The default `clerk-core` profile installs CivicCore first and then starts
-CivicSunshine and CivicMeetings. A passing verify run must prove:
+The default `clerk-core` profile installs Townlight Core first and then starts
+Townlight Records and Townlight Meetings. A passing verify run must prove:
 
-- CivicSunshine API health returns `status=ok` and `version=1.7.3`.
-- CivicSunshine web responds.
-- CivicMeetings API health returns `status=ok`, `version=1.0.4`, and
+- Townlight Records API health returns `status=ok` and `version=1.7.3`.
+- Townlight Records web responds.
+- Townlight Meetings API health returns `status=ok`, `version=1.0.4`, and
   `civiccore=1.2.0`.
-- CivicMeetings web responds.
-- CivicMeetings staff auth is protected by default and anonymous staff writes are
+- Townlight Meetings web responds.
+- Townlight Meetings staff auth is protected by default and anonymous staff writes are
   denied.
-- Optional workflow proof creates and fetches a real CivicSunshine records
+- Optional workflow proof creates and fetches a real Townlight Records records
   request, runs search, submits review, drafts a staff-reviewable response, and
   marks the request ready for release.
-- Optional workflow proof also runs CivicMeetings agenda intake/review/promotion,
+- Optional workflow proof also runs Townlight Meetings agenda intake/review/promotion,
   meeting creation, packet finalization, notice posting proof, motion/vote
   capture, citation-gated minutes draft creation, automatic-minutes-posting
   refusal, and public archive calendar/search visibility through
@@ -154,8 +154,8 @@ uninstall on the regenerated package.
 - macOS support is beta-level archive/readiness proof in this package. Full
   matching-host macOS lifecycle evidence still requires a Darwin/macOS Docker
   Desktop host run before any macOS lifecycle certification claim.
-- CivicSunshine and CivicMeetings are co-installed and contract-verified against
-  CivicCore, but this guide does not claim live workflow-record exchange
+- Townlight Records and Townlight Meetings are co-installed and contract-verified against
+  Townlight Core, but this guide does not claim live workflow-record exchange
   between the two modules yet.
 - This is outside-party testable software, not a municipal procurement-ready
   1.0 certification.
