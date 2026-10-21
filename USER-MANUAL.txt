@@ -454,9 +454,9 @@ The full suite architecture, dependency graph, data-flow rules, and Townlight Co
 <!-- Maintainers: re-run `python scripts/docs/render_topology.py --check` before publishing docs. -->
 Generated from `installer/modules.json`.
 
-- Root installer truth label: `townlight_records_meetings_code_zoning_public_beta`.
+- Root installer truth label: `townlight_records_meetings_code_beta_candidate`.
 - Primary product profile: `records-beta` (Townlight Records).
-- Townlight Records profile status: `public-beta`.
+- Townlight Records profile status: `stabilizing`.
 - Only the Townlight Records modules are represented in this candidate table.
 - Disabled profiles and excluded modules remain documented as out of scope until their own gates clear.
 
