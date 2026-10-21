@@ -65,7 +65,7 @@
       "compatibility": {"development_core": "1.2.0", "installer_core": "1.2.1", "public_status_core": "1.2.1"},
       "dependencies": ["core"],
       "maturity": {"state": "public-beta", "availability": "runtime", "arch_tier": 1, "legacy_grade": "released", "public_status_released_at": "2026-05-24"},
-      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "0218fa51bb0707e0ac63f58475308a77eb8e45ee"}
+      "installer": {"tier": 1, "role": "records workflow", "status": "v1_7_3_records_beta_candidate", "source_commit": "d57e1872e9dd60ce580ed71f665413415bb0b717"}
     },
     "meetings": {
       "public_name": "Townlight Meetings", "public_slug": "meetings",
@@ -109,7 +109,7 @@
       "compatibility": {"development_core": "1.2.1", "installer_core": "1.2.1", "public_status_core": "1.1.0"},
       "dependencies": ["core", "code"],
       "maturity": {"state": "queued", "availability": "runtime", "arch_tier": 2, "legacy_grade": "queued", "public_status_released_at": "2026-05-23"},
-      "installer": {"tier": 2, "role": "zoning and land use", "status": "local_z4_candidate_UNVERIFIED", "source_commit": null}
+      "installer": {"tier": 2, "role": "zoning and land use", "status": "v0_2_2_connected_beta_candidate", "source_commit": "6ff3af1039e248c0dcd596f9abe2db7f58adaa7d"}
     },
     "planning": {
       "public_name": "Townlight Planning", "public_slug": "planning",

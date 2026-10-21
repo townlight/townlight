@@ -111,7 +111,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
+          ref: d57e1872e9dd60ce580ed71f665413415bb0b717
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: 3e4413c35c213b036c431a8949e2bfa011c8c1d4
+          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
           path: zone
 
       - name: Check out Townlight Notice runtime source
@@ -504,7 +504,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 0218fa51bb0707e0ac63f58475308a77eb8e45ee
+          ref: d57e1872e9dd60ce580ed71f665413415bb0b717
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -525,7 +525,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: 3e4413c35c213b036c431a8949e2bfa011c8c1d4
+          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
           path: zone
 
       - name: Check out Townlight Notice runtime source

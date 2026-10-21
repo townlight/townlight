@@ -1028,7 +1028,7 @@ if (
   !desktopMsiWorkflow.includes("repository: townlight/meetings") ||
   !desktopMsiWorkflow.includes("repository: townlight/ordinances") ||
   !desktopMsiWorkflow.includes("repository: townlight/zone") ||
-  !desktopMsiWorkflow.includes("ref: 3e4413c35c213b036c431a8949e2bfa011c8c1d4") ||
+  !desktopMsiWorkflow.includes("ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d") ||
   !desktopMsiWorkflow.includes("-ProductProfile zoning-beta")
 ) {
   throw new Error("Connected Zoning MSI workflow requires pinned sources/profile.");

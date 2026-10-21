@@ -281,7 +281,7 @@
         "restore"
       ],
       "current_version": "1.7.3",
-      "source_commit": "0218fa51bb0707e0ac63f58475308a77eb8e45ee",
+      "source_commit": "d57e1872e9dd60ce580ed71f665413415bb0b717",
       "routes": [
         {
           "id": "records-requests",
@@ -527,7 +527,8 @@
         "civiccode"
       ],
       "default_port": 8030,
-      "installer_status": "local_z4_candidate_UNVERIFIED",
+      "installer_status": "v0_2_2_connected_beta_candidate",
+      "source_commit": "6ff3af1039e248c0dcd596f9abe2db7f58adaa7d",
       "current_version": "0.2.2",
       "routes": [
         {
