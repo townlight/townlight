@@ -242,7 +242,7 @@ def run_playwright(report_dir: Path, *, frontend_url: str) -> subprocess.Complet
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run CivicRecords AI cleanroom service proof.")
+    parser = argparse.ArgumentParser(description="Run Townlight Records cleanroom service proof.")
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--api-port", type=int, default=18000)
     parser.add_argument("--frontend-port", type=int, default=18080)
@@ -250,7 +250,7 @@ def main() -> int:
     args = parser.parse_args()
 
     if not CIVICRECORDS.is_dir():
-        print(f"ERROR: CivicRecords AI repo missing: {CIVICRECORDS}", file=sys.stderr)
+        print(f"ERROR: Townlight Records repo missing: {CIVICRECORDS}", file=sys.stderr)
         return 2
 
     run_id = args.run_id or make_run_id()

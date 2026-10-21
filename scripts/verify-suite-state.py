@@ -1021,7 +1021,7 @@ def main() -> int:
     spec_version_map = spec_versions()
     any_failures = False
     scaffold_warnings: list[str] = []
-    print("==> CivicSuite suite-state verification")
+    print("==> Townlight suite-state verification")
     print(f"workspace: {WORKSPACE}")
     print(f"repos: {len(REPOS)}")
     print(f"city-core source pins: {CITY_CORE_SOURCE_PIN_RECOVERY}")

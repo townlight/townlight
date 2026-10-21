@@ -91,7 +91,7 @@ def run_container(*, run_root: Path, image: str) -> subprocess.CompletedProcess[
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run minimal CivicCore installer in a cleanroom container.")
+    parser = argparse.ArgumentParser(description="Run minimal Townlight Core installer in a cleanroom container.")
     parser.add_argument("--image", default="python:3.12-slim", help="Container image to use.")
     parser.add_argument("--run-id", default=None, help="Evidence run id.")
     args = parser.parse_args()

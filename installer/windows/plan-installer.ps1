@@ -100,9 +100,9 @@ foreach ($ModuleId in $Module) {
 }
 
 if ($RunCleanroomProof -or $RunCleanroomGate) {
-    Write-Host "CivicSuite installer launcher: Windows cleanroom mode"
+    Write-Host "Townlight installer launcher: Windows cleanroom mode"
 } else {
-    Write-Host "CivicSuite installer launcher: Windows dry-run only"
+    Write-Host "Townlight installer launcher: Windows dry-run only"
 }
 Write-Host "Profile: $Profile"
 Write-Host "Menu style: $MenuStyle"
@@ -134,7 +134,7 @@ if ($ShowPreflight) {
     Write-Host "Executor preflight requested: blocked dry-run only"
 }
 if ($GenerateInstallKit) {
-    Write-Host "Minimal CivicCore install kit generation requested: writes installer/generated only"
+    Write-Host "Minimal Townlight Core install kit generation requested: writes installer/generated only"
 }
 if ($GenerateProfilePackage) {
     Write-Host "Profile package generation requested: writes installer/generated/packages only"

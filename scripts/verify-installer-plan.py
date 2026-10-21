@@ -2506,7 +2506,7 @@ def check_launchers() -> list[str]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Verify the CivicSuite suite-installer design contract."
+        description="Verify the Townlight suite-installer design contract."
     )
     parser.add_argument(
         "--require-package-cleanroom-evidence",
@@ -2518,7 +2518,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    print("==> CivicSuite installer plan verification")
+    print("==> Townlight installer plan verification")
     before_files, before_directories = snapshot_generated_artifacts()
     errors = []
     try:

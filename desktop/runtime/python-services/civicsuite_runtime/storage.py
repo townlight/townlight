@@ -1,4 +1,4 @@
-"""Local document storage service entry point for CivicSuite desktop."""
+"""Local document storage service entry point for Townlight desktop."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def main() -> int:
 
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
-    print(f"CivicSuite local file storage ready at {root}", flush=True)
+    print(f"Townlight local file storage ready at {root}", flush=True)
     while running:
         time.sleep(1.0)
     return 0

@@ -1,4 +1,4 @@
-"""Database migration runner for the CivicSuite Windows local runtime."""
+"""Database migration runner for the Townlight Windows local runtime."""
 
 from __future__ import annotations
 

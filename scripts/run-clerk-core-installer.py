@@ -2952,7 +2952,7 @@ def write_report(report_dir: Path, payload: dict[str, object]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run CivicSuite clerk-core installer lifecycle.")
+    parser = argparse.ArgumentParser(description="Run Townlight clerk-core installer lifecycle.")
     parser.add_argument("mode", choices=("readiness", "install", "verify", "repair", "backup", "restore", "uninstall"))
     parser.add_argument("--install-root", default=str(DEFAULT_INSTALL_ROOT))
     parser.add_argument("--run-id", default=None)
@@ -2975,7 +2975,7 @@ def main() -> int:
         "--staff-mode",
         choices=(CLERK_STAFF_MODE_PROTECTED, CLERK_STAFF_MODE_OPEN, CLERK_STAFF_MODE_BEARER),
         default=CLERK_STAFF_MODE_PROTECTED,
-        help="CivicClerk staff auth default for install/repair. Open mode is explicit local-rehearsal opt-in.",
+        help="Townlight Meetings staff auth default for install/repair. Open mode is explicit local-rehearsal opt-in.",
     )
     parser.add_argument(
         "--workflow-proof",
