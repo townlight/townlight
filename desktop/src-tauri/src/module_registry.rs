@@ -1115,7 +1115,7 @@ mod tests {
         let plan = module_index(&registry)["civicplan"];
         assert_eq!(plan.current_version.as_deref(), Some("0.2.2"));
         assert_eq!(plan.civiccore_requirement.as_deref(), Some("1.1.0"));
-        assert_eq!(plan.development_version.as_deref(), Some("0.3.0"));
+        assert_eq!(plan.development_version.as_deref(), Some("0.3.0+dev.1"));
         assert!(validate_profile(&registry, "land-use").is_err());
         assert!(resolve_custom_module_order(&registry, &["civicplan".to_string()]).is_err());
         for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
