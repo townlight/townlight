@@ -1,15 +1,17 @@
 # Townlight Core ↔ Module Compatibility Matrix
 
-## Planning P1/P2 development foundation
+## Planning P3/P4 development workflows
 
-Townlight Planning default-branch development advances to `0.3.0+dev.0` and the
-hash-pinned Core `1.2.1` wheel for source-bundle ingestion, explicit migrations,
-immutable policy revisions, adoption evidence and audit history. This is
-unreleased foundation work, not an installed Planning beta. Published Planning
-`v0.2.2` and its Core `1.1.0` pairing remain historical release facts; installer
-and public-status versions, maturity and all source pins remain unchanged.
-The signed Townlight 1.4 installer is unchanged and does not enable Planning.
-See the [Planning source contract](https://github.com/townlight/plan/blob/main/docs/PLANNING-P1-P2.md).
+Townlight Planning development advances to `0.3.0+dev.1` with the hash-pinned Core
+`1.2.1` wheel. Source-backed lookup, editable staff review, immutable snapshot
+export and trusted Meetings/Zoning/Records/Access composition extend the P1/P2
+source foundation. This is an unreleased API increment. Native Planning identity,
+desktop controls and profile activation remain P5; installed acceptance, signing
+and publication remain P6. Existing profiles and runtime source pins are unchanged.
+Published Planning `v0.2.2` and its Core `1.1.0` pairing remain historical release
+facts. Installer/public-status versions and maturity remain unchanged. The signed
+Townlight 1.4 installer does not enable Planning and remains unchanged.
+See the [Planning workflow contract](https://github.com/townlight/plan/blob/main/docs/PLANNING-P3-P4.md).
 
 ## Connected 1.4.0-beta.1 signed provenance
 

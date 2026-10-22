@@ -115,7 +115,7 @@
       "public_name": "Townlight Planning", "public_slug": "planning",
       "legacy": {"technical_id": "civicplan", "product_names": ["CivicPlan"], "package_names": ["civicplan"]},
       "repository": {"name": "townlight/plan", "aliases": ["CivicSuite/civicplan"], "default_branch": "main", "manifest_path": "pyproject.toml"},
-      "versions": {"development": "0.3.0+dev.0", "released": "0.2.2", "installer": "0.2.2", "public_status": "0.2.2"},
+      "versions": {"development": "0.3.0+dev.1", "released": "0.2.2", "installer": "0.2.2", "public_status": "0.2.2"},
       "release": {"tag": "v0.2.2", "published_at": "2026-05-23", "asset_policy": "python-package"},
       "compatibility": {"development_core": "1.2.1", "installer_core": "1.1.0", "public_status_core": "1.1.0"},
       "dependencies": ["core", "zoning", "meetings"],
