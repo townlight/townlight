@@ -1,5 +1,18 @@
 # Releasing the Townlight Records Windows MSI
 
+## Current preparation: opt-in staff Planning beta 1.5.0-beta.1
+
+Only release-preparation steps 1–3 are authorized. The separate beta build
+contract uses Planning 0.3.0, Records 1.7.4 and Core 1.2.1 with the existing
+Planning preview selection and unchanged interface. Signing, tags, draft release
+creation, publication and public download changes remain unauthorized. Historical
+authorizations below apply to their named releases only. Signed 1.4 remains the
+public download. See [staff beta preparation](docs/installer/planning-staff-beta-preparation.md)
+for the frozen identity, provenance, required CI and concrete upgrade/Repair/recovery
+procedure. Do not use the historical default signing command for Planning: a later
+explicitly authorized manual main run must select `planning-staff-beta`.
+
+
 ## Connected Records–Meetings–Code–Zoning: 1.4.0-beta.1
 
 Scott authorized push, merge after required checks, existing Azure signing,

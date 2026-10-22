@@ -2,6 +2,16 @@
 
 # Townlight Unified Specification
 
+## Planning staff beta preparation — October 22, 2026
+
+The opt-in staff Planning composition has P5 native integration and P6 unsigned
+installed evidence. Release preparation assigns Planning 0.3.0 / Records 1.7.4
+with Core 1.2.1. It retains the existing Planning preview selection and interface;
+Permitting/Inspections remain disabled. This is not a publication, broad public
+usability claim or final signed-byte certification. Public desktop truth remains
+signed 1.4; historical entries below are retained. See [the preparation contract](installer/planning-staff-beta-preparation.md).
+
+
 **Canonical suite specification for Townlight, Townlight Core, Townlight Records, Townlight Meetings, Townlight Zoning, Townlight Regulatory Watch, Townlight API, and future modules**
 
 Spec revision: 1.1

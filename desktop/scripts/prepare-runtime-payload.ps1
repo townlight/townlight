@@ -16,11 +16,18 @@ param(
     [string]$CodeRoot = "",
     [string]$ZoningRoot = "",
     [string]$PlanningRoot = "",
+    [ValidateSet('planning-preview', 'planning-staff-beta')]
+    [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
+
+if ($PlanningBuildProfile -eq 'planning-staff-beta' -and $ProductProfile -ne 'planning-preview') {
+    throw 'The staff beta build requires the existing planning-preview runtime composition.'
+}
 
 if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -833,7 +840,8 @@ function Install-PythonServicePackages {
         if (-not $PlanningRoot -or -not $RecordsBackendRoot) { throw "planning-preview requires explicit PlanningRoot and RecordsBackendRoot candidate sources." }
         if ($ReuseInstalledServiceDependencies) { throw 'Planning candidate provenance requires all pinned service sources; do not reuse unproven installed dependencies.' }
         $CivicPlan = (Resolve-Path $PlanningRoot).Path
-        $CandidatePins = Read-JsonFile -Path (Join-Path $RepoRoot 'config\planning-preview-sources.json')
+        $PlanningBuild = Get-PlanningBuildContract -Profile $PlanningBuildProfile -RepoRoot $RepoRoot
+        $CandidatePins = $PlanningBuild.Pins
         $SourceRoots = [ordered]@{
             'townlight/core' = $CivicCore; 'townlight/sunshine' = $CivicRecords
             'townlight/meetings' = $CivicClerk; 'townlight/ordinances' = $CivicCode
@@ -844,7 +852,7 @@ function Install-PythonServicePackages {
             $CandidateSource = $SourceRoots[$Repository]
             $Commit = (& git -C $CandidateSource rev-parse HEAD).Trim()
             $Dirty = & git -C $CandidateSource status --porcelain --untracked-files=normal
-            if ($LASTEXITCODE -ne 0 -or $Dirty -or $Commit -ne $CandidatePins.sources.$Repository) { throw "Planning source must be clean at its explicit development pin: $Repository" }
+            if ($LASTEXITCODE -ne 0 -or $Dirty -or $Commit -ne $CandidatePins.sources.$Repository) { throw "Planning source must be clean at its explicit build pin: $Repository" }
             $DevelopmentSources += @{ repository = $Repository; source_commit = $Commit }
         }
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'install', '--disable-pip-version-check', '--no-warn-script-location', 'setuptools>=68', 'wheel', 'hatchling>=1.27.0')
@@ -862,7 +870,10 @@ function Install-PythonServicePackages {
         if ($CandidateWheels.Count -ne 2) { throw "Expected exactly Planning and Records candidate wheels." }
         $ServicePackages += @($CandidateWheels | ForEach-Object { $_.FullName })
         Write-JsonFile -Path (Join-Path $PythonRoot 'planning-candidate-provenance.json') -Value @{
-            profile = 'planning-preview'; development_only = $true; sources = $DevelopmentSources
+            profile = 'planning-preview'; build_profile = $PlanningBuildProfile
+            development_only = $PlanningBuild.DevelopmentOnly; sources = $DevelopmentSources
+            contract_sha256 = Get-Sha256 -Path (Join-Path $RepoRoot $PlanningBuild.ContractPath)
+            sources_manifest_sha256 = Get-Sha256 -Path (Join-Path $RepoRoot $PlanningBuild.Contract.sources_manifest)
             wheels = @($CandidateWheels | ForEach-Object { @{ name = $_.Name; sha256 = Get-Sha256 -Path $_.FullName } })
         }
     }
@@ -916,7 +927,7 @@ function Install-PythonServicePackages {
     if ($ProductProfile -eq "planning-preview") {
         $UmbrellaCommit = (& git -C $RepoRoot rev-parse HEAD).Trim()
         $UmbrellaDirty = & git -C $RepoRoot status --porcelain --untracked-files=normal
-        if ($LASTEXITCODE -ne 0 -or $UmbrellaDirty) { throw 'Commit the umbrella development candidate before preparing its provenance.' }
+        if ($LASTEXITCODE -ne 0 -or $UmbrellaDirty) { throw 'Commit the umbrella build candidate before preparing its provenance.' }
         $PackageCsv = $InstalledPackages -join ','
         $ProvenanceScript = @"
 import importlib.metadata as metadata
@@ -927,8 +938,9 @@ from civicplan.source_store import PlanSourceRepository
 from civicplan.workflow_store import WorkflowRepository
 assert hasattr(PlanSourceRepository, 'inventory') and hasattr(WorkflowRepository, 'preview_snapshot')
 assert '/desktop/v1/planning-sources/search' in {route.path for route in router.routes}
-assert metadata.version('civicplan') == '0.3.0+dev.1'
-assert metadata.version('civiccore') == '1.2.1'
+assert metadata.version('civicplan') == '$($PlanningBuild.Contract.planning_package_version)'
+assert metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'
+assert metadata.version('civiccore') == '$($PlanningBuild.Contract.core_package_version)'
 path = Path(r'$PythonRoot') / 'planning-candidate-provenance.json'
 receipt = json.loads(path.read_text(encoding='utf-8-sig'))
 receipt['umbrella_source_commit'] = '$UmbrellaCommit'

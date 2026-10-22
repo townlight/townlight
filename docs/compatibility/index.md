@@ -1,5 +1,15 @@
 # Townlight Core ↔ Module Compatibility Matrix
 
+## Unreleased staff Planning beta preparation
+
+The separate `planning-staff-beta` build contract pins Planning 0.3.0 and Records
+1.7.4 with Core 1.2.1 and the six other unchanged P6 module sources. Installed
+selection stays `planning-preview`; no UI or compatibility identifiers change.
+These are prepared bundled package identities, not published module versions.
+Public/historical installer pins and the signed 1.4 download remain unchanged.
+See [the preparation contract](../installer/planning-staff-beta-preparation.md).
+
+
 ## Planning P6 unsigned candidate
 
 The separate candidate overlay selects desktop `1.5.0-1` / MSI `1.5.0.1`, with

@@ -33,10 +33,14 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
         # manifest; it must not repin the historical installer contract.
         if path == BUILD_WORKFLOW:
             integration = workflow.split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
-            candidate = json.loads(_read(ROOT / "config" / "planning-preview-sources.json"))
+            candidate = json.loads(_read(ROOT / "config" / "planning-staff-beta-sources.json"))
             candidate_pin = candidate["sources"][repository]
             checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
-            assert f"ref: {candidate_pin}" in checkout
+            if module_id == "civicrecords-ai":
+                assert "ref: ${{ steps.candidate.outputs.records_ref }}" in checkout
+                assert candidate_pin == candidate["sources"][repository]
+            else:
+                assert f"ref: {candidate_pin}" in checkout
             workflow = workflow.replace(integration, "")
         checkouts = workflow.split(f"repository: {repository}")[1:]
         assert checkouts, f"No {module_id} checkout in {path.name}"
@@ -54,17 +58,23 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
 def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> None:
     import re
 
-    candidate = json.loads(_read(ROOT / "config" / "planning-preview-sources.json"))
-    assert candidate["profile"] == "planning-preview"
-    assert candidate["development_only"] is True
-    assert candidate["sources"]["townlight/plan"] == "c0bd9bd40379764437db10b475fed0bee36175c6"
-    assert candidate["sources"]["townlight/sunshine"] != "45042345b5ca90ff837ae99275058b1ace733c9a"
-    integration = _read(BUILD_WORKFLOW).split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
-    for repository, pin in candidate["sources"].items():
+    development = json.loads(_read(ROOT / "config/planning-preview-sources.json"))
+    beta = json.loads(_read(ROOT / "config/planning-staff-beta-sources.json"))
+    assert development["profile"] == "planning-preview"
+    assert development["development_only"] is True
+    assert development["sources"]["townlight/plan"] == "c0bd9bd40379764437db10b475fed0bee36175c6"
+    assert development["sources"]["townlight/sunshine"] == "28a2eba1878e2fda10615a28c5f4274de216c9da"
+    assert beta["profile"] == "planning-staff-beta" and beta["development_only"] is False
+    assert beta["sources"].keys() == development["sources"].keys()
+    for repository, pin in beta["sources"].items():
         assert re.fullmatch(r"[0-9a-f]{40}", pin)
+        if repository not in {"townlight/plan", "townlight/sunshine"}:
+            assert pin == development["sources"][repository]
+    integration = _read(BUILD_WORKFLOW).split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
+    for repository, output in (("townlight/plan", "planning_ref"), ("townlight/sunshine", "records_ref")):
         checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
-        assert f"ref: {pin}" in checkout
-    assert "-ProductProfile planning-preview" in integration
+        assert f"ref: ${{{{ steps.candidate.outputs.{output} }}}}" in checkout
+    assert "-ProductProfile planning-preview -PlanningBuildProfile" in integration
     assert 'TOWNLIGHT_TEST_RUNTIME_PROFILE: "planning-preview"' in integration
 
 
@@ -236,4 +246,81 @@ def test_release_checks_both_artifacts_and_receipt_against_selected_run() -> Non
     assert "verify-publication-signature.ps1 -Path $embedded[0].FullName" in workflow
     assert "$entries[0].signed_sha256 -ne $sha" in workflow
     assert "$entries[0].signer_thumbprint -ne $sig.SignerCertificate.Thumbprint" in workflow
-    assert "$receiptFiles[0].FullName --clobber" in workflow
+    assert "--clobber" not in workflow
+    assert "Release destination must be an empty draft" in workflow
+
+
+def test_staff_beta_release_requires_its_composition_and_embedded_provenance() -> None:
+    workflow = _read(RELEASE_WORKFLOW)
+    assert "townlight-records-meetings-code-zoning-planning-v*" in workflow
+    assert "ProductProfile=planning-staff-beta" in workflow
+    assert "$receipt.planning_provenance_sha256 -ne $proofSha" in workflow
+    assert "$proof.umbrella_source_commit -ne $tagSha" in workflow
+    assert "$proof.sources_manifest_sha256 -ne $sourcesSha" in workflow
+    assert "$proof.package_versions.'civicrecords-ai' -ne $planning.Contract.records_package_version" in workflow
+    assert "$_.source_commit -eq $pin.Value" in workflow
+    assert "opt-in staff Planning beta" in workflow
+    # The release consumer expects a flat signed artifact, as before.
+    signed = _read(BUILD_WORKFLOW).split("- name: Upload SIGNED Windows Local MSI for publication gate", 1)[1].split("\n  desktop-civiccore-integration:", 1)[0]
+    assert "civicsuite/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json" in signed
+    assert "civicsuite/config/" not in signed
+    assert "civicsuite/desktop/runtime/" not in signed
+    payload = _read(ROOT / "desktop/scripts/prepare-runtime-payload.ps1")
+    assert "Get-PlanningBuildContract -Profile $PlanningBuildProfile" in payload
+    assert "metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'" in payload
+    assert "sources_manifest_sha256 = Get-Sha256" in payload
+
+
+def test_planning_resolver_selects_beta_without_opening_development_signing(tmp_path: Path) -> None:
+    import shutil
+    import subprocess
+
+    pwsh = shutil.which("pwsh")
+    if not pwsh:
+        pytest.skip("PowerShell is required for the executable resolver contract")
+    # Real resolver execution only; never dispatch a workflow or invoke signing.
+    for relative in (
+        "desktop/scripts/resolve-msi-candidate.ps1", "desktop/scripts/planning-build-contract.ps1",
+        "desktop/src-tauri/tauri.planning-candidate.conf.json", "desktop/src-tauri/tauri.planning-staff-beta.conf.json",
+        "config/planning-msi-candidate.json", "config/planning-preview-sources.json",
+        "config/planning-staff-beta.json", "config/planning-staff-beta-sources.json",
+    ):
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
+    script = tmp_path / "check.ps1"
+    script.write_text(r'''$ErrorActionPreference = 'Stop'
+$env:GITHUB_OUTPUT = ''
+function Resolve($Profile, $Branch, $Sign = $false) {
+    & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
+}
+if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
+if ((Resolve automatic planning/p6-candidate).product_profile -ne 'planning-preview') { throw 'development default changed' }
+$beta = Resolve automatic planning/staff-beta-prep
+if ($beta.product_profile -ne 'planning-staff-beta' -or $beta.runtime_profile -ne 'planning-preview' -or $beta.desktop_version -ne '1.5.0-1') { throw 'beta composition mismatch' }
+# Only validates future eligibility; no signer is called by this resolver.
+if ((Resolve planning-staff-beta main $true).product_profile -ne 'planning-staff-beta') { throw 'explicit main selection failed' }
+function MustReject([scriptblock]$Action) {
+    $rejected = $false
+    try { & $Action | Out-Null } catch { $rejected = $true }
+    if (-not $rejected) { throw 'Expected refusal' }
+}
+MustReject { Resolve planning-preview main $true }
+MustReject { Resolve planning-staff-beta planning/staff-beta-prep $true }
+$path = "$PSScriptRoot/config/planning-staff-beta.json"
+$c = Get-Content $path -Raw | ConvertFrom-Json
+$c.planning_package_version = '0.3.0+dev.1'
+$c | ConvertTo-Json | Set-Content $path
+MustReject { Resolve planning-staff-beta main }
+$c.planning_package_version = '0.3.0'
+$c | ConvertTo-Json | Set-Content $path
+$path = "$PSScriptRoot/config/planning-staff-beta-sources.json"
+$pins = Get-Content $path -Raw | ConvertFrom-Json
+$pins.sources.'townlight/plan' = 'main'
+$pins | ConvertTo-Json | Set-Content $path
+MustReject { Resolve planning-staff-beta main }
+Write-Output 'PASS selection and fail-closed release identities'
+''', encoding="utf-8")
+    result = subprocess.run([pwsh, "-NoProfile", "-File", str(script)], capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "PASS selection" in result.stdout

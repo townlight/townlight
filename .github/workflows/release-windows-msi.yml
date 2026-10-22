@@ -20,6 +20,7 @@ on:
       - "townlight-records-meetings-v*"
       - "townlight-records-meetings-code-v*"
       - "townlight-records-meetings-code-zoning-v*"
+      - "townlight-records-meetings-code-zoning-planning-v*"
 
 permissions:
   contents: write
@@ -40,9 +41,24 @@ jobs:
           $ErrorActionPreference = "Stop"
           $tag = "${{ github.event.inputs.tag || github.ref_name }}"
           if ([string]::IsNullOrWhiteSpace($tag)) { throw "A release tag is required." }
+          $isPlanning = $tag -like 'townlight-records-meetings-code-zoning-planning-v*'
+          if ($isPlanning) {
+            . ./desktop/scripts/planning-build-contract.ps1
+            $planning = Get-PlanningBuildContract -Profile planning-staff-beta
+            if ($tag -ne $planning.Contract.release_tag) { throw 'Planning tag does not match the frozen staff beta identity.' }
+          }
+          # Published history and existing assets are immutable, including drafts.
+          $existingText = gh release view $tag --json isDraft,assets 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $existing = $existingText | ConvertFrom-Json
+            if (-not $existing.isDraft -or @($existing.assets).Count -gt 0) {
+              throw 'Refusing to modify a published release or replace existing release assets.'
+            }
+          }
           Write-Host "Release tag: $tag"
 
           git fetch --force --tags
+          if ((git cat-file -t "refs/tags/$tag") -ne 'tag') { throw 'An annotated release tag is required.' }
           $tagSha = (git rev-list -n 1 $tag).Trim()
           if ($LASTEXITCODE -ne 0 -or $tagSha -notmatch '^[0-9a-f]{40}$') {
             throw "Could not resolve release tag $tag to a commit."
@@ -81,6 +97,11 @@ jobs:
           if ($evidence -notmatch "(?m)^SHA256=$signedSha$") { throw "Signed MSI hash does not match its evidence file." }
           if ($evidence -notmatch '(?m)^SignatureState=Valid$') { throw "Evidence does not classify the MSI signature as Valid." }
           if ($evidence -notmatch '(?m)^PublicationAllowed=true$') { throw "Evidence does not permit publication." }
+          if ($isPlanning -and ($evidence -notmatch '(?m)^ProductProfile=planning-staff-beta$' -or
+              $evidence -notmatch '(?m)^RuntimeProfile=planning-preview$' -or
+              $evidence -notmatch '(?m)^DesktopVersion=1\.5\.0-1$')) {
+            throw 'The selected signed artifact is not the frozen Planning staff beta composition.'
+          }
 
           $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
             Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1
@@ -111,6 +132,32 @@ jobs:
               throw 'Signing receipt does not match independently verified artifact evidence.'
             }
           }
+          if ($isPlanning) {
+            $proofFiles = @(Get-ChildItem -LiteralPath ./msi-artifact -Filter planning-candidate-provenance.json -File)
+            $embeddedProof = @(Get-ChildItem -LiteralPath $extract -Filter planning-candidate-provenance.json -Recurse -File)
+            if ($proofFiles.Count -ne 1 -or $embeddedProof.Count -ne 1) { throw 'Planning payload provenance is missing or ambiguous.' }
+            $proofSha = (Get-FileHash -LiteralPath $proofFiles[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($receipt.product_profile -ne 'planning-staff-beta' -or $receipt.runtime_profile -ne 'planning-preview' -or
+                $receipt.desktop_version -ne $planning.Contract.desktop_version -or $receipt.planning_provenance_sha256 -ne $proofSha -or
+                (Get-FileHash -LiteralPath $embeddedProof[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $proofSha) {
+              throw 'Planning composition/provenance does not match the signed receipt and embedded payload.'
+            }
+            $proof = Get-Content -LiteralPath $proofFiles[0].FullName -Raw | ConvertFrom-Json
+            $contractSha = (Get-FileHash -LiteralPath $planning.ContractPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            $sourcesSha = (Get-FileHash -LiteralPath $planning.Contract.sources_manifest -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($proof.build_profile -ne 'planning-staff-beta' -or $proof.profile -ne 'planning-preview' -or
+                $proof.development_only -ne $false -or $proof.umbrella_source_commit -ne $tagSha -or
+                $proof.contract_sha256 -ne $contractSha -or $proof.sources_manifest_sha256 -ne $sourcesSha -or
+                $proof.package_versions.civicplan -ne $planning.Contract.planning_package_version -or
+                $proof.package_versions.'civicrecords-ai' -ne $planning.Contract.records_package_version -or
+                $proof.package_versions.civiccore -ne $planning.Contract.core_package_version -or @($proof.sources).Count -ne 8) {
+              throw 'Planning payload source/package contract differs from the tagged release.'
+            }
+            foreach ($pin in $planning.Pins.sources.PSObject.Properties) {
+              $entries = @($proof.sources | Where-Object { $_.repository -eq $pin.Name -and $_.source_commit -eq $pin.Value })
+              if ($entries.Count -ne 1) { throw "Planning source pin mismatch: $($pin.Name)" }
+            }
+          }
 
           # The annotated tag is expected to already exist (see RELEASING.md). If the
           # release object does not exist yet, create it from the tag as a DRAFT
@@ -118,9 +165,16 @@ jobs:
           # signed clean-machine acceptance.
           gh release view $tag *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --draft --prerelease --title "Townlight Records + Meetings $tag" --notes "Automated signed Townlight Records + Meetings MSI attach from main build run $($run.databaseId). Finalize notes and publish only after signed clean-machine validation."
+            $scope = if ($isPlanning) { 'Townlight Records + Meetings + Code + Zoning + opt-in staff Planning beta' } else { 'Townlight Windows Local' }
+            gh release create $tag --draft --prerelease --title "$scope $tag" --notes "Signed $scope MSI from main build run $($run.databaseId). Finalize notes and publish only after exact signed-byte installation and upgrade acceptance."
             if ($LASTEXITCODE -ne 0) { throw "Failed to create the draft prerelease." }
           }
-          gh release upload $tag $msi.FullName $evidenceFiles[0].FullName $receiptFiles[0].FullName --clobber
+          $destinationText = gh release view $tag --json isDraft,assets
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify the draft destination before upload.' }
+          $destination = $destinationText | ConvertFrom-Json
+          if (-not $destination.isDraft -or @($destination.assets).Count -gt 0) { throw 'Release destination must be an empty draft; historical assets cannot be replaced.' }
+          $releaseAssets = @($msi.FullName, $evidenceFiles[0].FullName, $receiptFiles[0].FullName)
+          if ($isPlanning) { $releaseAssets += $proofFiles[0].FullName }
+          gh release upload $tag @releaseAssets
           if ($LASTEXITCODE -ne 0) { throw "Failed to upload the signed MSI release assets." }
           Write-Host "Attached the independently verified signed MSI to draft release $tag; publication remains blocked."
