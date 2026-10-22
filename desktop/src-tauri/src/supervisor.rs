@@ -2054,7 +2054,10 @@ fn run_python_migrations() -> Result<(), String> {
     })? {
         command.env(name, value);
     }
-    command.arg("-u").arg("-m").arg("civicsuite_runtime.migrate");
+    command
+        .arg("-u")
+        .arg("-m")
+        .arg("civicsuite_runtime.migrate");
     command_output_with_timeout(
         &mut command,
         "City-core database migrations",
@@ -4149,7 +4152,10 @@ mod tests {
                 fs::read_to_string(data.join("postmaster.pid")).unwrap(),
                 "999999\n"
             );
-            assert!(!backup_root().exists(), "no uncertified backup may be created");
+            assert!(
+                !backup_root().exists(),
+                "no uncertified backup may be created"
+            );
         });
     }
 
