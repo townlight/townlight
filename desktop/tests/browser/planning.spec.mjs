@@ -5,6 +5,7 @@ async function mount(page, publicMode = false) {
   await page.goto('/');
   await page.evaluate(async publicMode => {
     const {createPlanningView} = await import('/src/planning/view.js');
+    const {bindPlanningSources} = await import('/src/records/planning-sources.ts');
     window.__calls = []; window.__saved = null;
     const ref = {plan_id:'fictional',revision_id:'11111111-1111-4111-8111-111111111111',policy_id:'H1'};
     const policy = {...ref,document_id:'original',citation:'<img src=x onerror=alert(1)>',anchor:'paragraph 1',adopted_on:'2026-01-01',effective_on:'2026-01-01',excerpt:'Fictional housing policy',source_sha256:'a'.repeat(64)};
@@ -27,7 +28,10 @@ async function mount(page, publicMode = false) {
       if(r.operation === 'original') return {path:'managed/planning/original.txt',sha256:'a'.repeat(64)};
       throw new Error('Unexpected operation '+r.operation);
     };
-    const view = createPlanningView(invoke, publicMode); document.body.innerHTML = view.render(); view.bind();
+    const view = createPlanningView(invoke, publicMode); document.body.innerHTML = view.render();
+    // Match the shell's binding order; the Records handler must ignore this inventory.
+    bindPlanningSources(invoke, async () => {});
+    view.bind();
   },publicMode);
   await expect(page.locator('[data-planning-status]')).toHaveText('Saved work loaded.');
 }

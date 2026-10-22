@@ -11,7 +11,7 @@ export function renderPlanningSources(requestId:string) {
     <div data-source-results></div><p data-source-status role="status" aria-live="polite"></p></section>`;
 }
 export function bindPlanningSources(invoke:Invoke,refresh:()=>Promise<void>) {
-  const root=document.querySelector<HTMLElement>('[data-planning-sources]');
+  const root=document.querySelector<HTMLElement>('[data-planning-sources][data-request-id]');
   if (!root) return;
   const form=root.querySelector('form')!;
   const output=root.querySelector<HTMLElement>('[data-source-results]')!;
