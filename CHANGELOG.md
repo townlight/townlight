@@ -1,5 +1,19 @@
 # Changelog
 
+## Townlight opt-in staff Planning beta 1.5.0-beta.1 — Unreleased preparation
+
+- Prepare a distinct Planning release build contract and pinned package identities
+  (Planning 0.3.0 / Records 1.7.4 / Core 1.2.1), retaining the existing eight-module
+  runtime composition, opt-in setup and unchanged interface.
+- Keep development-candidate signing refusal and routine unsigned CI. Future
+  Planning release attachment verifies the selected composition and embedded
+  provenance, and refuses published releases or existing assets.
+- Document upgrade runtime Repair and coherent backup/recovery. Reuse P5/P6
+  evidence; final signed-byte acceptance and publication remain pending.
+- Preserve historical releases, signed 1.4, compatibility identities and public
+  download pointers. [Preparation contract](docs/installer/planning-staff-beta-preparation.md).
+
+
 All notable changes to the Townlight umbrella repo are documented here.
 
 ## Townlight Records + Meetings + Code + Zoning 1.4.0-beta.1 â€” 2026-10-21

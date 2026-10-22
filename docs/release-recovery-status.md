@@ -1,5 +1,15 @@
 # CivicSuite Release Recovery Status
 
+## October 22, 2026 — Planning preparation status
+
+P5 and P6 source changes are merged and the unsigned P6 installed journeys passed.
+The next opt-in staff beta is prepared separately with Planning 0.3.0 and Records
+1.7.4, not published. Current signed/public desktop remains 1.4. The interface,
+historical release evidence, compatibility identifiers and signed installer bytes
+are preserved. Final signed-byte normal-Windows acceptance and delivery remain
+pending. See [staff beta preparation](installer/planning-staff-beta-preparation.md).
+
+
 Status date: 2026-06-19
 
 Update 2026-06-19: CivicNotice v0.2.0 is promoted into the Windows Local city-core installer profile as the public-notice workflow release car. The suite installer vendored-source pin records CivicNotice commit `2bf0c9d7b764af84cd042657a972e84213a261d5`, packages `civicnotice.main` in the desktop runtime payload, exposes Public Notices in the desktop app, and includes CivicNotice in city-core profile generation, lifecycle verification, backup/restore contracts, and docs. This is a city-core beta module promotion only; it does not claim full-suite procurement readiness or promote modules outside the current city-core package.

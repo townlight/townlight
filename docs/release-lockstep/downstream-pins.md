@@ -1,5 +1,15 @@
 # Downstream Pin Lockstep Record
 
+## October 22, 2026 — staff Planning beta preparation only
+
+Planning source `0bf0a7c998cafb9057da81c23861681a9689bf84` assigns package 0.3.0.
+Records source `176ea1a09ba59c799f9298f56df44064ec7978ff` assigns package 1.7.4
+and synchronizes its OpenAPI version metadata. The beta source manifest is
+separate from the preserved P6 development pins and public 1.4 installer registry.
+Core stays 1.2.1. Six other module pins are unchanged. No module release, signing,
+tag or publication is performed. See the staff beta preparation contract.
+
+
 Status date: 2026-06-13
 
 This file records the downstream module version/pin changes that accompany the

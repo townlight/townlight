@@ -1,5 +1,15 @@
 # Townlight Records + Meetings + Code + Zoning — User Manual
 
+## Unreleased opt-in staff Planning beta preparation
+
+Planning 1.5.0-beta.1 is being prepared; signed 1.4 below remains the public
+download. The interface is unchanged, including the existing **Townlight Planning
+development preview** selection. Installing a future accepted MSI does not refresh
+the cached Python runtime: the documented upgrade requires backed-up opt-in and
+System Health Python-services Repair. See [upgrade and recovery instructions](docs/installer/planning-staff-beta-preparation.md).
+No signed Planning installer or publication is claimed here.
+
+
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
 Published October 21, 2026. Four connected Townlight products run locally through
