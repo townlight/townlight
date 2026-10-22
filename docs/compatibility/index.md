@@ -1,13 +1,15 @@
 # Townlight Core ↔ Module Compatibility Matrix
 
-## Planning P3/P4 development workflows
+## Planning P5 native development preview
 
 Townlight Planning development advances to `0.3.0+dev.1` with the hash-pinned Core
 `1.2.1` wheel. Source-backed lookup, editable staff review, immutable snapshot
 export and trusted Meetings/Zoning/Records/Access composition extend the P1/P2
-source foundation. This is an unreleased API increment. Native Planning identity,
-desktop controls and profile activation remain P5; installed acceptance, signing
-and publication remain P6. Existing profiles and runtime source pins are unchanged.
+source foundation. The opt-in `planning-preview` development composition adds native
+identity, desktop controls and backed-up profile activation. Its explicit candidate
+source pins are separate from historical installer pins. Installed release
+certification, signing and publication remain P6. Existing profiles retain their
+behavior. See the [development preview manual](../installer/planning-development-preview.md).
 Published Planning `v0.2.2` and its Core `1.1.0` pairing remain historical release
 facts. Installer/public-status versions and maturity remain unchanged. The signed
 Townlight 1.4 installer does not enable Planning and remains unchanged.

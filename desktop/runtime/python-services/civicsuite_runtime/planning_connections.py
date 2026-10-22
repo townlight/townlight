@@ -1,4 +1,4 @@
-"""Explicit Planning composition for source acceptance; profile activation is P5.
+"""Explicit Planning composition for the opt-in native development profile.
 
 Use the installed providers already configured by the runtime. No caller supplies
 URLs, provider code, native identity or publication permission.
@@ -8,7 +8,7 @@ from dataclasses import asdict
 
 def configure(records_app, planning_app, database_url):
     enabled = records_app.state.desktop_enabled_modules
-    required = {"civicplan", "civicclerk", "civiczone", "civicaccess", "civicrecords-ai"}
+    required = {"civicplan", "civicclerk", "civiccode", "civiczone", "civicaccess", "civicrecords-ai"}
     if not required.issubset(enabled):
         raise RuntimeError("Planning connections require all enabled source modules.")
 
@@ -34,7 +34,7 @@ def configure(records_app, planning_app, database_url):
         return asdict(rewrite_plain_language(text))
 
     def public_documents(query="", source_id=None):
-        if "civicplan" not in records_app.state.desktop_enabled_modules:
+        if not required.issubset(records_app.state.desktop_enabled_modules):
             raise RuntimeError("Planning source module unavailable.")
         from civicplan.migrations import source_engine
         from civicplan.source_store import PlanSourceRepository

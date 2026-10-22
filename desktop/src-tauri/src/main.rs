@@ -9,6 +9,7 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod planning_client;
 mod profile_gate;
 mod records_authority;
 mod supervisor;
@@ -101,6 +102,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "access",
             label: "Accessibility",
             description: "WCAG review, plain language, multilingual, exports",
+        },
+        NavigationItem {
+            id: "planning",
+            label: "Planning",
+            description: "Adopted policy sources and reviewed staff analysis",
         },
         NavigationItem {
             id: "search",
@@ -278,6 +284,7 @@ fn city_work_action_module_requirement(
             Some("code") => Some((vec!["civiccode"], false)),
             Some("notice") => Some((vec!["civicnotice"], false)),
             Some("access") => Some((vec!["civicaccess"], false)),
+            Some("planning") => Some((vec!["civicplan"], false)),
             _ => Some((
                 vec!["civicclerk", "civicrecords-ai", "civiccode", "civicnotice"],
                 true,
@@ -843,7 +850,7 @@ async fn meetings_domain_request(
         .profile_id;
     if !matches!(
         profile_id.as_str(),
-        "meetings-beta" | "city-core" | "zoning-beta"
+        "meetings-beta" | "city-core" | "zoning-beta" | "planning-preview"
     ) {
         return Err(domain_client::DomainError::denied());
     }
@@ -866,7 +873,10 @@ async fn code_domain_request(
     let profile_id = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?
         .profile_id;
-    if !matches!(profile_id.as_str(), "city-core" | "zoning-beta") {
+    if !matches!(
+        profile_id.as_str(),
+        "city-core" | "zoning-beta" | "planning-preview"
+    ) {
         return Err(domain_client::DomainError::denied());
     }
     let access =
@@ -933,6 +943,82 @@ async fn zoning_public_request(
         return Err(domain_client::DomainError::denied());
     }
     zoning_client::execute(request, String::new(), true).await
+}
+
+fn planning_capability(staff: bool) -> Result<String, domain_client::DomainError> {
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if selection.profile_id != "planning-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "civicplan")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    if !staff {
+        return Ok(String::new());
+    }
+    let session =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    if !matches!(
+        session.role.as_deref(),
+        Some("local-admin") | Some("city-staff")
+    ) {
+        return Err(domain_client::DomainError::denied());
+    }
+    auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())
+}
+
+#[tauri::command]
+async fn planning_domain_request(
+    request: planning_client::PlanningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    planning_client::execute(request, planning_capability(true)?, false).await
+}
+
+#[tauri::command]
+async fn planning_public_request(
+    request: planning_client::PlanningRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    planning_client::execute(request, planning_capability(false)?, true).await
+}
+
+#[tauri::command]
+async fn planning_pick_bundle() -> Result<Value, String> {
+    let _guard = profile_gate::operation().map_err(|_| "Profile maintenance in progress.")?;
+    planning_capability(true).map_err(|_| "Sign in with an authorized Planning account.")?;
+    tauri::async_runtime::spawn_blocking(|| {
+        #[cfg(windows)]
+        {
+            use std::io::Read;
+            let Some(path) = picked_file_path_for_desktop()? else {
+                return Ok(Value::Null);
+            };
+            let mut file =
+                std::fs::File::open(path).map_err(|_| "Could not read the selected bundle.")?;
+            let mut bytes = Vec::new();
+            file.by_ref()
+                .take(36_000_001)
+                .read_to_end(&mut bytes)
+                .map_err(|_| "Could not read the bundle.")?;
+            if bytes.len() > 36_000_000 {
+                return Err("Bundle exceeds the local import limit.".into());
+            }
+            serde_json::from_slice(&bytes)
+                .map_err(|_| "Choose a valid Planning JSON source bundle.".into())
+        }
+        #[cfg(not(windows))]
+        {
+            Err("Planning file picker requires Windows.".into())
+        }
+    })
+    .await
+    .map_err(|_| "Could not complete the source picker.".to_string())?
 }
 
 fn city_work_action_authorized(
@@ -1050,6 +1136,9 @@ pub fn run() {
             code_domain_request,
             zoning_domain_request,
             zoning_public_request,
+            planning_domain_request,
+            planning_public_request,
+            planning_pick_bundle,
             open_domain_exports,
             city_work_action
         ])

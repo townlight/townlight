@@ -65,10 +65,10 @@ def upgrade_all() -> None:
         records_root / "alembic",
         database_url,
     )
-    if profile in {"city-core", "meetings-beta", "zoning-beta"}:
+    if profile in {"city-core", "meetings-beta", "zoning-beta", "planning-preview"}:
         clerk_root = _package_root("civicclerk") / "migrations"
         _run_alembic("Townlight Meetings", clerk_root / "alembic.ini", clerk_root, sync_url)
-    if profile in {"city-core", "zoning-beta"}:
+    if profile in {"city-core", "zoning-beta", "planning-preview"}:
         code_root = _package_root("civiccode") / "migrations"
         _run_alembic("Townlight Code", code_root / "alembic.ini", code_root, sync_url)
 
@@ -84,15 +84,23 @@ def upgrade_all() -> None:
         ensure_schema(repository.engine)
         from civicsuite_runtime.native_accounts import metadata as account_metadata
         account_metadata.create_all(repository.engine)
-        if profile in {"city-core", "zoning-beta"}:
+        if profile in {"city-core", "zoning-beta", "planning-preview"}:
             from civicsuite_runtime.code_meetings import ensure_schema as ensure_connections
             ensure_connections(repository.engine)
     finally:
         repository.engine.dispose()
     print("Townlight Access: schema ensured (civicaccess-windows-local-state-v1)")
-    if profile == "zoning-beta":
+    if profile in {"zoning-beta", "planning-preview"}:
         zoning_root = _package_root("civiczone") / "migrations"
         _run_alembic("Townlight Zoning", zoning_root / "alembic.ini", zoning_root, sync_url)
+    if profile == "planning-preview":
+        from civicplan.migrations import source_engine, upgrade
+        engine = source_engine(sync_url)
+        try:
+            upgrade(engine)
+        finally:
+            engine.dispose()
+        print("Townlight Planning: schema migrated (civicplan_0002)")
 
 
 def main() -> int:

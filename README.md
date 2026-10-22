@@ -30,6 +30,13 @@ a source; no automatic public publication is introduced.
 **Open-source, local-first municipal software, released one useful public
 product at a time.**
 
+## Planning development preview
+
+The opt-in `planning-preview` source candidate adds native Planning sources,
+staff analysis/review, exact snapshot export and explicit Records selection.
+It is unreleased development work, separate from the signed 1.4 installer.
+See the [preview manual and recovery boundaries](docs/installer/planning-development-preview.md).
+
 ## Historical Records + Meetings + Code — 1.3.0-beta.1 public beta
 
 This release connects three products on one local Python/PostgreSQL

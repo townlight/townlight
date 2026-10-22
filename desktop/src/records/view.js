@@ -1,5 +1,6 @@
 import { renderMeetingsSources } from "./meetings-sources.ts";
 import { renderCodeSources } from "./code-sources.ts";
+import { renderPlanningSources } from "./planning-sources.ts";
 import { renderZoningSources } from "./zoning-sources.ts";
 // Existing Records presentation, extracted without changing its visual behavior.
 export function createRecordsRenderer({ state, currentNotification, workflowEmpty, escapeHtml, isPublicSurface, renderPublicRecordsWorkflow, cityWork, currentRecordsRequest, accessState, renderDemoTownBanner, renderGuidedWorkReview, renderFilePathField, renderWorkActionResult, formatFeeCents }) {
@@ -238,6 +239,7 @@ function renderRecordsWorkflow() {
         ${["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources(selectedRequest?.request_id || "") : ""}
         ${["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources(selectedRequest?.request_id || "") : ""}
         ${state.app.module_selection?.enabled_module_ids?.includes("civiczone") ? renderZoningSources(selectedRequest?.request_id || "") : ""}
+        ${state.app.module_selection?.enabled_module_ids?.includes("civicplan") ? renderPlanningSources(selectedRequest?.request_id || "") : ""}
         <label>Assign to <input type="text" data-work-field="assignedTo" value="${escapeHtml(state.workDraft.assignedTo)}" /></label>
         <label>Clarification note <textarea data-work-field="clarificationNote">${escapeHtml(state.workDraft.clarificationNote)}</textarea></label>
         <label>Search source note <textarea data-work-field="sourceNote">${escapeHtml(state.workDraft.sourceNote)}</textarea></label>

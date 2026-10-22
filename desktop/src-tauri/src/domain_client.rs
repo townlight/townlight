@@ -622,6 +622,14 @@ pub async fn execute_public(
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum RecordsRequest {
+    SearchPlanning {
+        query: String,
+    },
+    AttachPlanningSource {
+        request_id: Uuid,
+        source_id: String,
+        expected_sha256: String,
+    },
     SearchZoning {
         query: String,
     },
@@ -779,6 +787,20 @@ impl RecordsRequest {
             })
         };
         Ok(match self {
+            Self::SearchPlanning { query } => (
+                Method::POST,
+                "/desktop/v1/planning-sources/search".into(),
+                Some(serde_json::json!({"query":query})),
+            ),
+            Self::AttachPlanningSource {
+                request_id,
+                source_id,
+                expected_sha256,
+            } => (
+                Method::POST,
+                format!("/desktop/v1/requests/{request_id}/planning-sources"),
+                Some(serde_json::json!({"source_id":source_id,"expected_sha256":expected_sha256})),
+            ),
             Self::SearchZoning { query } => (
                 Method::POST,
                 "/desktop/v1/zoning-sources/search".into(),

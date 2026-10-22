@@ -8,11 +8,20 @@
     {
       "id": "postgres-17-pgvector",
       "label": "Portable PostgreSQL 17 with pgvector",
-      "services": ["postgres"],
+      "services": [
+        "postgres"
+      ],
       "source_dir": "postgres",
       "destination_dir": "runtime/postgres",
       "profile_required_files": {
-        "zoning-beta": ["share/extension/postgis.control", "lib/postgis-3.dll"]
+        "zoning-beta": [
+          "share/extension/postgis.control",
+          "lib/postgis-3.dll"
+        ],
+        "planning-preview": [
+          "share/extension/postgis.control",
+          "lib/postgis-3.dll"
+        ]
       },
       "required_files": [
         "bin/pg_ctl.exe",
@@ -30,7 +39,11 @@
     {
       "id": "cpython-services",
       "label": "Bundled CPython city services",
-      "services": ["python-services", "task-queue", "file-storage"],
+      "services": [
+        "python-services",
+        "task-queue",
+        "file-storage"
+      ],
       "source_dir": "python",
       "destination_dir": "runtime/python",
       "required_files": [
@@ -84,16 +97,37 @@
           "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0019_minutes_decisions.py",
           "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0020_delivery_history.py",
           "Lib/site-packages/civicclerk/migrations/versions/civicclerk_0021_sources_archive.py"
+        ],
+        "planning-preview": [
+          "Lib/site-packages/civiczone/geo_import.py",
+          "Lib/site-packages/civiczone/connected_sources.py",
+          "Lib/site-packages/civiczone/migrations/versions/civiczone_0006_cited_questions.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_bridge.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_records.py",
+          "Lib/site-packages/civicclerk/main.py",
+          "Lib/site-packages/civiccode/main.py",
+          "Lib/site-packages/civicplan/workflow_store.py",
+          "Lib/site-packages/civicplan/source_bundle.py",
+          "Lib/site-packages/civicplan/migrations/__init__.py",
+          "Lib/site-packages/civicplan/migrations/versions/civicplan_0002_workflows.py",
+          "Lib/site-packages/civicsuite_runtime/planning_bridge.py",
+          "Lib/site-packages/civicsuite_runtime/planning_connections.py",
+          "Lib/site-packages/app/requests/planning_sources.py",
+          "planning-candidate-provenance.json"
         ]
       }
     },
     {
       "id": "ollama-runtime",
       "label": "Native Ollama model runtime",
-      "services": ["model-runtime"],
+      "services": [
+        "model-runtime"
+      ],
       "source_dir": "ollama",
       "destination_dir": "runtime/ollama",
-      "required_files": ["ollama.exe"]
+      "required_files": [
+        "ollama.exe"
+      ]
     }
   ]
 }

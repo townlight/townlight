@@ -58,6 +58,10 @@ struct ModuleDefinition {
     #[serde(default)]
     current_version: Option<String>,
     #[serde(default)]
+    development_version: Option<String>,
+    #[serde(default)]
+    development_civiccore_requirement: Option<String>,
+    #[serde(default)]
     required: bool,
     #[serde(default)]
     selectable: bool,
@@ -327,8 +331,10 @@ fn validate_installable_module_contract(
     }
     if module.id != "civiccore"
         && !module
-            .civiccore_requirement
-            .as_deref()
+            .development_civiccore_requirement
+            .as_ref()
+            .or(module.civiccore_requirement.as_ref())
+            .map(String::as_str)
             .is_some_and(|required| core_version_satisfies(core_version, required))
     {
         return Err(format!(
@@ -416,6 +422,12 @@ fn validate_module_selection(
     let module_map = module_index(registry);
     let core_version = registry_core_version(registry)?;
     let selected_ids: HashSet<&str> = module_ids.iter().map(String::as_str).collect();
+    if selected_ids.contains("civicplan") && label != "planning-preview" {
+        return Err(
+            "Townlight Planning is available only in the planning-preview development profile."
+                .into(),
+        );
+    }
     for module_id in module_ids {
         let module = module_map
             .get(module_id.as_str())
@@ -451,6 +463,11 @@ fn resolve_custom_module_order(
         .map(String::as_str)
         .filter(|module_id| *module_id != "civiccore")
         .collect();
+    if selected_product_modules.contains(&"civicplan") {
+        return Err(
+            "Use the explicit planning-preview development profile for Townlight Planning.".into(),
+        );
+    }
     if selected_product_modules.is_empty() {
         return Err("Custom module selection requires at least one product module.".to_string());
     }
@@ -1015,7 +1032,9 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
         .modules
         .iter()
         .map(|module| {
-            let contract_result = validate_installable_module_contract(module, core_version);
+            let contract_result = if module.id == "civicplan" && selection.profile_id != "planning-preview" {
+                Err("Select the planning-preview development profile and its matching candidate payload.".into())
+            } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
                 Ok(()) => (true, None),
                 Err(error) => (false, Some(error)),
@@ -1031,9 +1050,16 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                 id: module.id.clone(),
                 display_name,
                 role: module.role.clone(),
-                version: module.current_version.clone(),
+                version: if selection.profile_id == "planning-preview" {
+                    module
+                        .development_version
+                        .clone()
+                        .or(module.current_version.clone())
+                } else {
+                    module.current_version.clone()
+                },
                 installer_status: module.installer_status.clone(),
-                civiccore_requirement: module.civiccore_requirement.clone(),
+                civiccore_requirement: if selection.profile_id == "planning-preview" { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
                 required: module.required,
                 selectable: module.selectable,
                 contract_ready,
@@ -1075,6 +1101,30 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn planning_is_an_explicit_development_composition_with_preserved_release_identity() {
+        let registry = parse_registry(MODULES_JSON).unwrap();
+        let selected = selection_for_profile(&registry, "planning-preview").unwrap();
+        assert!(selected
+            .enabled_module_ids
+            .contains(&"civicplan".to_string()));
+        assert!(selected
+            .enabled_module_ids
+            .contains(&"civicrecords-ai".to_string()));
+        let plan = module_index(&registry)["civicplan"];
+        assert_eq!(plan.current_version.as_deref(), Some("0.2.2"));
+        assert_eq!(plan.civiccore_requirement.as_deref(), Some("1.1.0"));
+        assert_eq!(plan.development_version.as_deref(), Some("0.3.0+dev.1"));
+        assert!(validate_profile(&registry, "land-use").is_err());
+        assert!(resolve_custom_module_order(&registry, &["civicplan".to_string()]).is_err());
+        for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
+            assert!(!selection_for_profile(&registry, profile)
+                .unwrap()
+                .enabled_module_ids
+                .contains(&"civicplan".to_string()));
+        }
+    }
     use crate::first_run;
     use std::env;
 
@@ -1376,7 +1426,7 @@ mod tests {
             let not_ready = persist_custom_selection(&["civicplan".to_string()]);
             assert!(not_ready
                 .expect_err("not-ready module selection fails")
-                .contains("compatible with 1.2.1"));
+                .contains("planning-preview development profile"));
         });
     }
 

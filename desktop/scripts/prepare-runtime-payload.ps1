@@ -10,11 +10,12 @@ param(
     [string]$PayloadRoot = "",
     [string]$RecordsBackendRoot = "",
     [switch]$ReuseInstalledServiceDependencies,
-    [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta")]
+    [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview")]
     [string]$ProductProfile = "records-beta",
     [string]$MeetingsRoot = "",
     [string]$CodeRoot = "",
     [string]$ZoningRoot = "",
+    [string]$PlanningRoot = "",
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
 )
@@ -747,11 +748,14 @@ function Test-PythonServiceImports {
         "civicsuite_runtime.services",
         "civicsuite_runtime.migrate"
     )
-    if ($ProductProfile -in @("city-core", "zoning-beta")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview")) {
         $ImportNames += @("civicclerk.main", "civiccode.main")
     }
-    if ($ProductProfile -eq "zoning-beta") {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview")) {
         $ImportNames += @("civiczone.connected_sources", "civicsuite_runtime.zoning_bridge", "civicsuite_runtime.zoning_records")
+    }
+    if ($ProductProfile -eq "planning-preview") {
+        $ImportNames += @("civicplan.migrations", "civicplan.workflow_store", "civicsuite_runtime.planning_bridge", "app.requests.planning_sources")
     }
     if ($ProductProfile -eq "meetings-beta") {
         $ImportNames += @(
@@ -815,14 +819,52 @@ function Install-PythonServicePackages {
         $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
         $ServicePackages += @($CivicNotice, $CivicAccess)
     }
-    if ($ProductProfile -in @("city-core", "zoning-beta")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview")) {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
         $CivicCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path }
         $ServicePackages += @($CivicClerk, $CivicCode)
     }
-    if ($ProductProfile -eq "zoning-beta") {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview")) {
         $CivicZone = if ($ZoningRoot) { (Resolve-Path $ZoningRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\zone")).Path }
         $ServicePackages += @($CivicZone)
+    }
+    $DevelopmentSources = @()
+    if ($ProductProfile -eq "planning-preview") {
+        if (-not $PlanningRoot -or -not $RecordsBackendRoot) { throw "planning-preview requires explicit PlanningRoot and RecordsBackendRoot candidate sources." }
+        if ($ReuseInstalledServiceDependencies) { throw 'Planning candidate provenance requires all pinned service sources; do not reuse unproven installed dependencies.' }
+        $CivicPlan = (Resolve-Path $PlanningRoot).Path
+        $CandidatePins = Read-JsonFile -Path (Join-Path $RepoRoot 'config\planning-preview-sources.json')
+        $SourceRoots = [ordered]@{
+            'townlight/core' = $CivicCore; 'townlight/sunshine' = $CivicRecords
+            'townlight/meetings' = $CivicClerk; 'townlight/ordinances' = $CivicCode
+            'townlight/zone' = $CivicZone; 'townlight/plan' = $CivicPlan
+            'townlight/notice' = $CivicNotice; 'townlight/access' = $CivicAccess
+        }
+        foreach ($Repository in $SourceRoots.Keys) {
+            $CandidateSource = $SourceRoots[$Repository]
+            $Commit = (& git -C $CandidateSource rev-parse HEAD).Trim()
+            $Dirty = & git -C $CandidateSource status --porcelain --untracked-files=normal
+            if ($LASTEXITCODE -ne 0 -or $Dirty -or $Commit -ne $CandidatePins.sources.$Repository) { throw "Planning source must be clean at its explicit development pin: $Repository" }
+            $DevelopmentSources += @{ repository = $Repository; source_commit = $Commit }
+        }
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'install', '--disable-pip-version-check', '--no-warn-script-location', 'setuptools>=68', 'wheel', 'hatchling>=1.27.0')
+        $WheelRoot = Join-Path $CacheRoot ("planning-candidate-" + [guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Force -Path $WheelRoot | Out-Null
+        foreach ($CandidateSource in @($CivicRecords, $CivicPlan)) {
+            $Commit = (& git -C $CandidateSource rev-parse HEAD).Trim()
+            if ($LASTEXITCODE -ne 0 -or $Commit -notmatch '^[0-9a-f]{40}$') { throw "Candidate source must have a Git commit." }
+            $Dirty = & git -C $CandidateSource status --porcelain --untracked-files=normal
+            if ($LASTEXITCODE -ne 0 -or $Dirty) { throw "Commit candidate source before packaging: $CandidateSource" }
+            Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '--no-index', '--wheel-dir', $WheelRoot, $CandidateSource)
+        }
+        $ServicePackages = @($ServicePackages | Where-Object { $_ -ne $CivicRecords })
+        $CandidateWheels = @(Get-ChildItem -LiteralPath $WheelRoot -Filter '*.whl')
+        if ($CandidateWheels.Count -ne 2) { throw "Expected exactly Planning and Records candidate wheels." }
+        $ServicePackages += @($CandidateWheels | ForEach-Object { $_.FullName })
+        Write-JsonFile -Path (Join-Path $PythonRoot 'planning-candidate-provenance.json') -Value @{
+            profile = 'planning-preview'; development_only = $true; sources = $DevelopmentSources
+            wheels = @($CandidateWheels | ForEach-Object { @{ name = $_.Name; sha256 = Get-Sha256 -Path $_.FullName } })
+        }
     }
     if ($ProductProfile -eq "meetings-beta") {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
@@ -861,14 +903,39 @@ function Install-PythonServicePackages {
     Copy-CivicRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
-    if ($ProductProfile -in @("city-core", "zoning-beta")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview")) {
         $InstalledPackages += @("civicclerk", "civiccode")
     }
-    if ($ProductProfile -eq "zoning-beta") {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview")) {
         $InstalledPackages += @("civiczone")
     }
+    if ($ProductProfile -eq "planning-preview") { $InstalledPackages += @("civicplan") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("civicclerk")
+    }
+    if ($ProductProfile -eq "planning-preview") {
+        $UmbrellaCommit = (& git -C $RepoRoot rev-parse HEAD).Trim()
+        $UmbrellaDirty = & git -C $RepoRoot status --porcelain --untracked-files=normal
+        if ($LASTEXITCODE -ne 0 -or $UmbrellaDirty) { throw 'Commit the umbrella development candidate before preparing its provenance.' }
+        $PackageCsv = $InstalledPackages -join ','
+        $ProvenanceScript = @"
+import importlib.metadata as metadata
+import json
+from pathlib import Path
+from app.desktop_bridge.router import router
+from civicplan.source_store import PlanSourceRepository
+from civicplan.workflow_store import WorkflowRepository
+assert hasattr(PlanSourceRepository, 'inventory') and hasattr(WorkflowRepository, 'preview_snapshot')
+assert '/desktop/v1/planning-sources/search' in {route.path for route in router.routes}
+assert metadata.version('civicplan') == '0.3.0+dev.1'
+assert metadata.version('civiccore') == '1.2.1'
+path = Path(r'$PythonRoot') / 'planning-candidate-provenance.json'
+receipt = json.loads(path.read_text(encoding='utf-8-sig'))
+receipt['umbrella_source_commit'] = '$UmbrellaCommit'
+receipt['package_versions'] = {name: metadata.version(name) for name in '$PackageCsv'.split(',')}
+path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+"@
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $ProvenanceScript) -ExtraEnvironment @{ TESTING = '1' }
     }
     return @{
         pip = $PipStatus
@@ -988,7 +1055,7 @@ $Report = [ordered]@{
     ollama = Install-OllamaPayload -Source $Manifest.sources.ollama -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
 }
 $Report.pgvector = Install-PgvectorPayload -Source $Manifest.sources.pgvector -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
-if ($ProductProfile -eq "zoning-beta") {
+if ($ProductProfile -in @("zoning-beta", "planning-preview")) {
     $Report.postgis = Install-PostgisPayload -Source $Manifest.sources.postgis -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
 }
 $Report.postgres_vcruntime = Copy-PostgresVcRuntime -PostgresRoot (Join-Path $PayloadRoot "postgres")

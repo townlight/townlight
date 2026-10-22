@@ -89,6 +89,8 @@ struct RuntimePayloadDefinition {
     source_dir: String,
     destination_dir: String,
     required_files: Vec<String>,
+    #[serde(default)]
+    profile_required_files: std::collections::HashMap<String, Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -249,8 +251,49 @@ fn parse_manifest() -> Result<RuntimeManifest, String> {
 }
 
 fn parse_payload_manifest() -> Result<RuntimePayloadManifest, String> {
-    serde_json::from_str(RUNTIME_PAYLOADS_JSON)
-        .map_err(|error| format!("Could not parse Windows runtime payload manifest: {error}"))
+    payload_manifest_for_profile(&crate::module_registry::module_selection_state()?.profile_id)
+}
+
+fn payload_manifest_for_profile(profile: &str) -> Result<RuntimePayloadManifest, String> {
+    let mut manifest: RuntimePayloadManifest = serde_json::from_str(RUNTIME_PAYLOADS_JSON)
+        .map_err(|error| format!("Could not parse Windows runtime payload manifest: {error}"))?;
+    for payload in &mut manifest.payloads {
+        if let Some(files) = payload.profile_required_files.get(profile) {
+            for file in files {
+                if !payload.required_files.contains(file) {
+                    payload.required_files.push(file.clone());
+                }
+            }
+        }
+    }
+    Ok(manifest)
+}
+
+pub fn prepare_planning_selection() -> Result<crate::module_registry::ModuleSelectionState, String>
+{
+    let _lifecycle = crate::profile_gate::lifecycle()?;
+    if crate::module_registry::module_selection_state()?.profile_id == "planning-preview" {
+        return crate::module_registry::module_selection_state();
+    }
+    // Verify the selected development payload before stopping services or changing
+    // a profile. An old signed 1.4 payload must never activate this composition.
+    let payloads = payload_manifest_for_profile("planning-preview")?;
+    for payload in &payloads.payloads {
+        let (root, source) = first_payload_source(payload)
+            .ok_or_else(|| "The matching Planning development payload is missing.".to_string())?;
+        verify_payload_files_against_lock(payload, &root, &source)?;
+    }
+    stop_data_writers_for_snapshot()?;
+    let backup = create_backup("pre-planning-preview")?;
+    verified_backup_manifest(&backup)?;
+    crate::atomic_io::atomic_write_json(
+        &config_dir().join("planning-preview-activation.json"),
+        &serde_json::json!({
+            "schema_version":1, "profile":"planning-preview", "phase":"backed-up-before-migration",
+            "backup_path":backup, "recovery":"Restore the coherent profile backup; do not drop or downgrade schemas."
+        }),
+    )?;
+    crate::module_registry::persist_profile_selection("planning-preview")
 }
 
 fn validate_manifest(manifest: &RuntimeManifest) -> Result<(), String> {
@@ -2099,6 +2142,7 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
                 "city-core" => "city-core".to_string(),
                 "meetings-beta" => "meetings-beta".to_string(),
                 "zoning-beta" => "zoning-beta".to_string(),
+                "planning-preview" => "planning-preview".to_string(),
                 _ => "records-beta".to_string(),
             },
         ),
@@ -4513,6 +4557,13 @@ mod tests {
         with_temp_state_dir_and_payload(payload_dir, |root| {
             #[cfg(windows)]
             link_payload_runtime(&root, &linked_payload_dir);
+            if env::var("TOWNLIGHT_TEST_RUNTIME_PROFILE").ok().as_deref()
+                == Some("planning-preview")
+            {
+                // Explicit disposable fresh-profile seam. Operator activation
+                // uses prepare_planning_selection and its verified backup.
+                crate::module_registry::persist_profile_selection("planning-preview").unwrap();
+            }
             supervisor_action("install", Some("postgres")).expect("install postgres payload");
             supervisor_action("install", Some("python-services"))
                 .expect("install python service payload");
