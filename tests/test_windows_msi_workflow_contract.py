@@ -28,8 +28,9 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
     pin = module["source_commit"]
     for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
         workflow = _read(path)
-        # Only the explicitly isolated development integration job consumes P5.
-        # Every installer/cleanroom checkout must retain the accepted release pin.
+        # Cleanroom/default MSI composition retains accepted release pins.
+        # The explicit unsigned Planning candidate resolves its separate source
+        # manifest; it must not repin the historical installer contract.
         if path == BUILD_WORKFLOW:
             integration = workflow.split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
             candidate = json.loads(_read(ROOT / "config" / "planning-preview-sources.json"))
@@ -41,6 +42,12 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
         assert checkouts, f"No {module_id} checkout in {path.name}"
         for checkout in checkouts:
             checkout_inputs = checkout.split("\n      - ", 1)[0]
+            if path == BUILD_WORKFLOW and module_id == "civicrecords-ai":
+                assert "ref: ${{ steps.candidate.outputs.records_ref }}" in checkout_inputs
+                resolver = _read(ROOT / "desktop/scripts/resolve-msi-candidate.ps1")
+                assert f"$RecordsRef = '{pin}'" in resolver
+                assert "$RecordsRef = $Pins.sources.'townlight/sunshine'" in resolver
+                continue
             assert f"ref: {pin}" in checkout_inputs, path.name
 
 
@@ -51,7 +58,7 @@ def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> N
     assert candidate["profile"] == "planning-preview"
     assert candidate["development_only"] is True
     assert candidate["sources"]["townlight/plan"] == "c0bd9bd40379764437db10b475fed0bee36175c6"
-    assert candidate["sources"]["townlight/sunshine"] == "84ce718eca10e37f01bf020968b62161873196c3"
+    assert candidate["sources"]["townlight/sunshine"] != "45042345b5ca90ff837ae99275058b1ace733c9a"
     integration = _read(BUILD_WORKFLOW).split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
     for repository, pin in candidate["sources"].items():
         assert re.fullmatch(r"[0-9a-f]{40}", pin)
@@ -59,6 +66,22 @@ def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> N
         assert f"ref: {pin}" in checkout
     assert "-ProductProfile planning-preview" in integration
     assert 'TOWNLIGHT_TEST_RUNTIME_PROFILE: "planning-preview"' in integration
+
+
+def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> None:
+    workflow = _read(BUILD_WORKFLOW)
+    contract = json.loads(_read(ROOT / "config/planning-msi-candidate.json"))
+    overlay = json.loads(_read(ROOT / "desktop" / contract["tauri_config"]))
+    base = json.loads(_read(ROOT / "desktop/src-tauri/tauri.conf.json"))
+    assert overlay == {"version": contract["desktop_version"]}
+    assert tuple(map(int, contract["windows_product_version"].split("."))) > (1, 4, 0, 1)
+    assert base["version"] == "1.4.0-1"
+    assert contract["development_only"] is True
+    assert contract["publication_allowed"] is False
+    assert "build --no-bundle ${{ steps.candidate.outputs.tauri_args }}" in workflow
+    assert "bundle --bundles msi --no-binary-patching ${{ steps.candidate.outputs.tauri_args }}" in workflow
+    assert "ProductProfile=${{ steps.candidate.outputs.product_profile }}" in workflow
+    assert "planning-candidate-provenance.json" in workflow
 
 
 def test_routine_ci_builds_a_visibly_unsigned_private_artifact() -> None:

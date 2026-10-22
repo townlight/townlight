@@ -398,7 +398,7 @@ for (const phrase of [
   "path: civiccore",
   "ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
   "path: civicrecords-ai",
-  `ref: ${recordsSourcePin}`,
+  "ref: ${{ steps.candidate.outputs.records_ref }}",
   "path: civicnotice",
   "ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810",
   "path: civicaccess",
@@ -415,6 +415,13 @@ for (const phrase of [
   if (!desktopMsiWorkflow.includes(phrase)) {
     throw new Error(`desktop MSI workflow missing phrase: ${phrase}`);
   }
+}
+
+const msiCandidateResolver = readFileSync(join(root, "scripts", "resolve-msi-candidate.ps1"), "utf8");
+if (!msiCandidateResolver.includes(`$RecordsRef = '${recordsSourcePin}'`) ||
+    !msiCandidateResolver.includes("$RecordsRef = $Pins.sources.'townlight/sunshine'") ||
+    !msiCandidateResolver.includes("if ($SourceBranch -eq $Contract.source_branch)")) {
+  throw new Error("MSI profile resolver must retain the historical default pin and isolate candidate source selection");
 }
 
 if (!rustMain.includes('include_str!("../../../installer/modules.json")')) {

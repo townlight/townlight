@@ -5,6 +5,8 @@ P5 adds opt-in `planning-preview` for native development acceptance: Planning
 Primary Records and other existing profiles retain their behavior; land-use stays
 disabled. This unsigned development candidate does not change the signed 1.4
 installer. P6 release certification, signing and distribution remain separate.
+The [P6 unsigned MSI candidate](planning-p6-unsigned-candidate.md) records the
+separate version overlay, candidate packaging and installed acceptance boundaries.
 
 ## Preparation and recovery
 

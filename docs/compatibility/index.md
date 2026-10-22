@@ -1,5 +1,14 @@
 # Townlight Core ↔ Module Compatibility Matrix
 
+## Planning P6 unsigned candidate
+
+The separate candidate overlay selects desktop `1.5.0-1` / MSI `1.5.0.1`, with
+Planning `0.3.0+dev.1`, Core `1.2.1` and the candidate Records audit-path repair.
+It retains the opt-in development composition and unchanged interface. Public
+versions, historical pairings and signed 1.4 remain unchanged. Candidate provenance
+and installed acceptance are separate from signing/publication; see the
+[P6 candidate contract](../installer/planning-p6-unsigned-candidate.md).
+
 ## Planning P5 native development preview
 
 Townlight Planning development advances to `0.3.0+dev.1` with the hash-pinned Core
