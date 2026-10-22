@@ -41,6 +41,23 @@
   ],
   "profiles": [
     {
+      "id": "planning-preview",
+      "label": "Townlight Planning development preview",
+      "description": "Opt-in unsigned development composition. Requires the matching Planning candidate payload; not a published release.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civicnotice",
+        "civicaccess",
+        "civiczone",
+        "civicplan"
+      ],
+      "disabled": false,
+      "development_only": true
+    },
+    {
       "id": "zoning-beta",
       "label": "Townlight Records + Meetings + Code + Zoning",
       "description": "Opt-in Records, Meetings, Code and Zoning in published desktop 1.4.0-beta.1; see signed acceptance and manual runtime upgrade steps.",
@@ -607,7 +624,47 @@
         "release_artifacts",
         "version_label_matches_recovery_status"
       ],
-      "current_version": "0.2.2"
+      "current_version": "0.2.2",
+      "development_version": "0.3.0+dev.1",
+      "development_civiccore_requirement": "1.2.1",
+      "routes": [
+        {
+          "id": "planning",
+          "label": "Planning",
+          "path": "/planning",
+          "surface": "Staff and local public read"
+        }
+      ],
+      "permissions": [
+        "planning.read",
+        "planning.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "civicplan_0002"
+      ],
+      "tasks": [
+        "planning-source-import",
+        "planning-analysis-review"
+      ],
+      "backup_restore_hooks": [
+        "Data/database",
+        "Data/files",
+        "config"
+      ],
+      "model_needs": [],
+      "lifecycle": {
+        "install": "planning-preview-candidate-only",
+        "update": "matching-candidate-payload",
+        "disable": "allowed-after-backup",
+        "uninstall": "backup-first-profile-removal"
+      }
     },
     {
       "id": "civicpermit",

@@ -4,6 +4,8 @@ import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
 import { createCodeView } from "./code/view.js";
+import { createPlanningView } from "./planning/view.js";
+import { bindPlanningSources } from "./records/planning-sources.ts";
 import { createZoningView } from "./zoning/view.js";
 import { bindMeetingsSources } from "./records/meetings-sources.ts";
 import { bindCodeSources } from "./records/code-sources.ts";
@@ -12,6 +14,8 @@ import { bindZoningSources } from "./records/zoning-sources.ts";
 const recordsController = createRecordsController(invoke);
 const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
+const planningView = createPlanningView(invoke);
+const publicPlanningView = createPlanningView(invoke, true);
 const zoningView = createZoningView(invoke);
 const publicZoningView = createZoningView(invoke, true);
 
@@ -33,13 +37,15 @@ const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "records-beta": RECORDS_BETA_PRODUCT_MODULE_IDS,
   "meetings-beta": [...RECORDS_BETA_PRODUCT_MODULE_IDS, "civicclerk"],
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
-  "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone"]
+  "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone"],
+  "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan"]
 };
 const MODULE_AREA_BY_ID = {
   meetings: "civicclerk",
   records: "civicrecords-ai",
   code: "civiccode",
   zoning: "civiczone",
+  planning: "civicplan",
   notice: "civicnotice",
   access: "civicaccess"
 };
@@ -54,6 +60,7 @@ const fallbackState = {
     ["records", "Records Requests", "Intake, review, response, exports"],
     ["code", "Code & Ordinances", "Search, imports, guidance, handoffs"],
     ["zoning", "Zoning", "Parcel information and cited rules"],
+    ["planning", "Planning", "Adopted policy sources and reviewed analysis"],
     ["notice", "Public Notices", "Deadlines, proof, archive packets"],
     ["access", "Accessibility", "WCAG review, plain language, multilingual, exports"],
     ["search", "Search City Knowledge", "Cross-module search with citations"],
@@ -1294,6 +1301,11 @@ function renderModuleSelectionControls() {
       id: "custom",
       label: "Custom",
       description: "Choose ready product modules. Townlight Core is always included."
+    },
+    {
+      id: "planning-preview",
+      label: "Townlight Planning development preview",
+      description: "Opt-in development profile. Verifies its matching candidate payload and backs up the coherent profile before migration."
     }
   ];
   return `
@@ -2929,7 +2941,7 @@ function isPublicSurface() {
 }
 
 function isPublicReadableArea() {
-  return isPublicSurface() && ["home", "meetings", "records", "code", "zoning", "search"].includes(state.activeArea);
+  return isPublicSurface() && ["home", "meetings", "records", "code", "zoning", "planning", "search"].includes(state.activeArea);
 }
 
 function publicCommentView(comment) {
@@ -5070,13 +5082,18 @@ function renderActiveArea() {
       <button type="button" data-action="retry-domain-state">Retry Records</button></section>`;
   }
   switch (state.activeArea) {
+    case "planning":
+      if (!isPublicSurface() && !["local-admin", "city-staff"].includes(access.role)) {
+        return `<section role="status"><h2>Planning staff access required</h2><p>Use a city staff or administrator account for private Planning work. The Resident/Public surface provides permitted policy context and reviewed public snapshots.</p></section>`;
+      }
+      return isPublicSurface() ? publicPlanningView.render() : planningView.render();
     case "zoning":
       return isPublicSurface() ? publicZoningView.render() : zoningView.render();
     case "meetings":
       if (
         state.app?.module_selection?.profile_id === "meetings-beta" ||
         ((state.app?.module_selection?.profile_id === "city-core" ||
-          state.app?.module_selection?.profile_id === "zoning-beta") &&
+          (state.app?.module_selection?.profile_id === "zoning-beta" || state.app?.module_selection?.profile_id === "planning-preview")) &&
           state.app?.domain_authority === "python-records")
       )
         return meetingsView.render();
@@ -5086,7 +5103,7 @@ function renderActiveArea() {
     case "code":
       if (
         (state.app?.module_selection?.profile_id === "city-core" ||
-          state.app?.module_selection?.profile_id === "zoning-beta") &&
+          (state.app?.module_selection?.profile_id === "zoning-beta" || state.app?.module_selection?.profile_id === "planning-preview")) &&
         state.app?.domain_authority === "python-records"
       )
         return codeView.render();
@@ -5208,6 +5225,10 @@ function bindEvents() {
   bindCodeSources(invoke, async () => { await loadAppState(); render(); });
   if (state.app.module_selection?.enabled_module_ids?.includes('civiczone')) {
     bindZoningSources(invoke, async () => { await loadAppState(); render(); });
+  }
+  if (state.app.module_selection?.enabled_module_ids?.includes("civicplan")) {
+    bindPlanningSources(invoke, async () => { await loadAppState(); render(); });
+    if (state.activeArea === "planning") (isPublicSurface() ? publicPlanningView : planningView).bind();
   }
   meetingsView.bind();
   codeView.bind();

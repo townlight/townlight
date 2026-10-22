@@ -14,6 +14,7 @@ pub enum ExportFolder {
     Records,
     Access,
     Meetings,
+    Planning,
 }
 
 #[derive(Deserialize)]
@@ -29,6 +30,7 @@ impl ExportFolder {
             Self::Records => "records",
             Self::Access => "access",
             Self::Meetings => "meetings",
+            Self::Planning => "planning",
         }
     }
 }
@@ -80,6 +82,48 @@ pub fn write_access_export(plan: ArtifactPlan) -> Result<String, String> {
     write_export_at(plan, &root)
 }
 
+pub fn write_planning_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {
+    let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
+        .join("exports")
+        .join("planning");
+    write_planning_file_at(&root, name, bytes, digest)
+}
+
+fn write_planning_file_at(
+    root: &Path,
+    name: &str,
+    bytes: &[u8],
+    digest: &str,
+) -> Result<String, String> {
+    if name.is_empty()
+        || name.len() > 300
+        || name.contains(['/', '\\', ':'])
+        || ![".json", ".txt", ".md", ".pdf", ".docx"]
+            .iter()
+            .any(|suffix| name.to_lowercase().ends_with(suffix))
+        || Path::new(name).file_name().and_then(|p| p.to_str()) != Some(name)
+        || bytes.len() > 16 * 1024 * 1024
+        || format!("{:x}", Sha256::digest(bytes)) != digest
+    {
+        return Err("Invalid Planning file or source digest.".into());
+    }
+    fs::create_dir_all(root).map_err(|_| "Could not create Planning export folder.")?;
+    let path = root.join(name);
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&path)
+        .map_err(|_| "Could not create a new Planning export.")?;
+    file.write_all(bytes)
+        .and_then(|_| file.sync_all())
+        .map_err(|_| "Could not finish Planning export.")?;
+    let stored = fs::read(&path).map_err(|_| "Could not verify Planning export.")?;
+    if format!("{:x}", Sha256::digest(&stored)) != digest {
+        return Err("Planning export verification failed.".into());
+    }
+    Ok(path.to_string_lossy().into_owned())
+}
+
 fn write_export_at(plan: ArtifactPlan, root: &Path) -> Result<String, String> {
     if Path::new(&plan.file_name)
         .file_name()
@@ -128,6 +172,20 @@ fn write_export_at(plan: ArtifactPlan, root: &Path) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn planning_export_checks_exact_bytes_paths_and_exclusive_creation() {
+        let root = std::env::temp_dir().join(format!("planning-export-{}", Uuid::new_v4()));
+        let content = b"{\"reviewed\":true}";
+        let digest = format!("{:x}", Sha256::digest(content));
+        assert!(write_planning_file_at(&root, "../outside.json", content, &digest).is_err());
+        assert!(write_planning_file_at(&root, "source.exe", content, &digest).is_err());
+        assert!(write_planning_file_at(&root, "source.json", b"changed", &digest).is_err());
+        let path = write_planning_file_at(&root, "source.json", content, &digest).unwrap();
+        assert_eq!(fs::read(path).unwrap(), content);
+        assert!(write_planning_file_at(&root, "source.json", content, &digest).is_err());
+        fs::remove_dir_all(root).unwrap();
+    }
 
     #[test]
     fn export_verifies_hash_confines_path_and_never_overwrites() {

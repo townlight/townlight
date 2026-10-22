@@ -30,6 +30,7 @@
     }
   },
   "profiles": {
+    "planning-preview": {"modules": ["core", "records", "meetings", "code", "notice", "access", "zoning", "planning"], "disabled": false, "development_only": true},
     "minimal": {"modules": ["core"], "disabled": false},
     "clerk-core": {"modules": ["core", "records", "meetings"], "disabled": false},
     "records-beta": {"modules": ["core", "records", "notice", "access"], "disabled": false},

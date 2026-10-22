@@ -27,6 +27,13 @@ retained-data uninstall. Optional local AI is not required for these determinist
 workflows. Human response approval and final export remain separate from attaching
 a source; no automatic public publication is introduced.
 
+## Unreleased Planning development preview
+
+Developers testing P5 use the separate opt-in `planning-preview` candidate and
+[Planning development manual](docs/installer/planning-development-preview.md).
+It adds native source import, staff review, exact snapshot export and explicit
+Records selection. It is not included in the signed 1.4 installer below.
+
 ## Install, upgrade and recover
 
 1. Download `Townlight_1.4.0-1_x64_en-US.msi` and its signing receipt/evidence from

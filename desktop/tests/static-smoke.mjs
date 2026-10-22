@@ -519,7 +519,7 @@ for (const phrase of [
   "System.Security.Cryptography.SHA256",
   "PayloadManifestPath",
   '[string]$ProductProfile = "records-beta"',
-  'if ($ProductProfile -in @("city-core", "zoning-beta"))',
+  'if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview"))',
   "TOWNLIGHT_PRODUCT_PROFILE",
   "New-RuntimePayloadLock",
   "required_files",

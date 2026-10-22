@@ -33,6 +33,9 @@ const LOCAL_DB_PORT: u16 = 15432;
 const PROFILE_REPLACE_ATTEMPTS: usize = 12;
 const PROFILE_REPLACE_RETRY_DELAY: Duration = Duration::from_millis(750);
 const SERVICE_COMMAND_TIMEOUT: Duration = Duration::from_secs(60);
+// Cold schema initialization imports and upgrades several packaged modules.
+// Keep short utility budgets separate from this bounded migration process.
+const MIGRATION_COMMAND_TIMEOUT: Duration = Duration::from_secs(300);
 
 // Resolve a Windows system binary to its absolute path under %SystemRoot% instead of
 // relying on PATH lookup. CreateProcess searches the app dir and CWD before System32,
@@ -89,6 +92,8 @@ struct RuntimePayloadDefinition {
     source_dir: String,
     destination_dir: String,
     required_files: Vec<String>,
+    #[serde(default)]
+    profile_required_files: std::collections::HashMap<String, Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -249,8 +254,49 @@ fn parse_manifest() -> Result<RuntimeManifest, String> {
 }
 
 fn parse_payload_manifest() -> Result<RuntimePayloadManifest, String> {
-    serde_json::from_str(RUNTIME_PAYLOADS_JSON)
-        .map_err(|error| format!("Could not parse Windows runtime payload manifest: {error}"))
+    payload_manifest_for_profile(&crate::module_registry::module_selection_state()?.profile_id)
+}
+
+fn payload_manifest_for_profile(profile: &str) -> Result<RuntimePayloadManifest, String> {
+    let mut manifest: RuntimePayloadManifest = serde_json::from_str(RUNTIME_PAYLOADS_JSON)
+        .map_err(|error| format!("Could not parse Windows runtime payload manifest: {error}"))?;
+    for payload in &mut manifest.payloads {
+        if let Some(files) = payload.profile_required_files.get(profile) {
+            for file in files {
+                if !payload.required_files.contains(file) {
+                    payload.required_files.push(file.clone());
+                }
+            }
+        }
+    }
+    Ok(manifest)
+}
+
+pub fn prepare_planning_selection() -> Result<crate::module_registry::ModuleSelectionState, String>
+{
+    let _lifecycle = crate::profile_gate::lifecycle()?;
+    if crate::module_registry::module_selection_state()?.profile_id == "planning-preview" {
+        return crate::module_registry::module_selection_state();
+    }
+    // Verify the selected development payload before stopping services or changing
+    // a profile. An old signed 1.4 payload must never activate this composition.
+    let payloads = payload_manifest_for_profile("planning-preview")?;
+    for payload in &payloads.payloads {
+        let (root, source) = first_payload_source(payload)
+            .ok_or_else(|| "The matching Planning development payload is missing.".to_string())?;
+        verify_payload_files_against_lock(payload, &root, &source)?;
+    }
+    stop_data_writers_for_snapshot()?;
+    let backup = create_backup("pre-planning-preview")?;
+    verified_backup_manifest(&backup)?;
+    crate::atomic_io::atomic_write_json(
+        &config_dir().join("planning-preview-activation.json"),
+        &serde_json::json!({
+            "schema_version":1, "profile":"planning-preview", "phase":"backed-up-before-migration",
+            "backup_path":backup, "recovery":"Restore the coherent profile backup; do not drop or downgrade schemas."
+        }),
+    )?;
+    crate::module_registry::persist_profile_selection("planning-preview")
 }
 
 fn validate_manifest(manifest: &RuntimeManifest) -> Result<(), String> {
@@ -2008,8 +2054,15 @@ fn run_python_migrations() -> Result<(), String> {
     })? {
         command.env(name, value);
     }
-    command.arg("-m").arg("civicsuite_runtime.migrate");
-    command_output(&mut command, "City-core database migrations")?;
+    command
+        .arg("-u")
+        .arg("-m")
+        .arg("civicsuite_runtime.migrate");
+    command_output_with_timeout(
+        &mut command,
+        "City-core database migrations",
+        MIGRATION_COMMAND_TIMEOUT,
+    )?;
     Ok(())
 }
 
@@ -2030,6 +2083,7 @@ fn start_postgres_service(
         let mut command = Command::new(binary);
         command
             .args(service_arg_values(service))
+            .args(["-t", "180"])
             .stdout(Stdio::null())
             .stderr(Stdio::null());
         if let Some(parent) = service_binary_path(service).parent() {
@@ -2038,7 +2092,7 @@ fn start_postgres_service(
         if let Err(error) = command_status_with_timeout(
             &mut command,
             "Local data store start",
-            SERVICE_COMMAND_TIMEOUT,
+            Duration::from_secs(185),
         ) {
             let mut details = Vec::new();
             if let Some(note) = stale_pid_note {
@@ -2099,6 +2153,7 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
                 "city-core" => "city-core".to_string(),
                 "meetings-beta" => "meetings-beta".to_string(),
                 "zoning-beta" => "zoning-beta".to_string(),
+                "planning-preview" => "planning-preview".to_string(),
                 _ => "records-beta".to_string(),
             },
         ),
@@ -2890,7 +2945,7 @@ fn stop_services(services: &[&ServiceDefinition]) -> Result<SupervisorActionResu
             if postgres_tcp_ready() {
                 let binary = service_binary_path(service);
                 if binary.is_file() {
-                    let _ = command_status_with_timeout(
+                    command_status_with_timeout(
                         Command::new(binary)
                             .arg("stop")
                             .arg("-D")
@@ -2898,15 +2953,19 @@ fn stop_services(services: &[&ServiceDefinition]) -> Result<SupervisorActionResu
                             .arg("-m")
                             .arg("fast")
                             .arg("-w")
+                            .arg("-t")
+                            .arg("120")
                             .stdout(Stdio::null())
                             .stderr(Stdio::null()),
                         "Local data store stop",
-                        PROFILE_REPLACE_RETRY_DELAY * PROFILE_REPLACE_ATTEMPTS as u32,
-                    );
+                        Duration::from_secs(125),
+                    )?;
                 }
             }
-            if let Ok(postgres) = postgres_binary(service, "postgres.exe") {
-                let _ = stop_processes_for_executable(&postgres);
+            // A live-directory backup must never follow a forced PostgreSQL
+            // termination. Preserve an incomplete shutdown for Start/recovery.
+            if postgres_tcp_ready() || postgres_pid_file().exists() {
+                return Err("PostgreSQL has not completed a clean shutdown. Use Start to recover, then Stop and retry; no backup or profile change was made.".to_string());
             }
             update_service_state(&mut state, &service.id, true, None, "stop");
             stopped.push(service.label.clone());
@@ -4077,6 +4136,30 @@ mod tests {
     }
 
     #[test]
+    fn postgres_stop_preserves_incomplete_shutdown_and_refuses_backup() {
+        with_temp_state_dir(|root| {
+            let data = root.join("Data").join("postgres");
+            fs::create_dir_all(&data).expect("postgres data directory");
+            fs::write(data.join("postmaster.pid"), "999999\n").expect("pid file");
+            let manifest = parse_manifest().expect("manifest");
+            let postgres = service_by_id(&manifest, "postgres").expect("postgres service");
+            let error = match stop_services(&[postgres]) {
+                Err(error) => error,
+                Ok(_) => panic!("incomplete shutdown must block"),
+            };
+            assert!(error.contains("has not completed a clean shutdown"));
+            assert_eq!(
+                fs::read_to_string(data.join("postmaster.pid")).unwrap(),
+                "999999\n"
+            );
+            assert!(
+                !backup_root().exists(),
+                "no uncertified backup may be created"
+            );
+        });
+    }
+
+    #[test]
     fn stale_postgres_pid_file_is_removed_before_start() {
         with_temp_state_dir(|root| {
             let postgres = root.join("Data").join("postgres");
@@ -4513,6 +4596,13 @@ mod tests {
         with_temp_state_dir_and_payload(payload_dir, |root| {
             #[cfg(windows)]
             link_payload_runtime(&root, &linked_payload_dir);
+            if env::var("TOWNLIGHT_TEST_RUNTIME_PROFILE").ok().as_deref()
+                == Some("planning-preview")
+            {
+                // Explicit disposable fresh-profile seam. Operator activation
+                // uses prepare_planning_selection and its verified backup.
+                crate::module_registry::persist_profile_selection("planning-preview").unwrap();
+            }
             supervisor_action("install", Some("postgres")).expect("install postgres payload");
             supervisor_action("install", Some("python-services"))
                 .expect("install python service payload");

@@ -504,7 +504,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
-          ref: 45042345b5ca90ff837ae99275058b1ace733c9a
+          ref: 84ce718eca10e37f01bf020968b62161873196c3
           path: civicrecords-ai
 
       - name: Check out Townlight Meetings runtime source
@@ -527,6 +527,13 @@ jobs:
           repository: townlight/zone
           ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
           path: zone
+
+      - name: Check out Townlight Planning development source
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/plan
+          ref: c0bd9bd40379764437db10b475fed0bee36175c6
+          path: plan
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
@@ -566,7 +573,25 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile zoning-beta
+        run: npm run prepare-runtime-payload -- -ProductProfile planning-preview -PlanningRoot "${{ github.workspace }}\plan" -RecordsBackendRoot "${{ github.workspace }}\civicrecords-ai\backend"
+
+      - name: Set up Python for native Planning boundary checks
+        uses: actions/setup-python@v6
+        with:
+          # These checks import the prepared CPython 3.13 payload's native wheels.
+          python-version: "3.13"
+
+      - name: Verify Planning native identity and profile boundaries
+        working-directory: civicsuite
+        shell: pwsh
+        env:
+          TESTING: "1"
+          JWT_SECRET: "fixture-only-planning-p5-000000000000000000000000000000000000000"
+          DATABASE_URL: "postgresql+asyncpg://fixture@127.0.0.1:25432/fixture"
+          PYTHONPATH: ${{ github.workspace }}\civicsuite\desktop\runtime\payload\python\Lib\site-packages
+        run: |
+          python -m pip install "pytest>=8,<9"
+          python -m pytest tests/test_planning_native.py tests/test_runtime_profile_contract.py -q
 
       - name: Run desktop<->CivicCore real-runtime integration test
         working-directory: civicsuite/desktop/src-tauri
@@ -574,6 +599,7 @@ jobs:
         env:
           # Un-gates the real-runtime contract test that is a no-op when unset.
           CIVICSUITE_RUN_REAL_RUNTIME_TEST: "1"
+          TOWNLIGHT_TEST_RUNTIME_PROFILE: "planning-preview"
           # Point the test at the payload just prepared above.
           CIVICSUITE_RUNTIME_PAYLOAD_DIR: ${{ github.workspace }}\civicsuite\desktop\runtime\payload
         run: |
