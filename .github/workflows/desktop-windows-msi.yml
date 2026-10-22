@@ -544,7 +544,7 @@ jobs:
         id: candidate
         shell: pwsh
         run: |
-          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile '${{ inputs.product_profile == 'planning-preview' && 'planning-preview' || 'planning-staff-beta' }}' -SourceBranch '${{ github.head_ref || github.ref_name }}'
+          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile '${{ inputs.product_profile == 'planning-preview' && 'planning-preview' || 'planning-staff-beta' }}'
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
