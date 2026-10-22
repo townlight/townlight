@@ -2,7 +2,7 @@
 
 # Townlight Unified Specification
 
-## Planning staff beta preparation — October 22, 2026
+## Planning staff beta preparation â€” October 22, 2026
 
 The opt-in staff Planning composition has P5 native integration and P6 unsigned
 installed evidence. Release preparation assigns Planning 0.3.0 / Records 1.7.4

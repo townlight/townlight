@@ -1,6 +1,6 @@
 # Changelog
 
-## Townlight opt-in staff Planning beta 1.5.0-beta.1 — Unreleased preparation
+## Townlight opt-in staff Planning beta 1.5.0-beta.1 â€” Unreleased preparation
 
 - Prepare a distinct Planning release build contract and pinned package identities
   (Planning 0.3.0 / Records 1.7.4 / Core 1.2.1), retaining the existing eight-module

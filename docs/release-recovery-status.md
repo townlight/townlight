@@ -1,6 +1,6 @@
 # CivicSuite Release Recovery Status
 
-## October 22, 2026 — Planning preparation status
+## October 22, 2026 â€” Planning preparation status
 
 P5 and P6 source changes are merged and the unsigned P6 installed journeys passed.
 The next opt-in staff beta is prepared separately with Planning 0.3.0 and Records

@@ -1,6 +1,6 @@
 # Downstream Pin Lockstep Record
 
-## October 22, 2026 — staff Planning beta preparation only
+## October 22, 2026 â€” staff Planning beta preparation only
 
 Planning source `0bf0a7c998cafb9057da81c23861681a9689bf84` assigns package 0.3.0.
 Records source `176ea1a09ba59c799f9298f56df44064ec7978ff` assigns package 1.7.4
