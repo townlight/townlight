@@ -578,7 +578,8 @@ jobs:
       - name: Set up Python for native Planning boundary checks
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          # These checks import the prepared CPython 3.13 payload's native wheels.
+          python-version: "3.13"
 
       - name: Verify Planning native identity and profile boundaries
         working-directory: civicsuite

@@ -41,7 +41,9 @@ def _run_alembic(label: str, config_path: Path, script_location: Path, database_
     previous_database_url = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = database_url
     try:
+        print(f"{label}: migration starting", flush=True)
         command.upgrade(cfg, "head")
+        print(f"{label}: migration complete", flush=True)
     finally:
         if previous_database_url is None:
             os.environ.pop("DATABASE_URL", None)

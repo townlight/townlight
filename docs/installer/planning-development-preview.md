@@ -23,6 +23,12 @@ changing a populated profile. The activation receipt records recovery informatio
 Start/Repair explicitly migrates through `civicplan_0002`. Missing packages,
 schemas or providers keep Planning unavailable. No municipal content is seeded.
 
+Cold migrations have a five-minute budget and retain per-schema progress in timeout
+diagnostics. PostgreSQL start/recovery waits up to three minutes, and clean shutdown
+waits up to two minutes. An incomplete shutdown blocks backup and activation;
+use Start to finish recovery, then retry. PostgreSQL is never force-killed to make
+a database-directory backup proceed.
+
 For recovery, retain the activation receipt and use System Health backup/restore
 to restore the coherent profile and database together. Start services afterward
 and verify retained work. Do not downgrade/drop Planning tables or reactivate old

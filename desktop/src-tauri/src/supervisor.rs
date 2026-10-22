@@ -33,6 +33,9 @@ const LOCAL_DB_PORT: u16 = 15432;
 const PROFILE_REPLACE_ATTEMPTS: usize = 12;
 const PROFILE_REPLACE_RETRY_DELAY: Duration = Duration::from_millis(750);
 const SERVICE_COMMAND_TIMEOUT: Duration = Duration::from_secs(60);
+// Cold schema initialization imports and upgrades several packaged modules.
+// Keep short utility budgets separate from this bounded migration process.
+const MIGRATION_COMMAND_TIMEOUT: Duration = Duration::from_secs(300);
 
 // Resolve a Windows system binary to its absolute path under %SystemRoot% instead of
 // relying on PATH lookup. CreateProcess searches the app dir and CWD before System32,
@@ -2051,8 +2054,12 @@ fn run_python_migrations() -> Result<(), String> {
     })? {
         command.env(name, value);
     }
-    command.arg("-m").arg("civicsuite_runtime.migrate");
-    command_output(&mut command, "City-core database migrations")?;
+    command.arg("-u").arg("-m").arg("civicsuite_runtime.migrate");
+    command_output_with_timeout(
+        &mut command,
+        "City-core database migrations",
+        MIGRATION_COMMAND_TIMEOUT,
+    )?;
     Ok(())
 }
 
@@ -2073,6 +2080,7 @@ fn start_postgres_service(
         let mut command = Command::new(binary);
         command
             .args(service_arg_values(service))
+            .args(["-t", "180"])
             .stdout(Stdio::null())
             .stderr(Stdio::null());
         if let Some(parent) = service_binary_path(service).parent() {
@@ -2081,7 +2089,7 @@ fn start_postgres_service(
         if let Err(error) = command_status_with_timeout(
             &mut command,
             "Local data store start",
-            SERVICE_COMMAND_TIMEOUT,
+            Duration::from_secs(185),
         ) {
             let mut details = Vec::new();
             if let Some(note) = stale_pid_note {
@@ -2934,7 +2942,7 @@ fn stop_services(services: &[&ServiceDefinition]) -> Result<SupervisorActionResu
             if postgres_tcp_ready() {
                 let binary = service_binary_path(service);
                 if binary.is_file() {
-                    let _ = command_status_with_timeout(
+                    command_status_with_timeout(
                         Command::new(binary)
                             .arg("stop")
                             .arg("-D")
@@ -2942,15 +2950,19 @@ fn stop_services(services: &[&ServiceDefinition]) -> Result<SupervisorActionResu
                             .arg("-m")
                             .arg("fast")
                             .arg("-w")
+                            .arg("-t")
+                            .arg("120")
                             .stdout(Stdio::null())
                             .stderr(Stdio::null()),
                         "Local data store stop",
-                        PROFILE_REPLACE_RETRY_DELAY * PROFILE_REPLACE_ATTEMPTS as u32,
-                    );
+                        Duration::from_secs(125),
+                    )?;
                 }
             }
-            if let Ok(postgres) = postgres_binary(service, "postgres.exe") {
-                let _ = stop_processes_for_executable(&postgres);
+            // A live-directory backup must never follow a forced PostgreSQL
+            // termination. Preserve an incomplete shutdown for Start/recovery.
+            if postgres_tcp_ready() || postgres_pid_file().exists() {
+                return Err("PostgreSQL has not completed a clean shutdown. Use Start to recover, then Stop and retry; no backup or profile change was made.".to_string());
             }
             update_service_state(&mut state, &service.id, true, None, "stop");
             stopped.push(service.label.clone());
@@ -4118,6 +4130,27 @@ mod tests {
             }
         }
         panic!("command never hit the timeout path after retries; last error: {last_error}");
+    }
+
+    #[test]
+    fn postgres_stop_preserves_incomplete_shutdown_and_refuses_backup() {
+        with_temp_state_dir(|root| {
+            let data = root.join("Data").join("postgres");
+            fs::create_dir_all(&data).expect("postgres data directory");
+            fs::write(data.join("postmaster.pid"), "999999\n").expect("pid file");
+            let manifest = parse_manifest().expect("manifest");
+            let postgres = service_by_id(&manifest, "postgres").expect("postgres service");
+            let error = match stop_services(&[postgres]) {
+                Err(error) => error,
+                Ok(_) => panic!("incomplete shutdown must block"),
+            };
+            assert!(error.contains("has not completed a clean shutdown"));
+            assert_eq!(
+                fs::read_to_string(data.join("postmaster.pid")).unwrap(),
+                "999999\n"
+            );
+            assert!(!backup_root().exists(), "no uncertified backup may be created");
+        });
     }
 
     #[test]
