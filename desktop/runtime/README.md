@@ -45,6 +45,9 @@ Current state:
 - The runtime manifest defines the local services the supervisor owns.
 - The payload manifest defines the files install/repair can copy into the local
   runtime profile.
+- First-run PostgreSQL initialization has a five-minute limit so `initdb` can
+  finish syncing the new cluster to disk. Disk syncing remains enabled; short
+  service commands keep their one-minute limit.
 - The desktop shell reports required services as needing setup until their
   bundled runtime payloads are present and their health checks pass.
 - Lifecycle actions now prepare folders, copy available payloads, start/stop

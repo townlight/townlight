@@ -33,6 +33,8 @@ const LOCAL_DB_PORT: u16 = 15432;
 const PROFILE_REPLACE_ATTEMPTS: usize = 12;
 const PROFILE_REPLACE_RETRY_DELAY: Duration = Duration::from_millis(750);
 const SERVICE_COMMAND_TIMEOUT: Duration = Duration::from_secs(60);
+// First-run initdb must finish syncing the new cluster to disk before returning.
+const POSTGRES_INITIALIZATION_TIMEOUT: Duration = Duration::from_secs(300);
 // Cold schema initialization imports and upgrades several packaged modules.
 // Keep short utility budgets separate from this bounded migration process.
 const MIGRATION_COMMAND_TIMEOUT: Duration = Duration::from_secs(300);
@@ -1858,7 +1860,11 @@ fn ensure_postgres_initialized(
     if let Some(parent) = initdb.parent() {
         command.current_dir(parent);
     }
-    command_output(&mut command, "Local data store initialization")?;
+    command_output_with_timeout(
+        &mut command,
+        "Local data store initialization",
+        POSTGRES_INITIALIZATION_TIMEOUT,
+    )?;
 
     fs::write(
         data_dir.join("postgresql.auto.conf"),
