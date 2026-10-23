@@ -296,8 +296,8 @@ function Resolve($Profile, $Branch, $Sign = $false) {
 }
 if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
 if ((Resolve automatic planning/p6-candidate).product_profile -ne 'planning-preview') { throw 'development default changed' }
-$beta = Resolve automatic planning/staff-beta-prep
-if ($beta.product_profile -ne 'planning-staff-beta' -or $beta.runtime_profile -ne 'planning-preview' -or $beta.desktop_version -ne '1.5.0-1') { throw 'beta composition mismatch' }
+$beta = Resolve automatic planning/layouts-beta-1-5-1
+if ($beta.product_profile -ne 'planning-staff-beta' -or $beta.runtime_profile -ne 'planning-preview' -or $beta.desktop_version -ne '1.5.1-1') { throw 'beta composition mismatch' }
 # Only validates future eligibility; no signer is called by this resolver.
 if ((Resolve planning-staff-beta main $true).product_profile -ne 'planning-staff-beta') { throw 'explicit main selection failed' }
 function MustReject([scriptblock]$Action) {
@@ -306,7 +306,7 @@ function MustReject([scriptblock]$Action) {
     if (-not $rejected) { throw 'Expected refusal' }
 }
 MustReject { Resolve planning-preview main $true }
-MustReject { Resolve planning-staff-beta planning/staff-beta-prep $true }
+MustReject { Resolve planning-staff-beta planning/layouts-beta-1-5-1 $true }
 $path = "$PSScriptRoot/config/planning-staff-beta.json"
 $c = Get-Content $path -Raw | ConvertFrom-Json
 $c.planning_package_version = '0.3.0+dev.1'

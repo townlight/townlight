@@ -38,8 +38,8 @@ function Get-PlanningBuildContract {
         if ($Contract.development_only -ne $false -or $Pins.development_only -ne $false -or
             $Contract.signing_eligible -ne $true -or $Contract.publication_requires_signed_acceptance -ne $true -or
             $Contract.runtime_profile -ne 'planning-preview' -or $Contract.channel -ne 'opt-in-staff-beta' -or
-            $Contract.release_tag -ne 'townlight-records-meetings-code-zoning-planning-v1.5.0-beta.1' -or
-            $Contract.desktop_version -ne '1.5.0-1' -or $Contract.windows_product_version -ne '1.5.0.1' -or
+            $Contract.release_tag -ne 'townlight-records-meetings-code-zoning-planning-v1.5.1-beta.1' -or
+            $Contract.desktop_version -ne '1.5.1-1' -or $Contract.windows_product_version -ne '1.5.1.1' -or
             $Contract.planning_package_version -ne '0.3.0' -or $Contract.records_package_version -ne '1.7.4') {
             throw 'Planning staff beta release contract mismatch.'
         }

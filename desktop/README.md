@@ -1,20 +1,23 @@
 # Townlight desktop
 
-Unreleased source update: the [Planning staff workspace layout](../docs/desktop/planning-workspace.md)
-adds the analyses list and Draft, Reviewed and public-preview workflow. Existing
-permissions, backend contracts and signed release artifacts are unchanged.
+Planning **1.5.1-beta.1** is in [release preparation](../docs/installer/planning-layouts-beta-preparation.md).
+The merged [Planning staff workspace layouts](../docs/desktop/planning-workspace.md)
+add the analyses list and Draft, Reviewed and public-preview workflow. This source
+preparation does not sign or release a new installer. Existing permissions,
+backend contracts and module pins remain unchanged.
 
-Current published desktop: **Records + Meetings + Code + Zoning 1.4.0-beta.1**,
-desktop version 1.4.0-1 / Windows ProductVersion 1.4.0.1. The exact signed installer
-passed fresh and populated signed 1.3 upgrade, connected workflow, recovery and
-retained-data uninstall acceptance on October 21, 2026. Select zoning-beta for all
-four products; Records-only remains default. Package names and installer identity
-are compatibility contracts. Source-copy changes do not rebuild or replace the
-accepted installer.
+The published opt-in [Planning staff beta 1.5.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.0-beta.1)
+contains the earlier interface. Its exact signed fresh-install acceptance does not
+certify 1.5.1. The populated signed-1.4 upgrade gap remains disclosed; upgrading
+1.5.0 to 1.5.1 is also unverified. Records remains the default selection.
 
-See the [current manual](../USER-MANUAL.md),
-[signed acceptance](../docs/installer/townlight-zoning-beta1-signed-acceptance.md)
-and [published release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1).
+The existing default download remains [Records + Meetings + Code + Zoning 1.4.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1),
+desktop version 1.4.0-1 / Windows ProductVersion 1.4.0.1. That exact signed installer
+passed fresh and populated signed-1.3 upgrade, connected workflow, recovery and
+retained-data uninstall acceptance on October 21, 2026. Its bytes and historical
+releases are preserved. Package names and installer identity remain compatibility
+contracts. See the [current manual](../USER-MANUAL.md) and
+[signed 1.4 acceptance](../docs/installer/townlight-zoning-beta1-signed-acceptance.md).
 
 ## Historical desktop development checkpoints (original text)
 
