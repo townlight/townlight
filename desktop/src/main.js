@@ -16,11 +16,13 @@ const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
 const planningView = createPlanningView(invoke);
 const publicPlanningView = createPlanningView(invoke, true);
+let planningAccount = null;
 const zoningView = createZoningView(invoke);
 const publicZoningView = createZoningView(invoke, true);
 
 function openConnectedWork(area, id) {
   if (!areaIsEnabled(area)) return;
+  if (state.activeArea === 'planning' && !planningView.canLeave()) return;
   state.activeArea = area;
   render();
   const target = document.querySelector(area === 'code' ? '[data-code-action="connection"]' : '[data-meetings-action="codeConnection"]');
@@ -5182,6 +5184,10 @@ function renderStateLoadError(message) {
 }
 
 function render() {
+  // Never retain an in-memory Planning draft across accounts or session loss.
+  const access = accessState();
+  const account = JSON.stringify([access.signed_in, access.operator_email, access.role]);
+  if (planningAccount !== account) { planningView.reset(); publicPlanningView.reset(); planningAccount = account; }
   if (state.appLoadError) {
     byId("app").innerHTML = renderStateLoadError(state.appLoadError);
     byId("app").querySelector("[data-action='retry-load-state']")
@@ -5242,6 +5248,7 @@ function bindEvents() {
   document.querySelectorAll("[data-area]").forEach((button) => {
     button.addEventListener("click", () => {
       if (!areaIsEnabled(button.dataset.area)) return;
+      if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
       state.pendingSupervisorReviewAction = null;
@@ -5253,6 +5260,7 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-surface]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (state.activeArea === 'planning' && !planningView.canLeave()) return;
       state.activeSurface = button.dataset.surface;
       state.pendingWorkReviewAction = null;
       state.pendingSupervisorReviewAction = null;
@@ -5844,6 +5852,7 @@ function authPayloadForAction(action, overridePayload = null) {
 }
 
 async function handleAuthAction(action, payloadOverride = null) {
+  if (action === 'sign-out' && !planningView.canLeave()) return;
   if (!hasTauriBridge()) {
     state.authActionResult = {
       accepted: false,
