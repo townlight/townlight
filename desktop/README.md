@@ -1,5 +1,9 @@
 # Townlight desktop
 
+Unreleased source update: the [Planning staff workspace layout](../docs/desktop/planning-workspace.md)
+adds the analyses list and Draft, Reviewed and public-preview workflow. Existing
+permissions, backend contracts and signed release artifacts are unchanged.
+
 Current published desktop: **Records + Meetings + Code + Zoning 1.4.0-beta.1**,
 desktop version 1.4.0-1 / Windows ProductVersion 1.4.0.1. The exact signed installer
 passed fresh and populated signed 1.3 upgrade, connected workflow, recovery and

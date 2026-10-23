@@ -1,0 +1,72 @@
+/* Scoped to Planning; the application shell and other modules retain their styles. */
+.planning { --planning-ink:#203440; --planning-sub:#536873; --planning-line:#d8e1e3; --planning-action:#205b57; color:var(--planning-ink); max-width:1280px; min-width:0; font-size:15px; line-height:1.55; }
+.planning *, .planning *::before, .planning *::after { box-sizing:border-box; }
+.planning [hidden] { display:none !important; }
+.planning h2 { font-size:28px; font-weight:600; line-height:1.25; margin:0 0 10px; overflow-wrap:anywhere; }
+.planning h3 { font-size:18px; margin:0 0 12px; }
+.planning h4 { font-size:15px; margin:0 0 8px; }
+.planning p { margin:0 0 14px; }
+.planning button { font:inherit; font-size:14px; font-weight:600; min-height:40px; border:1px solid var(--planning-line); border-radius:5px; padding:8px 14px; color:var(--planning-ink); background:#fff; cursor:pointer; white-space:normal; }
+.planning button:hover { background:#e9f0ef; }
+.planning button:disabled { opacity:.5; cursor:default; }
+.planning .planning-primary { color:#fff; background:var(--planning-action); border-color:var(--planning-action); }
+.planning .planning-primary:hover { background:#164642; }
+.planning :is(button,input,select,textarea,summary):focus-visible { outline:3px solid #206d90; outline-offset:3px; }
+.planning .planning-text-button { padding-left:0; border-color:transparent; background:transparent; color:var(--planning-action); }
+.planning-eyebrow { font-size:13px; color:var(--planning-sub); }
+.planning-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:22px; }
+.planning-heading p, .planning-help { color:var(--planning-sub); }
+.planning-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:12px 0; }
+.planning-tabs { display:flex; flex-wrap:wrap; gap:16px; border-bottom:1px solid var(--planning-line); margin-bottom:22px; }
+.planning .planning-tabs button { border:0; border-bottom:3px solid transparent; border-radius:0; background:transparent; padding:10px 2px; color:var(--planning-sub); }
+.planning .planning-tabs button[aria-current] { color:var(--planning-action); border-bottom-color:var(--planning-action); }
+.planning [data-planning-status] { background:#e9f0ef; border-radius:5px; padding:12px 16px; margin-bottom:24px; overflow-wrap:anywhere; }
+.planning-field { display:block; font-weight:600; margin:0 0 22px; min-width:0; }
+.planning-field :is(input,select,textarea) { display:block; width:100%; max-width:100%; min-width:0; margin-top:7px; padding:10px 12px; font:inherit; font-weight:400; line-height:1.6; border:1px solid #b8c8cd; border-radius:5px; color:var(--planning-ink); background:#fff; }
+.planning-field textarea { min-height:130px; resize:vertical; }
+.planning-field textarea[name="analysis_text"] { min-height:340px; }
+.planning-field textarea[name="staff_notes"] { min-height:110px; }
+.planning :is(input,textarea,select):disabled { opacity:1; color:var(--planning-ink); background:#f3f6f6; -webkit-text-fill-color:var(--planning-ink); }
+.planning-fields { border:0; padding:0; margin:0; min-width:0; }
+.planning-work { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,30%); gap:30px; align-items:start; }
+.planning-writing, .planning-context { min-width:0; }
+.planning-context { border-left:1px solid var(--planning-line); padding-left:24px; }
+.planning-context .planning-heading { gap:8px; margin-bottom:14px; }
+.planning-context .planning-heading h3 { margin:8px 0; font-size:16px; }
+.planning-context button { padding:6px 9px; font-size:13px; }
+.planning-reference { border-bottom:1px solid var(--planning-line); margin-bottom:24px; padding-bottom:20px; overflow-wrap:anywhere; }
+.planning [data-consideration] { border:1px solid var(--planning-line); padding:18px; min-width:0; margin:20px 0; }
+.planning legend { font-size:14px; padding:0 5px; }
+.planning blockquote { margin:12px 0; padding-left:14px; border-left:3px solid #b3c8c4; white-space:pre-wrap; }
+.planning-private { padding:18px; background:#e9f0ef; border-radius:5px; }
+.planning-private .planning-field { margin:0; }
+.planning-help { margin:20px 0 !important; font-size:13px; max-width:76ch; }
+.planning-list-search { max-width:520px; }
+.planning-table { width:100%; border-collapse:collapse; background:#fff; margin-bottom:20px; table-layout:fixed; }
+.planning-table th, .planning-table td { text-align:left; padding:20px 16px; border-bottom:1px solid var(--planning-line); overflow-wrap:anywhere; }
+.planning-table thead th { font-size:13px; color:var(--planning-sub); font-weight:500; }
+.planning-table th:first-child { width:50%; }
+.planning-badge { display:inline-block; font-size:12px; font-weight:600; border-radius:4px; padding:3px 9px; }
+.planning-badge.is-reviewed { color:#256349; background:#eaf4ee; }
+.planning-badge.is-draft { color:#795517; background:#faf2e2; }
+.planning-receipt { color:#256349; background:#eaf4ee; border-radius:5px; padding:18px 20px; margin:0 0 24px; }
+.planning-receipt p { margin:4px 0; }
+.planning [data-planning-part="review"] { max-width:850px; }
+.planning-check { display:flex; align-items:flex-start; gap:10px; max-width:76ch; margin:16px 0; }
+.planning-check input { flex:none; width:18px; height:18px; margin-top:4px; }
+.planning-preview-form, .planning-search { display:flex; align-items:flex-end; flex-wrap:wrap; gap:14px; margin:20px 0; }
+.planning-preview-form .planning-field, .planning-search .planning-field { flex:1 1 220px; margin:0; }
+.planning-search h3 { flex-basis:100%; }
+.planning-card { background:#fff; border:1px solid var(--planning-line); border-radius:5px; padding:20px; margin:18px 0; overflow-wrap:anywhere; }
+.planning-card > button { margin:4px 8px 4px 0; }
+.planning-card summary { font-weight:600; }
+.planning-paper { background:#fff; border:1px solid var(--planning-line); padding:28px; margin:18px 0; min-width:0; overflow-wrap:anywhere; }
+.planning-paper h3 { font-size:24px; }
+.planning-paper h4 { text-transform:capitalize; margin:20px 0 8px; }
+.planning-document-value { white-space:pre-wrap; line-height:1.75; }
+.planning-preview-bar { color:#fff; background:var(--planning-action); padding:12px 16px; border-radius:3px; }
+.planning details { font-size:13px; color:var(--planning-sub); border-top:1px solid var(--planning-line); margin-top:18px; padding-top:12px; }
+.planning summary { cursor:pointer; }
+.planning pre { white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; max-width:100%; font-size:12px; }
+@media (max-width:1150px) { .planning-work { grid-template-columns:minmax(0,1fr); } .planning-context { border-left:0; border-top:1px solid var(--planning-line); padding:22px 0 0; } }
+@media (max-width:600px) { .planning-table th,.planning-table td { padding:12px 7px; } .planning-table th:first-child { width:42%; } .planning-paper { padding:18px; } .planning-tabs { gap:8px; } .planning button { max-width:100%; } }
