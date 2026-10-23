@@ -1,9 +1,13 @@
-# Planning staff workspace layout (unreleased source)
+# Planning staff workspace layout (1.5.1-beta.1 preparation)
 
-This layout update applies to desktop source after the Planning staff beta. It
-does not replace a signed installer or change historical release/acceptance
-evidence. Planning remains opt-in; existing native permissions and backend
-validation apply to every operation.
+These layouts are merged into desktop source and are being prepared for the
+opt-in staff beta **1.5.1-beta.1**. The published **1.5.0-beta.1** installer has the
+earlier interface. No 1.5.1 installer is signed or released by this preparation;
+existing signed installers and historical acceptance evidence remain unchanged.
+See the [release preparation](../installer/planning-layouts-beta-preparation.md)
+for version identity, reused evidence and remaining acceptance gaps. Planning
+remains opt-in; existing native permissions and backend validation apply to every
+operation.
 
 Planning opens on **Analyses**. Continue a draft or open a reviewed analysis by
 project name. The project filter covers the loaded page only; use Next page for

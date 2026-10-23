@@ -1,11 +1,11 @@
 {
   "profile": "planning-staff-beta",
   "runtime_profile": "planning-preview",
-  "source_branch": "planning/staff-beta-prep",
+  "source_branch": "planning/layouts-beta-1-5-1",
   "channel": "opt-in-staff-beta",
-  "release_tag": "townlight-records-meetings-code-zoning-planning-v1.5.0-beta.1",
-  "desktop_version": "1.5.0-1",
-  "windows_product_version": "1.5.0.1",
+  "release_tag": "townlight-records-meetings-code-zoning-planning-v1.5.1-beta.1",
+  "desktop_version": "1.5.1-1",
+  "windows_product_version": "1.5.1.1",
   "planning_package_version": "0.3.0",
   "records_package_version": "1.7.4",
   "core_package_version": "1.2.1",
@@ -16,5 +16,5 @@
   "publication_requires_signed_acceptance": true,
   "status": "prepared-unreleased",
   "upgrade_from": "townlight-records-meetings-code-zoning-v1.4.0-beta.1",
-  "ui_status": "unchanged; known density, hierarchy and overflow limitations accepted for opt-in staff beta preparation"
+  "ui_status": "Planning staff workspace layouts merged; source checks passed; 1.5.1 signed installed acceptance pending"
 }
