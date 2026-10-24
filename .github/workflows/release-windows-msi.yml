@@ -99,7 +99,7 @@ jobs:
           if ($evidence -notmatch '(?m)^PublicationAllowed=true$') { throw "Evidence does not permit publication." }
           if ($isPlanning -and ($evidence -notmatch '(?m)^ProductProfile=planning-staff-beta$' -or
               $evidence -notmatch '(?m)^RuntimeProfile=planning-preview$' -or
-              $evidence -notmatch '(?m)^DesktopVersion=1\.5\.0-1$')) {
+              $evidence -notmatch ('(?m)^DesktopVersion=' + [regex]::Escape($planning.Contract.desktop_version) + '$'))) {
             throw 'The selected signed artifact is not the frozen Planning staff beta composition.'
           }
 
