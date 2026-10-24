@@ -17,6 +17,7 @@ async function mount(page, publicMode = false) {
       const r = args.request;
       if(r.operation === 'search-policies') return {status:'answered',sources:[policy]};
       if(r.operation === 'analyses') return {items:[{...window.__saved,...window.__saved.payload}],next_offset:null};
+      if(r.operation === 'sources' && window.__holdSources) await new Promise(resolve => { window.__releaseSources = resolve; });
       if(r.operation === 'sources' || r.operation === 'snapshots') return {items:[],next_offset:null};
       if(r.operation === 'preview-import') return {title:'Fictional import',policies:[policy]};
       if(r.operation === 'import-bundle') return {revision_id:ref.revision_id};
@@ -38,6 +39,22 @@ async function mount(page, publicMode = false) {
   },publicMode);
   await expect(page.locator('[data-planning-status]')).toHaveText('Saved work loaded.');
 }
+
+test('Planning library waits for sources before accepting source preview clicks', async ({page}) => {
+  await mount(page);
+  await page.evaluate(() => { window.__holdSources = true; });
+  await page.getByRole('button',{name:'Policy library',exact:true}).click();
+  const preview = page.getByRole('button',{name:'Choose and preview local source bundle'});
+  await expect(page.locator('[data-planning-status]')).toHaveText('Working…');
+  await page.getByText('Source administration',{exact:true}).evaluate(el => el.parentElement.open = true);
+  // A click while the library is loading must wait, rather than silently disappear.
+  await expect(preview.click({trial:true,timeout:500})).rejects.toThrow();
+  await page.evaluate(() => { window.__holdSources = false; window.__releaseSources(); });
+  await expect(page.locator('[data-planning-status]')).toHaveText('Policy library loaded.');
+  await preview.click();
+  await expect(page.locator('[data-planning-import]')).toContainText('Fictional import');
+  expect(await page.evaluate(() => window.__calls.filter(c => c.command === 'planning_pick_bundle').length)).toBe(1);
+});
 
 test('Planning staff source preview, cited draft, explicit review and snapshot preview', async ({page}, testInfo) => {
   await mount(page);

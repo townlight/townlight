@@ -35,7 +35,7 @@ export function createPlanningView(invoke, publicMode = false) {
     if (busy) return;
     const expected = session;
     busy = true;
-    root.querySelector('[data-planning-analysis]')?.setAttribute('inert','');
+    root.querySelectorAll('[data-planning-panel]').forEach(panel => panel.setAttribute('inert',''));
     control.disabled = true; report('Working…');
     try { await handler(); }
     catch (error) {
@@ -44,7 +44,7 @@ export function createPlanningView(invoke, publicMode = false) {
       report(code === 409 || error?.code === 'conflict' ? 'Saved work changed. Reopen the saved analysis, reconcile your edits, and save again.' :
         'Planning could not complete this action. Your edits are retained. Check your account and System Health before retrying.');
     } finally {
-      if (expected === session) { busy = false; root.querySelector('[data-planning-analysis]')?.removeAttribute('inert'); if (control.isConnected) control.disabled = false; updateState(); }
+      if (expected === session) { busy = false; root.querySelectorAll('[data-planning-panel], [data-planning-analysis]').forEach(panel => panel.removeAttribute('inert')); if (control.isConnected) control.disabled = false; updateState(); }
     }
   }
   function show(target, value) {
@@ -309,7 +309,7 @@ export function createPlanningView(invoke, publicMode = false) {
       root.querySelectorAll('[data-planning-nav]').forEach(el => el.addEventListener('click', () => run(el, async () => {
         navigate(el.dataset.planningNav);
         if (screen === 'analyses') await analyses(analysisOffset);
-        if (screen === 'library' && !publicMode) await sources(sourceOffset);
+        if (screen === 'library' && !publicMode) { await sources(sourceOffset); report('Policy library loaded.'); }
         if (screen === 'snapshots') await snapshots(snapshotOffset);
         root.querySelector(`[data-planning-panel="${screen}"] h2`)?.focus();
       })));

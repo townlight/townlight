@@ -14,6 +14,10 @@ project name. The project filter covers the loaded page only; use Next page for
 more saved analyses. Policy library, source administration and Reviewed snapshots
 are separate local sections.
 
+Panel controls wait while a Planning action is loading. After opening Policy
+library, **Policy library loaded.** confirms source loading has finished before
+choosing a local bundle for preview.
+
 In an analysis, use **Analysis** for proposal, staff analysis and private notes.
 Selected versioned policies and permitted connected evidence remain alongside
 the writing. **Policies & evidence** holds proposal-specific relationships,
