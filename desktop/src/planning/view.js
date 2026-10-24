@@ -44,7 +44,7 @@ export function createPlanningView(invoke, publicMode = false) {
       report(code === 409 || error?.code === 'conflict' ? 'Saved work changed. Reopen the saved analysis, reconcile your edits, and save again.' :
         'Planning could not complete this action. Your edits are retained. Check your account and System Health before retrying.');
     } finally {
-      if (expected === session) { busy = false; root.querySelectorAll('[data-planning-panel]').forEach(panel => panel.removeAttribute('inert')); if (control.isConnected) control.disabled = false; updateState(); }
+      if (expected === session) { busy = false; root.querySelectorAll('[data-planning-panel], [data-planning-analysis]').forEach(panel => panel.removeAttribute('inert')); if (control.isConnected) control.disabled = false; updateState(); }
     }
   }
   function show(target, value) {
