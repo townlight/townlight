@@ -731,6 +731,8 @@ test("browser preview refuses persistent city workflow mutations", async ({ page
 
 test("desktop workflow actions select freshly added records over restored stale records", async ({ page }) => {
   await page.goto("/");
+  // Let preview initialization finish before installing the action-only native mock.
+  await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
   await page.evaluate(() => {
     const emptyWork = () => ({
       meeting_bodies: [],
