@@ -6,7 +6,7 @@ on:
       product_profile:
         description: "Explicit MSI composition; automatic selects the matching preparation branch; main stays Zoning"
         type: choice
-        options: [automatic, zoning-beta, planning-preview, planning-staff-beta]
+        options: [automatic, zoning-beta, planning-preview, planning-staff-beta, permitting-preview]
         default: automatic
       sign_for_publication:
         description: "Sign and verify desktop EXE and MSI for publication (manual main-branch release gate only)"
@@ -84,7 +84,7 @@ jobs:
           echo "Changed files ($base..$head):"
           echo "$changed"
 
-          if echo "$changed" | grep -Eq '^desktop/|^\.github/workflows/desktop-windows-msi\.yml$|^installer/module-manifest-contract\.json$|^installer/modules\.json$|^config/planning-.*\.json$|^\.github/workflows/release-windows-msi\.yml$'; then
+          if echo "$changed" | grep -Eq '^desktop/|^\.github/workflows/desktop-windows-msi\.yml$|^installer/module-manifest-contract\.json$|^installer/modules\.json$|^config/(planning|permitting)-.*\.json$|^\.github/workflows/release-windows-msi\.yml$'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
@@ -136,6 +136,14 @@ jobs:
           repository: townlight/plan
           ref: ${{ steps.candidate.outputs.planning_ref }}
           path: plan
+
+      - name: Check out Townlight Permitting candidate source
+        if: steps.candidate.outputs.permitting_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/permit
+          ref: ${{ steps.candidate.outputs.permitting_ref }}
+          path: permit
 
       - name: Check out Townlight Meetings runtime source
         uses: actions/checkout@v5
@@ -274,7 +282,9 @@ jobs:
         shell: pwsh
         run: |
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
-            npm run prepare-runtime-payload -- -ProductProfile planning-preview -PlanningBuildProfile '${{ steps.candidate.outputs.product_profile }}' -PlanningRoot "${{ github.workspace }}\plan" -RecordsBackendRoot "${{ github.workspace }}\civicrecords-ai\backend"
+            $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
+            if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
+            npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta
           }
@@ -511,6 +521,9 @@ jobs:
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
             civicsuite/desktop/runtime/payload/runtime-payload-lock.json
             civicsuite/desktop/runtime/payload/python/planning-candidate-provenance.json
+            civicsuite/desktop/runtime/payload/python/permitting-candidate-provenance.json
+            civicsuite/config/permitting-msi-candidate.json
+            civicsuite/config/permitting-preview-sources.json
             civicsuite/config/planning-msi-candidate.json
             civicsuite/config/planning-staff-beta.json
             civicsuite/config/planning-staff-beta-sources.json
@@ -540,11 +553,15 @@ jobs:
         with:
           path: civicsuite
 
-      - name: Resolve Planning integration build contract
+      - name: Resolve connected integration build contract
         id: candidate
         shell: pwsh
+        env:
+          REQUESTED_PROFILE: ${{ inputs.product_profile || 'automatic' }}
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile '${{ inputs.product_profile == 'planning-preview' && 'planning-preview' || 'planning-staff-beta' }}'
+          $profile = if ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -eq 'permitting/connected-workflow') { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
+          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
@@ -588,6 +605,14 @@ jobs:
           ref: ${{ steps.candidate.outputs.planning_ref }}
           path: plan
 
+      - name: Check out Townlight Permitting development source
+        if: steps.candidate.outputs.permitting_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/permit
+          ref: ${{ steps.candidate.outputs.permitting_ref }}
+          path: permit
+
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
@@ -626,7 +651,10 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
-        run: npm run prepare-runtime-payload -- -ProductProfile planning-preview -PlanningBuildProfile '${{ steps.candidate.outputs.product_profile }}' -PlanningRoot "${{ github.workspace }}\plan" -RecordsBackendRoot "${{ github.workspace }}\civicrecords-ai\backend"
+        run: |
+          $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
+          if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
+          npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
         uses: actions/setup-python@v6
@@ -645,6 +673,8 @@ jobs:
         run: |
           python -m pip install "pytest>=8,<9"
           python -m pytest tests/test_planning_native.py tests/test_runtime_profile_contract.py -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { python -m pytest tests/test_permitting_native.py -q }
 
       - name: Run desktop<->CivicCore real-runtime integration test
         working-directory: civicsuite/desktop/src-tauri
@@ -652,7 +682,7 @@ jobs:
         env:
           # Un-gates the real-runtime contract test that is a no-op when unset.
           CIVICSUITE_RUN_REAL_RUNTIME_TEST: "1"
-          TOWNLIGHT_TEST_RUNTIME_PROFILE: "planning-preview"
+          TOWNLIGHT_TEST_RUNTIME_PROFILE: ${{ steps.candidate.outputs.runtime_profile }}
           # Point the test at the payload just prepared above.
           CIVICSUITE_RUNTIME_PAYLOAD_DIR: ${{ github.workspace }}\civicsuite\desktop\runtime\payload
         run: |

@@ -15,6 +15,7 @@ pub enum ExportFolder {
     Access,
     Meetings,
     Planning,
+    Permitting,
 }
 
 #[derive(Deserialize)]
@@ -31,6 +32,7 @@ impl ExportFolder {
             Self::Access => "access",
             Self::Meetings => "meetings",
             Self::Planning => "planning",
+            Self::Permitting => "permitting",
         }
     }
 }
@@ -80,6 +82,13 @@ pub fn write_access_export(plan: ArtifactPlan) -> Result<String, String> {
         .join("exports")
         .join("access");
     write_export_at(plan, &root)
+}
+
+pub fn write_permitting_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {
+    let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
+        .join("exports")
+        .join("permitting");
+    write_planning_file_at(&root, name, bytes, digest)
 }
 
 pub fn write_planning_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {

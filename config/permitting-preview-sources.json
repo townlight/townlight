@@ -1,0 +1,15 @@
+{
+  "profile": "permitting-preview",
+  "development_only": true,
+  "sources": {
+    "townlight/core": "b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
+    "townlight/sunshine": "be8dbf3c7d97b7ab8d62da523a4578b8d47927e1",
+    "townlight/meetings": "3dd73d0619943beb8ce2965abe7a41dfe596e9be",
+    "townlight/ordinances": "868891bd990588a8337832915e4d91af39ea22cd",
+    "townlight/zone": "6ff3af1039e248c0dcd596f9abe2db7f58adaa7d",
+    "townlight/plan": "0bf0a7c998cafb9057da81c23861681a9689bf84",
+    "townlight/notice": "79b8d07199ee77cd425b31c0e0a44f3a0832b810",
+    "townlight/access": "b9100edc80ca496d6061f1cdb3eb39a60ff5f31a",
+    "townlight/permit": "a8d6fee860171e8e49bbbdf0c3763cd22d6c1b39"
+  }
+}

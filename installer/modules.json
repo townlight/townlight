@@ -41,6 +41,24 @@
   ],
   "profiles": [
     {
+      "id": "permitting-preview",
+      "label": "Townlight Permitting development candidate",
+      "description": "Explicit unsigned staff candidate with reviewed intake, cited Code/Zoning and Records handoff.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civicnotice",
+        "civicaccess",
+        "civiczone",
+        "civicplan",
+        "civicpermit"
+      ],
+      "disabled": false,
+      "development_only": true
+    },
+    {
       "id": "planning-preview",
       "label": "Townlight Planning development preview",
       "description": "Opt-in unsigned development composition. Requires the matching Planning candidate payload; not a published release.",
@@ -691,7 +709,46 @@
         "release_artifacts",
         "version_label_matches_recovery_status"
       ],
-      "current_version": "0.2.2"
+      "current_version": "0.2.2",
+      "development_version": "0.3.0+dev.1",
+      "development_civiccore_requirement": "1.2.1",
+      "routes": [
+        {
+          "id": "permitting",
+          "label": "Permitting",
+          "path": "/permitting",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "permitting.read",
+        "permitting.manage",
+        "permitting.export"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "civicpermit_0001"
+      ],
+      "tasks": [
+        "intake-review"
+      ],
+      "backup_restore_hooks": [
+        "Data/postgres",
+        "Data/exports/permitting"
+      ],
+      "model_needs": [],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      }
     },
     {
       "id": "civicaccess",
