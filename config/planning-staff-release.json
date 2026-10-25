@@ -1,0 +1,8 @@
+{
+  "release_tag": "townlight-records-meetings-code-zoning-planning-v1.5.1",
+  "source_commit": "7ccfea24cd1da385faedc75544fe32f957b94083",
+  "workflow_run": 40116067286,
+  "artifact_id": 12570477112,
+  "msi_sha256": "3c6fe6baee8b56b1f03fd241c209ff426e14af145c1ae6fb3c3473272c066a62",
+  "supported_installation": "fresh-windows-installation"
+}

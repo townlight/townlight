@@ -1,6 +1,29 @@
 # Releasing the Townlight Records Windows MSI
 
-## Current preparation: opt-in staff Planning beta 1.5.0-beta.1
+## Current authorization: Planning 1.5.1 fresh-install release
+
+Scott confirmed there are no installed users and authorized push, protected merge,
+tag and publication on October 24, 2026. Promote only the existing signed candidate
+40116067286, source `7ccfea24cd1da385faedc75544fe32f957b94083`, to annotated tag
+`townlight-records-meetings-code-zoning-planning-v1.5.1`. No rebuild, new signing,
+local tests, Sandbox, upgrade environment or host changes are part of delivery.
+
+The original frozen beta build contract and source pins are unchanged. The
+separate `config/planning-staff-release.json` allows only this exact accepted
+source/run/artifact/hash under the new public release classification. After
+required CI and protected merge, dispatch the corrected attachment workflow from
+that main commit with the stable tag as input; do not dispatch the build/signing
+workflow. If the old tag-source workflow starts, cancel only that owned run.
+Retain every original verification and immutable-release guard. Read back the
+draft's exact original assets plus checksums/acceptance before publication;
+publish non-prerelease with `make_latest=false`, then verify public delivery.
+
+Historical 1.4/1.5.0 upgrades remain unverified and unsupported by this fresh-install
+release. Preserve all original installers, tags, releases, receipts and existing
+default download destinations. See [release scope and evidence](docs/installer/planning-1.5.1-fresh-install-release.md).
+Earlier preparation statements below are historical and do not override this authorization.
+
+## Historical preparation: opt-in staff Planning beta 1.5.0-beta.1
 
 Only release-preparation steps 1–3 are authorized. The separate beta build
 contract uses Planning 0.3.0, Records 1.7.4 and Core 1.2.1 with the existing

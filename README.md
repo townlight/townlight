@@ -1,5 +1,19 @@
 # Townlight
 
+## Planning 1.5.1 for fresh Windows installations
+
+The opt-in staff Planning release uses the same signed, installed-accepted
+1.5.1-beta.1 installer. It supports cited policy sources, saved staff analyses,
+explicit review and permission-controlled snapshots. Records remains the default.
+Choose the retained **Townlight Planning development preview** selection to opt in.
+Historical-version upgrades are outside this release's supported scope.
+
+[Planning release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1) ·
+[Exact installer, evidence and operating limits](docs/installer/planning-1.5.1-fresh-install-release.md) ·
+[Staff workspace guide](docs/desktop/planning-workspace.md)
+
+Existing default downloads and historical releases below remain unchanged.
+
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
 Published October 21, 2026. Four connected Townlight products run locally through
