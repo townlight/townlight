@@ -287,6 +287,8 @@ def test_planning_resolver_selects_beta_without_opening_development_signing(tmp_
         "desktop/src-tauri/tauri.planning-candidate.conf.json", "desktop/src-tauri/tauri.planning-staff-beta.conf.json",
         "config/planning-msi-candidate.json", "config/planning-preview-sources.json",
         "config/planning-staff-beta.json", "config/planning-staff-beta-sources.json",
+        "desktop/scripts/permitting-build-contract.ps1", "desktop/src-tauri/tauri.permitting-candidate.conf.json",
+        "config/permitting-msi-candidate.json", "config/permitting-preview-sources.json",
     ):
         target = tmp_path / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -298,6 +300,10 @@ function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
 if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
+$permit = Resolve automatic permitting/connected-workflow
+if ($permit.product_profile -ne 'permitting-preview' -or $permit.runtime_profile -ne 'permitting-preview' -or $permit.desktop_version -ne '1.6.0-1' -or $permit.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Permitting composition mismatch' }
+$overlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.permitting-candidate.conf.json" -Raw | ConvertFrom-Json
+if ($overlay.bundle.windows.wix.upgradeCode -ne '53211081-ea8b-4882-a752-d80a9363cda6') { throw 'Permitting installer identity changed' }
 if ((Resolve automatic planning/p6-candidate).product_profile -ne 'planning-preview') { throw 'development default changed' }
 $beta = Resolve automatic planning/layouts-beta-1-5-1
 if ($beta.product_profile -ne 'planning-staff-beta' -or $beta.runtime_profile -ne 'planning-preview' -or $beta.desktop_version -ne '1.5.1-1') { throw 'beta composition mismatch' }
@@ -309,6 +315,7 @@ function MustReject([scriptblock]$Action) {
     if (-not $rejected) { throw 'Expected refusal' }
 }
 MustReject { Resolve planning-preview main $true }
+MustReject { Resolve permitting-preview main $true }
 MustReject { Resolve planning-staff-beta planning/layouts-beta-1-5-1 $true }
 $path = "$PSScriptRoot/config/planning-staff-beta.json"
 $c = Get-Content $path -Raw | ConvertFrom-Json
