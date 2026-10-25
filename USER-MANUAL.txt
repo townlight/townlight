@@ -1,12 +1,16 @@
 # Townlight Records + Meetings + Code + Zoning — User Manual
 
-Unreleased opt-in staff Planning beta preparation
+Planning 1.5.1 — fresh Windows installations
 
-Planning 1.5.0-beta.1 is being prepared; signed 1.4 remains the public download.
-The interface and existing Townlight Planning development preview selection are
-unchanged. A future accepted MSI requires backed-up opt-in and System Health
-Python-services Repair to refresh the cached Python runtime. Upgrade and recovery:
-docs/installer/planning-staff-beta-preparation.md. No signed release is claimed.
+Release: https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1
+Records remains the default. Explicitly choose the retained Townlight Planning
+development preview selection. Follow docs/desktop/planning-workspace.md.
+Save drafts before closing or signing out. If starting stopped services leaves
+a saved Records error, use Retry Records after services have started.
+The installer is unchanged from accepted signed 1.5.1-beta.1. Historical-version
+upgrades remain unverified and outside supported scope. See exact identity,
+evidence and limits: docs/installer/planning-1.5.1-fresh-install-release.md.
+Existing default downloads and historical signed installers remain preserved.
 
 
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta

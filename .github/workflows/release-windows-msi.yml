@@ -42,10 +42,23 @@ jobs:
           $tag = "${{ github.event.inputs.tag || github.ref_name }}"
           if ([string]::IsNullOrWhiteSpace($tag)) { throw "A release tag is required." }
           $isPlanning = $tag -like 'townlight-records-meetings-code-zoning-planning-v*'
+          $promotion = $null
           if ($isPlanning) {
             . ./desktop/scripts/planning-build-contract.ps1
             $planning = Get-PlanningBuildContract -Profile planning-staff-beta
-            if ($tag -ne $planning.Contract.release_tag) { throw 'Planning tag does not match the frozen staff beta identity.' }
+            if ($tag -eq 'townlight-records-meetings-code-zoning-planning-v1.5.1') {
+              # Promote only the exact accepted signed bytes; keep their original beta build contract intact.
+              $promotion = Get-Content -LiteralPath config/planning-staff-release.json -Raw | ConvertFrom-Json
+              if ($promotion.release_tag -ne $tag -or
+                  $promotion.source_commit -ne '7ccfea24cd1da385faedc75544fe32f957b94083' -or
+                  $promotion.workflow_run -ne 40116067286 -or $promotion.artifact_id -ne 12570477112 -or
+                  $promotion.msi_sha256 -ne '3c6fe6baee8b56b1f03fd241c209ff426e14af145c1ae6fb3c3473272c066a62' -or
+                  $promotion.supported_installation -ne 'fresh-windows-installation') {
+                throw 'Planning fresh-install promotion identity mismatch.'
+              }
+            } elseif ($tag -ne $planning.Contract.release_tag) {
+              throw 'Planning tag does not match the frozen staff beta identity.'
+            }
           }
           # Published history and existing assets are immutable, including drafts.
           $existingText = gh release view $tag --json isDraft,assets 2>$null
@@ -63,12 +76,17 @@ jobs:
           if ($LASTEXITCODE -ne 0 -or $tagSha -notmatch '^[0-9a-f]{40}$') {
             throw "Could not resolve release tag $tag to a commit."
           }
+          if ($promotion -and $tagSha -ne $promotion.source_commit) { throw 'Promotion tag must target the accepted signed source.' }
 
           $runs = gh run list --workflow desktop-windows-msi.yml --branch main --event workflow_dispatch --status success --limit 30 --json databaseId,headSha,createdAt,url | ConvertFrom-Json
           $run = $null
           foreach ($candidate in @($runs | Where-Object { $_.headSha -eq $tagSha })) {
+            if ($promotion -and $candidate.databaseId -ne $promotion.workflow_run) { continue }
             $artifacts = gh api "repos/${{ github.repository }}/actions/runs/$($candidate.databaseId)/artifacts" | ConvertFrom-Json
             if (@($artifacts.artifacts | Where-Object { $_.name -eq 'civicsuite-windows-local-msi-SIGNED' }).Count -eq 1) {
+              if ($promotion -and @($artifacts.artifacts | Where-Object { $_.name -eq 'civicsuite-windows-local-msi-SIGNED' -and $_.id -eq $promotion.artifact_id }).Count -ne 1) {
+                throw 'Promotion signed artifact identity mismatch.'
+              }
               $run = $candidate
               break
             }
@@ -94,6 +112,7 @@ jobs:
           if ($evidenceFiles.Count -ne 1) { throw "Expected exactly one signed MSI evidence file; found $($evidenceFiles.Count)." }
           $evidence = (Get-Content -Raw -LiteralPath $evidenceFiles[0].FullName) -replace "`r`n?", "`n"
           $signedSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $msi.FullName).Hash.ToLowerInvariant()
+          if ($promotion -and $signedSha -ne $promotion.msi_sha256) { throw 'Promotion MSI differs from the accepted signed installer.' }
           if ($evidence -notmatch "(?m)^SHA256=$signedSha$") { throw "Signed MSI hash does not match its evidence file." }
           if ($evidence -notmatch '(?m)^SignatureState=Valid$') { throw "Evidence does not classify the MSI signature as Valid." }
           if ($evidence -notmatch '(?m)^PublicationAllowed=true$') { throw "Evidence does not permit publication." }

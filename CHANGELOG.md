@@ -1,5 +1,16 @@
 # Changelog
 
+## Townlight Planning 1.5.1 — fresh-install release
+
+- Promote the exact signed, installed-accepted 1.5.1-beta.1 candidate without
+  rebuilding or re-signing. Preserve its frozen contract, source pins and bytes.
+- Pin the stable attachment to accepted source/run/artifact/hash while retaining
+  original signature/provenance and immutable-history gates.
+- Support fresh Windows staff Planning installations; historical upgrades remain
+  unverified and outside scope. Document existing workflow evidence and limits.
+- Preserve all historical installers/releases and default downloads.
+  [Scope and acceptance](docs/installer/planning-1.5.1-fresh-install-release.md).
+
 ## Townlight opt-in staff Planning beta 1.5.0-beta.1 — Unreleased preparation
 
 - Prepare a distinct Planning release build contract and pinned package identities

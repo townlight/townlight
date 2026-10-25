@@ -1,13 +1,11 @@
-# Planning staff workspace layout (1.5.1-beta.1 preparation)
+# Planning staff workspace layout (1.5.1)
 
-These layouts are merged into desktop source and are being prepared for the
-opt-in staff beta **1.5.1-beta.1**. The published **1.5.0-beta.1** installer has the
-earlier interface. No 1.5.1 installer is signed or released by this preparation;
-existing signed installers and historical acceptance evidence remain unchanged.
-See the [release preparation](../installer/planning-layouts-beta-preparation.md)
-for version identity, reused evidence and remaining acceptance gaps. Planning
-remains opt-in; existing native permissions and backend validation apply to every
-operation.
+These layouts shipped in signed **1.5.1-beta.1** and are retained byte-for-byte
+for the **1.5.1 fresh-install release**. The older **1.5.0-beta.1** has the earlier
+interface and remains preserved. See [release scope, evidence and limits](../installer/planning-1.5.1-fresh-install-release.md).
+Planning remains opt-in through the retained **Townlight Planning development
+preview** selection. Existing native permissions and backend validation apply to
+every operation. Historical-version upgrades are outside the release scope.
 
 Planning opens on **Analyses**. Continue a draft or open a reviewed analysis by
 project name. The project filter covers the loaded page only; use Next page for

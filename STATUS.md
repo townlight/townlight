@@ -1,6 +1,17 @@
 # Townlight status
 
-**Current release verified:** October 21, 2026
+## Planning 1.5.1 fresh-install delivery
+
+The owner authorized a stable fresh-install Planning release on October 24, 2026,
+reusing signed candidate40116067286 and its passed installed acceptance. There are
+no installed users requiring historical migrations. Signed 1.4/1.5.0 upgrades
+remain unverified and outside this release scope. No new installer is built or
+signed. [Scope, exact identity and evidence](docs/installer/planning-1.5.1-fresh-install-release.md).
+The [release page](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1)
+records actual publication; source preparation alone is not delivery.
+Existing default downloads and the historical evidence below are preserved.
+
+**Historical release verified:** October 21, 2026
 
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
