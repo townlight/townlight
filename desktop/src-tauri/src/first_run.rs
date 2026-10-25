@@ -860,6 +860,9 @@ pub fn first_run_action(
                 let selected_modules = payload_string_array(payload, "selectedModuleIds")?;
                 module_registry::persist_custom_selection(&selected_modules)?;
             }
+            Some("permitting-preview") => {
+                crate::supervisor::prepare_permitting_selection()?;
+            }
             Some("planning-preview") => {
                 crate::supervisor::prepare_planning_selection()?;
             }

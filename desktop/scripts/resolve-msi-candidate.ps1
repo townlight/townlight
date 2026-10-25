@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('automatic', 'zoning-beta', 'planning-preview', 'planning-staff-beta')]
+    [ValidateSet('automatic', 'zoning-beta', 'planning-preview', 'planning-staff-beta', 'permitting-preview')]
     [string]$RequestedProfile = 'automatic',
     [string]$SourceBranch = '',
     [switch]$SignForPublication
@@ -7,14 +7,16 @@ param(
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
+. (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
 $Contract = Get-Content (Join-Path $RepoRoot 'config/planning-msi-candidate.json') -Raw | ConvertFrom-Json
 $BetaContract = Get-Content (Join-Path $RepoRoot 'config/planning-staff-beta.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -eq 'permitting/connected-workflow') { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
 $RecordsRef = '45042345b5ca90ff837ae99275058b1ace733c9a'
 $PlanningRef = ''
+$PermittingRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -37,7 +39,18 @@ if ($Selected -in @('planning-preview', 'planning-staff-beta')) {
     $PlanningContract = $Build.ContractPath
     $DesktopVersion = $Contract.desktop_version
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+if ($Selected -eq 'permitting-preview') {
+    if ($SignForPublication) { throw 'Permitting candidate signing and publication are unauthorized.' }
+    $Build = Get-PermittingBuildContract -RepoRoot $RepoRoot
+    $RecordsRef = $Build.Pins.sources.'townlight/sunshine'
+    $PlanningRef = $Build.Pins.sources.'townlight/plan'
+    $PermittingRef = $Build.Pins.sources.'townlight/permit'
+    $RuntimeProfile = 'permitting-preview'
+    $PlanningContract = $Build.ContractPath
+    $DesktopVersion = $Build.Contract.desktop_version
+    $TauriArgs = '--config src-tauri/tauri.permitting-candidate.conf.json'
+}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }

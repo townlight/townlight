@@ -9,6 +9,7 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod permitting_client;
 mod planning_client;
 mod profile_gate;
 mod records_authority;
@@ -102,6 +103,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "access",
             label: "Accessibility",
             description: "WCAG review, plain language, multilingual, exports",
+        },
+        NavigationItem {
+            id: "permitting",
+            label: "Permitting",
+            description: "Pre-application intake and reviewed workpapers",
         },
         NavigationItem {
             id: "planning",
@@ -285,6 +291,7 @@ fn city_work_action_module_requirement(
             Some("notice") => Some((vec!["civicnotice"], false)),
             Some("access") => Some((vec!["civicaccess"], false)),
             Some("planning") => Some((vec!["civicplan"], false)),
+            Some("permitting") => Some((vec!["civicpermit"], false)),
             _ => Some((
                 vec!["civicclerk", "civicrecords-ai", "civiccode", "civicnotice"],
                 true,
@@ -850,7 +857,7 @@ async fn meetings_domain_request(
         .profile_id;
     if !matches!(
         profile_id.as_str(),
-        "meetings-beta" | "city-core" | "zoning-beta" | "planning-preview"
+        "meetings-beta" | "city-core" | "zoning-beta" | "planning-preview" | "permitting-preview"
     ) {
         return Err(domain_client::DomainError::denied());
     }
@@ -875,7 +882,7 @@ async fn code_domain_request(
         .profile_id;
     if !matches!(
         profile_id.as_str(),
-        "city-core" | "zoning-beta" | "planning-preview"
+        "city-core" | "zoning-beta" | "planning-preview" | "permitting-preview"
     ) {
         return Err(domain_client::DomainError::denied());
     }
@@ -948,11 +955,13 @@ async fn zoning_public_request(
 fn planning_capability(staff: bool) -> Result<String, domain_client::DomainError> {
     let selection = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?;
-    if selection.profile_id != "planning-preview"
-        || !selection
-            .enabled_module_ids
-            .iter()
-            .any(|id| id == "civicplan")
+    if !matches!(
+        selection.profile_id.as_str(),
+        "planning-preview" | "permitting-preview"
+    ) || !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civicplan")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -977,6 +986,35 @@ async fn planning_domain_request(
     let _guard =
         profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     planning_client::execute(request, planning_capability(true)?, false).await
+}
+
+fn permitting_capability() -> Result<String, domain_client::DomainError> {
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if selection.profile_id != "permitting-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "civicpermit")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    planning_capability(true)
+}
+
+#[tauri::command]
+async fn permitting_domain_request(
+    request: permitting_client::PermittingRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    permitting_client::execute(request, permitting_capability()?).await
+}
+
+#[tauri::command]
+async fn permitting_pick_bundle() -> Result<Value, String> {
+    permitting_capability().map_err(|_| "Sign in with an authorized Permitting account.")?;
+    planning_pick_bundle().await
 }
 
 #[tauri::command]
@@ -1137,6 +1175,8 @@ pub fn run() {
             zoning_domain_request,
             zoning_public_request,
             planning_domain_request,
+            permitting_domain_request,
+            permitting_pick_bundle,
             planning_public_request,
             planning_pick_bundle,
             open_domain_exports,

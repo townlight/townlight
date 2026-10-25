@@ -21,6 +21,10 @@
         "planning-preview": [
           "share/extension/postgis.control",
           "lib/postgis-3.dll"
+        ],
+        "permitting-preview": [
+          "share/extension/postgis.control",
+          "lib/postgis-3.dll"
         ]
       },
       "required_files": [
@@ -114,6 +118,26 @@
           "Lib/site-packages/civicsuite_runtime/planning_connections.py",
           "Lib/site-packages/app/requests/planning_sources.py",
           "planning-candidate-provenance.json"
+        ],
+        "permitting-preview": [
+          "Lib/site-packages/civiczone/geo_import.py",
+          "Lib/site-packages/civiczone/connected_sources.py",
+          "Lib/site-packages/civiczone/migrations/versions/civiczone_0006_cited_questions.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_bridge.py",
+          "Lib/site-packages/civicsuite_runtime/zoning_records.py",
+          "Lib/site-packages/civicclerk/main.py",
+          "Lib/site-packages/civiccode/main.py",
+          "Lib/site-packages/civicplan/workflow_store.py",
+          "Lib/site-packages/civicplan/source_bundle.py",
+          "Lib/site-packages/civicplan/migrations/__init__.py",
+          "Lib/site-packages/civicplan/migrations/versions/civicplan_0002_workflows.py",
+          "Lib/site-packages/civicsuite_runtime/planning_bridge.py",
+          "Lib/site-packages/civicsuite_runtime/planning_connections.py",
+          "Lib/site-packages/app/requests/planning_sources.py",
+          "Lib/site-packages/civicpermit/workflow_store.py",
+          "Lib/site-packages/civicpermit/migrations/versions/civicpermit_0001_connected.py",
+          "Lib/site-packages/civicsuite_runtime/permitting_bridge.py",
+          "permitting-candidate-provenance.json"
         ]
       }
     },

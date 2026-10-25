@@ -422,10 +422,17 @@ fn validate_module_selection(
     let module_map = module_index(registry);
     let core_version = registry_core_version(registry)?;
     let selected_ids: HashSet<&str> = module_ids.iter().map(String::as_str).collect();
-    if selected_ids.contains("civicplan") && label != "planning-preview" {
+    if selected_ids.contains("civicplan")
+        && !matches!(label, "planning-preview" | "permitting-preview")
+    {
         return Err(
             "Townlight Planning is available only in the planning-preview development profile."
                 .into(),
+        );
+    }
+    if selected_ids.contains("civicpermit") && label != "permitting-preview" {
+        return Err(
+            "Use the explicit permitting-preview development profile and matching payload.".into(),
         );
     }
     for module_id in module_ids {
@@ -463,6 +470,9 @@ fn resolve_custom_module_order(
         .map(String::as_str)
         .filter(|module_id| *module_id != "civiccore")
         .collect();
+    if selected_product_modules.contains(&"civicpermit") {
+        return Err("Use the explicit permitting-preview development profile.".into());
+    }
     if selected_product_modules.contains(&"civicplan") {
         return Err(
             "Use the explicit planning-preview development profile for Townlight Planning.".into(),
@@ -1032,8 +1042,10 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
         .modules
         .iter()
         .map(|module| {
-            let contract_result = if module.id == "civicplan" && selection.profile_id != "planning-preview" {
+            let contract_result = if module.id == "civicplan" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
+            } else if module.id == "civicpermit" && selection.profile_id != "permitting-preview" {
+                Err("Select permitting-preview and its matching unsigned candidate payload.".into())
             } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
                 Ok(()) => (true, None),
@@ -1050,7 +1062,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                 id: module.id.clone(),
                 display_name,
                 role: module.role.clone(),
-                version: if selection.profile_id == "planning-preview" {
+                version: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") {
                     module
                         .development_version
                         .clone()
@@ -1059,7 +1071,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                     module.current_version.clone()
                 },
                 installer_status: module.installer_status.clone(),
-                civiccore_requirement: if selection.profile_id == "planning-preview" { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
+                civiccore_requirement: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
                 required: module.required,
                 selectable: module.selectable,
                 contract_ready,
@@ -1101,6 +1113,37 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn permitting_requires_explicit_composition_and_retains_published_identity() {
+        let registry = parse_registry(MODULES_JSON).unwrap();
+        let selected = selection_for_profile(&registry, "permitting-preview").unwrap();
+        for id in [
+            "civicpermit",
+            "civicplan",
+            "civiczone",
+            "civiccode",
+            "civicrecords-ai",
+        ] {
+            assert!(selected.enabled_module_ids.contains(&id.to_string()));
+        }
+        let permit = module_index(&registry)["civicpermit"];
+        assert_eq!(permit.current_version.as_deref(), Some("0.2.2"));
+        assert_eq!(permit.development_version.as_deref(), Some("0.3.0+dev.1"));
+        for profile in [
+            "records-beta",
+            "meetings-beta",
+            "city-core",
+            "zoning-beta",
+            "planning-preview",
+        ] {
+            assert!(!selection_for_profile(&registry, profile)
+                .unwrap()
+                .enabled_module_ids
+                .contains(&"civicpermit".to_string()));
+        }
+        assert!(resolve_custom_module_order(&registry, &["civicpermit".to_string()]).is_err());
+    }
 
     #[test]
     fn planning_is_an_explicit_development_composition_with_preserved_release_identity() {

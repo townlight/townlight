@@ -1,0 +1,12 @@
+{
+  "version": "1.6.0-1",
+  "identifier": "org.townlight.permitting.candidate",
+  "productName": "Townlight Permitting Candidate",
+  "bundle": {
+    "windows": {
+      "wix": {
+        "upgradeCode": "53211081-ea8b-4882-a752-d80a9363cda6"
+      }
+    }
+  }
+}

@@ -123,6 +123,7 @@ rewritten = rewritten.replace('"./meetings/view.js"', JSON.stringify(pathToFileU
 rewritten = rewritten.replace('"./code/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "code", "view.js")).href));
 rewritten = rewritten.replace('"./zoning/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "zoning", "view.js")).href));
 rewritten = rewritten.replace('"./planning/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "planning", "view.js")).href));
+rewritten = rewritten.replace('"./permitting/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "permitting", "view.js")).href));
 rewritten = rewritten.replace('"./records/planning-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "planning-sources.ts")).href));
 rewritten = rewritten.replace('"./records/zoning-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "zoning-sources.ts")).href));
 rewritten = rewritten.replace('"./records/meetings-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "meetings-sources.ts")).href));
