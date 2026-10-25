@@ -315,7 +315,18 @@ function MustReject([scriptblock]$Action) {
     if (-not $rejected) { throw 'Expected refusal' }
 }
 MustReject { Resolve planning-preview main $true }
+if ((Resolve permitting-preview main $true).product_profile -ne 'permitting-preview') { throw 'Permitting explicit main selection failed' }
+MustReject { Resolve permitting-preview permitting/connected-workflow $true }
+MustReject { Resolve permitting-preview release/permitting-1-6-0-signing $true }
+if ((Resolve automatic release/permitting-1-6-0-signing).product_profile -ne 'permitting-preview') { throw 'Release CI must exercise Permitting' }
+$permitPath = "$PSScriptRoot/config/permitting-msi-candidate.json"
+$permitContract = Get-Content $permitPath -Raw | ConvertFrom-Json
+if ($permitContract.development_only -ne $false -or $permitContract.publication_allowed -ne $true) { throw 'Temporary private-only restriction remains' }
+$permitContract.publication_allowed = $false
+$permitContract | ConvertTo-Json | Set-Content $permitPath
 MustReject { Resolve permitting-preview main $true }
+$permitContract.publication_allowed = $true
+$permitContract | ConvertTo-Json | Set-Content $permitPath
 MustReject { Resolve planning-staff-beta planning/layouts-beta-1-5-1 $true }
 $path = "$PSScriptRoot/config/planning-staff-beta.json"
 $c = Get-Content $path -Raw | ConvertFrom-Json
