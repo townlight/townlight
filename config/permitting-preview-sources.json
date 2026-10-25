@@ -1,6 +1,6 @@
 {
   "profile": "permitting-preview",
-  "development_only": true,
+  "development_only": false,
   "sources": {
     "townlight/core": "b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
     "townlight/sunshine": "86ae9844db6c33ebfaeccb43506024fd69a38aa9",

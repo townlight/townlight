@@ -12,7 +12,7 @@ $Contract = Get-Content (Join-Path $RepoRoot 'config/planning-msi-candidate.json
 $BetaContract = Get-Content (Join-Path $RepoRoot 'config/planning-staff-beta.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -eq 'permitting/connected-workflow') { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
 $RecordsRef = '45042345b5ca90ff837ae99275058b1ace733c9a'
 $PlanningRef = ''
@@ -40,7 +40,9 @@ if ($Selected -in @('planning-preview', 'planning-staff-beta')) {
     $DesktopVersion = $Contract.desktop_version
 }
 if ($Selected -eq 'permitting-preview') {
-    if ($SignForPublication) { throw 'Permitting candidate signing and publication are unauthorized.' }
+    if ($SignForPublication -and $SourceBranch -ne 'main') {
+        throw 'Permitting publication signing requires an explicit manual main-branch run.'
+    }
     $Build = Get-PermittingBuildContract -RepoRoot $RepoRoot
     $RecordsRef = $Build.Pins.sources.'townlight/sunshine'
     $PlanningRef = $Build.Pins.sources.'townlight/plan'

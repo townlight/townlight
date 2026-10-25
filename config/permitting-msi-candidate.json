@@ -9,7 +9,10 @@
   "core_package_version": "1.2.1",
   "sources_manifest": "config/permitting-preview-sources.json",
   "tauri_config": "src-tauri/tauri.permitting-candidate.conf.json",
-  "development_only": true,
-  "publication_allowed": false,
-  "scope": "Staff intake workpaper, reviewed source context and explicit Records copy. No official permit determinations."
+  "development_only": false,
+  "publication_allowed": true,
+  "scope": "Staff intake workpaper, reviewed source context and explicit Records copy. No official permit determinations.",
+  "signing_eligible": true,
+  "publication_requires_signed_acceptance": true,
+  "release_tag": "townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1"
 }

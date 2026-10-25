@@ -1,5 +1,36 @@
 # Releasing the Townlight Records Windows MSI
 
+## Current authorization: one signed connected Permitting beta
+
+Scott authorized one signed Permitting candidate, tagging and publication on
+October 25, 2026. The earlier private-only restriction is removed at his explicit
+request. Select `permitting-preview` and `sign_for_publication=true` in one manual
+`desktop-windows-msi.yml` run from protected merged main. Ordinary CI remains
+unsigned; non-main publication signing is refused. Do not change default profiles,
+module source pins, existing installers, historical releases or default downloads.
+
+Use annotated tag
+`townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1` at the
+exact successful signing source. Preserve the separate Permitting installer
+identity and version 1.6.0-1/MSI 1.6.0.1. The installed product name remains
+Townlight Permitting Candidate. Scope is staff intake, cited Code/Zoning,
+server-derived review, private workpapers and an explicit separate Records copy;
+official permit determinations, fees, inspections and writeback are outside scope.
+
+Reuse connected installed acceptance from unsigned run40220651661 and all
+unchanged functional evidence. Required CI validates the changed release path.
+The one signing run must pass signed EXE/MSI verification, receipt/provenance and
+dependent installed Windows lifecycle. Verify exact final signed installed
+identity and the existing saved Records attachment without repeating writes.
+Warn and wait before any restart. No Sandbox or broad suites.
+
+The release workflow attaches only the exact successful main signing artifact
+with valid timestamped EXE/MSI signatures, matching receipt, embedded provenance,
+contract, three wheels and nine source pins. Read back draft assets and acceptance
+notes before authorized publication as a prerelease with `make_latest=false`.
+Verify anonymous delivery and historical/default-download preservation afterward.
+No additional signing run or silent retry is authorized if the one candidate fails.
+
 ## Current authorization: Planning 1.5.1 fresh-install release
 
 Scott confirmed there are no installed users and authorized push, protected merge,

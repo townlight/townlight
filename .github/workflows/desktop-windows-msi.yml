@@ -432,14 +432,15 @@ jobs:
           }
           $receipt = [ordered]@{ schema_version = 1; source_commit = '${{ github.sha }}'; workflow_run = '${{ github.run_id }}'; product_profile = '${{ steps.candidate.outputs.product_profile }}'; runtime_profile = '${{ steps.candidate.outputs.runtime_profile }}'; desktop_version = '${{ steps.candidate.outputs.desktop_version }}'; files = @() }
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
-            $provenance = 'civicsuite/desktop/runtime/payload/python/planning-candidate-provenance.json'
-            $embeddedProvenance = @(Get-ChildItem -LiteralPath $extract -Filter planning-candidate-provenance.json -Recurse -File)
+            $provenanceName = if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
+            $provenance = Join-Path 'civicsuite/desktop/runtime/payload/python' $provenanceName
+            $embeddedProvenance = @(Get-ChildItem -LiteralPath $extract -Filter $provenanceName -Recurse -File)
             $provenanceSha = (Get-FileHash -LiteralPath $provenance -Algorithm SHA256).Hash.ToLowerInvariant()
             if ($embeddedProvenance.Count -ne 1 -or (Get-FileHash -LiteralPath $embeddedProvenance[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $provenanceSha) {
               throw 'MSI does not contain the exact Planning payload provenance.'
             }
-            $receipt.planning_provenance_sha256 = $provenanceSha
-            Copy-Item -LiteralPath $provenance -Destination (Join-Path (Split-Path -Parent $msi) 'planning-candidate-provenance.json')
+            if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $receipt.permitting_provenance_sha256 = $provenanceSha } else { $receipt.planning_provenance_sha256 = $provenanceSha }
+            Copy-Item -LiteralPath $provenance -Destination (Join-Path (Split-Path -Parent $msi) $provenanceName)
           }
           foreach ($item in @(@{path=$exe; unsigned='${{ steps.exe_intake.outputs.sha256 }}'}, @{path=$msi; unsigned='${{ steps.locate_msi.outputs.sha256 }}'})) {
             $sig = Get-AuthenticodeSignature -LiteralPath $item.path
@@ -543,6 +544,7 @@ jobs:
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*signing-receipt.json
             civicsuite/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json
+            civicsuite/desktop/src-tauri/target/release/bundle/msi/permitting-candidate-provenance.json
           retention-days: 7
 
   desktop-civiccore-integration:
@@ -564,7 +566,7 @@ jobs:
           REQUESTED_PROFILE: ${{ inputs.product_profile || 'automatic' }}
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          $profile = if ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -eq 'permitting/connected-workflow') { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
+          $profile = if ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
           ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
