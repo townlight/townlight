@@ -498,7 +498,11 @@ jobs:
             "PublicationAllowed=$publicationAllowed"
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
-            "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930"
+            if ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
+              "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
+            } else {
+              "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930"
+            }
             "SameVersionMajorUpgrade=true"
             "InstallerBundle=msi"
             "NoDockerPrerequisite=true"
