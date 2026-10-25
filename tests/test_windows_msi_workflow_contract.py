@@ -74,8 +74,11 @@ def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> N
     for repository, output in (("townlight/plan", "planning_ref"), ("townlight/sunshine", "records_ref")):
         checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
         assert f"ref: ${{{{ steps.candidate.outputs.{output} }}}}" in checkout
-    assert "-ProductProfile planning-preview -PlanningBuildProfile" in integration
-    assert 'TOWNLIGHT_TEST_RUNTIME_PROFILE: "planning-preview"' in integration
+    assert "'-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}'" in integration
+    assert "TOWNLIGHT_TEST_RUNTIME_PROFILE: ${{ steps.candidate.outputs.runtime_profile }}" in integration
+    resolver = _read(ROOT / "desktop/scripts/resolve-msi-candidate.ps1")
+    assert "$RuntimeProfile = 'planning-preview'" in resolver
+    assert "$RuntimeProfile = 'permitting-preview'" in resolver
 
 
 def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> None:
