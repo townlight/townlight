@@ -5274,11 +5274,12 @@ function bindEvents() {
     render();
   });
   document.querySelectorAll("[data-area]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       if (!areaIsEnabled(button.dataset.area)) return;
       if (state.activeArea === 'permitting' && button.dataset.area !== 'permitting' && !permittingView.canLeave()) return;
       if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
+      if (state.activeArea === 'inspections' && button.dataset.area === 'records') await loadAppState();
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
       state.pendingSupervisorReviewAction = null;
