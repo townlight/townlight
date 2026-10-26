@@ -117,17 +117,13 @@ globalThis.matchMedia = windowStub.matchMedia;
 //  - append an internals export for assertions.
 // ---------------------------------------------------------------------------
 let rewritten = mainSrc.replace(/^﻿/, "");
-rewritten = rewritten.replace('"./records/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "records", "view.js")).href));
-rewritten = rewritten.replace('"./records/controller.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "controller.ts")).href));
-rewritten = rewritten.replace('"./meetings/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "meetings", "view.js")).href));
-rewritten = rewritten.replace('"./code/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "code", "view.js")).href));
-rewritten = rewritten.replace('"./zoning/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "zoning", "view.js")).href));
-rewritten = rewritten.replace('"./planning/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "planning", "view.js")).href));
-rewritten = rewritten.replace('"./permitting/view.js"', JSON.stringify(pathToFileURL(join(root, "src", "permitting", "view.js")).href));
-rewritten = rewritten.replace('"./records/planning-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "planning-sources.ts")).href));
-rewritten = rewritten.replace('"./records/zoning-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "zoning-sources.ts")).href));
-rewritten = rewritten.replace('"./records/meetings-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "meetings-sources.ts")).href));
-rewritten = rewritten.replace('"./records/code-sources.ts"', JSON.stringify(pathToFileURL(join(root, "src", "records", "code-sources.ts")).href));
+// A data: module has no hierarchical base URL. Resolve every static relative
+// import against the original main.js, including newly connected product views.
+const mainUrl = pathToFileURL(join(root, "src", "main.js"));
+rewritten = rewritten.replace(
+  /(\bfrom\s*)(["'])(\.{1,2}\/[^"']+)\2/g,
+  (_match, prefix, _quote, specifier) => prefix + JSON.stringify(new URL(specifier, mainUrl).href)
+);
 rewritten = rewritten.replace(
   /import\s*\{\s*invoke\s*\}\s*from\s*["']@tauri-apps\/api\/core["'];?/,
   "const invoke = (...args) => globalThis.__TEST_INVOKE__(...args);"
