@@ -730,10 +730,17 @@ test("browser preview refuses persistent city workflow mutations", async ({ page
 });
 
 test("desktop workflow actions select freshly added records over restored stale records", async ({ page }) => {
-  await page.goto("/");
-  // Let preview initialization finish before installing the action-only native mock.
-  await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-  await page.evaluate(() => {
+  const startupErrors = [];
+  page.on("pageerror", (error) => startupErrors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error" && message.text().includes("Townlight could not load saved state")) {
+      startupErrors.push(message.text());
+    }
+  });
+  // A desktop fixture must serve bootstrap as well as actions. Switching an
+  // action-only bridge into an already-starting preview rejects get_app_state.
+  // An init script also reinstalls the complete fixture if the page reloads.
+  await page.addInitScript(() => {
     const emptyWork = () => ({
       meeting_bodies: [],
       meeting_members: [],
@@ -796,8 +803,30 @@ test("desktop workflow actions select freshly added records over restored stale 
     const freshSource = source("source-100", "Fresh source DIR094");
     window.__cityWorkState = emptyWork();
     window.__cityWorkCalls = [];
+    window.__cityWorkBootstrapCalls = 0;
+    const modules = [
+      ["civiccore", "Townlight Core"],
+      ["civicclerk", "Townlight Meetings"],
+      ["civiccode", "Townlight Code"]
+    ].map(([id, display_name]) => ({
+      id, display_name, required: id === "civiccore", installed: true,
+      enabled: true, selectable: id !== "civiccore", contract_ready: true
+    }));
     window.__TAURI_INTERNALS__ = {
       invoke: async (cmd, args = {}) => {
+        if (cmd === "get_app_state") {
+          window.__cityWorkBootstrapCalls += 1;
+          return {
+            product_name: "Townlight", local_only: true, modules,
+            module_selection: {
+              profile_id: "custom", installed_module_ids: modules.map(({ id }) => id),
+              enabled_module_ids: modules.map(({ id }) => id)
+            },
+            first_run: { finished: true, steps: [], locations: {} },
+            access: { configured: true, signed_in: true, role: "local-admin", operator_email: "workflow@example.invalid" },
+            health: [], city_work: structuredClone(window.__cityWorkState)
+          };
+        }
         if (cmd === "city_work_action") {
           window.__cityWorkCalls.push({ action: args.action, payload: args.payload });
           if (args.action === "create-meeting-body") {
@@ -827,6 +856,13 @@ test("desktop workflow actions select freshly added records over restored stale 
     };
   });
 
+  await page.goto("/");
+  // Use the action's normal auto-wait rather than a separate five-second
+  // preview deadline. Exercise a reload before any writes to prove bootstrap
+  // cannot fall back to the old action-only mock on a fresh document.
+  await page.getByRole("button", { name: /Meetings & Notices/ }).waitFor();
+  expect(await page.evaluate(() => window.__cityWorkBootstrapCalls)).toBe(1);
+  await page.reload();
   await page.getByRole("button", { name: /Meetings & Notices/ }).click();
   await page.getByRole("button", { name: "Save Meeting Body" }).click();
   await page.getByRole("button", { name: "Confirm Save Meeting Body" }).click();
@@ -850,6 +886,8 @@ test("desktop workflow actions select freshly added records over restored stale 
   const calls = await page.evaluate(() => window.__cityWorkCalls);
   expect(calls.find((call) => call.action === "add-minute-citation")?.payload.meetingId).toBe("meeting-100");
   expect(calls.find((call) => call.action === "draft-code-guidance")?.payload.codeSourceId).toBe("source-100");
+  expect(await page.evaluate(() => window.__cityWorkBootstrapCalls)).toBe(1);
+  expect(startupErrors).toEqual([]);
 });
 
 test("audit drawer uses local workflow audit language instead of placeholder text", async ({ page }) => {
