@@ -5,6 +5,7 @@ mod demo_fixture;
 mod domain_client;
 mod domain_files;
 mod first_run;
+mod inspections_client;
 mod local_paths;
 mod local_shell;
 mod model;
@@ -108,6 +109,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "permitting",
             label: "Permitting",
             description: "Pre-application intake and reviewed workpapers",
+        },
+        NavigationItem {
+            id: "inspections",
+            label: "Inspections",
+            description: "Reviewed inspection workpapers and Records copies",
         },
         NavigationItem {
             id: "planning",
@@ -292,6 +298,7 @@ fn city_work_action_module_requirement(
             Some("access") => Some((vec!["civicaccess"], false)),
             Some("planning") => Some((vec!["civicplan"], false)),
             Some("permitting") => Some((vec!["civicpermit"], false)),
+            Some("inspections") => Some((vec!["civicinspect"], false)),
             _ => Some((
                 vec!["civicclerk", "civicrecords-ai", "civiccode", "civicnotice"],
                 true,
@@ -857,7 +864,12 @@ async fn meetings_domain_request(
         .profile_id;
     if !matches!(
         profile_id.as_str(),
-        "meetings-beta" | "city-core" | "zoning-beta" | "planning-preview" | "permitting-preview"
+        "meetings-beta"
+            | "city-core"
+            | "zoning-beta"
+            | "planning-preview"
+            | "permitting-preview"
+            | "inspections-preview"
     ) {
         return Err(domain_client::DomainError::denied());
     }
@@ -882,7 +894,11 @@ async fn code_domain_request(
         .profile_id;
     if !matches!(
         profile_id.as_str(),
-        "city-core" | "zoning-beta" | "planning-preview" | "permitting-preview"
+        "city-core"
+            | "zoning-beta"
+            | "planning-preview"
+            | "permitting-preview"
+            | "inspections-preview"
     ) {
         return Err(domain_client::DomainError::denied());
     }
@@ -957,7 +973,7 @@ fn planning_capability(staff: bool) -> Result<String, domain_client::DomainError
         .map_err(|_| domain_client::DomainError::denied())?;
     if !matches!(
         selection.profile_id.as_str(),
-        "planning-preview" | "permitting-preview"
+        "planning-preview" | "permitting-preview" | "inspections-preview"
     ) || !selection
         .enabled_module_ids
         .iter()
@@ -991,11 +1007,13 @@ async fn planning_domain_request(
 fn permitting_capability() -> Result<String, domain_client::DomainError> {
     let selection = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?;
-    if selection.profile_id != "permitting-preview"
-        || !selection
-            .enabled_module_ids
-            .iter()
-            .any(|id| id == "civicpermit")
+    if !matches!(
+        selection.profile_id.as_str(),
+        "permitting-preview" | "inspections-preview"
+    ) || !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "civicpermit")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -1009,6 +1027,29 @@ async fn permitting_domain_request(
     let _guard =
         profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     permitting_client::execute(request, permitting_capability()?).await
+}
+
+fn inspections_capability() -> Result<String, domain_client::DomainError> {
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !matches!(selection.profile_id.as_str(), "inspections-preview")
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "civicinspect")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    planning_capability(true)
+}
+
+#[tauri::command]
+async fn inspections_domain_request(
+    request: inspections_client::InspectionsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    inspections_client::execute(request, inspections_capability()?).await
 }
 
 #[tauri::command]
@@ -1176,6 +1217,7 @@ pub fn run() {
             zoning_public_request,
             planning_domain_request,
             permitting_domain_request,
+            inspections_domain_request,
             permitting_pick_bundle,
             planning_public_request,
             planning_pick_bundle,

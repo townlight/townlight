@@ -10,14 +10,15 @@ param(
     [string]$PayloadRoot = "",
     [string]$RecordsBackendRoot = "",
     [switch]$ReuseInstalledServiceDependencies,
-    [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview", "permitting-preview")]
+    [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")]
     [string]$ProductProfile = "records-beta",
     [string]$MeetingsRoot = "",
     [string]$CodeRoot = "",
     [string]$ZoningRoot = "",
     [string]$PlanningRoot = "",
     [string]$PermittingRoot = "",
-    [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview')]
+    [string]$InspectionsRoot = "",
+    [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
     [switch]$SkipPgvectorBuild
@@ -26,6 +27,7 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
+. (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
 
 if ($PlanningBuildProfile -eq 'planning-staff-beta' -and $ProductProfile -ne 'planning-preview') {
     throw 'The staff beta build requires the existing planning-preview runtime composition.'
@@ -757,13 +759,13 @@ function Test-PythonServiceImports {
         "civicsuite_runtime.services",
         "civicsuite_runtime.migrate"
     )
-    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $ImportNames += @("civicclerk.main", "civiccode.main")
     }
-    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $ImportNames += @("civiczone.connected_sources", "civicsuite_runtime.zoning_bridge", "civicsuite_runtime.zoning_records")
     }
-    if ($ProductProfile -in @("planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
         $ImportNames += @("civicplan.migrations", "civicplan.workflow_store", "civicsuite_runtime.planning_bridge", "app.requests.planning_sources")
     }
     if ($ProductProfile -eq "meetings-beta") {
@@ -828,21 +830,21 @@ function Install-PythonServicePackages {
         $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
         $ServicePackages += @($CivicNotice, $CivicAccess)
     }
-    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
         $CivicCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path }
         $ServicePackages += @($CivicClerk, $CivicCode)
     }
-    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $CivicZone = if ($ZoningRoot) { (Resolve-Path $ZoningRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\zone")).Path }
         $ServicePackages += @($CivicZone)
     }
     $DevelopmentSources = @()
-    if ($ProductProfile -in @("planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
         if (-not $PlanningRoot -or -not $RecordsBackendRoot) { throw "planning-preview requires explicit PlanningRoot and RecordsBackendRoot candidate sources." }
         if ($ReuseInstalledServiceDependencies) { throw 'Planning candidate provenance requires all pinned service sources; do not reuse unproven installed dependencies.' }
         $CivicPlan = (Resolve-Path $PlanningRoot).Path
-        $PlanningBuild = if ($ProductProfile -eq 'permitting-preview') { Get-PermittingBuildContract -RepoRoot $RepoRoot } else { Get-PlanningBuildContract -Profile $PlanningBuildProfile -RepoRoot $RepoRoot }
+        $PlanningBuild = if ($ProductProfile -eq 'inspections-preview') { Get-InspectionsBuildContract -RepoRoot $RepoRoot } elseif ($ProductProfile -in @('permitting-preview', 'inspections-preview')) { Get-PermittingBuildContract -RepoRoot $RepoRoot } else { Get-PlanningBuildContract -Profile $PlanningBuildProfile -RepoRoot $RepoRoot }
         $CandidatePins = $PlanningBuild.Pins
         $SourceRoots = [ordered]@{
             'townlight/core' = $CivicCore; 'townlight/sunshine' = $CivicRecords
@@ -851,11 +853,17 @@ function Install-PythonServicePackages {
             'townlight/notice' = $CivicNotice; 'townlight/access' = $CivicAccess
         }
         $CandidateSourceRoots = @($CivicRecords, $CivicPlan)
-        if ($ProductProfile -eq 'permitting-preview') {
-            if (-not $PermittingRoot -or $PlanningBuildProfile -ne 'permitting-preview') { throw 'Explicit Permitting source/build profile required.' }
+        if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
+            if (-not $PermittingRoot -or $PlanningBuildProfile -ne $ProductProfile) { throw 'Explicit Permitting source/build profile required.' }
             $CivicPermit = (Resolve-Path $PermittingRoot).Path
             $SourceRoots['townlight/permit'] = $CivicPermit
             $CandidateSourceRoots += $CivicPermit
+        }
+        if ($ProductProfile -eq 'inspections-preview') {
+            if (-not $InspectionsRoot -or $PlanningBuildProfile -ne 'inspections-preview') { throw 'Explicit Inspections source/build profile required.' }
+            $CivicInspect = (Resolve-Path $InspectionsRoot).Path
+            $SourceRoots['townlight/inspect'] = $CivicInspect
+            $CandidateSourceRoots += $CivicInspect
         }
         foreach ($Repository in $SourceRoots.Keys) {
             $CandidateSource = $SourceRoots[$Repository]
@@ -878,7 +886,7 @@ function Install-PythonServicePackages {
         $CandidateWheels = @(Get-ChildItem -LiteralPath $WheelRoot -Filter '*.whl')
         if ($CandidateWheels.Count -ne $CandidateSourceRoots.Count) { throw "Expected exactly Planning and Records candidate wheels." }
         $ServicePackages += @($CandidateWheels | ForEach-Object { $_.FullName })
-        $ProvenanceName = if ($ProductProfile -eq 'permitting-preview') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
+        $ProvenanceName = if ($ProductProfile -eq 'inspections-preview') { 'inspections-candidate-provenance.json' } elseif ($ProductProfile -eq 'permitting-preview') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
         Write-JsonFile -Path (Join-Path $PythonRoot $ProvenanceName) -Value @{
             profile = $ProductProfile; build_profile = $PlanningBuildProfile
             development_only = $PlanningBuild.DevelopmentOnly; sources = $DevelopmentSources
@@ -923,22 +931,26 @@ function Install-PythonServicePackages {
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
     Copy-CivicRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
-    if ($ProductProfile -eq 'permitting-preview') {
+    if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', "import civicpermit.workflow_store, civicsuite_runtime.permitting_bridge") -ExtraEnvironment @{TESTING='1'}
     }
+    if ($ProductProfile -eq 'inspections-preview') {
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import civicinspect.workflow_store, civicsuite_runtime.inspections_bridge') -ExtraEnvironment @{TESTING='1'}
+    }
     $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
-    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $InstalledPackages += @("civicclerk", "civiccode")
     }
-    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $InstalledPackages += @("civiczone")
     }
-    if ($ProductProfile -in @("planning-preview", "permitting-preview")) { $InstalledPackages += @("civicplan") }
-    if ($ProductProfile -eq "permitting-preview") { $InstalledPackages += @("civicpermit") }
+    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicplan") }
+    if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicpermit") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("civicinspect") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("civicclerk")
     }
-    if ($ProductProfile -in @("planning-preview", "permitting-preview")) {
+    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
         $UmbrellaCommit = (& git -C $RepoRoot rev-parse HEAD).Trim()
         $UmbrellaDirty = & git -C $RepoRoot status --porcelain --untracked-files=normal
         if ($LASTEXITCODE -ne 0 -or $UmbrellaDirty) { throw 'Commit the umbrella build candidate before preparing its provenance.' }
@@ -955,9 +967,12 @@ assert '/desktop/v1/planning-sources/search' in {route.path for route in router.
 assert metadata.version('civicplan') == '$($PlanningBuild.Contract.planning_package_version)'
 assert metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'
 assert metadata.version('civiccore') == '$($PlanningBuild.Contract.core_package_version)'
-if '$ProductProfile' == 'permitting-preview':
+if '$ProductProfile' in ('permitting-preview', 'inspections-preview'):
     assert metadata.version('civicpermit') == '$($PlanningBuild.Contract.permitting_package_version)'
     assert '/desktop/v1/permitting-sources/search' in {route.path for route in router.routes}
+if '$ProductProfile' == 'inspections-preview':
+    assert metadata.version('civicinspect') == '$($PlanningBuild.Contract.inspections_package_version)'
+    assert '/desktop/v1/inspections-sources/search' in {route.path for route in router.routes}
 path = Path(r'$PythonRoot') / '$ProvenanceName'
 receipt = json.loads(path.read_text(encoding='utf-8-sig'))
 receipt['umbrella_source_commit'] = '$UmbrellaCommit'
@@ -1084,7 +1099,7 @@ $Report = [ordered]@{
     ollama = Install-OllamaPayload -Source $Manifest.sources.ollama -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
 }
 $Report.pgvector = Install-PgvectorPayload -Source $Manifest.sources.pgvector -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
-if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview")) {
+if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
     $Report.postgis = Install-PostgisPayload -Source $Manifest.sources.postgis -CacheRoot $CacheRoot -PayloadRoot $PayloadRoot
 }
 $Report.postgres_vcruntime = Copy-PostgresVcRuntime -PostgresRoot (Join-Path $PayloadRoot "postgres")

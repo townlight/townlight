@@ -291,3 +291,10 @@ identities.
 
 The Azure credentials already exist as Townlight organization secrets. Do not
 print, copy, rotate, or reprovision them as part of a routine release.
+
+
+### Inspections connected installed candidate
+
+The explicit `inspections/connected-workflow` branch selects `inspections-preview`, desktop 1.7.0-1 / MSI 1.7.0.1, using `config/inspections-msi-candidate.json` and ten exact source pins. Its separate Townlight Inspections Candidate product preserves accepted installations and default downloads. Ordinary PR CI produces an unsigned artifact. This task authorizes installed acceptance only; no signing, tag, merge or publication is requested.
+
+Acceptance uses fictional inspector notes, staff photo observations/transcripts and original evidence; actual imported Code citations; durable revision/repeat-case history; explicit staff review; a private report/notice workpaper; and an exact separately edited Records copy attached explicitly to an existing Records request. Approval and release remain separate. No official enforcement, scheduling, image analysis, transcription or system-of-record writeback is asserted. Reuse the accepted six-product/recovery evidence and check only changed behavior plus required CI. Preserve the MSI, receipts and fictional data while removing owned regenerable copies after acceptance.

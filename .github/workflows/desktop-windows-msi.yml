@@ -6,7 +6,7 @@ on:
       product_profile:
         description: "Explicit MSI composition; automatic selects the matching preparation branch; main stays Zoning"
         type: choice
-        options: [automatic, zoning-beta, planning-preview, planning-staff-beta, permitting-preview]
+        options: [automatic, zoning-beta, planning-preview, planning-staff-beta, permitting-preview, inspections-preview]
         default: automatic
       sign_for_publication:
         description: "Sign and verify desktop EXE and MSI for publication (manual main-branch release gate only)"
@@ -84,7 +84,7 @@ jobs:
           echo "Changed files ($base..$head):"
           echo "$changed"
 
-          if echo "$changed" | grep -Eq '^desktop/|^\.github/workflows/desktop-windows-msi\.yml$|^installer/module-manifest-contract\.json$|^installer/modules\.json$|^config/(planning|permitting)-.*\.json$|^\.github/workflows/release-windows-msi\.yml$'; then
+          if echo "$changed" | grep -Eq '^desktop/|^\.github/workflows/desktop-windows-msi\.yml$|^installer/module-manifest-contract\.json$|^installer/modules\.json$|^config/(planning|permitting|inspections)-.*\.json$|^\.github/workflows/release-windows-msi\.yml$'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
@@ -144,6 +144,14 @@ jobs:
           repository: townlight/permit
           ref: ${{ steps.candidate.outputs.permitting_ref }}
           path: permit
+
+      - name: Check out Townlight Inspections candidate source
+        if: steps.candidate.outputs.inspections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/inspect
+          ref: ${{ steps.candidate.outputs.inspections_ref }}
+          path: inspect
 
       - name: Check out Townlight Meetings runtime source
         uses: actions/checkout@v5
@@ -284,6 +292,7 @@ jobs:
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect") }
             npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta
@@ -432,14 +441,14 @@ jobs:
           }
           $receipt = [ordered]@{ schema_version = 1; source_commit = '${{ github.sha }}'; workflow_run = '${{ github.run_id }}'; product_profile = '${{ steps.candidate.outputs.product_profile }}'; runtime_profile = '${{ steps.candidate.outputs.runtime_profile }}'; desktop_version = '${{ steps.candidate.outputs.desktop_version }}'; files = @() }
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
-            $provenanceName = if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
+            $provenanceName = if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { 'inspections-candidate-provenance.json' } elseif ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
             $provenance = Join-Path 'civicsuite/desktop/runtime/payload/python' $provenanceName
             $embeddedProvenance = @(Get-ChildItem -LiteralPath $extract -Filter $provenanceName -Recurse -File)
             $provenanceSha = (Get-FileHash -LiteralPath $provenance -Algorithm SHA256).Hash.ToLowerInvariant()
             if ($embeddedProvenance.Count -ne 1 -or (Get-FileHash -LiteralPath $embeddedProvenance[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $provenanceSha) {
               throw 'MSI does not contain the exact Planning payload provenance.'
             }
-            if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $receipt.permitting_provenance_sha256 = $provenanceSha } else { $receipt.planning_provenance_sha256 = $provenanceSha }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $receipt.inspections_provenance_sha256 = $provenanceSha } elseif ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $receipt.permitting_provenance_sha256 = $provenanceSha } else { $receipt.planning_provenance_sha256 = $provenanceSha }
             Copy-Item -LiteralPath $provenance -Destination (Join-Path (Split-Path -Parent $msi) $provenanceName)
           }
           foreach ($item in @(@{path=$exe; unsigned='${{ steps.exe_intake.outputs.sha256 }}'}, @{path=$msi; unsigned='${{ steps.locate_msi.outputs.sha256 }}'})) {
@@ -499,7 +508,9 @@ jobs:
             "PublicationAllowed=$publicationAllowed"
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
-            if ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
+            if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
+              "UpgradeCode=9e5bde3b-4ce2-4568-97bc-8e618853b93e"
+            } elseif ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
               "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
             } else {
               "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930"
@@ -526,6 +537,9 @@ jobs:
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
             civicsuite/desktop/runtime/payload/runtime-payload-lock.json
             civicsuite/desktop/runtime/payload/python/planning-candidate-provenance.json
+            civicsuite/desktop/runtime/payload/python/inspections-candidate-provenance.json
+            civicsuite/config/inspections-msi-candidate.json
+            civicsuite/config/inspections-preview-sources.json
             civicsuite/desktop/runtime/payload/python/permitting-candidate-provenance.json
             civicsuite/config/permitting-msi-candidate.json
             civicsuite/config/permitting-preview-sources.json
@@ -544,6 +558,7 @@ jobs:
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
             civicsuite/desktop/src-tauri/target/release/bundle/msi/*signing-receipt.json
             civicsuite/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json
+            civicsuite/desktop/src-tauri/target/release/bundle/msi/inspections-candidate-provenance.json
             civicsuite/desktop/src-tauri/target/release/bundle/msi/permitting-candidate-provenance.json
           retention-days: 7
 
@@ -566,7 +581,7 @@ jobs:
           REQUESTED_PROFILE: ${{ inputs.product_profile || 'automatic' }}
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          $profile = if ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
+          $profile = if ($env:REQUESTED_PROFILE -eq 'inspections-preview' -or $env:SOURCE_BRANCH -eq 'inspections/connected-workflow') { 'inspections-preview' } elseif ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
           ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
@@ -619,6 +634,14 @@ jobs:
           ref: ${{ steps.candidate.outputs.permitting_ref }}
           path: permit
 
+      - name: Check out Townlight Inspections development source
+        if: steps.candidate.outputs.inspections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/inspect
+          ref: ${{ steps.candidate.outputs.inspections_ref }}
+          path: inspect
+
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
@@ -660,6 +683,7 @@ jobs:
         run: |
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
@@ -681,6 +705,7 @@ jobs:
           python -m pytest tests/test_planning_native.py tests/test_runtime_profile_contract.py -q
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { python -m pytest tests/test_permitting_native.py -q }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { python -m pytest tests/test_inspections_native.py -q }
 
       - name: Run desktop<->CivicCore real-runtime integration test
         working-directory: civicsuite/desktop/src-tauri

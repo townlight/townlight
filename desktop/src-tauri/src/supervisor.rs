@@ -284,6 +284,11 @@ pub fn prepare_permitting_selection() -> Result<crate::module_registry::ModuleSe
     prepare_candidate_selection("permitting-preview")
 }
 
+pub fn prepare_inspections_selection(
+) -> Result<crate::module_registry::ModuleSelectionState, String> {
+    prepare_candidate_selection("inspections-preview")
+}
+
 fn prepare_candidate_selection(
     profile: &str,
 ) -> Result<crate::module_registry::ModuleSelectionState, String> {
@@ -2172,6 +2177,7 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
                 "zoning-beta" => "zoning-beta".to_string(),
                 "planning-preview" => "planning-preview".to_string(),
                 "permitting-preview" => "permitting-preview".to_string(),
+                "inspections-preview" => "inspections-preview".to_string(),
                 _ => "records-beta".to_string(),
             },
         ),
@@ -4615,7 +4621,10 @@ mod tests {
             #[cfg(windows)]
             link_payload_runtime(&root, &linked_payload_dir);
             if let Ok(profile) = env::var("TOWNLIGHT_TEST_RUNTIME_PROFILE") {
-                if matches!(profile.as_str(), "planning-preview" | "permitting-preview") {
+                if matches!(
+                    profile.as_str(),
+                    "planning-preview" | "permitting-preview" | "inspections-preview"
+                ) {
                     // Explicit disposable fresh-profile seam. Operator activation
                     // uses prepare_planning_selection and its verified backup.
                     crate::module_registry::persist_profile_selection(&profile).unwrap();

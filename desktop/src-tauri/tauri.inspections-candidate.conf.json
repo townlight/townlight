@@ -1,0 +1,12 @@
+{
+  "version": "1.7.0-1",
+  "identifier": "org.townlight.inspections.candidate",
+  "productName": "Townlight Inspections Candidate",
+  "bundle": {
+    "windows": {
+      "wix": {
+        "upgradeCode": "9e5bde3b-4ce2-4568-97bc-8e618853b93e"
+      }
+    }
+  }
+}
