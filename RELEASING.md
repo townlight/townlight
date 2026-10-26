@@ -1,6 +1,34 @@
 # Releasing the Townlight Records Windows MSI
 
-## Current authorization: one signed connected Permitting beta
+## Current authorization: one signed connected Inspections beta
+
+Scott authorized signing, tagging and publishing Inspections 1.7.0-beta.1,
+including required release-workflow changes, on October 26, 2026. Use one manual
+`desktop-windows-msi.yml` run from protected merged main with
+`product_profile=inspections-preview` and `sign_for_publication=true`.
+Routine CI remains unsigned and main's default product selection is unchanged.
+
+Reuse completed connected installed acceptance and the saved-data Records
+navigation receipt from unsigned run40276077771. Do not repeat successful
+business writes. Required CI covers the changed release path; the signing run
+must pass signed EXE/MSI verification and the dependent installed lifecycle.
+Verify the final signed installed identity and the same saved Records attachment,
+then close only owned services and the app gracefully. Warn and wait before any
+restart. No Sandbox, broad suites, blind retries or extra signing candidates.
+
+Create annotated tag
+`townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1`
+at the exact successful signing source. Preserve Townlight Inspections Candidate,
+desktop 1.7.0-1 / MSI 1.7.0.1, its separate installer identity, all ten source pins,
+four wheels, historical installers/releases, profiles and default downloads.
+The attachment workflow independently checks signatures, timestamp, receipt,
+embedded provenance and the tagged composition before staging an empty draft.
+Verify its assets and acceptance notes, publish as a prerelease with
+`make_latest=false`, then verify anonymous delivery and preserved history/defaults.
+Scope remains reviewed staff workpapers and an explicit separate Records copy;
+official enforcement, notice issuance and writeback remain outside acceptance.
+
+## Historical authorization: signed connected Permitting beta
 
 The first attempt, run40236604656, failed in a browser fixture before signing
 and produced no signed candidate. Scott subsequently authorized diagnosing and
@@ -295,7 +323,7 @@ print, copy, rotate, or reprovision them as part of a routine release.
 
 ### Inspections connected installed candidate
 
-The explicit `inspections/connected-workflow` branch selects `inspections-preview`, desktop 1.7.0-1 / MSI 1.7.0.1, using `config/inspections-msi-candidate.json` and ten exact source pins. Its separate Townlight Inspections Candidate product preserves accepted installations and default downloads. Ordinary PR CI produces an unsigned artifact. This task authorizes installed acceptance only; no signing, tag, merge or publication is requested.
+The explicit `inspections/connected-workflow` branch selects `inspections-preview`, desktop 1.7.0-1 / MSI 1.7.0.1, using `config/inspections-msi-candidate.json` and ten exact source pins. Its separate Townlight Inspections Candidate product preserves accepted installations and default downloads. Ordinary PR CI produces an unsigned artifact. The installed acceptance is complete; the separately authorized signed release follows the current authorization above.
 
 The Node XSS/state harness resolves static relative imports against the original `src/main.js` URL before loading its data module. Connected views must use that resolution rather than a per-product import allowlist; the existing state-error and XSS assertions remain required.
 

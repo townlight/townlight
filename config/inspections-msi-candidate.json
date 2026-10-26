@@ -11,7 +11,8 @@
   "tauri_config": "src-tauri/tauri.inspections-candidate.conf.json",
   "development_only": false,
   "publication_allowed": true,
-  "scope": "Staff intake workpaper, reviewed source context and explicit Records copy. No official permit determinations.",
+  "scope": "Staff inspection workpaper, reviewed Code context and explicit Records copy. No official enforcement, notice issuance or writeback.",
+  "release_tag": "townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1",
   "signing_eligible": true,
   "publication_requires_signed_acceptance": true,
   "inspections_package_version": "0.3.0+dev.1"
