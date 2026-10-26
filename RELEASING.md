@@ -299,4 +299,6 @@ The explicit `inspections/connected-workflow` branch selects `inspections-previe
 
 The Node XSS/state harness resolves static relative imports against the original `src/main.js` URL before loading its data module. Connected views must use that resolution rather than a per-product import allowlist; the existing state-error and XSS assertions remain required.
 
+Returning from Inspections to Records reads the current canonical Records state before rendering. This makes a newly attached reviewed copy visible without restarting or repeating attachment. A failed canonical read retains the existing unavailable-state behavior; it does not fall back to legacy Records data.
+
 Acceptance uses fictional inspector notes, staff photo observations/transcripts and original evidence; actual imported Code citations; durable revision/repeat-case history; explicit staff review; a private report/notice workpaper; and an exact separately edited Records copy attached explicitly to an existing Records request. Approval and release remain separate. No official enforcement, scheduling, image analysis, transcription or system-of-record writeback is asserted. Reuse the accepted six-product/recovery evidence and check only changed behavior plus required CI. Preserve the MSI, receipts and fictional data while removing owned regenerable copies after acceptance.
