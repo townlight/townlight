@@ -22,6 +22,7 @@ on:
       - "townlight-records-meetings-code-zoning-v*"
       - "townlight-records-meetings-code-zoning-planning-v*"
       - "townlight-records-meetings-code-zoning-planning-permitting-v*"
+      - "townlight-records-meetings-code-zoning-planning-permitting-inspections-v*"
 
 permissions:
   contents: write
@@ -44,6 +45,12 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($tag)) { throw "A release tag is required." }
           $isPlanning = $tag -like 'townlight-records-meetings-code-zoning-planning-v*'
           $isPermitting = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-v*'
+          $isInspections = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*'
+          if ($isInspections) {
+            . ./desktop/scripts/inspections-build-contract.ps1
+            $inspections = Get-InspectionsBuildContract
+            if ($tag -ne $inspections.Contract.release_tag) { throw 'Inspections tag does not match the release contract.' }
+          }
           if ($isPermitting) {
             . ./desktop/scripts/permitting-build-contract.ps1
             $permitting = Get-PermittingBuildContract
@@ -219,13 +226,48 @@ jobs:
             }
           }
 
+          if ($isInspections) {
+            if ($evidence -notmatch '(?m)^ProductProfile=inspections-preview$' -or
+                $evidence -notmatch '(?m)^RuntimeProfile=inspections-preview$' -or
+                $evidence -notmatch ('(?m)^DesktopVersion=' + [regex]::Escape($inspections.Contract.desktop_version) + '$')) {
+              throw 'Inspections evidence composition mismatch.'
+            }
+            $proofFiles = @(Get-ChildItem -LiteralPath ./msi-artifact -Filter inspections-candidate-provenance.json -File)
+            $embeddedProof = @(Get-ChildItem -LiteralPath $extract -Filter inspections-candidate-provenance.json -Recurse -File)
+            if ($proofFiles.Count -ne 1 -or $embeddedProof.Count -ne 1) { throw 'Inspections payload provenance is missing or ambiguous.' }
+            $proofSha = (Get-FileHash -LiteralPath $proofFiles[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($receipt.product_profile -ne 'inspections-preview' -or $receipt.runtime_profile -ne 'inspections-preview' -or
+                $receipt.desktop_version -ne $inspections.Contract.desktop_version -or $receipt.inspections_provenance_sha256 -ne $proofSha -or
+                (Get-FileHash -LiteralPath $embeddedProof[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $proofSha) {
+              throw 'Inspections composition/provenance does not match the signed receipt and embedded payload.'
+            }
+            $proof = Get-Content -LiteralPath $proofFiles[0].FullName -Raw | ConvertFrom-Json
+            $contractSha = (Get-FileHash -LiteralPath $inspections.ContractPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            $sourcesSha = (Get-FileHash -LiteralPath $inspections.Contract.sources_manifest -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($proof.build_profile -ne 'inspections-preview' -or $proof.profile -ne 'inspections-preview' -or
+                $proof.development_only -ne $false -or $proof.umbrella_source_commit -ne $tagSha -or
+                $proof.contract_sha256 -ne $contractSha -or $proof.sources_manifest_sha256 -ne $sourcesSha -or
+                $proof.package_versions.civicinspect -ne $inspections.Contract.inspections_package_version -or
+                $proof.package_versions.civicpermit -ne $inspections.Contract.permitting_package_version -or
+                $proof.package_versions.civicplan -ne $inspections.Contract.planning_package_version -or
+                $proof.package_versions.'civicrecords-ai' -ne $inspections.Contract.records_package_version -or
+                $proof.package_versions.civiccore -ne $inspections.Contract.core_package_version -or
+                @($proof.sources).Count -ne 10 -or @($proof.wheels).Count -ne 4) {
+              throw 'Inspections payload source/package contract differs from the tagged release.'
+            }
+            foreach ($pin in $inspections.Pins.sources.PSObject.Properties) {
+              $entries = @($proof.sources | Where-Object { $_.repository -eq $pin.Name -and $_.source_commit -eq $pin.Value })
+              if ($entries.Count -ne 1) { throw "Inspections source pin mismatch: $($pin.Name)" }
+            }
+          }
+
           # The annotated tag is expected to already exist (see RELEASING.md). If the
           # release object does not exist yet, create it from the tag as a DRAFT
           # prerelease for a human to finalize and explicitly publish only after
           # signed clean-machine acceptance.
           gh release view $tag *> $null
           if ($LASTEXITCODE -ne 0) {
-            $scope = if ($isPermitting) { 'Townlight connected staff Permitting beta' } elseif ($isPlanning) { 'Townlight Records + Meetings + Code + Zoning + opt-in staff Planning beta' } else { 'Townlight Windows Local' }
+            $scope = if ($isInspections) { 'Townlight connected staff Inspections beta' } elseif ($isPermitting) { 'Townlight connected staff Permitting beta' } elseif ($isPlanning) { 'Townlight Records + Meetings + Code + Zoning + opt-in staff Planning beta' } else { 'Townlight Windows Local' }
             gh release create $tag --draft --prerelease --title "$scope $tag" --notes "Signed $scope MSI from main build run $($run.databaseId). Finalize notes and publish only after exact signed-byte installation and upgrade acceptance."
             if ($LASTEXITCODE -ne 0) { throw "Failed to create the draft prerelease." }
           }
@@ -234,7 +276,7 @@ jobs:
           $destination = $destinationText | ConvertFrom-Json
           if (-not $destination.isDraft -or @($destination.assets).Count -gt 0) { throw 'Release destination must be an empty draft; historical assets cannot be replaced.' }
           $releaseAssets = @($msi.FullName, $evidenceFiles[0].FullName, $receiptFiles[0].FullName)
-          if ($isPlanning -or $isPermitting) { $releaseAssets += $proofFiles[0].FullName }
+          if ($isPlanning -or $isPermitting -or $isInspections) { $releaseAssets += $proofFiles[0].FullName }
           gh release upload $tag @releaseAssets
           if ($LASTEXITCODE -ne 0) { throw "Failed to upload the signed MSI release assets." }
           Write-Host "Attached the independently verified signed MSI to draft release $tag; publication remains blocked."

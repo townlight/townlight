@@ -8,6 +8,7 @@ function Get-InspectionsBuildContract {
         $Contract.tauri_config -ne 'src-tauri/tauri.inspections-candidate.conf.json' -or $Contract.development_only -ne $false -or
         $Contract.publication_allowed -ne $true -or $Contract.signing_eligible -ne $true -or
         $Contract.publication_requires_signed_acceptance -ne $true -or
+        $Contract.release_tag -ne 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1' -or
         $Pins.profile -ne 'inspections-preview' -or $Pins.development_only -ne $false -or
         $Contract.desktop_version -ne '1.7.0-1' -or $Contract.windows_product_version -ne '1.7.0.1' -or
         $Overlay.version -ne $Contract.desktop_version -or $Overlay.identifier -ne 'org.townlight.inspections.candidate' -or

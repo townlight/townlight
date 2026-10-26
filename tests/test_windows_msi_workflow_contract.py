@@ -321,6 +321,16 @@ function MustReject([scriptblock]$Action) {
     if (-not $rejected) { throw 'Expected refusal' }
 }
 MustReject { Resolve planning-preview main $true }
+if ((Resolve inspections-preview main $true).product_profile -ne 'inspections-preview') { throw 'Inspections explicit main selection failed' }
+MustReject { Resolve inspections-preview inspections/connected-workflow $true }
+$inspectPath = "$PSScriptRoot/config/inspections-msi-candidate.json"
+$inspectContract = Get-Content $inspectPath -Raw | ConvertFrom-Json
+$inspectTag = $inspectContract.release_tag
+$inspectContract.release_tag = 'unexpected-tag'
+$inspectContract | ConvertTo-Json | Set-Content $inspectPath
+MustReject { Resolve inspections-preview main $true }
+$inspectContract.release_tag = $inspectTag
+$inspectContract | ConvertTo-Json | Set-Content $inspectPath
 if ((Resolve permitting-preview main $true).product_profile -ne 'permitting-preview') { throw 'Permitting explicit main selection failed' }
 MustReject { Resolve permitting-preview permitting/connected-workflow $true }
 MustReject { Resolve permitting-preview release/permitting-1-6-0-signing $true }
@@ -351,3 +361,18 @@ Write-Output 'PASS selection and fail-closed release identities'
     result = subprocess.run([pwsh, "-NoProfile", "-File", str(script)], capture_output=True, text=True, timeout=30)
     assert result.returncode == 0, result.stdout + result.stderr
     assert "PASS selection" in result.stdout
+
+
+def test_inspections_release_requires_exact_composition_and_embedded_provenance() -> None:
+    workflow = _read(RELEASE_WORKFLOW)
+    assert 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*' in workflow
+    assert '$tag -ne $inspections.Contract.release_tag' in workflow
+    assert 'ProductProfile=inspections-preview' in workflow
+    assert 'RuntimeProfile=inspections-preview' in workflow
+    assert '$receipt.inspections_provenance_sha256 -ne $proofSha' in workflow
+    assert 'inspections-candidate-provenance.json -Recurse -File' in workflow
+    assert '$proof.package_versions.civicinspect -ne $inspections.Contract.inspections_package_version' in workflow
+    assert '$proof.package_versions.civicpermit -ne $inspections.Contract.permitting_package_version' in workflow
+    assert '@($proof.sources).Count -ne 10 -or @($proof.wheels).Count -ne 4' in workflow
+    assert 'foreach ($pin in $inspections.Pins.sources.PSObject.Properties)' in workflow
+    assert '$isPlanning -or $isPermitting -or $isInspections' in workflow
