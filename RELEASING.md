@@ -2,6 +2,19 @@
 
 ## Current authorization: one signed connected Permitting beta
 
+The first attempt, run40236604656, failed in a browser fixture before signing
+and produced no signed candidate. Scott subsequently authorized diagnosing and
+fixing that case, required CI, and completion of the signed release. Preserve
+the failed run and its evidence; do not rerun it. After the corrected source
+passes protected CI, use one new manual signing run from that merged source.
+
+The record-selection browser case installs a complete desktop bridge before
+navigation, serves `get_app_state`, and exercises startup again on reload before
+any workflow writes. Its meeting/source selection assertions remain intact.
+It no longer swaps an action-only bridge into preview startup or imposes a
+separate five-second preview-readiness deadline. Focused diagnosis and trace
+evidence are retained locally with the release checkpoint.
+
 Scott authorized one signed Permitting candidate, tagging and publication on
 October 25, 2026. The earlier private-only restriction is removed at his explicit
 request. Select `permitting-preview` and `sign_for_publication=true` in one manual
