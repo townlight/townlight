@@ -423,17 +423,25 @@ fn validate_module_selection(
     let core_version = registry_core_version(registry)?;
     let selected_ids: HashSet<&str> = module_ids.iter().map(String::as_str).collect();
     if selected_ids.contains("civicplan")
-        && !matches!(label, "planning-preview" | "permitting-preview")
+        && !matches!(
+            label,
+            "planning-preview" | "permitting-preview" | "inspections-preview"
+        )
     {
         return Err(
             "Townlight Planning is available only in the planning-preview development profile."
                 .into(),
         );
     }
-    if selected_ids.contains("civicpermit") && label != "permitting-preview" {
+    if selected_ids.contains("civicpermit")
+        && !matches!(label, "permitting-preview" | "inspections-preview")
+    {
         return Err(
             "Use the explicit permitting-preview development profile and matching payload.".into(),
         );
+    }
+    if selected_ids.contains("civicinspect") && label != "inspections-preview" {
+        return Err("Use the explicit inspections-preview profile and matching payload.".into());
     }
     for module_id in module_ids {
         let module = module_map
@@ -470,6 +478,9 @@ fn resolve_custom_module_order(
         .map(String::as_str)
         .filter(|module_id| *module_id != "civiccore")
         .collect();
+    if selected_product_modules.contains(&"civicinspect") {
+        return Err("Use the explicit inspections-preview profile.".into());
+    }
     if selected_product_modules.contains(&"civicpermit") {
         return Err("Use the explicit permitting-preview development profile.".into());
     }
@@ -1042,9 +1053,11 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
         .modules
         .iter()
         .map(|module| {
-            let contract_result = if module.id == "civicplan" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") {
+            let contract_result = if module.id == "civicinspect" && selection.profile_id != "inspections-preview" {
+                Err("Select inspections-preview and its matching candidate payload.".into())
+            } else if module.id == "civicplan" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
-            } else if module.id == "civicpermit" && selection.profile_id != "permitting-preview" {
+            } else if module.id == "civicpermit" && !matches!(selection.profile_id.as_str(), "permitting-preview" | "inspections-preview") {
                 Err("Select permitting-preview and its matching unsigned candidate payload.".into())
             } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
@@ -1062,7 +1075,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                 id: module.id.clone(),
                 display_name,
                 role: module.role.clone(),
-                version: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") {
+                version: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                     module
                         .development_version
                         .clone()
@@ -1071,7 +1084,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                     module.current_version.clone()
                 },
                 installer_status: module.installer_status.clone(),
-                civiccore_requirement: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview") { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
+                civiccore_requirement: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
                 required: module.required,
                 selectable: module.selectable,
                 contract_ready,
@@ -1113,6 +1126,35 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn inspections_requires_explicit_profile_and_retains_accepted_profiles() {
+        let registry = parse_registry(MODULES_JSON).unwrap();
+        let selection = selection_for_profile(&registry, "inspections-preview").unwrap();
+        for module in [
+            "civicinspect",
+            "civicpermit",
+            "civicplan",
+            "civiccode",
+            "civicrecords-ai",
+        ] {
+            assert!(selection.enabled_module_ids.contains(&module.to_string()));
+        }
+        assert!(resolve_custom_module_order(&registry, &["civicinspect".into()]).is_err());
+        for profile in [
+            "records-beta",
+            "meetings-beta",
+            "city-core",
+            "zoning-beta",
+            "planning-preview",
+            "permitting-preview",
+        ] {
+            assert!(!selection_for_profile(&registry, profile)
+                .unwrap()
+                .enabled_module_ids
+                .contains(&"civicinspect".into()));
+        }
+    }
 
     #[test]
     fn permitting_requires_explicit_composition_and_retains_published_identity() {

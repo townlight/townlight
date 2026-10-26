@@ -289,6 +289,8 @@ def test_planning_resolver_selects_beta_without_opening_development_signing(tmp_
         "config/planning-staff-beta.json", "config/planning-staff-beta-sources.json",
         "desktop/scripts/permitting-build-contract.ps1", "desktop/src-tauri/tauri.permitting-candidate.conf.json",
         "config/permitting-msi-candidate.json", "config/permitting-preview-sources.json",
+        "desktop/scripts/inspections-build-contract.ps1", "desktop/src-tauri/tauri.inspections-candidate.conf.json",
+        "config/inspections-msi-candidate.json", "config/inspections-preview-sources.json",
     ):
         target = tmp_path / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -300,6 +302,10 @@ function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
 if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
+$inspect = Resolve automatic inspections/connected-workflow
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
+$inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
+if ($inspectionOverlay.identifier -ne 'org.townlight.inspections.candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -eq '53211081-ea8b-4882-a752-d80a9363cda6') { throw 'Separate Inspections identity required' }
 $permit = Resolve automatic permitting/connected-workflow
 if ($permit.product_profile -ne 'permitting-preview' -or $permit.runtime_profile -ne 'permitting-preview' -or $permit.desktop_version -ne '1.6.0-1' -or $permit.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Permitting composition mismatch' }
 $overlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.permitting-candidate.conf.json" -Raw | ConvertFrom-Json

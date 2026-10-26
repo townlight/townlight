@@ -526,7 +526,6 @@ for (const phrase of [
   "System.Security.Cryptography.SHA256",
   "PayloadManifestPath",
   '[string]$ProductProfile = "records-beta"',
-  'if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview"))',
   "TOWNLIGHT_PRODUCT_PROFILE",
   "New-RuntimePayloadLock",
   "required_files",
@@ -535,6 +534,15 @@ for (const phrase of [
 ]) {
   if (!runtimePayloadScript.includes(phrase)) {
     throw new Error(`Windows runtime payload script missing phrase: ${phrase}`);
+  }
+}
+
+// Require package coverage, allowing a new explicit profile without rejecting
+// unchanged accepted profiles merely because the literal list has grown.
+const serviceProfiles = runtimePayloadScript.match(/if \(\$ProductProfile -in @\(([^)]+)\)\) \{\s*\$CivicClerk =/);
+for (const profile of ["city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"]) {
+  if (!serviceProfiles?.[1].includes(`"${profile}"`)) {
+    throw new Error(`Connected service packages must include profile: ${profile}`);
   }
 }
 

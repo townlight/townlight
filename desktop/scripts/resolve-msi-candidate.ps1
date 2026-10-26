@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('automatic', 'zoning-beta', 'planning-preview', 'planning-staff-beta', 'permitting-preview')]
+    [ValidateSet('automatic', 'zoning-beta', 'planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$RequestedProfile = 'automatic',
     [string]$SourceBranch = '',
     [switch]$SignForPublication
@@ -8,15 +8,17 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
+. (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
 $Contract = Get-Content (Join-Path $RepoRoot 'config/planning-msi-candidate.json') -Raw | ConvertFrom-Json
 $BetaContract = Get-Content (Join-Path $RepoRoot 'config/planning-staff-beta.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -eq 'inspections/connected-workflow') { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
 $RecordsRef = '45042345b5ca90ff837ae99275058b1ace733c9a'
 $PlanningRef = ''
 $PermittingRef = ''
+$InspectionsRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -52,7 +54,21 @@ if ($Selected -eq 'permitting-preview') {
     $DesktopVersion = $Build.Contract.desktop_version
     $TauriArgs = '--config src-tauri/tauri.permitting-candidate.conf.json'
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+if ($Selected -eq 'inspections-preview') {
+    if ($SignForPublication -and $SourceBranch -ne 'main') {
+        throw 'Inspections publication signing requires an explicit manual main-branch run.'
+    }
+    $Build = Get-InspectionsBuildContract -RepoRoot $RepoRoot
+    $RecordsRef = $Build.Pins.sources.'townlight/sunshine'
+    $PlanningRef = $Build.Pins.sources.'townlight/plan'
+    $PermittingRef = $Build.Pins.sources.'townlight/permit'
+    $InspectionsRef = $Build.Pins.sources.'townlight/inspect'
+    $RuntimeProfile = 'inspections-preview'
+    $PlanningContract = $Build.ContractPath
+    $DesktopVersion = $Build.Contract.desktop_version
+    $TauriArgs = '--config src-tauri/tauri.inspections-candidate.conf.json'
+}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }

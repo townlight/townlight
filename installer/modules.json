@@ -41,6 +41,25 @@
   ],
   "profiles": [
     {
+      "id": "inspections-preview",
+      "label": "Townlight Inspections candidate",
+      "description": "Connected staff inspection workpapers, exact Code citations, review and separate Records handoff.",
+      "modules": [
+        "civiccore",
+        "civicrecords-ai",
+        "civicclerk",
+        "civiccode",
+        "civicnotice",
+        "civicaccess",
+        "civiczone",
+        "civicplan",
+        "civicpermit",
+        "civicinspect"
+      ],
+      "disabled": false,
+      "development_only": false
+    },
+    {
       "id": "permitting-preview",
       "label": "Townlight Permitting development candidate",
       "description": "Explicit unsigned staff candidate with reviewed intake, cited Code/Zoning and Records handoff.",
@@ -861,7 +880,46 @@
         "release_artifacts",
         "version_label_matches_recovery_status"
       ],
-      "current_version": "0.2.2"
+      "current_version": "0.2.2",
+      "development_version": "0.3.0+dev.1",
+      "development_civiccore_requirement": "1.2.1",
+      "routes": [
+        {
+          "id": "inspections",
+          "label": "Inspections",
+          "path": "/inspections",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "inspections.read",
+        "inspections.manage",
+        "inspections.export"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "civicinspect_0001"
+      ],
+      "tasks": [
+        "inspection-review"
+      ],
+      "model_needs": [],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "backup_restore_hooks": [
+        "Data/postgres",
+        "Data/exports/inspections"
+      ]
     },
     {
       "id": "civicgrants",

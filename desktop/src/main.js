@@ -5,6 +5,7 @@ import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
 import { createCodeView } from "./code/view.js";
 import { createPermittingView } from "./permitting/view.js";
+import { createInspectionsView } from "./inspections/view.js";
 import { createPlanningView } from "./planning/view.js";
 import { bindPlanningSources } from "./records/planning-sources.ts";
 import { createZoningView } from "./zoning/view.js";
@@ -16,6 +17,7 @@ const recordsController = createRecordsController(invoke);
 const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
 const permittingView = createPermittingView(invoke);
+const inspectionsView = createInspectionsView(invoke);
 const planningView = createPlanningView(invoke);
 const publicPlanningView = createPlanningView(invoke, true);
 let planningAccount = null;
@@ -25,6 +27,7 @@ const publicZoningView = createZoningView(invoke, true);
 function openConnectedWork(area, id) {
   if (!areaIsEnabled(area)) return;
   if (state.activeArea === 'permitting' && !permittingView.canLeave()) return;
+  if (state.activeArea === 'inspections' && !inspectionsView.canLeave()) return;
   if (state.activeArea === 'planning' && !planningView.canLeave()) return;
   state.activeArea = area;
   render();
@@ -44,6 +47,7 @@ const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
   "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone"],
   "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan"],
+  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan", "civicpermit", "civicinspect"],
   "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan", "civicpermit"]
 };
 const MODULE_AREA_BY_ID = {
@@ -53,6 +57,7 @@ const MODULE_AREA_BY_ID = {
   zoning: "civiczone",
   planning: "civicplan",
   permitting: "civicpermit",
+  inspections: "civicinspect",
   notice: "civicnotice",
   access: "civicaccess"
 };
@@ -69,6 +74,7 @@ const fallbackState = {
     ["zoning", "Zoning", "Parcel information and cited rules"],
     ["planning", "Planning", "Adopted policy sources and reviewed analysis"],
     ["permitting", "Permitting", "Pre-application intake and reviewed workpapers"],
+    ["inspections", "Inspections", "Inspection workpapers and reviewed Records copies"],
     ["notice", "Public Notices", "Deadlines, proof, archive packets"],
     ["access", "Accessibility", "WCAG review, plain language, multilingual, exports"],
     ["search", "Search City Knowledge", "Cross-module search with citations"],
@@ -1309,6 +1315,11 @@ function renderModuleSelectionControls() {
       id: "custom",
       label: "Custom",
       description: "Choose ready product modules. Townlight Core is always included."
+    },
+    {
+      id: "inspections-preview",
+      label: "Townlight Inspections candidate",
+      description: "Explicit staff profile with its matching payload and coherent backup before migration."
     },
     {
       id: "permitting-preview",
@@ -5095,6 +5106,8 @@ function renderActiveArea() {
       <button type="button" data-action="retry-domain-state">Retry Records</button></section>`;
   }
   switch (state.activeArea) {
+    case "inspections":
+      return !isPublicSurface() && ["local-admin", "city-staff"].includes(access.role) ? inspectionsView.render() : `<section><h2>Inspections staff access required</h2><p>Sign in with an authorized city staff account.</p></section>`;
     case "permitting":
       return !isPublicSurface() && ["local-admin", "city-staff"].includes(access.role) ? permittingView.render() : `<section><h2>Permitting staff access required</h2><p>Sign in with an authorized city staff account.</p></section>`;
     case "planning":
@@ -5108,7 +5121,7 @@ function renderActiveArea() {
       if (
         state.app?.module_selection?.profile_id === "meetings-beta" ||
         ((state.app?.module_selection?.profile_id === "city-core" ||
-          (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview"].includes(state.app?.module_selection?.profile_id))) &&
+          (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview", "inspections-preview"].includes(state.app?.module_selection?.profile_id))) &&
           state.app?.domain_authority === "python-records")
       )
         return meetingsView.render();
@@ -5118,7 +5131,7 @@ function renderActiveArea() {
     case "code":
       if (
         (state.app?.module_selection?.profile_id === "city-core" ||
-          (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview"].includes(state.app?.module_selection?.profile_id))) &&
+          (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview", "inspections-preview"].includes(state.app?.module_selection?.profile_id))) &&
         state.app?.domain_authority === "python-records"
       )
         return codeView.render();
@@ -5200,7 +5213,7 @@ function render() {
   // Never retain an in-memory Planning draft across accounts or session loss.
   const access = accessState();
   const account = JSON.stringify([access.signed_in, access.operator_email, access.role]);
-  if (planningAccount !== account) { planningView.reset(); publicPlanningView.reset(); permittingView.reset(); planningAccount = account; }
+  if (planningAccount !== account) { planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset(); planningAccount = account; }
   if (state.appLoadError) {
     byId("app").innerHTML = renderStateLoadError(state.appLoadError);
     byId("app").querySelector("[data-action='retry-load-state']")
@@ -5248,6 +5261,7 @@ function bindEvents() {
   if (state.app.module_selection?.enabled_module_ids?.includes("civicplan")) {
     bindPlanningSources(invoke, async () => { await loadAppState(); render(); });
     if (state.activeArea === "permitting") permittingView.bind();
+    if (state.activeArea === "inspections") inspectionsView.bind();
     if (state.activeArea === "planning") (isPublicSurface() ? publicPlanningView : planningView).bind();
   }
   meetingsView.bind();
@@ -5263,6 +5277,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       if (!areaIsEnabled(button.dataset.area)) return;
       if (state.activeArea === 'permitting' && button.dataset.area !== 'permitting' && !permittingView.canLeave()) return;
+      if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
@@ -5276,6 +5291,7 @@ function bindEvents() {
   document.querySelectorAll("[data-surface]").forEach((button) => {
     button.addEventListener("click", () => {
       if (state.activeArea === 'permitting' && !permittingView.canLeave()) return;
+      if (state.activeArea === 'inspections' && !inspectionsView.canLeave()) return;
   if (state.activeArea === 'planning' && !planningView.canLeave()) return;
       state.activeSurface = button.dataset.surface;
       state.pendingWorkReviewAction = null;
@@ -5868,7 +5884,7 @@ function authPayloadForAction(action, overridePayload = null) {
 }
 
 async function handleAuthAction(action, payloadOverride = null) {
-  if (action === 'sign-out' && (!planningView.canLeave() || !permittingView.canLeave())) return;
+  if (action === 'sign-out' && (!planningView.canLeave() || !permittingView.canLeave() || !inspectionsView.canLeave())) return;
   if (!hasTauriBridge()) {
     state.authActionResult = {
       accepted: false,
