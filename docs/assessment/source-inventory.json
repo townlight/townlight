@@ -1,0 +1,46 @@
+{
+  "review_date": "2026-10-26",
+  "meaning": "Source snapshot reviewed, not installed artifact identity",
+  "repositories": {
+    "core": {
+      "inspected_default_commit": "f3fc02a553e09d066cd2582cbad4ba623a329931",
+      "default_branch": "main"
+    },
+    "sunshine": {
+      "inspected_default_commit": "f97ace09386636ac06a1f01761b6c2871c2578e0",
+      "default_branch": "master"
+    },
+    "meetings": {
+      "inspected_default_commit": "b0158ab61eb6b10831ed274711371d0dddb0cda8",
+      "default_branch": "main"
+    },
+    "ordinances": {
+      "inspected_default_commit": "7a68faf7529946b0312286868e9134445743955a",
+      "default_branch": "main"
+    },
+    "zone": {
+      "inspected_default_commit": "40ffb407dc0091f28a532ebcf8440505b8afe3c8",
+      "default_branch": "main"
+    },
+    "plan": {
+      "inspected_default_commit": "46fd078c9884be748f1103149d34ab1f21bf9548",
+      "default_branch": "main"
+    },
+    "permit": {
+      "inspected_default_commit": "b15bc273b66b2ac18bcf2f0b2939da7d31c05a8a",
+      "default_branch": "main"
+    },
+    "inspect": {
+      "inspected_default_commit": "4ccf566461d6b95eef0e7f3a5298237b971cba25",
+      "default_branch": "main"
+    },
+    "townlight": {
+      "inspected_default_commit": "6533fd892edc6443475b019e7cd151124a47dfe3",
+      "default_branch": "main"
+    },
+    ".github": {
+      "inspected_default_commit": "d71dbc8d349706b9997254df75fc35cec2e82b00",
+      "default_branch": "main"
+    }
+  }
+}

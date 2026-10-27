@@ -1,3 +1,17 @@
+# Townlight FAQ — current guide
+
+Reviewed 2026-10-26. All eight accepted product workflows and their boundaries are documented in the [overall manual](USER-MANUAL.md). Signed [Inspections 1.7](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) and [Permitting 1.6](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1) are public; Planning 1.5.1 is a fresh-install release. The [default 1.4 download](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) remains unchanged.
+
+**Are all specifications complete?** No. The [source-grounded assessment](docs/assessment/feature-and-integration-review.md) identifies confirmed gaps, accepted deferrals and unverified capabilities separately for every product. There is no unresolved Core blocker identified in accepted workflow receipts; that does not complete the broader deferred Core catalog/exemption/scaffold contracts.
+
+**Do products work together?** The accepted direct evidence paths do. Records release remains explicit; official permit/enforcement decisions remain human and in their systems of record. Shared installation does not prove every pairwise interaction. The directed matrix records all 56 pairs.
+
+**Where do I start?** Choose a product at [the organization site](https://townlight.github.io/), then follow its current manual and exact signed release acceptance. Keep data/backups protected, save before leaving a draft and defer optional AI if not needed.
+
+## Historical status and FAQ reference
+
+Earlier status/version statements below describe their recorded date and are superseded by the current guide above. They remain for history, not as a current restriction on released Permitting/Inspections.
+
 # Townlight FAQ
 
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta

@@ -1,5 +1,30 @@
 # Townlight
 
+Eight connected local-first municipal products: Core, Records, Meetings, Code, Zoning, Planning, Permitting and Inspections. Human review, source provenance and explicit release decisions connect the work.
+
+[Organization and all products](https://townlight.github.io/) · [Overall operating manual](USER-MANUAL.md) · [Feature/integration assessment](docs/assessment/feature-and-integration-review.md)
+
+The accepted Windows workflows extend through signed [Inspections 1.7.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) and [Permitting 1.6.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1); [Planning 1.5.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1) retains its fresh-install boundary. The [default signed download](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) remains 1.4.0-beta.1 with Records-only selected by default. Newer compositions are explicit choices, not changed default downloads.
+
+Use the product manual for the installed workflow and the exact release acceptance for its boundaries. The broader specifications contain confirmed gaps and explicit deferrals; accepted connected workflows do not establish every specified feature or every possible pairwise integration. No application or installer changes accompany this documentation update.
+
+| Product | Operators | Release context | Guide |
+|---|---|---|---|
+| [Core](https://townlight.github.io/products/core/) | IT and platform maintainers | [Core 1.2.1, bundled in accepted desktop compositions](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/core/blob/main/USER-MANUAL.md) |
+| [Records](https://townlight.github.io/products/records/) | Records officers, clerks and authorized reviewers | [Records 1.7.4 in the accepted 1.7 desktop composition](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/sunshine/blob/master/USER-MANUAL.md) |
+| [Meetings](https://townlight.github.io/products/meetings/) | Clerks, meeting staff and authorized reviewers | [Meetings 1.0.4 in accepted connected desktops](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/meetings/blob/main/USER-MANUAL.md) |
+| [Code](https://townlight.github.io/products/code/) | Clerks, code custodians and legal reviewers | [Code 1.0.8 in accepted connected desktops](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/ordinances/blob/main/USER-MANUAL.md) |
+| [Zoning](https://townlight.github.io/products/zoning/) | Planners and authorized land-use staff | [Connected Zoning in signed desktop 1.4.0-beta.1 and later compositions](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) | [Manual](https://github.com/townlight/zone/blob/main/USER-MANUAL.md) |
+| [Planning](https://townlight.github.io/products/planning/) | Planning staff and authorized reviewers | [Signed Planning 1.5.1, fresh-install scope](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1) | [Manual](https://github.com/townlight/plan/blob/main/USER-MANUAL.md) |
+| [Permitting](https://townlight.github.io/products/permitting/) | Permit intake and development-review staff | [Signed Permitting 1.6.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1) | [Manual](https://github.com/townlight/permit/blob/main/USER-MANUAL.md) |
+| [Inspections](https://townlight.github.io/products/inspections/) | Inspectors and authorized reviewing staff | [Signed Inspections 1.7.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/inspect/blob/main/USER-MANUAL.md) |
+
+## Historical project reference
+
+The retained sections below describe earlier release/package states. Their “unreleased” labels and older product coverage are historical; the table and operating manual above give the current accepted compositions. Detailed contributor/reference information remains available for its matching version.
+
+# Townlight
+
 ## Planning 1.5.1 for fresh Windows installations
 
 The opt-in staff Planning release uses the same signed, installed-accepted
