@@ -1,15 +1,127 @@
+# Townlight — Overall user manual for all eight products
+
+Current guide · reviewed 2026-10-26. Core, Records, Meetings, Code, Zoning, Planning, Permitting and Inspections. Notice and Access are supporting components, not additional members of this eight-product set.
+
+[Organization and products](https://townlight.github.io/) · [Requirements and integration findings](docs/assessment/feature-and-integration-review.md)
+
+## Choose the right guide
+
+| Product | Operators | Accepted composition / scope | Full product guide |
+|---|---|---|---|
+| [Core](https://townlight.github.io/products/core/) | IT and platform maintainers | [Core 1.2.1, bundled in accepted desktop compositions](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/core/blob/main/USER-MANUAL.md) |
+| [Records](https://townlight.github.io/products/records/) | Records officers, clerks and authorized reviewers | [Records 1.7.4 in the accepted 1.7 desktop composition](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/sunshine/blob/master/USER-MANUAL.md) |
+| [Meetings](https://townlight.github.io/products/meetings/) | Clerks, meeting staff and authorized reviewers | [Meetings 1.0.4 in accepted connected desktops](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/meetings/blob/main/USER-MANUAL.md) |
+| [Code](https://townlight.github.io/products/code/) | Clerks, code custodians and legal reviewers | [Code 1.0.8 in accepted connected desktops](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/ordinances/blob/main/USER-MANUAL.md) |
+| [Zoning](https://townlight.github.io/products/zoning/) | Planners and authorized land-use staff | [Connected Zoning in signed desktop 1.4.0-beta.1 and later compositions](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) | [Manual](https://github.com/townlight/zone/blob/main/USER-MANUAL.md) |
+| [Planning](https://townlight.github.io/products/planning/) | Planning staff and authorized reviewers | [Signed Planning 1.5.1, fresh-install scope](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1) | [Manual](https://github.com/townlight/plan/blob/main/USER-MANUAL.md) |
+| [Permitting](https://townlight.github.io/products/permitting/) | Permit intake and development-review staff | [Signed Permitting 1.6.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1) | [Manual](https://github.com/townlight/permit/blob/main/USER-MANUAL.md) |
+| [Inspections](https://townlight.github.io/products/inspections/) | Inspectors and authorized reviewing staff | [Signed Inspections 1.7.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | [Manual](https://github.com/townlight/inspect/blob/main/USER-MANUAL.md) |
+
+## Release selection and installation
+
+The [default signed Windows download](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) remains 1.4.0-beta.1; Records-only remains its default selection. Nothing in this documentation changes GitHub Latest, release assets or an installed profile. Selecting a newer release is explicit:
+
+| Release | What to choose | Important boundary |
+|---|---|---|
+| [1.4.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) | zoning-beta for Records/Meetings/Code/Zoning; city-core omits Zoning | Bounded signed 1.3 upgrade and recovery evidence; not every historical upgrade |
+| [Planning 1.5.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1) | Retained “Townlight Planning development preview” selection | Published signed accepted bytes; fresh installation scope; no historical upgrade certification |
+| [Permitting 1.6.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1) | Explicit permitting-preview / Permitting staff selection | Separate installed product Townlight Permitting Candidate, MSI 1.6.0.1; former private-only restriction removed |
+| [Inspections 1.7.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) | Explicit inspections-preview / Inspections staff selection | Separate installed product Townlight Inspections Candidate, MSI 1.7.0.1; includes prior connected products |
+
+Download the selected MSI, SHA256SUMS, acceptance and signing/provenance receipts from its exact release. Verify the checksum and timestamped publisher signature. Save a coherent backup of existing work and read that release’s acceptance before an upgrade. Close the app before installation, retain previous installers and profiles, and do not assume different product identities replace one another. A release page, an internal preview label and a package’s version are distinct; rely on the published identity/receipt.
+
+Complete administrator setup and sign in with a named local staff account. Activate the canonical Python/PostgreSQL runtime using the explicit, backed-up migration controls. Use Settings to choose the intended composition. Optional AI can be deferred using Continue without local AI. A local model is not required for the accepted deterministic staff workflows. System Health must show the dependencies ready before using a workspace. Installation on Linux/macOS or a server is a separate deployment; the signed Windows acceptance does not certify those platforms.
+
+## The complete connected operating path
+
+1. **Core supports the work.** Setup, named staff identity, Python services, PostgreSQL, source/audit contracts and backup/restore provide the platform. Core is not a separate clerk work queue or an automatic data-sharing permission.
+2. **Meetings establishes meeting evidence.** Prepare the body/meeting, agenda and packet; record proceedings and review minutes/outcomes. Keep closed-session text private. Select actual adopted ordinance evidence for Code; draft/pending language is not law.
+3. **Code records authoritative text.** Import/reconcile the code source, inspect section/version/date and record codification separately from the adoption event. Downstream products select exact cited public versions. Explanations are informational, not legal advice.
+4. **Zoning adds parcel/rule context.** Import the full local EPSG:4326 GeoJSON dataset, configure cited Code rules and ask an informational question. Preserve human corrections and permitted Meetings context. Only explicitly public immutable snapshots may leave the staff context.
+5. **Planning relates policy to analysis.** Import adopted policy originals, select exact policies plus Meetings/Zoning evidence, save staff analysis, record review and create the correct audience snapshot. Review/creation/export are separate; public snapshots exclude private notes and full staff analysis.
+6. **Permitting assembles the intake workpaper.** Import requirement originals/checklists, select a revision, assess materials, cite Code/Zoning, save and record review. Write a separate public summary and inspect the Records copy. It does not issue permits, collect fees or schedule inspections.
+7. **Inspections keeps field evidence with a reviewed case.** Save original files and inspector observations, select cited Code, reopen/review and prepare a private packet or separate public copy. Photo observations and voice summaries are supplied by the inspector; automatic image/audio analysis is not implemented.
+8. **Records owns the response.** Create/open the actual request, explicitly select or receive the permitted reviewed copy, inspect the attachment and exact hash, perform exemption/release review, approve the exact response and deliberately release/fulfill/close. No preceding attachment or snapshot automatically approves a response or publishes municipal material.
+
+These are connected evidence paths, not one mandatory linear transaction. A city can use a subset. A Permit case does not automatically become an Inspections case, and Planning does not silently amend Zoning. The [directed matrix](docs/assessment/feature-and-integration-review.md#directed-interaction-matrix) records every ordered pair without inventing new direct integrations.
+
+## Identity, roles and public/private information
+
+Administrators manage local setup; authorized staff perform product work; reviewers deliberately record review; resident/public views contain permitted public material and omit staff editors. The native backend maps session proof to persisted account identity. Never impersonate a reviewer through a name field, browser header or developer API example.
+
+Original → imported source revision → selected citation/hash → saved workpaper revision → attributed review → audience-specific immutable copy → explicit Records attachment → separate Records approval/release is the provenance chain. Keep every link. Changing a source or editing a response can require renewed review; hashes are not decoration.
+
+Do not use a staff packet as a public copy. Public summaries are separately written and reviewed. Personal contact, full proposals, material notes and private staff notes are excluded under the relevant copy contract. Recheck current source permissions at later release; a previously attached document does not grant permanent access. A public preview in a local desktop does not host an internet portal.
+
+## Save, conflicts and service recovery
+
+Save before switching work, sign-out or closing. In-memory drafts are not autosaved records. A reviewed revision is immutable; editing starts a later draft and invalidates a preview. If a save conflicts, retain your edits, reopen current saved work and reconcile explicitly. If the result is unknown, look up the existing record before repeating a write.
+
+System Health separates PostgreSQL, City workflow services, Task queue, optional Model runtime and storage. Start dependencies, wait for readiness and then open the workspace. If a previous Records error persists after startup, use Retry Records or return through Records navigation to reload canonical state. Do not create duplicate requests, cases or attachments to refresh a screen. Source unavailable/restricted/hash errors require restoration of authorized evidence or deliberate reselection, not a cached/sample fallback.
+
+## Backup, restore, maintenance and uninstall
+
+Use the canonical coherent backup before migrations and maintenance. Keep protected copies of data, documents, profile/configuration and receipts; a public packet is not a recovery backup. Stop dependent City workflow services and Task queue before PostgreSQL maintenance. Use the supported restore controls; do not edit live SQL or use retired JSON writers as a fallback. Restore acceptance remains bounded to its recorded candidate/profile.
+
+Read the exact release’s upgrade notes. In the accepted 1.3-to-1.4 path, stop dependent services and PostgreSQL before City workflow services → Repair refreshes the PostgreSQL/PostGIS/Python payload. Wait for warm-up; locked runtime files require the documented stopped-service sequence, not deletion of database/profile. Do not apply that historical procedure as a universal upgrade recipe.
+
+Ordinary uninstall can retain data. Back up first and inspect removal options. Preserve older signed/unsigned installers and their acceptance when needed for history/recovery. Restart only after saving work and explicit operator approval; no documentation step requires an automatic restart. Keep secrets and resident data out of public issues and support attachments.
+
+## What is finished, and what is not
+
+The accepted installed workflows are wired together within their stated scopes. Broader specifications are not all complete: Core’s catalog/exemptions/scaffolding are explicitly deferred placeholders; Planning’s sample amendment/progress endpoints are not durable municipal workflows; Permitting lacks the specified live LLM pathway; Inspections does not automatically analyze photos or transcribe raw audio. Other source-present features have unresolved full acceptance rather than proven absence. See the [source-grounded assessment](docs/assessment/feature-and-integration-review.md) for each product and all pair directions.
+
+The existing System Health long-path overflow is recorded for a later app release; this manual does not claim a fix. No app, installer, default profile or runtime pin was changed to produce these documents. No blanket production, legal compliance, every-upgrade or every-interaction certification is made.
+
+## Evidence and maintainer reference
+
+See the assessment’s [reused acceptance register](docs/assessment/feature-and-integration-review.md#reused-acceptance-register), exact releases above and per-product manuals. Source/API implementation, installed acceptance and public delivery are different evidence. New documentation commits do not change accepted signed bytes.
+
+The generated table below is the legacy root installer manifest’s own profile description. It is preserved and checked against that manifest. It is not the authority for newer separately identified signed Planning, Permitting or Inspections releases; use their release receipts above.
+
+<!-- BEGIN GENERATED SUITE TOPOLOGY -->
+
+<!-- Maintainers: re-run `python scripts/docs/render_topology.py --check` before publishing docs. -->
+Generated from `installer/modules.json`.
+
+- Root installer truth label: `townlight_records_meetings_code_beta_candidate`.
+- Primary product profile: `records-beta` (Townlight Records).
+- Townlight Records profile status: `stabilizing`.
+- Only the Townlight Records modules are represented in this candidate table.
+- Disabled profiles and excluded modules remain documented as out of scope until their own gates clear.
+
+| Module | Version | Role | Dependencies | Source commit | Installer status |
+|---|---:|---|---|---|---|
+| Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
+| Townlight Records | 1.7.3 | records workflow | `civiccore` | `45042345b5ca` | `v1_7_3_records_beta_candidate` |
+| Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
+| Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
+
+Disabled profiles:
+- `land-use` (Land Use): queued - depends on Tier 2 module work after city-core ships
+- `full-suite` (Full Suite): 14 modules remain pre-1.0 scaffolds pinned to older CivicCore lines; not installable as a coherent suite
+
+<!-- END GENERATED SUITE TOPOLOGY -->
+
+## Historical manuals and predecessor instructions
+
+Everything below is retained for its original release/package context. Earlier “unreleased”, “private-only”, maturity and version statements are historical and do not supersede the current release table or operating guide above. Follow upgrade instructions only for their recorded accepted path.
+
 # Townlight Records + Meetings + Code + Zoning — User Manual
 
-Planning 1.5.1 — fresh Windows installations
+## Planning 1.5.1 — fresh Windows installations
 
-Release: https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1
-Records remains the default. Explicitly choose the retained Townlight Planning
-development preview selection. Follow docs/desktop/planning-workspace.md.
+Use the [Planning release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-v1.5.1)
+for a fresh installation. Records remains the default. Explicitly choose the
+retained **Townlight Planning development preview** selection to enable staff
+Planning, then follow the [workspace guide](docs/desktop/planning-workspace.md).
 Save drafts before closing or signing out. If starting stopped services leaves
-a saved Records error, use Retry Records after services have started.
-The installer is unchanged from accepted signed 1.5.1-beta.1. Historical-version
-upgrades remain unverified and outside supported scope. See exact identity,
-evidence and limits: docs/installer/planning-1.5.1-fresh-install-release.md.
+a saved Records error, use **Retry Records** after services have started.
+
+The installer and its internal profile/version names are unchanged from accepted
+1.5.1-beta.1. Historical-version upgrades are outside the supported release scope;
+do not treat the older preparation instructions as verified upgrade acceptance.
+See [exact identity, evidence and limits](docs/installer/planning-1.5.1-fresh-install-release.md).
 Existing default downloads and historical signed installers remain preserved.
 
 
@@ -39,6 +151,13 @@ fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
 retained-data uninstall. Optional local AI is not required for these deterministic
 workflows. Human response approval and final export remain separate from attaching
 a source; no automatic public publication is introduced.
+
+## Unreleased Planning development preview
+
+Developers testing P5 use the separate opt-in `planning-preview` candidate and
+[Planning development manual](docs/installer/planning-development-preview.md).
+It adds native source import, staff review, exact snapshot export and explicit
+Records selection. It is not included in the signed 1.4 installer below.
 
 ## Install, upgrade and recover
 
@@ -268,6 +387,8 @@ not instructions for the Townlight Records beta.
 
 ## Part 1 — For municipal decision-makers
 
+<a id="what-is-civicsuite"></a>
+
 ### What is Townlight?
 
 Townlight is an **open-source municipal product family**. It is not one giant program. It is a planned collection of modules a city can install one at a time, on its own hardware, on its own schedule. Cities do not need to send operational data to a vendor cloud, do not pay per seat, and can inspect or modify the source code.
@@ -287,6 +408,8 @@ The Windows Local city-core package (`civicsuite-windows-local-v1.0.2`) is a **G
 - The desktop app is the staff, resident/public preview, and IT/admin front door for the current city-core beta package. It is local-only by default and does not require Docker, WSL, a terminal, or developer tooling for the clerk path.
 
 A municipality should evaluate the Windows Local city-core package as a beta package, not as a completed full-suite procurement product.
+
+<a id="callout--how-the-civicaccess-module-arrived-v101--v102"></a>
 
 ### Callout — how the Townlight Access module arrived (v1.0.1 → v1.0.2)
 
@@ -462,29 +585,7 @@ The full suite architecture, dependency graph, data-flow rules, and Townlight Co
 
 ### Suite topology (generated summary)
 
-<!-- BEGIN GENERATED SUITE TOPOLOGY -->
-
-<!-- Maintainers: re-run `python scripts/docs/render_topology.py --check` before publishing docs. -->
-Generated from `installer/modules.json`.
-
-- Root installer truth label: `townlight_records_meetings_code_beta_candidate`.
-- Primary product profile: `records-beta` (Townlight Records).
-- Townlight Records profile status: `stabilizing`.
-- Only the Townlight Records modules are represented in this candidate table.
-- Disabled profiles and excluded modules remain documented as out of scope until their own gates clear.
-
-| Module | Version | Role | Dependencies | Source commit | Installer status |
-|---|---:|---|---|---|---|
-| Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
-| Townlight Records | 1.7.3 | records workflow | `civiccore` | `45042345b5ca` | `v1_7_3_records_beta_candidate` |
-| Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
-| Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
-
-Disabled profiles:
-- `land-use` (Land Use): queued - depends on Tier 2 module work after city-core ships
-- `full-suite` (Full Suite): 14 modules remain pre-1.0 scaffolds pinned to older CivicCore lines; not installable as a coherent suite
-
-<!-- END GENERATED SUITE TOPOLOGY -->
+[Legacy manifest table retained above.]
 
 ### Upgrade and migration order
 

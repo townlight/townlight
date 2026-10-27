@@ -1,12 +1,8 @@
-# Connected Permitting candidate
+# Connected Permitting workspace — signed 1.6.0-beta.1
 
-The explicit `permitting-preview` composition is an unsigned development candidate,
-not a public release. It extends the accepted Planning runtime with configured
-municipal intake requirements and the actual `civicpermit` migrated repository.
-Default product profiles, download links, prior installers and frozen Planning
-contracts are unchanged. The separate MSI product is **Townlight Permitting
-Candidate**, identifier `org.townlight.permitting.candidate`, version `1.6.0-1`
-(Windows `1.6.0.1`). Signing/publication is rejected by its build resolver.
+The explicit permitting-preview composition is publicly delivered as signed [1.6.0-beta.1](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1). The former unsigned/private-only restriction was removed before publication. Its separate installed identity remains **Townlight Permitting Candidate**, org.townlight.permitting.candidate, desktop 1.6.0-1 / MSI 1.6.0.1. That retained product name is not a publication prohibition.
+
+See the [full product manual](https://github.com/townlight/permit/blob/main/USER-MANUAL.md), [overall guide](../../USER-MANUAL.md) and [assessment](../assessment/feature-and-integration-review.md). Original installers, signed Planning, history, profiles and default downloads remain preserved.
 
 Use Settings to select the Permitting staff candidate, then activate the canonical
 runtime using the existing backed-up migration controls. Only city staff or local

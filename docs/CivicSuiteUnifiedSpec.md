@@ -1,3 +1,5 @@
+> **Status reconciliation — 2026-10-26:** This specification retains intended requirements and historical version/status paragraphs. Use the [feature and integration review](assessment/feature-and-integration-review.md) for source-proven implementation, explicit deferral, confirmed gaps and unresolved proof across all eight products. Planning, Permitting and Inspections now have accepted signed desktop compositions; older “queued”/demotion labels below are historical package context. This note does not remove broader requirements.
+
 <a id="civicsuite-unified-specification"></a>
 
 # Townlight Unified Specification
@@ -1234,4 +1236,3 @@ When documents conflict:
 ## 24. Working Rule
 
 No future Townlight implementation sprint should begin from memory or from an isolated module scaffold. It should begin by reading this document, the relevant module-specific spec, current repo state, and the current compatibility matrix.
-

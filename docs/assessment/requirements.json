@@ -1,0 +1,497 @@
+[
+  {
+    "id": "CORE-01",
+    "product": "core",
+    "requirement": "Migration runner and shared database/schema contracts",
+    "status": "I+A",
+    "source": "core:civiccore/migrations",
+    "conclusion": "Implemented; consumed in the accepted explicit native activation/migration path.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-02",
+    "product": "core",
+    "requirement": "Provider abstraction, adapters, templates and structured/context helpers",
+    "status": "I",
+    "source": "core:civiccore/llm",
+    "conclusion": "Implemented Python interfaces; configuring a provider does not certify every model or every consumer integration.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-03",
+    "product": "core",
+    "requirement": "Audit, provenance, manifests and exact export contracts",
+    "status": "I+A",
+    "source": "core:civiccore/provenance",
+    "conclusion": "Implemented and reused by accepted connected evidence/export workflows.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-04",
+    "product": "core",
+    "requirement": "Document ingestion pipeline",
+    "status": "I",
+    "source": "core:civiccore/ingest/pipeline.py",
+    "conclusion": "Implemented. The unified spec planned-extraction label is stale for ingestion; do not report this as missing.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-05",
+    "product": "core",
+    "requirement": "Search normalization, access filtering and result fusion",
+    "status": "I",
+    "source": "core:civiccore/search/__init__.py",
+    "conclusion": "Implemented helpers; no full centrally owned database-backed search/index service is established by these helpers.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-06",
+    "product": "core",
+    "requirement": "Full centrally owned auth/user/department/service-account administration",
+    "status": "U",
+    "source": "core:civiccore/auth",
+    "conclusion": "Helpers exist and consumers implement administration. A completed shared extraction is not established; this is distinct from working desktop staff authentication.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-07",
+    "product": "core",
+    "requirement": "Full shared search/index storage and retrieval orchestration",
+    "status": "U",
+    "source": "core:civiccore/search/__init__.py",
+    "conclusion": "The shipped namespace explicitly promises a small helper surface. Full extraction remains unproved, not equivalent to missing consumer search.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-08",
+    "product": "core",
+    "requirement": "Shared catalog: installed modules, municipal systems, connectors and recommendations",
+    "status": "D+G",
+    "source": "core:civiccore/catalog/__init__.py",
+    "conclusion": "Reserved placeholder only. Accepted ADR-0001 defers the broader specified shared implementation to a future phase.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-09",
+    "product": "core",
+    "requirement": "Shared jurisdictional exemption/rule engine",
+    "status": "D+G",
+    "source": "core:civiccore/exemptions/__init__.py",
+    "conclusion": "Reserved placeholder only. Accepted ADR-0002 defers it; Records-local exemptions are not the shared Core implementation.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-10",
+    "product": "core",
+    "requirement": "Module scaffolding CLI/templates",
+    "status": "D+G",
+    "source": "core:civiccore/scaffold/__init__.py",
+    "conclusion": "Reserved placeholder only under accepted ADR-0003. Existing repository scripts do not implement this shared API.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-11",
+    "product": "core",
+    "requirement": "Runtime, health, task queue and backup primitives",
+    "status": "I+A",
+    "source": "core:civiccore/platform",
+    "conclusion": "Implemented; native service ownership and coherent recovery remain composition-specific.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-12",
+    "product": "core",
+    "requirement": "Connector, notice, scheduling and security primitives",
+    "status": "I",
+    "source": "core:civiccore/connectors",
+    "conclusion": "Implemented primitives do not prove all vendor adapters, internet delivery, sovereignty verification or all city policies.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CORE-13",
+    "product": "core",
+    "requirement": "Shared resident/staff shell and complete notification delivery extraction",
+    "status": "U",
+    "source": "core:USER-MANUAL.md",
+    "conclusion": "Consumer desktop shell and notifications exist. Completion of every broader shared extraction is unverified; no accepted runtime blocker found.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-01",
+    "product": "records",
+    "requirement": "Request intake, clarification, assignment, search and timeline",
+    "status": "I+A",
+    "source": "sunshine:backend/app/requests/workflow.py",
+    "conclusion": "Implemented; accepted installed staff request journey reused.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-02",
+    "product": "records",
+    "requirement": "Permission-aware source search and connected evidence",
+    "status": "I+A",
+    "source": "sunshine:backend/app/desktop_bridge",
+    "conclusion": "Accepted selected-source workflows, including later Planning/Permit/Inspect receipts. Not proof of unrestricted federation.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-03",
+    "product": "records",
+    "requirement": "Response drafting, exact approval invalidation, release, fulfillment and close",
+    "status": "I+A",
+    "source": "sunshine:backend/app/requests/workflow.py",
+    "conclusion": "Implemented; approval is tied to exact response text. An attachment alone does not approve or release.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-04",
+    "product": "records",
+    "requirement": "Exemption decisions, evidence notes, fees/waivers and messages",
+    "status": "I",
+    "source": "sunshine:backend/app/requests/workflow.py",
+    "conclusion": "Source implementation exists. Full statutory coverage and all jurisdiction configurations are not certified by the bounded staff acceptance.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-05",
+    "product": "records",
+    "requirement": "Notification templates/outbox and SMTP",
+    "status": "I",
+    "source": "sunshine:backend/app/notifications/smtp_delivery.py",
+    "conclusion": "SMTP code exists; configuration and real mail delivery are separate evidence. Do not classify SMTP as absent from stale planned text.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-06",
+    "product": "records",
+    "requirement": "Public request submit/tracking/admin surfaces",
+    "status": "I+U",
+    "source": "sunshine:backend/app/public/router.py",
+    "conclusion": "Endpoints exist. Full specified resident portal, external deployment and all accessibility requirements lack complete current acceptance evidence.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "RECORDS-07",
+    "product": "records",
+    "requirement": "Complete redaction ledger and federation",
+    "status": "U",
+    "source": "sunshine:docs/UNIFIED-SPEC.md",
+    "conclusion": "Models contain redaction status and review decisions. A complete cross-system redaction ledger/federation acceptance is not established; not asserted absent solely from an old plan.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-01",
+    "product": "meetings",
+    "requirement": "Bodies, meetings, agenda intake, packets and staff reports",
+    "status": "I+A",
+    "source": "meetings:civicclerk/main.py",
+    "conclusion": "Accepted clerk workflow and source implementation reused.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-02",
+    "product": "meetings",
+    "requirement": "Notice, motions/votes, actions and minutes",
+    "status": "I+A",
+    "source": "meetings:civicclerk/meeting_lifecycle.py",
+    "conclusion": "Implemented lifecycle and accepted connected clerk journey; jurisdiction-specific legal compliance is not a universal certification.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-03",
+    "product": "meetings",
+    "requirement": "Adoption evidence and Code handoff",
+    "status": "I+A",
+    "source": "meetings:civicclerk/main.py",
+    "conclusion": "Adoption and Code codification stay distinct; permitted evidence handoff accepted.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-04",
+    "product": "meetings",
+    "requirement": "Archive, public materials and Records visibility",
+    "status": "I+A",
+    "source": "meetings:civicclerk/records_sources.py",
+    "conclusion": "Public/private boundary accepted; internet portal deployment remains separate.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-05",
+    "product": "meetings",
+    "requirement": "Supplied transcript capture, correction and history",
+    "status": "I",
+    "source": "meetings:civicclerk/transcripts.py",
+    "conclusion": "Actual transcript text capture exists. It does not perform audio-to-text transcription.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-06",
+    "product": "meetings",
+    "requirement": "Automatic audio transcription and livestream hosting",
+    "status": "D+U",
+    "source": "meetings:docs/architecture/ADR-0001-mvp-boundary.md",
+    "conclusion": "Explicit MVP deferral; supplied-text capture is not evidence of completed automatic transcription or streaming.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "MEETINGS-07",
+    "product": "meetings",
+    "requirement": "Vendor live synchronization",
+    "status": "I+U",
+    "source": "meetings:civicclerk/vendor_network_sync.py",
+    "conclusion": "Opt-in approved-source JSON network runner exists. Every vendor/credential/deployment path is not certified.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CODE-01",
+    "product": "code",
+    "requirement": "Authoritative sections, cited Q&A and version/date history",
+    "status": "I+A",
+    "source": "ordinances:civiccode/main.py",
+    "conclusion": "Source and accepted native cited code workflow reused; no legal advice.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CODE-02",
+    "product": "code",
+    "requirement": "Meetings adoption feed and explicit codification",
+    "status": "I+A",
+    "source": "ordinances:civiccode/main.py",
+    "conclusion": "Accepted separation between adoption event and code text change.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CODE-03",
+    "product": "code",
+    "requirement": "Source imports and local codifier sync orchestration",
+    "status": "I",
+    "source": "ordinances:civiccode/codifier_sync.py",
+    "conclusion": "run_local_payload orchestrates already-fetched data; it is not proof of a continuous live network integration.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "CODE-04",
+    "product": "code",
+    "requirement": "All commercial codifiers and every downstream section consumer",
+    "status": "U",
+    "source": "ordinances:civiccode/operational_readiness.py",
+    "conclusion": "No universal vendor or every-product integration acceptance. No missing accepted code workflow inferred from this limit.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "ZONING-01",
+    "product": "zoning",
+    "requirement": "Parcel/local GeoJSON import, PostGIS and original provenance",
+    "status": "I+A",
+    "source": "zone:civiczone/geo_import.py",
+    "conclusion": "Accepted EPSG:4326 local dataset path; no new import run needed.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "ZONING-02",
+    "product": "zoning",
+    "requirement": "Cited use/dimensional rules and informational answer safeguards",
+    "status": "I+A",
+    "source": "zone:civiczone/cited_rules.py",
+    "conclusion": "Source and accepted question/citation/correction path; official determinations remain human work.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "ZONING-03",
+    "product": "zoning",
+    "requirement": "Ambiguity review, analytics, flagged improvements and staff outlines",
+    "status": "I+U",
+    "source": "zone:civiczone/main.py",
+    "conclusion": "API functions exist. The accepted native path does not certify all analytics/UI combinations.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "ZONING-04",
+    "product": "zoning",
+    "requirement": "Meetings context, public snapshots and Records handoff",
+    "status": "I+A",
+    "source": "zone:civiczone/connected_sources.py",
+    "conclusion": "Accepted public snapshot/private-context boundary and later Planning/Permit selection reused.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "ZONING-05",
+    "product": "zoning",
+    "requirement": "All ArcGIS, assessor, CKAN and Access/Planning priority integrations",
+    "status": "U",
+    "source": "zone:civiczone/main.py",
+    "conclusion": "Local GeoJSON acceptance is not evidence that all priority connectors and reverse integrations are complete.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PLANNING-01",
+    "product": "planning",
+    "requirement": "Adopted policy bundle import, originals and immutable source revisions",
+    "status": "I+A",
+    "source": "plan:civicplan/source_store.py",
+    "conclusion": "Accepted native policy-library import and retained originals.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PLANNING-02",
+    "product": "planning",
+    "requirement": "Policy lookup, selected relationships and Meetings/Zoning context",
+    "status": "I+A",
+    "source": "plan:civicplan/workflow_models.py",
+    "conclusion": "Accepted version/hash/permission-aware selected evidence; no automatic recommendation.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PLANNING-03",
+    "product": "planning",
+    "requirement": "Saved analyses, explicit review and audience-controlled exact snapshots",
+    "status": "I+A",
+    "source": "plan:civicplan/workflow_store.py",
+    "conclusion": "Accepted signed 1.5.1 fresh-install behavior. Historical-version upgrade acceptance is outside that scope.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PLANNING-04",
+    "product": "planning",
+    "requirement": "Municipal progress tracking with durable status/evidence updates",
+    "status": "G",
+    "source": "plan:civicplan/plan_workflows.py",
+    "conclusion": "progress_targets returns SAMPLE_PROGRESS_TARGETS. A sample read endpoint is not the specified municipal tracking workflow.",
+    "specification": "Catalog Planning: key capabilities"
+  },
+  {
+    "id": "PLANNING-05",
+    "product": "planning",
+    "requirement": "Municipal amendment proposal/adoption lifecycle",
+    "status": "G",
+    "source": "plan:civicplan/plan_workflows.py",
+    "conclusion": "amendment_history returns SAMPLE_AMENDMENTS. Versioned source import does not implement a proposed-amendment/adoption workflow.",
+    "specification": "Catalog Planning: key capabilities"
+  },
+  {
+    "id": "PLANNING-06",
+    "product": "planning",
+    "requirement": "Full public exploration by topic/neighborhood/goal and cross-plan AI synthesis",
+    "status": "U",
+    "source": "plan:civicplan/public_ui.py",
+    "conclusion": "Static sample public page and deterministic helpers are not evidence of the complete specified municipal portal/AI workflow.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-01",
+    "product": "permitting",
+    "requirement": "Requirement originals, versioned checklist and saved intake assessments",
+    "status": "I+A",
+    "source": "permit:civicpermit/workflow_store.py",
+    "conclusion": "Accepted connected staff workflow and retained revisions; not an official completeness determination.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-02",
+    "product": "permitting",
+    "requirement": "Actual Code/Zoning sources and server-attributed review",
+    "status": "I+A",
+    "source": "permit:civicpermit/connections.py",
+    "conclusion": "Accepted exact source/provider/hash checks and named persisted reviewer.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-03",
+    "product": "permitting",
+    "requirement": "Private packet, separately edited public copy and Records attachment",
+    "status": "I+A",
+    "source": "permit:civicpermit/records_export.py",
+    "conclusion": "Accepted exclusion/hash/explicit attachment; no automatic Records approval/release.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-04",
+    "product": "permitting",
+    "requirement": "Live LLM permit pathway/fee/timeline recommendations",
+    "status": "G",
+    "source": "permit:civicpermit/main.py",
+    "conclusion": "Root contract explicitly says live LLM calls and fee calculations are not implemented. Deterministic local helpers are not the full catalog AI promise.",
+    "specification": "Catalog Permitting: pre-application/AI capabilities"
+  },
+  {
+    "id": "PERMITTING-05",
+    "product": "permitting",
+    "requirement": "Read-only vendor mirror and applicant status lookup",
+    "status": "U",
+    "source": "permit:civicpermit/main.py",
+    "conclusion": "Accepted workflow has no live vendor mirror acceptance; mock development-review contracts are not a live status service.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-06",
+    "product": "permitting",
+    "requirement": "Hearing-notice integration and full resident explainers/portal",
+    "status": "U",
+    "source": "permit:civicpermit/main.py",
+    "conclusion": "Public UI foundation exists; complete catalog applicant/Notice workflow is not established.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "PERMITTING-07",
+    "product": "permitting",
+    "requirement": "Permit issuance, fee collection, scheduling and official approval",
+    "status": "N",
+    "source": "permit:docs/connected-workflow.md",
+    "conclusion": "Explicitly excluded by specification/product boundary. These are not unfinished promises of the intake copilot.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "INSPECTIONS-01",
+    "product": "inspections",
+    "requirement": "Original files, saved case, Code citations and attributed review/history",
+    "status": "I+A",
+    "source": "inspect:civicinspect/workflow_store.py",
+    "conclusion": "Accepted installed business writes and corrected navigation readback reused.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "INSPECTIONS-02",
+    "product": "inspections",
+    "requirement": "Report/notice outline from supplied text and prior case lookup",
+    "status": "I+A",
+    "source": "inspect:civicinspect/report_draft.py",
+    "conclusion": "Actual inspector-entered observations and supplied voice-note summaries; saved case context is distinct from sample lookup.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "INSPECTIONS-03",
+    "product": "inspections",
+    "requirement": "Private packet, separately edited public copy and Records attachment",
+    "status": "I+A",
+    "source": "inspect:civicinspect/records_export.py",
+    "conclusion": "Accepted exact attachment plus navigation refresh and unchanged approval/release fields.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "INSPECTIONS-04",
+    "product": "inspections",
+    "requirement": "Automatic photo analysis and raw voice-to-text report drafting",
+    "status": "G",
+    "source": "inspect:civicinspect/report_draft.py",
+    "conclusion": "Function explicitly performs no image analysis; voice_notes is already text. Root contract explicitly excludes live photo/LLM analysis.",
+    "specification": "Catalog Inspections: photo-and-voice-to-report"
+  },
+  {
+    "id": "INSPECTIONS-05",
+    "product": "inspections",
+    "requirement": "Live enforcement-system integration, parcel/GIS capture and full field/mobile workflow",
+    "status": "U",
+    "source": "inspect:civicinspect/main.py",
+    "conclusion": "Local saved cases/originals do not establish the full specified external field system or jurisdictional deployment.",
+    "specification": "Unified specification"
+  },
+  {
+    "id": "INSPECTIONS-06",
+    "product": "inspections",
+    "requirement": "Autonomous enforcement, AI-initiated notices, fines and scheduling",
+    "status": "N",
+    "source": "inspect:civicinspect/main.py",
+    "conclusion": "Explicitly excluded from accepted implementation; autonomous enforcement is prohibited by the specification.",
+    "specification": "Unified specification"
+  }
+]

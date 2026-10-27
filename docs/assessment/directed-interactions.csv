@@ -1,0 +1,65 @@
+source,target,status,detail
+core,core,—,Same product; no cross-product assertion.
+core,records,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,meetings,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,code,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,zoning,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,planning,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,permitting,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+core,inspections,A,Core contracts consumed by the accepted composition; not proof of every Core capability.
+records,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+records,records,—,Same product; no cross-product assertion.
+records,meetings,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+records,code,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+records,zoning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+records,planning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+records,permitting,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+records,inspections,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+meetings,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+meetings,records,A,Permitted public meeting material selected as Records evidence.
+meetings,meetings,—,Same product; no cross-product assertion.
+meetings,code,A,Adopted ordinance/resolution evidence; separate Code codification.
+meetings,zoning,A,Permitted hearing/precedent context; private context remains private.
+meetings,planning,A,Selected immutable meeting/adoption/hearing evidence.
+meetings,permitting,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+meetings,inspections,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+code,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+code,records,A,Selected cited public section/version evidence.
+code,meetings,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+code,code,—,Same product; no cross-product assertion.
+code,zoning,A,Actual authoritative public Code context for cited rules.
+code,planning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+code,permitting,A,"Selected public Code evidence, rechecked hash/permissions."
+code,inspections,A,"Selected Code citation, reviewer owns the conclusion."
+zoning,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+zoning,records,A,Explicitly public immutable snapshots.
+zoning,meetings,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+zoning,code,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+zoning,zoning,—,Same product; no cross-product assertion.
+zoning,planning,A,Selected public source context.
+zoning,permitting,A,Selected public source context.
+zoning,inspections,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+planning,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+planning,records,A,Permitted reviewed immutable public snapshots.
+planning,meetings,U,Broader staff-report context helper exists; automatic live staff-report handoff not certified.
+planning,code,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+planning,zoning,U,Priority comprehensive-plan context in the Zoning spec; reverse live integration not established.
+planning,planning,—,Same product; no cross-product assertion.
+planning,permitting,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+planning,inspections,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+permitting,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+permitting,records,A,Explicit reviewed public-copy attachment; not release.
+permitting,meetings,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+permitting,code,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+permitting,zoning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+permitting,planning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+permitting,permitting,—,Same product; no cross-product assertion.
+permitting,inspections,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,core,S,Consumer uses Core; this reverse direction is not a separate business handoff.
+inspections,records,A,Explicit reviewed public-copy attachment plus canonical navigation readback.
+inspections,meetings,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,code,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,zoning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,planning,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,permitting,S,No required direct workflow identified in the reviewed eight-product contracts; no completion claim.
+inspections,inspections,—,Same product; no cross-product assertion.

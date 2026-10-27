@@ -49,16 +49,24 @@ try {
     const response = await page.goto(target, { waitUntil: "load" });
     const title = await page.title();
     const recordsHeadingVisible = await page
-      .getByRole("heading", { name: "Connected municipal work, accountable and local." })
+      .getByRole("heading", { name: "One source of truth. A connected day’s work." })
       .isVisible();
     const candidateStatusVisible = await page
-      .getByText("1.4.0-beta.1 · public beta", { exact: true })
+      .getByRole("link", { name: "Existing default Windows beta · 1.4", exact: true })
       .isVisible();
     const productModulesVisible = await Promise.all(
-      ["Townlight Core", "Townlight Records", "Townlight Meetings", "Townlight Code", "Townlight Notice", "Townlight Access"].map((name) =>
-        page.locator(".m-name a", { hasText: name }).first().isVisible(),
+      ["Core", "Records", "Meetings", "Code", "Zoning", "Planning", "Permitting", "Inspections"].map((name) =>
+        page.locator(".product h3").getByRole("link", { name, exact: true }).isVisible(),
       ),
     );
+    const productLinks = await page.locator(".product h3 a").evaluateAll((nodes) => nodes.map((node) => node.href));
+    const expectedProductLinks = ["core", "records", "meetings", "code", "zoning", "planning", "permitting", "inspections"]
+      .map((slug) => `https://townlight.github.io/products/${slug}/`);
+    const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
+      expectedProductLinks.every((link, index) => productLinks[index] === link);
+    const defaultDownloadPreserved = await page.getByRole("link", { name: "Existing default Windows beta · 1.4", exact: true })
+      .getAttribute("href") === "https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1";
+    const overallManualVisible = await page.getByRole("link", { name: "Read the overall manual", exact: true }).isVisible();
     const horizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );
@@ -74,6 +82,9 @@ try {
       recordsHeadingVisible,
       candidateStatusVisible,
       productModulesVisible,
+      productLinksCorrect,
+      defaultDownloadPreserved,
+      overallManualVisible,
       horizontalOverflow,
       focusedText,
       consoleMessages,
@@ -89,12 +100,15 @@ try {
 const failed = results.some(
   (result) =>
     result.status !== 200 ||
-    result.title !== "Townlight Records + Meetings + Code + Zoning | local-first municipal workflows" ||
+    result.title !== "Townlight — Eight connected municipal products" ||
     !result.recordsHeadingVisible ||
     !result.candidateStatusVisible ||
     result.productModulesVisible.some((visible) => !visible) ||
+    !result.productLinksCorrect ||
+    !result.defaultDownloadPreserved ||
+    !result.overallManualVisible ||
     result.horizontalOverflow ||
-    result.focusedText !== "Skip to main content" ||
+    result.focusedText !== "Skip to content" ||
     result.consoleMessages.length > 0,
 );
 
