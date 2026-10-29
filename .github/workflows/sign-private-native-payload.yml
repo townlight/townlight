@@ -1,0 +1,107 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Sign only exact prebuilt native dependencies. No checkout/build/release publication.
+name: Sign private native payload
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Unpublished draft containing the exact intake ZIP
+        required: true
+      asset_name:
+        description: Exact ZIP asset filename
+        required: true
+      expected_sha256:
+        description: SHA256 of the complete intake ZIP
+        required: true
+permissions:
+  contents: write # Required to read draft-release assets; no release writes below.
+jobs:
+  sign:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Download exact draft intake
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.release_tag }}
+          ASSET: ${{ inputs.asset_name }}
+        run: |
+          $ErrorActionPreference='Stop'
+          if ($env:ASSET -notmatch '^[A-Za-z0-9_.-]+\.zip$') { throw 'Invalid intake asset name' }
+          $draft=gh release view $env:TAG --json isDraft | ConvertFrom-Json
+          if ($LASTEXITCODE -or -not $draft.isDraft) { throw 'Intake must be an unpublished draft' }
+          New-Item intake -ItemType Directory | Out-Null
+          gh release download $env:TAG --pattern $env:ASSET --dir intake
+          if ($LASTEXITCODE) { throw 'Intake download failed' }
+      - name: Verify exact native intake
+        shell: pwsh
+        env:
+          EXPECTED: ${{ inputs.expected_sha256 }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $archives=@(Get-ChildItem intake -File)
+          if ($archives.Count -ne 1 -or $archives[0].Extension -ne '.zip') { throw 'Expected exactly one ZIP' }
+          if ($env:EXPECTED -notmatch '^[a-f0-9]{64}$') { throw 'Invalid expected SHA256' }
+          if ((Get-FileHash $archives[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $env:EXPECTED) { throw 'Intake hash mismatch' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive=[IO.Compression.ZipFile]::OpenRead($archives[0].FullName)
+          try {
+            $names=@($archive.Entries.FullName)
+            if (@($names|Select-Object -Unique).Count -ne $names.Count) { throw 'Duplicate ZIP entries' }
+            foreach ($entry in $archive.Entries) {
+              if ($entry.FullName -ne 'manifest.json' -and $entry.FullName -notmatch '^[a-f0-9]{64}\.(exe|dll|pyd)$') { throw 'Unexpected or unsafe ZIP entry' }
+              if ($entry.Length -gt 1073741824) { throw 'Oversize native file' }
+            }
+          } finally { $archive.Dispose() }
+          Expand-Archive $archives[0].FullName sign-input
+          $manifest=Get-Content sign-input/manifest.json -Raw | ConvertFrom-Json
+          if ($manifest.schema_version -ne 1 -or $manifest.publication_allowed -ne $false) { throw 'Unsupported signing manifest' }
+          if (@($manifest.files).Count -lt 1 -or @($manifest.files).Count -gt 1000) { throw 'Invalid file count' }
+          $native=@(Get-ChildItem sign-input -File|Where-Object Name -ne 'manifest.json')
+          if ($native.Count -ne @($manifest.files).Count -or @($manifest.files.name|Select-Object -Unique).Count -ne $native.Count) { throw 'Native file set mismatch' }
+          foreach ($file in $manifest.files) {
+            if ($file.name -notmatch '^[a-f0-9]{64}\.(exe|dll|pyd)$') { throw 'Unsafe native filename' }
+            $path=Join-Path sign-input $file.name
+            if ((Get-Item $path).Length -ne $file.bytes -or (Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.unsigned_sha256) { throw 'Native file hash mismatch' }
+            if ((Get-AuthenticodeSignature $path).Status -ne 'NotSigned') { throw 'Refusing to replace an existing vendor signature' }
+          }
+      - name: Sign native dependencies with existing publisher
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: https://wcus.codesigning.azure.net
+          signing-account-name: scottconverse-signing
+          certificate-profile-name: ScottConversePublic
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          files-folder: sign-input
+          files-folder-filter: exe,dll,pyd
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          timeout: 1200
+      - name: Verify every signature and retain hash mappings
+        shell: pwsh
+        env:
+          INTAKE_SHA256: ${{ inputs.expected_sha256 }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $manifest=Get-Content sign-input/manifest.json -Raw|ConvertFrom-Json
+          $receipts=@(foreach ($file in $manifest.files) {
+            $path=Join-Path sign-input $file.name
+            $sig=Get-AuthenticodeSignature $path
+            if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch '^CN=Scott Converse(?:,|$)' -or -not $sig.TimeStamperCertificate) { throw "Invalid publisher signature: $($file.name)" }
+            [ordered]@{name=$file.name;paths=$file.paths;unsigned_sha256=$file.unsigned_sha256;signed_sha256=(Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant();status=[string]$sig.Status;subject=$sig.SignerCertificate.Subject;timestamp_subject=$sig.TimeStamperCertificate.Subject}
+          })
+          [ordered]@{workflow_run=$env:RUN_ID;intake_sha256=$env:INTAKE_SHA256;publication_allowed=$false;files=$receipts}|ConvertTo-Json -Depth 8|Set-Content sign-input/signing-receipt.json -Encoding utf8
+          Compress-Archive sign-input/* signed-native-payload.zip -CompressionLevel Fastest
+      - name: Return private signing artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-native-payload
+          path: signed-native-payload.zip
+          retention-days: 1
+          if-no-files-found: error
