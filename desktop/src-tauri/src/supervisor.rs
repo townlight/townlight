@@ -2213,7 +2213,10 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
             .map(|root| root.join("station").join("bin").join("ffmpeg.exe"))
             .find(|path| path.is_file())
         {
-            env.push(("CIVICINSPECT_FFMPEG".to_string(), ffmpeg.display().to_string()));
+            env.push((
+                "CIVICINSPECT_FFMPEG".to_string(),
+                ffmpeg.display().to_string(),
+            ));
         }
         // Configure CivicAccess's durable-write guard so its persistence-write routes accept the
         // staff surface's token (pairs with the module's server-side X-CivicAccess-Write-Token).
@@ -4309,15 +4312,21 @@ mod tests {
             let previous = env::var_os("CIVICSUITE_RUNTIME_PAYLOAD_DIR");
             env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", &payload);
             let manifest = parse_manifest().unwrap();
-            let service = manifest.services.iter().find(|s| s.id == "python-services").unwrap();
+            let service = manifest
+                .services
+                .iter()
+                .find(|s| s.id == "python-services")
+                .unwrap();
             let result = service_environment(service);
             match previous {
                 Some(value) => env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", value),
                 None => env::remove_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR"),
             }
             let variables = result.unwrap();
-            assert!(variables.iter().any(|(name, value)|
-                name == "CIVICINSPECT_FFMPEG" && value == &ffmpeg.display().to_string()));
+            assert!(variables
+                .iter()
+                .any(|(name, value)| name == "CIVICINSPECT_FFMPEG"
+                    && value == &ffmpeg.display().to_string()));
         });
     }
 
