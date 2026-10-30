@@ -49,7 +49,6 @@
     },
     "inspection_voice": {
       "download_url": "https://github.com/townlight/townlight/releases/download/townlight-beta-1/Townlight-Beta-1-Inspection-Voice-Assets.zip",
-      "asset_api_url": "https://api.github.com/repos/townlight/townlight/releases/assets/693100326",
       "download_sha256": "0325c199b215316d8cbb5374150867f7fe2352e6a640ce80218dbac57d569fa8",
       "required_sha256": {
         "inspections/whistle/whistle.cact": "b6e02f048568ac5d01a2042556c658061e699acbc0aa2a1439f52f3d461dffeb",

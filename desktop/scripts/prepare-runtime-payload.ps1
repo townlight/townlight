@@ -1049,23 +1049,13 @@ function Install-OllamaPayload {
 
 function Install-InspectionVoicePayload {
     param([object]$Source, [string]$CacheRoot, [string]$PythonRoot)
-    if (-not $Source.download_sha256 -or -not $Source.download_url -or -not $Source.asset_api_url) {
+    if (-not $Source.download_sha256 -or -not $Source.download_url) {
         throw 'Inspection voice assets require explicit pinned download metadata.'
     }
     $Archive = Join-Path $CacheRoot 'Townlight-Beta-1-Inspection-Voice-Assets.zip'
     if (-not (Test-Path -LiteralPath $Archive) -or (Get-Sha256 -Path $Archive) -ne $Source.download_sha256) {
         if ($SkipDownloads) { throw 'Pinned inspection voice assets are not cached.' }
-        if ($env:GH_TOKEN) {
-            # The same repository's read-only Actions token can retrieve the
-            # accepted build input while the coordinated release is still draft.
-            # Keep the token in-process; do not put it in native command args.
-            Invoke-WebRequest -Uri $Source.asset_api_url -Headers @{
-                Authorization = "Bearer $env:GH_TOKEN"
-                Accept = 'application/octet-stream'
-            } -OutFile $Archive -UseBasicParsing
-        } else {
-            Invoke-CivicDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $Source.download_sha256 | Out-Null
-        }
+        Invoke-CivicDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $Source.download_sha256 | Out-Null
     }
     $Hash = Get-Sha256 -Path $Archive
     if ($Hash -ne $Source.download_sha256) { throw 'Inspection voice archive hash mismatch.' }

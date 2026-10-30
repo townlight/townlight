@@ -83,7 +83,10 @@ notices and reuse manifest are supplied in
 `Townlight-Beta-1-Inspection-Voice-Assets.zip`, pinned by SHA-256 in
 `desktop/runtime/windows-runtime-sources.json`. This is an existing vendor build
 input from the accepted candidate. The preparation script verifies the archive
-and both executable/model hashes. CI uses its repository's read-only token to
-retrieve this input while the coordinated release is draft; after publication a
+and both executable/model hashes. While the coordinated release is draft, a
+checkout-free CI staging job retrieves and hash-checks this fixed archive and
+passes it as an Actions artifact to the read-only Windows build/runtime jobs.
+GitHub requires push access to read a draft asset, so that small staging job alone
+has `contents: write`; it runs no application or package code. After publication a
 normal source build uses the public release URL. It does not sign or rebuild the
 accepted installer.
