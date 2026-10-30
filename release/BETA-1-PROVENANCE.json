@@ -292,7 +292,7 @@
       "path": "desktop/runtime/windows-runtime-payloads.json",
       "sha256": "d2cbb8e3981c45995741fb6b561ab001acc85819370c3c52686f1592ae568df7",
       "status": "changed",
-      "publication_sha256": "cad917bc5967836594c0844598b63f147ab89a6c863d1171efe89384ce4e9ca9"
+      "publication_sha256": "941e1c77a9d2babebcbe1a13ac91c70e9be5c2d42bf0f56e807dbddae5732563"
     },
     {
       "archive": "desktop/runtime/windows-runtime-sources.json",
@@ -316,7 +316,7 @@
       "path": "desktop/scripts/inspections-build-contract.ps1",
       "sha256": "6f423307a9288860bc8c047caa147def272edf78808e039cb2982018d2086bff",
       "status": "same",
-      "publication_sha256": "b321b9f7bdecdcfc2244a263093e3391bed0dbb739d42de091ed73dd204f6cb1"
+      "publication_sha256": "5b6a4fc9f2c85696629ba687419e6a06bfee328d5fb9e9c7e985bf4bc3bb9e64"
     },
     {
       "archive": "desktop/scripts/permitting-build-contract.ps1",
@@ -348,7 +348,7 @@
       "path": "desktop/scripts/resolve-msi-candidate.ps1",
       "sha256": "987a3bd46800cf8a5301fe30c7a854ea0c938b26e500ca3e513da87310274530",
       "status": "same",
-      "publication_sha256": "00f2e33c674969498c7c0bd8d336d72cb7330a4cb182a20e133c333e5e959169"
+      "publication_sha256": "6fc5d6fea770e6d05278acbcd540f6f56e910b8c2a5576c0a500539ee56f6d1c"
     },
     {
       "archive": "desktop/scripts/verify-desktop-runtime.ps1",
@@ -628,7 +628,7 @@
       "path": "desktop/src/permitting/view.js",
       "sha256": "ea60d8b4ed74035beeb5cf8bd4554eeb4a0153085c85cc7f702beedc8a48df0c",
       "status": "changed",
-      "publication_sha256": "261b6bcbdffc4c107bfddcfb46c7c8013de78e94b22171560034e3353e545a01"
+      "publication_sha256": "183911b5b0fc0d0e5eb5c9cb04334d767eb06c14a44cd16f0e5982f774746ff7"
     },
     {
       "archive": "desktop/src/planning/client.ts",
@@ -844,7 +844,7 @@
       "path": "LICENSE",
       "sha256": "f8d737bb0e71411f200b34d8c895df6ed6957fd3250f7976d5af9d7d7b752aac",
       "status": "changed",
-      "publication_sha256": "e0eedba615d5cd1b986afb6c5b3a4b1ae33713e7e9dc74d19daec5e3221f9d2e"
+      "publication_sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
     },
     {
       "archive": "townlight/LICENSE-CODE",
@@ -852,7 +852,7 @@
       "path": "LICENSE-CODE",
       "sha256": "e0eedba615d5cd1b986afb6c5b3a4b1ae33713e7e9dc74d19daec5e3221f9d2e",
       "status": "changed",
-      "publication_sha256": "e0eedba615d5cd1b986afb6c5b3a4b1ae33713e7e9dc74d19daec5e3221f9d2e"
+      "publication_sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
     },
     {
       "archive": "installed-owned-source/civicsuite_runtime/__init__.py",

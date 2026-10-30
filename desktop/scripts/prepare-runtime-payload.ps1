@@ -960,19 +960,23 @@ import importlib.metadata as metadata
 import json
 from pathlib import Path
 from app.desktop_bridge.router import router
+from fastapi import FastAPI
 from civicplan.source_store import PlanSourceRepository
 from civicplan.workflow_store import WorkflowRepository
+probe = FastAPI()
+probe.include_router(router)
+route_paths = set(probe.openapi()['paths'])
 assert hasattr(PlanSourceRepository, 'inventory') and hasattr(WorkflowRepository, 'preview_snapshot')
-assert '/desktop/v1/planning-sources/search' in {route.path for route in router.routes}
+assert '/desktop/v1/planning-sources/search' in route_paths
 assert metadata.version('civicplan') == '$($PlanningBuild.Contract.planning_package_version)'
 assert metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'
 assert metadata.version('civiccore') == '$($PlanningBuild.Contract.core_package_version)'
 if '$ProductProfile' in ('permitting-preview', 'inspections-preview'):
     assert metadata.version('civicpermit') == '$($PlanningBuild.Contract.permitting_package_version)'
-    assert '/desktop/v1/permitting-sources/search' in {route.path for route in router.routes}
+    assert '/desktop/v1/permitting-sources/search' in route_paths
 if '$ProductProfile' == 'inspections-preview':
     assert metadata.version('civicinspect') == '$($PlanningBuild.Contract.inspections_package_version)'
-    assert '/desktop/v1/inspections-sources/search' in {route.path for route in router.routes}
+    assert '/desktop/v1/inspections-sources/search' in route_paths
 path = Path(r'$PythonRoot') / '$ProvenanceName'
 receipt = json.loads(path.read_text(encoding='utf-8-sig'))
 receipt['umbrella_source_commit'] = '$UmbrellaCommit'

@@ -411,18 +411,19 @@ if (wixConfig.enableElevatedUpdateTask !== false) {
   throw new Error("Tauri MSI must not install an elevated update task");
 }
 
+const betaSources = JSON.parse(readFileSync(join(root, "..", "config", "inspections-preview-sources.json"), "utf8")).sources;
 for (const phrase of [
   "name: desktop-windows-msi",
   "runs-on: windows-latest",
   "path: civicsuite",
   "path: civiccore",
-  "ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
+  `ref: ${betaSources["townlight/core"]}`,
   "path: civicrecords-ai",
   "ref: ${{ steps.candidate.outputs.records_ref }}",
   "path: civicnotice",
-  "ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810",
+  `ref: ${betaSources["townlight/notice"]}`,
   "path: civicaccess",
-  "ref: b9100edc80ca496d6061f1cdb3eb39a60ff5f31a",
+  `ref: ${betaSources["townlight/access"]}`,
   "npm run prepare-runtime-payload",
   "npm run tauri -- build",
   "desktop/src-tauri/target/release/bundle/msi/*.msi",
@@ -1063,7 +1064,7 @@ if (
   !desktopMsiWorkflow.includes("repository: townlight/meetings") ||
   !desktopMsiWorkflow.includes("repository: townlight/ordinances") ||
   !desktopMsiWorkflow.includes("repository: townlight/zone") ||
-  !desktopMsiWorkflow.includes("ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d") ||
+  !desktopMsiWorkflow.includes(`ref: ${betaSources["townlight/zone"]}`) ||
   !desktopMsiWorkflow.includes("-ProductProfile zoning-beta")
 ) {
   throw new Error("Connected Zoning MSI workflow requires pinned sources/profile.");
