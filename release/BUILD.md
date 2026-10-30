@@ -76,3 +76,14 @@ component versions. These routine Windows CI builds remain unsigned and use the
 separate Inspections candidate installer identity. They are regression artifacts,
 not replacements for the published, previously signed Townlight MSI. Historical
 Planning/Permitting profile contracts remain in the repository for their own tags.
+
+The Inspections composition builds `inspection-transcriber` from the same pinned
+Inspections checkout. Its unchanged signed Needle engine, Whistle model, original
+notices and reuse manifest are supplied in
+`Townlight-Beta-1-Inspection-Voice-Assets.zip`, pinned by SHA-256 in
+`desktop/runtime/windows-runtime-sources.json`. This is an existing vendor build
+input from the accepted candidate. The preparation script verifies the archive
+and both executable/model hashes. CI uses its repository's read-only token to
+retrieve this input while the coordinated release is draft; after publication a
+normal source build uses the public release URL. It does not sign or rebuild the
+accepted installer.

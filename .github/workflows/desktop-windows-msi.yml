@@ -288,6 +288,8 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
@@ -680,6 +682,8 @@ jobs:
       - name: Prepare portable Windows runtime payload
         working-directory: civicsuite/desktop
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }

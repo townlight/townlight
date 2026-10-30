@@ -46,6 +46,15 @@
       "download_sha256": "9606cee7501703a0969682667def313130f99ed73f44a88a7a8efe82d4b565f0",
       "release_api": "https://api.github.com/repos/ollama/ollama/releases/latest",
       "asset_name_pattern": "ollama-windows-amd64.zip"
+    },
+    "inspection_voice": {
+      "download_url": "https://github.com/townlight/townlight/releases/download/townlight-beta-1/Townlight-Beta-1-Inspection-Voice-Assets.zip",
+      "asset_api_url": "https://api.github.com/repos/townlight/townlight/releases/assets/693100326",
+      "download_sha256": "0325c199b215316d8cbb5374150867f7fe2352e6a640ce80218dbac57d569fa8",
+      "required_sha256": {
+        "inspections/whistle/whistle.cact": "b6e02f048568ac5d01a2042556c658061e699acbc0aa2a1439f52f3d461dffeb",
+        "inspections/whistle/windows-x86_64/needle.exe": "298d76c6ae944611369b3f04e5873b03f69f0d1d8d62c1363a535331d5efc76a"
+      }
     }
   }
 }
