@@ -29,12 +29,11 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
     pin = module["source_commit"]
     for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
         workflow = _read(path)
-        # Cleanroom/default MSI composition retains accepted release pins.
-        # The explicit unsigned Planning candidate resolves its separate source
-        # manifest; it must not repin the historical installer contract.
+        # Historical archive cleanrooms retain their release pins. Current
+        # full-composition CI uses the explicit Beta 1 sibling manifest.
         if path == BUILD_WORKFLOW:
             integration = workflow.split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
-            candidate = json.loads(_read(ROOT / "config" / "planning-staff-beta-sources.json"))
+            candidate = json.loads(_read(ROOT / "config" / "inspections-preview-sources.json"))
             candidate_pin = candidate["sources"][repository]
             checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
             if module_id == "civicrecords-ai":
@@ -53,7 +52,8 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
                 assert f"$RecordsRef = '{pin}'" in resolver
                 assert "$RecordsRef = $Pins.sources.'townlight/sunshine'" in resolver
                 continue
-            assert f"ref: {pin}" in checkout_inputs, path.name
+            expected_pin = candidate_pin if path == BUILD_WORKFLOW else pin
+            assert f"ref: {expected_pin}" in checkout_inputs, path.name
 
 
 def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> None:
@@ -336,9 +336,10 @@ $env:GITHUB_OUTPUT = ''
 function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
-if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
+if ((Resolve automatic main).product_profile -ne 'inspections-preview') { throw 'main must exercise the full Beta 1 composition' }
+if ((Resolve automatic release/townlight-beta-1).product_profile -ne 'inspections-preview') { throw 'Beta 1 branch must exercise the full composition' }
 $inspect = Resolve automatic inspections/connected-workflow
-if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.6.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
 $inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
 if ($inspectionOverlay.identifier -ne 'org.townlight.inspections.candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -eq '53211081-ea8b-4882-a752-d80a9363cda6') { throw 'Separate Inspections identity required' }
 $permit = Resolve automatic permitting/connected-workflow

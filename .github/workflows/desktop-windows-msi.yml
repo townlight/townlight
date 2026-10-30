@@ -119,7 +119,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258
+          ref: 6c3f340c530cd1972f3016924111f3f32a59012b
           path: civiccore
 
       - name: Check out Townlight Records runtime source
@@ -157,35 +157,35 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
+          ref: dcc31159c902a098655b0e33a88464f106d9f134
           path: civicclerk
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          ref: beae47f43e895c2c45196cc6a762991384f95933
           path: civiccode
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
+          ref: b0ba1a4f54015c099905b34605637cc28c74cd67
           path: zone
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810
+          ref: 68d580efd9cb279cde5e878a3089831c9a8b18ea
           path: civicnotice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: b9100edc80ca496d6061f1cdb3eb39a60ff5f31a
+          ref: 7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc
           path: civicaccess
 
       - name: Validate publication-signing context
@@ -581,14 +581,14 @@ jobs:
           REQUESTED_PROFILE: ${{ inputs.product_profile || 'automatic' }}
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          $profile = if ($env:REQUESTED_PROFILE -eq 'inspections-preview' -or $env:SOURCE_BRANCH -eq 'inspections/connected-workflow') { 'inspections-preview' } elseif ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
+          $profile = if ($env:REQUESTED_PROFILE -eq 'inspections-preview' -or $env:SOURCE_BRANCH -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
           ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: b4d0156bdc6883c1c3ef167abe0379f9ca32b258
+          ref: 6c3f340c530cd1972f3016924111f3f32a59012b
           path: civiccore
 
       - name: Check out Townlight Records runtime source
@@ -602,21 +602,21 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 3dd73d0619943beb8ce2965abe7a41dfe596e9be
+          ref: dcc31159c902a098655b0e33a88464f106d9f134
           path: civicclerk
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: 868891bd990588a8337832915e4d91af39ea22cd
+          ref: beae47f43e895c2c45196cc6a762991384f95933
           path: civiccode
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: 6ff3af1039e248c0dcd596f9abe2db7f58adaa7d
+          ref: b0ba1a4f54015c099905b34605637cc28c74cd67
           path: zone
 
       - name: Check out Townlight Planning development source
@@ -646,14 +646,14 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 79b8d07199ee77cd425b31c0e0a44f3a0832b810
+          ref: 68d580efd9cb279cde5e878a3089831c9a8b18ea
           path: civicnotice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: b9100edc80ca496d6061f1cdb3eb39a60ff5f31a
+          ref: 7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc
           path: civicaccess
 
       - name: Set up Node

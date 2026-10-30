@@ -2,15 +2,15 @@
   "profile": "inspections-preview",
   "development_only": false,
   "sources": {
-    "townlight/core": "b4d0156bdc6883c1c3ef167abe0379f9ca32b258",
-    "townlight/sunshine": "07fdd12a80363001ee546a5d00ef94a8790b46f2",
-    "townlight/meetings": "3dd73d0619943beb8ce2965abe7a41dfe596e9be",
-    "townlight/ordinances": "868891bd990588a8337832915e4d91af39ea22cd",
-    "townlight/zone": "6ff3af1039e248c0dcd596f9abe2db7f58adaa7d",
-    "townlight/plan": "0bf0a7c998cafb9057da81c23861681a9689bf84",
-    "townlight/notice": "79b8d07199ee77cd425b31c0e0a44f3a0832b810",
-    "townlight/access": "b9100edc80ca496d6061f1cdb3eb39a60ff5f31a",
-    "townlight/permit": "89df6761972a50268eba7dd8eed8e90ad9da365c",
-    "townlight/inspect": "375279e1c1eecff71c29b0b2be3d90a67cc898b1"
+    "townlight/core": "6c3f340c530cd1972f3016924111f3f32a59012b",
+    "townlight/sunshine": "52309241c4e214e2979e0fe09423694335cff896",
+    "townlight/meetings": "dcc31159c902a098655b0e33a88464f106d9f134",
+    "townlight/ordinances": "beae47f43e895c2c45196cc6a762991384f95933",
+    "townlight/zone": "b0ba1a4f54015c099905b34605637cc28c74cd67",
+    "townlight/plan": "e7d8cc57c328d87b52f7fd806d79bfc1458c67a9",
+    "townlight/notice": "68d580efd9cb279cde5e878a3089831c9a8b18ea",
+    "townlight/access": "7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc",
+    "townlight/permit": "0ca5036e026a72e057fc4c27fad23d58fcce27f8",
+    "townlight/inspect": "8780285da5a0cd878d18d503a8f4af17190a6a1b"
   }
 }

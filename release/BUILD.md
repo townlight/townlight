@@ -1,4 +1,4 @@
-# Source and build identity — Townlight Beta 1
+# Source and build identity â€” Townlight Beta 1
 
 Use the signed suite MSI for the verified beta installation. Independent
 development installs and routine unsigned CI builds are different artifacts.
@@ -66,3 +66,13 @@ Signing is external and timestamped, so signed bytes are not claimed to be
 reproducible compiler output. Never include credentials, real profiles or staff
 session material in a source archive. Current owned code/docs are AGPL-3.0-only;
 historical grants and third-party terms remain attached to their material.
+
+## Source integration CI
+
+The coordinated Beta 1 branch and main select the existing full
+`inspections-preview` composition. `config/inspections-preview-sources.json`
+pins the accepted sibling source cohort; its contract retains the candidate
+component versions. These routine Windows CI builds remain unsigned and use the
+separate Inspections candidate installer identity. They are regression artifacts,
+not replacements for the published, previously signed Townlight MSI. Historical
+Planning/Permitting profile contracts remain in the repository for their own tags.

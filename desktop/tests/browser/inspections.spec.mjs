@@ -35,7 +35,7 @@ test('inspector originals, explicit review and separate Records copy remain usab
   await page.getByLabel('Inspection title',{exact:true}).fill('Fictional inspection');
   await page.getByLabel('Property reference — private',{exact:true}).fill('PRIVATE ADDRESS');
   await page.getByLabel('Inspector-entered notes — private',{exact:true}).fill('PRIVATE FIELD NOTES');
-  await page.getByLabel('Original file — up to 10MB total',{exact:true}).setInputFiles({name:'field-note.txt',mimeType:'text/plain',buffer:Buffer.from('original evidence')});
+  await page.getByLabel('Original file (photo, document, or voice memo) — up to 10MB total',{exact:true}).setInputFiles({name:'field-note.txt',mimeType:'text/plain',buffer:Buffer.from('original evidence')});
   await expect(page.locator('[data-inspections-status]')).toContainText('Original bytes and SHA256 selected');
   await page.getByLabel('Search adopted Code',{exact:true}).fill('fictional');
   await page.getByRole('button',{name:'Find cited Code',exact:true}).click();
