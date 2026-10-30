@@ -300,7 +300,7 @@
       "path": "desktop/runtime/windows-runtime-sources.json",
       "sha256": "f8e2e973d14ceb34671fcf5b487b7a7a080b1cd6c4e0f3bd3810f360d08d62ce",
       "status": "same",
-      "publication_sha256": "713b905172b3e8d3d9509ac9c6aedc70c577a23ba580dd846228bc295db0e02f"
+      "publication_sha256": "7377b664b23d25bd67975fac9a42bfa0b240dd517766a8e1d7fde58f3f0839a4"
     },
     {
       "archive": "desktop/scripts/generate-icon.mjs",
@@ -340,7 +340,7 @@
       "path": "desktop/scripts/prepare-runtime-payload.ps1",
       "sha256": "06a5a7b3b268e180cee7e024bcc5a328d3f1465d6b13ed7fdf8d09d228e2531d",
       "status": "same",
-      "publication_sha256": "5c212e5e3e626d286934a345ca7cf1f83dad12e886270d3f10ad5c31eb4596a3"
+      "publication_sha256": "a8de9ac0380d82da8b9b18c33459f7ce2c12e5375103e232a1a86bc40cdf95f9"
     },
     {
       "archive": "desktop/scripts/resolve-msi-candidate.ps1",
