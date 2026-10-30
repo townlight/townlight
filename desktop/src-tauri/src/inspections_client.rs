@@ -18,6 +18,9 @@ pub enum InspectionsRequest {
     CreatePacket { id: Uuid, payload: Value },
     ExportPacket { id: Uuid, expected_sha256: String },
     SearchConnections { payload: Value },
+    SupportedTypes {},
+    RetainEvidence { payload: Value },
+    AnalyseMedia { payload: Value },
     AttachRecords { request_id: Uuid, payload: Value },
 }
 
@@ -42,6 +45,9 @@ pub fn route(request: InspectionsRequest) -> (Method, String, Option<Value>) {
         SearchConnections { payload } => {
             (Method::POST, "/connections/search".into(), Some(payload))
         }
+        SupportedTypes {} => (Method::GET, "/evidence/supported-types".into(), None),
+        RetainEvidence { payload } => (Method::POST, "/evidence/retain".into(), Some(payload)),
+        AnalyseMedia { payload } => (Method::POST, "/media/analyse".into(), Some(payload)),
         AttachRecords {
             request_id,
             payload,

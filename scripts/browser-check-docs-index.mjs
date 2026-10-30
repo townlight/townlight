@@ -1,10 +1,12 @@
 import { chromium } from "playwright";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { mkdirSync } from "node:fs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const target = `file://${path.join(root, "docs", "index.html").replaceAll("\\", "/")}`;
 const outputDir = path.join(root, "docs", "audit-browser-qa");
+mkdirSync(outputDir, { recursive: true });
 
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
@@ -49,30 +51,30 @@ try {
     const response = await page.goto(target, { waitUntil: "load" });
     const title = await page.title();
     const recordsHeadingVisible = await page
-      .getByRole("heading", { name: "One source of truth. A connected day’s work." })
+      .getByRole("heading", { name: "Municipal work with a clear record." })
       .isVisible();
     const candidateStatusVisible = await page
-      .getByRole("link", { name: "Existing default Windows beta · 1.4", exact: true })
+      .locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1"]').first()
       .isVisible();
     const productModulesVisible = await Promise.all(
-      ["Core", "Records", "Meetings", "Code", "Zoning", "Planning", "Permitting", "Inspections"].map((name) =>
+      ["Core", "Records", "Meetings", "Code", "Zoning", "Planning", "Permitting", "Inspections", "Station"].map((name) =>
         page.locator(".product h3").getByRole("link", { name, exact: true }).isVisible(),
       ),
     );
     const productLinks = await page.locator(".product h3 a").evaluateAll((nodes) => nodes.map((node) => node.href));
-    const expectedProductLinks = ["core", "records", "meetings", "code", "zoning", "planning", "permitting", "inspections"]
-      .map((slug) => `https://townlight.github.io/products/${slug}/`);
+    const expectedProductLinks = ["core", "records", "meetings", "code", "zoning", "planning", "permitting", "inspections", "station"]
+      .map((slug) => `/products/${slug}/index.html`);
     const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
-      expectedProductLinks.every((link, index) => productLinks[index] === link);
-    const defaultDownloadPreserved = await page.getByRole("link", { name: "Existing default Windows beta · 1.4", exact: true })
-      .getAttribute("href") === "https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1";
-    const overallManualVisible = await page.getByRole("link", { name: "Read the overall manual", exact: true }).isVisible();
+      expectedProductLinks.every((link, index) => productLinks[index].endsWith(link));
+    const currentDownloadLinked = await page.locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1"]').first()
+      .getAttribute("href") === "https://github.com/townlight/townlight/releases/tag/townlight-beta-1";
+    const overallManualVisible = await page.locator('a[href$="manuals/suite.html"]').first().isVisible();
     const horizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );
     await page.keyboard.press("Tab");
     const focusedText = await page.evaluate(() => document.activeElement?.textContent?.trim() ?? "");
-    const screenshot = path.join(outputDir, `townlight-records-beta-${viewport.name}.png`);
+    const screenshot = path.join(outputDir, `townlight-beta-1-${viewport.name}.png`);
     const screenshotResult = await captureScreenshot(page, screenshot);
 
     results.push({
@@ -83,7 +85,7 @@ try {
       candidateStatusVisible,
       productModulesVisible,
       productLinksCorrect,
-      defaultDownloadPreserved,
+      currentDownloadLinked,
       overallManualVisible,
       horizontalOverflow,
       focusedText,
@@ -100,12 +102,12 @@ try {
 const failed = results.some(
   (result) =>
     result.status !== 200 ||
-    result.title !== "Townlight — Eight connected municipal products" ||
+    result.title !== "Townlight | Townlight Beta 1" ||
     !result.recordsHeadingVisible ||
     !result.candidateStatusVisible ||
     result.productModulesVisible.some((visible) => !visible) ||
     !result.productLinksCorrect ||
-    !result.defaultDownloadPreserved ||
+    !result.currentDownloadLinked ||
     !result.overallManualVisible ||
     result.horizontalOverflow ||
     result.focusedText !== "Skip to content" ||

@@ -1,0 +1,5 @@
+# Native Planning municipal candidate
+
+The native bridge now delegates initiative and amendment commands to civicplan0.4.0.dev1 municipal repositories. It uses mapped_native_actor and the existing Planning availability gate; no user ID supplied by the UI is trusted. Rust adds fixed staff-only transport variants and UUID path validation; public transport refuses these operations. The existing Planning screen adds named-policy tracking forms and revision history. No parallel state file or model/provider change was introduced.
+
+This source requires private Core1.3.0.dev1 and Planning0.4.0.dev1. Published installer runtime pins are unchanged; do not install with the old Planning package. Candidate desktop metadata is desktop 1.6.0-1 / MSI ProductVersion 1.6.0.1 (release label 1.6.0-beta.1) with AGPL-3.0-only owned code; historical code terms are retained. The full native Rust binary compiled for route tests before metadata-only version/license changes. Browser workflow used real native auth/PG with an explicit test transport adapter, not an installed Tauri app. Packaging and installed acceptance remain separate.

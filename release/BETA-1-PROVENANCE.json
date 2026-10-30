@@ -1,0 +1,1300 @@
+{
+  "edition": "Townlight Beta 1",
+  "base_commit": "84dc161003a97d12317a638091a627febdd37180",
+  "installer_sha256": "98bcdef11ebdf5c767f620c904ff49f85115fde3b5c23f62703b111e645aaf86",
+  "owned_source_sha256": "84a23e1297e42d17b16cfc9e51b2dd78bc46414c0de8ad7ebd2466c1a409d06b",
+  "documentation_sha256": "a928bb1c40fec7ef6f223c7b77bc9fe7837e4cfffcebf35bb3309cc5549284e6",
+  "release": "https://github.com/townlight/townlight/releases/tag/townlight-beta-1",
+  "archive_files": [
+    {
+      "archive": "desktop/README.md",
+      "repo": "townlight",
+      "path": "desktop/README.md",
+      "sha256": "9c166bcbb801034a82aa36f1cf33f9ac80c666eba1f8618f8eb734cd3c029e69",
+      "status": "same",
+      "publication_sha256": "040a214a78102f89f5deeb28af07feadae6ae968bec5f940891436aba5d53457"
+    },
+    {
+      "archive": "desktop/index.html",
+      "repo": "townlight",
+      "path": "desktop/index.html",
+      "sha256": "5908d2014821a75a12611d99d3df5450f7dc3d5805b6f9620a1bb7f405aa883e",
+      "status": "same",
+      "publication_sha256": "99e305a710911a5c352870aa9ddba4bb894edcb8381d9765516d5be2c6a26252"
+    },
+    {
+      "archive": "desktop/package-lock.json",
+      "repo": "townlight",
+      "path": "desktop/package-lock.json",
+      "sha256": "798aac40ecafa72777439883fb8be1d7063c4998e80c69dbb2382b31d64cec79",
+      "status": "changed",
+      "publication_sha256": "8383ab999680ec1d67d4a6c7416e6397f8de60616da5b3ea29681a953e153476"
+    },
+    {
+      "archive": "desktop/package.json",
+      "repo": "townlight",
+      "path": "desktop/package.json",
+      "sha256": "24b4fcb73fcdb782947aa2c572899afc6ac10fd6c9b21ddb688fd42518fab43f",
+      "status": "changed",
+      "publication_sha256": "1f3612b3329c66a7b786fa22a3c7694d6e93f44b11aadb30765339dca9de86aa"
+    },
+    {
+      "archive": "desktop/playwright.config.mjs",
+      "repo": "townlight",
+      "path": "desktop/playwright.config.mjs",
+      "sha256": "d4e8f32cc6cca8c01b83edaf79f18b2a92405ea3f99f8a95e7625320370e8700",
+      "status": "same",
+      "publication_sha256": "8b532ffd05222ea92970553437286cc4987b26ca6e467866437b0bba518c3bbd"
+    },
+    {
+      "archive": "desktop/runtime/README.md",
+      "repo": "townlight",
+      "path": "desktop/runtime/README.md",
+      "sha256": "bd3062c8e48edcf0c52e15ec00734ad243bb7c5f82b1570a1527b33c6053e097",
+      "status": "same",
+      "publication_sha256": "74c13ad5aaf5e260ff4e5efbc1666165bd0897138fb1ce2710f9154ec32f6879"
+    },
+    {
+      "archive": "desktop/runtime/gemma4-model.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/gemma4-model.json",
+      "sha256": "1a49e99f33e41ddb4dcc2a83483cacd17fc1b596850a700663310ee7339499c2",
+      "status": "same",
+      "publication_sha256": "7ada5dcf9926351963cd8affc39a85a1691f4a1c34b4ce7cd753240bd0bf3bb7"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/__init__.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/__init__.py",
+      "sha256": "b68059cf70d9999804385a093caa3d7520c96d92f705ba9ee05fbc7d2c2b1f1d",
+      "status": "same",
+      "publication_sha256": "56de213da3d7939fa625c18f1ea88fdaa85548e51ca1e95387ca3256dcce6f6f"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/access_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/access_bridge.py",
+      "sha256": "253dd834c23ef6f24f7d17f64dad44a941a034bb46f929bb5e8264dccf421f46",
+      "status": "same",
+      "publication_sha256": "77642b97af7a11691d37f7c4c6898cc44d4b75d896fa411588efe21090ae4ab1"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/code_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_bridge.py",
+      "sha256": "901f1473aa6f4db4b089925a2fec17e963cef7a27c6bf885099a362df1fe15e9",
+      "status": "same",
+      "publication_sha256": "f3d7bd60e5d82414babe2b6f1895b0591568eae310fc752043b6609f349d4535"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/code_meetings.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_meetings.py",
+      "sha256": "ee1e7d2e765396cf099e7c78113ea04a7db7d163892364669d1860815d20c818",
+      "status": "same",
+      "publication_sha256": "58419bd5862f3dc7fc86cff50f55d4e976972c591f6a4eda05ed1bddab7e1d4b"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/code_meetings_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_meetings_bridge.py",
+      "sha256": "831045dc48508e866472a9ff6d9d837e8eed0a46c91c8f93b41eec526650c7c5",
+      "status": "same",
+      "publication_sha256": "271552ce9479a271515a06560def8eb216ff40493a3fc5289422024b17bd5e50"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/code_public.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_public.py",
+      "sha256": "0fe956329a96e54e138b669d4ab4f69ab0d6f489b647a115cfd126cfa58742a5",
+      "status": "same",
+      "publication_sha256": "475d285b97ac70886c9b2d27918270f247b1074f74c782d319156c4ae88f19b6"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/code_records.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_records.py",
+      "sha256": "5791e31398ded128b1ef3e1fe65c0e54d38ea07578400117da07ad574b67943e",
+      "status": "same",
+      "publication_sha256": "07645bfa7bf2dad77c17d40c93a5d078ae1f3072e0e6b5a15a07cb03f7b0e322"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/fixtures/redstone-valley-records-demo-v1.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/fixtures/redstone-valley-records-demo-v1.json",
+      "sha256": "2039eca2587b4ace6937ca73e21d0a936835420f8534292247458a1a67516553",
+      "status": "same",
+      "publication_sha256": "cf5f16f7399d99534891ff36e002512dacf5301aba4488ec3699a81f96dd3d7a"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/inspections_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/inspections_bridge.py",
+      "sha256": "b7429c3ab988005a198795d6f1dfc3f785c7f96f61410903f8cb0ad38c6f512c",
+      "status": "changed",
+      "publication_sha256": "b7429c3ab988005a198795d6f1dfc3f785c7f96f61410903f8cb0ad38c6f512c"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/meetings_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/meetings_bridge.py",
+      "sha256": "37ea43e633b55e9428e928143e5da0d41a7a5906673b8cc54b40fa4d1748fa52",
+      "status": "changed",
+      "publication_sha256": "0716861dc7d432a491def6b87336dd5ebf1e989fe3036094ff70856bfaa0d02b"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/migrate.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/migrate.py",
+      "sha256": "cf632a6c00a1c6e3bdea08edf841510a194665c0ce97705dbc4e16f964bb6145",
+      "status": "changed",
+      "publication_sha256": "c516ea95794ef8aac728eda614e3effd2210fc17321aa3eec12f18de36f1b1b8"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/native_accounts.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/native_accounts.py",
+      "sha256": "e54d1dcfbbf5aecb2c61d7235884e787de05b8f48547f9c68348ba45a8ff9039",
+      "status": "same",
+      "publication_sha256": "29086449a56dd8019de32cad9963125fc723a15abc92f305fd661312c9f62e59"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/permitting_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/permitting_bridge.py",
+      "sha256": "786abd0dfc18ed0ce7ada70fcd120f96795d8e1ee46f38ca0770a8217b4d6e1d",
+      "status": "changed",
+      "publication_sha256": "786abd0dfc18ed0ce7ada70fcd120f96795d8e1ee46f38ca0770a8217b4d6e1d"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/planning_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/planning_bridge.py",
+      "sha256": "74a855b995b7f323873b9c788cd15bd4b0ebe3fc1c53879596e1b5043c2825bb",
+      "status": "changed",
+      "publication_sha256": "74a855b995b7f323873b9c788cd15bd4b0ebe3fc1c53879596e1b5043c2825bb"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/planning_connections.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/planning_connections.py",
+      "sha256": "9991e58a4b168fbbdf5f00334e8515061a09ab06ce593a7625ae007e2fd840f9",
+      "status": "same",
+      "publication_sha256": "f02de4af07ce07347f3a3becc12ec26d440442ed99c4d2a2b89ff4c2294243d7"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_cutover.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_cutover.py",
+      "sha256": "62b93909757ce822fc1f235b6c602d081a669d68e20bca63719b7c773940abde",
+      "status": "same",
+      "publication_sha256": "039a46c8da6d5eea53c6e3fe7d33b59fd1afbcb87fb23aba9104e2fed4538d98"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_demo.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_demo.py",
+      "sha256": "c1c4ef3dd1ffbca62ffaa84cef21a66ecfa57b9f0909a75c5e34bde068b2d4c5",
+      "status": "same",
+      "publication_sha256": "03bd774a247dda37921e022f564d39eb5df8191e0a5594b3d3ce6702a281f437"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_import.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import.py",
+      "sha256": "ba8a017e2e83f7b08707b1c1dfe701fb9540d130aebf5aacd29e2c9699ddc8b3",
+      "status": "same",
+      "publication_sha256": "fc98f9d6a590a4064d947bece445aa2a922a8691b3be6a6bc0a80df8bb9d31bb"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_import_access.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import_access.py",
+      "sha256": "c8d4052358b5679e64f1fd97097d5d6498b9fbcb4a71a4af3b688a766d5f3fb2",
+      "status": "same",
+      "publication_sha256": "c36ccbabf072ef23864060e51f5ee11f7ff5c72f7468289799cdf16e53885742"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_import_store.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import_store.py",
+      "sha256": "fe1acc8792fb8a2992d554568705663d2440d044616511891b98fff0e5eb35f7",
+      "status": "same",
+      "publication_sha256": "0db793e0feaa814166cb950b885e36b3ba908c7736e4c6807169c032b0bede4d"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/records_snapshot.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_snapshot.py",
+      "sha256": "800377214a5e0b52cd4f402aae015f9eb832d7d29a003cd4cc3b84316cd4a735",
+      "status": "same",
+      "publication_sha256": "2d128fc5abff610a6261473c1ad82a7a2b427b009d13a747749d822dcc9bb061"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/services.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/services.py",
+      "sha256": "5dfb0f58ea1f94185081426a3734905c78624d7bcd5407fd2c4e0fa1fb054a6b",
+      "status": "same",
+      "publication_sha256": "831e7486753f119750d12bc9aed725d8023ca5fa75ad9cb1db9a03389772042d"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/storage.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/storage.py",
+      "sha256": "2bac2625616fd4a4926a03bc1721afc634da6ee6cd11ff0745cfd9dabc6f533e",
+      "status": "same",
+      "publication_sha256": "34e1135580bd5104e54723ec6df70b6259f57e552ce9ded7842f930dbdc54c94"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/zoning_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/zoning_bridge.py",
+      "sha256": "eb80d79ffc4fc736789aab4f3d3b75a4d9d01101d6414a69a29053c7d5f90505",
+      "status": "changed",
+      "publication_sha256": "eb80d79ffc4fc736789aab4f3d3b75a4d9d01101d6414a69a29053c7d5f90505"
+    },
+    {
+      "archive": "desktop/runtime/python-services/civicsuite_runtime/zoning_records.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/zoning_records.py",
+      "sha256": "045718aaa5f1f42876dbb493e4649e721a94187375d96bc8d7a34512e9ce9806",
+      "status": "same",
+      "publication_sha256": "5c4b3d72c3795df980cd75af8e1fff644ee5e37bb85bb53c2b807f35941fbf48"
+    },
+    {
+      "archive": "desktop/runtime/python-services/pyproject.toml",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/pyproject.toml",
+      "sha256": "d72c20f8001d4d7479694ea99d11ec861a9310a67495cf4090c93db11c129e76",
+      "status": "changed",
+      "publication_sha256": "7b84d0ad6cd4802171115cf33ed912843ef3f6731a7a4c4c2fdf2e8306ec270e"
+    },
+    {
+      "archive": "desktop/runtime/windows-first-run.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/windows-first-run.json",
+      "sha256": "ade9a3470c9da5f6efe8b5254f4234860e72e22e834f88960a376ae1eabc18f6",
+      "status": "same",
+      "publication_sha256": "beee7928a1c382f54ca9147a59e11020ac9cb0342d51b58d578fefe0f7999d33"
+    },
+    {
+      "archive": "desktop/runtime/windows-local-runtime.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/windows-local-runtime.json",
+      "sha256": "f5b126b95122080195e4a0bdf421f0756e26ca0fac776879fc6d45d203f9a43d",
+      "status": "same",
+      "publication_sha256": "e71ee4e9b29ccbabe282e6490351c653f033184680805de4476bd7a1aed46994"
+    },
+    {
+      "archive": "desktop/runtime/windows-runtime-payloads.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/windows-runtime-payloads.json",
+      "sha256": "d2cbb8e3981c45995741fb6b561ab001acc85819370c3c52686f1592ae568df7",
+      "status": "changed",
+      "publication_sha256": "941e1c77a9d2babebcbe1a13ac91c70e9be5c2d42bf0f56e807dbddae5732563"
+    },
+    {
+      "archive": "desktop/runtime/windows-runtime-sources.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/windows-runtime-sources.json",
+      "sha256": "f8e2e973d14ceb34671fcf5b487b7a7a080b1cd6c4e0f3bd3810f360d08d62ce",
+      "status": "same",
+      "publication_sha256": "76e8c50b7adf0503a89a6f16b695918cb1e71e5a223a70b6b534cebeda5daab5"
+    },
+    {
+      "archive": "desktop/scripts/generate-icon.mjs",
+      "repo": "townlight",
+      "path": "desktop/scripts/generate-icon.mjs",
+      "sha256": "2524e17f9ca047220c6ff583970c425677a5d7aca925d09c00ee5ddc7a19935d",
+      "status": "same",
+      "publication_sha256": "2023bb9d8a84d61815c7c6e15dd8ab2af035b4ddee5bb86c83b07663846daddc"
+    },
+    {
+      "archive": "desktop/scripts/inspections-build-contract.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/inspections-build-contract.ps1",
+      "sha256": "6f423307a9288860bc8c047caa147def272edf78808e039cb2982018d2086bff",
+      "status": "same",
+      "publication_sha256": "5b6a4fc9f2c85696629ba687419e6a06bfee328d5fb9e9c7e985bf4bc3bb9e64"
+    },
+    {
+      "archive": "desktop/scripts/permitting-build-contract.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/permitting-build-contract.ps1",
+      "sha256": "1691867616f784e190a3a0cb57f15030f68cfa35d8f1b96c030afe6463655ffd",
+      "status": "same",
+      "publication_sha256": "b3cd9099130acb44370cf193085c3a9b32393b58135e4c62dc61b644fae849a9"
+    },
+    {
+      "archive": "desktop/scripts/planning-build-contract.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/planning-build-contract.ps1",
+      "sha256": "ee59bab50e96a8a9afb83bf953ec0d2b3d00e23b989ac1763ab8fff033672a26",
+      "status": "same",
+      "publication_sha256": "4bd7d843790c6098cd5fa2df69bc0e765ad0de69fda6658045354407dd0efabe"
+    },
+    {
+      "archive": "desktop/scripts/prepare-runtime-payload.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/prepare-runtime-payload.ps1",
+      "sha256": "06a5a7b3b268e180cee7e024bcc5a328d3f1465d6b13ed7fdf8d09d228e2531d",
+      "status": "same",
+      "publication_sha256": "7140aed7beb93832bcd99f461cae7d603f89cd7134edd07fc0fdcfa8f9ac16fe"
+    },
+    {
+      "archive": "desktop/scripts/resolve-msi-candidate.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/resolve-msi-candidate.ps1",
+      "sha256": "987a3bd46800cf8a5301fe30c7a854ea0c938b26e500ca3e513da87310274530",
+      "status": "same",
+      "publication_sha256": "6fc5d6fea770e6d05278acbcd540f6f56e910b8c2a5576c0a500539ee56f6d1c"
+    },
+    {
+      "archive": "desktop/scripts/verify-desktop-runtime.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/verify-desktop-runtime.ps1",
+      "sha256": "2bdd2f2577b22db05f1bee084b12462dba1482761beea7b88fc27b2f8bed9f0d",
+      "status": "same",
+      "publication_sha256": "3ce2916cfa72b93705735dd8eea2e6744ff95fa400e1dff1822326fc108735fa"
+    },
+    {
+      "archive": "desktop/scripts/verify-publication-signature.ps1",
+      "repo": "townlight",
+      "path": "desktop/scripts/verify-publication-signature.ps1",
+      "sha256": "a746631fc4db5fa0c97547ceb3a493229655b1a66eee02d47305c561315b8559",
+      "status": "same",
+      "publication_sha256": "bae63bc81212348465c835d04ef6be2c4a6e9eb89ad25bf593e7fd2959247b99"
+    },
+    {
+      "archive": "desktop/src-tauri/Cargo.lock",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/Cargo.lock",
+      "sha256": "f30e2467e111539ed05773bbdd9a2b61376d7d40179f574868e3ce4ff74e6b26",
+      "status": "changed",
+      "publication_sha256": "d5344b9c92b28699a09a58ab9f7cb1ad0eefa5a17561afe700ec66277b7d2056"
+    },
+    {
+      "archive": "desktop/src-tauri/Cargo.toml",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/Cargo.toml",
+      "sha256": "706f9c7c05c460197727319f22dfc7a705208574de4be22d4872856866b85e14",
+      "status": "changed",
+      "publication_sha256": "9f9ee036305b6d7ea23b67e30a201ba58614a901e7163589f9cd571c4223c00c"
+    },
+    {
+      "archive": "desktop/src-tauri/build.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/build.rs",
+      "sha256": "4ae2333b11623039cc115e29b696e7ff5cdfcd5b7d628280ddf48fa733e6418d",
+      "status": "same",
+      "publication_sha256": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f"
+    },
+    {
+      "archive": "desktop/src-tauri/capabilities/main-capability.json",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/capabilities/main-capability.json",
+      "sha256": "df68f0f56a75801e7d87af3932812950ab7f20219844c8ec3c9fd25fb91d28f9",
+      "status": "same",
+      "publication_sha256": "55b2308c26e16ed92549b2ec726abc395f6eceaa6a97ff93d716467930480b33"
+    },
+    {
+      "archive": "desktop/src-tauri/icons/icon.ico",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/icons/icon.ico",
+      "sha256": "f4a1544d6934a08ff48d2b73d85166adcf75cc53430d678ab415f29fc5740b41",
+      "status": "same",
+      "publication_sha256": "f4a1544d6934a08ff48d2b73d85166adcf75cc53430d678ab415f29fc5740b41"
+    },
+    {
+      "archive": "desktop/src-tauri/src/atomic_io.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/atomic_io.rs",
+      "sha256": "80a488ba6850f5361c235975af92a80246d1ab1dcd5e40935d08ae510af92afb",
+      "status": "same",
+      "publication_sha256": "23e39e5a0498e01ab10c7c047a16e45bef7e270a1bcb18c42fa92d07870e0ee1"
+    },
+    {
+      "archive": "desktop/src-tauri/src/auth.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/auth.rs",
+      "sha256": "d6f3a36cb56ccf8904d4e020affcbdf46263aa61a96839536b357291085f1178",
+      "status": "same",
+      "publication_sha256": "5a230009c61ff3df06748f9ecd652b7ca059ca114e8749e99a1cba20fb08bf77"
+    },
+    {
+      "archive": "desktop/src-tauri/src/code_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/code_client.rs",
+      "sha256": "7f07c7b90ccf97bfb8883541525417d598c6f385d54a9694d65e9ac40890cdad",
+      "status": "same",
+      "publication_sha256": "b5cbe3317f5d0bba498ba13302a62bf8330b85d95be81bd47cb385fcfe3ebb4f"
+    },
+    {
+      "archive": "desktop/src-tauri/src/demo_fixture.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/demo_fixture.rs",
+      "sha256": "bb82c8be42cfc89f7e4d2b6fb48201e8a7df7e855a10f8e302bf22110f12157f",
+      "status": "same",
+      "publication_sha256": "f3750775870cefe74b1d5344a5ab3dc8f2c33d0d1417ad3bf03c604b8c616d97"
+    },
+    {
+      "archive": "desktop/src-tauri/src/domain_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/domain_client.rs",
+      "sha256": "597d6ad98c1d15ba827c41878554c9630ea685e164f531b1efa1c684811cc100",
+      "status": "same",
+      "publication_sha256": "95bed34f9b3bce9d2f5a8010d281533a374ef9ca338381ef04ba41eb50c3642d"
+    },
+    {
+      "archive": "desktop/src-tauri/src/domain_files.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/domain_files.rs",
+      "sha256": "64c5182e8a2f4be9d6d08cf2ceb8a8f77643b5902527feafeb4138bdcebdc08a",
+      "status": "same",
+      "publication_sha256": "a16f0185448d6a6c1bbf593bcf50e9cb428e4ddb14dde9711c0773d246b0122d"
+    },
+    {
+      "archive": "desktop/src-tauri/src/first_run.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/first_run.rs",
+      "sha256": "08a28f7f529f076aff7df3d22be512fe77aa46cdfa916c74a62302781b7eb39c",
+      "status": "same",
+      "publication_sha256": "5715d9b517753a3a3f2881bdc965789d46aa3b8ed49c1ebaa669cb795c2f6162"
+    },
+    {
+      "archive": "desktop/src-tauri/src/inspections_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/inspections_client.rs",
+      "sha256": "9a128e1abd0c8691c19dd74933b463583ab73d055cb68d96290d1df4f4e908df",
+      "status": "changed",
+      "publication_sha256": "9a128e1abd0c8691c19dd74933b463583ab73d055cb68d96290d1df4f4e908df"
+    },
+    {
+      "archive": "desktop/src-tauri/src/local_paths.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/local_paths.rs",
+      "sha256": "7313fb8f3bd952ee11c5420665e6c557a0d16f7f1bc30d71229ed56a3ce7cdb6",
+      "status": "same",
+      "publication_sha256": "b6084a33c545a03d682e1f0fef95ab706ed89be02b377476f28af14176fceda5"
+    },
+    {
+      "archive": "desktop/src-tauri/src/local_shell.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/local_shell.rs",
+      "sha256": "5fcd441c1ceec18f1fc0217bd17d2e2f544d5e299361b563b4023025becc9466",
+      "status": "same",
+      "publication_sha256": "467f1eb7d808b83065a4812fdeb01f57a8a326150ce3feee5d1964e28d2fb77e"
+    },
+    {
+      "archive": "desktop/src-tauri/src/main.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/main.rs",
+      "sha256": "f53490d9358c670915316dd5b6ab3c9a288252d3c93fbb8bb1696890cdca516c",
+      "status": "same",
+      "publication_sha256": "4915b7832505970e67f7d969ad444aa4578f178d34f647249264c8c14068d984"
+    },
+    {
+      "archive": "desktop/src-tauri/src/model.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/model.rs",
+      "sha256": "45b0db86a13525254c046169bd206cb478030ac3bf519d6fe651b40b9c2ddf71",
+      "status": "same",
+      "publication_sha256": "2864007f4174de4a3d7eebec056e28ff1bc69b8be964c316e9b7e48da3305f56"
+    },
+    {
+      "archive": "desktop/src-tauri/src/module_registry.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/module_registry.rs",
+      "sha256": "79e7412734bce5b3b5d1a6008ad4be1815a711c27ddd048bd243d3ac142dfc3f",
+      "status": "same",
+      "publication_sha256": "925dc07ab45883cfacd66edae64f3ab7f1b0b2d63943585beb6b5745e6f7112e"
+    },
+    {
+      "archive": "desktop/src-tauri/src/permitting_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/permitting_client.rs",
+      "sha256": "c8b89ff3116af7c9263a79615438eaf2998cba2f543df9d1e1a9bacc3916958f",
+      "status": "changed",
+      "publication_sha256": "c8b89ff3116af7c9263a79615438eaf2998cba2f543df9d1e1a9bacc3916958f"
+    },
+    {
+      "archive": "desktop/src-tauri/src/planning_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/planning_client.rs",
+      "sha256": "a845f72dcf17e9fc566aec4c6359c5e97f6a46d6494de11abe65e90395000339",
+      "status": "changed",
+      "publication_sha256": "a845f72dcf17e9fc566aec4c6359c5e97f6a46d6494de11abe65e90395000339"
+    },
+    {
+      "archive": "desktop/src-tauri/src/profile_gate.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/profile_gate.rs",
+      "sha256": "5efaedda31be755a165b86d34e87c71d54cd01db94efdcc2b596d50d54cd5b66",
+      "status": "same",
+      "publication_sha256": "91182fcceaa475897e129f85efbbc235e3b8e3aa0fa8ac8366664f0608ff34f6"
+    },
+    {
+      "archive": "desktop/src-tauri/src/records_authority.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/records_authority.rs",
+      "sha256": "932224f88525e363e48f1a828a1c3602456e5376ca5494b85d37d559b16aeda9",
+      "status": "same",
+      "publication_sha256": "7cae8cfc3a099e295e5e955fe1d526507388973ed0c19e507699ca763ff5a28d"
+    },
+    {
+      "archive": "desktop/src-tauri/src/supervisor.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/supervisor.rs",
+      "sha256": "4369f788b1e9eeb05938cacef4968b888113020d6c7395e3ae0e9d0725bceb6c",
+      "status": "changed",
+      "publication_sha256": "fda604886ee33a13a25a16db8bd1cb780d06146d4336539d2205f350da823314"
+    },
+    {
+      "archive": "desktop/src-tauri/src/workflows.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/workflows.rs",
+      "sha256": "f568ebe2863888b797359939afb931f7df34d6522a91432257eb45f272a7c851",
+      "status": "same",
+      "publication_sha256": "18316036aa3212886e606f0eb0ec979e1098c07a092f8a6f80d59d27b55c8116"
+    },
+    {
+      "archive": "desktop/src-tauri/src/zoning_client.rs",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/src/zoning_client.rs",
+      "sha256": "97844a0ae0ab0048fd1c56306afcaab3d1c675db193cc79033dcf203e47ae3cc",
+      "status": "changed",
+      "publication_sha256": "97844a0ae0ab0048fd1c56306afcaab3d1c675db193cc79033dcf203e47ae3cc"
+    },
+    {
+      "archive": "desktop/src-tauri/tauri.conf.json",
+      "repo": "townlight",
+      "path": "desktop/src-tauri/tauri.conf.json",
+      "sha256": "4290340d8d05bf73777e169a4caa1d079463f4ea7206b546a4e947359af7d7d4",
+      "status": "changed",
+      "publication_sha256": "02e09bdb6cabb80fd4693dd8909d0baf1b6aebd53720556044203e34d74a1e0d"
+    },
+    {
+      "archive": "desktop/src/code/client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/code/client.ts",
+      "sha256": "82e69121ebba5c8d617a4b9afcc7b6a9d9fa360464bb1a62778cbfe2ea40e22c",
+      "status": "same",
+      "publication_sha256": "f2cfa0bd6ab0c86370f383b949d0bb6e387bcf3c94da1807a1d80df8b1b85a42"
+    },
+    {
+      "archive": "desktop/src/code/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/code/view.js",
+      "sha256": "cd4de8e1f4caae9a7a5331e1f34beadf2a8faef00883b14ac6a4e8be06be53e6",
+      "status": "same",
+      "publication_sha256": "0a3894c10232d69e4eb47d11482c16190444b509ad76b34a16caad61c1cf6135"
+    },
+    {
+      "archive": "desktop/src/inspections/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/inspections/view.js",
+      "sha256": "3cfe92292f8e3600f325612df81362294960ba414dde05811782e2f5ff879001",
+      "status": "changed",
+      "publication_sha256": "3cfe92292f8e3600f325612df81362294960ba414dde05811782e2f5ff879001"
+    },
+    {
+      "archive": "desktop/src/main.js",
+      "repo": "townlight",
+      "path": "desktop/src/main.js",
+      "sha256": "28ed22f3a3a11a366d44fd24da3955a0e9de84456613fc7b35802832362afeb2",
+      "status": "same",
+      "publication_sha256": "6138fa1b71c407644fafcc65935805978512ac3f75cbd10fafebab551791630c"
+    },
+    {
+      "archive": "desktop/src/meetings/client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/meetings/client.ts",
+      "sha256": "ba12839650f17a66d5eff5782c0e5feb1a9ad7abfbe1442958b86d9f7813e1cc",
+      "status": "same",
+      "publication_sha256": "a32fbea945b270cd0603e1233eb9cb740c0fc195adecceac81e0d45da231e227"
+    },
+    {
+      "archive": "desktop/src/meetings/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/meetings/view.js",
+      "sha256": "3d12d5fde231bd777eb3717aac068a8397afe4b2182debff3711592c9881ac24",
+      "status": "same",
+      "publication_sha256": "20ec72cd5ac9efccddc910bca4b5609a957b9d29d7844894a09ecdb8a422d70a"
+    },
+    {
+      "archive": "desktop/src/permitting/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/permitting/view.js",
+      "sha256": "ea60d8b4ed74035beeb5cf8bd4554eeb4a0153085c85cc7f702beedc8a48df0c",
+      "status": "changed",
+      "publication_sha256": "183911b5b0fc0d0e5eb5c9cb04334d767eb06c14a44cd16f0e5982f774746ff7"
+    },
+    {
+      "archive": "desktop/src/planning/client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/planning/client.ts",
+      "sha256": "2f865b41b770e5ad492ed65659e634b5c3bf9ca7e729f6dc868ea9ef174575eb",
+      "status": "changed",
+      "publication_sha256": "2f865b41b770e5ad492ed65659e634b5c3bf9ca7e729f6dc868ea9ef174575eb"
+    },
+    {
+      "archive": "desktop/src/planning/municipal.js",
+      "repo": "townlight",
+      "path": "desktop/src/planning/municipal.js",
+      "sha256": "b3e0cb7dd66e81584d317a6f270e9cf1892147805349e1f3ec91e453ece90d70",
+      "status": "new",
+      "publication_sha256": "2ea3bd504fdfb5d5df8cd8ae2e23daf8e66b6a3fbfeff10db3858efb9a286299"
+    },
+    {
+      "archive": "desktop/src/planning/planning.css",
+      "repo": "townlight",
+      "path": "desktop/src/planning/planning.css",
+      "sha256": "477e8f96587001e6d67f406bea2768d112fa519ae2e8cde55e18ad2eda678cfb",
+      "status": "same",
+      "publication_sha256": "8de80bd756fb396ec4e1842c6c14a044b19f66e665a1e6dc989d57d0a85284ae"
+    },
+    {
+      "archive": "desktop/src/planning/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/planning/view.js",
+      "sha256": "9b3b76c9ec43ac09df553469ed20263ba60c2cde65cfcaa8e32a591f59078a36",
+      "status": "changed",
+      "publication_sha256": "c6bccb643fbc476e53c3375cddffab6ced3ead90ae2e5db1db12d193f57c10b2"
+    },
+    {
+      "archive": "desktop/src/records/access-client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/access-client.ts",
+      "sha256": "4f01a632732b202c8e115bdbc76098dacd1a325fc9b4baed1ba7c592f3279fd4",
+      "status": "same",
+      "publication_sha256": "0a2e1a1d5eba039900f9b98758937242ec5d6eab20f2a928bad3eebb5519dc22"
+    },
+    {
+      "archive": "desktop/src/records/client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/client.ts",
+      "sha256": "9df93865a964bbb3ba991956f89bc51053511a6497e92b230f01a7a366420e6c",
+      "status": "same",
+      "publication_sha256": "bb1e84420ff70e56b0b669ccb2db936ac9655f4a6ab77847442e7131bb5231d9"
+    },
+    {
+      "archive": "desktop/src/records/code-sources.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/code-sources.ts",
+      "sha256": "52755e6d4248bbfc6268c62f9c663edef7526497dac27acb29b887d5b7b9d0d4",
+      "status": "same",
+      "publication_sha256": "9a7fc008816718572625f01aaf7a40b0b33fd209a91cae7d88c62b2020bb41e9"
+    },
+    {
+      "archive": "desktop/src/records/controller.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/controller.ts",
+      "sha256": "ccebec29d03f90b96179e76a49440ce2c63319af331227330d354319a0073647",
+      "status": "same",
+      "publication_sha256": "3764720b6312a1c42e70205d8a9291b9898128fff034f1766e87501b93653ace"
+    },
+    {
+      "archive": "desktop/src/records/meetings-sources.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/meetings-sources.ts",
+      "sha256": "ba5be1b8f0c1854ec777a69e7f5e307785f34d4a929179eabbcea6cf09712c6f",
+      "status": "same",
+      "publication_sha256": "d59bf93e53c4aa09a3b73e8eea961281e4efced714f125d9ef2524a2f3a0b0d8"
+    },
+    {
+      "archive": "desktop/src/records/planning-sources.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/planning-sources.ts",
+      "sha256": "98217a4d2c88068c036e9c9d5c2ba8e89f47fc74cc8054e3d4230c421199cbad",
+      "status": "same",
+      "publication_sha256": "761a0005e658b836152d0260a3e18ef94481cc3c401cc627d2e3434558de93ec"
+    },
+    {
+      "archive": "desktop/src/records/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/records/view.js",
+      "sha256": "0dbf440fb02ff3d358dd7dfd9895dc6ec1aab80a61182052cd934234283c6558",
+      "status": "same",
+      "publication_sha256": "d231902952e65b09c1692bfff5e1458841fc86332cf6e714fbd9079bc53ea0fa"
+    },
+    {
+      "archive": "desktop/src/records/zoning-sources.ts",
+      "repo": "townlight",
+      "path": "desktop/src/records/zoning-sources.ts",
+      "sha256": "333ba5a17c34e45627b04b185e4259a128cb624b2842943be770aa1db323064c",
+      "status": "same",
+      "publication_sha256": "12f01cfc5ea41d05ec79f14469cd867d32693b671856d2168c73cd307ba325d2"
+    },
+    {
+      "archive": "desktop/src/styles.css",
+      "repo": "townlight",
+      "path": "desktop/src/styles.css",
+      "sha256": "9e3baf03bb8bc258d3fd4548ba0d1fdab73edde1fc30f20bf055675ee6b7ee99",
+      "status": "same",
+      "publication_sha256": "4f6c1b1e49541615a6f2a16e69210aee8c859477bf526b6f18aae6e7de53c6fb"
+    },
+    {
+      "archive": "desktop/src/zoning/client.ts",
+      "repo": "townlight",
+      "path": "desktop/src/zoning/client.ts",
+      "sha256": "4bc35d1417b40d3d8dba5b8f86748be790c7023a3ed14de08c5d2fca536f1473",
+      "status": "changed",
+      "publication_sha256": "4bc35d1417b40d3d8dba5b8f86748be790c7023a3ed14de08c5d2fca536f1473"
+    },
+    {
+      "archive": "desktop/src/zoning/view.js",
+      "repo": "townlight",
+      "path": "desktop/src/zoning/view.js",
+      "sha256": "3548b0755bde1ec2db0396e03f4f56f5b3dfa679fa25da7f1473844cfa4a5b4d",
+      "status": "changed",
+      "publication_sha256": "d6f4fbfccf862f67724aebe2cfd5709d8050dfa64baf1ff6beb579f3cc7a7f2b"
+    },
+    {
+      "archive": "desktop/tests/browser/inspections-records-refresh.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/inspections-records-refresh.spec.mjs",
+      "sha256": "89f2ea1455efb0a569f9bffc2d693223a6090a2b33def747b7d541c69b6869aa",
+      "status": "same",
+      "publication_sha256": "e21e58dab06a02efae68752fc09e7564b8c38f97afeba0d8567b4fa48383a38a"
+    },
+    {
+      "archive": "desktop/tests/browser/inspections.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/inspections.spec.mjs",
+      "sha256": "121c19b0c9e2b17ebee20478b7cf8b5d31bf3e39ec2f80e6fec8c4007820bf77",
+      "status": "same",
+      "publication_sha256": "45869735fae63e4b5c097effb6912e37a94959cd63a8de6d548b83b5740df18a"
+    },
+    {
+      "archive": "desktop/tests/browser/model-readiness.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/model-readiness.spec.mjs",
+      "sha256": "495d1a4b92eafcfbaf163bf9a96067c870f5ececa8638cc93c46550eb97661a9",
+      "status": "same",
+      "publication_sha256": "878ebee1c2d3ea56bf6df42017de70e0502df68de8338c92f98ff02adb754def"
+    },
+    {
+      "archive": "desktop/tests/browser/permitting.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/permitting.spec.mjs",
+      "sha256": "2de99a579e5f59e7339a5f011f1b0d8c6b3d08de844c45dd4b0ec4002c0145d8",
+      "status": "same",
+      "publication_sha256": "dcebcabf045837022d3315d8e0c9b75d040f89c5444bc1dcc80ee866ad71445b"
+    },
+    {
+      "archive": "desktop/tests/browser/planning.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/planning.spec.mjs",
+      "sha256": "1d016d0449de62e8c0331941e3f5664c2c25d0996c4922b2683aa6850018d3f9",
+      "status": "same",
+      "publication_sha256": "945fa25ccf39a51d07a50f0c6fb6d585264f5dfe12fc9aeb6935b4cbe166da93"
+    },
+    {
+      "archive": "desktop/tests/browser/records-public-beta.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/records-public-beta.spec.mjs",
+      "sha256": "0b83e439be22cba2508cab12e9876449455f9f636bd1ef072885f00c965e829d",
+      "status": "same",
+      "publication_sha256": "420435e29abc56bc99fab551507b13d592474c26a72d68cdb3d8392af5792765"
+    },
+    {
+      "archive": "desktop/tests/browser/workflow-pages.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/workflow-pages.spec.mjs",
+      "sha256": "926497cf6ae5f0c462ee0884bbeedcee9fd9a3a1f6bbc46fa55d0712a3fe940b",
+      "status": "same",
+      "publication_sha256": "3ad629f4442b00a0a3bfa52d1b2e164cde884b3b478c1ae7d44a5e2767f3f43b"
+    },
+    {
+      "archive": "desktop/tests/browser/xss-backstop.spec.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/browser/xss-backstop.spec.mjs",
+      "sha256": "e5cbd1286d69bd3e8dab1210994855736d908958b4262bb412c0426c2db8836d",
+      "status": "same",
+      "publication_sha256": "53c814b61ddb25475a27956b0a8da2a8a338854066b6d24736bc7a0b48c633a6"
+    },
+    {
+      "archive": "desktop/tests/records-client.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/records-client.mjs",
+      "sha256": "7551f85e08b8bda24e39d61e676e57ddef2b3290b7e9b4ff1752dcfdc115537d",
+      "status": "same",
+      "publication_sha256": "ce8126a0f259c515b178a1d7c2e95fa1839f196f7662d9f1697aac1b50e37ceb"
+    },
+    {
+      "archive": "desktop/tests/static-smoke.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/static-smoke.mjs",
+      "sha256": "ffa7d647404952b43fafdcf89488694ea46d4a80142331727869f6a989cd5b39",
+      "status": "changed",
+      "publication_sha256": "bb73a839639155e16fc1c05a35b51669741f677fdf33c80220d7e3aba652b32c"
+    },
+    {
+      "archive": "desktop/tests/xss-and-state.mjs",
+      "repo": "townlight",
+      "path": "desktop/tests/xss-and-state.mjs",
+      "sha256": "fda45db65685ba7463d9f8c18af2696fffb96b132e6efb5c6f8fa9f95cc92392",
+      "status": "same",
+      "publication_sha256": "80cca87c01bdcbc62adbbcc89fd668a40e58065cc37f711d31b4061bc2120b55"
+    },
+    {
+      "archive": "townlight/LICENSE",
+      "repo": "townlight",
+      "path": "LICENSE",
+      "sha256": "f8d737bb0e71411f200b34d8c895df6ed6957fd3250f7976d5af9d7d7b752aac",
+      "status": "changed",
+      "publication_sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "archive": "townlight/LICENSE-CODE",
+      "repo": "townlight",
+      "path": "LICENSE-CODE",
+      "sha256": "e0eedba615d5cd1b986afb6c5b3a4b1ae33713e7e9dc74d19daec5e3221f9d2e",
+      "status": "changed",
+      "publication_sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/__init__.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/__init__.py",
+      "sha256": "b68059cf70d9999804385a093caa3d7520c96d92f705ba9ee05fbc7d2c2b1f1d",
+      "status": "same",
+      "publication_sha256": "56de213da3d7939fa625c18f1ea88fdaa85548e51ca1e95387ca3256dcce6f6f"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/access_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/access_bridge.py",
+      "sha256": "253dd834c23ef6f24f7d17f64dad44a941a034bb46f929bb5e8264dccf421f46",
+      "status": "same",
+      "publication_sha256": "77642b97af7a11691d37f7c4c6898cc44d4b75d896fa411588efe21090ae4ab1"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic.ini",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic.ini",
+      "sha256": "60e69c28e3c87e101995977223073125b196202555e1fc18902feed2afdc7e7e",
+      "status": "new",
+      "publication_sha256": "60e69c28e3c87e101995977223073125b196202555e1fc18902feed2afdc7e7e"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/env.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/env.py",
+      "sha256": "72f25d2ff59a9fdc6b5282e9d995c8c475146068c2e37b334236c690748ba637",
+      "status": "new",
+      "publication_sha256": "72f25d2ff59a9fdc6b5282e9d995c8c475146068c2e37b334236c690748ba637"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/script.mako",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/script.mako",
+      "sha256": "8bf20ff989c954ae7953cdd45becb27b5d709042884afa6bf33cfd5fcdc76d4b",
+      "status": "new",
+      "publication_sha256": "8bf20ff989c954ae7953cdd45becb27b5d709042884afa6bf33cfd5fcdc76d4b"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/script.py.mako",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/script.py.mako",
+      "sha256": "8bf20ff989c954ae7953cdd45becb27b5d709042884afa6bf33cfd5fcdc76d4b",
+      "status": "new",
+      "publication_sha256": "8bf20ff989c954ae7953cdd45becb27b5d709042884afa6bf33cfd5fcdc76d4b"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/001_initial.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/001_initial.py",
+      "sha256": "cc9de99c0c96fc844f59770c23d2fc4ffe18c4857bb28ce8155458f90d148897",
+      "status": "new",
+      "publication_sha256": "cc9de99c0c96fc844f59770c23d2fc4ffe18c4857bb28ce8155458f90d148897"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/002_documents.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/002_documents.py",
+      "sha256": "94d0858828284b3bfa2e6d923722c96ba42030d6b97626a2ebbf17b834e5859a",
+      "status": "new",
+      "publication_sha256": "94d0858828284b3bfa2e6d923722c96ba42030d6b97626a2ebbf17b834e5859a"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/003_model_registry.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/003_model_registry.py",
+      "sha256": "542161906da26f3fc589163b84a1097705f5b04cdce75e249ae000b1aeddaa58",
+      "status": "new",
+      "publication_sha256": "542161906da26f3fc589163b84a1097705f5b04cdce75e249ae000b1aeddaa58"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/004_search.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/004_search.py",
+      "sha256": "b388887ce12c8560396298a2c6686b87fd8e8cdd4e41ee0be133189706a94608",
+      "status": "new",
+      "publication_sha256": "b388887ce12c8560396298a2c6686b87fd8e8cdd4e41ee0be133189706a94608"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/005_requests.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/005_requests.py",
+      "sha256": "0a55883877cd95959d495b8865efec727f18b8bbb86bf8269a938d876e575e55",
+      "status": "new",
+      "publication_sha256": "0a55883877cd95959d495b8865efec727f18b8bbb86bf8269a938d876e575e55"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/006_exemptions.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/006_exemptions.py",
+      "sha256": "5b10d9ce0ee0b523502bbe075b45c52b6e3cb303d2a4904d27e337d529b210cf",
+      "status": "new",
+      "publication_sha256": "5b10d9ce0ee0b523502bbe075b45c52b6e3cb303d2a4904d27e337d529b210cf"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/008_extend_request_status_enum.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/008_extend_request_status_enum.py",
+      "sha256": "b98949215e447bbef20643a34445f21018e9c1719c78634dca1485740911c3f4",
+      "status": "new",
+      "publication_sha256": "b98949215e447bbef20643a34445f21018e9c1719c78634dca1485740911c3f4"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/009_fee_waivers.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/009_fee_waivers.py",
+      "sha256": "3374202e15d16b5e1f64679bd6720c27ed2ebe63993c045bf75e6cc68b8fadb8",
+      "status": "new",
+      "publication_sha256": "3374202e15d16b5e1f64679bd6720c27ed2ebe63993c045bf75e6cc68b8fadb8"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/010_remove_sent_status.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/010_remove_sent_status.py",
+      "sha256": "45aca2a0b308c0b3e519f087711e6229ff92edc5bedf538e8572c433245336c7",
+      "status": "new",
+      "publication_sha256": "45aca2a0b308c0b3e519f087711e6229ff92edc5bedf538e8572c433245336c7"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/011_fix_schema_drift.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/011_fix_schema_drift.py",
+      "sha256": "30b31274845637463a685fb8161a6212324bb9c942128293566ead73518f1fd5",
+      "status": "new",
+      "publication_sha256": "30b31274845637463a685fb8161a6212324bb9c942128293566ead73518f1fd5"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/012_add_liaison_public_roles.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/012_add_liaison_public_roles.py",
+      "sha256": "dc33549ad3807d866e5580983649af8ace21199a56c31ef2e8ff1e97a21cacb4",
+      "status": "new",
+      "publication_sha256": "dc33549ad3807d866e5580983649af8ace21199a56c31ef2e8ff1e97a21cacb4"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/013_add_connector_types.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/013_add_connector_types.py",
+      "sha256": "4509ee80f8f5a71fc46b7a7c80714bee02cd9df50bba87b60af9eb5aaa80b436",
+      "status": "new",
+      "publication_sha256": "4509ee80f8f5a71fc46b7a7c80714bee02cd9df50bba87b60af9eb5aaa80b436"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/014_p6a_idempotency.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/014_p6a_idempotency.py",
+      "sha256": "e6e37e72509f0b13afa975997a575e8f4194cdbdbb7448e301716e65cb1a5c95",
+      "status": "new",
+      "publication_sha256": "e6e37e72509f0b13afa975997a575e8f4194cdbdbb7448e301716e65cb1a5c95"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/015_p6b_scheduler.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/015_p6b_scheduler.py",
+      "sha256": "6cb8cf8f659658d2a2da313bc56865b7fb00e28865ec4e8bb088250bb10f8c78",
+      "status": "new",
+      "publication_sha256": "6cb8cf8f659658d2a2da313bc56865b7fb00e28865ec4e8bb088250bb10f8c78"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/016_p7_sync_failures.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/016_p7_sync_failures.py",
+      "sha256": "f5b069805a41f7be6910715aac74436eb1d4d19646294212e57a87df26769875",
+      "status": "new",
+      "publication_sha256": "f5b069805a41f7be6910715aac74436eb1d4d19646294212e57a87df26769875"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/017_rename_connector_enum_values.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/017_rename_connector_enum_values.py",
+      "sha256": "fae8c09bdd849a1fe85cb2b9186e35ee6dc25dc6fe775a20ad6835be128b4f50",
+      "status": "new",
+      "publication_sha256": "fae8c09bdd849a1fe85cb2b9186e35ee6dc25dc6fe775a20ad6835be128b4f50"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/018_city_profile_state_nullable.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/018_city_profile_state_nullable.py",
+      "sha256": "2d3da494cbd5d6391bed42cc31a30832f63fa078b50bcdc2eac89962f42ef3fb",
+      "status": "new",
+      "publication_sha256": "2d3da494cbd5d6391bed42cc31a30832f63fa078b50bcdc2eac89962f42ef3fb"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/019_encrypt_connection_config.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/019_encrypt_connection_config.py",
+      "sha256": "9a120c5faaeb4ea61001499c00aad5144a7084ed97753c6dfe12b9ad6f1e4636",
+      "status": "new",
+      "publication_sha256": "9a120c5faaeb4ea61001499c00aad5144a7084ed97753c6dfe12b9ad6f1e4636"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/020_phase2_consumer_app_backfill.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/020_phase2_consumer_app_backfill.py",
+      "sha256": "2bf286156d3862660f15da2ffc87de0eef1e5d9c1ff37fce69bc72d0bbec17ba",
+      "status": "new",
+      "publication_sha256": "2bf286156d3862660f15da2ffc87de0eef1e5d9c1ff37fce69bc72d0bbec17ba"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/021_first_admin_password_rotation.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/021_first_admin_password_rotation.py",
+      "sha256": "365d7fdfe5d733077649d00fe6983fdefd0dc2d9fc078b9cea0753d0d5f734e7",
+      "status": "new",
+      "publication_sha256": "365d7fdfe5d733077649d00fe6983fdefd0dc2d9fc078b9cea0753d0d5f734e7"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/022_native_records_mapping.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/022_native_records_mapping.py",
+      "sha256": "1ae8180ca83c5863c1718274e5435fe1419ec48a4737ccf2434f531a4f2fd7b8",
+      "status": "new",
+      "publication_sha256": "1ae8180ca83c5863c1718274e5435fe1419ec48a4737ccf2434f531a4f2fd7b8"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/023_native_records_lifecycle.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/023_native_records_lifecycle.py",
+      "sha256": "00633480cbda11121fc6f98aa10b978ca24213a3626ddd4106c1aa5f660e599e",
+      "status": "new",
+      "publication_sha256": "00633480cbda11121fc6f98aa10b978ca24213a3626ddd4106c1aa5f660e599e"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/024_records_file_evidence.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/024_records_file_evidence.py",
+      "sha256": "09c48872ab8e378d709542e20f8495cb1857146b78238e73de570a21151f2fcf",
+      "status": "new",
+      "publication_sha256": "09c48872ab8e378d709542e20f8495cb1857146b78238e73de570a21151f2fcf"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/025_records_artifacts.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/025_records_artifacts.py",
+      "sha256": "b4f4c62211d57b123978fe78ae3dc0c7503110ccae9422776e1bd6d13d003b8a",
+      "status": "new",
+      "publication_sha256": "b4f4c62211d57b123978fe78ae3dc0c7503110ccae9422776e1bd6d13d003b8a"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/026_native_public_actor.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/026_native_public_actor.py",
+      "sha256": "3958251d4c9710ffc20572ee7dcc0fe2dbc169e6f56bd1461d6c1239c2ac231c",
+      "status": "new",
+      "publication_sha256": "3958251d4c9710ffc20572ee7dcc0fe2dbc169e6f56bd1461d6c1239c2ac231c"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/civicrecords_alembic/alembic/versions/027_import_artifact_order.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/civicrecords_alembic/alembic/versions/027_import_artifact_order.py",
+      "sha256": "9ef98e386a1dc848a1fab6893b009198d70556020482df207618519a3301faf8",
+      "status": "new",
+      "publication_sha256": "9ef98e386a1dc848a1fab6893b009198d70556020482df207618519a3301faf8"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/code_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_bridge.py",
+      "sha256": "901f1473aa6f4db4b089925a2fec17e963cef7a27c6bf885099a362df1fe15e9",
+      "status": "same",
+      "publication_sha256": "f3d7bd60e5d82414babe2b6f1895b0591568eae310fc752043b6609f349d4535"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/code_meetings.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_meetings.py",
+      "sha256": "ee1e7d2e765396cf099e7c78113ea04a7db7d163892364669d1860815d20c818",
+      "status": "same",
+      "publication_sha256": "58419bd5862f3dc7fc86cff50f55d4e976972c591f6a4eda05ed1bddab7e1d4b"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/code_meetings_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_meetings_bridge.py",
+      "sha256": "831045dc48508e866472a9ff6d9d837e8eed0a46c91c8f93b41eec526650c7c5",
+      "status": "same",
+      "publication_sha256": "271552ce9479a271515a06560def8eb216ff40493a3fc5289422024b17bd5e50"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/code_public.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_public.py",
+      "sha256": "0fe956329a96e54e138b669d4ab4f69ab0d6f489b647a115cfd126cfa58742a5",
+      "status": "same",
+      "publication_sha256": "475d285b97ac70886c9b2d27918270f247b1074f74c782d319156c4ae88f19b6"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/code_records.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/code_records.py",
+      "sha256": "5791e31398ded128b1ef3e1fe65c0e54d38ea07578400117da07ad574b67943e",
+      "status": "same",
+      "publication_sha256": "07645bfa7bf2dad77c17d40c93a5d078ae1f3072e0e6b5a15a07cb03f7b0e322"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/fixtures/redstone-valley-records-demo-v1.json",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/fixtures/redstone-valley-records-demo-v1.json",
+      "sha256": "2039eca2587b4ace6937ca73e21d0a936835420f8534292247458a1a67516553",
+      "status": "same",
+      "publication_sha256": "cf5f16f7399d99534891ff36e002512dacf5301aba4488ec3699a81f96dd3d7a"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/inspections_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/inspections_bridge.py",
+      "sha256": "b7429c3ab988005a198795d6f1dfc3f785c7f96f61410903f8cb0ad38c6f512c",
+      "status": "changed",
+      "publication_sha256": "b7429c3ab988005a198795d6f1dfc3f785c7f96f61410903f8cb0ad38c6f512c"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/meetings_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/meetings_bridge.py",
+      "sha256": "37ea43e633b55e9428e928143e5da0d41a7a5906673b8cc54b40fa4d1748fa52",
+      "status": "changed",
+      "publication_sha256": "0716861dc7d432a491def6b87336dd5ebf1e989fe3036094ff70856bfaa0d02b"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/migrate.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/migrate.py",
+      "sha256": "cf632a6c00a1c6e3bdea08edf841510a194665c0ce97705dbc4e16f964bb6145",
+      "status": "changed",
+      "publication_sha256": "c516ea95794ef8aac728eda614e3effd2210fc17321aa3eec12f18de36f1b1b8"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/native_accounts.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/native_accounts.py",
+      "sha256": "e54d1dcfbbf5aecb2c61d7235884e787de05b8f48547f9c68348ba45a8ff9039",
+      "status": "same",
+      "publication_sha256": "29086449a56dd8019de32cad9963125fc723a15abc92f305fd661312c9f62e59"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/permitting_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/permitting_bridge.py",
+      "sha256": "786abd0dfc18ed0ce7ada70fcd120f96795d8e1ee46f38ca0770a8217b4d6e1d",
+      "status": "changed",
+      "publication_sha256": "786abd0dfc18ed0ce7ada70fcd120f96795d8e1ee46f38ca0770a8217b4d6e1d"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/planning_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/planning_bridge.py",
+      "sha256": "74a855b995b7f323873b9c788cd15bd4b0ebe3fc1c53879596e1b5043c2825bb",
+      "status": "changed",
+      "publication_sha256": "74a855b995b7f323873b9c788cd15bd4b0ebe3fc1c53879596e1b5043c2825bb"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/planning_connections.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/planning_connections.py",
+      "sha256": "9991e58a4b168fbbdf5f00334e8515061a09ab06ce593a7625ae007e2fd840f9",
+      "status": "same",
+      "publication_sha256": "f02de4af07ce07347f3a3becc12ec26d440442ed99c4d2a2b89ff4c2294243d7"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_cutover.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_cutover.py",
+      "sha256": "62b93909757ce822fc1f235b6c602d081a669d68e20bca63719b7c773940abde",
+      "status": "same",
+      "publication_sha256": "039a46c8da6d5eea53c6e3fe7d33b59fd1afbcb87fb23aba9104e2fed4538d98"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_demo.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_demo.py",
+      "sha256": "c1c4ef3dd1ffbca62ffaa84cef21a66ecfa57b9f0909a75c5e34bde068b2d4c5",
+      "status": "same",
+      "publication_sha256": "03bd774a247dda37921e022f564d39eb5df8191e0a5594b3d3ce6702a281f437"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_import.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import.py",
+      "sha256": "ba8a017e2e83f7b08707b1c1dfe701fb9540d130aebf5aacd29e2c9699ddc8b3",
+      "status": "same",
+      "publication_sha256": "fc98f9d6a590a4064d947bece445aa2a922a8691b3be6a6bc0a80df8bb9d31bb"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_import_access.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import_access.py",
+      "sha256": "c8d4052358b5679e64f1fd97097d5d6498b9fbcb4a71a4af3b688a766d5f3fb2",
+      "status": "same",
+      "publication_sha256": "c36ccbabf072ef23864060e51f5ee11f7ff5c72f7468289799cdf16e53885742"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_import_store.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_import_store.py",
+      "sha256": "fe1acc8792fb8a2992d554568705663d2440d044616511891b98fff0e5eb35f7",
+      "status": "same",
+      "publication_sha256": "0db793e0feaa814166cb950b885e36b3ba908c7736e4c6807169c032b0bede4d"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/records_snapshot.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/records_snapshot.py",
+      "sha256": "800377214a5e0b52cd4f402aae015f9eb832d7d29a003cd4cc3b84316cd4a735",
+      "status": "same",
+      "publication_sha256": "2d128fc5abff610a6261473c1ad82a7a2b427b009d13a747749d822dcc9bb061"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/services.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/services.py",
+      "sha256": "5dfb0f58ea1f94185081426a3734905c78624d7bcd5407fd2c4e0fa1fb054a6b",
+      "status": "same",
+      "publication_sha256": "831e7486753f119750d12bc9aed725d8023ca5fa75ad9cb1db9a03389772042d"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/storage.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/storage.py",
+      "sha256": "2bac2625616fd4a4926a03bc1721afc634da6ee6cd11ff0745cfd9dabc6f533e",
+      "status": "same",
+      "publication_sha256": "34e1135580bd5104e54723ec6df70b6259f57e552ce9ded7842f930dbdc54c94"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/zoning_bridge.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/zoning_bridge.py",
+      "sha256": "eb80d79ffc4fc736789aab4f3d3b75a4d9d01101d6414a69a29053c7d5f90505",
+      "status": "changed",
+      "publication_sha256": "eb80d79ffc4fc736789aab4f3d3b75a4d9d01101d6414a69a29053c7d5f90505"
+    },
+    {
+      "archive": "installed-owned-source/civicsuite_runtime/zoning_records.py",
+      "repo": "townlight",
+      "path": "desktop/runtime/python-services/civicsuite_runtime/zoning_records.py",
+      "sha256": "045718aaa5f1f42876dbb493e4649e721a94187375d96bc8d7a34512e9ce9806",
+      "status": "same",
+      "publication_sha256": "5c4b3d72c3795df980cd75af8e1fff644ee5e37bb85bb53c2b807f35941fbf48"
+    }
+  ],
+  "identity_note": "Publication commit integrates the already-built candidate; it is not claimed to be the original signing/build commit. Archive paths retain original byte hashes. Documentation entrypoints have a distribution addendum.",
+  "publication_note": "Original accepted bytes remain in the immutable source companion. Canonical sources normalize line endings. Release integration fixes remove a shadowed duplicate class, position imports for lint, format regression/acceptance tools and resolve the paired Core source dependency. Current audited manuals supersede build-time README copies. Each mapped file records both original and publication byte hashes."
+}

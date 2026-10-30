@@ -9,7 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULES_JSON = ROOT / "installer" / "modules.json"
-USER_MANUALS = (ROOT / "USER-MANUAL.md", ROOT / "USER-MANUAL.txt")
+USER_MANUALS = (ROOT / "docs/installer/generated-legacy-profile-topology.md",)
 
 START = "<!-- BEGIN GENERATED SUITE TOPOLOGY -->"
 END = "<!-- END GENERATED SUITE TOPOLOGY -->"

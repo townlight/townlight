@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (c) The CivicSuite Authors
 
 #Requires -Version 5.1
@@ -864,6 +864,9 @@ function Install-PythonServicePackages {
             $CivicInspect = (Resolve-Path $InspectionsRoot).Path
             $SourceRoots['townlight/inspect'] = $CivicInspect
             $CandidateSourceRoots += $CivicInspect
+            $InspectionTranscriber = Join-Path $CivicInspect 'inspection-transcriber'
+            if (-not (Test-Path -LiteralPath (Join-Path $InspectionTranscriber 'pyproject.toml'))) { throw 'Pinned Inspections source is missing its accepted transcription package.' }
+            $CandidateSourceRoots += $InspectionTranscriber
         }
         foreach ($Repository in $SourceRoots.Keys) {
             $CandidateSource = $SourceRoots[$Repository]
@@ -884,7 +887,7 @@ function Install-PythonServicePackages {
         }
         $ServicePackages = @($ServicePackages | Where-Object { $_ -ne $CivicRecords })
         $CandidateWheels = @(Get-ChildItem -LiteralPath $WheelRoot -Filter '*.whl')
-        if ($CandidateWheels.Count -ne $CandidateSourceRoots.Count) { throw "Expected exactly Planning and Records candidate wheels." }
+        if ($CandidateWheels.Count -ne $CandidateSourceRoots.Count) { throw "Expected one wheel for each pinned candidate package." }
         $ServicePackages += @($CandidateWheels | ForEach-Object { $_.FullName })
         $ProvenanceName = if ($ProductProfile -eq 'inspections-preview') { 'inspections-candidate-provenance.json' } elseif ($ProductProfile -eq 'permitting-preview') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
         Write-JsonFile -Path (Join-Path $PythonRoot $ProvenanceName) -Value @{
@@ -935,7 +938,7 @@ function Install-PythonServicePackages {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', "import civicpermit.workflow_store, civicsuite_runtime.permitting_bridge") -ExtraEnvironment @{TESTING='1'}
     }
     if ($ProductProfile -eq 'inspections-preview') {
-        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import civicinspect.workflow_store, civicsuite_runtime.inspections_bridge') -ExtraEnvironment @{TESTING='1'}
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import civicinspect.workflow_store, civicsuite_runtime.inspections_bridge, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
     $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
@@ -946,7 +949,7 @@ function Install-PythonServicePackages {
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicplan") }
     if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicpermit") }
-    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("civicinspect") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("civicinspect", "townlight-inspection-transcriber") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("civicclerk")
     }
@@ -960,19 +963,23 @@ import importlib.metadata as metadata
 import json
 from pathlib import Path
 from app.desktop_bridge.router import router
+from fastapi import FastAPI
 from civicplan.source_store import PlanSourceRepository
 from civicplan.workflow_store import WorkflowRepository
+probe = FastAPI()
+probe.include_router(router)
+route_paths = set(probe.openapi()['paths'])
 assert hasattr(PlanSourceRepository, 'inventory') and hasattr(WorkflowRepository, 'preview_snapshot')
-assert '/desktop/v1/planning-sources/search' in {route.path for route in router.routes}
+assert '/desktop/v1/planning-sources/search' in route_paths
 assert metadata.version('civicplan') == '$($PlanningBuild.Contract.planning_package_version)'
 assert metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'
 assert metadata.version('civiccore') == '$($PlanningBuild.Contract.core_package_version)'
 if '$ProductProfile' in ('permitting-preview', 'inspections-preview'):
     assert metadata.version('civicpermit') == '$($PlanningBuild.Contract.permitting_package_version)'
-    assert '/desktop/v1/permitting-sources/search' in {route.path for route in router.routes}
+    assert '/desktop/v1/permitting-sources/search' in route_paths
 if '$ProductProfile' == 'inspections-preview':
     assert metadata.version('civicinspect') == '$($PlanningBuild.Contract.inspections_package_version)'
-    assert '/desktop/v1/inspections-sources/search' in {route.path for route in router.routes}
+    assert '/desktop/v1/inspections-sources/search' in route_paths
 path = Path(r'$PythonRoot') / '$ProvenanceName'
 receipt = json.loads(path.read_text(encoding='utf-8-sig'))
 receipt['umbrella_source_commit'] = '$UmbrellaCommit'
@@ -1040,6 +1047,29 @@ function Install-OllamaPayload {
     return @{ status = "installed"; url = $Asset.browser_download_url; sha256 = $Sha; version = $Release.tag_name; path = $Destination }
 }
 
+function Install-InspectionVoicePayload {
+    param([object]$Source, [string]$CacheRoot, [string]$PythonRoot)
+    if (-not $Source.download_sha256 -or -not $Source.download_url) {
+        throw 'Inspection voice assets require explicit pinned download metadata.'
+    }
+    $Archive = Join-Path $CacheRoot 'Townlight-Beta-1-Inspection-Voice-Assets.zip'
+    if (-not (Test-Path -LiteralPath $Archive) -or (Get-Sha256 -Path $Archive) -ne $Source.download_sha256) {
+        if ($SkipDownloads) { throw 'Pinned inspection voice assets are not cached.' }
+        Invoke-CivicDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $Source.download_sha256 | Out-Null
+    }
+    $Hash = Get-Sha256 -Path $Archive
+    if ($Hash -ne $Source.download_sha256) { throw 'Inspection voice archive hash mismatch.' }
+    # Add this small asset subtree without resetting the provisioned interpreter.
+    Expand-Archive -LiteralPath $Archive -DestinationPath $PythonRoot -Force
+    foreach ($Entry in $Source.required_sha256.PSObject.Properties) {
+        $File = Join-CivicPath -Root $PythonRoot -RelativePath $Entry.Name
+        if (-not (Test-Path -LiteralPath $File) -or (Get-Sha256 -Path $File) -ne $Entry.Value) {
+            throw "Inspection voice asset hash mismatch: $($Entry.Name)"
+        }
+    }
+    return @{status='installed'; sha256=$Hash; source=$Source.download_url}
+}
+
 function Install-PgvectorPayload {
     param(
         [object]$Source,
@@ -1104,6 +1134,9 @@ if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview
 }
 $Report.postgres_vcruntime = Copy-PostgresVcRuntime -PostgresRoot (Join-Path $PayloadRoot "postgres")
 $Report.python_vcruntime = Copy-PythonVcRuntime -PythonRoot (Join-Path $PayloadRoot "python")
+if ($ProductProfile -eq 'inspections-preview') {
+    $Report.inspection_voice = Install-InspectionVoicePayload -Source $Manifest.sources.inspection_voice -CacheRoot $CacheRoot -PythonRoot (Join-Path $PayloadRoot 'python')
+}
 # Python imports generate __pycache__ paths that can exceed the WiX linker limit.
 # They are regenerable bytecode and must not be shipped; remove only those directories before hashing.
 $PythonRoot = Join-Path $PayloadRoot "python"

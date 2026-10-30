@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -28,12 +29,11 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
     pin = module["source_commit"]
     for path in (BUILD_WORKFLOW, ROOT / ".github" / "workflows" / "installer-cleanroom.yml"):
         workflow = _read(path)
-        # Cleanroom/default MSI composition retains accepted release pins.
-        # The explicit unsigned Planning candidate resolves its separate source
-        # manifest; it must not repin the historical installer contract.
+        # Historical archive cleanrooms retain their release pins. Current
+        # full-composition CI uses the explicit Beta 1 sibling manifest.
         if path == BUILD_WORKFLOW:
             integration = workflow.split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
-            candidate = json.loads(_read(ROOT / "config" / "planning-staff-beta-sources.json"))
+            candidate = json.loads(_read(ROOT / "config" / "inspections-preview-sources.json"))
             candidate_pin = candidate["sources"][repository]
             checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
             if module_id == "civicrecords-ai":
@@ -52,7 +52,8 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
                 assert f"$RecordsRef = '{pin}'" in resolver
                 assert "$RecordsRef = $Pins.sources.'townlight/sunshine'" in resolver
                 continue
-            assert f"ref: {pin}" in checkout_inputs, path.name
+            expected_pin = candidate_pin if path == BUILD_WORKFLOW else pin
+            assert f"ref: {expected_pin}" in checkout_inputs, path.name
 
 
 def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> None:
@@ -88,7 +89,41 @@ def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> 
     base = json.loads(_read(ROOT / "desktop/src-tauri/tauri.conf.json"))
     assert overlay == {"version": contract["desktop_version"]}
     assert tuple(map(int, contract["windows_product_version"].split("."))) > (1, 4, 0, 1)
-    assert base["version"] == "1.4.0-1"
+    # The shared base composition used to be pinned to one frozen literal, so a
+    # legitimate candidate metadata bump could only be satisfied by downgrading
+    # the version or deleting the check. Pin the properties that actually have
+    # to hold instead: a WiX-compilable numeric version, one desktop identity
+    # across all four manifests, no regression below the published desktop
+    # release, and an overlay that states its own version.
+    base_version = base["version"]
+    assert re.fullmatch(r"\d+\.\d+\.\d+-\d+", base_version), (
+        "Tauri base version must use the numeric MSI prerelease form X.Y.Z-N; "
+        f"a SemVer label such as 1.6.0-beta.1 cannot become a WiX ProductVersion: {base_version}"
+    )
+    lock = json.loads(_read(ROOT / "desktop/package-lock.json"))
+    for manifest, manifest_version in (
+        ("desktop/package.json", json.loads(_read(ROOT / "desktop/package.json"))["version"]),
+        ("desktop/package-lock.json", lock["version"]),
+        ("desktop/package-lock.json root package", lock["packages"][""]["version"]),
+        ("desktop/src-tauri/Cargo.toml",
+         re.search(r'^version\s*=\s*"([^"]+)"',
+                   _read(ROOT / "desktop/src-tauri/Cargo.toml"), re.M).group(1)),
+    ):
+        assert manifest_version == base_version, f"Desktop version drift: {manifest}={manifest_version}"
+    assert re.search(
+        r'\[\[package\]\]\r?\nname = "civicsuite-desktop"\r?\nversion = "'
+        + re.escape(base_version) + r'"',
+        _read(ROOT / "desktop/src-tauri/Cargo.lock"),
+    ), "Cargo.lock desktop package version drifted from tauri.conf.json"
+    published = tuple(map(int, re.split(r"[.-]", json.loads(
+        _read(ROOT / "config/suite-state.json"))["desktop_release"]["version"])))
+    base_product = tuple(map(int, base_version.replace("-", ".").split(".")))
+    assert base_product >= published, (
+        f"base desktop version {base_version} regresses the published desktop release identity"
+    )
+    assert overlay["version"] != base_version, (
+        "the Planning candidate overlay must state its own version, not inherit the base identity"
+    )
     assert contract["development_only"] is True
     assert contract["publication_allowed"] is False
     assert "build --no-bundle ${{ steps.candidate.outputs.tauri_args }}" in workflow
@@ -301,9 +336,10 @@ $env:GITHUB_OUTPUT = ''
 function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
-if ((Resolve automatic main).product_profile -ne 'zoning-beta') { throw 'main default changed' }
+if ((Resolve automatic main).product_profile -ne 'inspections-preview') { throw 'main must exercise the full Beta 1 composition' }
+if ((Resolve automatic release/townlight-beta-1).product_profile -ne 'inspections-preview') { throw 'Beta 1 branch must exercise the full composition' }
 $inspect = Resolve automatic inspections/connected-workflow
-if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.6.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
 $inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
 if ($inspectionOverlay.identifier -ne 'org.townlight.inspections.candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -eq '53211081-ea8b-4882-a752-d80a9363cda6') { throw 'Separate Inspections identity required' }
 $permit = Resolve automatic permitting/connected-workflow

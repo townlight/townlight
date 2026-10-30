@@ -18,6 +18,7 @@ pub enum ZoningRequest {
     LinkMeeting { id: uuid::Uuid, payload: Value },
     History { id: uuid::Uuid },
     Snapshot { id: uuid::Uuid, payload: Value },
+    Standards { payload: Value },
 }
 
 pub async fn execute(
@@ -91,6 +92,16 @@ pub async fn execute(
                 return Err(DomainError::denied());
             }
             (Method::GET, format!("/questions/{id}/history"), None)
+        }
+        ZoningRequest::Standards { payload } => {
+            if public {
+                return Err(DomainError::denied());
+            }
+            (
+                Method::POST,
+                "/standards/process-explanation".into(),
+                Some(payload),
+            )
         }
         ZoningRequest::Snapshot { id, payload } => {
             if public {

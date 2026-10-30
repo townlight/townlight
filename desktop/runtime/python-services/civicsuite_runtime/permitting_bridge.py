@@ -13,7 +13,9 @@ from app.auth.native_identity import mapped_native_actor
 from app.database import get_async_session
 from civicpermit.connections import SourceUnavailable, search
 from civicpermit.migrations import ready, source_engine
-from civicpermit.workflow_models import Model, RequirementBundle, IntakeInput
+from civicpermit.pathway import explain_pathway
+from civicpermit.sources import SourceConfigError, load_providers
+from civicpermit.workflow_models import Model, RequirementBundle, IntakeInput, SourceLink
 from civicpermit.workflow_store import IntakeRepository, Conflict
 from civicsuite_runtime.services import _sync_database_url
 
@@ -133,6 +135,59 @@ async def packet(request: Request, case_id: UUID, body: Packet, identity=Depends
 @router.get("/packets/{packet_id}")
 async def document(request: Request, packet_id: UUID, identity=Depends(actor)):
     return await call(request, lambda r: r.document(str(packet_id)))
+
+
+class Pathway(Model):
+    project_type: str = Field(min_length=1, max_length=120)
+    proposal: str = Field(default="", max_length=4000)
+    location_context: str = Field(default="", max_length=1000)
+    requirement_revision: UUID | None = None
+    fee_link: SourceLink | None = None
+
+
+@router.post("/pathway")
+async def pathway(request: Request, body: Pathway, identity=Depends(actor)):
+    """Cited likely permit pathway, attachments and timeline; informational only.
+
+    ``use_model_assistance`` does not exist here: the resident live-model
+    assistance flag (F-07) stays excluded, so only the deterministic cited
+    pathway is reachable from the shared shell.
+    """
+
+    try:
+        providers = load_providers()
+    except SourceConfigError as exc:
+        raise HTTPException(503, f"Configured public permit sources unavailable: {exc}") from None
+    def explain(repo):
+        combined = {}
+        for name in set(providers) | set(repo.providers):
+            def lookup(*, source_id=None, query=None, name=name):
+                primary = repo.providers.get(name)
+                rows = primary(source_id=source_id, query=query) if primary else []
+                if rows:
+                    return rows
+                fallback = providers.get(name)
+                return fallback(source_id=source_id, query=query) if fallback else []
+            combined[name] = lookup
+        return explain_pathway(
+        project_type=body.project_type, proposal=body.proposal,
+        location_context=body.location_context,
+        requirement=repo.guidance_requirement(body.project_type,
+            str(body.requirement_revision) if body.requirement_revision else None),
+        source_providers=combined,
+        fee_link=body.fee_link.model_dump() if body.fee_link else None)
+    result = await call(request, explain)
+    return {
+        "project_type": result.project_type, "title": result.title,
+        "likely_permits": result.likely_permits, "attachments": result.attachments,
+        "timeline": result.timeline, "unavailable": result.unavailable,
+        "fee": result.fee, "resident_explanation": result.resident_explanation,
+        "citations": result.citations, "review_required": result.review_required,
+        "determination_made": result.determination_made,
+        "boundary": result.boundary, "disclaimer": result.disclaimer,
+        "assistance": {"model_call_made": False,
+                       "note": "Resident live-model assistance is not enabled in this beta."},
+    }
 
 
 class Search(Model):

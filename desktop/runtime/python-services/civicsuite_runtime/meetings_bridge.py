@@ -545,3 +545,21 @@ def proceedings(meeting_id: UUID, actor_id: str = Depends(actor)):
                 for r in store.search(query="",include_closed=True) if r.meeting_id==str(meeting_id)]),
             "minutes": legal_record(MinutesDraftRepository,
                 lambda store: [d.public_dict() for d in store.list_drafts(str(meeting_id))])}
+
+
+# SPDX-License-Identifier: AGPL-3.0-only
+@router.get("/station/catalog")
+def station_catalog(actor_id: str = Depends(actor)):
+    """Authorized name-based operator selection from canonical Meetings data."""
+    engine = create_engine(database_url(), pool_pre_ping=True)
+    try:
+        with engine.connect() as conn:
+            meetings = [dict(r) for r in conn.execute(text(
+                "SELECT id,title,scheduled_start FROM civicclerk.meetings ORDER BY scheduled_start DESC NULLS LAST LIMIT 100")).mappings()]
+            agenda = [dict(r) for r in conn.execute(text(
+                "SELECT id,title,meeting_id FROM civicclerk.agenda_items WHERE meeting_id IN "
+                "(SELECT id FROM civicclerk.meetings ORDER BY scheduled_start DESC NULLS LAST LIMIT 100) "
+                "ORDER BY title LIMIT 1000")).mappings()]
+        return {'meetings': meetings, 'agenda': agenda}
+    finally:
+        engine.dispose()

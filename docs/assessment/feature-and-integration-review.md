@@ -1,4 +1,14 @@
-# Eight-product feature and integration assessment
+# Feature and integration assessment: private candidate update and historical eight-product register
+
+## Current private candidate update — 29 October 2026
+
+The 55-family/56-direction register below is the historical 26 October source assessment, not a current nine-product completion claim. Its source inventory and released pins remain historical. It must not be used to describe the corrected private candidate as still lacking implemented work.
+
+The private candidate adds persisted Planning initiative/amendment workflows and neighborhood applicability, source-backed Permitting steps/materials/timing and imported fee text, current official Zoning process citations, configured Inspections vision plus bundled raw-audio transcription, and the separate CivicCast-derived Station integration. Owned distribution declarations are AGPL-3.0-only. Station preserves the standalone CivicCast product and its separate identity/data.
+
+Normal first-run and the selected installed staff workflows are recorded separately in the private beta handoff. Reuse the earlier correction receipts for the unchanged media adapters; distinguish native UI/IPC, installed HTTP/media, source-only and deferred evidence. Live LLM assistance, universal vendors, a new portal framework, official fee calculations and a stack rewrite are not silently promoted into beta requirements. Historical deferral ADRs do not themselves establish current code status.
+
+## Historical assessment — 26 October 2026
 
 Reviewed 2026-10-26. Scope: Core, Records, Meetings, Code, Zoning, Planning, Permitting and Inspections. Read-only source/spec/evidence assessment; documentation and static sites are the only changes.
 

@@ -13,7 +13,7 @@ $Contract = Get-Content (Join-Path $RepoRoot 'config/planning-msi-candidate.json
 $BetaContract = Get-Content (Join-Path $RepoRoot 'config/planning-staff-beta.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -eq 'inspections/connected-workflow') { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
 $RecordsRef = '45042345b5ca90ff837ae99275058b1ace733c9a'
 $PlanningRef = ''

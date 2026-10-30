@@ -102,7 +102,7 @@ def upgrade_all() -> None:
             upgrade(engine)
         finally:
             engine.dispose()
-        print("Townlight Planning: schema migrated (civicplan_0002)")
+        print("Townlight Planning: schema migrated (civicplan_0004)")
 
     if profile in {"permitting-preview", "inspections-preview"}:
         from civicpermit.migrations import source_engine, upgrade

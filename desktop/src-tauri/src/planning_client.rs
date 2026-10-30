@@ -8,6 +8,30 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum PlanningRequest {
+    Initiatives {
+        offset: u32,
+    },
+    Amendments {
+        offset: u32,
+    },
+    MunicipalHistory {
+        id: Uuid,
+    },
+    CreateInitiative {
+        payload: Value,
+    },
+    ReviseInitiative {
+        id: Uuid,
+        payload: Value,
+    },
+    CreateAmendment {
+        payload: Value,
+    },
+    ReviseAmendment {
+        id: Uuid,
+        payload: Value,
+    },
+
     SearchPolicies {
         payload: Value,
     },
@@ -74,6 +98,9 @@ pub enum PlanningRequest {
     SearchConnections {
         payload: Value,
     },
+    PlanExplore {
+        payload: Value,
+    },
 }
 
 pub fn route(
@@ -85,6 +112,7 @@ pub fn route(
         && !matches!(
             &request,
             SearchPolicies { .. }
+                | PlanExplore { .. }
                 | Snapshots { .. }
                 | Snapshot { .. }
                 | Original { .. }
@@ -94,6 +122,30 @@ pub fn route(
         return Err(DomainError::denied());
     }
     let result = match request {
+        Initiatives { offset } => (
+            Method::GET,
+            format!("/progress/targets?offset={offset}"),
+            None,
+        ),
+        Amendments { offset } => (
+            Method::GET,
+            format!("/amendments/history?offset={offset}"),
+            None,
+        ),
+        MunicipalHistory { id } => (Method::GET, format!("/municipal-work/{id}/history"), None),
+        CreateInitiative { payload } => (Method::POST, "/initiatives".into(), Some(payload)),
+        ReviseInitiative { id, payload } => (
+            Method::POST,
+            format!("/initiatives/{id}/revisions"),
+            Some(payload),
+        ),
+        CreateAmendment { payload } => (Method::POST, "/amendments".into(), Some(payload)),
+        ReviseAmendment { id, payload } => (
+            Method::POST,
+            format!("/amendments/{id}/revisions"),
+            Some(payload),
+        ),
+
         SearchPolicies { payload } => (Method::POST, "/policies/search".into(), Some(payload)),
         Sources { offset } => (Method::GET, format!("/sources?offset={offset}"), None),
         SourceHistory { plan_id, offset } => (
@@ -150,6 +202,7 @@ pub fn route(
         SearchConnections { payload } => {
             (Method::POST, "/connections/search".into(), Some(payload))
         }
+        PlanExplore { payload } => (Method::POST, "/plan-explore".into(), Some(payload)),
     };
     let prefix = if public {
         "/civicplan"
@@ -227,7 +280,7 @@ mod tests {
     use super::*;
     #[test]
     fn public_transport_rejects_staff_reads_and_writes() {
-        for operation in ["sources", "analyses"] {
+        for operation in ["sources", "analyses", "initiatives", "amendments"] {
             let request =
                 serde_json::from_value(serde_json::json!({"operation":operation,"offset":0}))
                     .unwrap();
@@ -250,5 +303,30 @@ mod tests {
             serde_json::json!({"operation":"snapshots","offset":0,"actor":"forged"})
         )
         .is_err());
+    }
+
+    #[test]
+    fn municipal_routes_are_fixed_and_staff_only() {
+        for (operation, endpoint) in [
+            ("create-initiative", "/initiatives"),
+            ("create-amendment", "/amendments"),
+        ] {
+            let value = serde_json::json!({"operation": operation, "payload": {"title":"fixture"}});
+            let request = serde_json::from_value(value.clone()).unwrap();
+            assert!(route(request, true).is_err());
+            let (method, path, body) =
+                route(serde_json::from_value(value).unwrap(), false).unwrap();
+            assert_eq!(method, Method::POST);
+            assert_eq!(path, format!("/desktop/v1/planning{endpoint}"));
+            assert_eq!(body.unwrap()["title"], "fixture");
+        }
+        for operation in ["revise-initiative", "revise-amendment", "municipal-history"] {
+            assert!(
+                serde_json::from_value::<PlanningRequest>(serde_json::json!({
+                    "operation": operation, "id":"../../private", "payload":{}
+                }))
+                .is_err()
+            );
+        }
     }
 }
