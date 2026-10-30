@@ -548,7 +548,7 @@
       "path": "desktop/src-tauri/src/supervisor.rs",
       "sha256": "4369f788b1e9eeb05938cacef4968b888113020d6c7395e3ae0e9d0725bceb6c",
       "status": "changed",
-      "publication_sha256": "d52cf5c22cda20561af299e48ba873ec4c10bb08697f1cea8c519d92a7411be6"
+      "publication_sha256": "fda604886ee33a13a25a16db8bd1cb780d06146d4336539d2205f350da823314"
     },
     {
       "archive": "desktop/src-tauri/src/workflows.rs",
