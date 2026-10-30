@@ -340,7 +340,7 @@
       "path": "desktop/scripts/prepare-runtime-payload.ps1",
       "sha256": "06a5a7b3b268e180cee7e024bcc5a328d3f1465d6b13ed7fdf8d09d228e2531d",
       "status": "same",
-      "publication_sha256": "f63e43b030fad1ed3625e6f9b34d08be3b022e634a011e8cb1c2527edb0a1c6a"
+      "publication_sha256": "5c212e5e3e626d286934a345ca7cf1f83dad12e886270d3f10ad5c31eb4596a3"
     },
     {
       "archive": "desktop/scripts/resolve-msi-candidate.ps1",
@@ -828,7 +828,7 @@
       "path": "desktop/tests/static-smoke.mjs",
       "sha256": "ffa7d647404952b43fafdcf89488694ea46d4a80142331727869f6a989cd5b39",
       "status": "changed",
-      "publication_sha256": "1b649ec93e6b4e247804c55374a86d7fbef1b147982692da1e98500446abd34c"
+      "publication_sha256": "bb73a839639155e16fc1c05a35b51669741f677fdf33c80220d7e3aba652b32c"
     },
     {
       "archive": "desktop/tests/xss-and-state.mjs",
