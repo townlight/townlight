@@ -2206,6 +2206,15 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
     ];
     if service.kind.contains("python") || service.binary.ends_with("python.exe") {
         env.push(("PYTHONNOUSERSITE".to_string(), "1".to_string()));
+        // Station's packaged media tools stay with the installed resources,
+        // while Python may be provisioned to a separately selected runtime root.
+        if let Some(ffmpeg) = runtime_payload_roots()
+            .iter()
+            .map(|root| root.join("station").join("bin").join("ffmpeg.exe"))
+            .find(|path| path.is_file())
+        {
+            env.push(("CIVICINSPECT_FFMPEG".to_string(), ffmpeg.display().to_string()));
+        }
         // Configure CivicAccess's durable-write guard so its persistence-write routes accept the
         // staff surface's token (pairs with the module's server-side X-CivicAccess-Write-Token).
         env.push((
@@ -4288,6 +4297,28 @@ mod tests {
         let payload_manifest = parse_payload_manifest().expect("payload manifest parses");
         validate_payload_manifest(&manifest, &payload_manifest)
             .expect("payload manifest covers services");
+    }
+
+    #[test]
+    fn service_environment_finds_station_ffmpeg_after_python_relocation() {
+        with_temp_state_dir(|root| {
+            let payload = root.join("installed-resources");
+            let ffmpeg = payload.join("station").join("bin").join("ffmpeg.exe");
+            fs::create_dir_all(ffmpeg.parent().unwrap()).unwrap();
+            fs::write(&ffmpeg, b"synthetic path fixture").unwrap();
+            let previous = env::var_os("CIVICSUITE_RUNTIME_PAYLOAD_DIR");
+            env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", &payload);
+            let manifest = parse_manifest().unwrap();
+            let service = manifest.services.iter().find(|s| s.id == "python-services").unwrap();
+            let result = service_environment(service);
+            match previous {
+                Some(value) => env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", value),
+                None => env::remove_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR"),
+            }
+            let variables = result.unwrap();
+            assert!(variables.iter().any(|(name, value)|
+                name == "CIVICINSPECT_FFMPEG" && value == &ffmpeg.display().to_string()));
+        });
     }
 
     #[test]

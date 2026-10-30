@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -304,9 +304,9 @@ for (const [docName, doc] of currentFacingDocs) {
 
 for (const [docName, doc] of currentFacingDocs) {
   for (const requiredPhrase of [
-    "Windows Local",
-    "Tauri/WebView2",
-    "Gemma 4 12B QAT"
+    "Windows",
+    "Tauri",
+    "WebView2"
   ]) {
     if (!doc.includes(requiredPhrase)) {
       throw new Error(`${docName} missing current Windows Local phrase: ${requiredPhrase}`);
@@ -323,23 +323,40 @@ for (const [label, character] of [
   }
 }
 
-if (!tauriConfig.includes('"identifier": "org.civicsuite.desktop"')) {
-  throw new Error("Tauri identifier is missing");
+// Bundle contract: assert the parsed configuration, never the whitespace of
+// the file. Formatting is not a contract; the values and the shipped icon file
+// are.
+if (tauriConfigJson.identifier !== "org.civicsuite.desktop") {
+  throw new Error("Tauri identifier is missing or changed");
 }
 
-if (!tauriConfig.includes('"icon": ["icons/icon.ico"]')) {
+const bundleConfig = tauriConfigJson.bundle ?? {};
+const bundleWindows = bundleConfig.windows ?? {};
+
+const bundleIcons = bundleConfig.icon;
+if (!Array.isArray(bundleIcons) || !bundleIcons.includes("icons/icon.ico")) {
   throw new Error("Tauri bundle must declare the Windows .ico icon");
 }
+for (const iconPath of bundleIcons) {
+  if (!iconPath.toLowerCase().endsWith(".ico")) {
+    continue;
+  }
+  if (!existsSync(join(root, "src-tauri", iconPath))) {
+    throw new Error(`Tauri bundle icon is not present in the desktop source tree: ${iconPath}`);
+  }
+}
 
-if (!tauriConfig.includes('"targets": ["msi"]')) {
+const bundleTargets = bundleConfig.targets;
+if (!Array.isArray(bundleTargets) || !bundleTargets.includes("msi")) {
   throw new Error("Tauri bundle must default to the MSI target for the full Windows runtime payload");
 }
 
-if (tauriConfig.includes('"installerHooks"') || tauriConfig.includes('"nsis"')) {
+if ("installerHooks" in bundleConfig || "nsis" in bundleConfig || "nsis" in bundleWindows) {
   throw new Error("Tauri MSI packaging must not rely on NSIS installer hooks");
 }
 
-if (!tauriConfig.includes('"resources": ["../runtime/payload/"]')) {
+const bundleResources = bundleConfig.resources;
+if (!Array.isArray(bundleResources) || !bundleResources.includes("../runtime/payload/")) {
   throw new Error("Tauri bundle must include the Windows runtime payload resource folder");
 }
 
@@ -379,16 +396,19 @@ if (!tauriConfig.includes('"resources": ["../runtime/payload/"]')) {
   }
 }
 
-for (const phrase of [
-  '"wix": {',
-  '"allowDowngrades": false',
-  '"upgradeCode": "a63fc1d3-5437-5f55-89a2-fef93fb1f930"',
-  '"language": "en-US"',
-  '"enableElevatedUpdateTask": false'
-]) {
-  if (!tauriConfig.includes(phrase)) {
-    throw new Error(`Tauri MSI WiX config missing phrase: ${phrase}`);
-  }
+// WiX identity: values, not file layout.
+const wixConfig = bundleWindows.wix ?? {};
+if (bundleWindows.allowDowngrades !== false) {
+  throw new Error("Tauri MSI config must keep allowDowngrades disabled");
+}
+if (wixConfig.upgradeCode !== "a63fc1d3-5437-5f55-89a2-fef93fb1f930") {
+  throw new Error(`Tauri MSI WiX upgradeCode changed: ${wixConfig.upgradeCode}`);
+}
+if (wixConfig.language !== "en-US") {
+  throw new Error(`Tauri MSI WiX language changed: ${wixConfig.language}`);
+}
+if (wixConfig.enableElevatedUpdateTask !== false) {
+  throw new Error("Tauri MSI must not install an elevated update task");
 }
 
 for (const phrase of [

@@ -11,9 +11,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.native_identity import mapped_native_actor
 from app.database import get_async_session
+from civicinspect.adapters import (
+    ConfigurationError,
+    configured_analysis_providers,
+    configured_transcription_provider,
+    configured_vision_provider,
+)
 from civicinspect.connections import SourceUnavailable, search
+from civicinspect.media_analysis import (
+    EvidenceRejected,
+    analyse_evidence,
+    retain_evidence,
+)
 from civicinspect.migrations import ready, source_engine
-from civicinspect.workflow_models import Model, InspectionInput
+from civicinspect.workflow_models import AnalysisRecord, Model, InspectionInput
 from civicinspect.workflow_store import InspectionRepository, Conflict
 from civicinspect.notice_draft import draft_notice
 from civicsuite_runtime.services import _sync_database_url
@@ -128,6 +139,90 @@ async def packet(request: Request, case_id: UUID, body: Packet, identity=Depends
 @router.get("/packets/{packet_id}")
 async def document(request: Request, packet_id: UUID, identity=Depends(actor)):
     return await call(request, lambda r: r.document(str(packet_id)))
+
+
+class EvidenceItem(Model):
+    filename: str = Field(min_length=1, max_length=151)
+    media_type: str = Field(min_length=1, max_length=80)
+    description: str = Field(default="", max_length=2000)
+    content_base64: str = Field(min_length=1, max_length=14_000_000)
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class EvidenceItems(Model):
+    items: list[EvidenceItem] = Field(min_length=1, max_length=10)
+
+
+class CodeLink(Model):
+    provider: Literal["code"] = "code"
+    source_id: str = Field(min_length=1, max_length=500)
+    expected_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class MediaAnalysis(Model):
+    items: list[EvidenceItem] = Field(min_length=1, max_length=10)
+    code_links: list[CodeLink] = Field(default_factory=list, max_length=30)
+    inspector_supplied_text: str = Field(default="", max_length=10000)
+
+
+def _retain(items):
+    try:
+        return [retain_evidence(filename=item.filename, media_type=item.media_type,
+                                description=item.description,
+                                content_base64=item.content_base64,
+                                expected_sha256=item.sha256) for item in items]
+    except EvidenceRejected as exc:
+        raise HTTPException(422, f"Evidence retained nothing: {exc}") from None
+
+
+@router.get("/evidence/supported-types")
+async def supported_types(identity=Depends(actor)):
+    """The media types this deployment's product model actually accepts."""
+
+    from civicinspect.media_analysis import SUPPORTED_MEDIA_TYPES
+
+    return {"media_types": list(SUPPORTED_MEDIA_TYPES)}
+
+
+@router.post("/evidence/retain")
+async def retain(request: Request, body: EvidenceItems, identity=Depends(actor)):
+    retained = _retain(body.items)
+    return {"retained_evidence": [item.as_record() for item in retained],
+            "count": len(retained),
+            "raw_audio_retained": any(item.media_type.startswith("audio/")
+                                      for item in retained),
+            "disclaimer": ("Original bytes retained with their SHA256. Retention is "
+                           "not a finding, citation, notice or enforcement action.")}
+
+
+@router.post("/media/analyse")
+async def media_analyse(request: Request, body: MediaAnalysis,
+                        identity=Depends(actor)):
+    """Run the configured adapters over retained originals; draft only.
+
+    The result carries the same observations/citations the product route returns
+    plus ``analysis_record``: the exact ``AnalysisRecord`` the caller puts on its
+    case payload, so the reviewed draft is the analysed one.
+    """
+
+    retained = _retain(body.items)
+    try:
+        vision, model = configured_vision_provider()
+        # Resolve precisely the same active Code evidence used by saved cases.
+        analysis_providers = providers(request.app)
+        transcription = configured_transcription_provider()
+    except ConfigurationError as exc:
+        raise HTTPException(503, str(exc)) from None
+    payload = await analyse_evidence(
+        evidence=retained,
+        code_links=[link.model_dump() for link in body.code_links],
+        providers=analysis_providers, vision_provider=vision,
+        transcription_provider=transcription, model=model,
+        inspector_supplied_text=body.inspector_supplied_text)
+    result = payload.to_payload()
+    result["analysis_record"] = (
+        AnalysisRecord.from_media_analysis(result).model_dump(mode="json"))
+    return result
 
 
 class Search(Model):

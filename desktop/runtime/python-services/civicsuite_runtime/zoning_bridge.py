@@ -20,6 +20,8 @@ from app.database import get_async_session
 from civicsuite_runtime.services import _sync_database_url
 from civiczone import geo_import
 from civiczone import cited_rules, cited_questions
+from civiczone.discretionary import Unavailable, explain, nonconformity_review_note
+from civiczone.rule_lookup import DIMENSIONAL_RULES
 from civiczone import connected_sources as connected
 from civicsuite_runtime.code_public import public_citation
 
@@ -335,6 +337,67 @@ async def create_code_context(p: CodeContext, actor_id=Depends(actor)):
         "current" if asof == today else ("historical" if asof < today else "future")
     )
     return {"citation": citation, "temporal_context": temporal_context}
+
+
+class StandardsExplanation(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    question: str = Field(min_length=1, max_length=2000)
+    process_section: str = Field(default="", max_length=255)
+    zone_code: str = Field(default="", max_length=40)
+    rule_types: list[str] = Field(default_factory=list, max_length=10)
+    observed: dict[str, str] = Field(default_factory=dict)
+
+
+class _RuleSource:
+    """Adapt the existing configured rule lookup to the shape ``explain`` wants."""
+
+    @staticmethod
+    def lookup_dimensional_rule(*, zone_code: str, rule_type: str):
+        from civiczone.rule_lookup import RuleLookupRepository
+
+        if os.environ.get("CIVICZONE_PARCEL_RULE_DB_URL"):
+            repository = RuleLookupRepository(
+                db_url=os.environ["CIVICZONE_PARCEL_RULE_DB_URL"], seed_defaults=False)
+            try:
+                return repository.lookup_dimensional_rule(zone_code=zone_code,
+                                                          rule_type=rule_type)
+            finally:
+                repository.engine.dispose()
+        from civiczone.rule_lookup import lookup_dimensional_rule
+
+        return lookup_dimensional_rule(zone_code=zone_code, rule_type=rule_type)
+
+
+@router.post("/standards/process-explanation")
+async def standards_explanation(p: StandardsExplanation, actor_id=Depends(actor)):
+    """Cited variance/CUP/nonconformity process; never a determination."""
+
+    allowed = {rule_type for (_zone, rule_type) in DIMENSIONAL_RULES}
+    for rule_type in p.rule_types:
+        if rule_type.casefold() not in allowed:
+            raise HTTPException(422, f"Unknown rule type '{rule_type}'.")
+
+    def run():
+        source = _resolve_citation(p.process_section) if p.process_section else None
+        return explain(p.question, repository=_RuleSource(), zone_code=p.zone_code,
+                       rule_types=[item.casefold() for item in p.rule_types],
+                       observed=p.observed, process_source=source)
+
+    result = await run_in_threadpool(run)
+    note = nonconformity_review_note(p.question)
+    if isinstance(result, Unavailable):
+        return {"status": "unavailable", "reason": result.reason, "fix": result.fix,
+                "review_required": True, "determination_made": False,
+                "disclaimer": result.disclaimer, "nonconformity_note": note}
+    return {"status": "explained", "process": result.process, "label": result.label,
+            "what": result.what, "standard_citation": result.standard_citation,
+            "source_citation": result.source_citation,
+            "needs": result.needs, "review": result.review,
+            "standards": result.standards,
+            "flags": [flag.__dict__ for flag in result.flags],
+            "nonconformity_note": note, "review_required": True,
+            "determination_made": False, "disclaimer": result.disclaimer}
 
 
 def public_active(request: Request):

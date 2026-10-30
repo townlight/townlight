@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -88,7 +89,41 @@ def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> 
     base = json.loads(_read(ROOT / "desktop/src-tauri/tauri.conf.json"))
     assert overlay == {"version": contract["desktop_version"]}
     assert tuple(map(int, contract["windows_product_version"].split("."))) > (1, 4, 0, 1)
-    assert base["version"] == "1.4.0-1"
+    # The shared base composition used to be pinned to one frozen literal, so a
+    # legitimate candidate metadata bump could only be satisfied by downgrading
+    # the version or deleting the check. Pin the properties that actually have
+    # to hold instead: a WiX-compilable numeric version, one desktop identity
+    # across all four manifests, no regression below the published desktop
+    # release, and an overlay that states its own version.
+    base_version = base["version"]
+    assert re.fullmatch(r"\d+\.\d+\.\d+-\d+", base_version), (
+        "Tauri base version must use the numeric MSI prerelease form X.Y.Z-N; "
+        f"a SemVer label such as 1.6.0-beta.1 cannot become a WiX ProductVersion: {base_version}"
+    )
+    lock = json.loads(_read(ROOT / "desktop/package-lock.json"))
+    for manifest, manifest_version in (
+        ("desktop/package.json", json.loads(_read(ROOT / "desktop/package.json"))["version"]),
+        ("desktop/package-lock.json", lock["version"]),
+        ("desktop/package-lock.json root package", lock["packages"][""]["version"]),
+        ("desktop/src-tauri/Cargo.toml",
+         re.search(r'^version\s*=\s*"([^"]+)"',
+                   _read(ROOT / "desktop/src-tauri/Cargo.toml"), re.M).group(1)),
+    ):
+        assert manifest_version == base_version, f"Desktop version drift: {manifest}={manifest_version}"
+    assert re.search(
+        r'\[\[package\]\]\r?\nname = "civicsuite-desktop"\r?\nversion = "'
+        + re.escape(base_version) + r'"',
+        _read(ROOT / "desktop/src-tauri/Cargo.lock"),
+    ), "Cargo.lock desktop package version drifted from tauri.conf.json"
+    published = tuple(map(int, re.split(r"[.-]", json.loads(
+        _read(ROOT / "config/suite-state.json"))["desktop_release"]["version"])))
+    base_product = tuple(map(int, base_version.replace("-", ".").split(".")))
+    assert base_product >= published, (
+        f"base desktop version {base_version} regresses the published desktop release identity"
+    )
+    assert overlay["version"] != base_version, (
+        "the Planning candidate overlay must state its own version, not inherit the base identity"
+    )
     assert contract["development_only"] is True
     assert contract["publication_allowed"] is False
     assert "build --no-bundle ${{ steps.candidate.outputs.tauri_args }}" in workflow

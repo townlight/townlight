@@ -53,7 +53,7 @@ export function createPermittingView(invoke) {
   function render() {
     return `<section data-permitting><h2>Permitting</h2><p>${boundary}</p>
       <nav aria-label="Permitting workspace"><button data-permitting-action="cases">Intake cases</button><button data-permitting-action="requirements">Requirement library</button></nav>
-      <p data-permitting-status role="status" aria-live="polite">${esc(statusText)}</p><div data-permitting-content></div></section>`;
+      <p data-permitting-status role="status" aria-live="polite">${esc(statusText)}</p><form data-permitting-pathway><h3>Describe your project</h3><p>Get the cited likely permits, attachments and typical timeline for a described project. Informational only: no official fee, completeness review, scheduling, approval or issuance. A fee appears only when the deployment has a cited public fee source.</p><label>Imported requirement revision (optional; load the Requirement library to choose)<select name="requirement_revision"><option value="">Use the unique current matching checklist</option>${requirements.map(r => `<option value="${esc(r.revision_id)}">${esc(r.title)} · ${esc(r.jurisdiction)}</option>`).join('')}</select></label><label>Project type<input name="project_type" required maxlength="120"></label><label>What you want to do<textarea name="proposal" maxlength="4000"></textarea></label><label>Property or location context<input name="location_context" maxlength="1000"></label><button>Explain the cited pathway</button></form><div data-permitting-pathway-result></div><div data-permitting-content></div></section>`;
   }
   function paint() {
     if (!root?.isConnected) return;
@@ -83,6 +83,7 @@ export function createPermittingView(invoke) {
       output.innerHTML = `<h3>Intake cases</h3><button data-permitting-action="new">New intake case</button>
         <ul>${cases.map((item,index) => `<li>${esc(item.project_name)} · ${esc(item.review_state)} · ${esc(item.assigned_to || 'Unassigned')} <button data-permitting-open="${index}">Open intake case</button></li>`).join('')}</ul>`;
     }
+    bindPathway();
     if (next !== null && !draft) output.insertAdjacentHTML('beforeend', '<button data-permitting-action="next">Next page</button>');
     bindContent();
   }
@@ -124,6 +125,24 @@ export function createPermittingView(invoke) {
       ${visibility === 'records_copy' ? `<form data-permitting-attach><label>Existing Records request ID<input name="request_id" required></label><p>Attaches this reviewed copy for a separate Records review. Does not approve or release a response.</p><button>Attach reviewed copy to Records</button></form>` : ''}`;
     bindContent(); report('Exact packet prepared. Review the preview before exporting or attaching.');
   }
+  function bindPathway() {
+    const form = root?.querySelector('[data-permitting-pathway]');
+    if (!form) return;
+    form.onsubmit = event => {
+      event.preventDefault();
+      run(async () => {
+        const data = new FormData(form);
+        const result = await request('pathway', {payload: {
+          project_type: String(data.get('project_type') || ''), requirement_revision: String(data.get('requirement_revision') || '') || null,
+          proposal: String(data.get('proposal') || ''),
+          location_context: String(data.get('location_context') || '')}});
+        summary('[data-permitting-pathway-result]', result);
+        report(result.unavailable?.length
+          ? 'Cited pathway returned with explicitly unavailable items; nothing is assumed.'
+          : 'Cited pathway returned for staff and resident review.');
+      });
+    };
+  }
   function bindContent() {
     root.querySelectorAll('[data-permitting-action]').forEach(button => button.onclick = () => run(async () => {
       const action = button.dataset.permittingAction;
@@ -153,7 +172,8 @@ export function createPermittingView(invoke) {
     const attach=root.querySelector('[data-permitting-attach]');
     if(attach)attach.onsubmit=event=>{event.preventDefault();run(async()=>{await request('attach-records',{request_id:String(new FormData(attach).get('request_id')),payload:{source_id:packet.source_id,expected_sha256:packet.sha256}});report('Reviewed copy attached to Records. Separate Records review and release approval remain required.');});};
   }
-  function bind() {root=document.querySelector('[data-permitting]');if(!root)return;paint();if(!draft&&!cases.length&&!requirements.length)run(()=>load());}
+  function bind() {
+    root=document.querySelector('[data-permitting]');if(!root)return;bindPathway();paint();if(!draft&&!cases.length&&!requirements.length)run(()=>load());}
   globalThis.window?.addEventListener('beforeunload',event=>{if(dirty||busy){event.preventDefault();event.returnValue='';}});
   return {render,bind,reset,canLeave};
 }

@@ -18,10 +18,12 @@ from app.database import get_async_session
 from civicplan.connections import ConnectionUnavailable, search
 from civicplan.migrations import source_engine
 from civicplan.policy_service import PolicyService
+from civicplan.public_explore import explore
 from civicplan.source_bundle import BundleModel, PlanBundle
 from civicplan.source_store import PlanSourceRepository, SourceConflict, SourcesUnavailable
 from civicplan.workflow_models import AnalysisInput
 from civicplan.workflow_store import WorkflowRepository
+from civicplan.municipal import MunicipalRepository, InitiativeInput, AmendmentInput
 from civicsuite_runtime.services import _sync_database_url
 
 router = APIRouter(prefix="/desktop/v1/planning", tags=["native-planning"])
@@ -225,6 +227,29 @@ async def public_policies(request: Request, body: Search):
     return await call(request, lambda s, _: PolicyService(s).answer(body.query, plan_type=body.plan_type))
 
 
+class PublicExplore(BundleModel):
+    goal: str = Field(default="", max_length=500)
+    topic: str = Field(default="", max_length=160)
+    neighborhood: str = Field(default="", max_length=255)
+    plan_type: str = Field(default="", max_length=120)
+
+
+@public_router.post("/plan-explore", dependencies=[Depends(available)])
+async def public_plan_explore(request: Request, body: PublicExplore):
+    """Topic/goal/plan-type exploration over adopted public plan sources only."""
+
+    def operation(sources, _workflow):
+        result = explore(PolicyService(sources), goal=body.goal, topic=body.topic,
+                         plan_type=body.plan_type, neighborhood=body.neighborhood, staff=False)
+        return {"goal": result.goal, "topic": result.topic, "plan_type": result.plan_type,
+                "neighborhood": result.neighborhood,
+                "total": result.total, "plans": result.plans, "facets": result.facets,
+                "empty_reason": result.empty_reason,
+                "review_required": True, "disclaimer": result.disclaimer}
+
+    return await call(request, operation)
+
+
 @public_router.get("/snapshots", dependencies=[Depends(available)])
 async def public_snapshots(request: Request, limit: int = Query(50, ge=1, le=100),
                            offset: int = Query(0, ge=0, le=100000)):
@@ -239,3 +264,38 @@ async def public_document(request: Request, snapshot_id: UUID):
 @public_router.get("/revisions/{revision_id}/documents/{document_id}", dependencies=[Depends(available)])
 async def public_original(request: Request, revision_id: UUID, document_id: str):
     return await call(request, lambda s, _: original(s, str(revision_id), document_id, staff=False))
+
+
+@router.get("/progress/targets")
+async def municipal_progress(request: Request, offset: int = Query(0, ge=0, le=100000), identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).list("initiative", offset=offset))
+
+
+@router.get("/amendments/history")
+async def municipal_amendments(request: Request, offset: int = Query(0, ge=0, le=100000), identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).list("amendment", offset=offset))
+
+
+@router.get("/municipal-work/{item_id}/history")
+async def municipal_history(request: Request, item_id: UUID, identity=Depends(actor)):
+    return {"revisions": await call(request, lambda sources, _: MunicipalRepository(sources).history(str(item_id)))}
+
+
+@router.post("/initiatives")
+async def create_initiative(request: Request, body: InitiativeInput, identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).save(body, identity))
+
+
+@router.post("/initiatives/{item_id}/revisions")
+async def update_initiative(request: Request, item_id: UUID, body: InitiativeInput, identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).save(body, identity, str(item_id)))
+
+
+@router.post("/amendments")
+async def create_amendment(request: Request, body: AmendmentInput, identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).save(body, identity))
+
+
+@router.post("/amendments/{item_id}/revisions")
+async def update_amendment(request: Request, item_id: UUID, body: AmendmentInput, identity=Depends(actor)):
+    return await call(request, lambda sources, _: MunicipalRepository(sources).save(body, identity, str(item_id)))

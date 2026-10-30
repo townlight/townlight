@@ -121,7 +121,8 @@
           "Lib/site-packages/civicsuite_runtime/planning_bridge.py",
           "Lib/site-packages/civicsuite_runtime/planning_connections.py",
           "Lib/site-packages/app/requests/planning_sources.py",
-          "planning-candidate-provenance.json"
+          "planning-candidate-provenance.json",
+          "Lib/site-packages/civicplan/migrations/versions/civicplan_0004_neighborhoods.py"
         ],
         "permitting-preview": [
           "Lib/site-packages/civiczone/geo_import.py",
@@ -141,7 +142,8 @@
           "Lib/site-packages/civicpermit/workflow_store.py",
           "Lib/site-packages/civicpermit/migrations/versions/civicpermit_0001_connected.py",
           "Lib/site-packages/civicsuite_runtime/permitting_bridge.py",
-          "permitting-candidate-provenance.json"
+          "permitting-candidate-provenance.json",
+          "Lib/site-packages/civicplan/migrations/versions/civicplan_0004_neighborhoods.py"
         ],
         "inspections-preview": [
           "Lib/site-packages/civiczone/geo_import.py",
@@ -164,7 +166,12 @@
           "inspections-candidate-provenance.json",
           "Lib/site-packages/civicinspect/workflow_store.py",
           "Lib/site-packages/civicinspect/migrations/versions/civicinspect_0001_connected.py",
-          "Lib/site-packages/civicsuite_runtime/inspections_bridge.py"
+          "Lib/site-packages/civicsuite_runtime/inspections_bridge.py",
+          "Lib/site-packages/civicplan/migrations/versions/civicplan_0004_neighborhoods.py",
+          "Lib/site-packages/textflowkit/core/whistle.py",
+          "inspections/whistle/whistle.cact",
+          "inspections/whistle/windows-x86_64/needle.exe",
+          "inspections/reuse-manifest.json"
         ]
       }
     },

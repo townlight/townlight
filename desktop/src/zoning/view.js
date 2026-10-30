@@ -5,6 +5,7 @@ function render(publicMode=false) {
 <h3>Staff workspace</h3>
 <form data-zone-action="registerRule">
 <label>Jurisdiction <input name="jurisdiction" required></label>
+<label>Applicable process Code section <input name="process_section" maxlength="255"></label>
 <label>Zone code <input name="zone_code" required></label>
 <label>Kind <select name="kind" required><option value="use">use</option><option value="dimension">dimension</option></select></label>
 <label>Key <input name="key" required></label>
@@ -15,6 +16,14 @@ function render(publicMode=false) {
 <form data-zone-action="importBundle">
 <label>Bundle JSON <input name="bundle" type="file" accept=".json,application/json" required></label>
 <button type="submit">Import parcel dataset</button></form>
+<form data-zone-action="standards">
+<label>Variance, conditional use or nonconformity question <textarea name="question" required maxlength="2000"></textarea></label>
+<label>Applicable process Code section <input name="process_section" maxlength="255"></label>
+<label>Zone code <input name="zone_code" maxlength="40"></label>
+<label>Standard to cite (optional, comma separated) <input name="rule_types" maxlength="200"></label>
+<label>Your observed condition for that standard (optional, e.g. front_setback=8 feet) <input name="observed" maxlength="300"></label>
+<p>Explains the cited discretionary process and the cited standards it can verify. It raises review flags only, is never a determination, and reports standards the configured dataset cannot supply as unavailable.</p>
+<button type="submit">Explain the cited process</button></form>
 <form data-zone-action="workspace"><button type="submit">Workspace</button></form>
 <form data-zone-action="review">
 <label>ID <input name="id" required></label>
@@ -99,6 +108,14 @@ export function createZoningView(invoke, publicMode = false) {
               result = await client.importBundle(parsed);
               break;
             }
+            case 'standards': {
+              const observed = {};
+              for (const pair of String(fd.get('observed') || '').split(',')) {
+                const [key, ...rest] = pair.split('=');
+                if (key?.trim() && rest.length) observed[key.trim()] = rest.join('=').trim();
+              }
+              result = await client.standards({process_section:fd.get('process_section') || '',question:fd.get('question'),zone_code:fd.get('zone_code') || '',rule_types:String(fd.get('rule_types') || '').split(',').map(s=>s.trim()).filter(Boolean),observed});
+              break; }
             case 'workspace': result = await client.workspace(); break;
             case 'review': result = await client.review(fd.get('id'),{answer:fd.get('answer'),notes:fd.get('notes'),queue_status:fd.get('queue_status')}); break;
             case 'outline': result = await client.outline({title:fd.get('title'),question_ids:String(fd.get('question_ids') || '').split(',').map(s=>s.trim()).filter(Boolean)}); break;
@@ -123,6 +140,14 @@ export function createZoningView(invoke, publicMode = false) {
           });
           const ws = result;
           lines.push(`Workspace questions: ${Array.isArray(ws.questions) ? ws.questions.length : 0}`,`Workspace queue: ${Array.isArray(ws.queue) ? ws.queue.length : 0}`,`Workspace reviews: ${Array.isArray(ws.reviews) ? ws.reviews.length : 0}`,`Workspace analytics: ${val(JSON.stringify(ws.analytics))}`);
+          if (result.process || result.status === 'unavailable') {
+            lines.push(`Process: ${val(result.process)} (${val(result.label)})`,
+              `What happens: ${val(result.what)}`,`Needs: ${val((result.needs||[]).join('; '))}`,
+              `Review: ${val((result.review||[]).join(' '))}`);
+            for (const standard of result.standards || []) lines.push(`Cited standard: ${val(standard.rule_type)} = ${val(standard.value)} · ${val(standard.citation)}`);
+            for (const flag of result.flags || []) lines.push(`Review flag (not a finding): ${val(flag.basis)} · observed ${val(flag.observed)} vs ${val(flag.standard)} · ${val(flag.citation)}`);
+            if (result.status === 'unavailable') lines.push(`Unavailable: ${val(result.reason)}`,`Fix: ${val(result.fix)}`);
+          }
           lines.push('Audit JSON:',JSON.stringify(result,null,2));
           output.textContent = lines.join('\n');
         } catch (e) {

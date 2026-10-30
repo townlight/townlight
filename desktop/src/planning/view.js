@@ -1,3 +1,4 @@
+import { createMunicipalView } from './municipal.js';
 import { createPlanningClient } from './client.ts';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -11,7 +12,7 @@ const badge = state => `<span class="planning-badge ${state === 'reviewed' ? 'is
 
 export function createPlanningView(invoke, publicMode = false) {
   const transport = createPlanningClient(invoke, publicMode);
-  let session = 0;
+  let session = 0, municipalDirty = false;
   async function current(action) {
     const expected = session, result = await action();
     if (expected !== session) throw new Error('Planning session changed');
@@ -24,8 +25,9 @@ export function createPlanningView(invoke, publicMode = false) {
   let draft = {}, dirty = false, editing = false, busy = false, connected = [];
   let screen = publicMode ? 'library' : 'analyses', part = 'analysis', analysisItems = [], listQuery = '', analysisNext = null;
   const locked = () => active?.payload.review_state === 'reviewed' && !editing;
-  globalThis.window?.addEventListener('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
+  globalThis.window?.addEventListener('beforeunload', event => { if (dirty || municipalDirty || busy) { event.preventDefault(); event.returnValue = ''; } });
   const report = message => { if (status?.isConnected) status.textContent = message; };
+  const municipal = createMunicipalView({client, run, report, changed: value => { municipalDirty = value; }});
   const button = (label, handler, primary = false) => {
     const node = document.createElement('button'); node.type = 'button'; node.textContent = label;
     if (primary) node.className = 'planning-primary';
@@ -284,35 +286,80 @@ export function createPlanningView(invoke, publicMode = false) {
   return {
     canLeave() {
       if (busy) { report('Wait for the current Planning action to finish.'); return false; }
+      if (municipalDirty && !window.confirm('Leaving will discard unsaved municipal tracking edits. Continue?')) return false;
+      municipalDirty = false;
       return !dirty || window.confirm('Leave Planning with unsaved changes? Return to Planning to continue this draft. Signing out discards unsaved changes.');
     },
     reset() {
+      municipalDirty = false; municipal.reset();
       session += 1; busy = false; analysisItems = []; analysisNext = null; listQuery = ''; sourceOffset = 0; analysisOffset = 0; snapshotOffset = 0; pendingBundle = null; importPreview = null;
       active = null; draft = {}; selected = []; links = []; connected = []; draftConsiderations = []; dirty = false; editing = false; snapshotPreview = null;
       screen = publicMode ? 'library' : 'analyses'; part = 'analysis';
     },
     render() {
       return `<section class="planning" data-planning-workspace><p class="planning-eyebrow">Townlight Planning${publicMode ? '' : ' · Staff beta'}</p>
-        <nav class="planning-tabs" aria-label="Planning">${publicMode ? '' : '<button type="button" data-planning-nav="analyses">Analyses</button>'}<button type="button" data-planning-nav="library">Policy library</button><button type="button" data-planning-nav="snapshots">Reviewed snapshots</button>${publicMode ? '' : '<button type="button" data-planning-nav="workspace" hidden>Open analysis</button>'}</nav>
+        <nav class="planning-tabs" aria-label="Planning">${publicMode ? '' : '<button type="button" data-planning-nav="analyses">Analyses</button><button type="button" data-planning-nav="municipal">Implementation & amendments</button>'}<button type="button" data-planning-nav="library">Policy library</button><button type="button" data-planning-nav="snapshots">Reviewed snapshots</button>${publicMode ? '' : '<button type="button" data-planning-nav="workspace" hidden>Open analysis</button>'}</nav>
         <p data-planning-status role="status" aria-live="polite">Load saved work or search adopted policy sources.</p>
         ${publicMode ? '' : `<section data-planning-panel="analyses"><div class="planning-heading"><div><h2 tabindex="-1">Analyses</h2><p>Continue staff work or open a saved reviewed analysis.</p></div><button type="button" class="planning-primary" data-planning-new>New analysis</button></div><label class="planning-field planning-list-search">Find a project on this page<input type="search" data-planning-list-query value="${esc(listQuery)}"></label><div data-planning-analyses></div><p class="planning-help">Drafts stay with staff. Public snapshots require a separately edited summary and explicit review.</p></section>`}
-        <section data-planning-panel="library" hidden><div class="planning-heading"><div><h2 tabindex="-1">Policy library</h2><p>Find adopted policy sources and inspect their cited context.</p></div>${publicMode ? '' : '<button type="button" data-planning-return>Return to open analysis</button>'}</div><form class="planning-search" data-planning-search><label class="planning-field">Policy search <input name="query" required maxlength="2000"></label><button>Search adopted policies</button></form><div data-planning-results></div>
+        <section data-planning-panel="library" hidden><div class="planning-heading"><div><h2 tabindex="-1">Policy library</h2><p>Find adopted policy sources and inspect their cited context.</p></div>${publicMode ? '' : '<button type="button" data-planning-return>Return to open analysis</button>'}</div><form class="planning-search" data-planning-search><label class="planning-field">Policy search <input name="query" required maxlength="2000"></label><button>Search adopted policies</button></form><form class="planning-search planning-card" data-planning-explore><h3>Explore adopted plans</h3><p>Browse the adopted plans this deployment holds by goal, topic, neighborhood or plan type. Each result cites its adopted policy and original source.</p><label class="planning-field">Goal (optional) <input name="goal" maxlength="500"></label><label class="planning-field">Topic (optional) <input name="topic" maxlength="160"></label><label class="planning-field">Neighborhood (optional) <input name="neighborhood" maxlength="255"></label><label class="planning-field">Plan type (optional) <input name="plan_type" maxlength="120"></label><button>Explore plans</button></form><div data-planning-explore-results></div><div data-planning-results></div>
         ${publicMode ? '' : `<h3>Imported plans</h3><div data-planning-sources></div><div data-planning-source-detail></div><details class="planning-card"><summary>Source administration</summary><p>Preview metadata, exact excerpts, anchors and original hashes before importing.</p><button type="button" data-planning-pick>Choose and preview local source bundle</button><div data-planning-import></div>
           <button type="button" data-planning-open-exports>Open saved originals and snapshots folder</button>
           </details><details><summary>Source history</summary><div data-planning-source-history></div></details>`}</section>
         ${publicMode ? '' : `<section data-planning-panel="workspace" hidden><div data-planning-editor></div><form class="planning-search planning-card" data-planning-connections><h3>Find permitted evidence</h3><label class="planning-field">Evidence provider <select name="provider"><option value="meetings">Meetings</option><option value="zoning">Zoning</option></select></label><label class="planning-field">Evidence search <input name="query" required maxlength="500"></label><label class="planning-field">Relationship <select name="relation"><option value="context">Context</option><option value="hearing">Hearing</option><option value="adoption-evidence">Adoption evidence</option><option value="precedent">Precedent</option></select></label><button>Find permitted evidence</button></form><div data-planning-connection-results></div></section>`}
+        ${publicMode ? '' : '<section data-planning-panel="municipal" hidden><div data-planning-municipal></div></section>'}
         <section data-planning-panel="snapshots" hidden><h2 tabindex="-1">Reviewed snapshots</h2><p>Read saved versions or export their exact bytes. Exporting does not release a Records response.</p><div data-planning-snapshots></div><div data-planning-snapshot-detail></div></section><p class="planning-help">Cited policy context for human review. This is not a zoning, legal, land-use or entitlement determination.</p></section>`;
     },
     bind() {
       root = document.querySelector('[data-planning-workspace]'); if (!root) return;
       status = root.querySelector('[data-planning-status]');
+      if (!publicMode) municipal.mount(root.querySelector('[data-planning-municipal]'));
       root.querySelectorAll('[data-planning-nav]').forEach(el => el.addEventListener('click', () => run(el, async () => {
+        if (municipalDirty && !window.confirm('Discard unsaved municipal tracking edits? Saved revisions will be kept.')) return;
+        municipalDirty = false;
         navigate(el.dataset.planningNav);
+        if (screen === 'municipal') await municipal.list();
         if (screen === 'analyses') await analyses(analysisOffset);
         if (screen === 'library' && !publicMode) { await sources(sourceOffset); report('Policy library loaded.'); }
         if (screen === 'snapshots') await snapshots(snapshotOffset);
         root.querySelector(`[data-planning-panel="${screen}"] h2`)?.focus();
       })));
+      root.querySelector('[data-planning-explore]').addEventListener('submit', event => {
+        event.preventDefault(); const form = event.currentTarget;
+        run(form.querySelector('button'), async () => {
+          const data = new FormData(form);
+          const result = await client.request('plan-explore', {payload: {
+            goal: String(data.get('goal') || ''), topic: String(data.get('topic') || ''), neighborhood: String(data.get('neighborhood') || ''),
+            plan_type: String(data.get('plan_type') || '')}});
+          const output = root.querySelector('[data-planning-explore-results]'); output.replaceChildren();
+          const facets = document.createElement('p');
+          facets.textContent = `Facets from stored sources — goals: ${(result.facets?.goals||[]).join(', ') || 'none'}; `
+            + `topics: ${(result.facets?.topics||[]).join(', ') || 'none'}; `
+            + `neighborhoods: ${(result.facets?.neighborhoods||[]).join(', ') || 'none'}; `
+            + `plan types: ${(result.facets?.plan_types||[]).join(', ') || 'none'}`;
+          output.append(facets);
+          if (!result.plans?.length) {
+            const empty = document.createElement('p');
+            empty.textContent = result.empty_reason || 'No adopted public policy matches those filters.';
+            output.append(empty);
+          }
+          for (const plan of result.plans || []) {
+            const article = document.createElement('article'); article.className = 'planning-card';
+            const heading = document.createElement('h4'); heading.textContent = plan.title;
+            article.append(heading);
+            for (const goal of plan.goals || []) for (const objective of goal.objectives || []) {
+              for (const policy of objective.policies || []) {
+                const line = document.createElement('p');
+                line.textContent = `${goal.title} → ${objective.title} → ${policy.citation} · `
+                  + `${policy.topic_key} · ${policy.excerpt}`;
+                article.append(line);
+              }
+            }
+            output.append(article);
+          }
+          report(result.total ? `Explored ${result.total} cited adopted policies.`
+                              : 'No adopted public policy matches those filters.');
+        });
+      });
       root.querySelector('[data-planning-search]').addEventListener('submit', event => {
         event.preventDefault(); const form = event.currentTarget;
         run(form.querySelector('button'), async () => {
@@ -323,6 +370,12 @@ export function createPlanningView(invoke, publicMode = false) {
             const text = document.createElement('p'); text.textContent = `${policy.citation} · ${policy.anchor} · adopted ${policy.adopted_on} · effective ${policy.effective_on}\n${policy.excerpt}`;
             article.append(text, button('Save original source', async () => { const result = await client.request('original', {id:policy.revision_id,document_id:policy.document_id}); report(`Original saved: ${result.path} · SHA256 ${result.sha256}`); }));
             const provenance = document.createElement('details'); provenance.innerHTML = '<summary>Source provenance</summary>'; const metadata = document.createElement('pre'); metadata.textContent = JSON.stringify(policy,null,2); provenance.append(metadata); article.append(provenance);
+            if (!publicMode) for (const [type, label] of [['initiative', 'Track implementation'], ['amendment', 'Propose amendment']]) {
+              article.append(button(label, async () => {
+                if (municipalDirty && !window.confirm('Discard unsaved municipal tracking edits?')) return;
+                navigate('municipal'); await municipal.open(type, policy);
+              }));
+            }
             if (!publicMode) article.append(button('Select policy for analysis', async () => {
               if (locked()) { report('Choose Edit analysis before changing a reviewed revision.'); return; }
               collect(); if (!selected.some(p => p.revision_id === policy.revision_id && p.policy_id === policy.policy_id)) { selected.push(policy); dirty = true; }

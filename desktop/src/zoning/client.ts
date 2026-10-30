@@ -29,6 +29,9 @@ export interface ReviewPayload {
 }
 export interface OutlinePayload { title: string; question_ids: string[]; }
 export interface CodeContextPayload { section_number: string; as_of?: string | null; }
+export interface StandardsPayload {
+  question: string; zone_code?: string; rule_types?: string[]; observed?: Record<string, string>;
+}
 
 export function createZoningClient(invoke: Invoke, publicMode = false) {
   const command = publicMode ? "zoning_public_request" : "zoning_domain_request";
@@ -55,6 +58,12 @@ export function createZoningClient(invoke: Invoke, publicMode = false) {
     async importBundle(payload: object): Promise<ZoningResult> {
       requireStaff("importBundle");
       return invoke<ZoningResult>(command, {request: {operation: "import-bundle", payload}});
+    },
+    async standards(payload: StandardsPayload): Promise<ZoningResult & Record<string, any>> {
+      requireStaff("standards");
+      return invoke(command, {request: {operation: "standards", payload: {
+        question: payload.question, zone_code: payload.zone_code ?? "",
+        rule_types: payload.rule_types ?? [], observed: payload.observed ?? {}}}});
     },
     async workspace(): Promise<Workspace> {
       requireStaff("workspace");
