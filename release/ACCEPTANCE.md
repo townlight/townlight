@@ -1,67 +1,53 @@
-# Townlight Beta 1 acceptance
+# Townlight Beta 1 — Station delivery update
 
-This release distributes the previously verified Windows fresh-install candidate.
-Publishing its source and documentation does not create a new installer build.
+This release distributes the exact signed candidate accepted in a fresh headless Windows Sandbox. Publication changes documentation and source integration refs; it does not rebuild, re-sign or replace the accepted installer bytes. Existing technical versions remain unchanged.
 
-| Artifact | Bytes | SHA-256 |
-|---|---:|---|
-| Windows x64 MSI, product version 1.6.0.1 | 2,092,122,112 | `98bcdef11ebdf5c767f620c904ff49f85115fde3b5c23f62703b111e645aaf86` |
-| Exact owned source/build companion | 15,612,591 | `84a23e1297e42d17b16cfc9e51b2dd78bc46414c0de8ad7ebd2466c1a409d06b` |
-| Audited documentation companion | 5,973,722 | `a928bb1c40fec7ef6f223c7b77bc9fe7837e4cfffcebf35bb3309cc5549284e6` |
-
-The MSI has a valid Scott Converse Authenticode publisher signature and Microsoft
-timestamp. Signing workflow: [40954983813](https://github.com/townlight/townlight/actions/runs/40954983813).
-The fresh Sandbox installation returned exit 0 and all 23,713 installed files
-matched their recorded input hashes. The native executable, MSI and bundled
-transcription signatures were checked.
-
-Normal first-run used an empty profile: Setup created the profile and named
-administrator; staff accounts and sign-in were created through the application;
-the full desktop composition and canonical runtime were explicitly activated.
-No accounts, sessions or business records were seeded. Tests used synthetic data,
-installed IPC/HTTP, PostgreSQL/PostGIS and selected headless UI controls.
-
-| Product | Selected installed outcome |
+| Identity | Value |
 |---|---|
-| Core | Setup, activation, staff access and permission refusal; coherent backup/restore with retained/absent record readback after Start/Check. |
-| Records | Intake, original attachment and separate release copy, explicit decisions, exact-text approval, exports and fulfillment/readback. |
-| Meetings | Meeting/agenda, packet, motion/vote, supplied transcript, reviewed/adopted minutes and restricted archive/proceedings. |
-| Code | Retained source import and citations; proposal, Meetings decision, adoption and explicit codification closeout. |
-| Zoning | Local source and geometry evidence, cited jurisdiction process, saved review and private Records handoff. |
-| Planning | Retained policy sources, municipal initiatives/amendments, review and private Records handoff. |
-| Permitting | Saved intake/review, source-grounded guidance, hash-checked separate private Records copy. |
-| Inspections | Original evidence/hash, supplied observations and voice summary, saved/reviewed case and separate private Records copy. Earlier unchanged real vision/Whistle execution evidence was reused. |
-| Station | Real native staff/meeting authority, headless capture start/stop, decoded generated audio/video, served hash, locked/private original and idempotent Records handoff. |
+| Coordinated label | Townlight Beta 1 |
+| Release tag | `townlight-beta-1-station-delivery` |
+| MSI product version | 1.6.0.1 |
+| Station package version | 0.3.0 |
+| MSI SHA-256 | `173c032b874e2cf4091cd79213f53c0663d272070fc11712701892d490e09883` |
+| Exact source companion SHA-256 | `18d94a23b1a5d9f4ee6ecddb0e581f194c90ac8306b01b06d6534d86c2e2220d` |
+| ProductCode | `{19333354-73F2-4925-B251-0BEB552D216B}` |
+| Packaged/verified installed files | 23,716 |
+| Signing | Valid Scott Converse publisher signature and Microsoft timestamp |
 
-The detailed [workflow matrix](../docs/beta-1/reference/workflow-matrix.json) and
-[receipt hash index](../docs/beta-1/reference/sandbox-evidence-index.json) identify
-the retained evidence. Raw receipts containing session/profile material remain
-private. Earlier failed test-driver attempts and the intended refusal for a
-missing release decision were retained and resolved in the accepted paths.
-Guest uninstall passed, owned acceptance processes terminated and the owned
-Sandbox stopped. Existing host applications and standalone CivicCast were unchanged.
+[Signing run](https://github.com/townlight/townlight/actions/runs/41163156492). `SIGNATURE-AND-CANDIDATE.json`, `SOURCE-REFS.json`, `STATION-DELIVERY-PROVENANCE.json` and `SHA256SUMS.txt` identify exact artifacts and integrated source refs. Integration tags are not represented as original build commits. The unchanged native desktop and 893 native payload files retain their accepted signatures/bytes.
 
-## Limits and city commissioning
+## New installed acceptance
 
-- This is selected workflow acceptance, not certification of every field, role,
-  vendor, jurisdiction or historical in-place upgrade. Use a fresh Windows test
-  installation for this beta.
-- Station is explicitly configured through its separate CLI/database/storage
-  boundary and paired Townlight HTTP process. Automatic wizard provisioning and
-  Windows SCM commissioning were not established. Actual city encoder/network,
-  remote hosting and long-duration field quality remain site-specific.
-- Model execution receipts do not establish recognition accuracy on field images
-  or audio. Staff review remains required.
-- No city credentials or real city data were used. A beta site still configures
-  folders/backups, named local staff, authorized source bundles and any selected
-  Station feed, then has staff confirm applicability and run their workflows.
-- The expanded Station manual setup recipe was source/schema/parser checked; it
-  was not rerun verbatim end to end. The installed paired runtime workflow itself
-  passed as described above.
-- Universal vendors, a new portal framework, live Meetings transcription,
-  authoritative fee calculation, a stack rewrite and full CivicCast parity are
-  outside this beta. Resident live-model assistance remains conditional, not a
-  mandatory completed feature.
+A fresh network-disabled Sandbox installed the signed MSI with exit0 and all23,716 installed hashes matched. Normal first-run used a fresh non-admin Windows account and empty profile. The installed UI created the synthetic city and administrator, completed setup/health and signed in. It created staff through the normal UI, authenticated staff and refused staff user administration. Native Meetings/Records commands created the synthetic meeting, assigned agenda and request.
 
-Required source-repository checks and actual public download/Pages verification
-are separate publication evidence and must be recorded in the final release.
+The real installed Station operator and services passed all13 affected checks:
+
+- Real native staff session grants operator ticket.
+- Real headless operator live capture stop handoff logout.
+- Separate CivicCast SRT adapter received live bytes before capture stop.
+- Served recording hash equals completed output.
+- Captured synthetic audio video independently decode.
+- Normal Records request can read Station handoff.
+- Repeated handoff retains one canonical document.
+- Operator created explicit YouTube upload intent.
+- Installed upload worker reused real YouTube client with synthetic Google acknowledgements.
+- Exact packaged MP4 bytes sent with private visibility and reviewed title.
+- Upload left canonical recording unchanged.
+- Installed API prevents duplicate external upload.
+- Station original stays locked and private.
+
+The receiver was a separate process using the pinned CivicCast SRT source adapter. Its receipt was observed before capture stop; received media and the completed recording independently decoded. Two acknowledged Records handoffs retained one canonical hash-matched document, locked and private. The installed upload worker executed the actual pinned CivicCast OAuth/resumable client against synthetic Google acknowledgements; exact MP4 hash, reviewed title, private visibility and durable receipt matched. The original recording stayed unchanged; another upload was refused.
+
+All owned media/service children terminated. Guest uninstall returned exit0, removed its application registration/executable/runtime, and the owned Sandbox stopped. Host application executable hashes/timestamps stayed unchanged. A managed initial registry view was empty; direct host registrations matched retained baseline and their key timestamps all predated the task. Original snapshots and full synthetic execution receipts are retained locally; this public report contains no profiles, credentials, tokens or city data.
+
+## Retained baseline scope
+
+The eight unchanged products retain the [original Beta 1 selected workflow and recovery acceptance](https://github.com/townlight/townlight/blob/townlight-beta-1/release/ACCEPTANCE.md). Core, Records, Meetings, Code, Zoning, Planning, Permitting and Inspections were not rerun wholesale for this Station-only update. Normal setup/staff access and the connected Meetings → Station → Records path were newly verified. Source-level interruption, permissions, uncertain-upload recovery, retry and disconnected-receiver checks also passed before packaging.
+
+## Documentation and limits
+
+All nine product manuals and the suite manual remain available in HTML/PDF/Word, with READMEs, product/organization landing pages, architecture drawings, exact API/MCP references, terms, index and full license. Affected Station/suite editions now document live CivicCast delivery and completed-recording YouTube uploads, configuration and recovery. Fourteen desktop/mobile page checks and headless Word/PDF rendering passed. The eight unchanged product manual bodies retain historical baseline artifact identities; the current versions page and this release identify the new MSI.
+
+Development used synthetic accounts, records and media only. No new real YouTube upload, real city credentials, physical PEG/cable broadcast or historical in-place upgrade was tested. CivicCast's separately demonstrated real YouTube delivery remains separate evidence. Deployers supply Station-only OAuth credentials, SRT pairing/firewall settings and PEG operator configuration. Standalone CivicCast remains a separate product/repository/installation and was not changed. No new portal, universal vendor connectors, official fee engine or stack rewrite is part of this update.
+
+Current Townlight-owned source and documentation are AGPL-3.0-only. Original vendor grants/notices are preserved. The source archive retains the exact prepublication build identity and private preparation notes; this report and publication tags identify its subsequent public delivery. A routine unsigned CI build is a different artifact and cannot inherit this MSI's signature or acceptance.
