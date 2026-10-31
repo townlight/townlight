@@ -1,3 +1,5 @@
+> Current Station delivery update: [new accepted source/build identity](STATION-DELIVERY-BUILD.md) and [acceptance](ACCEPTANCE.md). The original Beta 1 build history below is retained.
+
 # Source and build identity â€” Townlight Beta 1
 
 Use the signed suite MSI for the verified beta installation. Independent

@@ -1,34 +1,10 @@
-# Townlight Suite Manual
-
-**Townlight Beta 1** · Documentation edition 30 October 2026
-
-## Contents
-
-- [Using this manual](#using-this-manual)
-- [Beta identity](#beta-identity)
-- [First run](#first-run)
-- [Daily workflow](#daily-workflow)
-- [Connected workflows](#connected-workflows)
-- [Architecture](#architecture)
-- [Existing product operating guides](#existing-product-operating-guides)
-- [Technical specifications](#technical-specifications)
-- [Configuration and administration](#configuration-and-administration)
-- [API and integration examples](#api-and-integration-examples)
-- [MCP and automation boundary](#mcp-and-automation-boundary)
-- [Security and permissions](#security-and-permissions)
-- [Backup recovery and maintenance](#backup-recovery-and-maintenance)
-- [Troubleshooting](#troubleshooting)
-- [Verified workflows and limits](#verified-workflows-and-limits)
-- [Terms of service and license](#terms-of-service-and-license)
-- [Glossary](#glossary)
-- [Alphabetical subject index](#alphabetical-subject-index)
-- [Source and document control](#source-and-document-control)
+> **Townlight Beta 1 — Station delivery update, 31 October 2026.** [Signed Windows installer, source, documentation and acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). This edition documents the Sandbox-tested Station delivery additions. Existing component versions are retained. Earlier baseline results remain identified as historical evidence; the new acceptance report identifies the new installer.
 
 ## Using this manual
 
 Townlight Beta 1 connects nine municipal products around retained sources, named staff and explicit human decisions. This suite manual explains setup, shared operating procedures and cross-product handoffs. Each product has a complete staff and technical manual. The accepted desktop contains eight products; Station is separately configured. Standalone CivicCast remains a separate product.
 
-Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the full API reference and per-product source contracts. These instructions describe the private candidate rather than older public release selections.
+Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the full API reference and per-product source contracts. These instructions describe the Station delivery candidate rather than older public release selections.
 
 ## Beta identity
 
@@ -37,13 +13,13 @@ Staff should start with First run and Connected workflows. Administrators should
 | Public documentation identity | Townlight Beta 1 |
 | Installer version | 1.6.0.1 |
 | Native desktop source version | 1.6.0-1 |
-| Candidate MSI SHA256 | `98bcdef11ebdf5c767f620c904ff49f85115fde3b5c23f62703b111e645aaf86` |
-| Corresponding-source SHA256 | `84a23e1297e42d17b16cfc9e51b2dd78bc46414c0de8ad7ebd2466c1a409d06b` |
+| Candidate artifact identity | Station delivery update; use the release SHA256SUMS.txt |
+| Corresponding source | Updated Station delivery candidate source companion |
 | Current owned software license | AGPL-3.0-only |
 | Supported acceptance profile | Windows x64 fresh install; inspections-preview; separate Station configuration |
 
 
-“Townlight Beta 1” identifies this coordinated beta delivery. It does not renumber the installer, native binary, Python packages or historical receipts. Component versions may differ. This documentation is a later companion to unchanged signed bytes, not a rebuilt installer. Historical release pages and manuals describe their own versions and are not the download instructions for this private candidate.
+“Townlight Beta 1” identifies this coordinated beta delivery. It does not renumber the installer, native binary, Python packages or historical receipts. Component versions may differ. This edition accompanies the newly packaged and signed MSI containing the Station delivery additions. The native desktop and other native payload files retain their accepted signed bytes. Historical release pages and manuals describe their own versions and are not the download instructions for this Station delivery candidate.
 
 ### Component versions
 
@@ -62,7 +38,7 @@ Staff should start with First run and Connected workflows. Administrators should
 
 ## First run
 
-1. Obtain the identified signed private candidate and its corresponding-source companion from the beta coordinator. The landing pages in this documentation are not an installer download service.
+1. Download the signed Windows installer and matching source/documentation companions from the [Station delivery release](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). Use that release’s checksums and publisher signature to identify the candidate.
 2. On the intended fresh Windows test installation, verify the MSI hash and publisher signature before installing. Preserve unrelated profiles and recovery material. This candidate has fresh-install acceptance; historical in-place upgrades are unverified.
 3. Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for all eight desktop products. A narrower default selection will not expose all workspaces.
 4. Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
@@ -108,20 +84,20 @@ Core provides shared contracts, named account/session support, ingestion/task he
 
 | Product | Purpose | Manual |
 | --- | --- | --- |
-| Core | A shared foundation for accountable municipal work. | [Core](docs/beta-1/manuals/core.html) |
-| Records | From request intake to a deliberate release. | [Records](docs/beta-1/manuals/records.html) |
-| Meetings | Keep the agenda, decisions and evidence connected. | [Meetings](docs/beta-1/manuals/meetings.html) |
-| Code | Trace every section to its source and history. | [Code](docs/beta-1/manuals/code.html) |
-| Zoning | Bring parcel context and cited rules into one review. | [Zoning](docs/beta-1/manuals/zoning.html) |
-| Planning | Connect policy, analysis and municipal progress. | [Planning](docs/beta-1/manuals/planning.html) |
-| Permitting | Prepare a complete, cited intake for staff review. | [Permitting](docs/beta-1/manuals/permitting.html) |
-| Inspections | Preserve evidence and review every draft finding. | [Inspections](docs/beta-1/manuals/inspections.html) |
-| Station | Capture the meeting and preserve its evidence. | [Station](docs/beta-1/manuals/station.html) |
+| Core | A shared foundation for accountable municipal work. | [Core](https://townlight.github.io/manuals/core.html) |
+| Records | From request intake to a deliberate release. | [Records](https://townlight.github.io/manuals/records.html) |
+| Meetings | Keep the agenda, decisions and evidence connected. | [Meetings](https://townlight.github.io/manuals/meetings.html) |
+| Code | Trace every section to its source and history. | [Code](https://townlight.github.io/manuals/code.html) |
+| Zoning | Bring parcel context and cited rules into one review. | [Zoning](https://townlight.github.io/manuals/zoning.html) |
+| Planning | Connect policy, analysis and municipal progress. | [Planning](https://townlight.github.io/manuals/planning.html) |
+| Permitting | Prepare a complete, cited intake for staff review. | [Permitting](https://townlight.github.io/manuals/permitting.html) |
+| Inspections | Preserve evidence and review every draft finding. | [Inspections](https://townlight.github.io/manuals/inspections.html) |
+| Station | Capture the meeting and preserve its evidence. | [Station](https://townlight.github.io/manuals/station.html) |
 
 
 ## Architecture
 
-![Townlight Suite architecture and evidence flow](docs/beta-1/assets/suite-architecture.svg)
+<img class="flow" src="https://townlight.github.io/assets/suite-architecture.svg" alt="Townlight Suite architecture and evidence flow">
 
 The drawing shows the principal staff/evidence path. Native commands carry trusted identity to Python business services; PostgreSQL and retained original files hold durable state. A downstream copy does not silently transfer decision authority. Station has its own configured authority/media boundary, database and mutable files. The connected-workflow text supplies the drawing’s reading order and accessibility alternative.
 
@@ -129,15 +105,15 @@ The drawing shows the principal staff/evidence path. Native commands carry trust
 
 Use each product's operating chapter for its actual controls, inputs, readback and refusal states. The suite coordinates evidence and authority; it does not replace those product decisions. Station requires an explicitly configured paired runtime and its separate operating procedure. The Code importer submits directly; Planning's source library has its own preview/confirmation flow.
 
-- [Core operating procedure](docs/beta-1/manuals/core.html#shared-catalog-rules-and-scaffolding).
-- [Records operating procedure](docs/beta-1/manuals/records.html#fees-messages-notifications-and-local-intake).
-- [Meetings operating procedure](docs/beta-1/manuals/meetings.html#transcript-corrections-and-action-items).
-- [Code operating procedure](docs/beta-1/manuals/code.html#cited-questions-summaries-and-local-synchronization).
-- [Zoning operating procedure](docs/beta-1/manuals/zoning.html#discretionary-processes-and-staff-review).
-- [Planning operating procedure](docs/beta-1/manuals/planning.html#exploration-initiatives-and-amendments).
-- [Permitting operating procedure](docs/beta-1/manuals/permitting.html#describe-a-project-and-read-source-grounded-guidance).
-- [Inspections operating procedure](docs/beta-1/manuals/inspections.html#evidence-limits-outlines-and-previous-cases).
-- [Station operating procedure](docs/beta-1/manuals/station.html#scheduling-playout-and-recovery).
+- [Core operating procedure](https://townlight.github.io/manuals/core.html#shared-catalog-rules-and-scaffolding).
+- [Records operating procedure](https://townlight.github.io/manuals/records.html#fees-messages-notifications-and-local-intake).
+- [Meetings operating procedure](https://townlight.github.io/manuals/meetings.html#transcript-corrections-and-action-items).
+- [Code operating procedure](https://townlight.github.io/manuals/code.html#cited-questions-summaries-and-local-synchronization).
+- [Zoning operating procedure](https://townlight.github.io/manuals/zoning.html#discretionary-processes-and-staff-review).
+- [Planning operating procedure](https://townlight.github.io/manuals/planning.html#exploration-initiatives-and-amendments).
+- [Permitting operating procedure](https://townlight.github.io/manuals/permitting.html#describe-a-project-and-read-source-grounded-guidance).
+- [Inspections operating procedure](https://townlight.github.io/manuals/inspections.html#evidence-limits-outlines-and-previous-cases).
+- [Station operating procedure](https://townlight.github.io/manuals/station.html#scheduling-playout-and-recovery).
 
 
 ## Technical specifications
@@ -159,7 +135,7 @@ Versioned saves use expected prior revision identifiers where defined. Reopen an
 
 This beta has synthetic single-profile workflow evidence. It does not have a published benchmark for concurrent staff capacity, minimum RAM/CPU, large-source limits or a field SLA. Do not turn a developer machine’s specification into a supported minimum. Installer size is 2,092,122,112 bytes before installation; allow additional disk for extracted runtime, database, originals, exports, media and backups. Select equipment/storage after sizing those actual workloads.
 
-The exact [runtime payload lock](docs/beta-1/reference/runtime-payload-lock.json) records pinned files, sizes and hashes. The [component metadata](docs/beta-1/reference/component-metadata.json) records shipped dependency declarations. These references are more precise than a manually copied dependency list. Third-party and historical license notices must accompany their matching payloads.
+The exact [runtime payload lock](https://townlight.github.io/reference/runtime-payload-lock.json) records pinned files, sizes and hashes. The [component metadata](https://townlight.github.io/reference/component-metadata.json) records shipped dependency declarations. These references are more precise than a manually copied dependency list. Third-party and historical license notices must accompany their matching payloads.
 
 ### Station operator and media components
 
@@ -228,7 +204,7 @@ This write requires Meetings to be enabled and the signed-in staff role to permi
 
 ### Complete technical contract
 
-Read the [Suite API reference](docs/beta-1/api/suite.html) for every documented operation, request field, constraint, response declaration and source supplement. Download the [OpenAPI JSON](docs/beta-1/api/suite-openapi.json) for tools. For Station this is the suite-side schema only; its separate service contract is documented in the API supplement. The [reference directory](docs/beta-1/reference/index.html) includes configuration/source inventories, dependency declarations, native command contracts, MCP signatures and candidate evidence.
+Read the [Suite API reference](https://townlight.github.io/api/suite.html) for every documented operation, request field, constraint, response declaration and source supplement. Download the [OpenAPI JSON](https://townlight.github.io/api/suite-openapi.json) for tools. For Station this is the suite-side schema only; its separate service contract is documented in the API supplement. The [reference directory](https://townlight.github.io/reference/index.html) includes configuration/source inventories, dependency declarations, native command contracts, MCP signatures and candidate evidence.
 
 ## MCP and automation boundary
 
@@ -242,7 +218,7 @@ For a transcription client already provisioned separately, an illustrative tool 
 {"name":"get_job_status","arguments":{"job_id":"synthetic-existing-job-id"}}
 ```
 
-Use a job ID returned by that transcription service. This example does not create a Townlight record or bypass its review/Records handoff. The exact optional adapter tool signatures are supplied in the [MCP source reference](docs/beta-1/reference/mcp.html). Station meeting capture does not become live speech recognition because this optional donor adapter exists.
+Use a job ID returned by that transcription service. This example does not create a Townlight record or bypass its review/Records handoff. The exact optional adapter tool signatures are supplied in the [MCP source reference](https://townlight.github.io/reference/mcp.html). Station meeting capture does not become live speech recognition because this optional donor adapter exists.
 
 ## Security and permissions
 
@@ -298,9 +274,9 @@ On failure, record the time, selected composition, component/installer versions 
 | Station | PASS | Actual native staff session and normally created meeting; headless operator live start/stop, decoded generated audio/video, served hash, private Records readback, idempotent locked original and logout. |
 
 
-These results come from the identified signed candidate’s fresh normal-profile Sandbox exercise: real native IPC/HTTP/PostgreSQL and selected headless controls. All accounts, source bundles and media were synthetic. The guest install/uninstall and recovery passed, and the owned Sandbox stopped. No host installed application or standalone CivicCast was changed. This documentation task reuses those receipts; it does not claim a new software acceptance run.
+The following baseline results come from the previously accepted signed candidate’s fresh normal-profile Sandbox exercise: real native IPC/HTTP/PostgreSQL and selected headless controls. All accounts, source bundles and media were synthetic. The guest install/uninstall and recovery passed, and the owned Sandbox stopped. No host installed application or standalone CivicCast was changed. Those baseline receipts are retained for unchanged workflows. The accompanying ACCEPTANCE.md records the separate installed verification and exact identity of this new Station delivery candidate.
 
-The [workflow matrix](docs/beta-1/reference/workflow-matrix.json) identifies raw receipt filenames. The [evidence index](docs/beta-1/reference/sandbox-evidence-index.json) retains their original hashes; raw receipts remain in the private beta handoff rather than being silently republished with the documentation site.
+The [workflow matrix](https://townlight.github.io/reference/workflow-matrix.json) identifies raw receipt filenames. The [evidence index](https://townlight.github.io/reference/sandbox-evidence-index.json) retains their original hashes; raw receipts remain in the private beta handoff rather than being silently republished with the documentation site.
 
 The limits remain: actual city field acceptance and equipment/network commissioning; Station automatic provisioning/SCM commissioning; every UI/role combination; field recognition accuracy; and historical in-place upgrades are not certified. They are not five invented feature requirements. Fresh-install controlled beta handoff remains the accepted scope. This package makes no city-deployment, publication or general-availability claim.
 
@@ -308,7 +284,7 @@ The limits remain: actual city field acceptance and equipment/network commission
 
 ### Scope and status
 
-These terms describe the Townlight Beta 1 software and this documentation package. This is a locally prepared private beta, not a hosted-service subscription, a city deployment agreement or a public release. No uptime commitment, support response time, indemnity, data-processing agreement or paid service is created by these documents. A separate signed agreement, if any, governs services it actually provides.
+These terms describe the Townlight Beta 1 software and this documentation package. This is a public beta software distribution. It does not create a hosted-service subscription or a city deployment agreement. No uptime commitment, support response time, indemnity, data-processing agreement or paid service is created by these documents. A separate signed agreement, if any, governs services it actually provides.
 
 ### Software license and rights
 
@@ -391,10 +367,30 @@ When an organization ends testing, it controls retention/export and removes acce
 
 ## Source and document control
 
-This edition is authored from the immutable corresponding-source companion, the generated installed-domain schema and the retained workflow receipts. The current software versions and signed artifacts are unchanged. Public historical pages are not synchronized or published by this local documentation task.
+This edition is authored from the immutable corresponding-source companion, the generated installed-domain schema and the retained workflow receipts. Component version numbers are retained. The private MSI has its own new hash and signing receipt. Historical release tags and their artifacts remain unchanged.
 
-- [Source inventory and file hashes](docs/beta-1/reference/source-inventory.json)
-- [All component metadata](docs/beta-1/reference/component-metadata.json)
-- [Installed domain OpenAPI](docs/beta-1/reference/desktop-domain-openapi.json)
-- [Workflow matrix](docs/beta-1/reference/workflow-matrix.json)
-- [Full AGPL text](docs/beta-1/reference/AGPL-3.0.txt)
+- [Source inventory and file hashes](https://townlight.github.io/reference/source-inventory.json)
+- [All component metadata](https://townlight.github.io/reference/component-metadata.json)
+- [Installed domain OpenAPI](https://townlight.github.io/reference/desktop-domain-openapi.json)
+- [Workflow matrix](https://townlight.github.io/reference/workflow-matrix.json)
+- [Full AGPL text](https://townlight.github.io/reference/AGPL-3.0.txt)
+
+
+## Station live and recorded delivery
+
+Station now offers two explicit delivery paths. During a live recording, staff may select an administrator-configured encrypted SRT feed to the separate CivicCast product. The PEG operator controls local cable take-to-air. After completion, staff may approve an upload copy to the Station-configured YouTube account, select its title and visibility, and inspect the durable receipt. The private canonical recording and existing Meetings → Station → Records handoff remain independent.
+
+<img class="flow" src="https://townlight.github.io/assets/station-delivery-architecture.svg" alt="Station live delivery and completed video uploads">
+
+These paths reuse the pinned CivicCast media and YouTube client code. A separate sender isolates network backpressure from capture, and a separate upload worker prevents long uploads from blocking recording. YouTube starts no live broadcast here. Standalone CivicCast has separate installation, identity, storage and operator control.
+
+Administrators run the explicit Station schema4 migration and provision Station-only OAuth and SRT pairing credentials. Existing component versions are retained. Preparation failures can be explicitly retried; uncertain external uploads require manual reconciliation and are never silently duplicated. No real credentials or external video publication are used in synthetic development acceptance.
+
+See [the Station manual delivery section](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage) for full staff steps, architecture, configuration, API request examples, permissions and recovery. Existing eight-product workflows are unchanged; their accepted evidence is retained rather than presented as a new run.
+
+
+## Delivery subject index
+
+- [CivicCast live feed](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage)
+- YouTube: explicit completed recording upload; visibility; receipt and reconciliation.
+- Schema4: durable upload intent; existing evidence retained.
