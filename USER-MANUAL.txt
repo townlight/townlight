@@ -38,7 +38,7 @@ Staff should start with First run and Connected workflows. Administrators should
 
 ## First run
 
-1. Obtain the identified signed Station delivery candidate and its corresponding-source companion from the beta coordinator. The landing pages in this documentation are not an installer download service.
+1. Download the signed Windows installer and matching source/documentation companions from the [Station delivery release](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). Use that release’s checksums and publisher signature to identify the candidate.
 2. On the intended fresh Windows test installation, verify the MSI hash and publisher signature before installing. Preserve unrelated profiles and recovery material. This candidate has fresh-install acceptance; historical in-place upgrades are unverified.
 3. Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for all eight desktop products. A narrower default selection will not expose all workspaces.
 4. Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
@@ -97,7 +97,7 @@ Core provides shared contracts, named account/session support, ingestion/task he
 
 ## Architecture
 
-<img class="flow" src="../assets/suite-architecture.svg" alt="Townlight Suite architecture and evidence flow">
+<img class="flow" src="https://townlight.github.io/assets/suite-architecture.svg" alt="Townlight Suite architecture and evidence flow">
 
 The drawing shows the principal staff/evidence path. Native commands carry trusted identity to Python business services; PostgreSQL and retained original files hold durable state. A downstream copy does not silently transfer decision authority. Station has its own configured authority/media boundary, database and mutable files. The connected-workflow text supplies the drawing’s reading order and accessibility alternative.
 
@@ -284,7 +284,7 @@ The limits remain: actual city field acceptance and equipment/network commission
 
 ### Scope and status
 
-These terms describe the Townlight Beta 1 software and this documentation package. This is a locally prepared private beta, not a hosted-service subscription, a city deployment agreement or a public release. No uptime commitment, support response time, indemnity, data-processing agreement or paid service is created by these documents. A separate signed agreement, if any, governs services it actually provides.
+These terms describe the Townlight Beta 1 software and this documentation package. This is a public beta software distribution. It does not create a hosted-service subscription or a city deployment agreement. No uptime commitment, support response time, indemnity, data-processing agreement or paid service is created by these documents. A separate signed agreement, if any, governs services it actually provides.
 
 ### Software license and rights
 
@@ -376,11 +376,11 @@ This edition is authored from the immutable corresponding-source companion, the 
 - [Full AGPL text](https://townlight.github.io/reference/AGPL-3.0.txt)
 
 
-## Station delivery in this Station delivery candidate
+## Station live and recorded delivery
 
 Station now offers two explicit delivery paths. During a live recording, staff may select an administrator-configured encrypted SRT feed to the separate CivicCast product. The PEG operator controls local cable take-to-air. After completion, staff may approve an upload copy to the Station-configured YouTube account, select its title and visibility, and inspect the durable receipt. The private canonical recording and existing Meetings → Station → Records handoff remain independent.
 
-<img class="flow" src="../assets/station-delivery-architecture.svg" alt="Station live delivery and completed video uploads">
+<img class="flow" src="https://townlight.github.io/assets/station-delivery-architecture.svg" alt="Station live delivery and completed video uploads">
 
 These paths reuse the pinned CivicCast media and YouTube client code. A separate sender isolates network backpressure from capture, and a separate upload worker prevents long uploads from blocking recording. YouTube starts no live broadcast here. Standalone CivicCast has separate installation, identity, storage and operator control.
 
