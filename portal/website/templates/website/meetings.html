@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<h1>Meetings</h1><ul>{% for m in meetings %}<li><a href="{% url 'meeting' m.pk %}">{{ m.title }}</a> {% if m.cancelled %}(Cancelled){% endif %}</li>{% empty %}<li>No published meetings.</li>{% endfor %}</ul>{% endblock %}

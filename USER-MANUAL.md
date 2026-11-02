@@ -394,3 +394,9 @@ See [the Station manual delivery section](https://townlight.github.io/manuals/st
 - [CivicCast live feed](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage)
 - YouTube: explicit completed recording upload; visibility; receipt and reconciliation.
 - Schema4: durable upload intent; existing evidence retained.
+
+## Public meeting portal (local integration candidate)
+
+Townlight's separately deployed portal can publish a reviewed Meetings archive with an explicitly selected, verified Records release copy of the matching completed Station recording. Staff must separately approve publication; fulfilling a Records request does not make the copy public. Review public text and the selected file, then use the Wagtail superuser publication form. Explicit withdrawal hides the published meeting and file. An unsuccessful sync preserves the previous publication. Keep the private original and never expose the native session proof. See the [portal guide](docs/beta-1/manuals/portal.html) for staff steps, setup, API, recovery and source obligations.
+
+This integration is a local candidate. The existing signed Beta 1 installer and historical Sandbox results do not establish that it contains or deploys this portal. CivicCast remains separate.

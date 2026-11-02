@@ -1,0 +1,114 @@
+{
+  "identity": "Townlight Beta 1 portal integration",
+  "date": "2026-11-02",
+  "scope": "Synthetic real-service and isolated native wheel acceptance; unpublished",
+  "passed": true,
+  "workflow_checks": [
+    "real isolated PostgreSQL Records, Meetings, Station and portal migrations",
+    "public archive, agenda, packet and minutes created via Meetings HTTP",
+    "actual Station worker processed synthetic video and returned hash-verified recording",
+    "publication denies absent proof, wrong role, missing approval and unfulfilled request",
+    "Records HTTP handoff, approved release copy, current approval, verified response and package, and fulfillment",
+    "native publisher lookup returns eligible public choice without granting approval and denies wrong role",
+    "bundle authenticates real public sources, rejects closed archive/wrong hash, contains only approved bytes",
+    "portal repeat sync is idempotent; public page and ranged release are hash-verified and exclude private content",
+    "public export contains approved release bytes and excludes private meeting title and request data",
+    "production Waitress entry enforces HTTPS redirect and serves approved range behind configured loopback TLS proxy",
+    "native service failure leaves existing public release available",
+    "headless browser plays approved MP4 and submits authenticated Wagtail publisher form",
+    "explicit withdrawal hides meeting and release routes"
+  ],
+  "browser_checks": [
+    "headless browser decoded and played approved MP4",
+    "Wagtail superuser submitted explicit publication form"
+  ],
+  "native_wheel": {
+    "file": "civicsuite_runtime-0.1.0-py3-none-any.whl",
+    "sha256": "0c6bd6c59a1561925e0121a9da11e9e490d8166580bc65a38050be175c4f94c2",
+    "verified_source_members": 56
+  },
+  "installed_wheel_import_verified": true,
+  "owned_services_terminal": true,
+  "temporary_proofs_removed": true,
+  "mobile_render": [
+    {
+      "label": "phone",
+      "viewport": 390,
+      "body": 390,
+      "document": 390,
+      "videoWidth": 358,
+      "naturalWidth": 640,
+      "packetWidth": 358
+    },
+    {
+      "label": "desktop",
+      "viewport": 1280,
+      "body": 1152,
+      "document": 1280,
+      "videoWidth": 640,
+      "naturalWidth": 640,
+      "packetWidth": 1120
+    }
+  ],
+  "portal_tests": {
+    "passed": 16,
+    "missing_migrations": false
+  },
+  "suite_contract_tests": {
+    "passed": 42
+  },
+  "source_hashes": {
+    "portal/manage.py": "fd2d426e0131b607d89462510280abe0a5d58f2b32e88f6a9dd252d4c8861bc0",
+    "portal/serve.py": "461c28ae493c2fe70cf988b9cd8b83c5e4dfe89901bcf7d37770b5ca9703e6fa",
+    "portal/portal/settings.py": "0103e7b55e37e8c862128c034c267a92cbfa9ebe44b064787c82aa33b06fc81c",
+    "portal/portal/urls.py": "a40d9a24008f5dfc767b7e986e0d4f8eb23ced11e6703707fd529bfe2e5623df",
+    "portal/portal/wsgi.py": "13b259e5b7ba828c62320b9c82b3049fdb1f6091918db0d6ebc459ad8e2f94fd",
+    "portal/portal/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/vendor/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/website/context_processors.py": "dba3173dcb57cb5edb170da7d557ba53666d367c11c0fbfc6ec8a7291951e328",
+    "portal/website/importing.py": "1c6da9559513ef9d533fd8cf783d3e08c66bcead42f5a3946e8b7cbc86684320",
+    "portal/website/models.py": "47e4dee9277428787699a92961feb61c130bd8a99cb7e98e273b39b1a0173156",
+    "portal/website/tests.py": "ed2e80a7fdc2e3f7d926cb657806580ebd86cbf78a432a5fbb04953566b41b7e",
+    "portal/website/test_deployment.py": "314aa2c6b54b1441097fc2e21e771e6651897cebaa2d23818eacd6ab1c39790e",
+    "portal/website/test_meeting_timezone.py": "4cbafc977c66ec7bf48e114d3f1b758906647a836730b54eaf9b537e3934a38e",
+    "portal/website/test_source_archive.py": "78c7fc810a33aa4eaa1deb07ee3e77399a98f7b14ed5904d23f359072d64acc9",
+    "portal/website/test_townlight.py": "e137e67090f38aa1ee2af41bdac3a89e628d23dcb63dbd2e536bdae3fe7eb980",
+    "portal/website/townlight.py": "40d19eb490c614312b557ee1ebdd0d3b0cba560092eabd610be438fae2e4d836",
+    "portal/website/views.py": "82808648b63f896676e45e932b7b05fe0f9927a928eea85f9d648959ab5b605e",
+    "portal/website/wagtail_hooks.py": "7a24e16300538415aa0d05bfdf2ac5ddfd8a16fa15185dc1057f5796f632e0c9",
+    "portal/website/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/website/management/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/website/migrations/0001_initial.py": "efe85c69fce793f6fd214d6045f5b8fb94aa3920ec371afa61881252358332f9",
+    "portal/website/migrations/0002_meeting_release.py": "061a91daaab9b249382db6cd830f84208c88f0087365d9d165f5a9360dbb6c66",
+    "portal/website/migrations/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/website/templates/base.html": "053728bf78b4bd29cebdba3661155a8b51b4db2080dad168be83e98d448464f8",
+    "portal/website/templates/website/home_page.html": "901e7055d7607adf10e8518c017825179be8e558d13f275cf765e02fc8967f12",
+    "portal/website/templates/website/meeting.html": "7a82d5bdada76de3ee064fe7e9b9f58c90c8b82812d41d3081c46b3b5641891c",
+    "portal/website/templates/website/meetings.html": "a2a3737e0c5db95d5d05b15ebcfa69b9c60b1d78b0b16d6bdfd7288532df3125",
+    "portal/website/templates/website/publication_admin.html": "25dc52ae07e441581326d074c537b890e5ee462765ac7f6386f41e44de1437c0",
+    "portal/website/templates/website/service_page.html": "f92518747f87020fe38cf15fc6c9b369472a40124ba38a005b4ba4ae0a3c5edc",
+    "portal/website/management/commands/export_public.py": "a74013eecdab3b9b3cc2527487932bd00279ef56255600b85c7d752d1ef5f963",
+    "portal/website/management/commands/import_synthetic.py": "d113088e20d0ec892ee283ba9d11d4863d3b8781197d86cbecfdfb6198517cd9",
+    "portal/website/management/commands/setup_demo.py": "a4d427573639bd4d5ece11f2040573fa2bb02746f9a2d4bbebc1fc22ee6a9a2a",
+    "portal/website/management/commands/sync_townlight.py": "adae7b3b850ebb17c81d98aa36f89081b58e08bb32f9409ce05a8423fa4fe683",
+    "portal/website/management/commands/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/vendor/civiccast/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/vendor/civiccore/manifest.py": "15caa167acce428facdf7683085d47dd4a01b02cc2d05df25d6aa1d157bb79bd",
+    "portal/vendor/civiccore/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "portal/vendor/civiccast/agenda_import/base.py": "d35605c2534aa6a635754fb7b831a971639689775e88fa6f73290e6390d257ef",
+    "portal/vendor/civiccast/agenda_import/docparse.py": "8fff0ec6df605a63c9895c69eca68ea246170edae063c93cf686b553c7be15c4",
+    "portal/vendor/civiccast/agenda_import/models.py": "832ac35ccab0fec09670da7de2e30c342c6a739c587276101549f90a73986845",
+    "portal/vendor/civiccast/agenda_import/primegov.py": "9f788b2840ef3f234e943bde1fbb3827b94dd572ae243fa52b32b5efa56c5f96",
+    "portal/vendor/civiccast/agenda_import/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "desktop/runtime/python-services/civicsuite_runtime/portal_publication.py": "bc23a9e240bec15197d338972a202da0bbc77886f997343889b8e721632c23a8",
+    "desktop/runtime/python-services/civicsuite_runtime/services.py": "9d539db28a8e893db6a27a2c51b13d76de9152f5150032bdda25d6a732c9b087"
+  },
+  "coverage_limits": [
+    "Short synthetic media only",
+    "Existing Records original/release limit 2147483647 bytes",
+    "Active native session proof required",
+    "No real PrimeGov tenant or physical city equipment",
+    "No host app changes, new signed installer, remote CI or publication",
+    "Superseded-copy/incomplete-recording guards traced in source, not separately forced in real-service run"
+  ]
+}
