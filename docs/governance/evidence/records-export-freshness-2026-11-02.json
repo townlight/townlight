@@ -1,0 +1,53 @@
+{
+  "scope": "Records C1: completed exports must match current approved response text",
+  "date": "2026-11-02",
+  "candidate_kind": "local source correction; not an installer release",
+  "repository": "townlight/sunshine",
+  "base_commit": "24a919c2bfcb8b720598ac94de2982f6171f452d",
+  "corrected_commit": "d10cafb913bc51e2edccc4272020d094f6064085",
+  "corrected_tree": "7a77409d1a8252372cc898644623de7c87b10f16",
+  "files": {
+    "backend/app/requests/artifacts.py": "89af4c3bf15ac1f38a67972890dd104e3950577ef0836b3c8ecbbbfae902fe15",
+    "backend/tests/test_desktop_records_artifacts.py": "fb54beaf95e11d5e096be6688c3fd68ac42b7f51cc12376ac4bb63feedce1fd0"
+  },
+  "reproduction": {
+    "baseline_unchanged": true,
+    "expected_http_status": 400,
+    "actual_http_status": 200,
+    "test": "test_fulfillment_requires_exports_for_current_approved_response[None]",
+    "result": "failed at stale-export fulfillment assertion, reproducing defect"
+  },
+  "validation": {
+    "environment": "isolated synthetic PostgreSQL 17.10; real ASGI authenticated API and actual export bytes",
+    "passed": 13,
+    "failed": 0,
+    "errors": 0,
+    "test_files": [
+      "tests/test_desktop_records_artifacts.py",
+      "tests/test_desktop_records_lifecycle.py",
+      "tests/test_desktop_records_files.py"
+    ],
+    "regression_variants": [
+      "both stale",
+      "response current/package stale",
+      "package current/response stale"
+    ],
+    "assertions": [
+      "stale exports refused",
+      "both current exports allow fulfillment",
+      "historical artifacts and bytes retained",
+      "fulfillment receipt omits historical response paths"
+    ],
+    "changed_python_ruff": "passed",
+    "git_diff_check": "passed",
+    "owned_test_databases_stopped": true
+  },
+  "limits": [
+    "No new installed acceptance or installer build",
+    "No package/version change",
+    "No GitHub CI or remote publication in this task",
+    "No whole-context approval redesign",
+    "No city data, model inference, real upload or broadcast"
+  ],
+  "evidence_handling": "Raw synthetic execution logs retained locally; no session proof, credentials, host profile paths or raw tracebacks included here."
+}
