@@ -1,7 +1,7 @@
 {
   "scope": "Records C1: completed exports must match current approved response text",
   "date": "2026-11-02",
-  "candidate_kind": "local source correction; not an installer release",
+  "candidate_kind": "source correction; not an installer release",
   "repository": "townlight/sunshine",
   "base_commit": "24a919c2bfcb8b720598ac94de2982f6171f452d",
   "corrected_commit": "d10cafb913bc51e2edccc4272020d094f6064085",
@@ -45,9 +45,13 @@
   "limits": [
     "No new installed acceptance or installer build",
     "No package/version change",
-    "No GitHub CI or remote publication in this task",
     "No whole-context approval redesign",
     "No city data, model inference, real upload or broadcast"
   ],
-  "evidence_handling": "Raw synthetic execution logs retained locally; no session proof, credentials, host profile paths or raw tracebacks included here."
+  "evidence_handling": "Raw synthetic execution logs retained locally; no session proof, credentials, host profile paths or raw tracebacks included here.",
+  "integration": {
+    "pull_request": "https://github.com/townlight/sunshine/pull/124",
+    "ci_run": "https://github.com/townlight/sunshine/actions/runs/41506234817",
+    "note": "Consult the PR for integration status and required CI results; local regression evidence below is separate."
+  }
 }

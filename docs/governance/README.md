@@ -5,7 +5,7 @@ is the canonical shared-platform technical contribution for deploying-agency
 review. It contains the AI-use inventory, all 47 framework fields, approval
 boundaries, use addenda, commissioning worksheet and evidence limits.
 
-The record distinguishes the published Beta 1 installer from the locally
+The record distinguishes the published Beta 1 installer from the
 corrected Records source candidate. A source correction does not update an
 existing installation or inherit installed acceptance. See the record's candidate
 section and [correction evidence](evidence/records-export-freshness-2026-11-02.json).
