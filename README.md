@@ -13,6 +13,7 @@ Staff should use the operating manual. Administrators should read first-run, con
 - [Operating manual](https://townlight.github.io/manuals/suite.html) · [Printable PDF](https://townlight.github.io/pdf/Townlight-Suite-Manual-Beta-1.pdf) · [Editable Word manual](https://townlight.github.io/docx/Townlight-Suite-Manual-Beta-1.docx)
 - [API and data dictionary](https://townlight.github.io/api/suite.html) · [OpenAPI JSON](https://townlight.github.io/api/suite-openapi.json)
 - [Product and suite directory](https://townlight.github.io/index.html) · [Terms and full license](https://townlight.github.io/terms.html)
+- [Governance and AI oversight](docs/governance/townlight-beta-1-agent-governance-record-draft.md) — Draft technical record covering AI uses, human approval boundaries, evidence, and decisions for deploying agencies. Distinguishes the published beta from corrected source; agency review remains required.
 
 ## Exact version and candidate
 
