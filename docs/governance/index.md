@@ -1,5 +1,12 @@
 # Governance
 
+## Townlight Beta 1 agency-review record
+
+The [draft Agent Governance Record](townlight-beta-1-agent-governance-record-draft.md)
+contains the shared-platform technical evidence and open agency-owned answers.
+It distinguishes the published installer from the corrected Records source
+candidate. See [how this record is maintained and used](README.md).
+
 ## Continuity
 
 Continuity is now an explicit suite gate, not a deferred governance aspiration.
@@ -18,13 +25,11 @@ Community contributions are welcomed via pull request to any repository. See [`.
 
 ## Licensing Posture
 
-The full license matrix is documented in [`../../CONSISTENCY.md`](../../CONSISTENCY.md) section 6. Summary:
-
-- Code: Apache License 2.0
-- Documentation: CC BY 4.0
-- Prompt libraries, if separated: CC BY-SA 4.0
-- Third-party dependencies: permissive or weak-copyleft only; AGPL and GPL-3.0 are blocked
-- Redis: pinned `<8.0` (BSD); never the SSPL releases
+Current Townlight-owned source and documentation use AGPL-3.0-only; see the
+[current license](../../LICENSE). Historical licensing statements do not replace
+the current grant. Third-party components retain their own licenses and notices.
+The Agent Governance Card framework and its adapted field vocabulary retain
+CC BY 4.0 attribution as documented in the governance record.
 
 ## Security Disclosure
 
