@@ -612,8 +612,26 @@ test("risky city workflow actions require guided review before mutation", async 
       lifecycle_disable: "allowed-after-backup",
       lifecycle_uninstall: "backup-first-module-data-removal"
     };
+    let notice;
     window.__TAURI_INTERNALS__ = {
-      invoke: async (cmd) => {
+      invoke: async (cmd, args) => {
+        if (cmd === "notice_domain_request") {
+          const { operation, payload } = args.request;
+          if (operation === "inventory") return { notices: notice ? [notice] : [] };
+          if (operation === "create") {
+            notice = {
+              notice_id: "notice-fixture", document: payload, sequence: 1,
+              state: "draft", proofs: [], deadline_workpaper: { basis: payload.statutory_basis, reminders: [] }
+            };
+            return notice;
+          }
+          if (operation === "read") return { notice, history: [] };
+          if (operation === "review" && payload.sequence === notice.sequence) {
+            notice = { ...notice, sequence: notice.sequence + 1, state: "reviewed" };
+            return notice;
+          }
+          throw new Error(`Unexpected Notice operation: ${operation}`);
+        }
         if (cmd === "get_app_state") {
           return {
             ...window.__appStateForTest,
@@ -636,29 +654,23 @@ test("risky city workflow actions require guided review before mutation", async 
   });
   await page.reload();
   await page.getByRole("button", { name: /Public Notices/ }).click();
-  await page.getByLabel("Statutory notice basis").fill("Open meetings \"notice\" basis");
-  await page.getByLabel("Posting confirmation").fill("</textarea><strong>DIR-NOTICE-XSS</strong>");
-  await expect(page.getByLabel("Statutory notice basis")).toHaveValue("Open meetings \"notice\" basis");
-  await expect(page.getByLabel("Posting confirmation")).toHaveValue("</textarea><strong>DIR-NOTICE-XSS</strong>");
-  await page.getByRole("button", { name: "Calculate Deadline" }).click();
-  await expect(page.getByRole("heading", { name: "Review Before Calculating Notice Deadline" })).toBeVisible();
-  await expect(page.getByText("Townlight Notice", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Confirm Calculate Deadline" })).toBeVisible();
-  await page.getByRole("button", { name: "Cancel Review" }).click();
-  await page.getByRole("button", { name: "Save Checklist" }).click();
-  await expect(page.getByRole("heading", { name: "Review Before Saving Notice Checklist" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Confirm Save Checklist" })).toBeVisible();
-  await page.getByRole("button", { name: "Cancel Review" }).click();
-  await page.getByRole("button", { name: "Record Posting Proof" }).click();
-  await expect(page.getByRole("heading", { name: "Review Before Recording Posting Proof" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Confirm Record Posting Proof" })).toBeVisible();
-  await page.getByRole("button", { name: "Cancel Review" }).click();
-  await page.getByRole("button", { name: "Build Archive Packet" }).click();
-  await expect(page.getByRole("heading", { name: "Review Before Building Notice Archive Packet" })).toBeVisible();
-  await expect(page.getByText("Saved notice checklist is required.")).toBeVisible();
-  await expect(page.getByText("Posting proof is required.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Confirm Build Archive Packet" })).toBeVisible();
-  await page.getByRole("button", { name: "Cancel Review" }).click();
+  const notice = page.locator("[data-notice]");
+  await notice.getByLabel("Title", { exact: true }).fill("Hearing notice");
+  await notice.getByLabel("Staff-verified statutory basis").fill('Open meetings "notice" basis');
+  await notice.getByLabel("Notice text").fill("</textarea><strong>DIR-NOTICE-XSS</strong>");
+  await notice.getByLabel("Event date").fill("2030-01-20");
+  await notice.getByRole("button", { name: "Save draft" }).click();
+  await expect(notice.getByRole("status")).toContainText("Draft saved");
+  await expect(notice.getByLabel("Staff-verified statutory basis")).toHaveValue('Open meetings "notice" basis');
+  await expect(notice.getByLabel("Notice text")).toHaveValue("</textarea><strong>DIR-NOTICE-XSS</strong>");
+  await expect(notice.locator("strong").filter({ hasText: "DIR-NOTICE-XSS" })).toHaveCount(0);
+  await expect(notice.getByRole("button", { name: "Approve reviewed notice" })).toBeDisabled();
+  await expect(notice.getByRole("button", { name: "Retain actual proof" })).toBeDisabled();
+  await expect(notice.getByRole("button", { name: "Create verified archive" })).toBeDisabled();
+  await notice.getByLabel("Review notes").fill("Reviewed source and dates.");
+  await notice.getByRole("button", { name: "Record review of saved revision" }).click();
+  await expect(notice.getByRole("status")).toContainText("Staff review recorded");
+  await expect(notice.getByRole("button", { name: "Approve reviewed notice" })).toBeEnabled();
 
   await page.getByRole("button", { name: /Records Requests/ }).click();
   await page.getByRole("button", { name: "Set Deadline" }).click();
