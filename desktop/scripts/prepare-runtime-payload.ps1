@@ -737,7 +737,10 @@ function Ensure-PythonPip {
         return @{ status = "present" }
     }
     $GetPip = Join-Path $CacheRoot "get-pip.py"
-    $Sha = Invoke-CivicDownload -Url $Source.get_pip_url -Destination $GetPip
+    # Pin the official bootstrap: the moving October 2026 bootstrap invokes a
+    # directory named pip, which trips pip's Windows self-modification guard.
+    # The pinned bootstrap still installs current pip into this isolated payload.
+    $Sha = Invoke-CivicDownload -Url $Source.get_pip_url -Destination $GetPip -ExpectedSha256 $Source.get_pip_sha256
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
         $GetPip,
         "--no-warn-script-location",
