@@ -230,10 +230,6 @@ def main():
     added_native = sorted(path.relative_to(output).as_posix() for path in output.rglob('*')
                           if path.is_file() and path.suffix.lower() in NATIVE
                           and path.relative_to(output).as_posix() not in reused_native)
-    lock = make_lock(output, read_json(ROOT / 'desktop/runtime/windows-runtime-payloads.json'))
-    lock['accepted_native_base_sha256'] = contract['accepted_msi_sha256']
-    lock['umbrella_source_commit'] = commit
-    write_json(output / 'runtime-payload-lock.json', lock)
     provenance = {'profile': PROFILE, 'build_profile': PROFILE, 'development_only': False,
                   'sources': [{'repository': name, 'source_commit': sha} for name, sha in pins.items()],
                   'contract_sha256': digest(config_path), 'sources_manifest_sha256': digest(pins_path),
@@ -241,6 +237,10 @@ def main():
                   'reused_station_runtime': station_reuse,
                   'package_versions': {name.replace('-', '_'): version for name, version in installed.items()}}
     write_json(output / 'python/inspections-candidate-provenance.json', provenance)
+    lock = make_lock(output, read_json(ROOT / 'desktop/runtime/windows-runtime-payloads.json'))
+    lock['accepted_native_base_sha256'] = contract['accepted_msi_sha256']
+    lock['umbrella_source_commit'] = commit
+    write_json(output / 'runtime-payload-lock.json', lock)
     write_json(args.receipt, {**provenance, 'accepted_msi_sha256': contract['accepted_msi_sha256'],
                              'copied_files': copied, 'reused_signed_native_files': reused_native,
                              'new_native_files_requiring_signing': added_native,
