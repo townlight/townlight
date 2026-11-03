@@ -47,14 +47,6 @@ MODULE_NOTICE = "townlight_notice"
 MODULE_ACCESS = "townlight_access"
 SELECTABLE_MODULES = (MODULE_RECORDS, MODULE_CLERK, MODULE_CODE, MODULE_NOTICE, MODULE_ACCESS)
 DEFAULT_SELECTED_MODULES = (MODULE_RECORDS, MODULE_CLERK)
-EXPECTED_TOWNLIGHT_CORE_VERSION = "1.2.0"
-EXPECTED_RECORDS_VERSION = "1.7.3"
-EXPECTED_CLERK_VERSION = "1.0.4"
-EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION = "1.2.1"
-EXPECTED_CODE_VERSION = "1.0.8"
-EXPECTED_CODE_TOWNLIGHT_CORE_VERSION = "1.2.1"
-EXPECTED_NOTICE_VERSION = "0.2.0"
-EXPECTED_ACCESS_VERSION = "0.4.0"
 SELECTED_MODULES_FILE = "selected-modules.json"
 BACKUPS_DIR = "backups"
 CLERK_STAFF_MODE_PROTECTED = "protected"
@@ -297,9 +289,9 @@ def source_root(module_name: str) -> Path:
     )
 
 
-def declared_source_commit(module_name: str) -> str | None:
+def installer_modules() -> dict[str, dict[str, object]]:
     if not MANIFEST.is_file():
-        return None
+        return {}
     try:
         payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
@@ -307,11 +299,24 @@ def declared_source_commit(module_name: str) -> str | None:
     modules = payload.get("modules", []) if isinstance(payload, dict) else []
     if not isinstance(modules, list):
         raise InstallerError("Installer manifest modules must be a list.")
-    for module in modules:
-        if isinstance(module, dict) and module.get("id") == module_name:
-            value = module.get("source_commit")
-            return str(value) if value else None
-    return None
+    return {module["id"]: module for module in modules
+            if isinstance(module, dict) and isinstance(module.get("id"), str)}
+
+
+def declared_source_commit(module_name: str) -> str | None:
+    value = installer_modules().get(module_name, {}).get("source_commit")
+    return str(value) if value else None
+
+
+def expected_installer_versions() -> dict[str, str]:
+    modules = installer_modules()
+    versions = {}
+    for name in ("townlight_core", *SELECTABLE_MODULES):
+        version = modules.get(name, {}).get("current_version")
+        if not isinstance(version, str) or not version:
+            raise InstallerError(f"Missing installer version for {name} in {MANIFEST}")
+        versions[name] = version
+    return versions
 
 
 def read_source_commit(source: Path) -> str:
@@ -1358,6 +1363,7 @@ def verify_townlight_core_contract(
     *,
     selected_modules: list[str] | tuple[str, ...] | None = None,
 ) -> dict[str, object]:
+    versions = expected_installer_versions()
     modules = normalize_selected_modules(selected_modules)
     checks: list[dict[str, object]] = []
     try:
@@ -1396,55 +1402,55 @@ def verify_townlight_core_contract(
     access_ok = True
     if MODULE_RECORDS in modules:
         checks.append({"name": "townlight_records_health", "status_code": records_status, "payload": records_health})
-        records_ok = records_status == 200 and records_health.get("version") == EXPECTED_RECORDS_VERSION
+        records_ok = records_status == 200 and records_health.get("version") == versions[MODULE_RECORDS]
     if MODULE_CLERK in modules:
         checks.append({"name": "townlight_meetings_health", "status_code": clerk_status, "payload": clerk_health})
         clerk_ok = (
             clerk_status == 200
             and clerk_health.get("service") == "townlight_meetings"
-            and clerk_health.get("version") == EXPECTED_CLERK_VERSION
-            and clerk_health.get("townlight_core") == EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION
+            and clerk_health.get("version") == versions[MODULE_CLERK]
+            and clerk_health.get("townlight_core") == versions["townlight_core"]
         )
     if MODULE_CODE in modules:
         checks.append({"name": "townlight_code_health", "status_code": code_status, "payload": code_health})
         code_ok = (
             code_status == 200
             and code_health.get("service") == "townlight_code"
-            and code_health.get("version") == EXPECTED_CODE_VERSION
-            and code_health.get("townlight_core") == EXPECTED_CODE_TOWNLIGHT_CORE_VERSION
+            and code_health.get("version") == versions[MODULE_CODE]
+            and code_health.get("townlight_core") == versions["townlight_core"]
         )
     if MODULE_NOTICE in modules:
         checks.append({"name": "townlight_notice_health", "status_code": notice_status, "payload": notice_health})
         notice_ok = (
             notice_status == 200
             and notice_health.get("service") == "townlight_notice"
-            and notice_health.get("version") == EXPECTED_NOTICE_VERSION
-            and notice_health.get("townlight_core_version") == EXPECTED_TOWNLIGHT_CORE_VERSION
+            and notice_health.get("version") == versions[MODULE_NOTICE]
+            and notice_health.get("townlight_core_version") == versions["townlight_core"]
         )
     if MODULE_ACCESS in modules:
         checks.append({"name": "townlight_access_health", "status_code": access_status, "payload": access_health})
         access_ok = (
             access_status == 200
             and access_health.get("service") == "townlight_access"
-            and access_health.get("version") == EXPECTED_ACCESS_VERSION
-            and access_health.get("townlight_core_version") == EXPECTED_TOWNLIGHT_CORE_VERSION
+            and access_health.get("version") == versions[MODULE_ACCESS]
+            and access_health.get("townlight_core_version") == versions["townlight_core"]
         )
     expected: dict[str, object] = {}
     if MODULE_RECORDS in modules:
-        expected[MODULE_RECORDS] = {"version": EXPECTED_RECORDS_VERSION}
+        expected[MODULE_RECORDS] = {"version": versions[MODULE_RECORDS]}
     if MODULE_CLERK in modules:
-        expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "townlight_core": EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION}
+        expected[MODULE_CLERK] = {"version": versions[MODULE_CLERK], "townlight_core": versions["townlight_core"]}
     if MODULE_CODE in modules:
-        expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "townlight_core": EXPECTED_CODE_TOWNLIGHT_CORE_VERSION}
+        expected[MODULE_CODE] = {"version": versions[MODULE_CODE], "townlight_core": versions["townlight_core"]}
     if MODULE_NOTICE in modules:
         expected[MODULE_NOTICE] = {
-            "version": EXPECTED_NOTICE_VERSION,
-            "townlight_core_version": EXPECTED_TOWNLIGHT_CORE_VERSION,
+            "version": versions[MODULE_NOTICE],
+            "townlight_core_version": versions["townlight_core"],
         }
     if MODULE_ACCESS in modules:
         expected[MODULE_ACCESS] = {
-            "version": EXPECTED_ACCESS_VERSION,
-            "townlight_core_version": EXPECTED_TOWNLIGHT_CORE_VERSION,
+            "version": versions[MODULE_ACCESS],
+            "townlight_core_version": versions["townlight_core"],
         }
     expected["townlight_core"] = {
         "role": "base dependency installed before selected modules through the installer plan"
@@ -1976,6 +1982,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
 
 
 def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
+    versions = expected_installer_versions()
     base = f"http://127.0.0.1:{ports['api']}"
     checks: list[dict[str, object]] = []
     try:
@@ -1984,8 +1991,8 @@ def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
         if (
             health_status != 200
             or health.get("service") != "townlight_code"
-            or health.get("version") != EXPECTED_CODE_VERSION
-            or health.get("townlight_core") != EXPECTED_CODE_TOWNLIGHT_CORE_VERSION
+            or health.get("version") != versions[MODULE_CODE]
+            or health.get("townlight_core") != versions["townlight_core"]
         ):
             return {"name": "townlight_code_workflow", "status": "failed", "checks": checks}
         public_status, _public = get_json(f"{base}/api/v1/townlight_code/sections/lookup?section_number=13.40.020")
@@ -2008,6 +2015,7 @@ def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
 
 
 def verify_access_workflow(access_source: Path, ports: dict[str, int]) -> dict[str, object]:
+    versions = expected_installer_versions()
     base = f"http://127.0.0.1:{ports['api']}"
     checks: list[dict[str, object]] = []
     write_token = parse_env_file(access_source / ".env").get("TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN", "")
@@ -2031,8 +2039,8 @@ def verify_access_workflow(access_source: Path, ports: dict[str, int]) -> dict[s
         if (
             health_status != 200
             or health.get("service") != "townlight_access"
-            or health.get("version") != EXPECTED_ACCESS_VERSION
-            or health.get("townlight_core_version") != EXPECTED_TOWNLIGHT_CORE_VERSION
+            or health.get("version") != versions[MODULE_ACCESS]
+            or health.get("townlight_core_version") != versions["townlight_core"]
         ):
             return {"name": "townlight_access_workflow", "status": "failed", "checks": checks}
         create_status, created = post_json(f"{base}/api/v1/townlight_access/review", review_payload, headers=write_headers)
