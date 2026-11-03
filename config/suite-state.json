@@ -345,7 +345,7 @@
         "tier": 1,
         "role": "meetings workflow",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "e0577a165cc8f09a3597ec3ce54ecc23168f8d62"
+        "source_commit": "723a93c5877b4ae1b6c3e46d6d44de1e0c479c63"
       }
     },
     "code": {

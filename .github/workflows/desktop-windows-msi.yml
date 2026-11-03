@@ -145,7 +145,11 @@ jobs:
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
           PUBLICATION_SIGNING: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         run: |
-          ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $env:REQUESTED_PROFILE -SourceBranch $env:SOURCE_BRANCH -SignForPublication:($env:PUBLICATION_SIGNING -eq 'true')
+          $requestedProfile = $env:REQUESTED_PROFILE
+          if ($requestedProfile -eq 'automatic' -and '${{ github.base_ref }}' -eq 'main') {
+            $requestedProfile = 'inspections-preview'
+          }
+          ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $requestedProfile -SourceBranch $env:SOURCE_BRANCH -SignForPublication:($env:PUBLICATION_SIGNING -eq 'true')
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
@@ -189,7 +193,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: e0577a165cc8f09a3597ec3ce54ecc23168f8d62
+          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
@@ -659,7 +663,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: e0577a165cc8f09a3597ec3ce54ecc23168f8d62
+          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
