@@ -16,12 +16,41 @@ Verification</h1><p class="lead">Staff guide and technical reference</p><p class
 id="toc-portal-verification-and-isolated-acceptance">Portal verification
 and isolated acceptance</a>
 <ul>
+<li><a href="#resident-website-design-verification"
+id="toc-resident-website-design-verification">Resident website design
+verification</a></li>
 <li><a href="#isolated-synthetic-runner"
 id="toc-isolated-synthetic-runner">Isolated synthetic runner</a></li>
 </ul></li>
-</ul></aside><article class="docbody"><h1
-id="portal-verification-and-isolated-acceptance">Portal verification and
-isolated acceptance</h1>
+</ul></aside><article class="docbody"><h2 id="portal-verification-and-isolated-acceptance">Portal verification and
+isolated acceptance</h2>
+<h2 id="resident-website-design-verification">Resident website design
+verification</h2>
+<p>The approved city-facing interface is implemented in the Wagtail
+application, not just in the separate design mockup. The retained
+website acceptance receipt is <a
+href="portal-resident-website-acceptance.json">resident website
+synthetic acceptance</a>. It supplements the historical
+native-integration receipt; the older installer and Sandbox results do
+not demonstrate this portal deployment.</p>
+<p>The affected Django suite covers city-content export, source assets,
+restricted/draft navigation and search, safe service destinations,
+public text documents, time/date filters, and withdrawal. Existing
+editor submission/moderator approval and native bundle/refusal tests
+remain in the suite. The real-service runner exercises actual synthetic
+Meetings, Station capture, Records release approval/fulfillment and
+portal publication, then checks the four resident layouts at desktop and
+phone widths, JavaScript-disabled navigation, actual MP4 decoding, all
+three approved text documents, staff service-content publication and the
+separate native-publication approval. Withdrawal is checked across
+document, playback, homepage and search routes. Failed source
+synchronization must preserve the prior public release.</p>
+<p>No city credentials, real tenant requests, physical capture
+equipment, YouTube upload or CivicCast broadcast are exercised by these
+portal checks. Existing unrelated product/hardware evidence is not
+relabeled as a new pass. Remote CI, a new signed installer, hosted
+deployment and public publication are not performed by this local
+verification.</p>
 <p>The existing signed Beta 1 installer predates the portal endpoints.
 The candidate wheel must be built and installed in a separately prepared
 matching runtime as described in <a href="../manuals/portal.html">the portal

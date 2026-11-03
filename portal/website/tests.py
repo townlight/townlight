@@ -73,7 +73,7 @@ class PortalTests(TestCase):
         self.assertFalse(self.service.permissions_for_user(editor).can_publish())
         self.assertTrue(self.service.permissions_for_user(publisher).can_publish())
         self.client.force_login(editor)
-        response=self.client.post(f"/admin/pages/{self.service.pk}/edit/", {"title":"Edited draft", "slug":"service", "body":"Draft body", "action-publish":"Publish"})
+        response=self.client.post(f"/admin/pages/{self.service.pk}/edit/", {"title":"Edited draft", "slug":"service", "body":"Draft body", "questions-count":"0", "action-publish":"Publish"})
         self.service.refresh_from_db(); self.assertEqual(self.service.title,"Service")
         self.assertNotContains(self.client.get('/service/'), "Draft body")
 
@@ -83,7 +83,7 @@ class PortalTests(TestCase):
         publisher=User.objects.create_user("review-publisher", password="synthetic", is_staff=True)
         publisher.groups.add(Group.objects.get(name="Moderators"))
         self.client.force_login(editor)
-        response=self.client.post(f"/admin/pages/{self.service.pk}/edit/", {"title":"Reviewed service", "slug":"service", "body":"Approved content", "action-submit":"Submit"})
+        response=self.client.post(f"/admin/pages/{self.service.pk}/edit/", {"title":"Reviewed service", "slug":"service", "body":"Approved content", "questions-count":"0", "action-submit":"Submit"})
         self.assertEqual(response.status_code,302)
         self.service.refresh_from_db()
         self.assertIsNotNone(self.service.current_workflow_task_state)

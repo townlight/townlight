@@ -42,6 +42,7 @@ children=[]; checks=[]; pg_process=None
 def save(name, obj): (root/name).write_text(json.dumps(obj,indent=2,default=str),encoding='utf-8')
 def identities():
     files=[Path(__file__),repo/'scripts/portal-e2e-browser.cjs',runtime/'civicsuite_runtime/services.py',runtime/'civicsuite_runtime/portal_publication.py',repo/'portal/website/townlight.py',repo/'portal/website/views.py',repo/'portal/website/wagtail_hooks.py',repo/'portal/serve.py',source/'meetings/civicclerk/public_archive.py',source/'meetings/civicclerk/meeting_lifecycle.py',backend/'app/requests/artifacts.py',backend/'app/requests/files.py',backend/'app/desktop_bridge/station.py',station/'townlight_station/api.py',station/'townlight_station/worker.py',media/'pyproject.toml']
+    files += [p for p in (repo/'portal').rglob('*') if p.is_file() and p.suffix in ('.py','.html','.css','.js','.svg') and '__pycache__' not in p.parts]
     hashes={}
     for path in files:
         if path.is_file():
@@ -236,6 +237,7 @@ try:
         partial=httpx.get(f'{portal_base}/meetings/{pk}/release/',headers={'Range':'bytes=0-15'},trust_env=False);assert partial.status_code==206 and partial.content==mp4.read_bytes()[:16]
         passed('portal repeat sync is idempotent; public page and ranged release are hash-verified and exclude private content')
         cmd('portal-demo',[portal_python,'manage.py','setup_demo'],cwd=repo/'portal')
+        cmd('portal-primegov',[portal_python,'manage.py','import_synthetic',repo/'portal/fixtures/meeting.json'],cwd=repo/'portal')
         exported=root/'portal-export'
         cmd('portal-export',[portal_python,'manage.py','export_public',exported],cwd=repo/'portal')
         exported_text=(exported/'content.json').read_text(encoding='utf-8')
@@ -263,16 +265,22 @@ try:
         env['PORTAL_TEST_PASSWORD']=admin_password
         create_admin="import os;from django.contrib.auth import get_user_model;get_user_model().objects.create_superuser('publisher','publisher@example.invalid',os.environ['PORTAL_TEST_PASSWORD'])"
         cmd('portal-admin',[portal_python,'manage.py','shell','-c',create_admin],cwd=repo/'portal')
-        browser_env={'base':portal_base,'pk':pk,'selection':selection,'password':admin_password}
+        with sqlite3.connect(env['TOWNLIGHT_DB']) as conn:
+            service_pk=conn.execute("SELECT page_ptr_id FROM website_servicepage WHERE kind='records'").fetchone()[0]
+        browser_env={'base':portal_base,'pk':pk,'service_pk':service_pk,'selection':selection,'password':admin_password}
         (root/'browser-input.json').write_text(json.dumps(browser_env),encoding='utf-8')
         cmd('browser',[node,repo/'scripts/portal-e2e-browser.cjs',playwright,root/'browser-input.json',root/'browser-result.json',chromium],timeout=90)
         (root/'browser-input.json').unlink()
-        passed('headless browser plays approved MP4 and submits authenticated Wagtail publisher form')
+        passed('headless browser verifies resident desktop/mobile/no-JS flows, editor content and authenticated publication with actual MP4 playback')
         withdrawal={**selection,'action':'withdraw'};selection_path.write_text(json.dumps(withdrawal))
         cmd('portal-withdraw',[portal_python,'manage.py','sync_townlight',selection_path],cwd=repo/'portal')
         assert httpx.get(f'{portal_base}/meetings/{pk}/',trust_env=False).status_code==404
         assert httpx.get(f'{portal_base}/meetings/{pk}/release/',trust_env=False).status_code==404
-        passed('explicit withdrawal hides meeting and release routes')
+        for kind in ('agenda','packet','minutes'):
+            assert httpx.get(f'{portal_base}/meetings/{pk}/documents/{kind}/',trust_env=False).status_code==404
+        assert 'Synthetic Council Session' not in httpx.get(portal_base+'/',trust_env=False).text
+        assert 'Synthetic Council Session' not in httpx.get(portal_base+'/search/?q=Synthetic',trust_env=False).text
+        passed('explicit withdrawal hides meeting, documents, search, homepage feature and release routes')
         save('result.json',{'passed':True,'checks':checks,'meeting_id':mid,'archive_id':archive['id'],'recording_id':rid,'request_id':req,'release_copy_id':copyid,'original_sha256':record['details']['sha256'],'release_sha256':digest})
 finally:
     for name,p,log in reversed(children):

@@ -2,6 +2,18 @@
 
 Wagtail provides public city pages and a meeting archive. The optional Townlight bridge pulls explicitly approved releases from the private desktop runtime; the synthetic PrimeGov fixture remains available for demonstrations and never contacts a real tenant.
 
+Townlight Beta 1 now includes the approved resident-facing design: a city-branded home and task finder, editable service guidance, searchable/filtered public meetings, recording playback, approved meeting document pages and optional provenance details. Pages are server-rendered and responsive; navigation and filters work without JavaScript. Existing component versions are retained.
+
+## City presentation and editing
+
+Edit the home in Wagtail for the city name/prefix, logo and hero image, heading/introduction, address/hours and synthetic-demo notice. Edit Service pages for kind, summary, body, next steps, optional questions, department/contact details and designated HTTPS service link. Normal page approval and privacy rules apply. The original illustrations are fallbacks; a city can supply approved imagery. Only live/public services appear in navigation and title search. The task finder accepts published page identities, not arbitrary redirect URLs.
+
+`setup_demo` creates fictional Juniper Falls content only when no Townlight home is configured, and preserves existing content on subsequent runs. Its service links use `.example` domains and are explicitly illustrative. Upgrade a separate existing portal by backing up its database, media and private releases, running `migrate` and `collectstatic`, then editing its presentation fields; no page text is automatically replaced. City-approved contact, privacy and accessibility content is configured by the adopting city.
+
+Residents use `/meetings/?period=upcoming|past|all` with `q`, `series` and `page` filters. Series uses actual public titles because the existing contract has no separate board taxonomy. `/search/?q=records` searches published page/meeting titles only. Native agenda, packet and minutes open at `/meetings/<pk>/documents/<agenda|packet|minutes>/`; they expose approved text, not imaginary PDF files. Withdrawal removes these document routes, playback, search results and the home feature together. Synthetic PrimeGov links retain their illustrative labels.
+
+The public presentation adds no resident accounts, transactions, fee calculator, new vendor connector or live-stream host. See the [portal guide](../docs/portal/guide.md) for complete field specifications, examples and existing publication controls.
+
 ## Local setup
 
 Use Python 3.13 and install the pinned dependencies with `python -m pip install --require-hashes -r requirements.lock`. Run `python manage.py migrate`, `python manage.py setup_demo`, and `python manage.py createsuperuser`; start with `python manage.py runserver 127.0.0.1:8000`. The public archive is `/meetings/` and the Wagtail admin is `/admin/`. Run `python manage.py test website` for portal tests.

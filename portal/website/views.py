@@ -7,9 +7,12 @@ import re
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, StreamingHttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
+from django.core.paginator import Paginator
+from wagtail.models import Site
 
-from .models import Meeting
+from .models import Meeting, ServicePage
 from .townlight import release_file
 
 
@@ -25,14 +28,37 @@ SOURCE_FILES = (
     "ARCHITECTURE.md",
     "SOURCE-AVAILABILITY.txt",
     "fixtures/meeting.json",  # The designated public sample, not runtime inputs.
+    "website/static/website/portal.css",
+    "website/static/website/portal.js",
+    "website/static/website/cityscape.svg",
+    "website/static/website/chamber.svg",
 )
 
 
 def meetings(request):
+    period = request.GET.get("period", "upcoming")
+    if period not in ("upcoming", "past", "all"):
+        period = "upcoming"
+    query = request.GET.get("q", "").strip()[:200]
+    series = request.GET.get("series", "")[:400]
+    items = Meeting.objects.filter(published=True)
+    titles = list(items.order_by("title").values_list("title", flat=True).distinct())
+    if period == "upcoming":
+        items = items.filter(scheduled_start__gte=timezone.now()).order_by("scheduled_start", "pk")
+    elif period == "past":
+        items = items.filter(scheduled_start__lt=timezone.now()).order_by("-scheduled_start", "-pk")
+    if query:
+        items = items.filter(title__icontains=query)
+    if series:
+        items = items.filter(title=series)
+    page = Paginator(items, 20).get_page(request.GET.get("page"))
+    filters = request.GET.copy()
+    filters.pop("page", None)
     return render(
         request,
         "website/meetings.html",
-        {"meetings": Meeting.objects.filter(published=True)},
+        {"meetings": page, "period": period, "query": query, "series": series,
+         "meeting_titles": titles, "filter_query": filters.urlencode()},
     )
 
 
@@ -47,6 +73,42 @@ def meeting(request, pk):
             "native": json.loads(item.source_body) if item.vendor == 'townlight' else None,
         },
     )
+
+
+def meeting_document(request, pk, kind):
+    item = get_object_or_404(Meeting, pk=pk, published=True, vendor="townlight", cancelled=False)
+    labels = {"agenda": "Agenda", "packet": "Meeting packet", "minutes": "Approved minutes"}
+    if kind not in labels:
+        raise Http404()
+    native = json.loads(item.source_body)
+    if not native.get(kind):
+        raise Http404()
+    return render(request, "website/meeting_document.html", {
+        "meeting": item, "document_title": labels[kind], "document_body": native[kind],
+    })
+
+
+def search(request):
+    query = request.GET.get("q", "").strip()[:200]
+    site = Site.find_for_request(request)
+    pages = ServicePage.objects.none()
+    items = Meeting.objects.none()
+    if query:
+        if site:
+            pages = ServicePage.objects.descendant_of(site.root_page).live().public().filter(title__icontains=query).order_by("title")[:50]
+        items = Meeting.objects.filter(published=True, title__icontains=query).order_by("-scheduled_start")[:50]
+    return render(request, "website/search.html", {"query": query, "pages": pages, "meeting_results": items})
+
+
+def find_service(request):
+    choice = request.GET.get("service", "")
+    if choice == "meetings":
+        return redirect("meetings")
+    site = Site.find_for_request(request)
+    if not site or not choice.isdecimal():
+        raise Http404()
+    page = get_object_or_404(ServicePage.objects.descendant_of(site.root_page).live().public(), pk=int(choice))
+    return redirect(page.get_url(request))
 
 
 def release(request, pk):

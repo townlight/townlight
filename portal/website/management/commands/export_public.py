@@ -15,11 +15,31 @@ class Command(BaseCommand):
         root.mkdir(parents=True, exist_ok=True)
         site=Site.objects.get(is_default_site=True)
         pages=[]
+        images={}
         for page in site.root_page.get_descendants(inclusive=True).live().public().specific():
             if page.__class__.__name__ not in ("HomePage", "ServicePage"): continue
-            pages.append({"type":page.__class__.__name__, "title":page.title, "url":page.url, "content":getattr(page, "intro", getattr(page, "body", ""))})
+            entry={"type":page.__class__.__name__, "title":page.title, "url":page.url, "content":getattr(page, "intro", getattr(page, "body", ""))}
+            if page.__class__.__name__ == "HomePage":
+                entry.update({name:getattr(page,name) for name in ("brand_name","brand_prefix","hero_title","contact_address","contact_hours","synthetic_demo")})
+                for name in ("logo", "hero_image"):
+                    image=getattr(page,name)
+                    if image:
+                        entry[name]={"title":image.title,"file":f'images/{image.pk}{Path(image.file.name).suffix}'}
+                        images[image.pk]=image
+            else:
+                entry.update({name:getattr(page,name) for name in ("kind","summary","heading","steps","destination_url","destination_label","department","contact_details")})
+                entry["questions"]=page.questions.get_prep_value()
+            pages.append(entry)
         meetings=list(Meeting.objects.filter(published=True).values("id", "vendor", "tenant", "external_id", "title", "scheduled_start", "display_timezone", "cancelled", "agenda", "documents", "recording_url", "source_url", "source_digest", "revision", "source_body"))
         files=[]
+        for image in images.values():
+            name=f'images/{image.pk}{Path(image.file.name).suffix}'
+            (root/'images').mkdir(exist_ok=True)
+            with image.file.open('rb') as stream, (root/name).open('wb') as out:
+                shutil.copyfileobj(stream,out)
+            size=(root/name).stat().st_size
+            with (root/name).open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
+            files.append(ManifestFile(path=name,byte_size=size,sha256=digest,media_type='application/octet-stream'))
         for meeting in meetings:
             if meeting['vendor'] != 'townlight': meeting.pop('source_body', None)
         for item in Meeting.objects.filter(published=True, vendor='townlight'):

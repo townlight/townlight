@@ -19,6 +19,9 @@ id="toc-townlight-portal-guide">Townlight Portal guide</a>
 id="toc-for-staff-prepare-and-publish">For staff: prepare and
 publish</a></li>
 <li><a href="#residents" id="toc-residents">Residents</a></li>
+<li><a href="#city-editors-branding-and-service-content"
+id="toc-city-editors-branding-and-service-content">City editors:
+branding and service content</a></li>
 <li><a href="#deployment-and-setup"
 id="toc-deployment-and-setup">Deployment and setup</a></li>
 <li><a href="#prepare-the-candidate-native-runtime"
@@ -79,6 +82,12 @@ intact. Repeating a successful publication updates the same archive
 identity. If source records change, review and explicitly publish again;
 do not assume a source error withdraws a prior version.</p>
 <h2 id="residents">Residents</h2>
+<figure>
+<img src="../assets/portal-home.png"
+alt="Actual Wagtail homepage with fictional Juniper Falls content" />
+<figcaption aria-hidden="true">Actual Wagtail homepage with fictional
+Juniper Falls content</figcaption>
+</figure>
 <p>The meeting archive is at <code>/meetings/</code>. A published
 meeting page at <code>/meetings/&lt;pk&gt;/</code> presents the approved
 public meeting text and links to its release at
@@ -89,6 +98,89 @@ internal notes, raw payloads, local paths and session proof are not
 public fields. This integration is for completed release copies, not
 live YouTube streaming. Station’s separate CivicCast and YouTube
 workflows retain their own controls.</p>
+<p>The city-branded homepage presents a resident task finder, service
+information and the latest published playable recording when one is
+available. The archive offers upcoming, past and all dates, title
+search, a meeting-series selector and 20 results per page. Meeting
+series uses the actual public title: the source contract does not supply
+a separate board taxonomy. Each date uses that meeting’s configured IANA
+time zone. Cancelled entries remain identifiable, with no offered
+playback or documents.</p>
+<figure>
+<img src="../assets/portal-meeting.png"
+alt="Actual public meeting page with a synthetic approved recording" />
+<figcaption aria-hidden="true">Actual public meeting page with a
+synthetic approved recording</figcaption>
+</figure>
+<p>On a native Townlight meeting, open <strong>Agenda</strong>,
+<strong>Meeting packet</strong> or <strong>Approved minutes</strong> to
+read the actual approved text in a separate printable page. These are
+text documents, not invented PDF attachments. Video controls play the
+approved release; <strong>Download approved release</strong> retrieves
+the same checked bytes. Expand <strong>About this public record</strong>
+for provenance IDs, hashes and precise timestamps. PrimeGov fixtures
+instead identify their links as synthetic references; they do not imply
+live vendor downloads or playable media.</p>
+<p><strong>Search</strong> matches published service-page titles and
+published meeting titles only, with at most 50 results of each type. It
+excludes drafts, restricted city pages, withdrawn meetings and private
+staff content. It does not search the bodies of documents, external
+systems or private Records requests. Service buttons name the
+destination host before taking a resident to the city’s configured
+existing service. Applications, requests and payments stay in that
+designated system. Navigation, the task finder and filters work without
+JavaScript; JavaScript enhances the mobile menu.</p>
+<h2 id="city-editors-branding-and-service-content">City editors:
+branding and service content</h2>
+<ol type="1">
+<li>Open the home page in Wagtail. Set <strong>Brand name</strong>,
+<strong>Brand prefix</strong>, the optional city <strong>Logo</strong>
+and <strong>Hero image</strong>, the <strong>Hero title</strong>,
+introduction, address and hours. Uploaded imagery must be approved for
+public use. With no uploaded images, the original generic civic emblem
+and illustrations are used. The page title is the fallback brand name;
+<code>TOWNLIGHT_BRAND</code> remains the administrative
+site-name/fallback setting. Existing versions stay unchanged and the
+suite label is <strong>Townlight Beta 1</strong>.</li>
+<li>Create or edit a <strong>Service page</strong> under the home page.
+Set its title, kind, summary, section heading and body. Enter one next
+step per line. Optional question/answer blocks become expandable common
+questions. Set the department and public contact details where
+relevant.</li>
+<li>For a handoff, enter the designated HTTPS <strong>Destination
+URL</strong> and clear <strong>Destination label</strong>. Addresses
+containing credentials and non-HTTPS schemes are rejected. The resident
+sees the destination host. This field is a link, not a vendor connector
+or new portal transaction. Verify it against the city’s authorized
+service before use.</li>
+<li>Page kinds determine icons and shared links. <code>records</code>,
+<code>permits</code>, <code>code</code>, <code>planning</code> and
+<code>contact</code> are resident service entries.
+<code>government</code> supplies the government navigation link;
+<code>privacy</code> and <code>accessibility</code> supply
+footer/utility links. Only live, public pages appear. Use Wagtail’s
+existing editor submission and moderator approval workflow; editing a
+draft does not update public pages.</li>
+<li>Review the public home, service page and phone layout after
+publishing. Unpublishing or restricting a page removes it from
+navigation, the task finder and title search. Configure city-approved
+privacy, accessibility and contact content; the fictional
+demonstration’s notices are examples, not an adopted city’s
+policies.</li>
+</ol>
+<p><code>setup_demo</code> creates the fictional <strong>Juniper
+Falls</strong> homepage and eight information pages on a fresh portal.
+The persistent synthetic notice is controlled by the home page’s
+<strong>Synthetic demo</strong> field. Example service destinations use
+reserved <code>.example</code> domains and do not operate real services.
+Repeating the command preserves any existing Townlight home and its
+editorial content; it does not replace a city’s website. Existing
+deployments receive additive fields through <code>migrate</code>; no
+existing text is overwritten. Configure their home and service pages
+through Wagtail after migration.</p>
+<p>No resident account framework, official fee calculation, payment
+processor, live-stream host or new vendor integration is introduced by
+this interface.</p>
 <h2 id="deployment-and-setup">Deployment and setup</h2>
 <p>The portal is a separate Wagtail deployment with its own database.
 Keep the native desktop runtime bound to loopback; do not expose it to
@@ -193,6 +285,7 @@ handles all other routes, including approved release files:</p>
     ssl_certificate /etc/ssl/town/fullchain.pem;
     ssl_certificate_key /etc/ssl/town/privkey.pem;
     location /static/ { alias /srv/townlight/static/; }
+    location /media/images/ { alias /srv/townlight/media/images/; }
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host town.example.gov;
@@ -206,6 +299,14 @@ handles all other routes, including approved release files:</p>
 alias. Test the deployed HTTPS origin, admin, archive, range playback
 and explicit withdrawal using an approved synthetic record before
 use.</p>
+<p><code>TOWNLIGHT_MEDIA_ROOT</code> selects Wagtail’s uploaded-media
+storage (default <code>portal/media</code>). The image alias above
+serves generated branding renditions from that root’s
+<code>images</code> directory. Set the actual path for the deployment.
+Do not alias the entire media root: Wagtail document downloads may have
+their own access restrictions, and private releases must never be placed
+there. Back up the full media root privately, including originals, with
+the database.</p>
 <h2 id="architecture-and-api">Architecture and API</h2>
 <figure>
 <img src="../assets/portal-architecture.svg"
@@ -249,6 +350,126 @@ service. A failed source sync preserves the prior projection;
 investigate permissions, source eligibility, IDs, expected hash,
 connection and proof-file access before retrying. An explicit withdrawal
 is necessary to remove a previously published item.</p>
+<p>The export also includes city branding fields, all published service
+guidance, destinations, contact details, question/answer blocks and the
+original uploaded logo/hero files referenced by the published home, with
+hashes. It excludes draft/restricted page content and unreferenced
+uploads. Back up Wagtail’s media directory with its database as well as
+the private approved releases; city-uploaded branding is stored in media
+and its generated renditions must be served by the deployment. The
+public export is a portable content bundle, not a replacement for a
+consistent full backup or a one-command restore.</p>
+<h3 id="public-presentation-routes">Public presentation routes</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Route</th>
+<th>Behavior and example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /</code></td>
+<td>City home, live/public service navigation and latest published
+playable recording</td>
+</tr>
+<tr>
+<td><code>GET /find-service/?service=meetings</code></td>
+<td>Task finder redirects to the archive; a numeric ID selects a
+live/public service under this site’s home; arbitrary redirect
+destinations are refused</td>
+</tr>
+<tr>
+<td><code>GET /meetings/?period=past&amp;q=Council&amp;series=Council%20Meeting&amp;page=1</code></td>
+<td>Published-title filters; <code>period</code> is
+<code>upcoming</code>, <code>past</code> or <code>all</code>; series
+matches a full public title; pages contain at most 20 results</td>
+</tr>
+<tr>
+<td><code>GET /meetings/&lt;pk&gt;/</code></td>
+<td>Published meeting and available public materials; unpublished
+identity returns 404</td>
+</tr>
+<tr>
+<td><code>GET /meetings/&lt;pk&gt;/documents/agenda/</code></td>
+<td>Approved native agenda text; <code>packet</code> and
+<code>minutes</code> select the other approved text documents;
+unavailable, cancelled, non-native or unpublished material returns
+404</td>
+</tr>
+<tr>
+<td><code>GET /meetings/&lt;pk&gt;/release/</code></td>
+<td>Existing integrity-checked approved release route with byte ranges;
+publication status is checked on every request</td>
+</tr>
+<tr>
+<td><code>GET /search/?q=records</code></td>
+<td>Live/public service title and published meeting title search; no
+private or external search</td>
+</tr>
+<tr>
+<td><code>GET /&lt;service-slug&gt;/</code></td>
+<td>Wagtail-published guidance and any configured service handoff</td>
+</tr>
+<tr>
+<td><code>GET /source/</code></td>
+<td>Allowlisted corresponding portal source, including deployed CSS,
+JavaScript, SVG illustrations, templates and native bridge source when
+present</td>
+</tr>
+</tbody>
+</table>
+<p>These resident routes create no records or accounts. The private
+native API and explicit publication approval contract below are
+unchanged. There is no new portal MCP endpoint.</p>
+<h3 id="editable-data-and-presentation-specifications">Editable data and
+presentation specifications</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Model</th>
+<th>Additional presentation fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HomePage</td>
+<td>Brand name (120 characters), prefix (40), hero title (160),
+introduction, address, hours, synthetic notice flag and optional Wagtail
+logo/hero image references</td>
+</tr>
+<tr>
+<td>ServicePage</td>
+<td>Kind (20), summary (300), heading (180), body and next-step text,
+destination URL and label (120), department (120), public contact text
+and Wagtail question/answer blocks</td>
+</tr>
+<tr>
+<td>Meeting</td>
+<td>Existing public identity, timestamps/time zone,
+cancellation/publication status, agenda/document projection and approved
+release/provenance fields; no invented board metadata</td>
+</tr>
+</tbody>
+</table>
+<p>The layouts reuse the approved civic navy/teal, warm white and gold
+design with local fonts and original local illustrations. CSS and a
+small menu script ship in <code>portal/website/static/website/</code>;
+there are no remote fonts, analytics or client-side vendor calls.
+Existing Wagtail permissions, revisions, media storage and static
+collection are reused. Focus styles, skip navigation, semantic headings,
+phone layouts, reduced-motion handling and printable document styling
+are included. Accessible source material, captions/transcripts where
+applicable and the adopting city’s assistance contact remain part of its
+content responsibilities; no accessibility certification is claimed.</p>
 <h3 id="bundle-contract-and-errors">Bundle contract and errors</h3>
 <p>For discovery, the trusted portal server can call
 <code>GET /desktop/v1/portal/selections?request_id=&lt;UUID&gt;</code>
@@ -318,6 +539,12 @@ API</li>
 <li>Proof and permissions: Deployment and setup; Architecture and
 API</li>
 <li>Resident pages and file: Residents</li>
+<li>Branding and city service guidance: City editors: branding and
+service content</li>
+<li>Search, filtering and document routes: Public presentation
+routes</li>
+<li>Data fields and responsive design: Editable data and presentation
+specifications</li>
 <li>Source and license: Source, license and demonstration data</li>
 <li>Withdrawal: For staff: prepare and publish; Architecture and
 API</li>
