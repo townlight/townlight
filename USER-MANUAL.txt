@@ -28,7 +28,7 @@ Beta identity
   Supported acceptance profile        Windows x64 fresh install; inspections-preview; separate Station configuration
   ------------------------------------------------------------------------------------------------------------------------
 
-The changed packages and native application advance their own versions. This candidate requires a new signed installer and new installed acceptance; earlier receipts do not certify it. Historical tags, receipts and archived manuals retain their original identities. Use a fresh profile and empty database. This candidate refuses legacy initialization; it does not provide an in-place upgrade. The Windows profile path remains %LOCALAPPDATA%\CivicSuite under Scott’s explicit exception. Preserve existing profiles and backups.
+The changed packages and native application advance their own versions. This candidate requires a new signed installer and new installed acceptance; earlier receipts do not certify it. Historical tags, receipts and archived manuals retain their original identities. Use a fresh profile and empty database. This candidate refuses legacy initialization; it does not provide an in-place upgrade. The Windows profile path remains %LOCALAPPDATA%\CivicSuite under an approved compatibility exception. Preserve existing profiles and backups.
 
 Component versions
 
