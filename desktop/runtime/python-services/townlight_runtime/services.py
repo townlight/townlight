@@ -373,6 +373,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.include_router(meetings_router)
         from townlight_runtime.meetings_bridge import public_router as meetings_public_router
         domain_app.include_router(meetings_public_router)
+        from townlight_runtime.portal_publication import router as portal_publication_router
+        domain_app.include_router(portal_publication_router)
         from townlight_meetings.records_sources import public_documents
         from townlight_runtime.meetings_bridge import database_url, readiness
         def meetings_sources(query="", source_id=None):

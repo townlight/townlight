@@ -36,3 +36,7 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Station | 0.3.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
 
 <!-- END GENERATED MODULE STATUS -->
+
+## Resident portal
+
+The [published portal prerelease](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal) is deployed separately. The [portal guide](docs/beta-1/manuals/portal.html) and [synthetic acceptance](docs/portal/acceptance.md) describe the Meetings, Station and Records publication workflow and its limits.

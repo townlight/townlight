@@ -741,7 +741,7 @@ function Ensure-PythonPip {
         return @{ status = "present" }
     }
     $GetPip = Join-Path $CacheRoot "get-pip.py"
-    $Sha = Invoke-TownlightDownload -Url $Source.get_pip_url -Destination $GetPip
+    $Sha = Invoke-TownlightDownload -Url $Source.get_pip_url -Destination $GetPip -ExpectedSha256 $Source.get_pip_sha256
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
         $GetPip,
         "--no-warn-script-location",

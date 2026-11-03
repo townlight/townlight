@@ -399,3 +399,11 @@ See [the Station manual delivery section](https://townlight.github.io/manuals/st
 - [CivicCast live feed](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage)
 - YouTube: explicit completed recording upload; visibility; receipt and reconciliation.
 - Schema4: durable upload intent; existing evidence retained.
+
+## Public meeting portal (separately deployed beta)
+
+The approved resident-facing website design is implemented in the portal: city identity and imagery, a resident task finder, editable service guidance, filtered meeting archives, approved recording playback and printable agenda/packet/minutes pages. City editors use Wagtail's existing page approval workflow. Service handoffs name the destination host; they do not create new resident accounts or transactions. Search covers public page and meeting titles only. Drafts, restricted pages and withdrawn records are excluded. City branding and guidance are exportable with referenced uploaded imagery. See the portal guide for field specifications, route examples, deployment and synthetic verification. Existing component versions remain unchanged; the label is Townlight Beta 1.
+
+Townlight's separately deployed portal can publish a reviewed Meetings archive with an explicitly selected, verified Records release copy of the matching completed Station recording. Staff must separately approve publication; fulfilling a Records request does not make the copy public. Review public text and the selected file, then use the Wagtail superuser publication form. Explicit withdrawal hides the published meeting and file. An unsuccessful sync preserves the previous publication. Keep the private original and never expose the native session proof. See the [portal guide](docs/beta-1/manuals/portal.html) for staff steps, setup, API, recovery and source obligations.
+
+This portal beta is distributed separately from the desktop installer. The existing signed Beta 1 installer and historical Sandbox results do not establish that it contains or deploys this portal. CivicCast remains separate.

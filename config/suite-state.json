@@ -294,7 +294,7 @@
         "tier": 1,
         "role": "records workflow",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "ad5559709bce55e3dd53e3a3ca45b3b234730099"
+        "source_commit": "e1b712091c38fadeb00c19233d7f2bf1280fc248"
       }
     },
     "meetings": {
