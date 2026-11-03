@@ -1,0 +1,190 @@
+[
+  {
+    "id": "1.1",
+    "label": "Name ▲What is the agent called?"
+  },
+  {
+    "id": "1.2",
+    "label": "What it is, in plain language ▲What is it, in plain language? (2–3 sentences)"
+  },
+  {
+    "id": "1.3",
+    "label": "Purpose / what it's for ▲What is it for — what task or service does it perform?"
+  },
+  {
+    "id": "1.4",
+    "label": "Agent type ▲Which agent type is it?"
+  },
+  {
+    "id": "1.5",
+    "label": "Location ▲Where does it run and how is it reached? What is the address of the service, page, or application where the agent operates, and the code repository, if there is one?"
+  },
+  {
+    "id": "2.1",
+    "label": "CapabilityWhat can it do? Choose every capability that applies."
+  },
+  {
+    "id": "2.2",
+    "label": "Capability specificsWhat exactly does the agent produce or do?"
+  },
+  {
+    "id": "2.3",
+    "label": "ModelWhich model or models does it run on? Give provider, name, and version for each."
+  },
+  {
+    "id": "2.4",
+    "label": "Hosting and platformWhere does it run, and what is it built on? Hosting: state environment, vendor cloud, on premises, or a mix. Platform: the framework or product it is assembled in."
+  },
+  {
+    "id": "2.5",
+    "label": "High-impact determination (OMB M-25-21)Is the agent's output used as a principal basis for a decision or action that has a legal, material, binding, or significant effect on rights, access to services, health and safety, critical infrastructure, or strategic assets? (Material influence counts even when a human signs off.)"
+  },
+  {
+    "id": "2.6",
+    "label": "Determination recordWho made the high-impact determination, in what role, on what date — and on what rationale?"
+  },
+  {
+    "id": "3.1",
+    "label": "Data sensitivityWhat is the most sensitive data it touches in operation — including what users type or say to it? (Judged by what it touches in operation, not the knowledge-store classification.)"
+  },
+  {
+    "id": "3.2",
+    "label": "Datasets / source of truthWhich datasets or sources of truth does it use?"
+  },
+  {
+    "id": "3.3",
+    "label": "Tools, systems & APIs it can reachWhich tools, systems, and APIs can it reach — everything it can call or act on?"
+  },
+  {
+    "id": "4.1",
+    "label": "Autonomy level ▲How much does the agent do before a human is involved? (\"Acts\" = any effect outside the conversation.)"
+  },
+  {
+    "id": "4.2",
+    "label": "Reversibility of its actionsOnce the agent's output has taken effect, is there a way to undo it?"
+  },
+  {
+    "id": "4.3",
+    "label": "Maximum consequence severityIf the output is wrong, what is in reach? Consider: how many people or records it can touch, whether it moves or decides money, and whether it can cause physical harm or the loss of a right."
+  },
+  {
+    "id": "4.4",
+    "label": "Safety red-line (the agentic trifecta)Without a human in the loop, does it combine all three of: acting on untrusted or external input; access to non-public personal or protected data; and the ability to change anything outside the conversation? (All three at once, with no human in the loop, is the red-line.)"
+  },
+  {
+    "id": "4.5",
+    "label": "How a person stops or overrides itHow does a person stop or override it?"
+  },
+  {
+    "id": "5.1",
+    "label": "Which base risks applyWhich AI base risks apply? Every AI system carries these — choose all that fit."
+  },
+  {
+    "id": "5.2",
+    "label": "Which agentic hazards applyWhich agentic hazards apply? A system with no tools at all marks this not applicable — that is a complete answer."
+  },
+  {
+    "id": "5.3",
+    "label": "Pre-deployment testing / evaluation doneHas an actual evaluation of this system been done before deployment, with results?"
+  },
+  {
+    "id": "5.4",
+    "label": "Public plain-language summary published ▲Is a public plain-language summary published?"
+  },
+  {
+    "id": "5.5",
+    "label": "Disclosure — are people told they're dealing with an agent ▲Are the people who interact with it told they're dealing with an AI agent? How?"
+  },
+  {
+    "id": "6.1",
+    "label": "Accountable owner (role, not person) ▲Who is answerable for it in operation — a role or title, not a person?"
+  },
+  {
+    "id": "6.2",
+    "label": "Deploying agency / unit + contact point ▲Which agency or unit deploys it, and what is the contact point?"
+  },
+  {
+    "id": "6.3",
+    "label": "Vendor & exit basicsWho built and maintains the agent: an outside vendor or an in-house team? If a vendor, under what contract vehicle? How easy is it for the state to switch any of the three: model, platform, or vendor?"
+  },
+  {
+    "id": "7.1",
+    "label": "Government function served ▲Which government function does it serve?"
+  },
+  {
+    "id": "7.2",
+    "label": "Lifecycle stage ▲Where is it in its lifecycle?"
+  },
+  {
+    "id": "8.1",
+    "label": "Acting identityWhen it acts — sends an email, calls a system — whose identity does it use?"
+  },
+  {
+    "id": "8.2",
+    "label": "Human principalOn whose authority does it act — who is the human principal or sponsor?"
+  },
+  {
+    "id": "8.3",
+    "label": "Authorized scopeWhat is it allowed to do: (a) which tasks and workflows; (b) which tools, data, and APIs?"
+  },
+  {
+    "id": "8.4",
+    "label": "Sub-agentsCan it create other agents? If so, can they do more than it can (they shouldn't), and is it recorded which agent created which?"
+  },
+  {
+    "id": "8.5",
+    "label": "Traceability to a personCan its actions be traced back to the responsible human? How?"
+  },
+  {
+    "id": "9.1",
+    "label": "Automation boundaryFor each action or decision type: is it autonomous, does it confirm with a human first, or is it human-only?"
+  },
+  {
+    "id": "9.2",
+    "label": "Actions requiring human approvalWhich actions always require human approval?"
+  },
+  {
+    "id": "10.1",
+    "label": "LogsWhat is logged? Is it enough to reconstruct a decision? Does the log distinguish what the agent did on its own from what a person told it to do?"
+  },
+  {
+    "id": "10.2",
+    "label": "Live monitoring and alertsIs there live monitoring, and what triggers an alert?"
+  },
+  {
+    "id": "10.3",
+    "label": "Oversight cadenceHow is the agent overseen: continuously, at set intervals, or only when something happens?"
+  },
+  {
+    "id": "10.4",
+    "label": "Independent reviewWho reviews the agent independently (not on the build team)?"
+  },
+  {
+    "id": "10.5",
+    "label": "Drift triggerWhat change(s) to the agent or its use would require this card to be re-done?"
+  },
+  {
+    "id": "11.1",
+    "label": "Appeal route ▲How does someone affected by the agent’s output challenge it?"
+  },
+  {
+    "id": "11.2",
+    "label": "Affected people ▲Who is affected by it, including indirectly?"
+  },
+  {
+    "id": "11.3",
+    "label": "Safeguard for fully-automated decisionsWhen the agent makes a decision with consequences for a person and no one reviews it, what additional safeguard applies?"
+  },
+  {
+    "id": "12.1",
+    "label": "Vendor and contractWho is the supplier, on what procurement route, and under what data-access terms?"
+  },
+  {
+    "id": "12.2",
+    "label": "Expected valueWhat is it compared against, and what is the expected benefit over the status quo?"
+  },
+  {
+    "id": "12.3",
+    "label": "Exit termsIf the state had to leave this vendor, could it? Answer each item of the US-OMB M-25-22 checklist."
+  }
+]
