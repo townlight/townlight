@@ -14,7 +14,7 @@
   "desktop_release": {
     "version": "1.7.0-1",
     "tag": "townlight-v1.7.0-beta.1",
-    "commit": null,
+    "commit": "51b2e7af26e5e62eb598c1348a36b693a70a1a6f",
     "channel": "candidate",
     "published_at": null,
     "asset_policy": "windows-msi",
