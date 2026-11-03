@@ -53,3 +53,7 @@ Use an active native sign-in authorized for both modules. The active profile's `
 Refresh the proof after session expiry, sign-out, account change or credential change.
 
 The default 8 GiB portal transport limit is not the end-to-end recording limit: the inherited Records managed-file receipt limits both originals and release copies to 2,147,483,647 bytes. At 6,000 kbps video, roughly 47 minutes approaches 2 GiB before audio and container overhead. Plan duration and bitrate before capture; for example, 2,000 kbps video plus audio for two hours is roughly 1.9 GB depending on actual rates and overhead. Measure the file and leave margin. No automatic transcoding is performed.
+
+## Separately deployed resident portal beta
+
+[Portal release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal) · [Portal guide](https://townlight.github.io/manuals/portal.html). Includes the approved city-facing website and the Meetings → Station → Records publication workflow. Deploy the portal and matching native bridge separately; the signed Windows installer is unchanged and does not install them. Acceptance uses synthetic data; CivicCast remains separate.

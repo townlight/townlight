@@ -1,6 +1,6 @@
 # Townlight Portal guide
 
-Townlight Beta 1 · local integration candidate
+Townlight Beta 1 · separately deployed portal beta
 
 The portal is a separately deployed suite capability for city pages and public meeting archives. It brings together a public Meetings archive, a completed Station recording and a Records release copy selected for publication. It does not add a tenth product. The existing signed Beta 1 installer and prior Sandbox evidence predate this local portal integration; they do not demonstrate that it is installed or publicly deployed. CivicCast remains separate.
 

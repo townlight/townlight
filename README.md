@@ -210,10 +210,14 @@ Current owned code is AGPL-3.0-only. Preserve full license, matching correspondi
 
 Staff can upload a verified completed recording to YouTube with explicit approval, title and visibility. Live recordings can simultaneously offer an encrypted SRT feed to the separate CivicCast/PEG operator. Recording continues independently of receiver availability. See the [updated Station manual](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage) for setup, API and recovery.
 
-## Public meeting portal (local integration candidate)
+## Public meeting portal (separately deployed beta)
 
 The approved resident-facing website design is implemented in the portal: city identity and imagery, a resident task finder, editable service guidance, filtered meeting archives, approved recording playback and printable agenda/packet/minutes pages. City editors use Wagtail's existing page approval workflow. Service handoffs name the destination host; they do not create new resident accounts or transactions. Search covers public page and meeting titles only. Drafts, restricted pages and withdrawn records are excluded. City branding and guidance are exportable with referenced uploaded imagery. See the portal guide for field specifications, route examples, deployment and synthetic verification. Existing component versions remain unchanged; the label is Townlight Beta 1.
 
 Townlight's separately deployed portal can publish a reviewed Meetings archive with an explicitly selected, verified Records release copy of the matching completed Station recording. Staff must separately approve publication; fulfilling a Records request does not make the copy public. Review public text and the selected file, then use the Wagtail superuser publication form. Explicit withdrawal hides the published meeting and file. An unsuccessful sync preserves the previous publication. Keep the private original and never expose the native session proof. See the [portal guide](docs/beta-1/manuals/portal.html) for staff steps, setup, API, recovery and source obligations.
 
-This integration is a local candidate. The existing signed Beta 1 installer and historical Sandbox results do not establish that it contains or deploys this portal. CivicCast remains separate.
+This portal beta is distributed separately from the desktop installer. The existing signed Beta 1 installer and historical Sandbox results do not establish that it contains or deploys this portal. CivicCast remains separate.
+
+## Separately deployed resident portal beta
+
+[Portal release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal) · [Portal guide](https://townlight.github.io/manuals/portal.html). Includes the approved city-facing website and the Meetings → Station → Records publication workflow. Deploy the portal and matching native bridge separately; the signed Windows installer is unchanged and does not install them. Acceptance uses synthetic data; CivicCast remains separate.
