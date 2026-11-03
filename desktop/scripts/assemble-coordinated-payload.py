@@ -211,8 +211,19 @@ def main():
                  '    assert pathlib.Path(module.__file__).resolve().is_relative_to(site.resolve()), name\n'
                  'print(json.dumps(expected, sort_keys=True))\n')
         installed = json.loads(invoke('-c', probe, json.dumps(package_names)))
-    if any(child(output, name).exists() for name in removed):
-        raise ValueError('An excluded historical service file reappeared')
+    # Meetings deliberately retains its neutral prompt resource paths. Verify
+    # reinstalled copies against the pinned wheel, never the historical MSI.
+    prompt_prefix = 'python/Lib/site-packages/'
+    with zipfile.ZipFile(args.wheels / wheel_receipt['meetings']['name']) as meetings_wheel:
+        wheel_files = set(meetings_wheel.namelist())
+        for name in sorted(removed):
+            path = child(output, name)
+            if not path.exists():
+                continue
+            wheel_name = name.removeprefix(prompt_prefix)
+            if (not name.startswith(prompt_prefix + 'prompts/') or
+                    wheel_name not in wheel_files or path.read_bytes() != meetings_wheel.read(wheel_name)):
+                raise ValueError(f'An excluded historical service file reappeared: {name}')
     for name, expected in reused_native.items():
         if digest(child(output, name)) != expected:
             raise ValueError(f'Wheel installation altered reused signed native bytes: {name}')
