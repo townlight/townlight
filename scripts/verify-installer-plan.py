@@ -1867,6 +1867,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
         if (
             "townlight_core-1.1.0-py3-none-any.whl" not in requirements_text
             and "townlight_core-1.2.0-py3-none-any.whl" not in requirements_text
+            and "townlight_core-1.3.0.dev2-py3-none-any.whl" not in requirements_text
         ):
             errors.append(
                 fail("minimal install kit requirements must point to a TownlightCore wheel")

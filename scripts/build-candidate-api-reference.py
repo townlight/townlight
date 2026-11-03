@@ -9,6 +9,7 @@ import copy
 import html
 import json
 import os
+import secrets
 from pathlib import Path
 import shutil
 import socket
@@ -76,7 +77,7 @@ def main():
     sys.path[:0] = [str(path) for path in SOURCES]
     os.environ.update(TESTING='1', TOWNLIGHT_PRODUCT_PROFILE='inspections-preview',
                       DATABASE_URL='postgresql+asyncpg://schema_export@127.0.0.1:9/schema_export',
-                      JWT_SECRET='schema-export-only-' * 4, FIRST_ADMIN_PASSWORD='SchemaExportOnly2026!',
+                      JWT_SECRET=secrets.token_urlsafe(32), FIRST_ADMIN_PASSWORD=secrets.token_urlsafe(24),
                       ENCRYPTION_KEY='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
                       JWT_SECRET_FILE='', FIRST_ADMIN_PASSWORD_FILE='')
     connections = []
