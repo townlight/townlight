@@ -169,7 +169,7 @@ test("Code C1 component renders exact citations and treats source HTML as text",
 });
 
 // The three Townlight Access AI-capable actions (accessibility-review,
-// civicaccess-plain-language, civicaccess-language-variant) go through the
+// townlight_access-plain-language, townlight_access-language-variant) go through the
 // guided-review confirm panel before dispatching -- when the model is ready
 // they can hold the global city-work write lock for a full generation call,
 // so a human confirm precedes taking that lock (same as the suggest-* AI
@@ -549,7 +549,7 @@ test("risky city workflow actions require guided review before mutation", async 
   await page.addInitScript(() => {
     const cityCoreModules = [
       {
-        id: "civiccore",
+        id: "townlight_core",
         display_name: "Townlight Core",
         role: "core platform",
         required: true,
@@ -559,7 +559,7 @@ test("risky city workflow actions require guided review before mutation", async 
         contract_ready: true
       },
       {
-        id: "civicrecords-ai",
+        id: "townlight_records",
         display_name: "Townlight Records",
         role: "records workflow",
         required: false,
@@ -569,7 +569,7 @@ test("risky city workflow actions require guided review before mutation", async 
         contract_ready: true
       },
       {
-        id: "civicclerk",
+        id: "townlight_meetings",
         display_name: "Townlight Meetings",
         role: "clerk workflow",
         required: false,
@@ -579,7 +579,7 @@ test("risky city workflow actions require guided review before mutation", async 
         contract_ready: true
       },
       {
-        id: "civiccode",
+        id: "townlight_code",
         display_name: "Townlight Code",
         role: "municipal code",
         required: false,
@@ -589,19 +589,19 @@ test("risky city workflow actions require guided review before mutation", async 
         contract_ready: true
       }
     ];
-    const civicnotice = {
-      id: "civicnotice",
+    const townlight_notice = {
+      id: "townlight_notice",
       display_name: "Townlight Notice",
       role: "public notice workflow",
       version: "0.2.0",
-      civiccore_requirement: "1.2.0",
+      townlight_core_requirement: "1.2.0",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore", "civicclerk"],
+      dependencies: ["townlight_core", "townlight_meetings"],
       route_count: 2,
       service_count: 2,
       task_count: 4,
@@ -619,14 +619,14 @@ test("risky city workflow actions require guided review before mutation", async 
             ...window.__appStateForTest,
             modules: [
               ...cityCoreModules,
-              civicnotice
+              townlight_notice
             ],
             module_selection: {
               ...(window.__appStateForTest?.module_selection || {}),
               profile_id: "custom",
               profile_label: "Custom",
-              installed_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice"],
-              enabled_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice"]
+              installed_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice"],
+              enabled_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice"]
             }
           };
         }
@@ -805,12 +805,12 @@ test("desktop workflow actions select freshly added records over restored stale 
     window.__cityWorkCalls = [];
     window.__cityWorkBootstrapCalls = 0;
     const modules = [
-      ["civiccore", "Townlight Core"],
-      ["civicclerk", "Townlight Meetings"],
-      ["civiccode", "Townlight Code"]
+      ["townlight_core", "Townlight Core"],
+      ["townlight_meetings", "Townlight Meetings"],
+      ["townlight_code", "Townlight Code"]
     ].map(([id, display_name]) => ({
-      id, display_name, required: id === "civiccore", installed: true,
-      enabled: true, selectable: id !== "civiccore", contract_ready: true
+      id, display_name, required: id === "townlight_core", installed: true,
+      enabled: true, selectable: id !== "townlight_core", contract_ready: true
     }));
     window.__TAURI_INTERNALS__ = {
       invoke: async (cmd, args = {}) => {
@@ -931,17 +931,17 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.getByRole("heading", { name: "Townlight Modules" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Choose Product Modules" })).toBeVisible();
   await expect(page.getByLabel(/City Core/)).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicrecords-ai"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicclerk"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civiccode"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicaccess"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civiczone"]')).toBeDisabled();
-  const civiczoneChoice = page.locator('label.module-choice').filter({ has: page.locator('[data-module-toggle="civiczone"]') });
-  await expect(civiczoneChoice.locator('[data-module-toggle="civiczone"]')).not.toBeChecked();
-  await expect(civiczoneChoice).toContainText("Ready for Windows Local 1.0");
+  await expect(page.locator('[data-module-toggle="townlight_records"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_meetings"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_code"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_access"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_zoning"]')).toBeDisabled();
+  const townlight_zoningChoice = page.locator('label.module-choice').filter({ has: page.locator('[data-module-toggle="townlight_zoning"]') });
+  await expect(townlight_zoningChoice.locator('[data-module-toggle="townlight_zoning"]')).not.toBeChecked();
+  await expect(townlight_zoningChoice).toContainText("Ready for Windows Local 1.0");
   await page.getByLabel(/Custom/).check();
   await expect(page.getByText("Custom selection will install Townlight Core plus 5 selected product modules.")).toBeVisible();
-  await page.locator('[data-module-toggle="civicrecords-ai"]').uncheck();
+  await page.locator('[data-module-toggle="townlight_records"]').uncheck();
   await expect(page.getByText("Custom selection will install Townlight Core plus 4 selected product modules.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Apply Module Selection" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Installed Product Profile" })).toBeVisible();
@@ -955,10 +955,10 @@ test("module manager presents the installed city-core package", async ({ page })
   // Townlight Access's contract line carries the model_required badge (its AI
   // features run on the pinned local model); Townlight Meetings's must NOT -- its
   // registry entry is required:false and this mirror previously drifted.
-  const civicaccessRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Access" }) });
-  await expect(civicaccessRow.getByText("local AI required")).toBeVisible();
-  const civicclerkRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Meetings" }) });
-  await expect(civicclerkRow.getByText("local AI required")).toHaveCount(0);
+  const townlight_accessRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Access" }) });
+  await expect(townlight_accessRow.getByText("local AI required")).toBeVisible();
+  const townlight_meetingsRow = page.locator(".module-row").filter({ has: page.getByRole("heading", { name: "Townlight Meetings" }) });
+  await expect(townlight_meetingsRow.getByText("local AI required")).toHaveCount(0);
   await expect(page.getByText("Backup includes: code workflow history, code exports, code files")).toBeVisible();
   await expect(page.getByRole("button", { name: "Disable Townlight Code" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Open Exports Townlight Code" })).toBeVisible();
@@ -995,12 +995,12 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.getByText("Scaffold")).toHaveCount(0);
 });
 
-test("civicaccess accessibility tab renders the seven workflow forms and refuses persistence from preview", async ({ page }) => {
+test("townlight_access accessibility tab renders the seven workflow forms and refuses persistence from preview", async ({ page }) => {
   await page.goto("/");
   const primaryNav = page.getByRole("navigation", { name: "Primary" });
   await primaryNav.getByRole("button", { name: /Accessibility/ }).click();
 
-  // Page heading + the seven civicaccess workflow forms render.
+  // Page heading + the seven townlight_access workflow forms render.
   await expect(page.getByRole("heading", { name: "Accessibility", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Accessibility Review (WCAG sample)" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Plain-Language Rewrite" })).toBeVisible();
@@ -1084,10 +1084,10 @@ test("civicaccess accessibility tab renders the seven workflow forms and refuses
   await expect(page.getByText("Desktop app required")).toBeVisible();
 });
 
-test("civicaccess delete-review guided-review panel renders, retargets, and deletes the confirmed review", async ({ page }) => {
+test("townlight_access delete-review guided-review panel renders, retargets, and deletes the confirmed review", async ({ page }) => {
   // Regression test for GauntletGate round-3 ENG-1/QA3-1/UX3-1: renderAccessibilityWorkflow()
   // was missing the renderGuidedWorkReview() call every other GUIDED_WORK_ACTIONS page has,
-  // making civicaccess-delete-review a 100% silent no-op. Also covers TEST-3's cross-contamination
+  // making townlight_access-delete-review a 100% silent no-op. Also covers TEST-3's cross-contamination
   // scenario (click Delete on review A, then review B without confirming, then Confirm) and
   // Cancel's safety, using the mocked Tauri-bridge pattern already established at line 553.
   await page.goto("/");
@@ -1120,7 +1120,7 @@ test("civicaccess delete-review guided-review panel renders, retargets, and dele
               ...window.__cityWorkState,
               access: { ...window.__cityWorkState.access, reviews: [...window.__cityWorkState.access.reviews, review] }
             };
-          } else if (args.action === "civicaccess-delete-review") {
+          } else if (args.action === "townlight_access-delete-review") {
             const reviews = window.__cityWorkState.access.reviews.filter((r) => r.review_id !== args.payload.reviewId);
             window.__cityWorkState = { ...window.__cityWorkState, access: { ...window.__cityWorkState.access, reviews } };
           }
@@ -1181,7 +1181,7 @@ test("civicaccess delete-review guided-review panel renders, retargets, and dele
   await page.getByRole("button", { name: "Confirm Delete Review" }).click();
   await expect(reviewList.getByRole("heading", { name: "Review B" })).not.toBeVisible();
   await expect(reviewList.getByRole("heading", { name: "Review A" })).toBeVisible();
-  const deleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "civicaccess-delete-review"));
+  const deleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "townlight_access-delete-review"));
   expect(deleteCalls).toHaveLength(1);
   expect(deleteCalls[0].payload.reviewId).toBe("review-2");
 
@@ -1200,15 +1200,15 @@ test("civicaccess delete-review guided-review panel renders, retargets, and dele
   await expect(guidedPanel).toContainText("Review A");
   await page.getByRole("button", { name: "Confirm Delete Review" }).click();
   await expect(reviewList.getByRole("heading", { name: "Review A" })).not.toBeVisible();
-  const finalDeleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "civicaccess-delete-review"));
+  const finalDeleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "townlight_access-delete-review"));
   expect(finalDeleteCalls).toHaveLength(2);
   expect(finalDeleteCalls[1].payload.reviewId).toBe("review-1");
 });
 
-test("civicaccess delete-review survives an overlapping second delete and a mid-confirm error", async ({ page }) => {
+test("townlight_access delete-review survives an overlapping second delete and a mid-confirm error", async ({ page }) => {
   // Regression test for GauntletGate round-4 ENG-R4-1/QA4-1: handleCityWorkAction's
   // finally block used to unconditionally clear state.workSelection.accessDeleteReviewId
-  // whenever any civicaccess-delete-review call settled -- so confirming a delete on
+  // whenever any townlight_access-delete-review call settled -- so confirming a delete on
   // review A while review B's confirm panel was already open (retargeted, per-row busy
   // isolation allows this) would wipe B's target out from under it the moment A's
   // slower request resolved, silently failing B's delete. Fixed by only clearing the id
@@ -1244,7 +1244,7 @@ test("civicaccess delete-review survives an overlapping second delete and a mid-
               ...window.__cityWorkState,
               access: { ...window.__cityWorkState.access, reviews: [...window.__cityWorkState.access.reviews, review] }
             };
-          } else if (args.action === "civicaccess-delete-review") {
+          } else if (args.action === "townlight_access-delete-review") {
             if (window.__cityWorkFailNext) {
               window.__cityWorkFailNext = false;
               throw new Error("Simulated network error");
@@ -1302,7 +1302,7 @@ test("civicaccess delete-review survives an overlapping second delete and a mid-
   await page.getByRole("button", { name: "Confirm Delete Review" }).click();
   await expect(reviewList.getByRole("heading", { name: "Fast Review" })).not.toBeVisible();
   await expect(reviewList.getByRole("heading", { name: "Slow Review" })).not.toBeVisible();
-  const deleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "civicaccess-delete-review"));
+  const deleteCalls = await page.evaluate(() => window.__cityWorkCalls.filter((c) => c.action === "townlight_access-delete-review"));
   expect(deleteCalls.map((c) => c.payload.reviewId).sort()).toEqual(["review-1", "review-2"]);
 
   // A mid-confirm backend error doesn't leave the row's Delete button stuck
@@ -1321,7 +1321,7 @@ test("civicaccess delete-review survives an overlapping second delete and a mid-
   await expect(reviewList.getByRole("heading", { name: "Error Review" })).not.toBeVisible();
 });
 
-test("civicaccess an earlier request resolving does not clear a later request's own busy indicator", async ({ page }) => {
+test("townlight_access an earlier request resolving does not clear a later request's own busy indicator", async ({ page }) => {
   // Regression test for GauntletGate round-5 ENG-R5-1/UX-R5-1: state.workActionInFlight
   // had the same unguarded-clear shape round 4 fixed for accessDeleteReviewId, but for
   // the per-row busy/disabled indicator instead of the confirm-panel target. Confirm
@@ -1360,7 +1360,7 @@ test("civicaccess an earlier request resolving does not clear a later request's 
               ...window.__cityWorkState,
               access: { ...window.__cityWorkState.access, reviews: [...window.__cityWorkState.access.reviews, review] }
             };
-          } else if (args.action === "civicaccess-delete-review") {
+          } else if (args.action === "townlight_access-delete-review") {
             // Review A (review-1) is fast and confirmed first; Review B
             // (review-2) is slow and confirmed second, so A resolves first
             // while B (the most-recently-confirmed) is still genuinely pending.
@@ -1413,7 +1413,7 @@ test("civicaccess an earlier request resolving does not clear a later request's 
   await expect(reviewList.getByRole("heading", { name: "Review B" })).not.toBeVisible({ timeout: 3000 });
 });
 
-test("civicaccess three simultaneously in-flight deletes each keep their own busy indicator", async ({ page }) => {
+test("townlight_access three simultaneously in-flight deletes each keep their own busy indicator", async ({ page }) => {
   // Regression test for GauntletGate round-7 W-3: state.workActionInFlight was a
   // single shared scalar, so confirming a THIRD row's delete while two others were
   // already in flight would immediately flip the scalar to the third tag alone --
@@ -1451,7 +1451,7 @@ test("civicaccess three simultaneously in-flight deletes each keep their own bus
               ...window.__cityWorkState,
               access: { ...window.__cityWorkState.access, reviews: [...window.__cityWorkState.access.reviews, review] }
             };
-          } else if (args.action === "civicaccess-delete-review") {
+          } else if (args.action === "townlight_access-delete-review") {
             // All three reviews share the same delay -- confirming all three in
             // quick succession puts all three genuinely in flight at once.
             await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -1503,7 +1503,7 @@ test("civicaccess three simultaneously in-flight deletes each keep their own bus
   await expect(reviewList.getByRole("heading", { name: "Review C" })).not.toBeVisible({ timeout: 3000 });
 });
 
-test("civicaccess Delete Review is visually distinct from safe secondary actions", async ({ page }) => {
+test("townlight_access Delete Review is visually distinct from safe secondary actions", async ({ page }) => {
   // Regression test for GauntletGate round-7 W-2: Delete Review previously shared
   // the same .secondary-action class (and therefore the same look) as every
   // non-destructive button in the app. It now carries its own .destructive-action
@@ -1588,7 +1588,7 @@ test("civicaccess Delete Review is visually distinct from safe secondary actions
 test("focus returns to main content after a workflow action, across modules", async ({ page }) => {
   // Regression test for GauntletGate round-7 W-1: render() replaces #app's entire
   // subtree on every action, which drops document.activeElement to <body> as a
-  // side effect of the DOM swap -- app-wide, not just in civicaccess. Check the
+  // side effect of the DOM swap -- app-wide, not just in townlight_access. Check the
   // fix holds in at least two different modules, not just the one it was found in.
   await page.goto("/");
   await page.evaluate(() => {
@@ -1661,7 +1661,7 @@ test("focus lands on Retry when the saved-state load itself fails", async ({ pag
   })).toBe(true);
 });
 
-test("civicaccess shows the explicit AI-engine-not-ready state with a guided path to model setup", async ({ page }) => {
+test("townlight_access shows the explicit AI-engine-not-ready state with a guided path to model setup", async ({ page }) => {
   // The browser-preview fallback state ships model.ready = false, which is the
   // same shape a broken post-install machine reports (weights deleted, dead
   // runtime). The tab must present a guided state -- banner + sample-mode form
@@ -1697,7 +1697,7 @@ test("civicaccess shows the explicit AI-engine-not-ready state with a guided pat
   await expect(page.getByRole("heading", { name: "Gemma 4 12B QAT Q4_0" })).toBeVisible();
 });
 
-test("civicaccess shows AI-ready framing when the local model reports ready", async ({ page }) => {
+test("townlight_access shows AI-ready framing when the local model reports ready", async ({ page }) => {
   // Mirror of the not-ready test: with model.ready = true from the (mocked)
   // desktop bridge, the banner disappears and the AI-capable forms describe
   // the local engine instead of sample mode.
@@ -1716,7 +1716,7 @@ test("civicaccess shows AI-ready framing when the local model reports ready", as
               provider: "Google",
               runtime: "ollama",
               ollama_model: "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
-              runtime_model: "civicsuite-gemma4-12b-qat:q4_0",
+              runtime_model: "townlight-gemma4-12b-qat:q4_0",
               download_size_bytes: 6975877728,
               download_policy: "Explicit model setup only",
               source_repo: "google/gemma-4-12B-it-qat-q4_0-gguf",
@@ -1735,12 +1735,12 @@ test("civicaccess shows AI-ready framing when the local model reports ready", as
             // Navigation filters areas by module enablement and the Home
             // screen maps over modules, so the mocked state must carry both
             // (same shape the Townlight Notice test uses) or nothing renders.
-            modules: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"].map((id) => ({
+            modules: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"].map((id) => ({
               id,
               display_name: id,
               role: "test module",
-              required: id === "civiccore",
-              selectable: id !== "civiccore",
+              required: id === "townlight_core",
+              selectable: id !== "townlight_core",
               installed: true,
               enabled: true,
               contract_ready: true
@@ -1748,8 +1748,8 @@ test("civicaccess shows AI-ready framing when the local model reports ready", as
             module_selection: {
               profile_id: "city-core",
               profile_label: "City Core",
-              installed_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"],
-              enabled_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"]
+              installed_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"],
+              enabled_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"]
             }
           };
         }
@@ -1783,7 +1783,7 @@ test("civicaccess shows AI-ready framing when the local model reports ready", as
   await page.getByRole("button", { name: "Cancel Review" }).click();
 });
 
-test("civicaccess stored AI analysis renders labeled, escaped, wrapped, and with line breaks preserved", async ({ page }) => {
+test("townlight_access stored AI analysis renders labeled, escaped, wrapped, and with line breaks preserved", async ({ page }) => {
   // Permanent re-land of the gate round-1 QA probe: the saved-review AI
   // analysis block is the suite's first surface persisting multi-line model
   // output into a rendered record. It must (a) stay inert under a hostile
@@ -1816,15 +1816,15 @@ test("civicaccess stored AI analysis renders labeled, escaped, wrapped, and with
         if (cmd === "get_app_state") {
           return {
             city_work: cityWork,
-            modules: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"].map((id) => ({
+            modules: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"].map((id) => ({
               id, display_name: id, role: "test module",
-              required: id === "civiccore", selectable: id !== "civiccore",
+              required: id === "townlight_core", selectable: id !== "townlight_core",
               installed: true, enabled: true, contract_ready: true
             })),
             module_selection: {
               profile_id: "city-core", profile_label: "City Core",
-              installed_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"],
-              enabled_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"]
+              installed_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"],
+              enabled_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"]
             }
           };
         }
@@ -1862,7 +1862,7 @@ test("civicaccess stored AI analysis renders labeled, escaped, wrapped, and with
   expect(layout.pageOverflowX).toBe(0);
 });
 
-test("civicaccess saved-review list paginates at 20 with a working show-all toggle", async ({ page }) => {
+test("townlight_access saved-review list paginates at 20 with a working show-all toggle", async ({ page }) => {
   // Regression test for QA-2-residual/W2R-3 (round 2) and TEST-5 (round 3):
   // only state.access.audit_events had a cap; the reviews list itself is
   // paginated client-side via state.accessReviewsShowAll + a 20-item slice.
@@ -1900,7 +1900,7 @@ test("civicaccess saved-review list paginates at 20 with a working show-all togg
 
   await page.getByRole("navigation", { name: "Primary" }).getByRole("button", { name: /Accessibility/ }).click();
   // Something must trigger a re-render against the seeded state: the only
-  // civicaccess action reachable without a saved review is a form submit.
+  // townlight_access action reachable without a saved review is a form submit.
   await page.getByLabel("Document title *").fill("trigger");
   await page.getByLabel("Public text *").fill("trigger");
   await runReviewAndSave(page);

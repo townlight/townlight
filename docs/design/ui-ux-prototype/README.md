@@ -1,14 +1,14 @@
-<a id="civicsuite-uiux-prototype"></a>
+<a id="townlight-uiux-prototype"></a>
 
 # Townlight UI/UX prototype
 
 This directory holds the **canonical UI/UX specification for Townlight**, built by Claude Design at Scott's request.
 
-It is a runnable React + Babel single-page prototype — no build step required. Open `CivicSuite.html` in a browser to interact with the design.
+It is a runnable React + Babel single-page prototype — no build step required. Open `Townlight.html` in a browser to interact with the design.
 
 ## Why it lives here
 
-The unified product spec at `docs/CivicSuiteUnifiedSpec.md` describes architectural intent — module catalog, tier structure, data models, principles. It does not describe the **visual** product: what each screen looks like, how density and color work, what the staff/resident/admin surface split feels like, what the audit drawer reveals, how the ⌘K palette behaves.
+The unified product spec at `docs/TownlightUnifiedSpec.md` describes architectural intent — module catalog, tier structure, data models, principles. It does not describe the **visual** product: what each screen looks like, how density and color work, what the staff/resident/admin surface split feels like, what the audit drawer reveals, how the ⌘K palette behaves.
 
 This prototype is that visual spec. Any pull request that touches user-visible code or copy must respect what's here unless the PR explicitly proposes a design change with rationale.
 
@@ -16,7 +16,7 @@ This prototype is that visual spec. Any pull request that touches user-visible c
 
 | File | Purpose |
 |---|---|
-| `CivicSuite.html` | Entry point. Open in browser. |
+| `Townlight.html` | Entry point. Open in browser. |
 | `app.jsx` | App-level routing + state. |
 | `shell.jsx` | App shell: topbar, ⌘K search palette, audit drawer, density toggle, surface switch (Staff / Resident / IT-Admin). |
 | `staff-dashboard.jsx` | Default staff landing surface. |
@@ -47,7 +47,7 @@ If the prototype and a PR conflict, **the prototype is authoritative** unless th
 ```bash
 cd docs/design/ui-ux-prototype
 python3 -m http.server 8000
-# open http://localhost:8000/CivicSuite.html
+# open http://localhost:8000/Townlight.html
 ```
 
 Or any static-file server. No Node, no build step, no npm install.

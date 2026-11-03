@@ -21,7 +21,7 @@ def _read(path: Path) -> str:
 
 @pytest.mark.parametrize(
     ("module_id", "repository"),
-    [("civicrecords-ai", "townlight/sunshine"), ("civicclerk", "townlight/meetings"), ("civiccode", "townlight/ordinances")],
+    [("townlight_records", "townlight/sunshine"), ("townlight_meetings", "townlight/meetings"), ("townlight_code", "townlight/ordinances")],
 )
 def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repository: str) -> None:
     manifest = json.loads(_read(ROOT / "installer" / "modules.json"))
@@ -32,11 +32,11 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
         # Historical archive cleanrooms retain their release pins. Current
         # full-composition CI uses the explicit Beta 1 sibling manifest.
         if path == BUILD_WORKFLOW:
-            integration = workflow.split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
+            integration = workflow.split("  desktop-townlight_core-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
             candidate = json.loads(_read(ROOT / "config" / "inspections-preview-sources.json"))
             candidate_pin = candidate["sources"][repository]
             checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
-            if module_id == "civicrecords-ai":
+            if module_id == "townlight_records":
                 assert "ref: ${{ steps.candidate.outputs.records_ref }}" in checkout
                 assert candidate_pin == candidate["sources"][repository]
             else:
@@ -46,10 +46,11 @@ def test_checkout_pins_match_the_accepted_installer_source(module_id: str, repos
         assert checkouts, f"No {module_id} checkout in {path.name}"
         for checkout in checkouts:
             checkout_inputs = checkout.split("\n      - ", 1)[0]
-            if path == BUILD_WORKFLOW and module_id == "civicrecords-ai":
+            if path == BUILD_WORKFLOW and module_id == "townlight_records":
                 assert "ref: ${{ steps.candidate.outputs.records_ref }}" in checkout_inputs
                 resolver = _read(ROOT / "desktop/scripts/resolve-msi-candidate.ps1")
-                assert f"$RecordsRef = '{pin}'" in resolver
+                assert re.fullmatch(r"[0-9a-f]{40}", pin)
+                assert "$RecordsRef = ($Modules.modules | Where-Object { $_.id -eq 'townlight_records' }).source_commit" in resolver
                 assert "$RecordsRef = $Pins.sources.'townlight/sunshine'" in resolver
                 continue
             expected_pin = candidate_pin if path == BUILD_WORKFLOW else pin
@@ -71,7 +72,7 @@ def test_planning_candidate_pins_are_explicit_and_confined_to_development() -> N
         assert re.fullmatch(r"[0-9a-f]{40}", pin)
         if repository not in {"townlight/plan", "townlight/sunshine"}:
             assert pin == development["sources"][repository]
-    integration = _read(BUILD_WORKFLOW).split("  desktop-civiccore-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
+    integration = _read(BUILD_WORKFLOW).split("  desktop-townlight_core-integration:", 1)[1].split("\n  windows-msi-lifecycle:", 1)[0]
     for repository, output in (("townlight/plan", "planning_ref"), ("townlight/sunshine", "records_ref")):
         checkout = integration.split(f"repository: {repository}", 1)[1].split("\n      - ", 1)[0]
         assert f"ref: ${{{{ steps.candidate.outputs.{output} }}}}" in checkout
@@ -111,7 +112,7 @@ def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> 
     ):
         assert manifest_version == base_version, f"Desktop version drift: {manifest}={manifest_version}"
     assert re.search(
-        r'\[\[package\]\]\r?\nname = "civicsuite-desktop"\r?\nversion = "'
+        r'\[\[package\]\]\r?\nname = "townlight-desktop"\r?\nversion = "'
         + re.escape(base_version) + r'"',
         _read(ROOT / "desktop/src-tauri/Cargo.lock"),
     ), "Cargo.lock desktop package version drifted from tauri.conf.json"
@@ -138,7 +139,7 @@ def test_routine_ci_builds_a_visibly_unsigned_private_artifact() -> None:
     assert "sign_for_publication:" in workflow
     assert 'type: boolean' in workflow
     assert "default: false" in workflow
-    assert "civicsuite-windows-local-msi-UNSIGNED" in workflow
+    assert "townlight-windows-local-msi-UNSIGNED" in workflow
     assert '"signature_state=UNSIGNED"' in workflow
     assert '"$($msi.BaseName)-UNSIGNED$($msi.Extension)"' in workflow
     assert '$signature.Status -ne "NotSigned"' in workflow
@@ -154,7 +155,7 @@ def test_signing_is_an_explicit_manual_publication_gate() -> None:
 
     assert workflow.count(gate) >= 5
     assert '"${{ github.ref }}" -ne "refs/heads/main"' in workflow
-    assert "civicsuite-windows-local-msi-SIGNED" in workflow
+    assert "townlight-windows-local-msi-SIGNED" in workflow
     assert "azure/artifact-signing-action@v2" in workflow
     assert "CN=Scott Converse" in workflow
     assert "TimeStamperCertificate" in workflow
@@ -174,7 +175,7 @@ def test_lifecycle_consumes_and_verifies_the_same_classified_artifact() -> None:
     _assert_installed_startup_requires_webview(workflow)
     assert "Repair the installed Townlight MSI" in workflow
     assert 'Start-Process msiexec.exe -ArgumentList @("/fa"' in workflow
-    assert 'Join-Path $env:LOCALAPPDATA "CivicSuite\\workflows\\city-work.json"' in workflow
+    assert 'Join-Path $env:LOCALAPPDATA "Townlight\\workflows\\city-work.json"' in workflow
     assert workflow.count('-replace "`r`n?", "`n"') >= 1
 
 
@@ -215,14 +216,14 @@ def test_release_accepts_only_a_signed_artifact_for_the_tag_commit() -> None:
     assert "--event workflow_dispatch" in workflow
     assert "--branch main" in workflow
     assert "$_.headSha -eq $tagSha" in workflow
-    assert workflow.count("civicsuite-windows-local-msi-SIGNED") >= 2
+    assert workflow.count("townlight-windows-local-msi-SIGNED") >= 2
     assert "Get-AuthenticodeSignature" in workflow
     assert "CN=Scott Converse" in workflow
     assert "signtool.FullName verify /pa /v" in workflow
     assert "SignatureState=Valid" in workflow
     assert "PublicationAllowed=true" in workflow
     assert '-replace "`r`n?", "`n"' in workflow
-    assert "civicsuite-windows-local-msi -D" not in workflow
+    assert "townlight-windows-local-msi -D" not in workflow
 
 
 def test_release_stages_a_draft_before_human_publication() -> None:
@@ -241,16 +242,26 @@ def test_signing_comments_do_not_repeat_the_false_subscription_claim() -> None:
     assert "future OIDC migration" in workflow
 
 
-def test_public_product_name_changes_without_replacing_installer_identity() -> None:
+def test_fresh_candidate_does_not_upgrade_the_accepted_installer_family() -> None:
     workflow = _read(BUILD_WORKFLOW)
     tauri_config = _read(ROOT / "desktop" / "src-tauri" / "tauri.conf.json")
 
     assert '"productName": "Townlight"' in tauri_config
     assert '"publisher": "Townlight"' in tauri_config
-    assert '"identifier": "org.civicsuite.desktop"' in tauri_config
-    assert '"upgradeCode": "a63fc1d3-5437-5f55-89a2-fef93fb1f930"' in tauri_config
+    assert '"identifier": "org.townlight.desktop"' in tauri_config
+    assert '"upgradeCode": "77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"' in tauri_config
     assert "Townlight Windows Local MSI build evidence" in workflow
-    assert "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930" in workflow
+    assert "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c" in workflow
+    base = json.loads(tauri_config)
+    candidate = json.loads(_read(ROOT / "desktop/src-tauri/tauri.inspections-candidate.conf.json"))
+    # Confirmed from the hash-verified Station delivery MSI's Product table,
+    # not inferred from an older product's source configuration.
+    accepted_station_upgrade_code = "a63fc1d3-5437-5f55-89a2-fef93fb1f930"
+    assert base["bundle"]["windows"]["wix"]["upgradeCode"] != accepted_station_upgrade_code
+    assert candidate["bundle"]["windows"]["wix"]["upgradeCode"] != accepted_station_upgrade_code
+    assert candidate["productName"] == "Townlight Candidate"
+    assert candidate["productName"] != base["productName"]
+    assert candidate["identifier"] == "org.townlight.naming.candidate"
 
 
 def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes() -> None:
@@ -295,17 +306,17 @@ def test_staff_beta_release_requires_its_composition_and_embedded_provenance() -
     assert "$receipt.planning_provenance_sha256 -ne $proofSha" in workflow
     assert "$proof.umbrella_source_commit -ne $tagSha" in workflow
     assert "$proof.sources_manifest_sha256 -ne $sourcesSha" in workflow
-    assert "$proof.package_versions.'civicrecords-ai' -ne $planning.Contract.records_package_version" in workflow
+    assert "$proof.package_versions.'townlight_records' -ne $planning.Contract.records_package_version" in workflow
     assert "$_.source_commit -eq $pin.Value" in workflow
     assert "opt-in staff Planning beta" in workflow
     # The release consumer expects a flat signed artifact, as before.
-    signed = _read(BUILD_WORKFLOW).split("- name: Upload SIGNED Windows Local MSI for publication gate", 1)[1].split("\n  desktop-civiccore-integration:", 1)[0]
-    assert "civicsuite/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json" in signed
-    assert "civicsuite/config/" not in signed
-    assert "civicsuite/desktop/runtime/" not in signed
+    signed = _read(BUILD_WORKFLOW).split("- name: Upload SIGNED Windows Local MSI for publication gate", 1)[1].split("\n  desktop-townlight_core-integration:", 1)[0]
+    assert "townlight/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json" in signed
+    assert "townlight/config/" not in signed
+    assert "townlight/desktop/runtime/" not in signed
     payload = _read(ROOT / "desktop/scripts/prepare-runtime-payload.ps1")
     assert "Get-PlanningBuildContract -Profile $PlanningBuildProfile" in payload
-    assert "metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'" in payload
+    assert "metadata.version('townlight_records') == '$($PlanningBuild.RecordsVersion)'" in payload
     assert "sources_manifest_sha256 = Get-Sha256" in payload
 
 
@@ -318,6 +329,7 @@ def test_planning_resolver_selects_beta_without_opening_development_signing(tmp_
         pytest.skip("PowerShell is required for the executable resolver contract")
     # Real resolver execution only; never dispatch a workflow or invoke signing.
     for relative in (
+        "installer/modules.json",
         "desktop/scripts/resolve-msi-candidate.ps1", "desktop/scripts/planning-build-contract.ps1",
         "desktop/src-tauri/tauri.planning-candidate.conf.json", "desktop/src-tauri/tauri.planning-staff-beta.conf.json",
         "config/planning-msi-candidate.json", "config/planning-preview-sources.json",
@@ -337,11 +349,12 @@ function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
 if ((Resolve automatic main).product_profile -ne 'inspections-preview') { throw 'main must exercise the full Beta 1 composition' }
+if ((Resolve automatic work/naming-access-notice-2026-11-02).product_profile -ne 'inspections-preview') { throw 'Naming candidate branch must exercise the full composition' }
 if ((Resolve automatic release/townlight-beta-1).product_profile -ne 'inspections-preview') { throw 'Beta 1 branch must exercise the full composition' }
 $inspect = Resolve automatic inspections/connected-workflow
-if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.6.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Inspections composition mismatch' }
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Coordinated composition mismatch' }
 $inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
-if ($inspectionOverlay.identifier -ne 'org.townlight.inspections.candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -eq '53211081-ea8b-4882-a752-d80a9363cda6') { throw 'Separate Inspections identity required' }
+if ($inspectionOverlay.identifier -ne 'org.townlight.naming.candidate' -or $inspectionOverlay.productName -ne 'Townlight Candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -ne '77c47cc0-128e-50b0-acc1-0bdf84ac3b3c') { throw 'Separate coordinated candidate identity required' }
 $permit = Resolve automatic permitting/connected-workflow
 if ($permit.product_profile -ne 'permitting-preview' -or $permit.runtime_profile -ne 'permitting-preview' -or $permit.desktop_version -ne '1.6.0-1' -or $permit.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Permitting composition mismatch' }
 $overlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.permitting-candidate.conf.json" -Raw | ConvertFrom-Json
@@ -407,8 +420,8 @@ def test_inspections_release_requires_exact_composition_and_embedded_provenance(
     assert 'RuntimeProfile=inspections-preview' in workflow
     assert '$receipt.inspections_provenance_sha256 -ne $proofSha' in workflow
     assert 'inspections-candidate-provenance.json -Recurse -File' in workflow
-    assert '$proof.package_versions.civicinspect -ne $inspections.Contract.inspections_package_version' in workflow
-    assert '$proof.package_versions.civicpermit -ne $inspections.Contract.permitting_package_version' in workflow
+    assert '$proof.package_versions.townlight_inspections -ne $inspections.Contract.inspections_package_version' in workflow
+    assert '$proof.package_versions.townlight_permitting -ne $inspections.Contract.permitting_package_version' in workflow
     assert '@($proof.sources).Count -ne 10 -or @($proof.wheels).Count -ne 4' in workflow
     assert 'foreach ($pin in $inspections.Pins.sources.PSObject.Properties)' in workflow
     assert '$isPlanning -or $isPermitting -or $isInspections' in workflow

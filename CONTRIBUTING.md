@@ -1,8 +1,8 @@
-<a id="contributing-to-civicsuite"></a>
+<a id="contributing-to-townlight"></a>
 
 # Contributing to Townlight
 
-The civicsuite umbrella repo holds suite-wide documentation, design principles,
+The townlight umbrella repo holds suite-wide documentation, design principles,
 cross-module ADRs, the roadmap, governance, and the Townlight Core <-> module
 compatibility matrix. It does not hold code.
 
@@ -46,7 +46,7 @@ the most common contributor friction.
 ## Attribution
 
 Documentation in this repo is licensed under CC BY 4.0. If you adapt or
-republish any of it, attribute "CivicSuite contributors" and link back to
+republish any of it, attribute "Townlight contributors" and link back to
 this repository.
 
 ## Code of conduct

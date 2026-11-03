@@ -5,7 +5,7 @@ title: "[idea] "
 labels: enhancement
 ---
 
-> **Code-level feature requests belong on a module repo, not here.** If you want a new feature in `civicrecords-ai` or `civiccore`, please file there.
+> **Code-level feature requests belong on a module repo, not here.** If you want a new feature in `townlight_records` or `townlight_core`, please file there.
 >
 > This umbrella accepts: new module proposals, roadmap reordering, governance/process changes, suite-wide naming or versioning conventions, and changes to the compatibility matrix policy.
 

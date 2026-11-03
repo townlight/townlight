@@ -22,7 +22,7 @@ Original signed bytes and source-archive bytes remain unchanged.
 
 | Runtime | Repository/source |
 |---|---|
-| Shared Python foundation | `townlight/core`, `civiccore/` |
+| Shared Python foundation | `townlight/core`, `townlight_core/` |
 | Records | `townlight/sunshine`, `backend/app/` |
 | Meetings / Code / Zoning | `townlight/meetings`, `townlight/ordinances`, `townlight/zone` |
 | Planning / Permitting / Inspections | `townlight/plan`, `townlight/permit`, `townlight/inspect` |

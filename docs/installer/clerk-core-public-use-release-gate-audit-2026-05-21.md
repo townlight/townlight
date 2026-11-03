@@ -2,18 +2,18 @@
 
 Audit mode: release-gate.
 
-Scope: CivicSuite Clerk-Core starter release only: CivicCore, CivicRecords AI,
-CivicClerk, and the `clerk-core` installer profile. Queued product modules are
+Scope: Townlight Clerk-Core starter release only: Townlight Core, Townlight Records,
+Townlight Meetings, and the `clerk-core` installer profile. Queued product modules are
 out of scope and remain unpromoted.
 
-Audited live baseline: CivicSuite main merge SHA
+Audited live baseline: Townlight main merge SHA
 `eaf71ea83e5022a06cf28cf18937e010ee6b88b6`.
 
 Verdict: PASS FOR CLERK-CORE PUBLIC-USE STARTER RELEASE.
 
 No unresolved Blocker or Critical findings remain for the starter release scope.
 This audit does not certify procurement use, production hosting, airgap use,
-the full CivicSuite module catalog, live cross-module records exchange, or
+the full Townlight module catalog, live cross-module records exchange, or
 macOS matching-host lifecycle behavior.
 
 ## 1. Executive Audit
@@ -39,24 +39,24 @@ Release posture: Clerk-Core starter is ready to publish as
 | macOS install path | Partially checked | macOS archive/readiness passed; matching-host lifecycle is not certified. |
 | First boot and health | Checked | Lifecycle proof includes install and verify modes. |
 | Backup and restore | Checked | Linux and Windows lifecycle evidence include PostgreSQL dump and `pg_restore` probe evidence. |
-| Runtime workflows | Checked | Installed proof covers CivicRecords AI request/search/review/response and CivicClerk agenda/packet/minutes/vote/notice/archive. |
-| Auth and role boundaries | Checked | CivicClerk source fix gates protected staff API loading behind staff-session success; matrix records missing/spoofed staff-role probes. |
+| Runtime workflows | Checked | Installed proof covers Townlight Records request/search/review/response and Townlight Meetings agenda/packet/minutes/vote/notice/archive. |
+| Auth and role boundaries | Checked | Townlight Meetings source fix gates protected staff API loading behind staff-session success; matrix records missing/spoofed staff-role probes. |
 | Browser verification | Checked | Matrix records 20 desktop/mobile browser checks and 154 deduplicated installed routes. |
 | UI states | Checked | Loading, success, empty, error, and partial states are recorded where supported. |
 | Docs truthfulness | Checked | Current-facing docs distinguish starter public-use release from full-suite/city/procurement/macOS lifecycle claims. |
-| Version and release consistency | Checked | Suite verifier expects CivicRecords AI `1.6.1`, CivicClerk `1.0.1`, and final installer tag `installer-clerk-core-v0.1.0`. |
-| Test realism | Checked | CivicRecords AI and CivicClerk release verifier scripts passed locally; suite verifier binds JSON evidence, not prose alone. |
+| Version and release consistency | Checked | Suite verifier expects Townlight Records `1.6.1`, Townlight Meetings `1.0.1`, and final installer tag `installer-clerk-core-v0.1.0`. |
+| Test realism | Checked | Townlight Records and Townlight Meetings release verifier scripts passed locally; suite verifier binds JSON evidence, not prose alone. |
 
 ## 3. Claim Verification Matrix
 
 | Claim | Verdict | Evidence |
 |---|---|---|
-| CivicRecords AI current release truth is `1.6.1` | True | Main verify run `26210542980` logs `[civicrecords-ai] PASS 1.6.1`. |
+| Townlight Records current release truth is `1.6.1` | True | Main verify run `26210542980` logs `[townlight_records] PASS 1.6.1`. |
 | Clerk-Core workflow proof exists | True | Main verify logs `[clerk-core-workflow-proof] PASS`; lifecycle logs include starter workflow proof. |
 | Linux full lifecycle is proven | True | Installer-cleanroom run `26210542979`, job `linux archive full lifecycle`, passed on rerun. |
 | Windows full lifecycle is proven | True | `docs/installer/clerk-core-final-package-evidence-2026-05-21.md` records matching-host Windows lifecycle pass. |
 | macOS lifecycle is certified | False | macOS is explicitly bounded to beta-level archive/readiness only. |
-| Full CivicSuite municipal-completion claim | False | Only the Clerk-Core starter profile is promoted. |
+| Full Townlight municipal-completion claim | False | Only the Clerk-Core starter profile is promoted. |
 | Live cross-module records exchange is proven | False | Evidence covers installed starter workflows, not live cross-module records exchange. |
 
 ## 4. What The Dev Team Needs To Do Now
@@ -68,7 +68,7 @@ Clerk-Core starter profile.
 ## 5. Next-Sprint Watchlist
 
 After this release, generate the next-module order from
-`docs/CivicSuiteUnifiedSpec.md` and the current repository maturity map. Do not
+`docs/TownlightUnifiedSpec.md` and the current repository maturity map. Do not
 start queued module implementation until the Clerk-Core release tag and CI are
 green.
 
@@ -80,7 +80,7 @@ release-gate phrasing. The release does not depend on prose-only PASS strings.
 
 ## 7. Security And Authorization Deep Dive
 
-CivicClerk protected staff APIs no longer load before staff-session success.
+Townlight Meetings protected staff APIs no longer load before staff-session success.
 The installed matrix records public/staff boundary checks, missing staff-role
 checks, and protected-state copy. AI output remains staff-reviewed and
 non-authoritative.
@@ -114,7 +114,7 @@ runs the matching lifecycle.
 ## 12. Version And Release Consistency Deep Dive
 
 The final tag is `installer-clerk-core-v0.1.0`. Starter module versions remain
-CivicCore `1.1.0`, CivicRecords AI `1.6.1`, and CivicClerk `1.0.1`; no
+Townlight Core `1.1.0`, Townlight Records `1.6.1`, and Townlight Meetings `1.0.1`; no
 downstream package pin moves in this promotion.
 
 ## 13. Test Engineering Deep Dive

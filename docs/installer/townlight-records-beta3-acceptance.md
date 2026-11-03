@@ -13,7 +13,7 @@ not all historical suite requirements or delivery of Meetings and Code.
 - Desktop integration: [Townlight #260](https://github.com/townlight/townlight/pull/260), all four required checks passed before merge.
 - MSI: `Townlight_1.1.0-3_x64_en-US.msi`, 1,631,694,848 bytes.
 - MSI SHA-256: `07f4ebe97bccd32db2a10fc5a5df106fd1bb7b499593e07277e712b815ccaff1`.
-- Installed `civicsuite-desktop.exe` SHA-256: `350ea134ff8360d9a34f948984fa7e0938e66a93440f49dfd88bcbc10372d166`.
+- Installed `townlight-desktop.exe` SHA-256: `350ea134ff8360d9a34f948984fa7e0938e66a93440f49dfd88bcbc10372d166`.
 - Independent Authenticode status: **Valid** for both files; timestamps present.
 - Signer: `CN=Scott Converse, O=Scott Converse, L=Longmont, S=co, C=US`.
 - Signer thumbprint: `A0A2F8534834EDEAB65DCDD929637CA24A9B8636`.

@@ -16,12 +16,12 @@ Generated from `installer/modules.json`.
 | Module | Version | Role | Dependencies | Source commit | Installer status |
 |---|---:|---|---|---|---|
 | Townlight Core | 1.2.1 | shared platform | none | `b4d0156bdc68` | `v1_2_1_records_beta_platform` |
-| Townlight Records | 1.7.3 | records workflow | `civiccore` | `45042345b5ca` | `v1_7_3_records_beta_candidate` |
-| Townlight Notice | 0.2.0 | public notice workflow | `civiccore` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
-| Townlight Access | 0.4.0 | accessibility + records-ready export | `civiccore` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
+| Townlight Records | 1.7.3 | records workflow | `townlight_core` | `45042345b5ca` | `v1_7_3_records_beta_candidate` |
+| Townlight Notice | 0.2.0 | public notice workflow | `townlight_core` | `79b8d07199ee` | `v0_2_0_records_beta_candidate` |
+| Townlight Access | 0.4.0 | accessibility + records-ready export | `townlight_core` | `b9100edc80ca` | `v0_4_0_records_beta_candidate` |
 
 Disabled profiles:
 - `land-use` (Land Use): queued - depends on Tier 2 module work after city-core ships
-- `full-suite` (Full Suite): 14 modules remain pre-1.0 scaffolds pinned to older CivicCore lines; not installable as a coherent suite
+- `full-suite` (Full Suite): 14 modules remain pre-1.0 scaffolds pinned to older Townlight Core lines; not installable as a coherent suite
 
 <!-- END GENERATED SUITE TOPOLOGY -->

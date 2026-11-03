@@ -4,6 +4,6 @@ Payload source: `installer/generated/packages/city-core/macos`
 
 Use `pkgbuild` and `productbuild` with the included distribution file to create
 a macOS package. This beta wrapper is intentionally unsigned for the public
-CivicSuite open-source path. macOS unidentified developer warnings are
-expected. Verify the release SHA256 checksum and official CivicSuite source
+Townlight open-source path. macOS unidentified developer warnings are
+expected. Verify the release SHA256 checksum and official Townlight source
 before allowing the package in Privacy & Security.

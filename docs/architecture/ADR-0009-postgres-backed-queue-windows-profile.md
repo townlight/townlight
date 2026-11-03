@@ -19,11 +19,11 @@ mature Python implementations exist (for example Procrastinate).
 
 ## Decision
 
-- CivicCore gains a `civiccore.tasks` abstraction for enqueueing, scheduling,
+- Townlight Core gains a `townlight_core.tasks` abstraction for enqueueing, scheduling,
   and worker execution.
 - The abstraction has two backends: `celery-redis` (Linux/server profile,
   spec unchanged) and `postgres` (Windows profile, SKIP LOCKED queue).
-- Module code enqueues and schedules only through `civiccore.tasks`. Direct
+- Module code enqueues and schedules only through `townlight_core.tasks`. Direct
   Celery imports in module code are a lint violation once the abstraction
   ships.
 - Scheduled (beat-style) jobs use the queue's scheduler on the Windows
@@ -33,8 +33,8 @@ mature Python implementations exist (for example Procrastinate).
 
 In scope:
 
-- The `civiccore.tasks` subsystem with backend-parity contract tests.
-- Migration of existing module task definitions (CivicRecords AI's Celery
+- The `townlight_core.tasks` subsystem with backend-parity contract tests.
+- Migration of existing module task definitions (Townlight Records's Celery
   tasks first) onto the abstraction, with identical behavior on the Linux
   profile.
 
@@ -47,9 +47,9 @@ Out of scope:
 
 - The Windows profile needs zero services beyond PostgreSQL, Ollama, and the
   suite's own processes.
-- CivicCore carries parity tests proving a task behaves identically on both
+- Townlight Core carries parity tests proving a task behaves identically on both
   backends.
-- CivicRecords AI's worker layer is the first consumer to migrate; its Linux
+- Townlight Records's worker layer is the first consumer to migrate; its Linux
   compose deployment keeps Celery and must show no behavior change.
 - Queue throughput on Windows is bounded by PostgreSQL; this is acceptable
   for single-city scale and is revisited only with evidence.

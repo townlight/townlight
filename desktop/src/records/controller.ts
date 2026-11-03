@@ -32,7 +32,7 @@ export function createRecordsController(invoke: Invoke) {
         result = await records.publicAction(action, payload);
       } else if (isRecordsAction(action)) {
         result = await records.action(action, payload, current) as Result;
-      } else if (action === "accessibility-review" || action.startsWith("civicaccess-")) {
+      } else if (action === "accessibility-review" || action.startsWith("townlight_access-")) {
         result = await access.action(action, payload, current.access as AccessState | undefined) as Result;
       } else if (action === "search-city-knowledge") {
         result = await invoke<Result>("suite_domain_request", {request:{operation:"search", query:payload.query ?? ""}});

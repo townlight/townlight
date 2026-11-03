@@ -22,7 +22,7 @@
     "role",
     "selectable",
     "required",
-    "civiccore_requirement",
+    "townlight_core_requirement",
     "dependencies",
     "installer_status",
     "proof_required"
@@ -32,12 +32,12 @@
     "source_commit"
   ],
   "city_core_profile": [
-    "civiccore",
-    "civicrecords-ai",
-    "civicclerk",
-    "civiccode",
-    "civicnotice",
-    "civicaccess"
+    "townlight_core",
+    "townlight_records",
+    "townlight_meetings",
+    "townlight_code",
+    "townlight_notice",
+    "townlight_access"
   ],
   "planned_repo_null_statuses": [
     "planned_spec_module_no_runtime_repo"

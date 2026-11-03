@@ -25,15 +25,15 @@
       "type": "check"
     },
     {
-      "description": "Shared staff session env var CIVICCORE_SUITE_SESSION_SECRET is created at runtime if missing and shared with selected services.",
+      "description": "Shared staff session env var TOWNLIGHT_CORE_SUITE_SESSION_SECRET is created at runtime if missing and shared with selected services.",
       "id": "shared-staff-session-env",
       "mode": "env_plan",
       "type": "check"
     },
     {
-      "civiccore_requirement": null,
+      "townlight_core_requirement": null,
       "display_name": "Townlight Core",
-      "module": "civiccore",
+      "module": "townlight_core",
       "proof_required": [
         "install",
         "version_check",
@@ -45,9 +45,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.1",
+      "townlight_core_requirement": "1.2.1",
       "display_name": "Townlight Records",
-      "module": "civicrecords-ai",
+      "module": "townlight_records",
       "proof_required": [
         "install",
         "health_check",
@@ -60,9 +60,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicClerk",
-      "module": "civicclerk",
+      "townlight_core_requirement": "1.2.0",
+      "display_name": "TownlightMeetings",
+      "module": "townlight_meetings",
       "proof_required": [
         "install",
         "health_check",
@@ -75,9 +75,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.1",
-      "display_name": "CivicCode",
-      "module": "civiccode",
+      "townlight_core_requirement": "1.2.1",
+      "display_name": "TownlightCode",
+      "module": "townlight_code",
       "proof_required": [
         "module_selection",
         "install_plan",
@@ -91,9 +91,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.1",
+      "townlight_core_requirement": "1.2.1",
       "display_name": "Townlight Notice",
-      "module": "civicnotice",
+      "module": "townlight_notice",
       "proof_required": [
         "module_selection",
         "install_plan",
@@ -108,9 +108,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.1",
+      "townlight_core_requirement": "1.2.1",
       "display_name": "Townlight Access",
-      "module": "civicaccess",
+      "module": "townlight_access",
       "proof_required": [
         "module_selection",
         "install_plan",
@@ -147,10 +147,10 @@
       ],
       "port": 18082,
       "shared_staff_session": {
-        "env_var": "CIVICCORE_SUITE_SESSION_SECRET",
+        "env_var": "TOWNLIGHT_CORE_SUITE_SESSION_SECRET",
         "persisted_value_in_plan": false,
-        "revocation_env_var": "CIVICCORE_SUITE_SESSION_REVOCATION_FILE",
-        "revocation_file": "/civicsuite-shared/civiccore_suite_session_revocations.json",
+        "revocation_env_var": "TOWNLIGHT_CORE_SUITE_SESSION_REVOCATION_FILE",
+        "revocation_file": "/townlight-shared/townlight_core_suite_session_revocations.json",
         "value_source": "generated on first install if missing"
       },
       "source": "installer\\runtime\\suite-launcher",
@@ -184,12 +184,12 @@
     "label": "Guided Setup"
   },
   "modules": [
-    "civiccore",
-    "civicrecords-ai",
-    "civicclerk",
-    "civiccode",
-    "civicnotice",
-    "civicaccess"
+    "townlight_core",
+    "townlight_records",
+    "townlight_meetings",
+    "townlight_code",
+    "townlight_notice",
+    "townlight_access"
   ],
   "mutates_host": false,
   "profile": "city-core",

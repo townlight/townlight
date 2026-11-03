@@ -54,7 +54,7 @@
     {
       "id": "code-public-search",
       "viewport": "desktop",
-      "url": "http://127.0.0.1:19740/civiccode/search?q=13.40.020",
+      "url": "http://127.0.0.1:19740/townlight_code/search?q=13.40.020",
       "status": 200,
       "expected_text_present": true,
       "console_events": [],
@@ -63,7 +63,7 @@
     {
       "id": "code-public-search",
       "viewport": "mobile",
-      "url": "http://127.0.0.1:19740/civiccode/search?q=13.40.020",
+      "url": "http://127.0.0.1:19740/townlight_code/search?q=13.40.020",
       "status": 200,
       "expected_text_present": true,
       "console_events": [],

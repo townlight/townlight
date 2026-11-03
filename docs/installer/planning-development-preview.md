@@ -22,7 +22,7 @@ pins remain separate.
 Select Planning preview in setup. Activation verifies the candidate payload,
 fences operations, stops writers and creates a verified coherent backup before
 changing a populated profile. The activation receipt records recovery information.
-Start/Repair explicitly migrates through `civicplan_0002`. Missing packages,
+Start/Repair explicitly migrates through `townlight_planning_0002`. Missing packages,
 schemas or providers keep Planning unavailable. No municipal content is seeded.
 
 Cold migrations have a five-minute budget and retain per-schema progress in timeout

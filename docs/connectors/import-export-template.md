@@ -1,4 +1,4 @@
-<a id="civicsuite-connector-importexport-template"></a>
+<a id="townlight-connector-importexport-template"></a>
 
 # Townlight Connector Import/Export Template
 
@@ -95,7 +95,7 @@ exports/
 
 - `module`
 - `module_version`
-- `civiccore_version`
+- `townlight_core_version`
 - `export_purpose`
 - `created_at`
 - `created_by`
@@ -154,7 +154,7 @@ Each module import/export implementation must include:
 - Documentation tests or grep gates that prevent planned connectors from being
   described as shipped.
 
-<a id="civiccore-extraction-candidate"></a>
+<a id="townlight_core-extraction-candidate"></a>
 
 ## Townlight Core Extraction Candidate
 

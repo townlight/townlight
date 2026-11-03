@@ -4,6 +4,6 @@ Payload source: `installer/generated/packages/city-core/linux`
 
 Use the `debian/` metadata as the first `.deb` wrapper for the generated Linux
 operator package. Dependency installation remains explicit and operator-led.
-This beta wrapper is intentionally unsigned for the public CivicSuite
-open-source path. Verify the release SHA256 checksum and official CivicSuite
+This beta wrapper is intentionally unsigned for the public Townlight
+open-source path. Verify the release SHA256 checksum and official Townlight
 source before installing the local package.

@@ -14,8 +14,8 @@ fn windows_path_string(path: PathBuf) -> String {
     path.to_string_lossy().replace('/', "\\")
 }
 
-pub fn civic_suite_root() -> PathBuf {
-    env::var("CIVICSUITE_DESKTOP_STATE_DIR")
+pub fn townlight_root() -> PathBuf {
+    env::var("TOWNLIGHT_DESKTOP_STATE_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
             env::var("LOCALAPPDATA")
@@ -26,7 +26,7 @@ pub fn civic_suite_root() -> PathBuf {
 }
 
 pub fn config_dir() -> PathBuf {
-    civic_suite_root().join("config")
+    townlight_root().join("config")
 }
 
 fn locations_path() -> PathBuf {
@@ -34,18 +34,18 @@ fn locations_path() -> PathBuf {
 }
 
 pub fn default_locations() -> LocalLocations {
-    let root = civic_suite_root();
-    let backup_root = env::var("CIVICSUITE_BACKUP_DIR")
+    let root = townlight_root();
+    let backup_root = env::var("TOWNLIGHT_BACKUP_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
-            if env::var("CIVICSUITE_DESKTOP_STATE_DIR").is_ok() {
+            if env::var("TOWNLIGHT_DESKTOP_STATE_DIR").is_ok() {
                 root.join("Backups")
             } else {
                 env::var("USERPROFILE")
                     .map(PathBuf::from)
                     .unwrap_or_else(|_| PathBuf::from("{documents}"))
                     .join("Documents")
-                    .join("CivicSuite Backups")
+                    .join("Townlight Backups")
             }
         });
     LocalLocations {
@@ -116,7 +116,7 @@ pub fn save_locations(locations: &LocalLocations) -> Result<LocalLocations, Stri
 pub fn data_root() -> PathBuf {
     effective_locations()
         .map(|locations| PathBuf::from(locations.data_root))
-        .unwrap_or_else(|_| civic_suite_root().join("Data"))
+        .unwrap_or_else(|_| townlight_root().join("Data"))
 }
 
 pub fn backup_root() -> PathBuf {

@@ -26,16 +26,16 @@ def _prepend_path(path: Path) -> None:
 
 
 def _load_city_core_modules() -> dict[str, object]:
-    _prepend_path(WORKSPACE_ROOT / "civiccore")
-    _prepend_path(WORKSPACE_ROOT / "civicrecords-ai" / "backend")
-    _prepend_path(WORKSPACE_ROOT / "civicclerk")
-    _prepend_path(WORKSPACE_ROOT / "civiccode")
+    _prepend_path(WORKSPACE_ROOT / "townlight_core")
+    _prepend_path(WORKSPACE_ROOT / "townlight_records" / "backend")
+    _prepend_path(WORKSPACE_ROOT / "townlight_meetings")
+    _prepend_path(WORKSPACE_ROOT / "townlight_code")
 
     records_suite_session_path = (
-        WORKSPACE_ROOT / "civicrecords-ai" / "backend" / "app" / "auth" / "suite_session.py"
+        WORKSPACE_ROOT / "townlight_records" / "backend" / "app" / "auth" / "suite_session.py"
     )
     records_spec = importlib.util.spec_from_file_location(
-        "civicrecords_ai_suite_session_closeout_contract",
+        "townlight_records_suite_session_closeout_contract",
         records_suite_session_path,
     )
     assert records_spec is not None
@@ -45,10 +45,10 @@ def _load_city_core_modules() -> dict[str, object]:
     records_spec.loader.exec_module(records_module)
 
     return {
-        "core": importlib.import_module("civiccore.auth.suite_session"),
+        "core": importlib.import_module("townlight_core.auth.suite_session"),
         "records": records_module,
-        "clerk": importlib.import_module("civicclerk.suite_session_compat"),
-        "code": importlib.import_module("civiccode.suite_session_auth"),
+        "clerk": importlib.import_module("townlight_meetings.suite_session_compat"),
+        "code": importlib.import_module("townlight_code.suite_session_auth"),
     }
 
 
@@ -86,7 +86,7 @@ def test_unsupported_suite_session_header_is_rejected_across_city_core_modules(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     secret = "city-core-suite-session-header-secret"
-    monkeypatch.setenv("CIVICCORE_SUITE_SESSION_SECRET", secret)
+    monkeypatch.setenv("TOWNLIGHT_CORE_SUITE_SESSION_SECRET", secret)
     modules = _load_city_core_modules()
     roles = frozenset({"records_admin", "clerk_admin", "code_admin", "staff"})
     token = _issue_token_with_header(
@@ -117,15 +117,15 @@ def test_unsupported_suite_session_header_is_rejected_across_city_core_modules(
 
 
 @pytest.mark.asyncio
-async def test_civicclerk_logout_revokes_suite_session_across_city_core_modules(
+async def test_townlight_meetings_logout_revokes_suite_session_across_city_core_modules(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     secret = "city-core-suite-session-logout-secret"
     revocation_file = tmp_path / "shared-suite-session-logout-revocations.json"
-    monkeypatch.setenv("CIVICCORE_SUITE_SESSION_SECRET", secret)
-    monkeypatch.setenv("CIVICCORE_SUITE_SESSION_REVOCATION_FILE", str(revocation_file))
-    monkeypatch.setenv("CIVICCLERK_STAFF_AUTH_MODE", "bearer")
+    monkeypatch.setenv("TOWNLIGHT_CORE_SUITE_SESSION_SECRET", secret)
+    monkeypatch.setenv("TOWNLIGHT_CORE_SUITE_SESSION_REVOCATION_FILE", str(revocation_file))
+    monkeypatch.setenv("TOWNLIGHT_MEETINGS_STAFF_AUTH_MODE", "bearer")
 
     modules = _load_city_core_modules()
     core = modules["core"]
@@ -154,7 +154,7 @@ async def test_civicclerk_logout_revokes_suite_session_across_city_core_modules(
         required_roles={"records_admin"},
     ).session_id == "city-core-logout-session"
 
-    clerk_main = importlib.import_module("civicclerk.main")
+    clerk_main = importlib.import_module("townlight_meetings.main")
     async with AsyncClient(
         transport=ASGITransport(app=clerk_main.app),
         base_url="http://testserver",

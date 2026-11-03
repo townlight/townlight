@@ -151,7 +151,7 @@ search, questions and section exports through `code_domain_request`. Rust is a
 fixed-loopback transport with native identity/module checks, not a second Code
 implementation. The screen is selected only for activated Python authority.
 
-Public `/civiccode` views reuse existing Code renderers and public summaries.
+Public `/townlight_code` views reuse existing Code renderers and public summaries.
 They do not mount the standalone application's staff endpoints or expose staff
 interpretation notes. Unavailable authoritative public sources produce refusal;
 explanations are reading aids, not law or legal determinations.
@@ -306,5 +306,5 @@ Public product and publisher strings use Townlight. Existing technical
 identities remain intentionally stable during this beta, including the Rust
 crate/npm package names, `civic*` module IDs/imports, `CIVIC*` environment
 variables, database/schema names, the Tauri identifier
-`org.civicsuite.desktop`, the MSI UpgradeCode, and legacy local-data discovery
+`org.townlight.desktop`, the MSI UpgradeCode, and legacy local-data discovery
 under `%LOCALAPPDATA%\CivicSuite`.

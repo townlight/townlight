@@ -2,7 +2,8 @@
 import type {Invoke} from "./client.ts";
 
 type Payload = Record<string, unknown>;
-export interface AccessState { reviews: {review_id: string; canonical_review_id: string}[] }
+export interface AccessState { reviews: {review_id: string; canonical_review_id: string}[];
+  drafts?: {draft_id: string}[] }
 const text = (p: Payload, key: string) => String(p[key] ?? "");
 const flag = (p: Payload, key: string) => p[key] === true || p[key] === "true";
 const list = (p: Payload, key: string): string[] => Array.isArray(p[key]) ? (p[key] as unknown[]).map(String) :
@@ -18,26 +19,31 @@ export function createAccessClient(invoke: Invoke) {
           request = {operation: "review", payload: {title: text(p, "title"), body: text(p, "body"),
             language: text(p, "language"), hasAltText: flag(p, "hasAltText")}};
           break;
-        case "civicaccess-delete-review": case "civicaccess-records-export":
+        case "townlight_access-delete-review": case "townlight_access-records-export":
           const selected = current?.reviews.find(row => row.review_id === text(p, "reviewId"));
           if (!selected?.canonical_review_id) throw new Error("Refresh Access and select the saved review again.");
-          request = {operation: action === "civicaccess-delete-review" ? "delete-review" : "export-review", review_id: selected.canonical_review_id};
+          request = {operation: action === "townlight_access-delete-review" ? "delete-review" : "export-review", review_id: selected.canonical_review_id};
           break;
-        case "civicaccess-plain-language": case "civicaccess-language-variant":
-          request = {operation: "rewrite", payload: {action: action.slice("civicaccess-".length),
+        case "townlight_access-export-draft":
+          const draft = current?.drafts?.find(row => row.draft_id === text(p, "draftId"));
+          if (!draft) throw new Error("Refresh Access and select the saved draft again.");
+          request = {operation: "export-draft", draft_id: draft.draft_id};
+          break;
+        case "townlight_access-plain-language": case "townlight_access-language-variant":
+          request = {operation: "rewrite", payload: {action: action.slice("townlight_access-".length),
             text: text(p, "text"), language: text(p, "language")}};
           break;
-        case "civicaccess-form-plan":
+        case "townlight_access-form-plan":
           request = {operation: "tool", payload: {action: "form-plan", formName: text(p, "formName"), fields: list(p, "fields")}};
           break;
-        case "civicaccess-publishing-workflow":
+        case "townlight_access-publishing-workflow":
           request = {operation: "tool", payload: {action: "publishing-workflow", title: text(p, "title"),
             hasReview: flag(p, "hasReview"), hasPlainLanguage: flag(p, "hasPlainLanguage"), hasTranslationReview: flag(p, "hasTranslationReview")}};
           break;
-        case "civicaccess-ada-title-ii":
+        case "townlight_access-ada-title-ii":
           request = {operation: "tool", payload: {action: "ada-title-ii", serviceArea: text(p, "serviceArea"), hasCoordinatorReview: flag(p, "hasCoordinatorReview")}};
           break;
-        case "civicaccess-tagged-pdf": {
+        case "townlight_access-tagged-pdf": {
           const levels = list(p, "headingLevels");
           if (levels.some(level => !/^\d+$/.test(level) || Number(level) > 4294967295)) throw new Error("Heading levels must be whole numbers.");
           request = {operation: "tool", payload: {action: "tagged-pdf", headingLevels: levels.map(Number)}};

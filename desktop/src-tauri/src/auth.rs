@@ -78,7 +78,7 @@ const SESSION_SECRET_BYTES: usize = 32;
 const SHA256_BLOCK_SIZE: usize = 64;
 
 fn session_secret_path() -> PathBuf {
-    crate::local_paths::civic_suite_root().join(SESSION_SECRET_FILE)
+    crate::local_paths::townlight_root().join(SESSION_SECRET_FILE)
 }
 
 /// Reads the per-install session MAC key, creating it on first use. Stored as
@@ -551,9 +551,9 @@ pub(crate) fn domain_public_proof() -> Result<String, String> {
 fn role_module_ids(role: &str) -> Option<&'static [&'static str]> {
     match role {
         "local-admin" | "city-staff" => None,
-        "clerk" => Some(&["civicclerk", "civicnotice", "civicaccess"]),
-        "records-staff" => Some(&["civicrecords-ai"]),
-        "code-staff" => Some(&["civiccode"]),
+        "clerk" => Some(&["townlight_meetings", "townlight_notice", "townlight_access"]),
+        "records-staff" => Some(&["townlight_records"]),
+        "code-staff" => Some(&["townlight_code"]),
         _ => Some(&[]),
     }
 }
@@ -813,13 +813,13 @@ mod tests {
     fn with_temp_state_dir<T>(test: impl FnOnce(PathBuf) -> T) -> T {
         let _guard = first_run::test_env_lock().lock().expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-auth-test-{}",
+            "townlight-desktop-auth-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }

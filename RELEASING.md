@@ -254,7 +254,7 @@ hash, and Authenticode evidence—not textual equality between the public tag
 and WiX ProductVersion.
 
 Public display strings use Townlight. Internal artifact names and stable
-application identifiers may retain `civicsuite` as documented compatibility
+application identifiers may retain `townlight` as documented compatibility
 identities.
 
 ## Candidate and publication gates

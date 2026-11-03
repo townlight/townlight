@@ -20,7 +20,7 @@ cannot pass the acceptance test for structural reasons, not polish reasons:
 - Docker Desktop interposes its own license prompt and its own update and
   diagnostics surfaces between the operator and the suite.
 - Every Docker Desktop failure mode (WSL servicing failures, virtualization
-  disabled, corporate policy blocks) becomes a CivicSuite support incident
+  disabled, corporate policy blocks) becomes a Townlight support incident
   that a small-town clerk cannot resolve.
 
 A sibling project on the same development hardware (CivicCast) shipped a

@@ -1,4 +1,4 @@
-<a id="civicsuite-continuity-and-succession"></a>
+<a id="townlight-continuity-and-succession"></a>
 
 # Townlight Continuity And Succession
 
@@ -34,7 +34,7 @@ This document does **not** replace repo-specific operational runbooks. It identi
 
 `Phase 0` required all of the following:
 
-1. A second GitHub org owner is active in `CivicSuite`.
+1. A second GitHub org owner is active in `Townlight`.
 2. Release-signing custody and package-publishing custody are documented.
 3. Credential custody and emergency access expectations are documented.
 4. Release-critical repos and their continuity roles are documented.
@@ -44,18 +44,18 @@ This document does **not** replace repo-specific operational runbooks. It identi
 
 These repos are continuity-critical:
 
-- `civicsuite`
-- `civiccore`
-- `civicrecords-ai`
+- `townlight`
+- `townlight_core`
+- `townlight_records`
 - any module repo currently in the shipping or productizing tiers
 
 Current named continuity roles:
 
 | Repo group | Primary maintainer | Continuity backup | Notes |
 |---|---|---|---|
-| `civicsuite` | `scottconverse` | `APirateMonk` | Umbrella governance, roadmap, compatibility, continuity truth source |
-| `civiccore` | `scottconverse` | `APirateMonk` | Shared platform release path is GitHub-tag driven |
-| `civicrecords-ai` | `scottconverse` | `APirateMonk` | Shipping flagship release path is GitHub-tag driven |
+| `townlight` | `scottconverse` | `APirateMonk` | Umbrella governance, roadmap, compatibility, continuity truth source |
+| `townlight_core` | `scottconverse` | `APirateMonk` | Shared platform release path is GitHub-tag driven |
+| `townlight_records` | `scottconverse` | `APirateMonk` | Shipping flagship release path is GitHub-tag driven |
 | shipping/productizing module repos | `scottconverse` | `APirateMonk` | Current continuity backup until repo-specific maintainer lines expand |
 
 Each release-critical repo must always have:
@@ -72,17 +72,17 @@ The continuity model is shared custody, not single-person memory.
 
 ### GitHub Org Custody
 
-- `CivicSuite` must have at least two org owners
+- `Townlight` must have at least two org owners
 - admin access must not depend on a single personal account
 - branch-protection changes, repo transfers, and release-admin actions must be recoverable by a second owner
 
 ### Release Custody
 
 - GitHub release permissions for shipping and productizing repos are available to both current org owners
-- `civiccore` currently publishes from a tag-driven GitHub Actions workflow that runs `scripts/verify-release.sh`, builds wheel/sdist/checksums, and creates a GitHub release using the repository `GITHUB_TOKEN`
-- `civiccore` does **not** currently require a separate PyPI secret or code-signing secret to ship
-- `civicrecords-ai` currently publishes from a tag-driven GitHub Actions workflow that builds the unsigned Windows installer, writes a checksum, creates a draft GitHub release, uploads artifacts, and publishes the release using the repository `GITHUB_TOKEN`
-- `civicrecords-ai` intentionally remains unsigned today, so there is no code-signing certificate custody requirement in the current release path
+- `townlight_core` currently publishes from a tag-driven GitHub Actions workflow that runs `scripts/verify-release.sh`, builds wheel/sdist/checksums, and creates a GitHub release using the repository `GITHUB_TOKEN`
+- `townlight_core` does **not** currently require a separate PyPI secret or code-signing secret to ship
+- `townlight_records` currently publishes from a tag-driven GitHub Actions workflow that builds the unsigned Windows installer, writes a checksum, creates a draft GitHub release, uploads artifacts, and publishes the release using the repository `GITHUB_TOKEN`
+- `townlight_records` intentionally remains unsigned today, so there is no code-signing certificate custody requirement in the current release path
 - if PyPI publication, signed installers, or other external release credentials are introduced later, this document must be updated before that release mode becomes canonical
 
 ### Credential Custody
@@ -99,14 +99,14 @@ The second maintainer can currently recover the suite release path without any h
 1. Read the umbrella roadmap, compatibility matrix, and current continuity status.
 2. Work from the relevant repo on `main`.
 3. Run the repo’s verification gate before release:
-   - `civicsuite`: `bash scripts/verify-docs.sh`
-   - `civiccore`: `bash scripts/verify-release.sh`
-   - `civicrecords-ai`: `bash scripts/verify-release.sh`
+   - `townlight`: `bash scripts/verify-docs.sh`
+   - `townlight_core`: `bash scripts/verify-release.sh`
+   - `townlight_records`: `bash scripts/verify-release.sh`
 4. Create and push the release tag from a repo owner account.
 5. Let the tag-driven GitHub Actions workflow build and publish artifacts.
 6. Verify the GitHub release artifacts and checksums before declaring the release complete.
 
-For `civicrecords-ai`, the recovery maintainer must also remember that the Windows installer is intentionally unsigned in the current posture. A future signing program is roadmap work, not a current release dependency.
+For `townlight_records`, the recovery maintainer must also remember that the Windows installer is intentionally unsigned in the current posture. A future signing program is roadmap work, not a current release dependency.
 
 ## Minimum Recovery Packet
 
@@ -114,8 +114,8 @@ The second maintainer must be able to locate, without asking:
 
 - the canonical roadmap
 - the compatibility matrix
-- the release procedure for `civiccore`
-- the release procedure for `civicrecords-ai`
+- the release procedure for `townlight_core`
+- the release procedure for `townlight_records`
 - the current shipping/productizing/foundation taxonomy
 - the current continuity status
 - the repo containing each active suite runbook

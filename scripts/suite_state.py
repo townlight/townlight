@@ -16,10 +16,10 @@ SCHEMA_PATH = ROOT / "config" / "suite-state.schema.json"
 INSTALLER_PATH = ROOT / "installer" / "modules.json"
 PUBLIC_STATUS_PATH = ROOT / "installer" / "modules.public-status.json"
 
-SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$")
+SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:[.+-][A-Za-z0-9.-]+)?$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA1_RE = re.compile(r"^[a-f0-9]{40}$")
-ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 
 REQUIRED_ROOT_FIELDS = {
     "schema_version",
@@ -55,6 +55,7 @@ MATURITY_STATES = {
 LEGACY_GRADES = {
     "platform",
     "released",
+    "candidate",
     "queued",
     "early-scaffold",
     "foundation",
@@ -228,18 +229,21 @@ def validate_state(data: dict[str, Any]) -> list[str]:
             "channel",
             "published_at",
             "asset_policy",
+            "runtime_version",
         }
         errors.extend(_unknown_and_missing(desktop, required, "desktop_release"))
         if not _is_semver(desktop.get("version")):
             errors.append("desktop_release.version: must be semantic version text")
-        if not isinstance(desktop.get("commit"), str) or not SHA1_RE.fullmatch(
-            desktop["commit"]
-        ):
+        pending_commit = (desktop.get("commit") is None and desktop.get("channel") == "candidate"
+                          and desktop.get("published_at") is None)
+        if not pending_commit and (not isinstance(desktop.get("commit"), str) or not SHA1_RE.fullmatch(desktop["commit"])):
             errors.append(
-                "desktop_release.commit: must be a 40-character lowercase SHA-1"
+                "desktop_release.commit: must be a 40-character lowercase SHA-1, or null for an unbound unpublished candidate"
             )
-        if not _is_date(desktop.get("published_at")):
-            errors.append("desktop_release.published_at: must be YYYY-MM-DD")
+        if not _is_semver(desktop.get("runtime_version")):
+            errors.append("desktop_release.runtime_version: must be semantic version text")
+        if not _is_date(desktop.get("published_at"), nullable=desktop.get("channel") in {"candidate", "internal"}):
+            errors.append("desktop_release.published_at: must be YYYY-MM-DD (or null before publication)")
         if desktop.get("asset_policy") not in asset_policy_ids:
             errors.append("desktop_release.asset_policy: unknown asset policy")
 
@@ -247,8 +251,8 @@ def validate_state(data: dict[str, Any]) -> list[str]:
     if not isinstance(modules, dict):
         return errors + ["modules: must be an object"]
     module_ids = set(modules)
-    if len(module_ids) != 28:
-        errors.append(f"modules: expected 28 catalog modules, found {len(module_ids)}")
+    if len(module_ids) != 11:
+        errors.append(f"modules: expected 11 catalog modules, found {len(module_ids)}")
 
     order = data.get("module_order")
     if not isinstance(order, list):
@@ -475,7 +479,7 @@ def validate_state(data: dict[str, Any]) -> list[str]:
             if repository is None:
                 errors.append(f"{context}: runtime module must declare a repository")
             if isinstance(versions, dict) and (
-                versions.get("development") is None or versions.get("released") is None
+                versions.get("development") is None
             ):
                 errors.append(
                     f"{context}: runtime module needs development and released versions"
@@ -521,8 +525,8 @@ def validate_schema_document(schema: dict[str, Any]) -> list[str]:
     if properties.get("schema_version", {}).get("const") != 1:
         errors.append("schema: schema_version const must be 1")
     modules = properties.get("modules", {})
-    if modules.get("minProperties") != 28 or modules.get("maxProperties") != 28:
-        errors.append("schema: modules must require exactly 28 entries")
+    if modules.get("minProperties") != 11 or modules.get("maxProperties") != 11:
+        errors.append("schema: modules must require exactly 11 entries")
     definitions = schema.get("$defs")
     if not isinstance(definitions, dict):
         return errors + ["schema: $defs must be an object"]
@@ -608,7 +612,7 @@ def compare_legacy_sources(
                 "role": module["installer"]["role"],
                 "installer_status": module["installer"]["status"],
                 "current_version": module["versions"]["installer"],
-                "civiccore_requirement": module["compatibility"]["installer_core"],
+                "townlight_core_requirement": module["compatibility"]["installer_core"],
             }
             for field, value in expected.items():
                 if current.get(field) != value:
@@ -637,7 +641,7 @@ def compare_legacy_sources(
             expected = {
                 "arch_tier": module["maturity"]["arch_tier"],
                 "current_version": module["versions"]["public_status"],
-                "civiccore_requirement": module["compatibility"]["public_status_core"],
+                "townlight_core_requirement": module["compatibility"]["public_status_core"],
             }
             for field, value in expected.items():
                 if status.get(field) != value:

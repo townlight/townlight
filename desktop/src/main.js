@@ -7,6 +7,7 @@ import { createCodeView } from "./code/view.js";
 import { createPermittingView } from "./permitting/view.js";
 import { createInspectionsView } from "./inspections/view.js";
 import { createPlanningView } from "./planning/view.js";
+import { createNoticeView } from "./notice/view.js";
 import { bindPlanningSources } from "./records/planning-sources.ts";
 import { createZoningView } from "./zoning/view.js";
 import { bindMeetingsSources } from "./records/meetings-sources.ts";
@@ -14,6 +15,7 @@ import { bindCodeSources } from "./records/code-sources.ts";
 import { bindZoningSources } from "./records/zoning-sources.ts";
 
 const recordsController = createRecordsController(invoke);
+const noticeView = createNoticeView(invoke);
 const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
 const permittingView = createPermittingView(invoke);
@@ -26,6 +28,7 @@ const publicZoningView = createZoningView(invoke, true);
 
 function openConnectedWork(area, id) {
   if (!areaIsEnabled(area)) return;
+  if (state.activeArea === 'notice' && !noticeView.canLeave()) return;
   if (state.activeArea === 'permitting' && !permittingView.canLeave()) return;
   if (state.activeArea === 'inspections' && !inspectionsView.canLeave()) return;
   if (state.activeArea === 'planning' && !planningView.canLeave()) return;
@@ -38,28 +41,28 @@ function openConnectedWork(area, id) {
   target.requestSubmit();
 }
 
-const LOCKED_FOUNDATION_MODULE_ID = "civiccore";
-const RECORDS_BETA_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicnotice", "civicaccess"];
-const CITY_CORE_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"];
+const LOCKED_FOUNDATION_MODULE_ID = "townlight_core";
+const RECORDS_BETA_PRODUCT_MODULE_IDS = ["townlight_records", "townlight_notice", "townlight_access"];
+const CITY_CORE_PRODUCT_MODULE_IDS = ["townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"];
 const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "records-beta": RECORDS_BETA_PRODUCT_MODULE_IDS,
-  "meetings-beta": [...RECORDS_BETA_PRODUCT_MODULE_IDS, "civicclerk"],
+  "meetings-beta": [...RECORDS_BETA_PRODUCT_MODULE_IDS, "townlight_meetings"],
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
-  "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone"],
-  "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan"],
-  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan", "civicpermit", "civicinspect"],
-  "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "civiczone", "civicplan", "civicpermit"]
+  "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning"],
+  "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning"],
+  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections"],
+  "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting"]
 };
 const MODULE_AREA_BY_ID = {
-  meetings: "civicclerk",
-  records: "civicrecords-ai",
-  code: "civiccode",
-  zoning: "civiczone",
-  planning: "civicplan",
-  permitting: "civicpermit",
-  inspections: "civicinspect",
-  notice: "civicnotice",
-  access: "civicaccess"
+  meetings: "townlight_meetings",
+  records: "townlight_records",
+  code: "townlight_code",
+  zoning: "townlight_zoning",
+  planning: "townlight_planning",
+  permitting: "townlight_permitting",
+  inspections: "townlight_inspections",
+  notice: "townlight_notice",
+  access: "townlight_access"
 };
 
 const fallbackState = {
@@ -83,7 +86,7 @@ const fallbackState = {
   ].map(([id, label, description]) => ({ id, label, description })),
   modules: [
     {
-      id: "civiccore",
+      id: "townlight_core",
       display_name: "Townlight Core",
       role: "shared platform",
       version: "1.2.1",
@@ -100,18 +103,18 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-profile-removal"
     },
     {
-      id: "civicrecords-ai",
+      id: "townlight_records",
       display_name: "Townlight Records",
       role: "records workflow",
       version: "1.7.3",
-      civiccore_requirement: "1.2.1",
+      townlight_core_requirement: "1.2.1",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore"],
+      dependencies: ["townlight_core"],
       route_count: 2,
       service_count: 2,
       task_count: 4,
@@ -123,23 +126,23 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-module-data-removal"
     },
     {
-      id: "civicclerk",
+      id: "townlight_meetings",
       display_name: "Townlight Meetings",
       role: "meetings workflow",
       version: "1.0.4",
-      civiccore_requirement: "1.2.0",
+      townlight_core_requirement: "1.2.0",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore"],
+      dependencies: ["townlight_core"],
       route_count: 2,
       service_count: 2,
       task_count: 5,
       backup_restore_hooks: ["Data/workflows/meetings", "Data/exports/meetings", "Data/files/meetings"],
-      // Registry truth: civicclerk's model_needs entry is required:false
+      // Registry truth: townlight_meetings's model_needs entry is required:false
       // (minutes drafting is AI-assisted, not AI-required) -- this mirror
       // previously drifted to true with no parity test guarding the field.
       model_required: false,
@@ -149,18 +152,18 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-module-data-removal"
     },
     {
-      id: "civiccode",
+      id: "townlight_code",
       display_name: "Townlight Code",
       role: "municipal code",
       version: "1.0.8",
-      civiccore_requirement: "1.2.0",
+      townlight_core_requirement: "1.2.0",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore"],
+      dependencies: ["townlight_core"],
       route_count: 2,
       service_count: 2,
       task_count: 4,
@@ -172,18 +175,18 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-module-data-removal"
     },
     {
-      id: "civicnotice",
+      id: "townlight_notice",
       display_name: "Townlight Notice",
       role: "public notice workflow",
       version: "0.2.0",
-      civiccore_requirement: "1.2.1",
+      townlight_core_requirement: "1.2.1",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore"],
+      dependencies: ["townlight_core"],
       route_count: 2,
       service_count: 2,
       task_count: 4,
@@ -195,18 +198,18 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-module-data-removal"
     },
     {
-      id: "civicaccess",
+      id: "townlight_access",
       display_name: "Townlight Access",
       role: "accessibility + records-ready export",
       version: "0.4.0",
-      civiccore_requirement: "1.2.1",
+      townlight_core_requirement: "1.2.1",
       required: false,
       selectable: true,
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: ["civiccore"],
+      dependencies: ["townlight_core"],
       route_count: 2,
       service_count: 2,
       task_count: 2,
@@ -218,7 +221,7 @@ const fallbackState = {
       lifecycle_uninstall: "backup-first-module-data-removal"
     },
     {
-      id: "civiczone",
+      id: "townlight_zoning",
       display_name: "Townlight Zoning",
       role: "zoning workflow",
       version: "0.2.2",
@@ -272,8 +275,8 @@ const fallbackState = {
   module_selection: {
     profile_id: "city-core",
     profile_label: "City Core",
-    installed_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"],
-    enabled_module_ids: ["civiccore", "civicrecords-ai", "civicclerk", "civiccode", "civicnotice", "civicaccess"],
+    installed_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"],
+    enabled_module_ids: ["townlight_core", "townlight_records", "townlight_meetings", "townlight_code", "townlight_notice", "townlight_access"],
     disabled_module_ids: [],
     last_updated_unix_seconds: 0
   },
@@ -286,8 +289,8 @@ const fallbackState = {
     status: "Needs setup",
     current_step_id: "locations",
     locations: {
-      install_root: "%LOCALAPPDATA%\\Townlight",
-      data_root: "%LOCALAPPDATA%\\Townlight\\Data",
+      install_root: "%LOCALAPPDATA%\\CivicSuite",
+      data_root: "%LOCALAPPDATA%\\CivicSuite\\Data",
       backup_root: "%USERPROFILE%\\Documents\\Townlight Backups"
     },
     available_actions: ["choose-location", "select-modules", "create-city-profile", "create-admin", "choose-backup", "download-model", "defer-model", "verify-health", "open-app", "repair", "backup", "uninstall"],
@@ -413,7 +416,7 @@ const fallbackState = {
     license: "Apache-2.0",
     runtime: "ollama",
     ollama_model: "hf.co/google/gemma-4-12B-it-qat-q4_0-gguf:Q4_0",
-    runtime_model: "civicsuite-gemma4-12b-qat:q4_0",
+    runtime_model: "townlight-gemma4-12b-qat:q4_0",
     format: "GGUF",
     quantization: "QAT Q4_0",
     parameters: "12B",
@@ -429,8 +432,8 @@ const fallbackState = {
       model_id: "gemma-4-12b-it-qat-q4_0",
       status: "Not downloaded",
       message: "No verified or partial Gemma model download is saved on this machine.",
-      local_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
-      partial_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf.part",
+      local_path: "%LOCALAPPDATA%\\CivicSuite\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
+      partial_path: "%LOCALAPPDATA%\\CivicSuite\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf.part",
       expected_size_bytes: 6975879296,
       local_bytes: 0,
       partial_bytes: 0,
@@ -440,7 +443,7 @@ const fallbackState = {
     },
     artifact: {
       file_name: "gemma-4-12b-it-qat-q4_0.gguf",
-      local_path: "%LOCALAPPDATA%\\Townlight\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
+      local_path: "%LOCALAPPDATA%\\CivicSuite\\Data\\models\\gemma-4-12b-it-qat-q4_0.gguf",
       expected_size_bytes: 6975879296,
       expected_sha256: "93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b",
       checksum_required: true,
@@ -485,7 +488,7 @@ const fallbackState = {
         label: "Gemma model loaded in Ollama",
         ok: false,
         status: "Needs load",
-        message: "The local Ollama runtime does not list civicsuite-gemma4-12b-qat:q4_0 yet.",
+        message: "The local Ollama runtime does not list townlight-gemma4-12b-qat:q4_0 yet.",
         next_action: "Load the verified Gemma model into the local Ollama runtime before staff workflows use AI."
       },
       {
@@ -517,7 +520,7 @@ const fallbackState = {
       status: "Needs setup",
       message: "City data folder has not been created yet.",
       next_action: "Use First Run or Repair to create the city data folder.",
-      admin_detail: "%LOCALAPPDATA%\\Townlight\\Data",
+      admin_detail: "%LOCALAPPDATA%\\CivicSuite\\Data",
       actionable: false
     },
     {
@@ -621,7 +624,7 @@ const state = {
   supervisorActionResult: null,
   workActionResult: null,
   // GauntletGate round-7 (W-3): upgraded from a single scalar to a Set so N
-  // simultaneously in-flight civicaccess actions can each be independently
+  // simultaneously in-flight townlight_access actions can each be independently
   // tracked -- a completing action's tag no longer clobbers a different,
   // still-pending action's busy indicator no matter how many are in flight at
   // once. `has()`/`add()`/`delete()` on a Set are the whole implementation;
@@ -1094,7 +1097,7 @@ function moduleIsEnabled(moduleId) {
 function areaIsEnabled(areaId) {
   if (["home", "health", "settings"].includes(areaId)) return true;
   if (areaId === "search") {
-    return [...CITY_CORE_PRODUCT_MODULE_IDS, "civicnotice"].some((moduleId) => moduleIsEnabled(moduleId));
+    return [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_notice"].some((moduleId) => moduleIsEnabled(moduleId));
   }
   const moduleId = MODULE_AREA_BY_ID[areaId];
   return moduleId ? moduleIsEnabled(moduleId) : true;
@@ -1844,10 +1847,10 @@ const GUIDED_WORK_ACTIONS = new Set([
   "complete-notice-checklist",
   "post-notice",
   "export-meeting-packet",
-  "civicnotice-calculate-deadline",
-  "civicnotice-complete-checklist",
-  "civicnotice-post-notice",
-  "civicnotice-export-archive-packet",
+  "townlight_notice-calculate-deadline",
+  "townlight_notice-complete-checklist",
+  "townlight_notice-post-notice",
+  "townlight_notice-export-archive-packet",
   "add-minute-citation",
   "review-public-comment",
   "redact-public-comment",
@@ -1880,13 +1883,13 @@ const GUIDED_WORK_ACTIONS = new Set([
   "publish-code-source",
   "unpublish-code-source",
   "create-code-handoff",
-  "civicaccess-delete-review",
+  "townlight_access-delete-review",
   // Local-AI dual-path actions: when the model is ready, each of these can
   // hold the global city-work write lock for the full generation call, so a
   // human confirm before taking that lock matches the suggest-* precedent.
   "accessibility-review",
-  "civicaccess-plain-language",
-  "civicaccess-language-variant"
+  "townlight_access-plain-language",
+  "townlight_access-language-variant"
 ]);
 
 const GUIDED_SUPERVISOR_ACTIONS = new Set([
@@ -2249,7 +2252,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Meetings audit entry for the packet export and durable records-ready bundle manifest.",
       retry: "If the packet, checksum sidecar, or bundle manifest cannot be written, the desktop app reports the failure and preserves the meeting record."
     },
-    "civicnotice-calculate-deadline": {
+    "townlight_notice-calculate-deadline": {
       title: "Review Before Calculating Notice Deadline",
       confirmLabel: "Calculate Deadline",
       module: "Townlight Notice",
@@ -2270,7 +2273,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Notice audit entry for the calculated notice deadline without claiming legal sufficiency.",
       retry: "If required notice details are missing, the day count or time zone is invalid, approval is unchecked, or the meeting is archived, the desktop app leaves the notice unchanged."
     },
-    "civicnotice-complete-checklist": {
+    "townlight_notice-complete-checklist": {
       title: "Review Before Saving Notice Checklist",
       confirmLabel: "Save Checklist",
       module: "Townlight Notice",
@@ -2289,7 +2292,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Notice audit entry for checklist approval without claiming legal sufficiency.",
       retry: "If required checklist details are missing, the time zone is invalid, or approval is not checked, the desktop app leaves the notice unchanged."
     },
-    "civicnotice-post-notice": {
+    "townlight_notice-post-notice": {
       title: "Review Before Recording Posting Proof",
       confirmLabel: "Record Posting Proof",
       module: "Townlight Notice",
@@ -2308,7 +2311,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Notice audit entry for posting proof with location, method, and confirmation evidence.",
       retry: "If required meeting details are missing, the desktop app shows the issue and leaves the notice unchanged."
     },
-    "civicnotice-export-archive-packet": {
+    "townlight_notice-export-archive-packet": {
       title: "Review Before Building Notice Archive Packet",
       confirmLabel: "Build Archive Packet",
       module: "Townlight Notice",
@@ -2833,7 +2836,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Code audit entry for the clerk handoff.",
       retry: "If no source exists, the desktop app blocks handoff creation."
     },
-    "civicaccess-delete-review": {
+    "townlight_access-delete-review": {
       title: "Review Before Deleting Accessibility Review",
       confirmLabel: "Delete Review",
       module: "Townlight Access",
@@ -2867,7 +2870,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Access audit entry naming the engine used (local model or deterministic only).",
       retry: "If the AI engine is not ready, the review still saves with deterministic findings only and says so — nothing is generated by AI in that case."
     },
-    "civicaccess-plain-language": {
+    "townlight_access-plain-language": {
       title: "Review Before Drafting Plain-Language Rewrite",
       confirmLabel: "Draft Rewrite",
       module: "Townlight Access",
@@ -2888,7 +2891,7 @@ function guidedReviewForAction(action) {
       audit: "Creates a Townlight Access audit entry naming the engine used for the rewrite.",
       retry: "If the local AI engine is not ready, the tool falls back to the deterministic sample and says so — nothing is generated by AI in that case."
     },
-    "civicaccess-language-variant": {
+    "townlight_access-language-variant": {
       title: "Review Before Drafting Translation Variant",
       confirmLabel: "Draft Variant",
       module: "Townlight Access",
@@ -3639,7 +3642,7 @@ function localCodeQuestionResults(query, { publicOnly = false } = {}) {
           ? source.staff_guidance
           : String(source.body || "").split(".")[0] || source.body;
       return {
-        module_id: "civiccode",
+        module_id: "townlight_code",
         title: `Code answer: ${source.title}`,
         snippet: `${publicOnly ? "Non-authoritative public summary" : "Staff code guidance"}: ${answer}. This is not legal advice; confirm interpretation with city staff or counsel.`,
         citation: source.citation,
@@ -3648,78 +3651,9 @@ function localCodeQuestionResults(query, { publicOnly = false } = {}) {
     });
 }
 
-function renderNoticeWorkflow() {
-  if (isPublicSurface()) return renderPublicMeetingsWorkflow();
-  const work = cityWork();
-  const selectedMeeting = currentMeeting(work);
-  const noticeMeetings = (work.meetings || []).filter((meeting) => (
-    (meeting.notice_checklists || []).length > 0 ||
-    (meeting.notice_postings || []).length > 0 ||
-    (meeting.export_bundles || []).length > 0 ||
-    meeting.notice_status
-  ));
-  return `
-    <section class="page-heading">
-      <p class="eyebrow">${state.activeSurface}</p>
-      <h2>Public Notices</h2>
-      <p>Manage statutory deadline workpapers, clerk approval, posting proof, and records-ready notice archive packets.</p>
-    </section>
-    ${renderGuidedWorkReview()}
-    <section class="workflow-editor">
-      <div class="workflow-form">
-        <h3>Notice Workpaper</h3>
-        <p class="form-help">${selectedMeeting ? `Working on ${escapeHtml(selectedMeeting.title)}.` : "Create a meeting in Meetings & Notices before preparing notice proof."}</p>
-        <label>Notice meeting type <input type="text" data-work-field="noticeMeetingType" value="${escapeHtml(state.workDraft.noticeMeetingType)}" placeholder="Regular council meeting" /></label>
-        <label>Statutory notice basis <input type="text" data-work-field="noticeStatutoryBasis" value="${escapeHtml(state.workDraft.noticeStatutoryBasis)}" placeholder="Municipal open meetings notice" /></label>
-        <label>Notice lead days <input type="number" min="1" max="365" step="1" data-work-field="noticeLeadDays" value="${escapeHtml(state.workDraft.noticeLeadDays)}" /></label>
-        <label>Lead day type
-          <select aria-label="Lead day type" data-work-field="noticeDayType">
-            <option value="calendar days" ${state.workDraft.noticeDayType === "calendar days" ? "selected" : ""}>Calendar days</option>
-            <option value="business days" ${state.workDraft.noticeDayType === "business days" ? "selected" : ""}>Business days</option>
-          </select>
-        </label>
-        <label>Notice deadline <input type="date" data-work-field="noticeDeadline" value="${escapeHtml(state.workDraft.noticeDeadline)}" /></label>
-        <label>Notice time zone <input type="text" data-work-field="noticeTimeZone" value="${escapeHtml(state.workDraft.noticeTimeZone)}" placeholder="America/Denver" /></label>
-        <label class="checkbox-row"><input type="checkbox" data-work-field="noticeHumanApproval" ${state.workDraft.noticeHumanApproval ? "checked" : ""} /> Clerk has reviewed and approved the notice checklist</label>
-        <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicnotice-calculate-deadline">Calculate Deadline</button>
-          <button type="button" class="secondary-action" data-work-action="civicnotice-complete-checklist">Save Checklist</button>
-        </div>
-      </div>
-      <div class="workflow-form">
-        <h3>Posting Proof</h3>
-        <label>Actual posting date <input type="date" data-work-field="noticePostingDate" value="${escapedDraft("noticePostingDate")}" /></label>
-        <label>Posting location <input type="text" data-work-field="noticeLocation" value="${escapedDraft("noticeLocation")}" placeholder="City Hall bulletin board and city website" /></label>
-        <label>Posting method <input type="text" data-work-field="noticeMethod" value="${escapedDraft("noticeMethod")}" placeholder="Posted PDF and clerk attestation" /></label>
-        <label>Posting confirmation <textarea data-work-field="noticeConfirmation">${escapedDraft("noticeConfirmation")}</textarea></label>
-        <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicnotice-post-notice">Record Posting Proof</button>
-          <button type="button" class="secondary-action" data-work-action="civicnotice-export-archive-packet">Build Archive Packet</button>
-          <button type="button" class="secondary-action" data-work-action="open-exports-folder">Open Exports Folder</button>
-        </div>
-      </div>
-    </section>
-    ${renderWorkActionResult()}
-    <section class="workflow-list" aria-label="Notice workpapers">
-      ${noticeMeetings.length === 0 ? workflowEmpty("No notice workpapers have been saved yet.") : noticeMeetings.map((meeting) => `
-        <article class="workflow-record">
-          <span class="${meeting.notice_status === "public notice ready" ? "status-ok" : "status-warn"}">${escapeHtml(meeting.notice_status || meeting.status)}</span>
-          <h3>${escapeHtml(meeting.title)}</h3>
-          <p>${escapeHtml(meeting.summary || "No meeting summary recorded.")}</p>
-          <p><strong>Checklists:</strong> ${(meeting.notice_checklists || []).length} <strong>Posting proofs:</strong> ${(meeting.notice_postings || []).length} <strong>Archive packets:</strong> ${(meeting.export_bundles || []).length}</p>
-          <div class="record-actions">
-            ${state.workSelection.meetingId === meeting.id ? `<span class="status-ok">Selected for notice work</span>` : `<button type="button" class="secondary-action" data-select-work-record="meeting" data-record-id="${escapeHtml(meeting.id)}">Work On This</button>`}
-          </div>
-          <small>${escapeHtml(meeting.meeting_date || "No meeting date")} - Townlight Notice preserves proof; staff still verify legal sufficiency.</small>
-        </article>
-      `).join("")}
-    </section>
-  `;
-}
+const TOWNLIGHT_ACCESS_DISCLAIMER_TEXT = "Persisted reviews are advisory clerk support, not a certified accessibility audit.";
 
-const CIVICACCESS_DISCLAIMER_TEXT = "Persisted reviews are advisory clerk support, not a certified accessibility audit.";
-
-const CIVICACCESS_STATUS_LABELS = {
+const TOWNLIGHT_ACCESS_STATUS_LABELS = {
   "passes-sample-checks": "No findings (advisory)",
   "needs-fixes": "Findings to address"
 };
@@ -3728,40 +3662,57 @@ function jsonAttr(value) {
   return escapeHtml(JSON.stringify(value));
 }
 
-function civicaccessActionInFlight(action) {
+function townlight_accessActionInFlight(action) {
   for (const tag of state.workActionInFlightTags) {
     if (tag === action || tag.startsWith(`${action}:`)) return true;
   }
   return false;
 }
 
-function civicaccessActionBusy(action, reviewId) {
+function townlight_accessActionBusy(action, reviewId) {
   if (state.workActionInFlightTags.has(reviewId ? `${action}:${reviewId}` : action)) return true;
   // A guided-review confirmation pending for this exact row also counts as busy
   // (handleCityWorkAction returns before adding to workActionInFlightTags while
   // the confirm panel is showing, so that state alone wouldn't otherwise
   // disable it).
-  if (action === "civicaccess-delete-review" && state.pendingWorkReviewAction === "civicaccess-delete-review") {
+  if (action === "townlight_access-delete-review" && state.pendingWorkReviewAction === "townlight_access-delete-review") {
     return state.workSelection.accessDeleteReviewId === reviewId;
   }
   return false;
+}
+
+function renderAccessDrafts() {
+  const drafts = cityWork().access?.drafts || [];
+  return `<section class="workflow-list" aria-label="Saved plain-language and translation drafts">
+    <h3>Saved plain-language and translation drafts</h3>
+    ${drafts.length === 0 ? workflowEmpty("No drafts saved yet.") : drafts.slice().reverse().map(draft => `
+      <article class="workflow-record">
+        <h4>${escapeHtml(draft.action)} ${escapeHtml(draft.language || "")}</h4>
+        <p><strong>Source:</strong> ${escapeHtml(draft.source_text)}</p>
+        <p><strong>${draft.outcome === "generated" ? "Generated advisory draft" : "Sample only"}:</strong> ${escapeHtml(draft.result_text)}</p>
+        <p>${escapeHtml(draft.review_status)} | ${escapeHtml(draft.model || "No model output")} | ${escapeHtml(draft.created_at)}</p>
+        <button type="button" class="secondary-action" data-work-action="townlight_access-export-draft"
+          data-action-payload='${jsonAttr({draftId: draft.draft_id})}'
+          ${townlight_accessActionBusy("townlight_access-export-draft") ? "disabled" : ""}>Export source and draft record</button>
+      </article>`).join("")}
+  </section>`;
 }
 
 function renderAccessibilityWorkflow() {
   if (isPublicSurface()) return renderPublicMeetingsWorkflow();
   const reviews = (cityWork().access && cityWork().access.reviews) || [];
   const sortedReviews = reviews.slice().sort((a, b) => b.created_at_unix_seconds - a.created_at_unix_seconds);
-  const civicaccessBusy = [
+  const townlight_accessBusy = [
     "accessibility-review",
-    "civicaccess-plain-language",
-    "civicaccess-language-variant",
-    "civicaccess-form-plan",
-    "civicaccess-publishing-workflow",
-    "civicaccess-ada-title-ii",
-    "civicaccess-tagged-pdf",
-    "civicaccess-records-export",
-    "civicaccess-delete-review"
-  ].some((action) => civicaccessActionInFlight(action));
+    "townlight_access-plain-language",
+    "townlight_access-language-variant",
+    "townlight_access-form-plan",
+    "townlight_access-publishing-workflow",
+    "townlight_access-ada-title-ii",
+    "townlight_access-tagged-pdf",
+    "townlight_access-records-export",
+    "townlight_access-delete-review"
+  ].some((action) => townlight_accessActionInFlight(action));
   return `
     <section class="page-heading">
       <p class="eyebrow">${state.activeSurface}</p>
@@ -3780,8 +3731,8 @@ function renderAccessibilityWorkflow() {
       all checklist tools work normally.
       <button type="button" class="text-link" data-area="health">Open model setup</button>
     </aside>` : ""}
-    <section class="workflow-editor"${civicaccessBusy ? ' aria-busy="true"' : ""}>
-      <aside class="section-band" role="note">${escapeHtml(CIVICACCESS_DISCLAIMER_TEXT)} Final compliance review must come from a qualified human reviewer.</aside>
+    <section class="workflow-editor"${townlight_accessBusy ? ' aria-busy="true"' : ""}>
+      <aside class="section-band" role="note">${escapeHtml(TOWNLIGHT_ACCESS_DISCLAIMER_TEXT)} Final compliance review must come from a qualified human reviewer.</aside>
       <p class="form-help">Fields marked * are required. Most show a finding or blocker if left empty instead of an error; the others must have a value before the tool can run.</p>
       <div class="workflow-form">
         <h3>Accessibility Review (WCAG sample)</h3>
@@ -3794,7 +3745,7 @@ function renderAccessibilityWorkflow() {
         <label for="access-language">Language tag</label>
         <input type="text" id="access-language" data-work-field="accessLanguage" value="${escapeHtml(state.workDraft.accessLanguage)}" placeholder="en" />
         <div class="workflow-actions">
-          <button type="button" class="primary-action" data-work-action="accessibility-review" ${civicaccessActionBusy("accessibility-review") ? "disabled" : ""}>Run Review &amp; Save</button>
+          <button type="button" class="primary-action" data-work-action="accessibility-review" ${townlight_accessActionBusy("accessibility-review") ? "disabled" : ""}>Run Review &amp; Save</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3803,7 +3754,7 @@ function renderAccessibilityWorkflow() {
         <label for="access-plain-text">Text to rewrite *</label>
         <textarea id="access-plain-text" aria-required="true" data-work-field="accessPlainText" placeholder="Residents must remit payment prior to the deadline.">${escapeHtml(state.workDraft.accessPlainText)}</textarea>
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-plain-language" ${civicaccessActionBusy("civicaccess-plain-language") ? "disabled" : ""}>Draft Plain-Language Rewrite</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-plain-language" ${townlight_accessActionBusy("townlight_access-plain-language") ? "disabled" : ""}>Draft Plain-Language Rewrite</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3814,7 +3765,7 @@ function renderAccessibilityWorkflow() {
         <label for="access-variant-language">Target language *</label>
         <input type="text" id="access-variant-language" aria-required="true" data-work-field="accessVariantLanguage" value="${escapeHtml(state.workDraft.accessVariantLanguage)}" placeholder="es" />
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-language-variant" ${civicaccessActionBusy("civicaccess-language-variant") ? "disabled" : ""}>Draft Translation Variant</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-language-variant" ${townlight_accessActionBusy("townlight_access-language-variant") ? "disabled" : ""}>Draft Translation Variant</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3825,7 +3776,7 @@ function renderAccessibilityWorkflow() {
         <label for="access-form-fields">Fields (comma or newline separated) *</label>
         <textarea id="access-form-fields" aria-required="true" data-work-field="accessFormFields" placeholder="name, contact, request">${escapeHtml(state.workDraft.accessFormFields)}</textarea>
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-form-plan" ${civicaccessActionBusy("civicaccess-form-plan") ? "disabled" : ""}>Plan Accessible Form</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-form-plan" ${townlight_accessActionBusy("townlight_access-form-plan") ? "disabled" : ""}>Plan Accessible Form</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3837,7 +3788,7 @@ function renderAccessibilityWorkflow() {
         <label class="checkbox-row"><input type="checkbox" data-work-field="accessPublishingHasPlainLanguage" ${state.workDraft.accessPublishingHasPlainLanguage ? "checked" : ""} /> Plain-language summary attached</label>
         <label class="checkbox-row"><input type="checkbox" data-work-field="accessPublishingHasTranslationReview" ${state.workDraft.accessPublishingHasTranslationReview ? "checked" : ""} /> Translation review on file</label>
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-publishing-workflow" ${civicaccessActionBusy("civicaccess-publishing-workflow") ? "disabled" : ""}>Build Publishing Plan</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-publishing-workflow" ${townlight_accessActionBusy("townlight_access-publishing-workflow") ? "disabled" : ""}>Build Publishing Plan</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3846,7 +3797,7 @@ function renderAccessibilityWorkflow() {
         <input type="text" id="access-ada-service-area" aria-required="true" data-work-field="accessAdaServiceArea" value="${escapeHtml(state.workDraft.accessAdaServiceArea)}" placeholder="Records intake" />
         <label class="checkbox-row"><input type="checkbox" data-work-field="accessAdaHasCoordinatorReview" ${state.workDraft.accessAdaHasCoordinatorReview ? "checked" : ""} /> ADA coordinator or qualified reviewer has reviewed</label>
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-ada-title-ii" ${civicaccessActionBusy("civicaccess-ada-title-ii") ? "disabled" : ""}>Build ADA Review Plan</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-ada-title-ii" ${townlight_accessActionBusy("townlight_access-ada-title-ii") ? "disabled" : ""}>Build ADA Review Plan</button>
         </div>
       </div>
       <div class="workflow-form">
@@ -3855,24 +3806,32 @@ function renderAccessibilityWorkflow() {
         <label for="access-tagged-pdf-headings">Heading levels (comma separated) *</label>
         <input type="text" id="access-tagged-pdf-headings" aria-required="true" data-work-field="accessTaggedPdfHeadings" value="${escapeHtml(state.workDraft.accessTaggedPdfHeadings)}" placeholder="1, 2, 3" />
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="civicaccess-tagged-pdf" ${civicaccessActionBusy("civicaccess-tagged-pdf") ? "disabled" : ""}>Plan Tagged-PDF Expectations</button>
+          <button type="button" class="secondary-action" data-work-action="townlight_access-tagged-pdf" ${townlight_accessActionBusy("townlight_access-tagged-pdf") ? "disabled" : ""}>Plan Tagged-PDF Expectations</button>
         </div>
       </div>
     </section>
     ${renderWorkActionResult()}
+    ${renderAccessDrafts()}
     <section class="workflow-list" aria-label="Saved accessibility reviews">
-      ${sortedReviews.length === 0 ? workflowEmpty(`No accessibility reviews saved yet. Start with "Run Review & Save" above. ${CIVICACCESS_DISCLAIMER_TEXT}`) : (state.accessReviewsShowAll ? sortedReviews : sortedReviews.slice(0, 20)).map((review) => `
+      ${sortedReviews.length === 0 ? workflowEmpty(`No accessibility reviews saved yet. Start with "Run Review & Save" above. ${TOWNLIGHT_ACCESS_DISCLAIMER_TEXT}`) : (state.accessReviewsShowAll ? sortedReviews : sortedReviews.slice(0, 20)).map((review) => `
         <article class="workflow-record">
-          <span class="${review.status === "passes-sample-checks" ? "status-ok" : "status-warn"}">${escapeHtml(CIVICACCESS_STATUS_LABELS[review.status] || review.status)}</span>
+          <span class="${review.status === "passes-sample-checks" ? "status-ok" : "status-warn"}">${escapeHtml(TOWNLIGHT_ACCESS_STATUS_LABELS[review.status] || review.status)}</span>
           <h3>${escapeHtml(review.title || "(no title)")}</h3>
           <p>${(review.findings || []).length} ${(review.findings || []).length === 1 ? "finding" : "findings"} &middot; language ${escapeHtml((review.language || "en").toUpperCase())} &middot; alt text ${review.has_alt_text ? "present" : "missing"}</p>
+          <details>
+            <summary>Saved source and review provenance</summary>
+            <p>Saved ${escapeHtml(new Date(review.created_at_unix_seconds * 1000).toLocaleString())} &middot; actor ID ${escapeHtml(review.created_by || "not recorded in imported history")}</p>
+            <p>AI outcome: ${escapeHtml(review.ai_outcome || "not recorded in imported history")} &middot; model ${escapeHtml(review.ai_analysis_model || "none recorded")}. Advisory only; qualified human review is required.</p>
+            <h4>Reviewed source text</h4>
+            <pre class="source-text">${escapeHtml(review.body || "")}</pre>
+          </details>
           ${(review.findings || []).length === 0 ? "" : `<ul class="finding-list">${(review.findings || []).map((finding) => `<li><strong>${escapeHtml(finding.severity)}</strong> ${escapeHtml(finding.message)} <em>${escapeHtml(finding.fix)}</em> <small>${escapeHtml(finding.wcag_reference)}</small></li>`).join("")}</ul>`}
           ${review.ai_analysis ? `<div class="comment-review-item"><p><strong>Local AI analysis (${escapeHtml(review.ai_analysis_model || "local model")}) — advisory</strong></p><p>${escapeHtml(review.ai_analysis)}</p></div>` : ""}
           <div class="record-actions">
-            <button type="button" class="secondary-action" data-work-action="civicaccess-records-export" data-action-payload='${jsonAttr({reviewId: review.review_id})}' aria-label="${escapeHtml(`Generate Records-Ready Export for ${review.title || "(no title)"} (${review.review_id})`)}" ${civicaccessActionBusy("civicaccess-records-export", review.review_id) ? "disabled" : ""}>Generate Records-Ready Export</button>
-            <button type="button" class="destructive-action" data-work-action="civicaccess-delete-review" data-action-payload='${jsonAttr({reviewId: review.review_id})}' aria-label="${escapeHtml(`Delete review: ${review.title || "(no title)"} (${review.review_id})`)}" ${civicaccessActionBusy("civicaccess-delete-review", review.review_id) ? "disabled" : ""}>Delete Review</button>
+            <button type="button" class="secondary-action" data-work-action="townlight_access-records-export" data-action-payload='${jsonAttr({reviewId: review.review_id})}' aria-label="${escapeHtml(`Generate Records-Ready Export for ${review.title || "(no title)"} (${review.review_id})`)}" ${townlight_accessActionBusy("townlight_access-records-export", review.review_id) ? "disabled" : ""}>Generate Records-Ready Export</button>
+            <button type="button" class="destructive-action" data-work-action="townlight_access-delete-review" data-action-payload='${jsonAttr({reviewId: review.review_id})}' aria-label="${escapeHtml(`Delete review: ${review.title || "(no title)"} (${review.review_id})`)}" ${townlight_accessActionBusy("townlight_access-delete-review", review.review_id) ? "disabled" : ""}>Delete Review</button>
           </div>
-          <small>${escapeHtml(review.review_id)} &mdash; ${escapeHtml(CIVICACCESS_DISCLAIMER_TEXT)}</small>
+          <small>${escapeHtml(review.review_id)} &mdash; ${escapeHtml(TOWNLIGHT_ACCESS_DISCLAIMER_TEXT)}</small>
         </article>
       `).join("")}
       ${sortedReviews.length > 20 ? `
@@ -4121,7 +4080,7 @@ function localSearchResults(query, { publicOnly = false } = {}) {
     const bodySearchText = [body.name, body.body_type, body.statutory_basis, body.meeting_cadence, body.quorum_rule, body.status];
     if (bodySearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
       results.push({
-        module_id: "civicclerk",
+        module_id: "townlight_meetings",
         title: `Meeting body: ${body.name}`,
         snippet: `${body.body_type}; ${body.meeting_cadence}; quorum ${body.quorum_rule}`,
         citation: body.statutory_basis,
@@ -4135,7 +4094,7 @@ function localSearchResults(query, { publicOnly = false } = {}) {
       : [member.name, member.role, member.body_name, member.term_start, member.term_end, member.email, member.status];
     if (memberSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
       results.push({
-        module_id: "civicclerk",
+        module_id: "townlight_meetings",
         title: `Meeting member: ${member.name}`,
         snippet: `${member.role}; ${member.body_name}`,
         citation: member.body_name,
@@ -4276,11 +4235,11 @@ function localSearchResults(query, { publicOnly = false } = {}) {
         : publicMeetingFields
       : [meeting.title, meeting.body_name, meeting.summary, meeting.status, meeting.minutes, meeting.minutes_signed_by, meeting.minutes_signature_attestation, noticeChecklists, noticePostings, agendaTitles, staffReports, packetAttachments, packetAssemblies, exportBundles, attendanceRecords, quorumChecks, minuteCitations, motions, memberVotes, outcomes, actionItems, actionRecords, adoptedLegislation, closedSessions, residentComments, publicComments];
     if (meetingSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
-      results.push({ module_id: "civicclerk", title: meeting.title, snippet: meeting.summary, citation: `Meeting ${meeting.meeting_date}`, status: meeting.status });
+      results.push({ module_id: "townlight_meetings", title: meeting.title, snippet: meeting.summary, citation: `Meeting ${meeting.meeting_date}`, status: meeting.status });
     }
     if ([noticeChecklists, noticePostings, exportBundles].some((value) => String(value || "").toLowerCase().includes(normalized))) {
       results.push({
-        module_id: "civicnotice",
+        module_id: "townlight_notice",
         title: `Notice workpaper: ${meeting.title}`,
         snippet: meeting.notice_status || "Notice workpaper",
         citation: `Meeting ${meeting.meeting_date}`,
@@ -4302,7 +4261,7 @@ function localSearchResults(query, { publicOnly = false } = {}) {
       ];
       if (intakeSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
         results.push({
-          module_id: "civicclerk",
+          module_id: "townlight_meetings",
           title: `Agenda intake: ${intake.title}`,
           snippet: `${intake.department}; ${intake.summary}`,
           citation: intake.source_reference,
@@ -4373,14 +4332,14 @@ function localSearchResults(query, { publicOnly = false } = {}) {
       ...(request.timeline || []).map((entry) => [entry.action, entry.actor, entry.note].join(" "))
     ];
     if (recordsSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
-      results.push({ module_id: "civicrecords-ai", title: `Records request: ${request.requester}`, snippet: request.summary, citation: request.citations[0] || "Local records request", status: request.status });
+      results.push({ module_id: "townlight_records", title: `Records request: ${request.requester}`, snippet: request.summary, citation: request.citations[0] || "Local records request", status: request.status });
     }
   });
   const codeSources = publicOnly ? publicCodeSources(work) : work.code_sources;
   codeSources.forEach((source) => {
     const codeSearchText = codeSourceSearchFields(source, { publicOnly });
     if (codeSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
-      results.push({ module_id: "civiccode", title: source.title, snippet: source.body, citation: source.citation, status: source.status });
+      results.push({ module_id: "townlight_code", title: source.title, snippet: source.body, citation: source.citation, status: source.status });
     }
   });
   if (!publicOnly) {
@@ -4396,7 +4355,7 @@ function localSearchResults(query, { publicOnly = false } = {}) {
       ];
       if (notificationSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
         results.push({
-          module_id: "civiccore",
+          module_id: "townlight_core",
           title: `Notification: ${event.subject}`,
           snippet: event.body,
           citation: event.channel,
@@ -4413,7 +4372,7 @@ function localSearchResults(query, { publicOnly = false } = {}) {
     const reviewSearchText = [review.title, review.body, review.language, review.status, findingSummary];
     if (reviewSearchText.some((value) => String(value || "").toLowerCase().includes(normalized))) {
       results.push({
-        module_id: "civicaccess",
+        module_id: "townlight_access",
         title: `Accessibility review: ${review.title || "(no title)"}`,
         snippet: `${review.status} (${(review.findings || []).length} finding(s); language: ${review.language}; alt text: ${review.has_alt_text ? "yes" : "no"})`,
         citation: `Accessibility advisory review ${review.review_id}`,
@@ -4484,7 +4443,7 @@ function moduleLifecycleItems(module) {
     .map(([label, value]) => ({ label, value: lifecycleStatusText(value) }));
 }
 
-const MODULE_EXPORTS_AVAILABLE = new Set(["civicrecords-ai", "civicclerk", "civiccode", "civicnotice"]);
+const MODULE_EXPORTS_AVAILABLE = new Set(["townlight_records", "townlight_meetings", "townlight_code", "townlight_notice"]);
 
 function backupHookLabel(hook) {
   const labels = {
@@ -4659,7 +4618,7 @@ function guidedModuleReviewForAction(action, moduleId) {
     sources: [
       `Module id: ${module.id}`,
       `Pinned version: ${version}`,
-      `Townlight Core requirement: ${module.civiccore_requirement || "Townlight Core foundation"}`
+      `Townlight Core requirement: ${module.townlight_core_requirement || "Townlight Core foundation"}`
     ]
   };
   const reviews = {
@@ -5137,7 +5096,7 @@ function renderActiveArea() {
         return codeView.render();
       return renderCodeWorkflow();
     case "notice":
-      return renderNoticeWorkflow();
+      return isPublicSurface() ? renderPublicMeetingsWorkflow() : noticeView.render();
     case "access":
       return renderAccessibilityWorkflow();
     case "search":
@@ -5213,7 +5172,7 @@ function render() {
   // Never retain an in-memory Planning draft across accounts or session loss.
   const access = accessState();
   const account = JSON.stringify([access.signed_in, access.operator_email, access.role]);
-  if (planningAccount !== account) { planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset(); planningAccount = account; }
+  if (planningAccount !== account) { noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset(); planningAccount = account; }
   if (state.appLoadError) {
     byId("app").innerHTML = renderStateLoadError(state.appLoadError);
     byId("app").querySelector("[data-action='retry-load-state']")
@@ -5239,7 +5198,7 @@ function render() {
   // GauntletGate round-7 (W-1, extended per W7-4): every render() call
   // replaces #app's entire subtree, which drops focus to <body> as a side
   // effect of the DOM swap itself -- app-wide, at all ~36 call sites,
-  // including the appLoadError branch above, not just civicaccess. One
+  // including the appLoadError branch above, not just townlight_access. One
   // shared tail check covers both branches instead of patching each one.
   // maybeAdvanceFirstRunFocus() above defers its own focus-move via
   // requestAnimationFrame, so this synchronous check still runs first; its
@@ -5253,12 +5212,13 @@ function render() {
 }
 
 function bindEvents() {
+  if (state.activeArea === "notice" && !isPublicSurface()) noticeView.bind();
   bindMeetingsSources(invoke, async () => { await loadAppState(); render(); });
   bindCodeSources(invoke, async () => { await loadAppState(); render(); });
-  if (state.app.module_selection?.enabled_module_ids?.includes('civiczone')) {
+  if (state.app.module_selection?.enabled_module_ids?.includes('townlight_zoning')) {
     bindZoningSources(invoke, async () => { await loadAppState(); render(); });
   }
-  if (state.app.module_selection?.enabled_module_ids?.includes("civicplan")) {
+  if (state.app.module_selection?.enabled_module_ids?.includes("townlight_planning")) {
     bindPlanningSources(invoke, async () => { await loadAppState(); render(); });
     if (state.activeArea === "permitting") permittingView.bind();
     if (state.activeArea === "inspections") inspectionsView.bind();
@@ -5276,6 +5236,7 @@ function bindEvents() {
   document.querySelectorAll("[data-area]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!areaIsEnabled(button.dataset.area)) return;
+      if (state.activeArea === 'notice' && button.dataset.area !== 'notice' && !noticeView.canLeave()) return;
       if (state.activeArea === 'permitting' && button.dataset.area !== 'permitting' && !permittingView.canLeave()) return;
       if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
@@ -5291,6 +5252,7 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-surface]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (state.activeArea === 'notice' && !noticeView.canLeave()) return;
       if (state.activeArea === 'permitting' && !permittingView.canLeave()) return;
       if (state.activeArea === 'inspections' && !inspectionsView.canLeave()) return;
   if (state.activeArea === 'planning' && !planningView.canLeave()) return;
@@ -5447,7 +5409,7 @@ function bindEvents() {
           overridePayload = null;
         }
       }
-      if (button.dataset.workAction === "civicaccess-delete-review" && overridePayload) {
+      if (button.dataset.workAction === "townlight_access-delete-review" && overridePayload) {
         // Row-scoped action with no form binding: remember which review is
         // targeted so it survives into the guided-review confirm step, which
         // (like every other GUIDED_WORK_ACTIONS entry) re-derives its payload
@@ -5843,7 +5805,7 @@ async function handleChooseFolderPath(field) {
     }
   } catch (error) {
     const raw = String(error);
-    const isAdminGate = /sign in as the civicsuite admin/i.test(raw);
+    const isAdminGate = /sign in as the townlight admin/i.test(raw);
     state.actionResult = {
       accepted: false,
       forStepId,
@@ -5885,7 +5847,7 @@ function authPayloadForAction(action, overridePayload = null) {
 }
 
 async function handleAuthAction(action, payloadOverride = null) {
-  if (action === 'sign-out' && (!planningView.canLeave() || !permittingView.canLeave() || !inspectionsView.canLeave())) return;
+  if (action === 'sign-out' && (!noticeView.canLeave() || !planningView.canLeave() || !permittingView.canLeave() || !inspectionsView.canLeave())) return;
   if (!hasTauriBridge()) {
     state.authActionResult = {
       accepted: false,
@@ -6072,7 +6034,7 @@ function workPayloadForAction(action) {
       postingConfirmation: draft.noticeConfirmation,
       postingDate: draft.noticePostingDate
     },
-    "civicnotice-calculate-deadline": {
+    "townlight_notice-calculate-deadline": {
       ...selected,
       noticeMeetingType: draft.noticeMeetingType,
       noticeStatutoryBasis: draft.noticeStatutoryBasis,
@@ -6081,7 +6043,7 @@ function workPayloadForAction(action) {
       noticeTimeZone: draft.noticeTimeZone,
       noticeHumanApproval: draft.noticeHumanApproval
     },
-    "civicnotice-complete-checklist": {
+    "townlight_notice-complete-checklist": {
       ...selected,
       noticeMeetingType: draft.noticeMeetingType,
       noticeStatutoryBasis: draft.noticeStatutoryBasis,
@@ -6089,14 +6051,14 @@ function workPayloadForAction(action) {
       noticeTimeZone: draft.noticeTimeZone,
       noticeHumanApproval: draft.noticeHumanApproval
     },
-    "civicnotice-post-notice": {
+    "townlight_notice-post-notice": {
       ...selected,
       postingLocation: draft.noticeLocation,
       postingMethod: draft.noticeMethod,
       postingConfirmation: draft.noticeConfirmation,
       postingDate: draft.noticePostingDate
     },
-    "civicnotice-export-archive-packet": selected,
+    "townlight_notice-export-archive-packet": selected,
     "export-meeting-packet": selected,
     "suggest-minutes-draft": selected,
     "record-minutes": { ...selected, minutes: draft.minutes },
@@ -6317,32 +6279,32 @@ function workPayloadForAction(action) {
     },
     // records-export gets its reviewId from the per-row button's data-action-payload
     // override. No draft binding intentionally — the action is row-scoped, not form-scoped.
-    "civicaccess-records-export": {},
+    "townlight_access-records-export": {},
     // delete-review goes through the guided-review confirm step (GUIDED_WORK_ACTIONS),
     // which re-derives its payload here rather than from the original click's
     // overridePayload -- workSelection.accessDeleteReviewId is set by the click
     // handler before the guided-review panel renders, and survives into Confirm.
-    "civicaccess-delete-review": { reviewId: state.workSelection.accessDeleteReviewId },
-    "civicaccess-plain-language": { text: draft.accessPlainText },
-    "civicaccess-language-variant": {
+    "townlight_access-delete-review": { reviewId: state.workSelection.accessDeleteReviewId },
+    "townlight_access-plain-language": { text: draft.accessPlainText },
+    "townlight_access-language-variant": {
       text: draft.accessVariantText,
       language: draft.accessVariantLanguage
     },
-    "civicaccess-form-plan": {
+    "townlight_access-form-plan": {
       formName: draft.accessFormName,
       fields: draft.accessFormFields
     },
-    "civicaccess-publishing-workflow": {
+    "townlight_access-publishing-workflow": {
       title: draft.accessPublishingTitle,
       hasReview: draft.accessPublishingHasReview,
       hasPlainLanguage: draft.accessPublishingHasPlainLanguage,
       hasTranslationReview: draft.accessPublishingHasTranslationReview
     },
-    "civicaccess-ada-title-ii": {
+    "townlight_access-ada-title-ii": {
       serviceArea: draft.accessAdaServiceArea,
       hasCoordinatorReview: draft.accessAdaHasCoordinatorReview
     },
-    "civicaccess-tagged-pdf": { headingLevels: draft.accessTaggedPdfHeadings }
+    "townlight_access-tagged-pdf": { headingLevels: draft.accessTaggedPdfHeadings }
   };
   return payloads[action] || {};
 }
@@ -6554,7 +6516,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
   // guided-review re-derivation in workPayloadForAction instead), so fall back to
   // workSelection for the row-scoped busy key on that one action.
   const inFlightReviewId = overridePayload?.reviewId
-    || (action === "civicaccess-delete-review" ? state.workSelection.accessDeleteReviewId : null);
+    || (action === "townlight_access-delete-review" ? state.workSelection.accessDeleteReviewId : null);
   const myWorkTag = inFlightReviewId ? `${action}:${inFlightReviewId}` : action;
   state.workActionInFlightTags.add(myWorkTag);
   render();
@@ -6607,7 +6569,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     // single app-wide guided-review confirm panel currently targets, not a
     // busy/in-flight tracker) so it keeps its own equality guard: only clear
     // it if it still points at the review THIS call was processing.
-    if (action === "civicaccess-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
+    if (action === "townlight_access-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
       state.workSelection.accessDeleteReviewId = "";
     }
   }

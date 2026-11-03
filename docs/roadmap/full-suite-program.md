@@ -3,7 +3,7 @@
 Adopted: 2026-06-10. Owner: Scott Converse. This document supersedes the
 city-core-only execution focus and defines the program that runs until every
 catalog module is finished. The canonical spec
-([CivicSuiteUnifiedSpec.md](../CivicSuiteUnifiedSpec.md)) still defines what
+([TownlightUnifiedSpec.md](../TownlightUnifiedSpec.md)) still defines what
 each module is; this document defines the order, the gate, and the resource
 rules for finishing them.
 
@@ -72,7 +72,7 @@ labels stay until the gate passes.
 
 - The GitHub account is on the Free plan. Hosted Actions minutes and LFS are
   budgeted: routine CI runs on the self-hosted runner
-  (`civicsuite-wsl-linux-2`, labels `self-hosted, linux, x64`); hosted
+  (`townlight-wsl-linux-2`, labels `self-hosted, linux, x64`); hosted
   runners are reserved for release-tag verification.
 - Fork pull requests require explicit approval before any workflow runs
   (repository Actions policy `all_external_contributors`) because
@@ -84,8 +84,8 @@ labels stay until the gate passes.
 
 ## Local workspace truth
 
-Suite development and evidence live under `C:\CivicSuiteDev\` (repos, tools,
-plans) and `D:\CivicSuiteDev\` (test VM, models, artifacts) on the
+Suite development and evidence live under `C:\TownlightDev\` (repos, tools,
+plans) and `D:\TownlightDev\` (test VM, models, artifacts) on the
 development machine. The suite's local PostgreSQL test instance runs on port
 54330. Older documents referencing `C:\dev\Claude\...` paths describe
 historical runs; new evidence paths follow this layout. Durable truth always

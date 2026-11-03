@@ -12,7 +12,7 @@ archive").
 
 Routine pull-request and `main` CI deliberately builds and tests an **unsigned**
 installer. The Actions artifact is named
-`civicsuite-windows-local-msi-UNSIGNED`, the MSI filename ends in
+`townlight-windows-local-msi-UNSIGNED`, the MSI filename ends in
 `-UNSIGNED.msi`, and the accompanying evidence records
 `SignatureState=UNSIGNED` and `PublicationAllowed=false`. This keeps normal
 engineering validation independent of Azure credentials while making the
@@ -22,7 +22,7 @@ Publication signing is a separate, explicit manual gate. A `main` dispatch with
 `sign_for_publication=true` signs through Azure Trusted Signing, requires a
 valid Authenticode signature from `CN=Scott Converse` with a timestamp, and
 runs this same lifecycle job against the signed bytes. Only that path emits
-`civicsuite-windows-local-msi-SIGNED` with `PublicationAllowed=true` evidence.
+`townlight-windows-local-msi-SIGNED` with `PublicationAllowed=true` evidence.
 The release workflow accepts only that exact artifact from a successful manual
 `main` run whose head SHA equals the release tag, then recomputes its hash and
 re-verifies Authenticode before upload. An unsigned artifact cannot satisfy the
@@ -33,15 +33,15 @@ release contract.
 | Lifecycle stage | How it is exercised | Pass signal |
 |---|---|---|
 | **Install** | `msiexec /i <built.msi> /quiet /norestart /l*v` (runner is elevated, so no interactive UAC) | msiexec exit code `0` |
-| **Install integrity** | Read ARP/uninstall registry keys; resolve the install dir (`InstallLocation`, else the ARP `DisplayIcon` path) and confirm a non-uninstaller application exe is present | ARP entry present, install dir resolved, main binary (`civicsuite-desktop.exe`, the Cargo binary name) discovered by scan present |
-| **First-run / backup / restore (logic)** | `cargo test first_run`, `cargo test backup`, `cargo test restore` against the desktop crate with an isolated `CIVICSUITE_DESKTOP_STATE_DIR` | the first-run, backup, and restore unit/integration tests pass (includes `first_run_uninstall_action_uses_real_supervisor_final_backup`, `restore_replaces_profile_from_latest_backup`, backup manifest/tamper guards) |
+| **Install integrity** | Read ARP/uninstall registry keys; resolve the install dir (`InstallLocation`, else the ARP `DisplayIcon` path) and confirm a non-uninstaller application exe is present | ARP entry present, install dir resolved, main binary (`townlight-desktop.exe`, the Cargo binary name) discovered by scan present |
+| **First-run / backup / restore (logic)** | `cargo test first_run`, `cargo test backup`, `cargo test restore` against the desktop crate with an isolated `TOWNLIGHT_DESKTOP_STATE_DIR` | the first-run, backup, and restore unit/integration tests pass (includes `first_run_uninstall_action_uses_real_supervisor_final_backup`, `restore_replaces_profile_from_latest_backup`, backup manifest/tamper guards) |
 | **Uninstall** | `msiexec /x <built.msi> /quiet /norestart /l*v` | msiexec exit code `0` |
 | **Uninstall integrity** | Re-read ARP keys and the install dir | ARP entry gone, the application exe removed |
 
 The main binary is **discovered by scan** (first non-`unins*` exe under the
 resolved install dir), not matched against a hardcoded name: Tauri/WiX names the
-exe from the Cargo binary (`civicsuite-desktop.exe`), which can differ from the
-product display name, so this job does not hardcode `CivicSuite.exe`.
+exe from the Cargo binary (`townlight-desktop.exe`), which can differ from the
+product display name, so this job does not hardcode `Townlight.exe`.
 
 This install-integrity step does **not** check for the bundled
 `runtime-payload-lock.json` (the portable Postgres/Python/Ollama payload). On
@@ -50,7 +50,7 @@ do not stage it under the install dir, so checking for it here would be a false
 signal. The data-plane half of the lifecycle (bundled PostgreSQL 17 + pgvector
 bring-up, embedded CPython city services, and the PostgreSQL-backed task-queue
 worker) is proven separately and against the real prepared payload by the
-`desktop-civiccore-integration` job (audit finding T-C1), which is the only job
+`desktop-townlight_core-integration` job (audit finding T-C1), which is the only job
 that references `runtime-payload-lock.json`.
 
 ## Validated end-to-end on a pristine Windows Sandbox (QA-B1 clean-VM)
@@ -75,9 +75,9 @@ end-to-end on the clean VM:
   Latest Backup buttons were exercised on the clean VM and round-tripped the
   local profile.
 
-**Validated artifact:** `CivicSuite_1.0.1_x64_en-US.msi` — SHA-256
+**Validated artifact:** `Townlight_1.0.1_x64_en-US.msi` — SHA-256
 `5a1e5e2e4d2f3d7f77c52f108c4445c85db10ff3edc2c151d6bbae1cd97ce3ea`
-(1,645,479,777 bytes) — the exact MSI attached to the `civicsuite-windows-local-v1.0.1`
+(1,645,479,777 bytes) — the exact MSI attached to the `townlight-windows-local-v1.0.1`
 release. The end-to-end run above was performed against this artifact.
 
 This is hand-run clean-VM validation captured in the CHANGELOG, not an automated
@@ -116,7 +116,7 @@ catch a blank/crash regression in the partial states cheaply on every PR.
    machine (Beelink/Windows Sandbox), not on a hosted CI runner. The install /
    verify / uninstall portion of QA-B1 has been run on a fresh Windows Sandbox
    (msiexec install and uninstall exit 0, ARP entry registered then removed,
-   binary at `C:\Program Files\CivicSuite\civicsuite-desktop.exe`), and the
+   binary at `C:\Program Files\Townlight\townlight-desktop.exe`), and the
    interactive click-through wizard has now also been completed end-to-end on a
    pristine Windows Sandbox (see "Validated end-to-end" above). It still cannot
    run on a hosted runner, so it stays a hand-run clean-VM step to repeat per RC.

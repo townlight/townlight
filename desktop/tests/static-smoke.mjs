@@ -14,7 +14,7 @@ const cargoToml = readFileSync(join(root, "src-tauri", "Cargo.toml"), "utf8");
 const cargoLock = readFileSync(join(root, "src-tauri", "Cargo.lock"), "utf8");
 const desktopMsiWorkflow = readFileSync(join(root, "..", ".github", "workflows", "desktop-windows-msi.yml"), "utf8");
 const recordsSourcePin = JSON.parse(readFileSync(join(root, "..", "installer", "modules.json"), "utf8"))
-  .modules.find((module) => module.id === "civicrecords-ai").source_commit;
+  .modules.find((module) => module.id === "townlight_records").source_commit;
 const cargoConfig = readFileSync(join(root, ".cargo", "config.toml"), "utf8");
 if (!cargoConfig.includes('[target.x86_64-pc-windows-msvc]') || !cargoConfig.includes('target-feature=+crt-static')) {
   throw new Error('Windows desktop must statically link the CRT for clean-machine startup');
@@ -326,7 +326,7 @@ for (const [label, character] of [
 // Bundle contract: assert the parsed configuration, never the whitespace of
 // the file. Formatting is not a contract; the values and the shipped icon file
 // are.
-if (tauriConfigJson.identifier !== "org.civicsuite.desktop") {
+if (tauriConfigJson.identifier !== "org.townlight.desktop") {
   throw new Error("Tauri identifier is missing or changed");
 }
 
@@ -381,7 +381,7 @@ if (!Array.isArray(bundleResources) || !bundleResources.includes("../runtime/pay
   }
 
   const cargoVersion = /^version\s*=\s*"([^"]+)"/m.exec(cargoToml)?.[1];
-  const cargoLockVersion = /\[\[package\]\]\r?\nname = "civicsuite-desktop"\r?\nversion = "([^"]+)"/m.exec(cargoLock)?.[1];
+  const cargoLockVersion = /\[\[package\]\]\r?\nname = "townlight-desktop"\r?\nversion = "([^"]+)"/m.exec(cargoLock)?.[1];
   const manifestVersions = {
     "package.json": desktopPackageJson.version,
     "package-lock.json": desktopPackageLockJson.version,
@@ -401,7 +401,7 @@ const wixConfig = bundleWindows.wix ?? {};
 if (bundleWindows.allowDowngrades !== false) {
   throw new Error("Tauri MSI config must keep allowDowngrades disabled");
 }
-if (wixConfig.upgradeCode !== "a63fc1d3-5437-5f55-89a2-fef93fb1f930") {
+if (wixConfig.upgradeCode !== "77c47cc0-128e-50b0-acc1-0bdf84ac3b3c") {
   throw new Error(`Tauri MSI WiX upgradeCode changed: ${wixConfig.upgradeCode}`);
 }
 if (wixConfig.language !== "en-US") {
@@ -415,19 +415,19 @@ const betaSources = JSON.parse(readFileSync(join(root, "..", "config", "inspecti
 for (const phrase of [
   "name: desktop-windows-msi",
   "runs-on: windows-latest",
-  "path: civicsuite",
-  "path: civiccore",
+  "path: townlight",
+  "path: townlight_core",
   `ref: ${betaSources["townlight/core"]}`,
-  "path: civicrecords-ai",
+  "path: townlight_records",
   "ref: ${{ steps.candidate.outputs.records_ref }}",
-  "path: civicnotice",
+  "path: townlight_notice",
   `ref: ${betaSources["townlight/notice"]}`,
-  "path: civicaccess",
+  "path: townlight_access",
   `ref: ${betaSources["townlight/access"]}`,
   "npm run prepare-runtime-payload",
   "npm run tauri -- build",
   "desktop/src-tauri/target/release/bundle/msi/*.msi",
-  "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930",
+  "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c",
   "SameVersionMajorUpgrade=true",
   "InstallerBundle=msi",
   "NoDockerPrerequisite=true",
@@ -439,10 +439,11 @@ for (const phrase of [
 }
 
 const msiCandidateResolver = readFileSync(join(root, "scripts", "resolve-msi-candidate.ps1"), "utf8");
-if (!msiCandidateResolver.includes(`$RecordsRef = '${recordsSourcePin}'`) ||
+if (!/^[0-9a-f]{40}$/.test(recordsSourcePin) ||
+    !msiCandidateResolver.includes("$RecordsRef = ($Modules.modules | Where-Object { $_.id -eq 'townlight_records' }).source_commit") ||
     !msiCandidateResolver.includes("$RecordsRef = $Pins.sources.'townlight/sunshine'") ||
-    !msiCandidateResolver.includes("if ($SourceBranch -eq $Contract.source_branch)")) {
-  throw new Error("MSI profile resolver must retain the historical default pin and isolate candidate source selection");
+    !msiCandidateResolver.includes("$SourceBranch -eq $CombinedContract.source_branch")) {
+  throw new Error("MSI profile resolver must use the exact module-manifest default pin and the coordinated candidate branch");
 }
 
 if (!rustMain.includes('include_str!("../../../installer/modules.json")')) {
@@ -538,7 +539,7 @@ for (const phrase of [
   "Install-PgvectorPayload",
   "Get-PostgresSourceUrl",
   "falling back to PostgreSQL download-page discovery",
-  "Test-CivicDownloadHash",
+  "Test-TownlightDownloadHash",
   "Downloaded payload hash mismatch",
   "Get-Command curl.exe",
   '"--continue-at", "-"',
@@ -560,7 +561,7 @@ for (const phrase of [
 
 // Require package coverage, allowing a new explicit profile without rejecting
 // unchanged accepted profiles merely because the literal list has grown.
-const serviceProfiles = runtimePayloadScript.match(/if \(\$ProductProfile -in @\(([^)]+)\)\) \{\s*\$CivicClerk =/);
+const serviceProfiles = runtimePayloadScript.match(/if \(\$ProductProfile -in @\(([^)]+)\)\) \{\s*\$TownlightMeetings =/);
 for (const profile of ["city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"]) {
   if (!serviceProfiles?.[1].includes(`"${profile}"`)) {
     throw new Error(`Connected service packages must include profile: ${profile}`);
@@ -577,11 +578,11 @@ const pythonInstallSection = runtimePayloadScript.slice(
 const buildBackendBootstrapIndex = pythonInstallSection.indexOf(
   "Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServiceInstallArguments"
 );
-const civicCoreInstallIndex = pythonInstallSection.indexOf("        $CivicCore,");
+const townlightCoreInstallIndex = pythonInstallSection.indexOf("        $TownlightCore,");
 if (
   buildBackendBootstrapIndex < 0 ||
-  civicCoreInstallIndex < 0 ||
-  buildBackendBootstrapIndex > civicCoreInstallIndex
+  townlightCoreInstallIndex < 0 ||
+  buildBackendBootstrapIndex > townlightCoreInstallIndex
 ) {
   throw new Error("embedded Python build backends must be installed before local service packages");
 }
@@ -707,14 +708,14 @@ for (const marker of requiredStaticMarkers) {
 for (const phrase of [
   "AI engine not ready",
   "Open model setup",
-  "civicaccess-plain-language",
-  "civicaccess-language-variant",
+  "townlight_access-plain-language",
+  "townlight_access-language-variant",
   "Review Before Running Accessibility Review",
   "Review Before Drafting Plain-Language Rewrite",
   "Review Before Drafting Translation Variant"
 ]) {
   if (!main.includes(phrase)) {
-    throw new Error(`desktop civicaccess AI state missing phrase: ${phrase}`);
+    throw new Error(`desktop townlight_access AI state missing phrase: ${phrase}`);
   }
 }
 
@@ -819,16 +820,16 @@ for (const requiredPayload of [
   [
     "cpython-services",
     "python.exe",
-    "Lib/site-packages/civiccore/__init__.py",
-    "Lib/site-packages/civiccore/migrations/alembic.ini",
-    "Lib/site-packages/civiccore/migrations/versions/civiccore_0003_local_task_queue.py",
-    "Lib/site-packages/app/main.py",
-    "Lib/site-packages/civicnotice/main.py",
-    "Lib/site-packages/civicaccess/main.py",
-    "Lib/site-packages/civicsuite_runtime/__init__.py",
-    "Lib/site-packages/civicsuite_runtime/migrate.py",
-    "Lib/site-packages/civicsuite_runtime/civicrecords_alembic/alembic.ini",
-    "Lib/site-packages/civicsuite_runtime/civicrecords_alembic/alembic/env.py"
+    "Lib/site-packages/townlight_core/__init__.py",
+    "Lib/site-packages/townlight_core/migrations/alembic.ini",
+    "Lib/site-packages/townlight_core/migrations/versions/townlight_core_0003_local_task_queue.py",
+    "Lib/site-packages/townlight_records/main.py",
+    "Lib/site-packages/townlight_notice/main.py",
+    "Lib/site-packages/townlight_access/main.py",
+    "Lib/site-packages/townlight_runtime/__init__.py",
+    "Lib/site-packages/townlight_runtime/migrate.py",
+    "Lib/site-packages/townlight_runtime/townlight_records_alembic/alembic.ini",
+    "Lib/site-packages/townlight_runtime/townlight_records_alembic/alembic/env.py"
   ],
   ["ollama-runtime", "ollama.exe"]
 ]) {
@@ -886,7 +887,7 @@ if (modelManifest.model.artifact.file_name !== "gemma-4-12b-it-qat-q4_0.gguf") {
   throw new Error("Windows model manifest must pin the expected GGUF file");
 }
 
-if (modelManifest.model.runtime_model !== "civicsuite-gemma4-12b-qat:q4_0") {
+if (modelManifest.model.runtime_model !== "townlight-gemma4-12b-qat:q4_0") {
   throw new Error("Windows model manifest must define the local Ollama runtime model name");
 }
 
@@ -962,7 +963,7 @@ if (css.includes("blur(") || css.includes("radial-gradient")) {
 
 // fallbackState module-card metadata parity with canonical installer/modules.json.
 // Locks in route_count / service_count / task_count so fallback drift can't recur
-// (this caught civicrecords-ai 6->4 and civicclerk 6->5 stale task_counts that
+// (this caught townlight_records 6->4 and townlight_meetings 6->5 stale task_counts that
 // shipped silently for months because fallbackState is only used in browser preview).
 {
   const modulesJson = JSON.parse(readFileSync(
@@ -991,7 +992,7 @@ if (css.includes("blur(") || css.includes("radial-gradient")) {
     const r = /route_count:\s*(\d+)/.exec(body);
     const s = /service_count:\s*(\d+)/.exec(body);
     const t = /task_count:\s*(\d+)/.exec(body);
-    if (!r && !s && !t) continue; // Skip entries without count fields (e.g. civiccore foundation)
+    if (!r && !s && !t) continue; // Skip entries without count fields (e.g. townlight_core foundation)
     seen.set(id, {
       route_count: r ? Number(r[1]) : null,
       service_count: s ? Number(s[1]) : null,
@@ -1001,7 +1002,7 @@ if (css.includes("blur(") || css.includes("radial-gradient")) {
   const driftErrors = [];
   for (const [id, fallback] of seen.entries()) {
     const canon = canonical.get(id);
-    if (!canon) continue; // Fallback entry has no canonical match (e.g. civiczone preview-only) — skip.
+    if (!canon) continue; // Fallback entry has no canonical match (e.g. townlight_zoning preview-only) — skip.
     for (const field of ["route_count", "service_count", "task_count"]) {
       if (canon[field] === null) continue; // Canonical doesn't expose this field for this module.
       if (fallback[field] !== null && fallback[field] !== canon[field]) {
@@ -1013,7 +1014,7 @@ if (css.includes("blur(") || css.includes("radial-gradient")) {
   }
   // Reverse direction: a SHIPPED city-core module with no fallbackState entry at
   // all means browser-preview silently omits that module's card — the exact bug
-  // class this guard exists to catch (fallbackState.modules was missing civicaccess
+  // class this guard exists to catch (fallbackState.modules was missing townlight_access
   // until commit 32e08da). Scoped to CITY_CORE_PRODUCT_MODULE_IDS (the actual
   // shipped profile), not every id in installer/modules.json — most canonical
   // entries are queued Tier 2+ modules that have never had a fallback card and
@@ -1050,8 +1051,8 @@ for (const demoTownContract of [
 
 const pythonPayload = runtimePayloadManifest.payloads.find((payload) => payload.id === "cpython-services");
 for (const excludedFromRecordsBeta of [
-  "Lib/site-packages/civicclerk/main.py",
-  "Lib/site-packages/civiccode/main.py"
+  "Lib/site-packages/townlight_meetings/main.py",
+  "Lib/site-packages/townlight_code/main.py"
 ]) {
   if (pythonPayload.required_files.includes(excludedFromRecordsBeta)) {
     throw new Error(`Records beta payload must not require ${excludedFromRecordsBeta}`);
@@ -1076,17 +1077,17 @@ if (tauriConfigJson.productName !== "Townlight" || tauriConfigJson.bundle.publis
 if (tauriConfigJson.app.windows[0]?.title !== "Townlight") {
   throw new Error("Desktop window title must use the Townlight public identity");
 }
-if (tauriConfigJson.identifier !== "org.civicsuite.desktop") {
+if (tauriConfigJson.identifier !== "org.townlight.desktop") {
   throw new Error("The stable Tauri application identifier must not change during the display-only rename");
 }
-if (tauriConfigJson.bundle.windows?.wix?.upgradeCode !== "a63fc1d3-5437-5f55-89a2-fef93fb1f930") {
-  throw new Error("The stable MSI upgrade code must not change during the display-only rename");
+if (tauriConfigJson.bundle.windows?.wix?.upgradeCode !== "77c47cc0-128e-50b0-acc1-0bdf84ac3b3c") {
+  throw new Error("The fresh naming candidate must use its separate MSI upgrade code");
 }
 if (!moduleRegistryRust.includes('const DEFAULT_PROFILE_ID: &str = "records-beta";')) {
   throw new Error("Fresh desktop installs must select the dependency-closed Records beta profile");
 }
 for (const recordsBetaUiContract of [
-  'const RECORDS_BETA_PRODUCT_MODULE_IDS = ["civicrecords-ai", "civicnotice", "civicaccess"]',
+  'const RECORDS_BETA_PRODUCT_MODULE_IDS = ["townlight_records", "townlight_notice", "townlight_access"]',
   '"records-beta": RECORDS_BETA_PRODUCT_MODULE_IDS',
   'selection.profile_id === "custom" || !knownProfile',
   'return { profileId: state.moduleDraft.profileId }'
@@ -1098,8 +1099,13 @@ for (const recordsBetaUiContract of [
 if (firstRunManifest.profile_label !== "Townlight Records") {
   throw new Error("Fresh-install first-run manifest must identify the Townlight Records product profile");
 }
-if (!firstRunRust.includes('join("CivicSuite")') || !modelRust.includes('join("CivicSuite")')) {
-  throw new Error("Legacy app-data discovery paths must remain available during the display-only rename");
+const localPathsRust = readFileSync(join(root, "src-tauri", "src", "local_paths.rs"), "utf8");
+const profileIdentityRust = readFileSync(join(root, "src-tauri", "src", "profile_identity.rs"), "utf8");
+if (!localPathsRust.includes('join("CivicSuite")') ||
+    !firstRunRust.includes('local_paths::config_dir()') || !modelRust.includes('join("CivicSuite")') ||
+    !rustMain.includes('profile_identity::prepare()') ||
+    !profileIdentityRust.includes('An existing unmarked profile was detected and left unchanged.')) {
+  throw new Error("The sole approved profile-path exception and fresh-profile refusal fence must remain active");
 }
 
 console.log("PASS: desktop static smoke checks passed");

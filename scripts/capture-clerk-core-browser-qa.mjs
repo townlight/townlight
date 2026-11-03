@@ -8,10 +8,10 @@ const screenshotRoot = path.join(evidenceRoot, "screenshots", "2026-05-19-clerk-
 const jsonPath = path.join(evidenceRoot, "2026-05-19-clerk-core-installed-workflows.json");
 const summaryPath = path.join(evidenceRoot, "2026-05-19-clerk-core-installed-workflows.md");
 
-const recordsWeb = process.env.CIVICSUITE_RECORDS_WEB_URL ?? "http://127.0.0.1:18080";
-const recordsApi = process.env.CIVICSUITE_RECORDS_API_URL ?? "http://127.0.0.1:18000";
-const clerkWeb = process.env.CIVICSUITE_CLERK_WEB_URL ?? "http://127.0.0.1:18081";
-const clerkToken = process.env.CIVICSUITE_CLERK_STAFF_TOKEN ?? "clerk-core-workflow-proof";
+const recordsWeb = process.env.TOWNLIGHT_RECORDS_WEB_URL ?? "http://127.0.0.1:18080";
+const recordsApi = process.env.TOWNLIGHT_RECORDS_API_URL ?? "http://127.0.0.1:18000";
+const clerkWeb = process.env.TOWNLIGHT_CLERK_WEB_URL ?? "http://127.0.0.1:18081";
+const clerkToken = process.env.TOWNLIGHT_CLERK_STAFF_TOKEN ?? "clerk-core-workflow-proof";
 
 function parseEnv(text) {
   const values = {};
@@ -25,14 +25,14 @@ function parseEnv(text) {
 }
 
 async function readRecordsCredentials() {
-  const envPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "civicrecords-ai", ".env");
+  const envPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "townlight_records", ".env");
   const secretPath = path.join(
     root,
     "installer",
     "runtime",
     "clerk-core",
     "sources",
-    "civicrecords-ai",
+    "townlight_records",
     "data",
     "secrets",
     "first_admin_password",
@@ -147,62 +147,62 @@ async function main() {
   const checks = [
     {
       id: "records-login-desktop",
-      product: "CivicRecords AI",
+      product: "TownlightRecords",
       url: `${recordsWeb}/`,
       viewport: desktop,
-      expectedCopy: ["CivicRecords AI", "Sign in"],
+      expectedCopy: ["TownlightRecords", "Sign in"],
     },
     {
       id: "records-login-mobile",
-      product: "CivicRecords AI",
+      product: "TownlightRecords",
       url: `${recordsWeb}/`,
       viewport: mobile,
-      expectedCopy: ["CivicRecords AI", "Sign in"],
+      expectedCopy: ["TownlightRecords", "Sign in"],
     },
     {
       id: "records-admin-desktop",
-      product: "CivicRecords AI",
+      product: "TownlightRecords",
       url: `${recordsWeb}/`,
       viewport: desktop,
       login: recordsCredentials,
-      expectedCopy: ["CivicRecords AI"],
+      expectedCopy: ["TownlightRecords"],
       afterLoad: async (page) => {
         await page.waitForTimeout(1500);
       },
     },
     {
       id: "clerk-staff-desktop",
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       url: `${clerkWeb}/staff`,
       viewport: desktop,
       headers: { Authorization: `Bearer ${clerkToken}` },
-      expectedCopy: ["CivicClerk", "Agenda", "Packet", "Notice", "Minutes"],
+      expectedCopy: ["TownlightMeetings", "Agenda", "Packet", "Notice", "Minutes"],
     },
     {
       id: "clerk-staff-mobile",
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       url: `${clerkWeb}/staff`,
       viewport: mobile,
       headers: { Authorization: `Bearer ${clerkToken}` },
-      expectedCopy: ["CivicClerk", "Agenda", "Packet", "Notice", "Minutes"],
+      expectedCopy: ["TownlightMeetings", "Agenda", "Packet", "Notice", "Minutes"],
     },
     {
       id: "clerk-public-desktop",
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       url: `${clerkWeb}/public`,
       viewport: desktop,
       expectedCopy: ["Public", "Meeting"],
     },
     {
       id: "clerk-public-mobile",
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       url: `${clerkWeb}/public`,
       viewport: mobile,
       expectedCopy: ["Public", "Meeting"],
     },
     {
       id: "clerk-protected-error-desktop",
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       url: `${clerkWeb}/staff`,
       viewport: desktop,
       allowFailures: true,
@@ -220,13 +220,13 @@ async function main() {
   }
 
   const health = {
-    civicrecords: await fetch(`${recordsApi}/health`).then((response) => response.json()),
-    civicclerk: await fetch(`${clerkWeb}/api/health`).then((response) => response.json()),
+    townlight_records: await fetch(`${recordsApi}/health`).then((response) => response.json()),
+    townlight_meetings: await fetch(`${clerkWeb}/api/health`).then((response) => response.json()),
   };
   const report = {
     name: "clerk-core-installed-browser-qa",
     captured_at: new Date().toISOString(),
-    baseline: "origin/main 681dda494c6c3109ddbc00e6f1170b54c0f0057b plus local CivicClerk docker nginx proxy fix",
+    baseline: "origin/main 681dda494c6c3109ddbc00e6f1170b54c0f0057b plus local TownlightMeetings docker nginx proxy fix",
     urls: { recordsWeb, recordsApi, clerkWeb },
     health,
     checks: results,
@@ -240,12 +240,12 @@ async function main() {
     "",
     `Status: ${report.status.toUpperCase()}`,
     "",
-    "Scope: local Docker/browser install of CivicRecords AI 1.6.1 and CivicClerk 1.0.1 for the Clerk-Core starter product. This is browser/user-facing QA evidence, not a claim of city production deployment or macOS lifecycle certification.",
+    "Scope: local Docker/browser install of TownlightRecords 1.6.1 and TownlightMeetings 1.0.1 for the Clerk-Core starter product. This is browser/user-facing QA evidence, not a claim of city production deployment or macOS lifecycle certification.",
     "",
     "## Runtime",
     "",
-    `- CivicRecords AI health: ${health.civicrecords.status} ${health.civicrecords.version}`,
-    `- CivicClerk health through nginx /api proxy: ${health.civicclerk.status} ${health.civicclerk.version}`,
+    `- TownlightRecords health: ${health.townlight_records.status} ${health.townlight_records.version}`,
+    `- TownlightMeetings health through nginx /api proxy: ${health.townlight_meetings.status} ${health.townlight_meetings.version}`,
     "",
     "## Browser Checks",
     "",
@@ -258,9 +258,9 @@ async function main() {
     "",
     "## UX / QA Notes",
     "",
-    "- Desktop and mobile widths were checked for CivicRecords AI sign-in, CivicClerk staff workflow, and CivicClerk public portal.",
-    "- CivicClerk staff was checked with bearer staff auth through the installed nginx path, proving React `/api/...` calls reach FastAPI through the Docker/browser product path.",
-    "- The unauthenticated CivicClerk staff path intentionally renders an actionable protected-state message with fix guidance.",
+    "- Desktop and mobile widths were checked for TownlightRecords sign-in, TownlightMeetings staff workflow, and TownlightMeetings public portal.",
+    "- TownlightMeetings staff was checked with bearer staff auth through the installed nginx path, proving React `/api/...` calls reach FastAPI through the Docker/browser product path.",
+    "- The unauthenticated TownlightMeetings staff path intentionally renders an actionable protected-state message with fix guidance.",
     "- Keyboard focus was advanced with Tab in every checked page and recorded in the JSON evidence.",
     "- Console warnings/errors, page errors, failed responses, and horizontal overflow are recorded per check in the JSON evidence.",
     "",

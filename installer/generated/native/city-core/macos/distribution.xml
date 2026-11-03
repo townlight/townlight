@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-  <title>CivicSuite city-core</title>
+  <title>Townlight city-core</title>
   <options customize="never" require-scripts="false"/>
   <domains enable_anywhere="true"/>
-  <pkg-ref id="gov.civicsuite.city-core" version="0.1.2">CivicSuite-city-core.pkg</pkg-ref>
+  <pkg-ref id="gov.townlight.city-core" version="0.1.2">Townlight-city-core.pkg</pkg-ref>
   <choices-outline>
     <line choice="default"/>
   </choices-outline>
-  <choice id="default" title="CivicSuite city-core">
-    <pkg-ref id="gov.civicsuite.city-core"/>
+  <choice id="default" title="Townlight city-core">
+    <pkg-ref id="gov.townlight.city-core"/>
   </choice>
 </installer-gui-script>

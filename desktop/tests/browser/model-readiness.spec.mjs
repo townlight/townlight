@@ -168,7 +168,7 @@ test("desktop backup and support results render before slow health refresh", asy
               service_id: null,
               status: "Backup created",
               message:
-                "Created a verified Townlight backup at C:\\Townlight Backups\\civicsuite-manual-backup-123.",
+                "Created a verified Townlight backup at C:\\Townlight Backups\\townlight-manual-backup-123.",
               next_action:
                 "Keep this backup folder available for restore or reinstall recovery."
             };

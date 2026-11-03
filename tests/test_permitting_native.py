@@ -25,8 +25,8 @@ def native_permitting(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
     from app.database import get_async_session
     from app.models.user import UserRole
-    from civicpermit.migrations import source_engine, upgrade
-    from civicsuite_runtime import permitting_bridge as bridge
+    from townlight_permitting.migrations import source_engine, upgrade
+    from townlight_runtime import permitting_bridge as bridge
 
     url = f"sqlite:///{tmp_path / 'intake.db'}"
     engine = source_engine(url)
@@ -89,10 +89,10 @@ def native_permitting(tmp_path, monkeypatch):
     app = FastAPI()
     app.state.desktop_profile_root = profile
     app.state.desktop_enabled_modules = {
-        "civicpermit",
-        "civicrecords-ai",
-        "civiccode",
-        "civiczone",
+        "townlight_permitting",
+        "townlight_records",
+        "townlight_code",
+        "townlight_zoning",
     }
     app.state.desktop_domain_enabled = True
     app.include_router(bridge.router)
@@ -185,7 +185,7 @@ def test_native_intake_reopen_review_and_records_copy(native_permitting):
     assert packet.status_code == 200, packet.text
     assert "PRIVATE" not in packet.json()["text"]
     assert "A reviewed intake inquiry." in packet.json()["text"]
-    assert client.get("/civicpermit/cases").status_code == 404
+    assert client.get("/townlight_permitting/cases").status_code == 404
 
 
 @pytest.mark.parametrize(
@@ -203,7 +203,7 @@ def test_native_intake_reopen_review_and_records_copy(native_permitting):
     ],
 )
 def test_native_permitting_denials_never_write(native_permitting, case):
-    from civicpermit.workflow_store import IntakeRepository
+    from townlight_permitting.workflow_store import IntakeRepository
 
     client, app, engine, sign_in, users, identities, config = native_permitting
     headers = sign_in()

@@ -115,7 +115,7 @@ pub async fn execute(
         }
     };
     let prefix = if public {
-        "/civiczone"
+        "/townlight_zoning"
     } else {
         "/desktop/v1/zoning"
     };

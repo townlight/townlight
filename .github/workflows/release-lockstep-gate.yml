@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     tags:
-      - "civicsuite-windows-local-v*"
+      - "townlight-windows-local-v*"
       - "installer-*-v*"
 
 jobs:

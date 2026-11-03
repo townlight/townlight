@@ -14,13 +14,13 @@ test("Townlight Records beta completes the fictional request-to-release journey"
       display_name: displayName,
       role,
       version: "beta",
-      required: id === "civiccore",
-      selectable: id !== "civiccore",
+      required: id === "townlight_core",
+      selectable: id !== "townlight_core",
       installed: true,
       enabled: true,
       contract_ready: true,
       blocked_reason: null,
-      dependencies: id === "civiccore" ? [] : ["civiccore"],
+      dependencies: id === "townlight_core" ? [] : ["townlight_core"],
       proof_required: ["records-beta-acceptance"],
       backup_restore_hooks: [],
       route_count: 1,
@@ -90,10 +90,10 @@ test("Townlight Records beta completes the fictional request-to-release journey"
       status_label: "Townlight Records public beta",
       local_only: true,
       modules: [
-        module("civiccore", "Townlight Core", "shared platform"),
-        module("civicrecords-ai", "Townlight Records", "records workflow"),
-        module("civicnotice", "Townlight Notice", "public notice workflow"),
-        module("civicaccess", "Townlight Access", "accessibility review")
+        module("townlight_core", "Townlight Core", "shared platform"),
+        module("townlight_records", "Townlight Records", "records workflow"),
+        module("townlight_notice", "Townlight Notice", "public notice workflow"),
+        module("townlight_access", "Townlight Access", "accessibility review")
       ],
       module_profiles: [{
         id: "records-beta",
@@ -106,9 +106,9 @@ test("Townlight Records beta completes the fictional request-to-release journey"
       module_selection: {
         profile_id: "records-beta",
         profile_label: "Townlight Records",
-        installed_module_ids: ["civiccore", "civicrecords-ai", "civicnotice", "civicaccess"],
-        enabled_module_ids: ["civiccore", "civicrecords-ai", "civicnotice", "civicaccess"],
-        disabled_module_ids: ["civicclerk", "civiccode"],
+        installed_module_ids: ["townlight_core", "townlight_records", "townlight_notice", "townlight_access"],
+        enabled_module_ids: ["townlight_core", "townlight_records", "townlight_notice", "townlight_access"],
+        disabled_module_ids: ["townlight_meetings", "townlight_code"],
         last_updated_unix_seconds: 1
       },
       first_run: { finished: true, status: "Ready", steps: [], locations: {} },
@@ -153,7 +153,7 @@ test("Townlight Records beta completes the fictional request-to-release journey"
           work.demo_fixture = {
             fixture_id: "redstone-valley-records-demo",
             fixture_version: "1.0.0",
-            fixture_sha256: "a9c242a3f2618a69d7effb1d0d17d2df06f6744c8c351bba4065d315c94575b4",
+            fixture_sha256: "d9aaa79403cfca2711e8031439fbab8bf9f70a20b8afc293faef8edd683ffbd6",
             municipality_name: "Town of Redstone Valley (Fictional)",
             watermark: "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD",
             loaded_at_unix_seconds: 2
@@ -252,11 +252,11 @@ test("Townlight Records beta completes the fictional request-to-release journey"
   await expect(primaryNav.getByRole("button", { name: /Code & Ordinances/ })).toHaveCount(0);
   await primaryNav.getByRole("button", { name: /Settings/ }).click();
   await expect(page.getByLabel(/Townlight Records/).first()).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicrecords-ai"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicnotice"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicaccess"]')).toBeChecked();
-  await expect(page.locator('[data-module-toggle="civicclerk"]')).toHaveCount(0);
-  await expect(page.locator('[data-module-toggle="civiccode"]')).toHaveCount(0);
+  await expect(page.locator('[data-module-toggle="townlight_records"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_notice"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_access"]')).toBeChecked();
+  await expect(page.locator('[data-module-toggle="townlight_meetings"]')).toHaveCount(0);
+  await expect(page.locator('[data-module-toggle="townlight_code"]')).toHaveCount(0);
   await primaryNav.getByRole("button", { name: /Records Requests/ }).click();
 
   await page.getByRole("button", { name: "Load demo town" }).click();

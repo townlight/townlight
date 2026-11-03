@@ -19,9 +19,9 @@
       "type": "check"
     },
     {
-      "civiccore_requirement": null,
+      "townlight_core_requirement": null,
       "display_name": "Townlight Core",
-      "module": "civiccore",
+      "module": "townlight_core",
       "proof_required": [
         "install",
         "version_check",
@@ -33,9 +33,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.1",
+      "townlight_core_requirement": "1.2.1",
       "display_name": "Townlight Records",
-      "module": "civicrecords-ai",
+      "module": "townlight_records",
       "proof_required": [
         "install",
         "health_check",
@@ -48,9 +48,9 @@
       "type": "install_module"
     },
     {
-      "civiccore_requirement": "1.2.0",
-      "display_name": "CivicClerk",
-      "module": "civicclerk",
+      "townlight_core_requirement": "1.2.0",
+      "display_name": "TownlightMeetings",
+      "module": "townlight_meetings",
       "proof_required": [
         "install",
         "health_check",
@@ -86,9 +86,9 @@
     "label": "Guided Setup"
   },
   "modules": [
-    "civiccore",
-    "civicrecords-ai",
-    "civicclerk"
+    "townlight_core",
+    "townlight_records",
+    "townlight_meetings"
   ],
   "mutates_host": false,
   "profile": "clerk-core",

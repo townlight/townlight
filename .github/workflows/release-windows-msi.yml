@@ -15,7 +15,7 @@ on:
         required: true
   push:
     tags:
-      - "civicsuite-windows-local-v*"
+      - "townlight-windows-local-v*"
       - "townlight-records-v*"
       - "townlight-records-meetings-v*"
       - "townlight-records-meetings-code-v*"
@@ -97,8 +97,8 @@ jobs:
           foreach ($candidate in @($runs | Where-Object { $_.headSha -eq $tagSha })) {
             if ($promotion -and $candidate.databaseId -ne $promotion.workflow_run) { continue }
             $artifacts = gh api "repos/${{ github.repository }}/actions/runs/$($candidate.databaseId)/artifacts" | ConvertFrom-Json
-            if (@($artifacts.artifacts | Where-Object { $_.name -eq 'civicsuite-windows-local-msi-SIGNED' }).Count -eq 1) {
-              if ($promotion -and @($artifacts.artifacts | Where-Object { $_.name -eq 'civicsuite-windows-local-msi-SIGNED' -and $_.id -eq $promotion.artifact_id }).Count -ne 1) {
+            if (@($artifacts.artifacts | Where-Object { $_.name -eq 'townlight-windows-local-msi-SIGNED' }).Count -eq 1) {
+              if ($promotion -and @($artifacts.artifacts | Where-Object { $_.name -eq 'townlight-windows-local-msi-SIGNED' -and $_.id -eq $promotion.artifact_id }).Count -ne 1) {
                 throw 'Promotion signed artifact identity mismatch.'
               }
               $run = $candidate
@@ -109,7 +109,7 @@ jobs:
             throw "No successful manual main signing run for tag SHA $tagSha has exactly one SIGNED MSI artifact."
           }
           Write-Host "Using signed MSI run: $($run.databaseId) $($run.url)"
-          gh run download $run.databaseId -n civicsuite-windows-local-msi-SIGNED -D ./msi-artifact
+          gh run download $run.databaseId -n townlight-windows-local-msi-SIGNED -D ./msi-artifact
           if ($LASTEXITCODE -ne 0) { throw "Failed to download the signed MSI artifact." }
 
           $msis = @(Get-ChildItem -LiteralPath ./msi-artifact -Filter *.msi -File)
@@ -151,7 +151,7 @@ jobs:
           $extract = Join-Path $env:RUNNER_TEMP 'townlight-release-extract'
           $p = Start-Process msiexec.exe -ArgumentList @('/a', "`"$($msi.FullName)`"", '/qn', "TARGETDIR=`"$extract`"") -Wait -PassThru
           if ($p.ExitCode -ne 0) { throw "MSI extraction failed: $($p.ExitCode)" }
-          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter civicsuite-desktop.exe -Recurse -File)
+          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter townlight-desktop.exe -Recurse -File)
           if ($embedded.Count -ne 1) { throw 'Expected one embedded desktop executable.' }
           & ./desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
           foreach ($artifact in @($msi, $embedded[0])) {
@@ -181,9 +181,9 @@ jobs:
             if ($proof.build_profile -ne 'planning-staff-beta' -or $proof.profile -ne 'planning-preview' -or
                 $proof.development_only -ne $false -or $proof.umbrella_source_commit -ne $tagSha -or
                 $proof.contract_sha256 -ne $contractSha -or $proof.sources_manifest_sha256 -ne $sourcesSha -or
-                $proof.package_versions.civicplan -ne $planning.Contract.planning_package_version -or
-                $proof.package_versions.'civicrecords-ai' -ne $planning.Contract.records_package_version -or
-                $proof.package_versions.civiccore -ne $planning.Contract.core_package_version -or @($proof.sources).Count -ne 8) {
+                $proof.package_versions.townlight_planning -ne $planning.Contract.planning_package_version -or
+                $proof.package_versions.'townlight_records' -ne $planning.Contract.records_package_version -or
+                $proof.package_versions.townlight_core -ne $planning.Contract.core_package_version -or @($proof.sources).Count -ne 8) {
               throw 'Planning payload source/package contract differs from the tagged release.'
             }
             foreach ($pin in $planning.Pins.sources.PSObject.Properties) {
@@ -213,10 +213,10 @@ jobs:
             if ($proof.build_profile -ne 'permitting-preview' -or $proof.profile -ne 'permitting-preview' -or
                 $proof.development_only -ne $false -or $proof.umbrella_source_commit -ne $tagSha -or
                 $proof.contract_sha256 -ne $contractSha -or $proof.sources_manifest_sha256 -ne $sourcesSha -or
-                $proof.package_versions.civicpermit -ne $permitting.Contract.permitting_package_version -or
-                $proof.package_versions.civicplan -ne $permitting.Contract.planning_package_version -or
-                $proof.package_versions.'civicrecords-ai' -ne $permitting.Contract.records_package_version -or
-                $proof.package_versions.civiccore -ne $permitting.Contract.core_package_version -or
+                $proof.package_versions.townlight_permitting -ne $permitting.Contract.permitting_package_version -or
+                $proof.package_versions.townlight_planning -ne $permitting.Contract.planning_package_version -or
+                $proof.package_versions.'townlight_records' -ne $permitting.Contract.records_package_version -or
+                $proof.package_versions.townlight_core -ne $permitting.Contract.core_package_version -or
                 @($proof.sources).Count -ne 9 -or @($proof.wheels).Count -ne 3) {
               throw 'Permitting payload source/package contract differs from the tagged release.'
             }
@@ -247,11 +247,11 @@ jobs:
             if ($proof.build_profile -ne 'inspections-preview' -or $proof.profile -ne 'inspections-preview' -or
                 $proof.development_only -ne $false -or $proof.umbrella_source_commit -ne $tagSha -or
                 $proof.contract_sha256 -ne $contractSha -or $proof.sources_manifest_sha256 -ne $sourcesSha -or
-                $proof.package_versions.civicinspect -ne $inspections.Contract.inspections_package_version -or
-                $proof.package_versions.civicpermit -ne $inspections.Contract.permitting_package_version -or
-                $proof.package_versions.civicplan -ne $inspections.Contract.planning_package_version -or
-                $proof.package_versions.'civicrecords-ai' -ne $inspections.Contract.records_package_version -or
-                $proof.package_versions.civiccore -ne $inspections.Contract.core_package_version -or
+                $proof.package_versions.townlight_inspections -ne $inspections.Contract.inspections_package_version -or
+                $proof.package_versions.townlight_permitting -ne $inspections.Contract.permitting_package_version -or
+                $proof.package_versions.townlight_planning -ne $inspections.Contract.planning_package_version -or
+                $proof.package_versions.'townlight_records' -ne $inspections.Contract.records_package_version -or
+                $proof.package_versions.townlight_core -ne $inspections.Contract.core_package_version -or
                 @($proof.sources).Count -ne 10 -or @($proof.wheels).Count -ne 4) {
               throw 'Inspections payload source/package contract differs from the tagged release.'
             }

@@ -24,8 +24,8 @@ def native_planning(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
     from app.database import get_async_session
     from app.models.user import UserRole
-    from civicplan.migrations import source_engine, upgrade
-    from civicsuite_runtime import planning_bridge as bridge, services
+    from townlight_planning.migrations import source_engine, upgrade
+    from townlight_runtime import planning_bridge as bridge, services
 
     url = f'sqlite:///{tmp_path / "planning.db"}'
     engine = source_engine(url)
@@ -63,7 +63,7 @@ def native_planning(tmp_path, monkeypatch):
 
     app = FastAPI()
     app.state.desktop_profile_root = profile
-    app.state.desktop_enabled_modules = {'civicplan', 'civicrecords-ai', 'civicclerk', 'civiccode', 'civiczone', 'civicaccess'}
+    app.state.desktop_enabled_modules = {'townlight_planning', 'townlight_records', 'townlight_meetings', 'townlight_code', 'townlight_zoning', 'townlight_access'}
     app.state.desktop_domain_enabled = True
     app.state.planning_providers = {'meetings': lambda **_: [], 'zoning': lambda **_: []}
     app.state.planning_access_rewrite = lambda text: {'advice': 'Fixture advice'}
@@ -92,9 +92,9 @@ def bundle():
 
 
 def test_native_actors_review_preview_and_public_boundaries(native_planning):
-    from civicplan.source_store import PlanSourceRepository
-    from civicplan.workflow_store import WorkflowRepository
-    from civicplan.workflow_schema import versions
+    from townlight_planning.source_store import PlanSourceRepository
+    from townlight_planning.workflow_store import WorkflowRepository
+    from townlight_planning.workflow_schema import versions
     import sqlalchemy as sa
     client, app, engine, sign_in, _, identities, _ = native_planning
     headers = sign_in()
@@ -128,17 +128,17 @@ def test_native_actors_review_preview_and_public_boundaries(native_planning):
     created = client.post(path + '/snapshots', json=snapshot, headers=headers)
     assert created.status_code == 200, created.text
     assert created.json()['sha256'] == preview.json()['sha256']
-    public = client.get('/civicplan/snapshots')
+    public = client.get('/townlight_planning/snapshots')
     assert public.status_code == 200 and len(public.json()['items']) == 1
     assert 'PRIVATE NOTES' not in public.text and 'Private proposal' not in public.text
-    assert client.get('/civicplan/analyses').status_code == 404
-    assert client.post('/civicplan/imports', json={'bundle':bundle()}).status_code == 404
+    assert client.get('/townlight_planning/analyses').status_code == 404
+    assert client.post('/townlight_planning/imports', json={'bundle':bundle()}).status_code == 404
     assert workflow.audit(first['analysis_id'])['ok']
 
 
 @pytest.mark.parametrize('case', ['missing', 'forged', 'expired', 'signed-out', 'disabled', 'records-only', 'module-disabled', 'domain-disabled', 'sql-disabled', 'service-key-spoof'])
 def test_native_planning_denials_do_not_write(native_planning, case):
-    from civicplan.source_store import PlanSourceRepository
+    from townlight_planning.source_store import PlanSourceRepository
     client, app, engine, sign_in, users, identities, config = native_planning
     headers = sign_in()
     if case == 'missing': headers = {}
@@ -152,7 +152,7 @@ def test_native_planning_denials_do_not_write(native_planning, case):
     if case == 'module-disabled': app.state.desktop_enabled_modules = set()
     if case == 'domain-disabled': app.state.desktop_domain_enabled = False
     if case == 'sql-disabled': identities[users[0]['email']].is_active = False
-    if case == 'service-key-spoof': headers = {'X-CivicPlan-Staff-Key':'service-key', 'X-CivicPlan-Role':'staff', 'X-Actor-Id':str(uuid4())}
+    if case == 'service-key-spoof': headers = {'X-Townlight-Planning-Staff-Key':'service-key', 'X-Townlight-Planning-Role':'staff', 'X-Actor-Id':str(uuid4())}
     response = client.post('/desktop/v1/planning/imports', json={'bundle':bundle()}, headers=headers)
     assert response.status_code in {401, 403, 503}, response.text
     assert PlanSourceRepository(engine).inventory()['items'] == []
@@ -160,21 +160,21 @@ def test_native_planning_denials_do_not_write(native_planning, case):
 
 def test_planning_profile_is_opt_in_and_missing_schema_or_provider_blocks(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
-    from civicsuite_runtime import services
+    from townlight_runtime import services
     for profile in ('records-beta', 'meetings-beta', 'city-core', 'zoning-beta'):
-        assert 'civicplan' not in dict(services._required_module_imports(profile))
+        assert 'townlight_planning' not in dict(services._required_module_imports(profile))
     monkeypatch.setenv('TOWNLIGHT_PRODUCT_PROFILE', 'planning-preview')
     monkeypatch.setenv('TOWNLIGHT_PROFILE_ROOT', str(tmp_path / 'profile'))
-    assert dict(services._required_module_imports('planning-preview'))['civicplan'] == 'civicplan.workflow_store'
+    assert dict(services._required_module_imports('planning-preview'))['townlight_planning'] == 'townlight_planning.workflow_store'
     monkeypatch.setattr(services, '_domain_database_status', lambda: {'ok':True,'reason':'ready'})
-    monkeypatch.setattr('civicsuite_runtime.meetings_bridge.readiness', lambda: True)
+    monkeypatch.setattr('townlight_runtime.meetings_bridge.readiness', lambda: True)
     monkeypatch.setattr(services, '_code_database_status', lambda: {'ok':True})
     monkeypatch.setattr(services, '_zoning_database_status', lambda: {'ok':True})
     monkeypatch.setattr(services, '_planning_database_status', lambda: {'ok':False,'reason':'planning-schema-unavailable'})
     app = services.create_runtime_app(domain_enabled=True)
     with TestClient(app) as client:
         assert client.get('/ready').status_code == 503
-        assert client.get('/civicplan/snapshots').status_code == 503
+        assert client.get('/townlight_planning/snapshots').status_code == 503
         monkeypatch.setattr(services, '_planning_database_status', lambda: {'ok':True,'reason':'planning-schema-ready'})
         assert client.get('/ready').status_code == 200
         domain = next(route.app for route in app.routes if getattr(route, 'path', None) == '')

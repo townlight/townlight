@@ -15,7 +15,7 @@ The supported artifact decision is:
 - Tag: `installer-clerk-core-v0.1.0-beta.4`
 - Distribution status: unsigned OSS beta
 - Supported publish scope: clerk-core starter archives for outside testing
-- Starter profile: CivicCore, CivicRecords AI 1.6.1, and CivicClerk 1.0.1
+- Starter profile: Townlight Core, Townlight Records 1.6.1, and Townlight Meetings 1.0.1
 - Runtime truth: Linux/container-first Docker/browser path
 - Windows truth: wrapper/readiness path plus prior matching-host Docker Desktop
   lifecycle evidence on Windows 11 with WSL 2
@@ -35,7 +35,7 @@ Published release baseline:
 - Verify run: `26134412418`
 - Installer-cleanroom run: `26134412420`
 - Release-lockstep PR run: `26134059097`
-- Suite truth: `[civicrecords-ai] PASS 1.6.1`
+- Suite truth: `[townlight_records] PASS 1.6.1`
 - Workflow proof: `[clerk-core-workflow-proof] PASS`
 - Installer plan: `VERIFY-INSTALLER-PLAN: PASSED`
 - Suite verifier: `VERIFY-SUITE-STATE: PASSED`
@@ -46,16 +46,16 @@ Published release baseline:
 
 Published beta.4 archive checksums:
 
-- `CivicSuite-clerk-core-windows-0.1.0.zip`: `632bf24487df5a9e156a68389819dbb5914bc0f910a99621e5b8f9711b7abfa5`
-- `CivicSuite-clerk-core-macos-0.1.0.tar.gz`: `82c5baa841bd7f15485036e09380e1c4b209107121ab0d99d62b5820ab7fb86a`
-- `CivicSuite-clerk-core-linux-0.1.0.tar.gz`: `f7d72bfed585e3134249213e137c15f9d2c96f33a9f0919789d8cbfb2187cbaf`
+- `Townlight-clerk-core-windows-0.1.0.zip`: `632bf24487df5a9e156a68389819dbb5914bc0f910a99621e5b8f9711b7abfa5`
+- `Townlight-clerk-core-macos-0.1.0.tar.gz`: `82c5baa841bd7f15485036e09380e1c4b209107121ab0d99d62b5820ab7fb86a`
+- `Townlight-clerk-core-linux-0.1.0.tar.gz`: `f7d72bfed585e3134249213e137c15f9d2c96f33a9f0919789d8cbfb2187cbaf`
 
 ## Release-Tag Lockstep Path
 
 The beta.4 release-truth PR included the `release-tag` label and updated or preserved
 these lockstep truth artifacts together:
 
-- `docs/CivicSuiteUnifiedSpec.md`
+- `docs/TownlightUnifiedSpec.md`
 - `docs/release-recovery-status.md`
 - `scripts/verify-suite-state.py`
 - `installer/modules.json`
@@ -76,7 +76,7 @@ Required CI after merge:
 
 - main `verify` passes
 - main `installer-cleanroom` passes
-- logs show `[civicrecords-ai] PASS 1.6.1`
+- logs show `[townlight_records] PASS 1.6.1`
 - logs show `[clerk-core-workflow-proof] PASS`
 - logs show Linux matching-host workflow proof, backup, and restore evidence
 
@@ -88,7 +88,7 @@ The required limitations are:
 - not city-ready
 - not procurement-ready
 - not production-ready
-- not a live cross-module CivicRecords/CivicClerk records exchange
+- not a live cross-module TownlightRecords/Townlight Meetings records exchange
 - not macOS lifecycle certified
 - not a full-suite release
 

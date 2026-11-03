@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       product_profile:
-        description: "Explicit MSI composition; automatic selects the matching preparation branch; main stays Zoning"
+        description: "Explicit MSI composition; automatic selects the matching preparation branch; main and the coordinated naming branch use the full candidate"
         type: choice
         options: [automatic, zoning-beta, planning-preview, planning-staff-beta, permitting-preview, inspections-preview]
         default: automatic
@@ -129,13 +129,13 @@ jobs:
       - name: Check out Townlight
         uses: actions/checkout@v5
         with:
-          path: civicsuite
+          path: townlight
 
       - name: Retrieve hash-verified inspection voice build input
         uses: actions/download-artifact@v4
         with:
           name: beta-1-inspection-voice-build-input
-          path: civicsuite/.runtime-cache/windows-local-1.0
+          path: townlight/.runtime-cache/windows-local-1.0
 
       - name: Resolve explicit MSI candidate contract
         id: candidate
@@ -145,21 +145,21 @@ jobs:
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
           PUBLICATION_SIGNING: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         run: |
-          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $env:REQUESTED_PROFILE -SourceBranch $env:SOURCE_BRANCH -SignForPublication:($env:PUBLICATION_SIGNING -eq 'true')
+          ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $env:REQUESTED_PROFILE -SourceBranch $env:SOURCE_BRANCH -SignForPublication:($env:PUBLICATION_SIGNING -eq 'true')
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: 6c3f340c530cd1972f3016924111f3f32a59012b
-          path: civiccore
+          ref: 3021821bf9a92c790a399ad12aed821d65b09105
+          path: townlight_core
 
       - name: Check out Townlight Records runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
           ref: ${{ steps.candidate.outputs.records_ref }}
-          path: civicrecords-ai
+          path: townlight_records
 
       - name: Check out Townlight Planning candidate source
         if: steps.candidate.outputs.planning_ref != ''
@@ -189,36 +189,44 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: dcc31159c902a098655b0e33a88464f106d9f134
-          path: civicclerk
+          ref: e0577a165cc8f09a3597ec3ce54ecc23168f8d62
+          path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: beae47f43e895c2c45196cc6a762991384f95933
-          path: civiccode
+          ref: 22d00f560cc45088a5b24a3f997787ee9c7a5e31
+          path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: b0ba1a4f54015c099905b34605637cc28c74cd67
+          ref: fb352955720db2e6e21caca816a8eb609a49f768
           path: zone
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 68d580efd9cb279cde5e878a3089831c9a8b18ea
-          path: civicnotice
+          ref: 4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48
+          path: townlight_notice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: 7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc
-          path: civicaccess
+          ref: f377a9a6e2a14d890333a20eab9277d644a9aaeb
+          path: townlight_access
+
+      - name: Check out exact Station Beta 1 source
+        if: steps.candidate.outputs.inspections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/station
+          ref: 7205ed1b07132b1649c994e190b381d773807aff
+          path: station
 
       - name: Validate publication-signing context
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
@@ -288,72 +296,80 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: civicsuite/desktop/package-lock.json
+          cache-dependency-path: townlight/desktop/package-lock.json
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install desktop dependencies
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm ci
 
       - name: Audit desktop dependencies
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm audit --audit-level=moderate
 
       - name: Run desktop static contract checks
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm test
 
       # QA3-2/UX3-2 (GauntletGate round 3): npm test above is JSON/string
       # contract checks only -- it cannot see broken render wiring or event
       # bindings. Nothing in required CI exercised the Playwright browser
-      # suite, which is exactly why a fully-broken UI feature (civicaccess
+      # suite, which is exactly why a fully-broken UI feature (townlight_access
       # delete-review's guided-review panel never rendering) shipped through
       # 3 rounds of green CI. windows-latest ships Microsoft Edge, which
       # playwright.config.mjs's channel: "msedge" uses directly -- no browser
       # download needed.
       - name: Run desktop browser (Playwright) tests
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm run test:browser
 
       - name: Prepare portable Windows runtime payload
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         shell: pwsh
         run: |
+          $sourceRoots = @(
+            '-CoreRoot', "${{ github.workspace }}\townlight_core"
+            '-RecordsBackendRoot', "${{ github.workspace }}\townlight_records\backend"
+            '-NoticeRoot', "${{ github.workspace }}\townlight_notice"
+            '-AccessRoot', "${{ github.workspace }}\townlight_access"
+            '-MeetingsRoot', "${{ github.workspace }}\townlight_meetings"
+            '-CodeRoot', "${{ github.workspace }}\townlight_code"
+          )
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
-            $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
+            $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1") }
             npm run prepare-runtime-payload -- @parameters
           } else {
-            npm run prepare-runtime-payload -- -ProductProfile zoning-beta
+            npm run prepare-runtime-payload -- -ProductProfile zoning-beta @sourceRoots
           }
 
       - name: Run Tauri Rust tests
-        working-directory: civicsuite/desktop/src-tauri
+        working-directory: townlight/desktop/src-tauri
         env:
-          CIVICSUITE_DESKTOP_STATE_DIR: ${{ runner.temp }}\townlight-unit-test-state
+          TOWNLIGHT_DESKTOP_STATE_DIR: ${{ runner.temp }}\townlight-unit-test-state
         run: cargo test
 
       - name: Check Rust formatting
-        working-directory: civicsuite/desktop/src-tauri
+        working-directory: townlight/desktop/src-tauri
         run: cargo fmt --check
 
       - name: Build desktop executable without packaging
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm run tauri -- build --no-bundle ${{ steps.candidate.outputs.tauri_args }}
 
       - name: Verify desktop starts without a system VC++ runtime
         shell: pwsh
-        run: ./civicsuite/desktop/scripts/verify-desktop-runtime.ps1 -Path ./civicsuite/desktop/src-tauri/target/release/civicsuite-desktop.exe
+        run: ./townlight/desktop/scripts/verify-desktop-runtime.ps1 -Path ./townlight/desktop/src-tauri/target/release/townlight-desktop.exe
 
       - name: Record unsigned executable intake
         id: exe_intake
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          $exe = Get-Item -LiteralPath "civicsuite/desktop/src-tauri/target/release/civicsuite-desktop.exe"
+          $exe = Get-Item -LiteralPath "townlight/desktop/src-tauri/target/release/townlight-desktop.exe"
           if ((Get-AuthenticodeSignature -LiteralPath $exe.FullName).Status -ne 'NotSigned') {
             throw "Freshly built executable is not unsigned; refusing signing intake."
           }
@@ -379,7 +395,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         shell: pwsh
         run: |
-          & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path "${{ steps.exe_intake.outputs.path }}"
+          & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path "${{ steps.exe_intake.outputs.path }}"
 
       - name: Record executable bytes before bundling
         id: bundle_exe_input
@@ -389,7 +405,7 @@ jobs:
           "sha256=$hash" >> $env:GITHUB_OUTPUT
 
       - name: Bundle the already built executable into Windows MSI
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         # Never patch the already signed EXE while building the installer.
         run: npm run tauri -- bundle --bundles msi --no-binary-patching ${{ steps.candidate.outputs.tauri_args }}
 
@@ -413,7 +429,7 @@ jobs:
         id: locate_msi
         shell: pwsh
         run: |
-          $msi = Get-ChildItem -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi" -Filter "*.msi" | Select-Object -First 1
+          $msi = Get-ChildItem -LiteralPath "townlight/desktop/src-tauri/target/release/bundle/msi" -Filter "*.msi" | Select-Object -First 1
           if (-not $msi) { throw "Townlight Windows Local MSI was not produced." }
           if ((Get-AuthenticodeSignature -LiteralPath $msi.FullName).Status -ne 'NotSigned') {
             throw "Freshly bundled MSI is not unsigned; refusing signing intake."
@@ -464,9 +480,9 @@ jobs:
           $extract = Join-Path $env:RUNNER_TEMP "townlight-signed-msi-extract"
           $p = Start-Process msiexec.exe -ArgumentList @('/a', "`"$msi`"", '/qn', "TARGETDIR=`"$extract`"") -Wait -PassThru
           if ($p.ExitCode -ne 0) { throw "MSI extraction failed: $($p.ExitCode)" }
-          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter civicsuite-desktop.exe -Recurse -File)
+          $embedded = @(Get-ChildItem -LiteralPath $extract -Filter townlight-desktop.exe -Recurse -File)
           if ($embedded.Count -ne 1) { throw "Expected one embedded desktop executable." }
-          & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
+          & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
           $exeHash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
           if ((Get-FileHash -LiteralPath $embedded[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $exeHash) {
             throw "MSI does not contain the exact signed executable."
@@ -474,7 +490,7 @@ jobs:
           $receipt = [ordered]@{ schema_version = 1; source_commit = '${{ github.sha }}'; workflow_run = '${{ github.run_id }}'; product_profile = '${{ steps.candidate.outputs.product_profile }}'; runtime_profile = '${{ steps.candidate.outputs.runtime_profile }}'; desktop_version = '${{ steps.candidate.outputs.desktop_version }}'; files = @() }
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $provenanceName = if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { 'inspections-candidate-provenance.json' } elseif ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
-            $provenance = Join-Path 'civicsuite/desktop/runtime/payload/python' $provenanceName
+            $provenance = Join-Path 'townlight/desktop/runtime/payload/python' $provenanceName
             $embeddedProvenance = @(Get-ChildItem -LiteralPath $extract -Filter $provenanceName -Recurse -File)
             $provenanceSha = (Get-FileHash -LiteralPath $provenance -Algorithm SHA256).Hash.ToLowerInvariant()
             if ($embeddedProvenance.Count -ne 1 -or (Get-FileHash -LiteralPath $embeddedProvenance[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $provenanceSha) {
@@ -487,7 +503,7 @@ jobs:
             $sig = Get-AuthenticodeSignature -LiteralPath $item.path
             $receipt.files += [ordered]@{ file=(Split-Path $item.path -Leaf); unsigned_sha256=$item.unsigned; signed_sha256=(Get-FileHash -LiteralPath $item.path -Algorithm SHA256).Hash.ToLowerInvariant(); signer_subject=$sig.SignerCertificate.Subject; signer_thumbprint=$sig.SignerCertificate.Thumbprint; timestamp_subject=$sig.TimeStamperCertificate.Subject }
           }
-          $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi/Townlight-signing-receipt.json" -Encoding utf8
+          $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "townlight/desktop/src-tauri/target/release/bundle/msi/Townlight-signing-receipt.json" -Encoding utf8
 
       - name: Classify and label MSI artifact
         id: artifact_mode
@@ -503,7 +519,7 @@ jobs:
             if ($signature.SignerCertificate.Subject -notmatch '(^|,\s*)CN=Scott Converse(,|$)') {
               throw "Publication MSI signer is not CN=Scott Converse."
             }
-            "artifact_name=civicsuite-windows-local-msi-SIGNED" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            "artifact_name=townlight-windows-local-msi-SIGNED" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             "signature_state=Valid" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             "path=$($msi.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             exit 0
@@ -515,7 +531,7 @@ jobs:
           $unsignedName = "$($msi.BaseName)-UNSIGNED$($msi.Extension)"
           $unsignedPath = Join-Path $msi.DirectoryName $unsignedName
           Move-Item -LiteralPath $msi.FullName -Destination $unsignedPath
-          "artifact_name=civicsuite-windows-local-msi-UNSIGNED" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "artifact_name=townlight-windows-local-msi-UNSIGNED" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "signature_state=UNSIGNED" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "path=$unsignedPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
@@ -541,11 +557,11 @@ jobs:
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
             if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-              "UpgradeCode=9e5bde3b-4ce2-4568-97bc-8e618853b93e"
+              "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
             } elseif ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
               "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
             } else {
-              "UpgradeCode=a63fc1d3-5437-5f55-89a2-fef93fb1f930"
+              "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
             }
             "SameVersionMajorUpgrade=true"
             "InstallerBundle=msi"
@@ -557,45 +573,45 @@ jobs:
             "DesktopVersion=${{ steps.candidate.outputs.desktop_version }}"
             "SourceCommit=${{ github.sha }}"
           )
-          $evidence | Set-Content -LiteralPath "civicsuite/desktop/src-tauri/target/release/bundle/msi/Townlight-msi-evidence.txt" -Encoding UTF8
+          $evidence | Set-Content -LiteralPath "townlight/desktop/src-tauri/target/release/bundle/msi/Townlight-msi-evidence.txt" -Encoding UTF8
 
       - name: Upload UNSIGNED Windows Local MSI for private CI testing
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.sign_for_publication) }}
         uses: actions/upload-artifact@v4
         with:
-          name: civicsuite-windows-local-msi-UNSIGNED
+          name: townlight-windows-local-msi-UNSIGNED
           path: |
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/*.msi
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
-            civicsuite/desktop/runtime/payload/runtime-payload-lock.json
-            civicsuite/desktop/runtime/payload/python/planning-candidate-provenance.json
-            civicsuite/desktop/runtime/payload/python/inspections-candidate-provenance.json
-            civicsuite/config/inspections-msi-candidate.json
-            civicsuite/config/inspections-preview-sources.json
-            civicsuite/desktop/runtime/payload/python/permitting-candidate-provenance.json
-            civicsuite/config/permitting-msi-candidate.json
-            civicsuite/config/permitting-preview-sources.json
-            civicsuite/config/planning-msi-candidate.json
-            civicsuite/config/planning-staff-beta.json
-            civicsuite/config/planning-staff-beta-sources.json
+            townlight/desktop/src-tauri/target/release/bundle/msi/*.msi
+            townlight/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
+            townlight/desktop/runtime/payload/runtime-payload-lock.json
+            townlight/desktop/runtime/payload/python/planning-candidate-provenance.json
+            townlight/desktop/runtime/payload/python/inspections-candidate-provenance.json
+            townlight/config/inspections-msi-candidate.json
+            townlight/config/inspections-preview-sources.json
+            townlight/desktop/runtime/payload/python/permitting-candidate-provenance.json
+            townlight/config/permitting-msi-candidate.json
+            townlight/config/permitting-preview-sources.json
+            townlight/config/planning-msi-candidate.json
+            townlight/config/planning-staff-beta.json
+            townlight/config/planning-staff-beta-sources.json
           retention-days: 7
 
       - name: Upload SIGNED Windows Local MSI for publication gate
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         uses: actions/upload-artifact@v4
         with:
-          name: civicsuite-windows-local-msi-SIGNED
+          name: townlight-windows-local-msi-SIGNED
           path: |
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/*.msi
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/*signing-receipt.json
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/inspections-candidate-provenance.json
-            civicsuite/desktop/src-tauri/target/release/bundle/msi/permitting-candidate-provenance.json
+            townlight/desktop/src-tauri/target/release/bundle/msi/*.msi
+            townlight/desktop/src-tauri/target/release/bundle/msi/*evidence*.txt
+            townlight/desktop/src-tauri/target/release/bundle/msi/*signing-receipt.json
+            townlight/desktop/src-tauri/target/release/bundle/msi/planning-candidate-provenance.json
+            townlight/desktop/src-tauri/target/release/bundle/msi/inspections-candidate-provenance.json
+            townlight/desktop/src-tauri/target/release/bundle/msi/permitting-candidate-provenance.json
           retention-days: 7
 
-  desktop-civiccore-integration:
-    name: desktop<->CivicCore real-runtime integration test
+  desktop-townlight_core-integration:
+    name: desktop<->TownlightCore real-runtime integration test
     needs: [detect-desktop-changes, stage-inspection-voice-input]
     if: always() && needs.detect-desktop-changes.outputs.relevant == 'true'
     runs-on: windows-latest
@@ -604,13 +620,13 @@ jobs:
       - name: Check out Townlight
         uses: actions/checkout@v5
         with:
-          path: civicsuite
+          path: townlight
 
       - name: Retrieve hash-verified inspection voice build input
         uses: actions/download-artifact@v4
         with:
           name: beta-1-inspection-voice-build-input
-          path: civicsuite/.runtime-cache/windows-local-1.0
+          path: townlight/.runtime-cache/windows-local-1.0
 
       - name: Resolve connected integration build contract
         id: candidate
@@ -620,41 +636,41 @@ jobs:
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           $profile = if ($env:REQUESTED_PROFILE -eq 'inspections-preview' -or $env:SOURCE_BRANCH -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($env:REQUESTED_PROFILE -eq 'permitting-preview' -or $env:SOURCE_BRANCH -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($env:REQUESTED_PROFILE -eq 'planning-preview') { 'planning-preview' } else { 'planning-staff-beta' }
-          ./civicsuite/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
+          ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: 6c3f340c530cd1972f3016924111f3f32a59012b
-          path: civiccore
+          ref: 3021821bf9a92c790a399ad12aed821d65b09105
+          path: townlight_core
 
       - name: Check out Townlight Records runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/sunshine
           ref: ${{ steps.candidate.outputs.records_ref }}
-          path: civicrecords-ai
+          path: townlight_records
 
       - name: Check out Townlight Meetings runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: dcc31159c902a098655b0e33a88464f106d9f134
-          path: civicclerk
+          ref: e0577a165cc8f09a3597ec3ce54ecc23168f8d62
+          path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: beae47f43e895c2c45196cc6a762991384f95933
-          path: civiccode
+          ref: 22d00f560cc45088a5b24a3f997787ee9c7a5e31
+          path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: b0ba1a4f54015c099905b34605637cc28c74cd67
+          ref: fb352955720db2e6e21caca816a8eb609a49f768
           path: zone
 
       - name: Check out Townlight Planning development source
@@ -684,28 +700,36 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 68d580efd9cb279cde5e878a3089831c9a8b18ea
-          path: civicnotice
+          ref: 4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48
+          path: townlight_notice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: 7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc
-          path: civicaccess
+          ref: f377a9a6e2a14d890333a20eab9277d644a9aaeb
+          path: townlight_access
+
+      - name: Check out exact Station Beta 1 source
+        if: steps.candidate.outputs.inspections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/station
+          ref: 7205ed1b07132b1649c994e190b381d773807aff
+          path: station
 
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: civicsuite/desktop/package-lock.json
+          cache-dependency-path: townlight/desktop/package-lock.json
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install desktop dependencies
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm ci
 
       # Builds the portable Windows runtime payload the wired contract needs:
@@ -714,14 +738,22 @@ jobs:
       # the integration test exercises -- no external service is provisioned because
       # the product ships its own portable stack. The ~6.97 GB Gemma model is NOT
       # downloaded here (only first-run pulls it); this job proves the
-      # desktop<->CivicCore data-plane contract without the heavy model.
+      # desktop<->TownlightCore data-plane contract without the heavy model.
       - name: Prepare portable Windows runtime payload
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         shell: pwsh
         run: |
-          $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan", '-RecordsBackendRoot', "${{ github.workspace }}\civicrecords-ai\backend")
+          $sourceRoots = @(
+            '-CoreRoot', "${{ github.workspace }}\townlight_core"
+            '-RecordsBackendRoot', "${{ github.workspace }}\townlight_records\backend"
+            '-NoticeRoot', "${{ github.workspace }}\townlight_notice"
+            '-AccessRoot', "${{ github.workspace }}\townlight_access"
+            '-MeetingsRoot', "${{ github.workspace }}\townlight_meetings"
+            '-CodeRoot', "${{ github.workspace }}\townlight_code"
+          )
+          $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
@@ -731,13 +763,13 @@ jobs:
           python-version: "3.13"
 
       - name: Verify Planning native identity and profile boundaries
-        working-directory: civicsuite
+        working-directory: townlight
         shell: pwsh
         env:
           TESTING: "1"
           JWT_SECRET: "fixture-only-planning-p5-000000000000000000000000000000000000000"
           DATABASE_URL: "postgresql+asyncpg://fixture@127.0.0.1:25432/fixture"
-          PYTHONPATH: ${{ github.workspace }}\civicsuite\desktop\runtime\payload\python\Lib\site-packages
+          PYTHONPATH: ${{ github.workspace }}\townlight\desktop\runtime\payload\python\Lib\site-packages
         run: |
           python -m pip install "pytest>=8,<9"
           python -m pytest tests/test_planning_native.py tests/test_runtime_profile_contract.py -q
@@ -745,15 +777,15 @@ jobs:
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { python -m pytest tests/test_permitting_native.py -q }
           if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { python -m pytest tests/test_inspections_native.py -q }
 
-      - name: Run desktop<->CivicCore real-runtime integration test
-        working-directory: civicsuite/desktop/src-tauri
+      - name: Run desktop<->TownlightCore real-runtime integration test
+        working-directory: townlight/desktop/src-tauri
         shell: pwsh
         env:
           # Un-gates the real-runtime contract test that is a no-op when unset.
-          CIVICSUITE_RUN_REAL_RUNTIME_TEST: "1"
+          TOWNLIGHT_RUN_REAL_RUNTIME_TEST: "1"
           TOWNLIGHT_TEST_RUNTIME_PROFILE: ${{ steps.candidate.outputs.runtime_profile }}
           # Point the test at the payload just prepared above.
-          CIVICSUITE_RUNTIME_PAYLOAD_DIR: ${{ github.workspace }}\civicsuite\desktop\runtime\payload
+          TOWNLIGHT_RUNTIME_PAYLOAD_DIR: ${{ github.workspace }}\townlight\desktop\runtime\payload
         run: |
           cargo test -- --nocapture --test-threads=1 real_postgres_payload_initializes_and_migrates_when_enabled real_ollama_runtime_with_no_model_serves_the_not_ready_contract_when_enabled
 
@@ -761,8 +793,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-civiccore-integration-logs
-          path: civicsuite/desktop/runtime/payload/runtime-payload-lock.json
+          name: desktop-townlight_core-integration-logs
+          path: townlight/desktop/runtime/payload/runtime-payload-lock.json
           retention-days: 7
 
   windows-msi-lifecycle:
@@ -779,7 +811,7 @@ jobs:
       - name: Check out Townlight
         uses: actions/checkout@v5
         with:
-          path: civicsuite
+          path: townlight
 
       - name: Download built Windows Local MSI
         uses: actions/download-artifact@v4
@@ -828,7 +860,7 @@ jobs:
           $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
           if (-not $msi) { throw "No MSI found in the downloaded artifact." }
           Write-Host "Installing $($msi.FullName)"
-          $log = Join-Path $env:RUNNER_TEMP "civicsuite-msi-install.log"
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-install.log"
           $p = Start-Process msiexec.exe -ArgumentList @("/i", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -Wait -PassThru
           Write-Host "msiexec install exit code: $($p.ExitCode)"
           if (Test-Path $log) { Get-Content $log -Tail 40 }
@@ -888,7 +920,7 @@ jobs:
           $hash = (Get-FileHash -LiteralPath $env:TOWNLIGHT_EXE -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($evidence -notmatch "(?m)^InnerExecutableSHA256=$hash\r?$") { throw 'Installed executable hash differs from packaged evidence.' }
           if ($env:EXPECTED_SIGNATURE_STATE -eq 'Valid') {
-            & ./civicsuite/desktop/scripts/verify-publication-signature.ps1 -Path $env:TOWNLIGHT_EXE
+            & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path $env:TOWNLIGHT_EXE
           } elseif ((Get-AuthenticodeSignature -LiteralPath $env:TOWNLIGHT_EXE).Status -ne 'NotSigned') {
             throw 'Routine CI installed executable is unexpectedly signed.'
           }
@@ -978,20 +1010,20 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: civicsuite/desktop/package-lock.json
+          cache-dependency-path: townlight/desktop/package-lock.json
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install desktop dependencies
-        working-directory: civicsuite/desktop
+        working-directory: townlight/desktop
         run: npm ci
 
       - name: Exercise first-run, backup, and restore lifecycle logic (isolated state dir)
-        working-directory: civicsuite/desktop/src-tauri
+        working-directory: townlight/desktop/src-tauri
         shell: pwsh
         env:
-          CIVICSUITE_DESKTOP_STATE_DIR: ${{ runner.temp }}\civicsuite-lifecycle-state
+          TOWNLIGHT_DESKTOP_STATE_DIR: ${{ runner.temp }}\townlight-lifecycle-state
         run: |
           # first_run::* and supervisor backup/restore unit+integration tests run
           # against an isolated state dir; this is the headless-feasible proof of
@@ -999,11 +1031,11 @@ jobs:
           cargo test first_run -- --nocapture
           cargo test backup -- --nocapture
           cargo test restore -- --nocapture
-          # civicaccess: same headless-feasible proof, for the module this lifecycle
+          # townlight_access: same headless-feasible proof, for the module this lifecycle
           # job previously never ran (TEST-7) -- the desktop-windows-msi build job
-          # runs the full civicaccess suite too, but this job is the one that
+          # runs the full townlight_access suite too, but this job is the one that
           # follows a real msiexec install/uninstall cycle, so cover it here as well.
-          cargo test civicaccess -- --nocapture
+          cargo test townlight_access -- --nocapture
 
       # ---- UNINSTALL ----------------------------------------------------------
       - name: Uninstall the MSI silently
@@ -1011,7 +1043,7 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
-          $log = Join-Path $env:RUNNER_TEMP "civicsuite-msi-uninstall.log"
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-uninstall.log"
           $p = Start-Process msiexec.exe -ArgumentList @("/x", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -Wait -PassThru
           Write-Host "msiexec uninstall exit code: $($p.ExitCode)"
           if (Test-Path $log) { Get-Content $log -Tail 40 }
@@ -1033,7 +1065,7 @@ jobs:
             Where-Object { $_.Name -notlike "unins*" } | Select-Object -First 1
           if ($exe) { throw "Application exe still present under $installDir after uninstall: $($exe.FullName)." }
           # QA-4: also confirm the uninstaller didn't leave city-work.json behind under
-          # the real per-user data path (not the isolated CIVICSUITE_DESKTOP_STATE_DIR
+          # the real per-user data path (not the isolated TOWNLIGHT_DESKTOP_STATE_DIR
           # used by the cargo lifecycle tests above). NOTE -- the interactive GUI
           # first-run wizard does not execute in this job (see QA-5 / the comment
           # above "Exercise first-run..."), so this job never writes real user data to
@@ -1042,7 +1074,7 @@ jobs:
           # "the uninstaller and this job's own actions did not leak state into the
           # real per-user path," not "a real clerk's saved city-work.json is purged on
           # uninstall." That stronger claim needs a real GUI walkthrough (Phase D).
-          $realUserData = Join-Path $env:LOCALAPPDATA "CivicSuite\workflows\city-work.json"
+          $realUserData = Join-Path $env:LOCALAPPDATA "Townlight\workflows\city-work.json"
           if (Test-Path $realUserData) { throw "city-work.json still present under the real per-user data path after uninstall: $realUserData." }
           Write-Host "Uninstall verified: product deregistered, main binary removed, no real per-user data path leak."
 
@@ -1051,5 +1083,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-msi-lifecycle-logs
-          path: ${{ runner.temp }}\civicsuite-msi-*.log
+          path: ${{ runner.temp }}\townlight-msi-*.log
           retention-days: 7

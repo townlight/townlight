@@ -1,14 +1,14 @@
-> **Townlight Beta 1 — Station delivery update, 31 October 2026.** [Signed Windows installer, source, documentation and acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). This edition documents the Sandbox-tested Station delivery additions. Existing component versions are retained. Earlier baseline results remain identified as historical evidence; the new acceptance report identifies the new installer.
+> **Prepared naming, Access and Notice candidate — 2 November 2026.** Build, signing, installed acceptance and publication remain pending. Earlier signed releases and receipts apply only to their identified artifacts.
 
 # Townlight
 
-**Townlight Beta 1** · Existing component versions retained · AGPL-3.0-only
+**Townlight Beta 1** · Naming candidate; component versions advanced · AGPL-3.0-only
 
 Nine connected municipal products for staff workflows grounded in retained sources, explicit review and accountable release decisions.
 
 ## Start here
 
-Staff should use the operating manual. Administrators should read first-run, configuration and recovery before changing a deployment. Developers should read the exact API/schema reference and matching source companion. This edition accompanies the [published Station delivery update](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery).
+Staff should use the operating manual. Administrators should read first-run, configuration and recovery before changing a deployment. Developers should read the exact API/schema reference and matching source companion. This edition describes the prepared source candidate. The earlier Station delivery release remains historical evidence for its own artifacts.
 
 - [Operating manual](https://townlight.github.io/manuals/suite.html) · [Printable PDF](https://townlight.github.io/pdf/Townlight-Suite-Manual-Beta-1.pdf) · [Editable Word manual](https://townlight.github.io/docx/Townlight-Suite-Manual-Beta-1.docx)
 - [API and data dictionary](https://townlight.github.io/api/suite.html) · [OpenAPI JSON](https://townlight.github.io/api/suite-openapi.json)
@@ -18,16 +18,13 @@ Staff should use the operating manual. Administrators should read first-run, con
 
 | Identity | Value |
 | --- | --- |
-| Public documentation identity | Townlight Beta 1 |
-| Installer version | 1.6.0.1 |
-| Native desktop source version | 1.6.0-1 |
-| Candidate artifact identity | Station delivery update; use the release SHA256SUMS.txt |
-| Corresponding source | Updated Station delivery candidate source companion |
-| Current owned software license | AGPL-3.0-only |
-| Supported acceptance profile | Windows x64 fresh install; inspections-preview; separate Station configuration |
+| Documentation | Townlight Beta 1 naming, Access and Notice candidate |
+| Intended installer version | 1.7.0.1; build and acceptance pending |
+| Native desktop source version | 1.7.0-1 |
+| Candidate hashes | Pending build, signing and installed acceptance |
+| License | AGPL-3.0-only |
 
-
-“Townlight Beta 1” identifies this coordinated beta delivery. It does not renumber the installer, native binary, Python packages or historical receipts. Component versions may differ. This edition accompanies the newly packaged and signed MSI containing the Station delivery additions. The native desktop and other native payload files retain their accepted signed bytes. Historical release pages and manuals describe their own versions and are not the download instructions for this Station delivery candidate.
+Use a fresh profile and empty database. Existing unmarked city data is refused before initialization; no in-place upgrade is supported. Preserve the existing `%LOCALAPPDATA%\CivicSuite` profile, data and recovery material. Historical releases retain their original identities.
 
 ## What staff can do
 
@@ -69,7 +66,7 @@ Versioned saves use expected prior revision identifiers where defined. Reopen an
 
 ### Capacity and platform statements
 
-This beta has synthetic single-profile workflow evidence. It does not have a published benchmark for concurrent staff capacity, minimum RAM/CPU, large-source limits or a field SLA. Do not turn a developer machine’s specification into a supported minimum. Installer size is 2,092,122,112 bytes before installation; allow additional disk for extracted runtime, database, originals, exports, media and backups. Select equipment/storage after sizing those actual workloads.
+This beta has synthetic single-profile workflow evidence. It does not have a published benchmark for concurrent staff capacity, minimum RAM/CPU, large-source limits or a field SLA. Do not turn a developer machine’s specification into a supported minimum. The new installer size remains pending its build;  allow additional disk for extracted runtime, database, originals, exports, media and backups. Select equipment/storage after sizing those actual workloads.
 
 The exact [runtime payload lock](https://townlight.github.io/reference/runtime-payload-lock.json) records pinned files, sizes and hashes. The [component metadata](https://townlight.github.io/reference/component-metadata.json) records shipped dependency declarations. These references are more precise than a manually copied dependency list. Third-party and historical license notices must accompany their matching payloads.
 
@@ -82,8 +79,8 @@ The separate pinned CivicCast-derived media engine uses Python/native GStreamer 
 ## Setup and operation
 
 1. Download the signed Windows installer and matching source/documentation companions from the [Station delivery release](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). Use that release’s checksums and publisher signature to identify the candidate.
-2. On the intended fresh Windows test installation, verify the MSI hash and publisher signature before installing. Preserve unrelated profiles and recovery material. This candidate has fresh-install acceptance; historical in-place upgrades are unverified.
-3. Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for all eight desktop products. A narrower default selection will not expose all workspaces.
+2. On the intended fresh Windows test installation, verify the MSI hash and publisher signature before installing. Preserve unrelated profiles and recovery material. Installed acceptance for this source candidate remains pending; no in-place legacy upgrade is supported.
+3. Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for the bounded desktop composition, including Access and Notice. A narrower default selection will not expose all workspaces.
 4. Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
 5. Run Health Check and wait for readiness. Open Townlight. In System Health select **Finish Records Migration** to activate the canonical Python/PostgreSQL runtime. Do not fabricate migration receipts or seed accounts.
 6. Create named staff through Settings. Import authorized sources using each product’s source library. All examples in this package are synthetic; they are not municipal authority.
@@ -92,9 +89,9 @@ The separate pinned CivicCast-derived media engine uses Python/native GStreamer 
 ## Configuration
 ### Native deployment configuration
 
-Use Setup, Settings and System Health for supported staff operation. Administrators provision folders, backup storage, named accounts and the city profile. Select `inspections-preview` for the full eight-workspace desktop. Station remains a separate service boundary. Do not use a standalone product’s demo server as a substitute for the installed workspace.
+Use Setup, Settings and System Health for supported staff operation. Administrators provision folders, backup storage, named accounts and the city profile. Select `inspections-preview` for the bounded desktop composition, including Access and Notice. Station remains a separate service boundary. Do not use a standalone product’s demo server as a substitute for the installed workspace.
 
-Technical deployments use `TOWNLIGHT_PRODUCT_PROFILE`, `TOWNLIGHT_PROFILE_ROOT`, `DATABASE_URL`, `CIVICSUITE_RUNTIME_PORT`, `PORTAL_MODE` and the runtime-managed secret files. Treat database URLs and native session proofs as secrets. The installed native domain runtime explicitly refuses non-loopback binding. `PORTAL_MODE=private` is the accepted posture; changing it does not by itself commission an internet portal, authentication provider or reverse proxy.
+Technical deployments use `TOWNLIGHT_PRODUCT_PROFILE`, `TOWNLIGHT_PROFILE_ROOT`, `DATABASE_URL`, `TOWNLIGHT_RUNTIME_PORT`, `PORTAL_MODE` and the runtime-managed secret files. Treat database URLs and native session proofs as secrets. The installed native domain runtime explicitly refuses non-loopback binding. `PORTAL_MODE=private` is the accepted posture; changing it does not by itself commission an internet portal, authentication provider or reverse proxy.
 
 The isolated documentation exporter sets a fictional profile and unusable synthetic database origin only to read schemas; those values are not deployment configuration. Keep deployment values in the intended process/account scope. An already-running process does not automatically inherit later environment edits.
 

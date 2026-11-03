@@ -1,4 +1,4 @@
-<a id="civicsuite-installer-contract"></a>
+<a id="townlight-installer-contract"></a>
 
 # Townlight Installer Contract
 
@@ -67,7 +67,7 @@ The installer must treat these as explicit baseline checks:
 The installer may guide the user to install privileged dependencies when silent
 installation would be unsafe, unsupported, or outside the operator's control.
 
-<a id="civiccore-first"></a>
+<a id="townlight_core-first"></a>
 
 ## Townlight Core First
 
@@ -112,7 +112,7 @@ stack only; it does not fetch network fonts or mutate host state.
 
 The launcher includes QA fixtures for loading, success, empty, error, and
 partial states through `?state=loading|success|empty|error|partial`. Runtime
-module URLs can be overridden by defining `window.CIVICSUITE_LAUNCHER_CONFIG`
+module URLs can be overridden by defining `window.TOWNLIGHT_LAUNCHER_CONFIG`
 before `src/app.js` loads.
 
 ## Menu Styles
@@ -178,7 +178,7 @@ Initial readiness scenarios:
 - `windows-missing-wsl`: Windows WSL 2 prerequisites are unavailable.
 - `low-resources`: the selected profile may not have enough disk or memory.
 - `ollama-missing`: local LLM features may be unavailable.
-- `civiccore-mismatch`: selected modules require a different Townlight Core version.
+- `townlight_core-mismatch`: selected modules require a different Townlight Core version.
 
 Every failed readiness check must include a clear message, concrete fix steps,
 and a next action. "Something failed" is not an acceptable installer state.
@@ -299,9 +299,9 @@ copy:
 
 ```powershell
 python scripts\run-installer-package-cleanroom.py
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-windows-0.1.0.zip
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-windows-0.1.0.zip --staff-mode bearer --workflow-proof
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-macos-0.1.0.tar.gz --skip-install
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-windows-0.1.0.zip
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-windows-0.1.0.zip --staff-mode bearer --workflow-proof
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-macos-0.1.0.tar.gz --skip-install
 ```
 
 Those commands extract the release archive, run the platform launcher from the
@@ -330,7 +330,7 @@ This writes Windows, macOS, and Linux package directories under
 - `README.md`: first-run operator instructions for readiness, plan review, and
   the cleanroom gate.
 - `install-plan.json`: the resolved profile plan from `modules.json`.
-- `start-civicsuite-installer.ps1` or `start-civicsuite-installer.sh`: the
+- `start-townlight-installer.ps1` or `start-townlight-installer.sh`: the
   platform entrypoint.
 
 Readiness and plan modes remain non-mutating. Gate mode is explicitly mutating:
@@ -409,7 +409,7 @@ The current preflight surface is intentionally blocked with
 `executor_not_implemented`. It exists to show what must be true before a future
 mutating executor can be trusted.
 
-<a id="minimal-civiccore-install-kit"></a>
+<a id="minimal-townlight_core-install-kit"></a>
 
 ## Minimal Townlight Core Install Kit
 
@@ -429,13 +429,13 @@ The generated install kit includes:
 
 - `README.md`
 - `requirements.txt`
-- `civiccore-install-plan.json`
-- `install-civiccore.ps1`
-- `install-civiccore.sh`
-- `verify-civiccore.ps1`
-- `verify-civiccore.sh`
-- `reset-civiccore.ps1`
-- `reset-civiccore.sh`
+- `townlight_core-install-plan.json`
+- `install-townlight_core.ps1`
+- `install-townlight_core.sh`
+- `verify-townlight_core.ps1`
+- `verify-townlight_core.sh`
+- `reset-townlight_core.ps1`
+- `reset-townlight_core.sh`
 
 The generated install scripts install Townlight Core from the local wheel artifact
 into a `.venv` inside the generated kit. They do not install Docker, WSL,
@@ -463,7 +463,7 @@ This cleanroom proof mutates the disposable container and the evidence directory
 only. It does not install host dependencies, start host services, or change
 module source code.
 
-<a id="civicrecords-service-cleanroom-proof"></a>
+<a id="townlight_records-service-cleanroom-proof"></a>
 
 ## Townlight Records Service Cleanroom Proof
 
@@ -471,10 +471,10 @@ The first service-profile cleanroom runner exercises Townlight Records from a
 copied source tree:
 
 ```powershell
-python scripts\run-civicrecords-cleanroom.py --run-id manual-civicrecords-service-cleanroom-4
+python scripts\run-townlight_records-cleanroom.py --run-id manual-townlight_records-service-cleanroom-4
 ```
 
-The runner copies `civicrecords-ai` into
+The runner copies `townlight_records` into
 `installer/reports/{run_id}/source`, writes a clean `.env`, adds isolated host
 ports, builds the API and frontend images, starts Postgres, Redis, Ollama, API,
 and frontend with a unique Compose project name, checks API/frontend health,
@@ -483,9 +483,9 @@ stack down with volumes removed.
 
 Passing evidence for the current run lives at:
 
-- `installer/reports/manual-civicrecords-service-cleanroom-4/service-ui-proof.json`
-- `installer/reports/manual-civicrecords-service-cleanroom-4/cleanroom-ui-desktop.png`
-- `installer/reports/manual-civicrecords-service-cleanroom-4/cleanroom-ui-mobile.png`
+- `installer/reports/manual-townlight_records-service-cleanroom-4/service-ui-proof.json`
+- `installer/reports/manual-townlight_records-service-cleanroom-4/cleanroom-ui-desktop.png`
+- `installer/reports/manual-townlight_records-service-cleanroom-4/cleanroom-ui-mobile.png`
 
 The suite installer exposes this proof as the `clerk-core` cleanroom proof:
 

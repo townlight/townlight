@@ -16,7 +16,7 @@ Key payload:
 {
   "mode": "restore",
   "status": "failed",
-  "error": "Backup manifest missing: C:\\dev\\Claude\\CivicSuite-clerk-core-city-release\\installer\\runtime\\clerk-core\\backups\\does-not-exist\\backup-manifest.json",
+  "error": "Backup manifest missing: C:\\dev\\Claude\\Townlight-clerk-core-city-release\\installer\\runtime\\clerk-core\\backups\\does-not-exist\\backup-manifest.json",
   "fix_steps": [
     "Confirm Docker is installed, open, and reports a running engine.",
     "Confirm the resolved ports in the report are free, or rerun with --port-offset / explicit port flags.",

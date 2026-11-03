@@ -1,4 +1,4 @@
-"""Verify the CivicSuite suite-installer design contract."""
+"""Verify the Townlight suite-installer design contract."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ PLANNER = ROOT / "scripts" / "plan-installer.py"
 INSTALLER_LIFECYCLE_RUNNER = ROOT / "scripts" / "run-clerk-core-installer.py"
 PACKAGE_CLEANROOM_RUNNER = ROOT / "scripts" / "run-installer-package-cleanroom.py"
 CLEANROOM_RUNNER = ROOT / "scripts" / "run-minimal-cleanroom.py"
-SERVICE_CLEANROOM_RUNNER = ROOT / "scripts" / "run-civicrecords-cleanroom.py"
+SERVICE_CLEANROOM_RUNNER = ROOT / "scripts" / "run-townlight_records-cleanroom.py"
 MODULE_MANIFEST_CONTRACT_VERIFIER = (
     ROOT / "scripts" / "verify-module-manifest-contract.py"
 )
@@ -56,36 +56,12 @@ REQUIRED_PROFILES = {
     "custom",
 }
 REQUIRED_MODULES = {
-    "civiccore",
-    "civicrecords-ai",
-    "civicclerk",
-    "civiccode",
-    "civiczone",
-    "civicaccess",
-    "civicplan",
-    "civicpermit",
-    "civicinspect",
-    "civicgrants",
-    "civicprocure",
-    "civiccontracts",
-    "civicboards",
-    "civicnotice",
-    "civic311",
-    "civiccomms",
-    "civicdata",
-    "civicregwatch",
-    "civicapi",
-    "civichr",
-    "civicbudget",
-    "civiclegal",
-    "civicelections",
-    "civicutility",
-    "civiccourt",
-    "civicsafety",
-    "civiclibrary",
-    "civicparks",
+    "townlight_core", "townlight_records", "townlight_meetings", "townlight_code",
+    "townlight_zoning", "townlight_access", "townlight_planning",
+    "townlight_permitting", "townlight_inspections", "townlight_notice",
+    "townlight-station",
 }
-PLANNED_NON_SELECTABLE_MODULES = {"civicregwatch", "civicapi"}
+EXTERNAL_NON_SELECTABLE_MODULES = {"townlight-station"}
 REQUIRED_DOC_PHRASES = (
     "zero-baseline machine",
     "Townlight Core",
@@ -172,11 +148,11 @@ def load_manifest() -> dict[str, object]:
     return data
 
 
-def has_local_civiccore_wheel() -> bool:
-    if os.environ.get("CIVICSUITE_VERIFY_NO_LOCAL_CIVICCORE") == "1":
+def has_local_townlight_core_wheel() -> bool:
+    if os.environ.get("TOWNLIGHT_VERIFY_NO_LOCAL_TOWNLIGHT_CORE") == "1":
         return False
-    dist = ROOT.parent / "civiccore" / "dist"
-    return dist.is_dir() and any(dist.glob("civiccore-*.whl"))
+    dist = ROOT.parent / "core" / "dist"
+    return dist.is_dir() and any(dist.glob("townlight_core-*.whl"))
 
 
 def check_docs() -> list[str]:
@@ -198,25 +174,15 @@ def check_docs() -> list[str]:
         for phrase in (
             "Townlight Core installs first",
             "Townlight Records and Townlight Meetings are selectable",
-            "Windows and Linux package lifecycle proof are required",
-            "macOS archives and wrapper manifests are generated and supported at beta",
-            "before any macOS lifecycle certification claim",
-            "Townlight Records reports v1.7.3",
-            "Townlight Meetings reports v1.0.4 with Townlight Core v1.2.0",
-            "install --staff-mode bearer --workflow-proof",
-            "first-admin JWT auth",
-            "bearer-protected staff auth",
-            "exercise the search surface",
-            "submit the request for review",
-            "motion/vote capture",
-            "automatic-minutes-posting",
-            "Reports must not persist the Townlight Records admin password or bearer token",
-            "Package Cleanroom Contract",
-            "run-installer-package-cleanroom.py --archive installer\\dist\\CivicSuite-clerk-core-windows-0.1.0.zip --platform windows --staff-mode bearer --workflow-proof",
-            "workflow_proof_requested=true",
-            "civicclerk_staff_mode=bearer",
-            "Windows package workflow proof has been run on a Windows 11 host with",
-            "not yet a claim that Townlight Records and Townlight Meetings exchange workflow records",
+            "exact signed Windows installed acceptance remains pending",
+            "first-admin authentication",
+            "bearer-protected staff",
+            "anonymous/unauthorized-write refusal",
+            "backup/restore evidence",
+            "Reports must not persist passwords or",
+            "new versus reused evidence",
+            "No in-place upgrade or import shim",
+            "original starter-set release contract",
         ):
             if phrase not in contract:
                 errors.append(
@@ -229,30 +195,18 @@ def check_docs() -> list[str]:
     else:
         guide = OUTSIDE_TEST_GUIDE.read_text(encoding="utf-8")
         for phrase in (
-            "outside-party test path",
-            "Linux",
-            "Windows 10/11",
-            "macOS archives are built",
-            "SmartScreen or Unknown Publisher warnings are normal",
-            "SHA256 checksum matches",
-            "official Townlight release source",
-            "Install",
-            "Verify",
-            "Repair",
-            "Uninstall",
-            "Townlight Records API health returns `status=ok` and `version=1.7.3`",
-            "Townlight Meetings API health returns `status=ok`, `version=1.0.4`, and",
-            "anonymous staff writes are",
-            "submits review",
-            "staff-reviewable response",
-            "packet finalization",
-            "public archive calendar/search visibility",
-            "run-installer-package-cleanroom.py --archive installer\\dist\\CivicSuite-clerk-core-windows-0.1.0.zip --platform windows --staff-mode bearer --workflow-proof",
-            "workflow_proof_requested=true",
-            "civicclerk_staff_mode=bearer",
-            "evidence_classification=matching_host_lifecycle",
-            "does not claim live workflow-record exchange",
-            "not a municipal procurement-ready",
+            "signed Windows installed acceptance remains pending",
+            "exact candidate hash, signature and corresponding-source receipt",
+            "Scott's separate approval",
+            "Windows Sandbox",
+            "Never adopt an unmarked legacy database",
+            "Access review",
+            "Notice draft",
+            "Code → Meetings",
+            "Meetings → Station → Records",
+            "backup/restore",
+            "Reports must not contain passwords or bearer tokens",
+            "original outside-test guide",
         ):
             if phrase not in guide:
                 errors.append(
@@ -300,19 +254,19 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
     open_text = open_env.read_text(encoding="utf-8")
     bearer_text = bearer_env.read_text(encoding="utf-8")
 
-    if "CIVICCLERK_STAFF_AUTH_MODE=protected" not in default_text:
+    if "TOWNLIGHT_MEETINGS_STAFF_AUTH_MODE=protected" not in default_text:
         errors.append(fail("clerk-core installer default staff mode must be protected"))
-    if "CIVICCLERK_STAFF_AUTH_MODE=open" not in open_text:
+    if "TOWNLIGHT_MEETINGS_STAFF_AUTH_MODE=open" not in open_text:
         errors.append(
             fail("clerk-core installer open mode must remain explicit opt-in")
         )
-    if "CIVICCLERK_STAFF_AUTH_MODE=bearer" not in bearer_text:
+    if "TOWNLIGHT_MEETINGS_STAFF_AUTH_MODE=bearer" not in bearer_text:
         errors.append(
             fail(
                 "clerk-core installer bearer mode must be available for workflow proof"
             )
         )
-    if "CIVICCLERK_STAFF_AUTH_TOKEN_ROLES=" not in bearer_text:
+    if "TOWNLIGHT_MEETINGS_STAFF_AUTH_TOKEN_ROLES=" not in bearer_text:
         errors.append(
             fail("clerk-core installer bearer mode must configure proof token roles")
         )
@@ -324,24 +278,24 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
         "--port-offset",
         "--records-api-port",
         "--compose-project-suffix",
-        "CIVICSUITE_INSTALLER_RUN_ID",
-        "CIVICSUITE_INSTALLER_INSTALL_ROOT",
+        "TOWNLIGHT_INSTALLER_RUN_ID",
+        "TOWNLIGHT_INSTALLER_INSTALL_ROOT",
         "compose_projects",
-        "verify_civiccore_contract",
+        "verify_townlight_core_contract",
         "verify_starter_set_workflow_contract",
-        "civicrecords_workflow",
-        "civicclerk_bearer_workflow",
+        "townlight_records_workflow",
+        "townlight_meetings_bearer_workflow",
         "search_records",
         "submit_request_review",
         "draft_response_letter",
         "create_packet_assembly",
         "create_minutes_draft",
         "public_archive_search",
-        "starter_set_civiccore_contract",
-        "EXPECTED_CIVICCORE_VERSION = \"1.2.0\"",
+        "starter_set_townlight_core_contract",
+        "EXPECTED_TOWNLIGHT_CORE_VERSION = \"1.2.0\"",
         "EXPECTED_RECORDS_VERSION = \"1.7.3\"",
         "EXPECTED_CLERK_VERSION = \"1.0.4\"",
-        "allows anonymous writes to civicclerk endpoints",
+        "allows anonymous writes to townlight_meetings endpoints",
         "Use ONLY for local rehearsal",
         "Re-run with --staff-mode protected",
     ):
@@ -370,13 +324,13 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
         if '"8000:8000"' in normalized or '"8080:80"' in normalized:
             errors.append(
                 fail(
-                    "clerk-core installer must replace CivicSunshine default host ports"
+                    "clerk-core installer must replace Townlight Records default host ports"
                 )
             )
         if '"18123:8000"' not in normalized or '"18124:80"' not in normalized:
             errors.append(
                 fail(
-                    "clerk-core installer must normalize CivicSunshine ports to resolved installer ports"
+                    "clerk-core installer must normalize Townlight Records ports to resolved installer ports"
                 )
             )
         env_file = Path(temp_dir) / ".env"
@@ -388,13 +342,13 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
         ):
             errors.append(
                 fail(
-                    "clerk-core installer must write CivicSunshine resolved host ports into .env"
+                    "clerk-core installer must write Townlight Records resolved host ports into .env"
                 )
             )
         if "PORTAL_MODE=private" not in env_text:
             errors.append(
                 fail(
-                    "clerk-core installer must keep CivicSunshine private mode as the default for smaller profiles"
+                    "clerk-core installer must keep Townlight Records private mode as the default for smaller profiles"
                 )
             )
         module.write_records_env(env_file, {"api": 18125, "web": 18126})
@@ -405,7 +359,7 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
         ):
             errors.append(
                 fail(
-                    "clerk-core installer must refresh CivicSunshine host ports in existing .env files"
+                    "clerk-core installer must refresh Townlight Records host ports in existing .env files"
                 )
             )
         module.write_records_env(env_file, {"api": 18127, "web": 18128}, portal_mode="public")
@@ -413,39 +367,39 @@ def check_clerk_core_staff_mode_contract() -> list[str]:
         if "PORTAL_MODE=public" not in public_env_text:
             errors.append(
                 fail(
-                    "city-core installer must be able to write CivicSunshine public portal mode"
+                    "city-core installer must be able to write Townlight Records public portal mode"
                 )
             )
-        if module.records_portal_mode_for_modules(["civicrecords-ai", "civicclerk"]) != "private":
-            errors.append(fail("clerk-core selected modules must resolve CivicSunshine private portal mode"))
+        if module.records_portal_mode_for_modules(["townlight_records", "townlight_meetings"]) != "private":
+            errors.append(fail("clerk-core selected modules must resolve Townlight Records private portal mode"))
         if (
-            module.records_portal_mode_for_modules(["civicrecords-ai", "civicclerk", "civiccode"])
+            module.records_portal_mode_for_modules(["townlight_records", "townlight_meetings", "townlight_code"])
             != "public"
         ):
-            errors.append(fail("city-core selected modules must resolve CivicSunshine public portal mode"))
+            errors.append(fail("city-core selected modules must resolve Townlight Records public portal mode"))
     isolation = module.resolve_isolation(run_id="verify-isolation-run", port_offset=37)
     ports = isolation.get("ports", {})
     projects = isolation.get("compose_projects", {})
     if (
         not isinstance(ports, dict)
-        or ports.get("civicrecords-ai", {}).get("api") != 18037
+        or ports.get("townlight_records", {}).get("api") != 18037
     ):
         errors.append(
             fail(
-                "clerk-core installer must derive CivicSunshine API port from the run isolation model"
+                "clerk-core installer must derive Townlight Records API port from the run isolation model"
             )
         )
     if not isinstance(projects, dict) or projects.get(
-        "civicrecords-ai"
-    ) == projects.get("civicclerk"):
+        "townlight_records"
+    ) == projects.get("townlight_meetings"):
         errors.append(
             fail(
                 "clerk-core installer must resolve distinct compose project names per module"
             )
         )
     if (
-        "civicsuite-clerk-core-records" in runner_text
-        or "civicsuite-clerk-core-clerk" in runner_text
+        "townlight-clerk-core-records" in runner_text
+        or "townlight-clerk-core-clerk" in runner_text
     ):
         errors.append(
             fail(
@@ -470,16 +424,16 @@ def check_cleanroom_workflow(data: dict[str, object]) -> list[str]:
         "actions/upload-artifact@v4",
         "retention-days:",
         "--profile \"${{ matrix.profile }}\"",
-        "CivicSuite-city-core-linux-0.1.2.tar.gz",
+        "Townlight-city-core-linux-0.1.2.tar.gz",
         "--staff-mode bearer --workflow-proof",
         "workflow proof",
     ]
     cleanroom_module_ids = (
-        "civicrecords-ai",
-        "civicclerk",
-        "civiccode",
-        "civicnotice",
-        "civicaccess",
+        "townlight_records",
+        "townlight_meetings",
+        "townlight_code",
+        "townlight_notice",
+        "townlight_access",
     )
     modules = data.get("modules", [])
     module_by_id = {
@@ -531,10 +485,10 @@ def check_package_cleanroom_evidence_contract(
         "dependency_gate_blocked",
         "unsupported_lifecycle",
         "darwin",
-        "CIVICSUITE_INSTALLER_RUN_ID",
+        "TOWNLIGHT_INSTALLER_RUN_ID",
         "--workflow-proof",
         "workflow_proof_requested",
-        "civicclerk_staff_mode",
+        "townlight_meetings_staff_mode",
         "cleanup_error",
         "extracted_bundle_retained",
     ):
@@ -747,12 +701,12 @@ def check_manifest(data: dict[str, object]) -> list[str]:
             fail("module ids must be unique and every module must have an id")
         )
 
-    civiccore = module_by_id.get("civiccore", {})
-    if isinstance(civiccore, dict):
-        if civiccore.get("selectable") is not False:
-            errors.append(fail("civiccore must not be directly selectable"))
-        if civiccore.get("required") is not True:
-            errors.append(fail("civiccore must be required"))
+    townlight_core = module_by_id.get("townlight_core", {})
+    if isinstance(townlight_core, dict):
+        if townlight_core.get("selectable") is not False:
+            errors.append(fail("townlight_core must not be directly selectable"))
+        if townlight_core.get("required") is not True:
+            errors.append(fail("townlight_core must be required"))
 
     for module_id, module in module_by_id.items():
         if not isinstance(module, dict):
@@ -778,8 +732,8 @@ def check_manifest(data: dict[str, object]) -> list[str]:
         if not isinstance(profile_modules, list):
             errors.append(fail(f"profile {profile.get('id')} modules must be a list"))
             continue
-        if profile.get("id") != "custom" and "civiccore" not in profile_modules:
-            errors.append(fail(f"profile {profile.get('id')} must include civiccore"))
+        if profile.get("id") != "custom" and "townlight_core" not in profile_modules:
+            errors.append(fail(f"profile {profile.get('id')} must include townlight_core"))
         for module_id in profile_modules:
             if module_id not in module_by_id:
                 errors.append(
@@ -828,15 +782,15 @@ def check_planner(data: dict[str, object]) -> list[str]:
     spec.loader.exec_module(module)
 
     scenarios = {
-        "minimal": ["civiccore"],
-        "clerk-core": ["civiccore", "civicrecords-ai", "civicclerk"],
+        "minimal": ["townlight_core"],
+        "clerk-core": ["townlight_core", "townlight_records", "townlight_meetings"],
         "city-core": [
-            "civiccore",
-            "civicrecords-ai",
-            "civicclerk",
-            "civiccode",
-            "civicnotice",
-            "civicaccess",
+            "townlight_core",
+            "townlight_records",
+            "townlight_meetings",
+            "townlight_code",
+            "townlight_notice",
+            "townlight_access",
         ],
     }
     for profile, expected_modules in scenarios.items():
@@ -887,7 +841,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     errors.append(
                         fail(f"clerk-core verify_profile missing proof {proof}")
                     )
-            for module_id in ("civicrecords-ai", "civicclerk"):
+            for module_id in ("townlight_records", "townlight_meetings"):
                 install_actions = [
                     action
                     for action in plan.get("actions", [])
@@ -977,54 +931,54 @@ def check_planner(data: dict[str, object]) -> list[str]:
         selector.get("selectable_modules", []) if isinstance(selector, dict) else []
     )
     expected_selectable_count = len(
-        REQUIRED_MODULES - {"civiccore"} - PLANNED_NON_SELECTABLE_MODULES
+        REQUIRED_MODULES - {"townlight_core"} - EXTERNAL_NON_SELECTABLE_MODULES
     )
     if not isinstance(selectable, list) or len(selectable) != expected_selectable_count:
         errors.append(
-            fail("menu model must expose every selectable non-CivicCore module")
+            fail("menu model must expose every selectable non-TownlightCore module")
         )
-    civicinspect_selector = [
+    townlight_inspections_selector = [
         item
         for item in selectable
-        if isinstance(item, dict) and item.get("id") == "civicinspect"
+        if isinstance(item, dict) and item.get("id") == "townlight_inspections"
     ]
-    if not civicinspect_selector:
+    if not townlight_inspections_selector:
         errors.append(
-            fail("menu model must expose CivicInspect as a selectable module")
+            fail("menu model must expose TownlightInspections as a selectable module")
         )
-    elif civicinspect_selector[0].get("civiccore_requirement") != "1.1.0":
-        errors.append(fail("CivicInspect selector must require CivicCore 1.1.0"))
+    elif townlight_inspections_selector[0].get("townlight_core_requirement") != "1.3.0.dev2":
+        errors.append(fail("TownlightInspections selector must require Townlight Core 1.3.0.dev2"))
 
-    civicinspect_plan = module.build_install_plan(
+    townlight_inspections_plan = module.build_install_plan(
         manifest=data,
         profile_id="custom",
-        selected_modules=["civicinspect"],
+        selected_modules=["townlight_inspections"],
         menu_style="guided",
         host={"system": "Windows", "release": "test", "machine": "x86_64"},
     )
-    if "civicinspect" not in civicinspect_plan.get("modules", []):
-        errors.append(fail("custom CivicInspect plan must include civicinspect"))
-    for required_dependency in ("civiccore", "civiccode", "civicpermit"):
-        if required_dependency not in civicinspect_plan.get("modules", []):
+    if "townlight_inspections" not in townlight_inspections_plan.get("modules", []):
+        errors.append(fail("custom TownlightInspections plan must include townlight_inspections"))
+    for required_dependency in ("townlight_core", "townlight_code", "townlight_permitting"):
+        if required_dependency not in townlight_inspections_plan.get("modules", []):
             errors.append(
                 fail(
-                    f"custom CivicInspect plan missing dependency {required_dependency}"
+                    f"custom TownlightInspections plan missing dependency {required_dependency}"
                 )
             )
-    civicinspect_actions = [
+    townlight_inspections_actions = [
         action
-        for action in civicinspect_plan.get("actions", [])
-        if isinstance(action, dict) and action.get("module") == "civicinspect"
+        for action in townlight_inspections_plan.get("actions", [])
+        if isinstance(action, dict) and action.get("module") == "townlight_inspections"
     ]
-    if not civicinspect_actions:
+    if not townlight_inspections_actions:
         errors.append(
-            fail("custom CivicInspect plan must include a CivicInspect install action")
+            fail("custom TownlightInspections plan must include a TownlightInspections install action")
         )
     else:
-        action = civicinspect_actions[0]
-        if action.get("civiccore_requirement") != "1.1.0":
+        action = townlight_inspections_actions[0]
+        if action.get("townlight_core_requirement") != "1.3.0.dev2":
             errors.append(
-                fail("CivicInspect install action must require CivicCore 1.1.0")
+                fail("TownlightInspections install action must require Townlight Core 1.3.0.dev2")
             )
         proof_required = action.get("proof_required", [])
         for proof in (
@@ -1037,123 +991,15 @@ def check_planner(data: dict[str, object]) -> list[str]:
             if proof not in proof_required:
                 errors.append(
                     fail(
-                        f"CivicInspect install action missing proof requirement {proof}"
+                        f"TownlightInspections install action missing proof requirement {proof}"
                     )
                 )
 
-    civicgrants_selector = [
-        item
-        for item in selectable
-        if isinstance(item, dict) and item.get("id") == "civicgrants"
-    ]
-    if not civicgrants_selector:
-        errors.append(fail("menu model must expose CivicGrants as a selectable module"))
-    elif civicgrants_selector[0].get("civiccore_requirement") != "1.1.0":
-        errors.append(fail("CivicGrants selector must require CivicCore 1.1.0"))
-
-    civicgrants_plan = module.build_install_plan(
-        manifest=data,
-        profile_id="custom",
-        selected_modules=["civicgrants"],
-        menu_style="guided",
-        host={"system": "Windows", "release": "test", "machine": "x86_64"},
-    )
-    if "civicgrants" not in civicgrants_plan.get("modules", []):
-        errors.append(fail("custom CivicGrants plan must include civicgrants"))
-    for required_dependency in ("civiccore", "civicrecords-ai"):
-        if required_dependency not in civicgrants_plan.get("modules", []):
-            errors.append(
-                fail(
-                    f"custom CivicGrants plan missing dependency {required_dependency}"
-                )
-            )
-    civicgrants_actions = [
-        action
-        for action in civicgrants_plan.get("actions", [])
-        if isinstance(action, dict) and action.get("module") == "civicgrants"
-    ]
-    if not civicgrants_actions:
-        errors.append(
-            fail("custom CivicGrants plan must include a CivicGrants install action")
-        )
-    else:
-        action = civicgrants_actions[0]
-        if action.get("civiccore_requirement") != "1.1.0":
-            errors.append(
-                fail("CivicGrants install action must require CivicCore 1.1.0")
-            )
-        proof_required = action.get("proof_required", [])
-        for proof in (
-            "module_selection",
-            "install_plan",
-            "artifact_resolution",
-            "health_check",
-            "restart",
-        ):
-            if proof not in proof_required:
-                errors.append(
-                    fail(
-                        f"CivicGrants install action missing proof requirement {proof}"
-                    )
-                )
-
-    civicprocure_selector = [
-        item
-        for item in selectable
-        if isinstance(item, dict) and item.get("id") == "civicprocure"
-    ]
-    if not civicprocure_selector:
-        errors.append(
-            fail("menu model must expose CivicProcure as a selectable module")
-        )
-    elif civicprocure_selector[0].get("civiccore_requirement") != "1.1.0":
-        errors.append(fail("CivicProcure selector must require CivicCore 1.1.0"))
-
-    civicprocure_plan = module.build_install_plan(
-        manifest=data,
-        profile_id="custom",
-        selected_modules=["civicprocure"],
-        menu_style="guided",
-        host={"system": "Windows", "release": "test", "machine": "x86_64"},
-    )
-    if "civicprocure" not in civicprocure_plan.get("modules", []):
-        errors.append(fail("custom CivicProcure plan must include civicprocure"))
-    for required_dependency in ("civiccore",):
-        if required_dependency not in civicprocure_plan.get("modules", []):
-            errors.append(
-                fail(
-                    f"custom CivicProcure plan missing dependency {required_dependency}"
-                )
-            )
-    civicprocure_actions = [
-        action
-        for action in civicprocure_plan.get("actions", [])
-        if isinstance(action, dict) and action.get("module") == "civicprocure"
-    ]
-    if not civicprocure_actions:
-        errors.append(
-            fail("custom CivicProcure plan must include a CivicProcure install action")
-        )
-    else:
-        action = civicprocure_actions[0]
-        if action.get("civiccore_requirement") != "1.1.0":
-            errors.append(
-                fail("CivicProcure install action must require CivicCore 1.1.0")
-            )
-        proof_required = action.get("proof_required", [])
-        for proof in (
-            "module_selection",
-            "install_plan",
-            "artifact_resolution",
-            "health_check",
-            "restart",
-        ):
-            if proof not in proof_required:
-                errors.append(
-                    fail(
-                        f"CivicProcure install action missing proof requirement {proof}"
-                    )
-                )
+    # The private repositories are outside this candidate. Station remains a
+    # separate configured service, never a selectable native module.
+    for item in selectable:
+        if isinstance(item, dict) and item.get("id") not in REQUIRED_MODULES - {"townlight_core", "townlight-station"}:
+            errors.append(fail(f"selector exposes excluded module {item.get('id')}"))
 
     readiness_scenarios = {
         "nominal": "ready",
@@ -1161,7 +1007,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
         "windows-missing-wsl": "blocked",
         "low-resources": "blocked",
         "ollama-missing": "warning",
-        "civiccore-mismatch": "blocked",
+        "townlight_core-mismatch": "blocked",
     }
     for scenario, expected_status in readiness_scenarios.items():
         readiness = module.build_readiness_model(
@@ -1614,9 +1460,9 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 )
             )
         for platform_id, launcher in (
-            ("windows", "start-civicsuite-installer.ps1"),
-            ("macos", "start-civicsuite-installer.sh"),
-            ("linux", "start-civicsuite-installer.sh"),
+            ("windows", "start-townlight-installer.ps1"),
+            ("macos", "start-townlight-installer.sh"),
+            ("linux", "start-townlight-installer.sh"),
         ):
             package_dir = GENERATED_PACKAGES / "clerk-core" / platform_id
             for name in ("README.md", "install-plan.json", launcher):
@@ -1630,7 +1476,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     "public-use starter",
                     "SHA256",
                     "Windows",
-                    "official CivicSuite",
+                    "official Townlight",
                     "workflow proof",
                     "bearer staff mode",
                 ):
@@ -1647,7 +1493,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     "unsigned",
                     "SHA256",
                     "public-use starter",
-                    "official CivicSuite",
+                    "official Townlight",
                     "workflow-proof" if platform_id != "windows" else "WorkflowProof",
                 ):
                     if phrase not in launcher_text:
@@ -1661,7 +1507,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 plan_data = json.loads(plan_path.read_text(encoding="utf-8"))
                 if plan_data.get(
                     "profile"
-                ) != "clerk-core" or "civiccore" not in plan_data.get("modules", []):
+                ) != "clerk-core" or "townlight_core" not in plan_data.get("modules", []):
                     errors.append(
                         fail(
                             f"profile package {platform_id} plan has wrong profile/modules"
@@ -1679,15 +1525,15 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     if isinstance(item, dict) and item.get("type") == "install_module"
                 }
                 expected_records_requirement = manifest_modules.get(
-                    "civicrecords-ai", {}
-                ).get("civiccore_requirement")
+                    "townlight_records", {}
+                ).get("townlight_core_requirement")
                 actual_records_requirement = plan_modules.get(
-                    "civicrecords-ai", {}
-                ).get("civiccore_requirement")
+                    "townlight_records", {}
+                ).get("townlight_core_requirement")
                 if actual_records_requirement != expected_records_requirement:
                     errors.append(
                         fail(
-                            f"profile package {platform_id} CivicSunshine CivicCore requirement "
+                            f"profile package {platform_id} Townlight Records Townlight Core requirement "
                             f"drifted from manifest: {actual_records_requirement!r} != {expected_records_requirement!r}"
                         )
                     )
@@ -1700,7 +1546,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 GENERATED_PACKAGES
                 / "clerk-core"
                 / platform_id
-                / "start-civicsuite-installer.sh"
+                / "start-townlight-installer.sh"
             )
             ok, output = run_launcher(
                 [bash, package_launcher.relative_to(ROOT).as_posix(), "plan"]
@@ -1722,7 +1568,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             GENERATED_PACKAGES
             / "clerk-core"
             / "windows"
-            / "start-civicsuite-installer.ps1"
+            / "start-townlight-installer.ps1"
         )
         if powershell_command():
             ok, output = run_launcher(
@@ -1817,10 +1663,10 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     )
                 )
             signing_text = json.dumps(signing, sort_keys=True)
-            if "official CivicSuite" not in signing_text:
+            if "official Townlight" not in signing_text:
                 errors.append(
                     fail(
-                        "release manifest signing block must require official CivicSuite source verification"
+                        "release manifest signing block must require official Townlight source verification"
                     )
                 )
             if (
@@ -1838,7 +1684,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     fail("release manifest must record passed archive hygiene")
                 )
         for platform_id, required in (
-            ("windows", "CivicSuiteInstaller.iss"),
+            ("windows", "TownlightInstaller.iss"),
             ("macos", "distribution.xml"),
             ("linux", "debian/control"),
         ):
@@ -1850,7 +1696,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 if (
                     "unsigned" not in text
                     or "SHA256" not in text
-                    or "official CivicSuite" not in text
+                    or "official Townlight" not in text
                 ):
                     errors.append(
                         fail(
@@ -1868,12 +1714,12 @@ def check_planner(data: dict[str, object]) -> list[str]:
         if city_core_release.get("mutates_host") is not False:
             errors.append(fail("city-core release artifact generator must not mutate host state"))
         if city_core_release.get("modules") != [
-            "civiccore",
-            "civicrecords-ai",
-            "civicclerk",
-            "civiccode",
-            "civicnotice",
-            "civicaccess",
+            "townlight_core",
+            "townlight_records",
+            "townlight_meetings",
+            "townlight_code",
+            "townlight_notice",
+            "townlight_access",
         ]:
             errors.append(fail("city-core release artifacts must package the six city-core modules"))
         if len(city_core_release.get("archives", [])) != 3:
@@ -1890,9 +1736,9 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     fail("city-core release manifest must label macOS package support as beta")
                 )
         for platform_id, launcher in (
-            ("windows", "start-civicsuite-installer.ps1"),
-            ("macos", "start-civicsuite-installer.sh"),
-            ("linux", "start-civicsuite-installer.sh"),
+            ("windows", "start-townlight-installer.ps1"),
+            ("macos", "start-townlight-installer.sh"),
+            ("linux", "start-townlight-installer.sh"),
         ):
             package_dir = GENERATED_PACKAGES / "city-core" / platform_id
             for name in ("README.md", "install-plan.json", launcher):
@@ -1912,11 +1758,11 @@ def check_planner(data: dict[str, object]) -> list[str]:
             expected_city_core_modules = [
                 str(module_id) for module_id in city_core_profile.get("modules", [])
             ]
-            # The launcher installs civiccore separately; its default-profile list is the rest.
+            # The launcher installs townlight_core separately; its default-profile list is the rest.
             expected_launcher_modules = [
                 module_id
                 for module_id in expected_city_core_modules
-                if module_id != "civiccore"
+                if module_id != "townlight_core"
             ]
             plan_path = package_dir / "install-plan.json"
             if plan_path.is_file():
@@ -1939,15 +1785,15 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 for action in install_actions:
                     module_id = action.get("module")
                     expected_requirement = module_by_id.get(str(module_id), {}).get(
-                        "civiccore_requirement"
+                        "townlight_core_requirement"
                     )
                     if (
                         module_id in set(expected_launcher_modules)
-                        and action.get("civiccore_requirement") != expected_requirement
+                        and action.get("townlight_core_requirement") != expected_requirement
                     ):
                         errors.append(
                             fail(
-                                f"city-core package {platform_id} {module_id} must install against CivicCore {expected_requirement}"
+                                f"city-core package {platform_id} {module_id} must install against TownlightCore {expected_requirement}"
                             )
                         )
             launcher_path = package_dir / launcher
@@ -1967,7 +1813,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                         )
                     )
 
-    if has_local_civiccore_wheel():
+    if has_local_townlight_core_wheel():
         install_kit = module.generate_minimal_install_kit(manifest=data)
         if install_kit.get("mutates_host") is not False:
             errors.append(
@@ -1982,13 +1828,13 @@ def check_planner(data: dict[str, object]) -> list[str]:
     expected_generated = {
         "README.md",
         "requirements.txt",
-        "civiccore-install-plan.json",
-        "install-civiccore.ps1",
-        "install-civiccore.sh",
-        "verify-civiccore.ps1",
-        "verify-civiccore.sh",
-        "reset-civiccore.ps1",
-        "reset-civiccore.sh",
+        "townlight_core-install-plan.json",
+        "install-townlight_core.ps1",
+        "install-townlight_core.sh",
+        "verify-townlight_core.ps1",
+        "verify-townlight_core.sh",
+        "reset-townlight_core.ps1",
+        "reset-townlight_core.sh",
     }
     missing_generated = [
         name for name in expected_generated if not (GENERATED_MINIMAL / name).is_file()
@@ -1999,13 +1845,13 @@ def check_planner(data: dict[str, object]) -> list[str]:
                 f"minimal install kit missing files: {', '.join(sorted(missing_generated))}"
             )
         )
-    plan_path = GENERATED_MINIMAL / "civiccore-install-plan.json"
+    plan_path = GENERATED_MINIMAL / "townlight_core-install-plan.json"
     if plan_path.is_file():
         generated_plan = json.loads(plan_path.read_text(encoding="utf-8"))
         if generated_plan.get("profile") != "minimal" or generated_plan.get(
             "modules"
-        ) != ["civiccore"]:
-            errors.append(fail("minimal install kit plan must install CivicCore only"))
+        ) != ["townlight_core"]:
+            errors.append(fail("minimal install kit plan must install TownlightCore only"))
         boundary = generated_plan.get("operator_boundary", {})
         if boundary.get("does_not_install_system_dependencies") is not True:
             errors.append(
@@ -2019,11 +1865,11 @@ def check_planner(data: dict[str, object]) -> list[str]:
     if requirements.is_file():
         requirements_text = requirements.read_text(encoding="utf-8")
         if (
-            "civiccore-1.1.0-py3-none-any.whl" not in requirements_text
-            and "civiccore-1.2.0-py3-none-any.whl" not in requirements_text
+            "townlight_core-1.1.0-py3-none-any.whl" not in requirements_text
+            and "townlight_core-1.2.0-py3-none-any.whl" not in requirements_text
         ):
             errors.append(
-                fail("minimal install kit requirements must point to a CivicCore wheel")
+                fail("minimal install kit requirements must point to a TownlightCore wheel")
             )
 
     try:
@@ -2050,13 +1896,13 @@ def run_launcher(command: list[str]) -> tuple[bool, str]:
 
 
 def powershell_command() -> str | None:
-    if os.environ.get("CIVICSUITE_VERIFY_NO_POWERSHELL") == "1":
+    if os.environ.get("TOWNLIGHT_VERIFY_NO_POWERSHELL") == "1":
         return None
     return shutil.which("powershell") or shutil.which("pwsh")
 
 
 def bash_command() -> str | None:
-    if os.environ.get("CIVICSUITE_VERIFY_NO_BASH") == "1":
+    if os.environ.get("TOWNLIGHT_VERIFY_NO_BASH") == "1":
         return None
     candidates = (
         os.environ.get("GIT_BASH"),
@@ -2245,7 +2091,7 @@ def check_launchers() -> list[str]:
                         f"windows launcher {switch} did not return expected non-mutating model"
                     )
                 )
-        if has_local_civiccore_wheel():
+        if has_local_townlight_core_wheel():
             ok, output = run_launcher(
                 [
                     powershell,
@@ -2432,7 +2278,7 @@ def check_launchers() -> list[str]:
                         f"{name} launcher {flag} did not return expected non-mutating model"
                     )
                 )
-        if has_local_civiccore_wheel():
+        if has_local_townlight_core_wheel():
             ok, output = run_launcher(
                 [
                     bash,
@@ -2538,7 +2384,7 @@ def main() -> int:
         errors.extend(check_clerk_core_staff_mode_contract())
         require_package_reports = (
             args.require_package_cleanroom_evidence
-            or os.environ.get("CIVICSUITE_REQUIRE_PACKAGE_CLEANROOM_EVIDENCE") == "1"
+            or os.environ.get("TOWNLIGHT_REQUIRE_PACKAGE_CLEANROOM_EVIDENCE") == "1"
         )
         errors.extend(
             check_package_cleanroom_evidence_contract(

@@ -7,8 +7,8 @@ labels: bug
 
 > **Most bugs belong on a module repo, not here.** This umbrella repo holds documentation, ADRs, governance, the roadmap, and the compatibility matrix — no runtime code. If your bug is in a module's code, please file it on that module's repo:
 >
-> - civicrecords-ai → <https://github.com/townlight/sunshine/issues>
-> - civiccore → <https://github.com/townlight/core/issues>
+> - townlight_records → <https://github.com/townlight/sunshine/issues>
+> - townlight_core → <https://github.com/townlight/core/issues>
 >
 > If your bug is in **this umbrella repo's docs or governance artifacts**, continue below.
 
@@ -28,7 +28,7 @@ Brief description of the issue (one or two sentences).
 
 ## Why does it matter?
 
-Who is harmed by the inaccuracy and how? (e.g. "evaluators reading the matrix will think civiccore is at 0.1.0 when it's at 0.2.0")
+Who is harmed by the inaccuracy and how? (e.g. "evaluators reading the matrix will think townlight_core is at 0.1.0 when it's at 0.2.0")
 
 ## Suggested fix (optional)
 

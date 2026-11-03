@@ -30,7 +30,7 @@ Community leaders are responsible for clarifying and enforcing our standards of 
 
 ## Scope
 
-This Code of Conduct applies within all Townlight community spaces, including the umbrella repo (`civicsuite`), every module repo (`civiccore`, `civicrecords-ai`, future module repos), GitHub Discussions, issue trackers, pull request reviews, and any official communication channels.
+This Code of Conduct applies within all Townlight community spaces, including the umbrella repo (`townlight`), every module repo (`townlight_core`, `townlight_records`, future module repos), GitHub Discussions, issue trackers, pull request reviews, and any official communication channels.
 
 ## Enforcement
 

@@ -135,9 +135,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#RUN_CLEANROOM_PROOF[@]} -gt 0 || ${#RUN_CLEANROOM_GATE[@]} -gt 0 ]]; then
-  echo "CivicSuite installer launcher: Linux cleanroom mode"
+  echo "Townlight installer launcher: Linux cleanroom mode"
 else
-  echo "CivicSuite installer launcher: Linux dry-run only"
+  echo "Townlight installer launcher: Linux dry-run only"
 fi
 echo "Profile: ${PROFILE}"
 echo "Menu style: ${MENU_STYLE}"
@@ -169,7 +169,7 @@ if [[ ${#SHOW_PREFLIGHT[@]} -gt 0 ]]; then
   echo "Executor preflight requested: blocked dry-run only"
 fi
 if [[ ${#GENERATE_INSTALL_KIT[@]} -gt 0 ]]; then
-  echo "Minimal CivicCore install kit generation requested: writes installer/generated only"
+  echo "Minimal TownlightCore install kit generation requested: writes installer/generated only"
 fi
 if [[ ${#GENERATE_PROFILE_PACKAGE[@]} -gt 0 ]]; then
   echo "Profile package generation requested: writes installer/generated/packages only"

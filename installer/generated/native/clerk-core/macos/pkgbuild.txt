@@ -1,2 +1,2 @@
-pkgbuild --root "installer/generated/packages/clerk-core/macos" --identifier gov.civicsuite.clerk-core --version 0.1.0 CivicSuite-clerk-core.pkg
-productbuild --distribution distribution.xml --package-path . CivicSuite-clerk-core-0.1.0.pkg
+pkgbuild --root "installer/generated/packages/clerk-core/macos" --identifier gov.townlight.clerk-core --version 0.1.0 Townlight-clerk-core.pkg
+productbuild --distribution distribution.xml --package-path . Townlight-clerk-core-0.1.0.pkg

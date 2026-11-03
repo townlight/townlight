@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "civicsuite-runtime"
-version = "0.1.0"
+name = "townlight-runtime"
+version = "0.2.0"
 description = "Local Windows runtime bridge for Townlight Records desktop services."
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"
@@ -13,7 +13,11 @@ dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["civicsuite_runtime*"]
+include = ["townlight_runtime*"]
 
 [tool.setuptools.package-data]
-civicsuite_runtime = ["fixtures/*.json"]
+townlight_runtime = [
+    "fixtures/*.json",
+    "townlight_records_alembic/alembic.ini",
+    "townlight_records_alembic/alembic/*.mako",
+]

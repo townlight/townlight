@@ -1,6 +1,6 @@
-# SUPERVISOR — CivicSuite Operating Card
+# SUPERVISOR — Townlight Operating Card
 
-For Scott. One page. CivicSuite is the umbrella repo (github.com/CivicSuite org) — suite-wide docs, ADRs, roadmap, governance, and the CivicCore ↔ module compatibility matrix. **It holds no code.** Code lives in `civiccore` and `civicrecords-ai` (and future module repos). Treat this repo as the coordination layer.
+For Scott. One page. Townlight is the umbrella repo (github.com/Townlight org) — suite-wide docs, ADRs, roadmap, governance, and the Townlight Core ↔ module compatibility matrix. **It holds no code.** Code lives in `townlight_core` and `townlight_records` (and future module repos). Treat this repo as the coordination layer.
 
 ---
 
@@ -10,7 +10,7 @@ Skim in this order:
 
 1. `README.md` — what's here and the entry workflow (paste `CHARTER.md` to a new Claude).
 2. `CHARTER.md` — the single source of truth the agent reads first; contains roadmap + governance + bug-routing + compatibility matrix.
-3. `CONSISTENCY.md` — the numbers table (27 product modules plus CivicCore, 7 tiers, 6 CivicCore phases, etc.). If a number changed in any spec, this must match.
+3. `CONSISTENCY.md` — the numbers table (27 product modules plus Townlight Core, 7 tiers, 6 Townlight Core phases, etc.). If a number changed in any spec, this must match.
 4. `docs/roadmap/index.md`, `docs/architecture/index.md` (ADR-0001/0002/0003), `docs/governance/index.md` — only if the session touches them.
 5. `CHANGELOG.md` `[Unreleased]` — what's already been noted since the last release.
 
@@ -22,11 +22,11 @@ If any number disagrees across those files, stop and flag it before any new work
 
 This is coordination work, not implementation. Five concrete actions:
 
-1. **Route the request to the correct repo.** Use the bug-routing tree in `CONTRIBUTING.md` / `CHARTER.md` (shared-platform → `civiccore`; records-lifecycle → `civicrecords-ai`; cross-module/roadmap/ADR/governance → here). If the request is code, redirect — this repo is docs-only.
-2. **Keep `CONSISTENCY.md` true.** Any change to a spec number (module count, tier count, phase count, CivicClerk entity/endpoint/page counts, CivicZone counts, etc.) must update `CONSISTENCY.md` in the same commit. This is the anti-drift mechanism for a docs umbrella.
+1. **Route the request to the correct repo.** Use the bug-routing tree in `CONTRIBUTING.md` / `CHARTER.md` (shared-platform → `townlight_core`; records-lifecycle → `townlight_records`; cross-module/roadmap/ADR/governance → here). If the request is code, redirect — this repo is docs-only.
+2. **Keep `CONSISTENCY.md` true.** Any change to a spec number (module count, tier count, phase count, Townlight Meetings entity/endpoint/page counts, Townlight Zoning counts, etc.) must update `CONSISTENCY.md` in the same commit. This is the anti-drift mechanism for a docs umbrella.
 3. **Record cross-module decisions as ADRs.** New file `docs/architecture/ADR-NNNN-short-title.md`, add to the ADR index in `docs/architecture/index.md`, note it in `CHANGELOG.md`. ADRs scoped to a single module live in that module's repo, not here.
-4. **Keep the compatibility matrix current.** When `civiccore` or `civicrecords-ai` cuts a release, update the matrix row in `CHARTER.md` (repo, current version, compatible CivicCore range, last verified). Notify downstream module repos if the compatible range changed.
-5. **Verify before declaring done.** There is no `verify-release.sh`, no `tests/`, no `scripts/`, no `.claude/` hooks, no `package.json` or `pyproject.toml` in this repo. Verification here = human review of the rendered Markdown + landing page (`docs/index.html`) + a link-and-number audit against `CONSISTENCY.md`. Code tests run in the downstream repos (`civiccore`, `civicrecords-ai`) — link to their CI as evidence if the change implies a downstream change.
+4. **Keep the compatibility matrix current.** When `townlight_core` or `townlight_records` cuts a release, update the matrix row in `CHARTER.md` (repo, current version, compatible Townlight Core range, last verified). Notify downstream module repos if the compatible range changed.
+5. **Verify before declaring done.** There is no `verify-release.sh`, no `tests/`, no `scripts/`, no `.claude/` hooks, no `package.json` or `pyproject.toml` in this repo. Verification here = human review of the rendered Markdown + landing page (`docs/index.html`) + a link-and-number audit against `CONSISTENCY.md`. Code tests run in the downstream repos (`townlight_core`, `townlight_records`) — link to their CI as evidence if the change implies a downstream change.
 
 ---
 
@@ -35,7 +35,7 @@ This is coordination work, not implementation. Five concrete actions:
 1. **Read before you write** — fires constantly; always read `CHARTER.md` + `CONSISTENCY.md` + target doc before editing.
 2. **Run before you declare done** — for a docs repo, "run" means render the Markdown, open `docs/index.html`, and cross-check numbers against `CONSISTENCY.md`.
 3. **Tests for logic changes** — mostly N/A; no code here. Downstream changes must land with tests in the downstream repo.
-4a. **Never skip tests** — N/A here; enforce it in `civiccore` / `civicrecords-ai` PRs this umbrella references.
+4a. **Never skip tests** — N/A here; enforce it in `townlight_core` / `townlight_records` PRs this umbrella references.
 4. **No secrets in client code** — zero secrets belong in this repo; no `.env`, no keys, no internal URLs.
 5. **Challenge bad requirements** — fires often at the coordination layer; roadmap reshuffles, premature module builds, numbers that don't reconcile, and off-charter asks should be pushed back before they infect the specs.
 6. **Work incrementally** — one spec / ADR / matrix row per commit; don't bulk-edit four specs in one pass without a CONSISTENCY.md reconciliation.
@@ -53,7 +53,7 @@ See `coder-ui-qa-test` skill.
 
 ---
 
-## 5. Good session ending — CivicSuite checklist
+## 5. Good session ending — Townlight checklist
 
 Finished coordination work looks like this:
 
@@ -61,7 +61,7 @@ Finished coordination work looks like this:
 - [ ] `CONSISTENCY.md` reconciles: every number cited in any edited spec matches the table; every table row's source reference still resolves.
 - [ ] If a spec count changed: `CONSISTENCY.md` + the spec + any ADR that references that number all updated in the same commit.
 - [ ] If an ADR was added: file created, listed in `docs/architecture/index.md`, and noted in `CHANGELOG.md` `[Unreleased]`.
-- [ ] If the compatibility matrix changed: `CHARTER.md` row updated, and the downstream repo (`civiccore` or `civicrecords-ai`) has been notified — open a tracking issue there if the range changed.
+- [ ] If the compatibility matrix changed: `CHARTER.md` row updated, and the downstream repo (`townlight_core` or `townlight_records`) has been notified — open a tracking issue there if the range changed.
 - [ ] `CHANGELOG.md` `[Unreleased]` has an entry for every user-visible doc change.
 - [ ] `docs/index.html` landing page still reflects current positioning (check when roadmap or module list changes).
 - [ ] No half-done cross-repo state: no edit here that assumes a downstream commit that hasn't landed yet. If it does, call it out explicitly and link the downstream issue/PR.

@@ -8,12 +8,12 @@ from check_test_naming_honesty import scan_test_naming_honesty
 
 
 def test_live_named_test_that_monkeypatches_named_boundary_fails(tmp_path: Path) -> None:
-    bad_test = tmp_path / "test_civiccode_live_handoff_emitter.py"
+    bad_test = tmp_path / "test_townlight_code_live_handoff_emitter.py"
     bad_test.write_text(
         "\n".join(
             [
                 "def test_handoff(monkeypatch):",
-                "    monkeypatch.setattr(civiccode_handoff, '_send_civiccode_handoff_payload', lambda *args: None)",
+                "    monkeypatch.setattr(townlight_code_handoff, '_send_townlight_code_handoff_payload', lambda *args: None)",
             ]
         ),
         encoding="utf-8",
@@ -34,12 +34,12 @@ def test_live_named_test_that_monkeypatches_named_boundary_fails(tmp_path: Path)
 
 
 def test_unit_named_test_may_monkeypatch_without_live_claim(tmp_path: Path) -> None:
-    unit_test = tmp_path / "test_civiccode_handoff_emitter_unit.py"
+    unit_test = tmp_path / "test_townlight_code_handoff_emitter_unit.py"
     unit_test.write_text(
         "\n".join(
             [
                 "def test_handoff(monkeypatch):",
-                "    monkeypatch.setattr(civiccode_handoff, '_send_civiccode_handoff_payload', lambda *args: None)",
+                "    monkeypatch.setattr(townlight_code_handoff, '_send_townlight_code_handoff_payload', lambda *args: None)",
             ]
         ),
         encoding="utf-8",

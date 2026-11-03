@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = {
   modules: [
     {
       id: "records",
-      name: "CivicRecords AI",
+      name: "TownlightRecords",
       port: 18080,
       href: "http://127.0.0.1:18080/",
       staffAction: "Review requests",
@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     },
     {
       id: "clerk",
-      name: "CivicClerk",
+      name: "TownlightMeetings",
       port: 18081,
       href: "http://127.0.0.1:18081/",
       staffAction: "Prepare agendas and minutes",
@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
     },
     {
       id: "code",
-      name: "CivicCode",
+      name: "TownlightCode",
       port: 18820,
       href: "http://127.0.0.1:18820/",
       staffAction: "Codify adopted ordinances",
@@ -32,9 +32,9 @@ const DEFAULT_CONFIG = {
   ]
 };
 
-const config = Object.assign({}, DEFAULT_CONFIG, window.CIVICSUITE_LAUNCHER_CONFIG || {});
-if (window.CIVICSUITE_LAUNCHER_CONFIG?.modules) {
-  config.modules = window.CIVICSUITE_LAUNCHER_CONFIG.modules;
+const config = Object.assign({}, DEFAULT_CONFIG, window.TOWNLIGHT_LAUNCHER_CONFIG || {});
+if (window.TOWNLIGHT_LAUNCHER_CONFIG?.modules) {
+  config.modules = window.TOWNLIGHT_LAUNCHER_CONFIG.modules;
 }
 
 const states = {
@@ -53,10 +53,10 @@ const states = {
     next: "Open the Staff surface or use Ctrl-K to jump directly to a module.",
     statuses: { records: "ready", clerk: "ready", code: "ready" },
     audit: [
-      { time: "09:44", action: "Records request viewed by staff", source: "civicrecords-ai" },
-      { time: "09:43", action: "Meeting packet updated", source: "civicclerk" },
-      { time: "09:42", action: "Ordinance citation indexed", source: "civiccode" },
-      { time: "09:41", action: "City-core shared session validated", source: "civiccore" },
+      { time: "09:44", action: "Records request viewed by staff", source: "townlight_records" },
+      { time: "09:43", action: "Meeting packet updated", source: "townlight_meetings" },
+      { time: "09:42", action: "Ordinance citation indexed", source: "townlight_code" },
+      { time: "09:41", action: "City-core shared session validated", source: "townlight_core" },
       { time: "09:40", action: "Operator selected city-core profile", source: "suite-launcher" }
     ]
   },
@@ -71,22 +71,22 @@ const states = {
   error: {
     label: "Records service unavailable",
     badge: "error",
-    summary: "CivicRecords AI did not report ready. Clerk and Code remain listed so staff can keep orienting.",
+    summary: "TownlightRecords did not report ready. Clerk and Code remain listed so staff can keep orienting.",
     next: "Run the city-core local runtime verify action, confirm required services are healthy, then refresh this launcher.",
     statuses: { records: "error", clerk: "ready", code: "ready" },
     audit: [
-      { time: "09:44", action: "CivicRecords AI health check failed", source: "http://127.0.0.1:18080/" },
+      { time: "09:44", action: "TownlightRecords health check failed", source: "http://127.0.0.1:18080/" },
       { time: "09:43", action: "Launcher kept Clerk and Code links visible", source: "suite-launcher" }
     ]
   },
   partial: {
     label: "Partial profile health",
     badge: "warn",
-    summary: "CivicRecords AI and CivicClerk are ready. CivicCode is degraded, so codification work should wait.",
-    next: "Open IT-Admin, inspect CivicCode service logs, then rerun verify before staff codification.",
+    summary: "TownlightRecords and TownlightMeetings are ready. TownlightCode is degraded, so codification work should wait.",
+    next: "Open IT-Admin, inspect TownlightCode service logs, then rerun verify before staff codification.",
     statuses: { records: "ready", clerk: "ready", code: "degraded" },
     audit: [
-      { time: "09:46", action: "CivicCode returned degraded health", source: "http://127.0.0.1:18820/" },
+      { time: "09:46", action: "TownlightCode returned degraded health", source: "http://127.0.0.1:18820/" },
       { time: "09:45", action: "Records and Clerk checks passed", source: "suite-launcher" }
     ]
   }
@@ -172,7 +172,7 @@ function render() {
         <div class="brand-block">
           <div class="seal" aria-hidden="true">CS</div>
           <div>
-            <div class="brand-name">CivicSuite</div>
+            <div class="brand-name">Townlight</div>
             <div class="brand-city">${config.cityName}</div>
           </div>
         </div>
@@ -346,9 +346,9 @@ function auditDrawer(state) {
 
 function commandPalette(state) {
   const commands = [
-    ["Open CivicRecords AI", "records"],
-    ["Open CivicClerk", "clerk"],
-    ["Open CivicCode", "code"],
+    ["Open TownlightRecords", "records"],
+    ["Open TownlightMeetings", "clerk"],
+    ["Open TownlightCode", "code"],
     ["Switch to Staff", "staff"],
     ["Switch to Resident", "resident"],
     ["Switch to IT-Admin", "admin"],

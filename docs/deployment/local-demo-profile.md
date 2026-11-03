@@ -37,13 +37,12 @@ It intentionally does not claim production deployment readiness. Production pilo
 ## Prerequisites
 
 - Docker Desktop with Compose v2.
-- Local sibling clones at:
-  - `../civicrecords-ai`
-  - `../civicclerk`
-  - `../civiccode`
-  - `../civiczone`
-- Townlight Records `.env` file in `../civicrecords-ai/.env`.
-- Internet access during first image/wheel download.
+- Local sibling clones at `../sunshine`, `../core`, `../meetings`,
+  `../ordinances` and `../zone`, using the candidate's exact source pins.
+- Townlight Records `.env` file in `../sunshine/.env`, configured for this
+  isolated evaluation database and Redis service. Preserve existing city data.
+- Python 3.11 or newer with `build`, `packaging` and `pyyaml` for wheel preparation.
+- Internet access during source, build-dependency, third-party package and image download.
 - Optional: Ollama model already pulled if testing LLM-backed behavior.
 
 ## Start The Demo Stack
@@ -51,8 +50,29 @@ It intentionally does not claim production deployment readiness. Production pilo
 From the umbrella repo:
 
 ```bash
+python -m pip install "build>=1.2,<2" "packaging>=24,<27" pyyaml
+python scripts/demo_wheels.py
+python scripts/verify-deployment-profile.py --static-only
 docker compose -f deploy/post-foundation-demo.compose.yml up --build
 ```
+
+The builder fetches the four exact commits in `config/suite-state.json`, checks
+their distribution/version metadata and builds local Core, Meetings, Code and
+Zoning wheels. It records each wheel's SHA256 and source identity in
+`.candidate-wheels/demo-wheels.json`. Compose mounts that directory read-only;
+it never constructs renamed URLs for old release artifacts. Records builds from
+its owning sibling checkout and its own pinned Core bootstrap.
+
+To build from existing clean sibling clones instead of fetching sources, use
+`python scripts/demo_wheels.py --workspace ..`. The clones must match the
+canonical pins. During implementation only, `--allow-working-tree` on both the
+builder and verifier permits explicitly identified preparation artifacts; that
+mode is not clean-pin, release or installed acceptance evidence. The default
+verifier rejects those artifacts. Final source pins and publication are pending
+for this coordinated candidate.
+
+If moving the staged wheels, pass `--wheel-dir /absolute/path` to the verifier
+and set `TOWNLIGHT_DEMO_WHEELS` to that same absolute directory for Compose.
 
 To include the Ollama container:
 
@@ -78,14 +98,19 @@ This checks that:
 
 - The compose file exists and parses through Docker Compose in full local mode.
 - The expected services are present.
-- Published module wheel URLs are pinned to the compatibility matrix versions.
-- Published module wheel metadata requires the same Townlight Core wheel pinned in the compose file.
-- Local in-process smoke checks use the current sibling-clone `civiccore` checkout and therefore verify local import compatibility, not only the compose wheel pins.
-- Module services set `CIVICCORE_LLM_PROVIDER=ollama`.
+- Actual local wheel bytes match their provenance receipt and the canonical clean source pins.
+- Module wheel metadata requires the exact same Townlight Core version installed by Compose.
+- The distributions, versions and principal imports in those wheels match the candidate manifest.
+- Local in-process smoke checks use the owning sibling repositories (`core`, `meetings`, `ordinances`, `zone`) and verify source import compatibility separately from wheel metadata.
+- Module services set `TOWNLIGHT_CORE_LLM_PROVIDER=ollama`.
 - No cloud LLM provider is configured by default.
 - Local no-network smoke checks can import Townlight Meetings, Townlight Code, and Townlight Zoning and call their `/health` endpoints in process.
 
-The `--static-only` mode is for CI and skips the Docker Compose config execution plus the local sibling-clone `/health` imports. It still verifies compose shape, wheel pins, local-first LLM defaults, and this guide.
+The `--static-only` mode is for CI and skips Docker Compose execution and local
+sibling-clone `/health` imports. It still inspects the staged wheel metadata,
+hashes and source receipt, compose shape, local-first LLM defaults and this guide.
+Missing or mismatched artifacts fail verification. Neither static verification
+nor an in-process health response establishes installed Windows behavior.
 
 ## No-Network Meaning
 
@@ -94,7 +119,8 @@ The default local deployment profile must not require outbound runtime calls for
 - Townlight Meetings, Townlight Code, and Townlight Zoning expose deterministic foundation APIs that can be smoke-tested in process without network calls.
 - Townlight Records uses local PostgreSQL, Redis, and optional Ollama.
 - Cloud LLM providers are not configured by default.
-- The compose profile may need internet access to download images or release wheels before the stack is cached locally.
+- Preparation may need internet access to fetch exact source commits, build dependencies,
+  third-party packages and images before the stack is cached locally.
 
 ## Operator Modes
 
@@ -119,8 +145,8 @@ Then open:
 
 - `http://localhost:8080`
 - `http://localhost:8010/staff`
-- `http://localhost:8020/civiccode`
-- `http://localhost:8030/civiczone`
+- `http://localhost:8020/townlight_code`
+- `http://localhost:8030/townlight_zoning`
 
 ### Production Pilot Install
 

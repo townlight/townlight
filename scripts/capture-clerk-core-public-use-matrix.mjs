@@ -10,11 +10,11 @@ const screenshotRoot = path.join(evidenceRoot, "screenshots", evidenceName);
 const jsonPath = path.join(evidenceRoot, `${evidenceName}.json`);
 const summaryPath = path.join(evidenceRoot, `${evidenceName}.md`);
 
-const recordsWeb = process.env.CIVICSUITE_RECORDS_WEB_URL ?? "http://127.0.0.1:19314";
-const recordsApi = process.env.CIVICSUITE_RECORDS_API_URL ?? "http://127.0.0.1:19234";
-const clerkWeb = process.env.CIVICSUITE_CLERK_WEB_URL ?? "http://127.0.0.1:19315";
-const clerkApi = process.env.CIVICSUITE_CLERK_API_URL ?? "http://127.0.0.1:20010";
-const clerkToken = process.env.CIVICSUITE_CLERK_STAFF_TOKEN ?? "clerk-core-workflow-proof";
+const recordsWeb = process.env.TOWNLIGHT_RECORDS_WEB_URL ?? "http://127.0.0.1:19314";
+const recordsApi = process.env.TOWNLIGHT_RECORDS_API_URL ?? "http://127.0.0.1:19234";
+const clerkWeb = process.env.TOWNLIGHT_CLERK_WEB_URL ?? "http://127.0.0.1:19315";
+const clerkApi = process.env.TOWNLIGHT_CLERK_API_URL ?? "http://127.0.0.1:20010";
+const clerkToken = process.env.TOWNLIGHT_CLERK_STAFF_TOKEN ?? "clerk-core-workflow-proof";
 
 function parseEnv(text) {
   const values = {};
@@ -28,8 +28,8 @@ function parseEnv(text) {
 }
 
 async function readRecordsCredentials() {
-  const envPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "civicrecords-ai", ".env");
-  const secretPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "civicrecords-ai", "data", "secrets", "first_admin_password");
+  const envPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "townlight_records", ".env");
+  const secretPath = path.join(root, "installer", "runtime", "clerk-core", "sources", "townlight_records", "data", "secrets", "first_admin_password");
   const env = parseEnv(await fs.readFile(envPath, "utf8"));
   return {
     email: env.FIRST_ADMIN_EMAIL,
@@ -166,7 +166,7 @@ function routeAuth(product, route) {
   if (route.startsWith("/public")) return "none";
   if (route.startsWith("/auth/") || route === "/config/portal-mode") return "none";
   if (route.startsWith("/staff/login") || route.startsWith("/staff/auth-readiness")) return "none";
-  if (product === "CivicClerk" && route.startsWith("/staff")) return "staff auth required";
+  if (product === "TownlightMeetings" && route.startsWith("/staff")) return "staff auth required";
   return "staff auth required";
 }
 
@@ -205,7 +205,7 @@ async function openApiRoutes(product, baseUrl) {
       audience: routeAudience(route),
       auth_requirement: routeAuth(product, route),
       desktop_mobile_qa: "covered by installed-stack browser/API matrix when route participates in public, staff, or workflow-proof surfaces; otherwise API inventory only",
-      states: "loading/success/empty/error/partial browser states covered for CivicClerk stateful surfaces; CivicRecords browser smoke covers login/dashboard/search/requests with API workflow proof for request/search/review/response",
+      states: "loading/success/empty/error/partial browser states covered for TownlightMeetings stateful surfaces; TownlightRecords browser smoke covers login/dashboard/search/requests with API workflow proof for request/search/review/response",
     }));
 }
 
@@ -218,26 +218,26 @@ async function main() {
     body: new URLSearchParams({ username: recordsCredentials.email, password: recordsCredentials.password }),
   });
   if (recordsLogin.status !== 200 || !recordsLogin.body.access_token) {
-    throw new Error(`CivicRecords admin login failed for browser matrix with HTTP ${recordsLogin.status}`);
+    throw new Error(`TownlightRecords admin login failed for browser matrix with HTTP ${recordsLogin.status}`);
   }
   const recordsToken = recordsLogin.body.access_token;
   const desktop = { width: 1440, height: 1000 };
   const mobile = { width: 390, height: 844 };
   const browser = await chromium.launch();
   const checks = [
-    { id: "records-login-desktop", product: "CivicRecords AI", surface: "staff browser", auth: "none before login", state: "success", url: `${recordsWeb}/`, viewport: desktop, expectedCopy: ["CivicRecords AI", "Sign in"] },
-    { id: "records-login-mobile", product: "CivicRecords AI", surface: "staff browser", auth: "none before login", state: "success", url: `${recordsWeb}/`, viewport: mobile, expectedCopy: ["CivicRecords AI", "Sign in"] },
-    { id: "records-dashboard-desktop", product: "CivicRecords AI", surface: "staff browser", auth: "first-admin JWT", state: "success", url: `${recordsWeb}/`, viewport: desktop, localStorage: { token: recordsToken }, expectedCopy: ["CivicRecords AI", "Requests"], afterLoad: async (page) => page.waitForTimeout(1000) },
-    { id: "records-search-desktop", product: "CivicRecords AI", surface: "staff browser", auth: "first-admin JWT", state: "empty", url: `${recordsWeb}/search`, viewport: desktop, localStorage: { token: recordsToken }, expectedCopy: ["Search"], afterLoad: async (page) => page.waitForTimeout(1000) },
-    { id: "records-requests-mobile", product: "CivicRecords AI", surface: "staff browser", auth: "first-admin JWT", state: "success", url: `${recordsWeb}/requests`, viewport: mobile, localStorage: { token: recordsToken }, expectedCopy: ["Requests"], afterLoad: async (page) => page.waitForTimeout(1000) },
-    { id: "clerk-staff-desktop", product: "CivicClerk", surface: "staff browser", auth: "bearer staff token", state: "success", url: `${clerkWeb}/staff`, viewport: desktop, headers: { Authorization: `Bearer ${clerkToken}` }, expectedCopy: ["CivicClerk", "Agenda", "Packet", "Notice", "Minutes"] },
-    { id: "clerk-staff-mobile", product: "CivicClerk", surface: "staff browser", auth: "bearer staff token", state: "success", url: `${clerkWeb}/staff`, viewport: mobile, headers: { Authorization: `Bearer ${clerkToken}` }, expectedCopy: ["CivicClerk", "Agenda", "Packet", "Notice", "Minutes"] },
-    { id: "clerk-public-desktop", product: "CivicClerk", surface: "public browser", auth: "none", state: "success", url: `${clerkWeb}/public`, viewport: desktop, expectedCopy: ["Public", "Meeting"] },
-    { id: "clerk-public-mobile", product: "CivicClerk", surface: "public browser", auth: "none", state: "success", url: `${clerkWeb}/public`, viewport: mobile, expectedCopy: ["Public", "Meeting"] },
-    { id: "clerk-protected-error-desktop", product: "CivicClerk", surface: "staff browser", auth: "missing staff auth", state: "error", url: `${clerkWeb}/staff`, viewport: desktop, expectedCopy: ["Staff sign-in needed", "Bearer token required", "allowed roles"], allowedFailureStatuses: [401] },
+    { id: "records-login-desktop", product: "TownlightRecords", surface: "staff browser", auth: "none before login", state: "success", url: `${recordsWeb}/`, viewport: desktop, expectedCopy: ["TownlightRecords", "Sign in"] },
+    { id: "records-login-mobile", product: "TownlightRecords", surface: "staff browser", auth: "none before login", state: "success", url: `${recordsWeb}/`, viewport: mobile, expectedCopy: ["TownlightRecords", "Sign in"] },
+    { id: "records-dashboard-desktop", product: "TownlightRecords", surface: "staff browser", auth: "first-admin JWT", state: "success", url: `${recordsWeb}/`, viewport: desktop, localStorage: { token: recordsToken }, expectedCopy: ["TownlightRecords", "Requests"], afterLoad: async (page) => page.waitForTimeout(1000) },
+    { id: "records-search-desktop", product: "TownlightRecords", surface: "staff browser", auth: "first-admin JWT", state: "empty", url: `${recordsWeb}/search`, viewport: desktop, localStorage: { token: recordsToken }, expectedCopy: ["Search"], afterLoad: async (page) => page.waitForTimeout(1000) },
+    { id: "records-requests-mobile", product: "TownlightRecords", surface: "staff browser", auth: "first-admin JWT", state: "success", url: `${recordsWeb}/requests`, viewport: mobile, localStorage: { token: recordsToken }, expectedCopy: ["Requests"], afterLoad: async (page) => page.waitForTimeout(1000) },
+    { id: "clerk-staff-desktop", product: "TownlightMeetings", surface: "staff browser", auth: "bearer staff token", state: "success", url: `${clerkWeb}/staff`, viewport: desktop, headers: { Authorization: `Bearer ${clerkToken}` }, expectedCopy: ["TownlightMeetings", "Agenda", "Packet", "Notice", "Minutes"] },
+    { id: "clerk-staff-mobile", product: "TownlightMeetings", surface: "staff browser", auth: "bearer staff token", state: "success", url: `${clerkWeb}/staff`, viewport: mobile, headers: { Authorization: `Bearer ${clerkToken}` }, expectedCopy: ["TownlightMeetings", "Agenda", "Packet", "Notice", "Minutes"] },
+    { id: "clerk-public-desktop", product: "TownlightMeetings", surface: "public browser", auth: "none", state: "success", url: `${clerkWeb}/public`, viewport: desktop, expectedCopy: ["Public", "Meeting"] },
+    { id: "clerk-public-mobile", product: "TownlightMeetings", surface: "public browser", auth: "none", state: "success", url: `${clerkWeb}/public`, viewport: mobile, expectedCopy: ["Public", "Meeting"] },
+    { id: "clerk-protected-error-desktop", product: "TownlightMeetings", surface: "staff browser", auth: "missing staff auth", state: "error", url: `${clerkWeb}/staff`, viewport: desktop, expectedCopy: ["Staff sign-in needed", "Bearer token required", "allowed roles"], allowedFailureStatuses: [401] },
     ...["success", "loading", "empty", "error", "partial"].map((state) => ({
       id: `clerk-staff-state-${state}`,
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       surface: "staff browser",
       auth: "bearer staff token",
       state,
@@ -245,11 +245,11 @@ async function main() {
       viewport: desktop,
       headers: { Authorization: `Bearer ${clerkToken}` },
       clickState: state,
-      expectedCopy: state === "success" ? ["CivicClerk", "Staff workflow"] : state === "loading" ? ["Loading"] : state === "empty" ? ["No dashboard"] : state === "error" ? ["Could not load dashboard", "retry"] : ["dashboard is partially available"],
+      expectedCopy: state === "success" ? ["TownlightMeetings", "Staff workflow"] : state === "loading" ? ["Loading"] : state === "empty" ? ["No dashboard"] : state === "error" ? ["Could not load dashboard", "retry"] : ["dashboard is partially available"],
     })),
     ...["success", "loading", "empty", "error", "partial"].map((state) => ({
       id: `clerk-public-state-${state}`,
-      product: "CivicClerk",
+      product: "TownlightMeetings",
       surface: "public browser",
       auth: "none",
       state,
@@ -270,25 +270,25 @@ async function main() {
   }
 
   const health = {
-    civicrecords: await fetch(`${recordsApi}/health`).then((response) => response.json()),
-    civicclerk: await fetch(`${clerkWeb}/api/health`).then((response) => response.json()),
+    townlight_records: await fetch(`${recordsApi}/health`).then((response) => response.json()),
+    townlight_meetings: await fetch(`${clerkWeb}/api/health`).then((response) => response.json()),
   };
   const route_inventory = dedupeRoutes([
-    ...(await openApiRoutes("CivicRecords AI", recordsApi)),
-    ...(await openApiRoutes("CivicClerk", clerkApi)),
-    { product: "CivicRecords AI", route: "/public", audience: "public", auth_requirement: "none in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
-    { product: "CivicRecords AI", route: "/public/register", audience: "public", auth_requirement: "none in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
-    { product: "CivicRecords AI", route: "/public/submit", audience: "public", auth_requirement: "none or resident token in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
+    ...(await openApiRoutes("TownlightRecords", recordsApi)),
+    ...(await openApiRoutes("TownlightMeetings", clerkApi)),
+    { product: "TownlightRecords", route: "/public", audience: "public", auth_requirement: "none in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
+    { product: "TownlightRecords", route: "/public/register", audience: "public", auth_requirement: "none in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
+    { product: "TownlightRecords", route: "/public/submit", audience: "public", auth_requirement: "none or resident token in public portal mode", desktop_mobile_qa: "public portal browser route inventoried from React app; installed stack is private-mode for current Clerk-Core package", states: "not browser-promoted in private-mode installed package" },
     ...["/", "/search", "/requests", "/requests/:id", "/exemptions", "/sources", "/ingestion", "/users", "/onboarding", "/city-profile", "/settings", "/audit-log"].map((route) => ({
-      product: "CivicRecords AI",
+      product: "TownlightRecords",
       route,
       audience: "staff",
       auth_requirement: "first-admin/staff JWT",
       desktop_mobile_qa: ["/", "/search", "/requests"].includes(route) ? "covered in this browser matrix" : "inventoried from React app; API route coverage is included in OpenAPI/workflow proof where applicable",
-      states: "CivicRecords request/search/review/response states covered through installed workflow proof; browser smoke covers login/dashboard/search/requests",
+      states: "TownlightRecords request/search/review/response states covered through installed workflow proof; browser smoke covers login/dashboard/search/requests",
     })),
-    { product: "CivicClerk", route: "/staff", audience: "staff", auth_requirement: "bearer staff token in installed proof mode", desktop_mobile_qa: "covered in this browser matrix", states: "success/loading/empty/error/partial covered" },
-    { product: "CivicClerk", route: "/public", audience: "public", auth_requirement: "none", desktop_mobile_qa: "covered in this browser matrix", states: "success/loading/empty/error/partial covered" },
+    { product: "TownlightMeetings", route: "/staff", audience: "staff", auth_requirement: "bearer staff token in installed proof mode", desktop_mobile_qa: "covered in this browser matrix", states: "success/loading/empty/error/partial covered" },
+    { product: "TownlightMeetings", route: "/public", audience: "public", auth_requirement: "none", desktop_mobile_qa: "covered in this browser matrix", states: "success/loading/empty/error/partial covered" },
   ]);
 
   const adversarial = {
@@ -314,7 +314,7 @@ async function main() {
   const report = {
     name: "clerk-core-public-use-route-state-matrix",
     captured_at: new Date().toISOString(),
-    baseline: "CivicSuite main after PR #160 merge, installed locally with bearer workflow proof",
+    baseline: "Townlight main after PR #160 merge, installed locally with bearer workflow proof",
     urls: { recordsWeb, recordsApi, clerkWeb, clerkApi },
     health,
     route_inventory,
@@ -323,9 +323,9 @@ async function main() {
     status: results.every((result) => result.status !== "failed") ? "capture_complete" : "capture_failed",
     qa_notes: [
       "Capture status means the browser check rendered without capture-tool failure; release readiness is decided by the full gate.",
-      "CivicClerk public screenshots were captured against a dev build that renders staff chrome, the surface switch, Show audit, INSTALL DETAIL, and QA-state controls; they are not clean public-surface proof.",
-      "CivicClerk public loading/empty/error/partial states are harness-simulated, not observed production behavior.",
-      "CivicRecords footer shows v1.4.1 while header and /health report v1.6.1; tracked as CivicRecords AI issue #88.",
+      "TownlightMeetings public screenshots were captured against a dev build that renders staff chrome, the surface switch, Show audit, INSTALL DETAIL, and QA-state controls; they are not clean public-surface proof.",
+      "TownlightMeetings public loading/empty/error/partial states are harness-simulated, not observed production behavior.",
+      "TownlightRecords footer shows v1.4.1 while header and /health report v1.6.1; tracked as TownlightRecords issue #88.",
     ],
   };
   await fs.writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
@@ -335,12 +335,12 @@ async function main() {
     "",
     `Status: CAPTURE COMPLETE - ${results.length}/${results.length} checks rendered; evidence for the Clerk-Core public-use starter release gate.`,
     "",
-    "Scope: local installed Clerk-Core stack containing CivicRecords AI 1.6.1 and CivicClerk 1.0.1. This is browser/API/user-facing evidence for the starter product and is not a claim of city production deployment, external municipal validation, procurement certification, airgap proof, or macOS lifecycle certification.",
+    "Scope: local installed Clerk-Core stack containing TownlightRecords 1.6.1 and TownlightMeetings 1.0.1. This is browser/API/user-facing evidence for the starter product and is not a claim of city production deployment, external municipal validation, procurement certification, airgap proof, or macOS lifecycle certification.",
     "",
     "## Runtime",
     "",
-    `- CivicRecords AI health: ${health.civicrecords.status} ${health.civicrecords.version}`,
-    `- CivicClerk health through installed nginx /api proxy: ${health.civicclerk.status} ${health.civicclerk.version}`,
+    `- TownlightRecords health: ${health.townlight_records.status} ${health.townlight_records.version}`,
+    `- TownlightMeetings health through installed nginx /api proxy: ${health.townlight_meetings.status} ${health.townlight_meetings.version}`,
     "",
     "## Browser State Matrix",
     "",
@@ -358,18 +358,18 @@ async function main() {
     "",
     `- Bad input guard: HTTP ${adversarial.bad_inputs.status}.`,
     `- Spoofed/missing staff role guard: HTTP ${adversarial.missing_staff_role.status}.`,
-    `- Missing/stale CivicRecords request guard using a valid random UUID: HTTP ${adversarial.missing_record.status}.`,
+    `- Missing/stale TownlightRecords request guard using a valid random UUID: HTTP ${adversarial.missing_record.status}.`,
     `- Optional unavailable/degraded integration posture: HTTP ${adversarial.unavailable_dependency.status}; payload recorded in JSON.`,
     `- Public/staff permission boundary guard: HTTP ${adversarial.public_staff_boundary.status}.`,
     "",
     "## QA Notes",
     "",
-    "- Desktop and mobile browser checks cover CivicRecords AI login/dashboard/search/requests and CivicClerk staff/public surfaces.",
-    "- CivicClerk public screenshots were captured against a dev build that renders staff chrome, the surface switch, Show audit, INSTALL DETAIL, and QA-state controls; they are not clean public-surface proof.",
-    "- CivicClerk built-in QA state controls were exercised for loading, success, empty, error, and partial/degraded states; public state evidence is harness-simulated, not observed production behavior.",
+    "- Desktop and mobile browser checks cover TownlightRecords login/dashboard/search/requests and TownlightMeetings staff/public surfaces.",
+    "- TownlightMeetings public screenshots were captured against a dev build that renders staff chrome, the surface switch, Show audit, INSTALL DETAIL, and QA-state controls; they are not clean public-surface proof.",
+    "- TownlightMeetings built-in QA state controls were exercised for loading, success, empty, error, and partial/degraded states; public state evidence is harness-simulated, not observed production behavior.",
     "- Browser console warnings/errors, page errors, failed HTTP responses, keyboard focus target after Tab, and horizontal overflow are recorded in JSON.",
-    "- CivicRecords AI state proof is split between browser smoke checks and installed workflow proof for request/search/review/response because the current private-mode Clerk-Core package does not expose the public resident portal by default.",
-    "- CivicRecords footer shows v1.4.1 while header and /health report v1.6.1; tracked as CivicRecords AI issue #88.",
+    "- TownlightRecords state proof is split between browser smoke checks and installed workflow proof for request/search/review/response because the current private-mode Clerk-Core package does not expose the public resident portal by default.",
+    "- TownlightRecords footer shows v1.4.1 while header and /health report v1.6.1; tracked as TownlightRecords issue #88.",
     "",
   ].join("\n");
   await fs.writeFile(summaryPath, summary, "utf8");

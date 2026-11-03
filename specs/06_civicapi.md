@@ -101,13 +101,13 @@ Every response uses the same envelope:
     "total": 147,
     "page": 1,
     "page_size": 25,
-    "source_module": "civicclerk",
+    "source_module": "townlight_meetings",
     "record_type": "meeting",
     "schema_version": "1.0"
   },
   "citation": {
     "city": "City of Longmont, Colorado",
-    "source_module": "civicclerk",
+    "source_module": "townlight_meetings",
     "record_type": "meeting",
     "published_at": "2026-04-29T14:22:00Z",
     "published_by_role": "City Clerk",

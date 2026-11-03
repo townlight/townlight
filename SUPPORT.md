@@ -41,15 +41,15 @@ For vulnerabilities, follow [SECURITY.md](SECURITY.md), not a public issue.
 
 ## Historical suite support routing
 
-The `civicsuite` umbrella repo is for **suite-wide** orientation, governance, roadmap, ADRs, and the compatibility matrix. Most support questions belong on a specific module's repo. Please use the table below to route your question to the right place.
+The `townlight` umbrella repo is for **suite-wide** orientation, governance, roadmap, ADRs, and the compatibility matrix. Most support questions belong on a specific module's repo. Please use the table below to route your question to the right place.
 
 ## Where to ask
 
 | Audience | What you're asking about | Where to go |
 |---|---|---|
 | **Municipal evaluators** | "Is Townlight right for my city?" "What does it actually do today?" "How is it licensed?" | Start with the [README](README.md) and the [USER-MANUAL](USER-MANUAL.md). Open a Discussion under **Announcements** or **Roadmap** if you have follow-up questions. |
-| **Municipal evaluators** | "Can I see a working module?" "Can I try the beta?" | The current beta is the **Windows Local city-core** desktop package (Townlight Core + Townlight Records + Townlight Meetings + Townlight Code + Townlight Notice + Townlight Access). Follow [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md) and get the MSI from the [civicsuite-windows-local-v1.0.2 release](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2). To browse one module's source, `civicrecords-ai` lives at <https://github.com/townlight/sunshine>. |
-| **Module developers** | "How do I integrate civiccore?" "How do auth/RBAC/audit work?" | File at `townlight/core`. The civiccore repo's `README.md`, `USER-MANUAL.md`, and `docs/` are the canonical reference. |
+| **Municipal evaluators** | "Can I see a working module?" "Can I try the beta?" | The current beta is the **Windows Local city-core** desktop package (Townlight Core + Townlight Records + Townlight Meetings + Townlight Code + Townlight Notice + Townlight Access). Follow [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md) and get the MSI from the [townlight-windows-local-v1.0.2 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2). To browse one module's source, `townlight_records` lives at <https://github.com/townlight/sunshine>. |
+| **Module developers** | "How do I integrate townlight_core?" "How do auth/RBAC/audit work?" | File at `townlight/core`. The townlight_core repo's `README.md`, `USER-MANUAL.md`, and `docs/` are the canonical reference. |
 | **Module developers** | "Bug in records-ai" | File at `townlight/sunshine` (now transferred). |
 | **Module developers** | "Cross-module question — how should two modules interact?" | Open a Discussion here under **Architecture**. |
 | **Contributors** | "How do I contribute documentation here?" | See [CONTRIBUTING.md](CONTRIBUTING.md). |

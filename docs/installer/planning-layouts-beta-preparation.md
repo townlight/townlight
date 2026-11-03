@@ -29,7 +29,7 @@ unchanged: Planning `0.3.0`, Records `1.7.4`, Core `1.2.1` and all other module 
 retain their prior identities. No module publication is implied. Records remains
 the default; Permitting, Inspections and the wider land-use profile remain disabled.
 
-Application ID `org.civicsuite.desktop`, MSI upgrade code
+Application ID `org.townlight.desktop`, MSI upgrade code
 `a63fc1d3-5437-5f55-89a2-fef93fb1f930`, compatibility paths and API/package identifiers
 are preserved. The separate P5/P6 development contracts and source manifests are
 unchanged. No existing installer, historical receipt or release asset is replaced.

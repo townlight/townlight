@@ -5,7 +5,7 @@
 ## Status
 
 - Version: `0.1.0`
-- Townlight Core pin: `{{CIVICCORE_RELEASE_WHEEL_URL}}#sha256={{CIVICCORE_SHA256}}`
+- Townlight Core pin: `{{TOWNLIGHT_CORE_RELEASE_WHEEL_URL}}#sha256={{TOWNLIGHT_CORE_SHA256}}`
 - Release posture: developer preview until the full public-use gate and independent audit clear.
 
 ## Local Development

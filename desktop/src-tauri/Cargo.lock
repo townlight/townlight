@@ -493,8 +493,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "civicsuite-desktop"
-version = "1.6.0-1"
+name = "townlight-desktop"
+version = "1.7.0-1"
 dependencies = [
  "argon2",
  "base64 0.22.1",

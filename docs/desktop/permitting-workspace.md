@@ -13,7 +13,7 @@ are not accepted. Optional AI is not needed for this workflow.
 1. Open **Permitting → Requirement library**. Choose a JSON requirement bundle,
    inspect its title, jurisdiction, effective date, original hash, citations and
    material checklist, then explicitly import it. The bundle schema is
-   `civicpermit.workflow_models.RequirementBundle`. Fictional sources stay labelled.
+   `townlight_permitting.workflow_models.RequirementBundle`. Fictional sources stay labelled.
    A later import under the same ID requires the current revision and retains history.
 2. Create an intake case using a selected requirement revision. Enter the project,
    property/location, applicant contact and assigned staff. Assess each required

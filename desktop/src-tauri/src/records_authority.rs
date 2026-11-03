@@ -54,7 +54,7 @@ mod tests {
         let root =
             std::env::temp_dir().join(format!("townlight-authority-test-{}", std::process::id()));
         fs::create_dir_all(root.join("config")).unwrap();
-        std::env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        std::env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         assert!(legacy_allowed().is_ok());
         for phase in ["importing", "active"] {
             write(&Journal {
@@ -72,7 +72,7 @@ mod tests {
         fs::write(path(), "corrupt").unwrap();
         assert!(read().is_err());
         assert!(crate::workflows::city_work_state().is_err());
-        std::env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        std::env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         fs::remove_dir_all(root).unwrap();
     }
 }

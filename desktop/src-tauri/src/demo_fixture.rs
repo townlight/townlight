@@ -8,8 +8,8 @@ use sha2::{Digest, Sha256};
 const EMBEDDED_FIXTURE: &str =
     include_str!("../resources/fixtures/redstone-valley-records-demo-v1.json");
 pub const FIXTURE_ID: &str = "redstone-valley-records-demo";
-pub const FIXTURE_VERSION: &str = "1.0.0";
-pub const FIXTURE_SHA256: &str = "a9c242a3f2618a69d7effb1d0d17d2df06f6744c8c351bba4065d315c94575b4";
+pub const FIXTURE_VERSION: &str = "1.0.1";
+pub const FIXTURE_SHA256: &str = "d9aaa79403cfca2711e8031439fbab8bf9f70a20b8afc293faef8edd683ffbd6";
 pub const FIXTURE_NAME: &str = "Town of Redstone Valley (Fictional)";
 pub const FIXTURE_REQUEST_ID: &str = "rv-request-2026-0001";
 pub const WATERMARK: &str = "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD";
@@ -160,7 +160,7 @@ pub fn parse_and_validate(contents: &str) -> Result<DemoFixture, String> {
         || manifest.fixture_version != FIXTURE_VERSION
         || manifest.deterministic_seed != "townlight-records-demo-v1"
         || manifest.generation_mode != "static-canonical-v1"
-        || manifest.generator != "civiccore.testing.mock_city"
+        || manifest.generator != "townlight_core.testing.mock_city"
         || manifest.municipality.name != FIXTURE_NAME
         || !manifest.municipality.fictional
         || !manifest.synthetic

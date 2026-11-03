@@ -123,7 +123,7 @@ const lines = [
   "",
   "- All sampled prototype token combinations meet the sampled thresholds after darkening gold, muted-text, and rule tokens.",
   "- This is still a static token calculation; rendered component states require the separate axe/browser evidence captured for this run.",
-  "- This table does not certify Records AI, CivicClerk, CivicCode, or launcher WCAG conformance; axe/browser evidence is tracked separately.",
+  "- This table does not certify Records AI, TownlightMeetings, TownlightCode, or launcher WCAG conformance; axe/browser evidence is tracked separately.",
   "",
 ];
 

@@ -44,7 +44,7 @@ def main() -> int:
             json.dumps(
                 {
                     "status": "pass" if not errors else "fail",
-                    "module_count": 28 if not errors else None,
+                    "module_count": 11 if not errors else None,
                     "errors": errors,
                 },
                 indent=2,
@@ -56,7 +56,7 @@ def main() -> int:
             print(f"- {error}")
     else:
         print("CHECK-SUITE-STATE: PASSED")
-        print("- 28 canonical modules validated")
+        print("- 11 canonical modules validated")
         print("- stable Townlight identities and legacy aliases are unique")
         print("- products, profiles, and dependency references resolve")
         print("- installer/modules.json matches the recorded legacy projection")

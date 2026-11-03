@@ -1,4 +1,4 @@
-<a id="civicsuite-ai--principal-engineer-charter"></a>
+<a id="townlight-ai--principal-engineer-charter"></a>
 
 # Townlight AI — Principal Engineer Charter
 
@@ -60,11 +60,11 @@ The suite strategy is captured in four spec documents in this folder's `specs/` 
 
 1. **specs/01_catalog.md** — the module catalog (27 product modules plus Townlight Core across 7 tiers, Tier 0 Foundation through Tier 6 Specialized), strategic framing, design principles, what-not-to-build boundaries. Product strategy at suite scope. The 2026-04-30 addendum incorporates Townlight Regulatory Watch and Townlight API; their detailed contracts live in specs/05 and specs/06.
 
-2. **specs/02_CivicCore.md** — the non-breaking refactor plan that turns Townlight Records's shared plumbing into a standalone Townlight Core package. Defines the new Townlight umbrella repo. Includes the six-phase rollout (Phase 0 through Phase 5), import-shim pattern, database migration strategy, and risk table.
+2. **specs/02_Townlight Core.md** — the non-breaking refactor plan that turns Townlight Records's shared plumbing into a standalone Townlight Core package. Defines the new Townlight umbrella repo. Includes the six-phase rollout (Phase 0 through Phase 5), import-shim pattern, database migration strategy, and risk table.
 
-3. **specs/03_civicclerk.md** — the first Tier 1 module to build at full depth. Meetings, agendas, packets, minutes, voting, sunshine-law compliance, Whisper-local transcription, migration from incumbent platforms (Granicus, Legistar, PrimeGov, NovusAGENDA).
+3. **specs/03_townlight_meetings.md** — the first Tier 1 module to build at full depth. Meetings, agendas, packets, minutes, voting, sunshine-law compliance, Whisper-local transcription, migration from incumbent platforms (Granicus, Legistar, PrimeGov, NovusAGENDA).
 
-4. **specs/04_civiczone.md** — the Tier 2 reference module. Zoning code, parcel-aware Q&A, GIS integration, planner workflows. Not the next thing to build — it demonstrates how downstream modules inherit from Townlight Core and Townlight Code, and it sets up the dependency chain for a future build.
+4. **specs/04_townlight_zoning.md** — the Tier 2 reference module. Zoning code, parcel-aware Q&A, GIS integration, planner workflows. Not the next thing to build — it demonstrates how downstream modules inherit from Townlight Core and Townlight Code, and it sets up the dependency chain for a future build.
 
 Read them in full. Do not work from summaries.
 
@@ -78,26 +78,26 @@ A companion file, `CONSISTENCY.md`, in this folder, lists every cross-reference 
 
 The whole suite strategy depends on one thing: proving that Townlight Records's shared infrastructure can be extracted into a Townlight Core package without breaking the shipping records product. **Phase 1 of the Townlight Core extraction is the single most important piece of work.** Nothing else matters until it ships. Not Townlight Meetings code. Not Townlight Zoning code. Not additional module specs. If Phase 1 holds up in practice, every subsequent phase follows the same blueprint and gets easier. If Phase 1 falls apart, we rethink the whole approach before committing to it across five modules.
 
-<a id="week-1--make-the-architecture-real-no-code-changes-to-civicrecords-ai"></a>
+<a id="week-1--make-the-architecture-real-no-code-changes-to-townlight_records"></a>
 
 ### Week 1 — make the architecture real (no code changes to Townlight Records)
 
-**Day 1–2: create the repos (Townlight Core Extraction Spec Phase 0).** Confirm the GitHub org name with the user before creating (default: `civicsuite`). Create two repositories: `civicsuite` (the umbrella; docs only) and `civiccore` (the shared platform package skeleton). For each:
+**Day 1–2: create the repos (Townlight Core Extraction Spec Phase 0).** Confirm the GitHub org name with the user before creating (default: `townlight`). Create two repositories: `townlight` (the umbrella; docs only) and `townlight_core` (the shared platform package skeleton). For each:
 
-- Correct LICENSE file. `civiccore`: Apache 2.0. `civicsuite`: CC BY 4.0 as LICENSE and a second LICENSE-CODE file with Apache 2.0 for example snippets.
+- Correct LICENSE file. `townlight_core`: Apache 2.0. `townlight`: CC BY 4.0 as LICENSE and a second LICENSE-CODE file with Apache 2.0 for example snippets.
 - CHANGELOG.md starting at v0.1.0 unreleased.
 - CONTRIBUTING.md with the bug-filing decision tree referenced in Townlight Core Extraction Spec §18 (Risks table, mitigation row 7).
 - README.md with a short paragraph and links to the other repos. No marketing copy.
 
-Into `civicsuite/docs/` copy the four spec documents and render markdown versions for GitHub viewers. Create `docs/catalog/`, `docs/principles/`, `docs/architecture/`, `docs/roadmap/`, `docs/governance/`, `docs/compatibility/` with stub index files referencing the relevant spec sections. The compatibility matrix starts empty; Phase 1 populates it.
+Into `townlight/docs/` copy the four spec documents and render markdown versions for GitHub viewers. Create `docs/catalog/`, `docs/principles/`, `docs/architecture/`, `docs/roadmap/`, `docs/governance/`, `docs/compatibility/` with stub index files referencing the relevant spec sections. The compatibility matrix starts empty; Phase 1 populates it.
 
-For `civiccore`, scaffold the directory layout from Townlight Core Extraction Spec Appendix B: `civiccore/{auth,audit,llm,ingest,search,connectors,notifications,onboarding,catalog,exemptions,verification,models,migrations,scaffold}/` as empty packages with `__init__.py`. Add `pyproject.toml` with Townlight Core's declared dependencies (match Townlight Records's pins where they overlap). Add empty `tests/` and `scripts/verify/` directories. No implementation yet — this is setup.
+For `townlight_core`, scaffold the directory layout from Townlight Core Extraction Spec Appendix B: `townlight_core/{auth,audit,llm,ingest,search,connectors,notifications,onboarding,catalog,exemptions,verification,models,migrations,scaffold}/` as empty packages with `__init__.py`. Add `pyproject.toml` with Townlight Core's declared dependencies (match Townlight Records's pins where they overlap). Add empty `tests/` and `scripts/verify/` directories. No implementation yet — this is setup.
 
-**Day 3: extraction inventory (preparation for Phase 1).** In the Townlight Records repo, create a branch named `civiccore-extraction-inventory`. Do not modify code. Produce a single artifact: `docs/civiccore-extraction-inventory.md`. For every `from app.xxx import yyy` across the codebase, classify it as "moves to Townlight Core," "stays module-side," or "needs investigation." The Townlight Core Extraction Spec §8 (extraction inventory) and §9 (what stays in Townlight Records) give you the canonical categorization — where the spec is clear, classify confidently; where it's ambiguous, list the symbol in the investigation bucket with a short note. (Note: the extraction spec's Phase 0 covers only the repo skeleton work in Day 1–2; this Day 3 inventory is preparation that bridges into Phase 1.)
+**Day 3: extraction inventory (preparation for Phase 1).** In the Townlight Records repo, create a branch named `townlight_core-extraction-inventory`. Do not modify code. Produce a single artifact: `docs/townlight_core-extraction-inventory.md`. For every `from app.xxx import yyy` across the codebase, classify it as "moves to Townlight Core," "stays module-side," or "needs investigation." The Townlight Core Extraction Spec §8 (extraction inventory) and §9 (what stays in Townlight Records) give you the canonical categorization — where the spec is clear, classify confidently; where it's ambiguous, list the symbol in the investigation bucket with a short note. (Note: the extraction spec's Phase 0 covers only the repo skeleton work in Day 1–2; this Day 3 inventory is preparation that bridges into Phase 1.)
 
 This file becomes your Phase 1 checklist. Commit it, open a PR, and have the user review before Phase 1 starts.
 
-<a id="weeks-13--civiccore-phase-1"></a>
+<a id="weeks-13--townlight_core-phase-1"></a>
 
 ### Weeks 1–3 — Townlight Core Phase 1
 
@@ -105,7 +105,7 @@ Extract exactly four subsystems, no more: `User`, `Role`, `Department`, and `aud
 
 Execute the move with these constraints:
 
-- **Shim every moved symbol.** Every `from app.models.user import User` in the records repo must continue to work via a 3-line shim file that re-exports from `civiccore.models.user`. Never hand-edit import paths across the records repo during Phases 1–4. The import-path codemod happens in Phase 5, not before.
+- **Shim every moved symbol.** Every `from app.models.user import User` in the records repo must continue to work via a 3-line shim file that re-exports from `townlight_core.models.user`. Never hand-edit import paths across the records repo during Phases 1–4. The import-path codemod happens in Phase 5, not before.
 
 - **Database migrations are carefully staged.** Townlight Core seeds its Alembic version history starting from the latest Townlight Records migration that touched a shared table. That migration is marked as the Townlight Core baseline. Townlight Records's `env.py` is modified to call Townlight Core's migration runner first, then apply records-specific migrations. Alembic's `depends_on` enforces ordering. A fresh-install CI test mounts an empty Postgres and runs the full migration sequence before the PR is mergeable.
 
@@ -117,16 +117,16 @@ Execute the move with these constraints:
 
 Ship Phase 1 as:
 
-- `civiccore` 0.1.0 (on the new repo).
-- `civicrecords-ai` as a patch release pinning `civiccore >= 0.1, < 0.2`.
+- `townlight_core` 0.1.0 (on the new repo).
+- `townlight_records` as a patch release pinning `townlight_core >= 0.1, < 0.2`.
 
-Update the compatibility matrix in `civicsuite/docs/compatibility/` to reflect the pairing.
+Update the compatibility matrix in `townlight/docs/compatibility/` to reflect the pairing.
 
-<a id="parallel-track-opens-up-only-after-phase-1-ships--civicclerk-scaffolding"></a>
+<a id="parallel-track-opens-up-only-after-phase-1-ships--townlight_meetings-scaffolding"></a>
 
 ### Parallel track, opens up only after Phase 1 ships — Townlight Meetings scaffolding
 
-Once Phase 1 is merged, create the third repo: `civicclerk`. Scaffold it the same way as `civiccore`: directory layout from the Townlight Meetings spec, `pyproject.toml` pinning civiccore, spec doc in `docs/`, empty migration stubs matching the 15 entities in Townlight Meetings spec §12 (Entity overview), empty FastAPI router stubs matching the 25 endpoints in §29 (REST API).
+Once Phase 1 is merged, create the third repo: `townlight_meetings`. Scaffold it the same way as `townlight_core`: directory layout from the Townlight Meetings spec, `pyproject.toml` pinning townlight_core, spec doc in `docs/`, empty migration stubs matching the 15 entities in Townlight Meetings spec §12 (Entity overview), empty FastAPI router stubs matching the 25 endpoints in §29 (REST API).
 
 **Do not implement any Townlight Meetings feature yet.** This is setup, not build. Townlight Core Phases 2–4 continue in parallel on the Townlight Core repo. Once Townlight Core has LLM + ingest + search + connectors + notifications extracted (Phases 2–3), you begin Townlight Meetings Phase 1: meeting CRUD + agenda-item CRUD + a basic staff workbench. No AI features, no Whisper transcription, no packet assembly yet. The boring, shippable, highest-value piece ships first. AI features land in Townlight Meetings Phases 2–4.
 

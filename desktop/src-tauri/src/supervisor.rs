@@ -27,8 +27,8 @@ const REQUIRED_ACTIONS: [&str; 12] = [
     "uninstall",
     "open-windows-uninstall",
 ];
-const LOCAL_DB_NAME: &str = "civicsuite";
-const LOCAL_DB_USER: &str = "civicsuite";
+const LOCAL_DB_NAME: &str = "townlight";
+const LOCAL_DB_USER: &str = "townlight";
 const LOCAL_DB_PORT: u16 = 15432;
 const PROFILE_REPLACE_ATTEMPTS: usize = 12;
 const PROFILE_REPLACE_RETRY_DELAY: Duration = Duration::from_millis(750);
@@ -390,8 +390,8 @@ fn validate_payload_manifest(
     Ok(())
 }
 
-fn civic_suite_root() -> PathBuf {
-    local_paths::civic_suite_root()
+fn townlight_root() -> PathBuf {
+    local_paths::townlight_root()
 }
 
 fn data_root() -> PathBuf {
@@ -415,12 +415,12 @@ fn support_bundle_root() -> PathBuf {
 }
 
 fn runtime_root() -> PathBuf {
-    env::var("CIVICSUITE_RUNTIME_ROOT")
+    env::var("TOWNLIGHT_RUNTIME_ROOT")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
             local_paths::effective_locations()
                 .map(|locations| PathBuf::from(locations.install_root))
-                .unwrap_or_else(|_| civic_suite_root())
+                .unwrap_or_else(|_| townlight_root())
         })
 }
 
@@ -449,8 +449,8 @@ fn postgres_password() -> Result<String, String> {
     read_or_create_secret("postgres-password.txt", 32)
 }
 
-fn civicaccess_trusted_write_token() -> Result<String, String> {
-    read_or_create_secret("civicaccess-trusted-write-token.txt", 32)
+fn townlight_access_trusted_write_token() -> Result<String, String> {
+    read_or_create_secret("townlight_access-trusted-write-token.txt", 32)
 }
 
 fn local_database_url(driver: &str) -> Result<String, String> {
@@ -492,7 +492,7 @@ fn append_executable_payload_roots(candidates: &mut Vec<PathBuf>, executable_par
 
 fn runtime_payload_roots() -> Vec<PathBuf> {
     let mut candidates = Vec::new();
-    if let Ok(root) = env::var("CIVICSUITE_RUNTIME_PAYLOAD_DIR") {
+    if let Ok(root) = env::var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR") {
         candidates.push(PathBuf::from(root));
     }
     if let Ok(exe) = env::current_exe() {
@@ -519,7 +519,7 @@ fn ensure_profile_child_for_delete(path: &Path) -> Result<(), String> {
     if !path.exists() {
         return Ok(());
     }
-    let root = civic_suite_root();
+    let root = townlight_root();
     fs::create_dir_all(&root)
         .map_err(|error| format!("Could not create Townlight profile root: {error}"))?;
     let canonical_root = fs::canonicalize(&root)
@@ -1196,7 +1196,7 @@ fn restore_swap_path(destination: &Path, suffix: &str) -> Result<PathBuf, String
             )
         })?;
     Ok(parent.join(format!(
-        ".civicsuite-restore-{suffix}-{name}-{}-{}",
+        ".townlight-restore-{suffix}-{name}-{}-{}",
         now_unix_seconds(),
         std::process::id()
     )))
@@ -1445,7 +1445,7 @@ fn create_backup_with_options(kind: &str, options: BackupOptions) -> Result<Path
     fs::create_dir_all(&root)
         .map_err(|error| format!("Could not create backup folder {}: {error}", root.display()))?;
     let destination = root.join(format!(
-        "civicsuite-{kind}-backup-{created}-{}",
+        "townlight-{kind}-backup-{created}-{}",
         std::process::id()
     ));
     fs::create_dir_all(&destination).map_err(|error| {
@@ -1507,7 +1507,7 @@ fn create_backup_with_options(kind: &str, options: BackupOptions) -> Result<Path
         schema_version: 1,
         kind: kind.to_string(),
         created_unix_seconds: created,
-        source_root: civic_suite_root().display().to_string(),
+        source_root: townlight_root().display().to_string(),
         data_source: data.display().to_string(),
         config_source: config.display().to_string(),
         backup_root: root.display().to_string(),
@@ -1579,7 +1579,7 @@ fn latest_backup_dir() -> Result<Option<PathBuf>, String> {
             && entry
                 .file_name()
                 .to_string_lossy()
-                .starts_with("civicsuite-")
+                .starts_with("townlight-")
         {
             let manifest_path = path.join("backup-manifest.json");
             let manifest_sort_key = fs::read_to_string(&manifest_path)
@@ -1713,11 +1713,11 @@ fn command_output_with_timeout(
         .map(|duration| duration.as_nanos())
         .unwrap_or(0);
     let stdout_path = env::temp_dir().join(format!(
-        "civicsuite-command-{}-{capture_id}-stdout.log",
+        "townlight-command-{}-{capture_id}-stdout.log",
         std::process::id()
     ));
     let stderr_path = env::temp_dir().join(format!(
-        "civicsuite-command-{}-{capture_id}-stderr.log",
+        "townlight-command-{}-{capture_id}-stderr.log",
         std::process::id()
     ));
     let stdout_file = fs::File::create(&stdout_path)
@@ -2009,7 +2009,7 @@ fn ensure_postgres_database(service: &ServiceDefinition) -> Result<(), String> {
             "postgres",
             "-At",
             "-c",
-            "SELECT 1 FROM pg_database WHERE datname = 'civicsuite';",
+            "SELECT 1 FROM pg_database WHERE datname = 'townlight';",
         ],
         "Local data store database check",
     )?;
@@ -2079,7 +2079,7 @@ fn run_python_migrations() -> Result<(), String> {
     command
         .arg("-u")
         .arg("-m")
-        .arg("civicsuite_runtime.migrate");
+        .arg("townlight_runtime.migrate");
     command_output_with_timeout(
         &mut command,
         "City-core database migrations",
@@ -2154,14 +2154,14 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
     let mut env = vec![
         (
             "TOWNLIGHT_PROFILE_ROOT".to_string(),
-            civic_suite_root().display().to_string(),
+            townlight_root().display().to_string(),
         ),
         (
-            "CIVICSUITE_DATA_DIR".to_string(),
+            "TOWNLIGHT_DATA_DIR".to_string(),
             data.to_string_lossy().to_string(),
         ),
         (
-            "CIVICSUITE_FILE_STORAGE_DIR".to_string(),
+            "TOWNLIGHT_FILE_STORAGE_DIR".to_string(),
             data.join("files").to_string_lossy().to_string(),
         ),
         ("DATABASE_URL".to_string(), db_url.to_string()),
@@ -2186,23 +2186,23 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
             "http://127.0.0.1:15434".to_string(),
         ),
         (
-            "CIVICCLERK_OLLAMA_BASE_URL".to_string(),
+            "TOWNLIGHT_MEETINGS_OLLAMA_BASE_URL".to_string(),
             "http://127.0.0.1:15434".to_string(),
         ),
-        ("CIVICCODE_AI_MODE".to_string(), "ollama".to_string()),
+        ("TOWNLIGHT_CODE_AI_MODE".to_string(), "ollama".to_string()),
         (
-            "CIVICCODE_OLLAMA_URL".to_string(),
+            "TOWNLIGHT_CODE_OLLAMA_URL".to_string(),
             "http://127.0.0.1:15434".to_string(),
         ),
         (
-            "CIVICCODE_OLLAMA_MODEL".to_string(),
+            "TOWNLIGHT_CODE_OLLAMA_MODEL".to_string(),
             crate::model::pinned_runtime_model()?,
         ),
         (
             "LLM_MODEL".to_string(),
             crate::model::pinned_runtime_model()?,
         ),
-        ("CIVICCORE_LLM_PROVIDER".to_string(), "ollama".to_string()),
+        ("TOWNLIGHT_CORE_LLM_PROVIDER".to_string(), "ollama".to_string()),
     ];
     if service.kind.contains("python") || service.binary.ends_with("python.exe") {
         env.push(("PYTHONNOUSERSITE".to_string(), "1".to_string()));
@@ -2214,15 +2214,15 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
             .find(|path| path.is_file())
         {
             env.push((
-                "CIVICINSPECT_FFMPEG".to_string(),
+                "TOWNLIGHT_INSPECTIONS_FFMPEG".to_string(),
                 ffmpeg.display().to_string(),
             ));
         }
-        // Configure CivicAccess's durable-write guard so its persistence-write routes accept the
-        // staff surface's token (pairs with the module's server-side X-CivicAccess-Write-Token).
+        // Configure TownlightAccess's durable-write guard so its persistence-write routes accept the
+        // staff surface's token (pairs with the module's server-side X-Townlight-Access-Write-Token).
         env.push((
-            "CIVICACCESS_TRUSTED_WRITE_TOKEN".to_string(),
-            civicaccess_trusted_write_token()?,
+            "TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN".to_string(),
+            townlight_access_trusted_write_token()?,
         ));
     }
     if service.id == "model-runtime" {
@@ -2329,7 +2329,7 @@ fn process_ids_for_executable(_executable: &Path) -> Vec<u32> {
     #[cfg(target_os = "windows")]
     {
         let script = r#"
-$target = [System.IO.Path]::GetFullPath($env:CIVICSUITE_PROCESS_LOOKUP_TARGET)
+$target = [System.IO.Path]::GetFullPath($env:TOWNLIGHT_PROCESS_LOOKUP_TARGET)
 Get-CimInstance Win32_Process |
   Where-Object { $_.ExecutablePath -and ([System.IO.Path]::GetFullPath($_.ExecutablePath) -ieq $target) } |
   Select-Object -ExpandProperty ProcessId
@@ -2342,7 +2342,7 @@ Get-CimInstance Win32_Process |
             .arg("Bypass")
             .arg("-Command")
             .arg(script)
-            .env("CIVICSUITE_PROCESS_LOOKUP_TARGET", _executable);
+            .env("TOWNLIGHT_PROCESS_LOOKUP_TARGET", _executable);
         return command_output_with_timeout(
             &mut command,
             "Windows process lookup",
@@ -2632,7 +2632,7 @@ fn task_queue_schema_health(manifest: &RuntimeManifest) -> Option<RuntimeHealthI
 
 fn folder_write_probe(path: &Path) -> Result<(), String> {
     let check_path = path.join(format!(
-        ".civicsuite-health-check-{}-{}.tmp",
+        ".townlight-health-check-{}-{}.tmp",
         std::process::id(),
         now_unix_seconds()
     ));
@@ -3128,7 +3128,7 @@ fn create_support_bundle(services: &[&ServiceDefinition]) -> Result<PathBuf, Str
         )
     })?;
     let destination = bundle_root.join(format!(
-        "civicsuite-support-bundle-{created}-{}",
+        "townlight-support-bundle-{created}-{}",
         std::process::id()
     ));
     fs::create_dir_all(&destination).map_err(|error| {
@@ -3229,7 +3229,7 @@ fn create_support_bundle(services: &[&ServiceDefinition]) -> Result<PathBuf, Str
         schema_version: 1,
         kind: "support-bundle".to_string(),
         created_unix_seconds: created,
-        source_root: civic_suite_root().display().to_string(),
+        source_root: townlight_root().display().to_string(),
         data_source: data_root().display().to_string(),
         backup_root: backup_root().display().to_string(),
         selected_services: services.iter().map(|service| service.id.clone()).collect(),
@@ -3452,7 +3452,7 @@ fn activate_records_action() -> Result<SupervisorActionResult, String> {
     start_postgres_service(service_by_id(&manifest, "postgres")?, false)?;
     let python = service_by_id(&manifest, "python-services")?;
     let mut command = Command::new(service_binary_path(python));
-    command.args(["-m", "civicsuite_runtime.records_cutover"]);
+    command.args(["-m", "townlight_runtime.records_cutover"]);
     for (name, value) in service_environment(python)? {
         command.env(name, value);
     }
@@ -3487,7 +3487,7 @@ fn load_records_demo_action() -> Result<SupervisorActionResult, String> {
     start_postgres_service(service_by_id(&manifest, "postgres")?, false)?;
     let python = service_by_id(&manifest, "python-services")?;
     let mut command = Command::new(service_binary_path(python));
-    command.args(["-m", "civicsuite_runtime.records_demo"]);
+    command.args(["-m", "townlight_runtime.records_demo"]);
     for (name, value) in service_environment(python)? {
         command.env(name, value);
     }
@@ -3816,7 +3816,7 @@ mod tests {
                         "-U",
                         "townlight_convergence",
                         "-d",
-                        "civicrecords",
+                        "townlight_records",
                         "-At",
                         "-v",
                         "ON_ERROR_STOP=1",
@@ -3905,19 +3905,19 @@ mod tests {
             .lock()
             .expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-supervisor-test-{}",
+            "townlight-desktop-supervisor-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
-        env::set_var("CIVICSUITE_RUNTIME_ROOT", root.join("Runtime"));
-        env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", root.join("Payload"));
-        env::set_var("CIVICSUITE_BACKUP_DIR", root.join("Backups"));
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_RUNTIME_ROOT", root.join("Runtime"));
+        env::set_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR", root.join("Payload"));
+        env::set_var("TOWNLIGHT_BACKUP_DIR", root.join("Backups"));
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
-        env::remove_var("CIVICSUITE_RUNTIME_ROOT");
-        env::remove_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR");
-        env::remove_var("CIVICSUITE_BACKUP_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_RUNTIME_ROOT");
+        env::remove_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR");
+        env::remove_var("TOWNLIGHT_BACKUP_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }
@@ -4009,28 +4009,28 @@ mod tests {
             .lock()
             .expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-supervisor-real-test-{}",
+            "townlight-desktop-supervisor-real-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
         // Restore each var's PRIOR value on exit instead of blindly removing:
-        // CIVICSUITE_RUNTIME_PAYLOAD_DIR is supplied by the CI step env, and
+        // TOWNLIGHT_RUNTIME_PAYLOAD_DIR is supplied by the CI step env, and
         // the first gated test's cleanup used to delete it out from under the
         // second gated test in the same process (the helper predates running
         // more than one payload test per invocation).
         let prior: Vec<(&str, Option<std::ffi::OsString>)> = [
-            "CIVICSUITE_DESKTOP_STATE_DIR",
-            "CIVICSUITE_RUNTIME_ROOT",
-            "CIVICSUITE_RUNTIME_PAYLOAD_DIR",
-            "CIVICSUITE_BACKUP_DIR",
+            "TOWNLIGHT_DESKTOP_STATE_DIR",
+            "TOWNLIGHT_RUNTIME_ROOT",
+            "TOWNLIGHT_RUNTIME_PAYLOAD_DIR",
+            "TOWNLIGHT_BACKUP_DIR",
         ]
         .iter()
         .map(|name| (*name, env::var_os(name)))
         .collect();
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
-        env::set_var("CIVICSUITE_RUNTIME_ROOT", root.join("Runtime"));
-        env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", &payload_dir);
-        env::set_var("CIVICSUITE_BACKUP_DIR", root.join("Backups"));
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_RUNTIME_ROOT", root.join("Runtime"));
+        env::set_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR", &payload_dir);
+        env::set_var("TOWNLIGHT_BACKUP_DIR", root.join("Backups"));
         let result = test(root.clone());
         for (name, value) in prior {
             match value {
@@ -4284,7 +4284,7 @@ mod tests {
                     path.file_name()
                         .map(|name| {
                             name.to_string_lossy()
-                                .starts_with(".civicsuite-restore-postgres-repair-old-postgres-")
+                                .starts_with(".townlight-restore-postgres-repair-old-postgres-")
                         })
                         .unwrap_or(false)
                 })
@@ -4309,8 +4309,8 @@ mod tests {
             let ffmpeg = payload.join("station").join("bin").join("ffmpeg.exe");
             fs::create_dir_all(ffmpeg.parent().unwrap()).unwrap();
             fs::write(&ffmpeg, b"synthetic path fixture").unwrap();
-            let previous = env::var_os("CIVICSUITE_RUNTIME_PAYLOAD_DIR");
-            env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", &payload);
+            let previous = env::var_os("TOWNLIGHT_RUNTIME_PAYLOAD_DIR");
+            env::set_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR", &payload);
             let manifest = parse_manifest().unwrap();
             let service = manifest
                 .services
@@ -4319,13 +4319,13 @@ mod tests {
                 .unwrap();
             let result = service_environment(service);
             match previous {
-                Some(value) => env::set_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR", value),
-                None => env::remove_var("CIVICSUITE_RUNTIME_PAYLOAD_DIR"),
+                Some(value) => env::set_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR", value),
+                None => env::remove_var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR"),
             }
             let variables = result.unwrap();
             assert!(variables
                 .iter()
-                .any(|(name, value)| name == "CIVICINSPECT_FFMPEG"
+                .any(|(name, value)| name == "TOWNLIGHT_INSPECTIONS_FFMPEG"
                     && value == &ffmpeg.display().to_string()));
         });
     }
@@ -4364,12 +4364,12 @@ mod tests {
             }));
             assert!(env
                 .iter()
-                .any(|(name, value)| name == "CIVICCODE_AI_MODE" && value == "ollama"));
+                .any(|(name, value)| name == "TOWNLIGHT_CODE_AI_MODE" && value == "ollama"));
             assert!(env.iter().any(|(name, value)| {
-                name == "CIVICCODE_OLLAMA_MODEL" && value == "civicsuite-gemma4-12b-qat:q4_0"
+                name == "TOWNLIGHT_CODE_OLLAMA_MODEL" && value == "townlight-gemma4-12b-qat:q4_0"
             }));
             assert!(env.iter().any(|(name, value)| {
-                name == "LLM_MODEL" && value == "civicsuite-gemma4-12b-qat:q4_0"
+                name == "LLM_MODEL" && value == "townlight-gemma4-12b-qat:q4_0"
             }));
         });
     }
@@ -4377,7 +4377,7 @@ mod tests {
     #[test]
     fn runtime_root_uses_saved_install_location_without_env_override() {
         with_temp_state_dir(|root| {
-            env::remove_var("CIVICSUITE_RUNTIME_ROOT");
+            env::remove_var("TOWNLIGHT_RUNTIME_ROOT");
             let install_root = root.join("selected-install-root");
             crate::local_paths::save_locations(&crate::local_paths::LocalLocations {
                 install_root: install_root.to_string_lossy().to_string(),
@@ -4388,13 +4388,13 @@ mod tests {
 
             assert_eq!(runtime_root(), install_root);
 
-            env::set_var("CIVICSUITE_RUNTIME_ROOT", root.join("Runtime"));
+            env::set_var("TOWNLIGHT_RUNTIME_ROOT", root.join("Runtime"));
         });
     }
 
     #[test]
     fn executable_payload_roots_include_tauri_up_payload_dir() {
-        let executable_parent = PathBuf::from(r"C:\Program Files\CivicSuite");
+        let executable_parent = PathBuf::from(r"C:\Program Files\Townlight");
         let mut roots = Vec::new();
 
         append_executable_payload_roots(&mut roots, &executable_parent);
@@ -4641,7 +4641,7 @@ mod tests {
                     entry
                         .file_name()
                         .to_string_lossy()
-                        .starts_with(".civicsuite-health-check-")
+                        .starts_with(".townlight-health-check-")
                 })
                 .count();
             assert_eq!(leftover_checks, 0);
@@ -4650,12 +4650,12 @@ mod tests {
 
     #[test]
     fn real_postgres_payload_initializes_and_migrates_when_enabled() {
-        if env::var("CIVICSUITE_RUN_REAL_RUNTIME_TEST").ok().as_deref() != Some("1") {
+        if env::var("TOWNLIGHT_RUN_REAL_RUNTIME_TEST").ok().as_deref() != Some("1") {
             return;
         }
-        let payload_dir = env::var("CIVICSUITE_RUNTIME_PAYLOAD_DIR")
+        let payload_dir = env::var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR")
             .map(PathBuf::from)
-            .expect("CIVICSUITE_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
+            .expect("TOWNLIGHT_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
         let linked_payload_dir = payload_dir.clone();
         with_temp_state_dir_and_payload(payload_dir, |root| {
             #[cfg(windows)]
@@ -4720,16 +4720,16 @@ mod tests {
     // retired JSON domain actions are not a runtime-readiness test seam.
     #[test]
     fn real_ollama_runtime_with_no_model_serves_the_not_ready_contract_when_enabled() {
-        if env::var("CIVICSUITE_RUN_REAL_RUNTIME_TEST").ok().as_deref() != Some("1") {
+        if env::var("TOWNLIGHT_RUN_REAL_RUNTIME_TEST").ok().as_deref() != Some("1") {
             return;
         }
-        let payload_dir = env::var("CIVICSUITE_RUNTIME_PAYLOAD_DIR")
+        let payload_dir = env::var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR")
             .map(PathBuf::from)
-            .expect("CIVICSUITE_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
+            .expect("TOWNLIGHT_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
         let linked_payload_dir = payload_dir.clone();
         with_temp_state_dir_and_payload(payload_dir, |root| {
-            env::remove_var("CIVICSUITE_FAKE_MODEL_RESPONSE");
-            env::remove_var("CIVICSUITE_FAKE_MODEL_ERROR");
+            env::remove_var("TOWNLIGHT_FAKE_MODEL_RESPONSE");
+            env::remove_var("TOWNLIGHT_FAKE_MODEL_ERROR");
             #[cfg(windows)]
             link_payload_runtime_set(&root, &linked_payload_dir, &["ollama"]);
             supervisor_action("install", Some("model-runtime")).expect("install ollama payload");
@@ -4788,16 +4788,16 @@ mod tests {
 
     #[test]
     fn real_copied_payload_repair_recovers_partial_postgres_when_enabled() {
-        if env::var("CIVICSUITE_RUN_REAL_RUNTIME_COPY_TEST")
+        if env::var("TOWNLIGHT_RUN_REAL_RUNTIME_COPY_TEST")
             .ok()
             .as_deref()
             != Some("1")
         {
             return;
         }
-        let payload_dir = env::var("CIVICSUITE_RUNTIME_PAYLOAD_DIR")
+        let payload_dir = env::var("TOWNLIGHT_RUNTIME_PAYLOAD_DIR")
             .map(PathBuf::from)
-            .expect("CIVICSUITE_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
+            .expect("TOWNLIGHT_RUNTIME_PAYLOAD_DIR points at prepared desktop runtime payload");
         with_temp_state_dir_and_payload(payload_dir, |root| {
             let partial_postgres = root.join("Data").join("postgres");
             fs::create_dir_all(&partial_postgres).expect("partial postgres folder");
@@ -5165,7 +5165,7 @@ mod tests {
                 .expect("profile entries")
                 .filter_map(Result::ok)
                 .map(|entry| entry.file_name().to_string_lossy().to_string())
-                .filter(|name| name.starts_with(".civicsuite-restore-"))
+                .filter(|name| name.starts_with(".townlight-restore-"))
                 .collect();
             assert!(!restore_swap_entries
                 .iter()

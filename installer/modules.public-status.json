@@ -1,13 +1,14 @@
 {
-  "$schema_note": "Public status truth for all 28 modules — the single machine source for the module explorer (docs/module-explorer.html), STATUS.md's generated module-status block, and status badge strings. Rendered by scripts/docs/render_public_status.py (--write to regenerate, --check gates CI). Field notes: arch_tier follows ARCHITECTURE.md's suite topology (the public taxonomy); modules.json's own 'tier' field is the installer's internal grouping and intentionally differs. current_version and civiccore_requirement are cross-checked against installer/modules.json by the generator. Standalone package versions retain their recorded verification dates. Connected desktop release notes and public names reconciled 2026-10-21; this does not assert new standalone releases.",
-  "verified": "2026-07-03",
+  "$schema_note": "Current bounded public catalog. Candidate versions are prepared, not published or installed-accepted. Historical release receipts retain their original identities.",
+  "verified": "2026-11-02",
   "grade_labels": {
     "platform": "Shared platform",
     "released": "Published beta capability",
-    "queued": "Queued · Tier 2",
+    "queued": "Queued \u00b7 Tier 2",
     "early-scaffold": "Early scaffold",
     "foundation": "Foundation",
-    "planned": "Planned"
+    "planned": "Planned",
+    "candidate": "Candidate \u2014 installed acceptance pending"
   },
   "grade_desc": {
     "platform": "The shared platform every module depends on; always installed.",
@@ -15,15 +16,13 @@
     "queued": "Early scaffold with a corrected version label; full build queued for Tier 2.",
     "early-scaffold": "Early scaffold; not city-ready.",
     "foundation": "Package/schema/sample-depth foundation only; not product-ready.",
-    "planned": "Spec exists; no runtime repo yet."
+    "planned": "Spec exists; no runtime repo yet.",
+    "candidate": "Prepared software; completion and publication require the recorded exact-candidate acceptance."
   },
   "grade_order": [
     "platform",
-    "released",
-    "queued",
-    "early-scaffold",
-    "foundation",
-    "planned"
+    "candidate",
+    "released"
   ],
   "grade_dot": {
     "platform": "var(--info)",
@@ -31,7 +30,8 @@
     "queued": "var(--gold-strong)",
     "early-scaffold": "var(--warn)",
     "foundation": "var(--ink-3)",
-    "planned": "var(--ink-4)"
+    "planned": "var(--ink-4)",
+    "candidate": "var(--warn)"
   },
   "tier_names": {
     "0": "Foundation platform",
@@ -44,367 +44,146 @@
   },
   "modules": [
     {
-      "id": "civiccore",
+      "id": "townlight_core",
       "name": "Townlight Core",
       "arch_tier": 0,
-      "current_version": "1.2.1",
-      "civiccore_requirement": null,
+      "current_version": "1.3.0.dev2",
+      "townlight_core_requirement": null,
       "public_status": {
         "grade": "platform",
-        "released_date": "2026-07-04",
-        "release_url_state": "published",
-        "note": "Shared platform for identity, audit, retention, local tasks, and document ingestion. Version 1.2.1 is always installed with Townlight Records."
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicrecords-ai",
+      "id": "townlight_records",
       "name": "Townlight Records",
       "arch_tier": 1,
-      "current_version": "1.7.3",
-      "civiccore_requirement": "1.2.1",
+      "current_version": "1.8.0.dev2",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-05-24",
-        "release_url_state": "published",
-        "note": "Public-records intake, cited search, human review, release packaging, fulfillment and public status. The connected 1.4.0-beta.1 desktop uses Python/PostgreSQL and can attach permitted Meetings and Code sources with history, citations and hashes."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicclerk",
+      "id": "townlight_meetings",
       "name": "Townlight Meetings",
       "arch_tier": 1,
-      "current_version": "1.0.4",
-      "civiccore_requirement": "1.2.0",
+      "current_version": "1.0.5",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-06-13",
-        "release_url_state": "published",
-        "note": "Agendas, packets, delivery, notices, proceedings and manual minutes. Connected 1.4.0-beta.1 supports explicit Code agenda/adoption links and permitted source attachments to Records; optional native AI minutes/transcription is not claimed."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civiccode",
+      "id": "townlight_code",
       "name": "Townlight Code",
       "arch_tier": 1,
-      "current_version": "1.0.8",
-      "civiccore_requirement": "1.2.1",
+      "current_version": "1.0.9",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-05-23",
-        "release_url_state": "published",
-        "note": "Current and historical ordinance versions, meeting-linked proposals, explicit human adoption and separate codification. Connected 1.4.0-beta.1 supplies permitted cited source copies to Records without exposing restricted material."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicaccess",
+      "id": "townlight_access",
       "name": "Townlight Access",
       "arch_tier": 1,
-      "current_version": "0.4.0",
-      "civiccore_requirement": "1.2.1",
+      "current_version": "0.5.0",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-06-28",
-        "release_url_state": "published",
-        "note": "Accessibility and records-release review, including plain-language, translation, and WCAG-oriented checks. Bundled with Townlight Records beta."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civiczone",
+      "id": "townlight_zoning",
       "name": "Townlight Zoning",
       "arch_tier": 2,
-      "current_version": "0.2.2",
-      "civiccore_requirement": "1.2.1",
+      "current_version": "0.2.3",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-05-23",
-        "release_url_state": "published",
-        "note": "Connected desktop 1.4.0-beta.1 includes opt-in Zoning: staff GeoJSON import, PostGIS lookup, cited rules, human corrections and public immutable Records sources. Standalone package version 0.2.2 is historical; live GIS ingestion, determinations and the wider land-use suite are not delivered."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicplan",
+      "id": "townlight_planning",
       "name": "Townlight Planning",
       "arch_tier": 2,
-      "current_version": "0.2.2",
-      "civiccore_requirement": "1.1.0",
+      "current_version": "0.4.0.dev2",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "queued",
-        "released_date": "2026-05-23",
-        "release_url_state": "published",
-        "note": "Comprehensive-plan policy lookup. Early scaffold; full build queued."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicpermit",
+      "id": "townlight_permitting",
       "name": "Townlight Permitting",
       "arch_tier": 2,
-      "current_version": "0.2.2",
-      "civiccore_requirement": "1.1.0",
+      "current_version": "0.3.0+dev.2",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "queued",
-        "released_date": "2026-05-23",
-        "release_url_state": "published",
-        "note": "Permit pre-application and development-review intake. Early scaffold; full build queued."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicinspect",
+      "id": "townlight_inspections",
       "name": "Townlight Inspections",
       "arch_tier": 2,
-      "current_version": "0.2.2",
-      "civiccore_requirement": "1.1.0",
+      "current_version": "0.3.0+dev.2",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "queued",
-        "released_date": "2026-05-23",
-        "release_url_state": "published",
-        "note": "Inspection assistant foundation. Early scaffold; full build queued."
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicgrants",
-      "name": "Townlight Grants",
-      "arch_tier": 3,
-      "current_version": "0.2.0",
-      "civiccore_requirement": "1.1.0",
-      "public_status": {
-        "grade": "early-scaffold",
-        "released_date": "2026-05-10",
-        "release_url_state": "published",
-        "note": "Grant-opportunity triage and compliance support. Early scaffold; not city-ready."
-      }
-    },
-    {
-      "id": "civicprocure",
-      "name": "Townlight Procurement",
-      "arch_tier": 3,
-      "current_version": "0.2.0",
-      "civiccore_requirement": "1.1.0",
-      "public_status": {
-        "grade": "early-scaffold",
-        "released_date": "2026-05-10",
-        "release_url_state": "published",
-        "note": "Procurement RFP drafting and award-packet support. Early scaffold; not city-ready."
-      }
-    },
-    {
-      "id": "civiccontracts",
-      "name": "Townlight Contracts",
-      "arch_tier": 3,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Contract repository and renewal visibility. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicboards",
-      "name": "Townlight Boards",
-      "arch_tier": 3,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Board and commission administration. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicnotice",
+      "id": "townlight_notice",
       "name": "Townlight Notice",
       "arch_tier": 3,
-      "current_version": "0.2.0",
-      "civiccore_requirement": "1.2.1",
+      "current_version": "0.3.0",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "released",
-        "released_date": "2026-07-03",
-        "release_url_state": "published",
-        "note": "Deterministic deadline, proof, and archive support bundled with Townlight Records beta."
-      }
-    },
-    {
-      "id": "civic311",
-      "name": "Townlight 311",
-      "arch_tier": 4,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Resident service-request intake and Open311 export. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civiccomms",
-      "name": "Townlight Communications",
-      "arch_tier": 4,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Source-backed public explainers and communications support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicdata",
-      "name": "Townlight Data",
-      "arch_tier": 4,
-      "current_version": "0.1.2",
-      "civiccore_requirement": "0.4.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-29",
-        "release_url_state": "published",
-        "note": "Open-data and transparency publishing. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicregwatch",
-      "name": "Townlight Regulatory Watch",
-      "arch_tier": 4,
-      "current_version": null,
-      "civiccore_requirement": null,
-      "public_status": {
-        "grade": "planned",
+        "grade": "candidate",
         "released_date": null,
-        "release_url_state": "none",
-        "note": "Federal regulatory-intelligence module. Detailed spec exists; no runtime repo yet."
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     },
     {
-      "id": "civicapi",
-      "name": "Townlight API",
-      "arch_tier": 4,
-      "current_version": null,
-      "civiccore_requirement": null,
+      "id": "townlight-station",
+      "name": "Townlight Station",
+      "arch_tier": 3,
+      "current_version": "0.3.0",
+      "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "planned",
+        "grade": "candidate",
         "released_date": null,
-        "release_url_state": "none",
-        "note": "Public read-only data gateway. Detailed spec exists; no runtime repo yet."
-      }
-    },
-    {
-      "id": "civichr",
-      "name": "Townlight HR",
-      "arch_tier": 5,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Personnel-policy and HR knowledge support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicbudget",
-      "name": "Townlight Budget",
-      "arch_tier": 5,
-      "current_version": "0.1.2",
-      "civiccore_requirement": "0.4.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-29",
-        "release_url_state": "published",
-        "note": "Budget-narrative and transparency support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civiclegal",
-      "name": "Townlight Legal",
-      "arch_tier": 5,
-      "current_version": "0.1.2",
-      "civiccore_requirement": "0.11.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-29",
-        "release_url_state": "published",
-        "note": "Internal legal-record research support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicelections",
-      "name": "Townlight Elections",
-      "arch_tier": 5,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Election-administration support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicutility",
-      "name": "Townlight Utilities",
-      "arch_tier": 6,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Utility-operations support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civiccourt",
-      "name": "Townlight Courts",
-      "arch_tier": 6,
-      "current_version": "0.1.2",
-      "civiccore_requirement": "0.4.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-29",
-        "release_url_state": "published",
-        "note": "Municipal-court support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicsafety",
-      "name": "Townlight Safety",
-      "arch_tier": 6,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Public-safety administrative support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civiclibrary",
-      "name": "Townlight Library",
-      "arch_tier": 6,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Library-operations support. Schema/spec foundation; not city-ready."
-      }
-    },
-    {
-      "id": "civicparks",
-      "name": "Townlight Parks",
-      "arch_tier": 6,
-      "current_version": "0.1.1",
-      "civiccore_requirement": "0.3.0",
-      "public_status": {
-        "grade": "foundation",
-        "released_date": "2026-04-28",
-        "release_url_state": "published",
-        "note": "Parks-and-recreation support. Schema/spec foundation; not city-ready."
+        "release_url_state": "candidate",
+        "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
       }
     }
   ]

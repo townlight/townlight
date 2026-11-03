@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_ROOT = ROOT / "installer" / "reports"
 REPO_RECLAIM_TARGETS = (
     ROOT / "installer" / "generated",
-    ROOT / "modules" / "civicrecords-ai",
-    ROOT / "modules" / "civicclerk",
-    ROOT / "modules" / "civiccode",
+    ROOT / "modules" / "townlight_records",
+    ROOT / "modules" / "townlight_meetings",
+    ROOT / "modules" / "townlight_code",
 )
 HOST_LINUX_RECLAIM_TARGETS = (
     Path("/usr/local/lib/android"),

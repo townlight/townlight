@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# verify-docs.sh â€” civicsuite umbrella docs sanity check
+# verify-docs.sh â€” townlight umbrella docs sanity check
 # 1) Required artifacts exist
 # 2) No stale current-facing strings (CHANGELOG history exempt)
 # Exits 1 on first failure; prints PASS at the end.
@@ -36,9 +36,9 @@ REQUIRED=(
   docs/architecture/ADR-0004-shared-shell-boundaries.md
   docs/connectors/import-export-template.md
   docs/architecture/ADR-0005-connector-import-export-boundaries.md
-  docs/civiccore/v0.3-extraction-proposal.md
-  docs/architecture/ADR-0006-civiccore-v0-3-extraction-scope.md
-  docs/roadmap/civicclerk-production-depth-workflow.md
+  docs/townlight_core/v0.3-extraction-proposal.md
+  docs/architecture/ADR-0006-townlight_core-v0-3-extraction-scope.md
+  docs/roadmap/townlight_meetings-production-depth-workflow.md
   docs/architecture/ADR-0007-first-production-depth-workflow.md
   docs/github-discussions-seed.md
   scripts/verify-deployment-profile.py
@@ -63,10 +63,10 @@ done
 
 echo "==> Stale current-facing strings check (CHANGELOG, ADRs, SUPERVISOR.md, compatibility history exempt)"
 # Flag stale current-facing strings after the records-ai transfer.
-PATTERN='Phase 0 scaffold|civiccore[^,]{0,30}0\.1\.0|github\.com/scottconverse/civicrecords-ai|scottconverse/civicrecords-ai|will transfer|transfer has not happened|transfer hasn'\''t happened|0\.1\.0\.dev0|0\.1\.1\.dev0|~=0\.2|==0\.2\.0 for current foundation|future modules not created yet|Five additional modules|v0\.1\.0 foundation lane|Status: shipping v0\.1\.0 foundation|Status: shipping v0\.1\.0 runtime foundation|Shipping v0\.1\.0</span>'
+PATTERN='Phase 0 scaffold|townlight_core[^,]{0,30}0\.1\.0|github\.com/scottconverse/townlight_records|scottconverse/townlight_records|will transfer|transfer has not happened|transfer hasn'\''t happened|0\.1\.0\.dev0|0\.1\.1\.dev0|~=0\.2|==0\.2\.0 for current foundation|future modules not created yet|Five additional modules|v0\.1\.0 foundation lane|Status: shipping v0\.1\.0 foundation|Status: shipping v0\.1\.0 runtime foundation|Shipping v0\.1\.0</span>'
 HITS=$(grep -rn -E "$PATTERN" README.md USER-MANUAL.md docs/ \
        --include='*.md' --include='*.html' 2>/dev/null \
-       | grep -vE 'CHANGELOG|docs/architecture/ADR-|docs/SUPERVISOR\.md|docs/compatibility/index\.md|docs/github-discussions-seed\.md|docs/governance/civicrecords-ai-org-transfer-runbook\.md' \
+       | grep -vE 'CHANGELOG|docs/architecture/ADR-|docs/SUPERVISOR\.md|docs/compatibility/index\.md|docs/github-discussions-seed\.md|docs/governance/townlight_records-org-transfer-runbook\.md' \
        || true)
 if [ -n "$HITS" ]; then
   echo "  STALE STRINGS FOUND:"
@@ -78,7 +78,7 @@ echo "==> Release-recovery overclaim check"
 OVERCLAIM_PATTERN='positioned as production-usable|flagship shipping product|developer-finished|clear second-product candidate|productizing second-product candidate|Browser QA passed|browser QA passed|React staff workspace and public portal'
 OVERCLAIM_HITS=$(grep -rn -E "$OVERCLAIM_PATTERN" README.md USER-MANUAL.md docs/ \
        --include='*.md' --include='*.html' 2>/dev/null \
-       | grep -vE 'CHANGELOG|docs/architecture/ADR-|docs/compatibility/index\.md|docs/release-recovery-status\.md|docs/governance/civicrecords-ai-org-transfer-runbook\.md' \
+       | grep -vE 'CHANGELOG|docs/architecture/ADR-|docs/compatibility/index\.md|docs/release-recovery-status\.md|docs/governance/townlight_records-org-transfer-runbook\.md' \
        || true)
 if [ -n "$OVERCLAIM_HITS" ]; then
   echo "  OVERCLAIM STRINGS FOUND:"

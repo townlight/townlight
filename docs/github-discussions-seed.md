@@ -1,6 +1,6 @@
 # GitHub Discussions — Seed Posts
 
-This file contains the seed content for enabling GitHub Discussions on the `civicsuite` umbrella repo. Each section corresponds to one discussion category. Posts should be created (manually or via `gh api`) by a maintainer with their own voice; the text below is a starting point.
+This file contains the seed content for enabling GitHub Discussions on the `townlight` umbrella repo. Each section corresponds to one discussion category. Posts should be created (manually or via `gh api`) by a maintainer with their own voice; the text below is a starting point.
 
 > **Note:** GitHub Discussions must be enabled at the repo level (Settings → General → Features → Discussions) before any of these posts can be created. The umbrella does NOT use a `.github/DISCUSSIONS_SEEDED` marker file.
 
@@ -10,7 +10,7 @@ This file contains the seed content for enabling GitHub Discussions on the `civi
 
 - **Announcements** (announcement type) — release notes, milestones, status updates
 - **Roadmap** (open-ended) — module sequencing, prioritization, suggestions
-- **Architecture** (open-ended) — civiccore design questions, dependency policy, ADR discussion
+- **Architecture** (open-ended) — townlight_core design questions, dependency policy, ADR discussion
 - **Governance** (open-ended) — contribution policy, repo standards, transfer plans
 - **Compatibility** (open-ended) — matrix updates, paired-release coordination
 
@@ -28,10 +28,10 @@ Welcome to the Townlight community space. This post is a snapshot of where the s
 
 **Shipping today:**
 
-- `civiccore` v1.2.0 - the shared platform package for the active city-core profile. Repo: <https://github.com/townlight/core>.
-- `civicrecords-ai` v1.7.3 - open-source FOIA / public records management. Repo: <https://github.com/townlight/sunshine>.
-- `civicclerk` v1.0.4 - meetings, agendas, packets, minutes, notices, votes, and public meeting records. Repo: <https://github.com/townlight/meetings>.
-- `civiccode` v1.0.8 - municipal code search, cited Q&A, and Clerk ordinance handoff support. Repo: <https://github.com/townlight/ordinances>.
+- `townlight_core` v1.2.0 - the shared platform package for the active city-core profile. Repo: <https://github.com/townlight/core>.
+- `townlight_records` v1.7.3 - open-source FOIA / public records management. Repo: <https://github.com/townlight/sunshine>.
+- `townlight_meetings` v1.0.4 - meetings, agendas, packets, minutes, notices, votes, and public meeting records. Repo: <https://github.com/townlight/meetings>.
+- `townlight_code` v1.0.8 - municipal code search, cited Q&A, and Clerk ordinance handoff support. Repo: <https://github.com/townlight/ordinances>.
 
 **Planned or queued:**
 
@@ -39,7 +39,7 @@ Welcome to the Townlight community space. This post is a snapshot of where the s
 
 **What's this umbrella for?**
 
-This `civicsuite` repo is documentation-only. It holds the charter, the spec library, ADRs, the roadmap, governance, and the [civiccore↔module compatibility matrix](../docs/compatibility/index.md). No runtime code. Every module lives in its own repo.
+This `townlight` repo is documentation-only. It holds the charter, the spec library, ADRs, the roadmap, governance, and the [townlight_core↔module compatibility matrix](../docs/compatibility/index.md). No runtime code. Every module lives in its own repo.
 
 **Where to get help / ask questions:** see [SUPPORT.md](../SUPPORT.md).
 
@@ -59,8 +59,8 @@ The reconciled catalog lists 27 product modules across 7 tiers, plus Townlight C
 
 **Two leading candidates:**
 
-1. **civicclerk** (Tier 1) — meetings, agendas, packets, minutes, voting, sunshine-law compliance. The spec is drafted. This is the highest-leverage second module because most municipal staff time outside the records office is spent on the meeting cycle.
-2. **civiczone** (Tier 2) — zoning code and parcel-aware planner workflows. Spec drafted. The technical case for this module is that it's a clean test of the "downstream module inherits civiccore" pattern with a different shape than records-ai.
+1. **townlight_meetings** (Tier 1) — meetings, agendas, packets, minutes, voting, sunshine-law compliance. The spec is drafted. This is the highest-leverage second module because most municipal staff time outside the records office is spent on the meeting cycle.
+2. **townlight_zoning** (Tier 2) — zoning code and parcel-aware planner workflows. Spec drafted. The technical case for this module is that it's a clean test of the "downstream module inherits townlight_core" pattern with a different shape than records-ai.
 
 **Question for the community:**
 
@@ -70,7 +70,7 @@ We'll use this thread to gather signal before locking the next-module decision.
 
 ---
 
-## Architecture — How is civiccore designed, and why is it not a monorepo?
+## Architecture — How is townlight_core designed, and why is it not a monorepo?
 
 **Title:** Why Townlight is a multi-repo, not a monorepo
 
@@ -80,9 +80,9 @@ This question comes up often enough that we want a single canonical thread for i
 
 **Short version:** Cities install one module at a time. A monorepo would imply a single release artifact, which would break the "install only what you need" promise. Each module having its own repo lets module maintainers ship on their own cadence and lets cities pin a specific module version without dragging unrelated changes along.
 
-The full reasoning is in the [civiccore extraction spec](../specs/02_CivicCore.md) section 5.2.
+The full reasoning is in the [townlight_core extraction spec](../specs/02_Townlight Core.md) section 5.2.
 
-**The dependency rule:** Modules depend on civiccore. Civiccore never depends on a module. This is the core architectural constraint and is enforced in CI in the civiccore repo.
+**The dependency rule:** Modules depend on townlight_core. Civiccore never depends on a module. This is the core architectural constraint and is enforced in CI in the townlight_core repo.
 
 If you're considering contributing a new module or are evaluating the architecture for your own civic-tech project, this is the design tradeoff to understand first. Comments and pushback welcome.
 
@@ -90,13 +90,13 @@ If you're considering contributing a new module or are evaluating the architectu
 
 ## Governance — Open-source posture and the records-ai org transfer
 
-**Title:** Plan to transfer civicrecords-ai to the Townlight GitHub org
+**Title:** Plan to transfer townlight_records to the Townlight GitHub org
 
 **Body:**
 
 A status note on a piece of governance some readers may have noticed:
 
-`civicrecords-ai` currently lives at `github.com/townlight/sunshine`. The intent is to transfer the repo to the `CivicSuite` org so all modules live under the same umbrella. This is intentionally not yet done — we want the suite-wide documentation, governance, and contribution standards to settle first so the transfer is a clean handoff rather than a scramble.
+`townlight_records` currently lives at `github.com/townlight/sunshine`. The intent is to transfer the repo to the `Townlight` org so all modules live under the same umbrella. This is intentionally not yet done — we want the suite-wide documentation, governance, and contribution standards to settle first so the transfer is a clean handoff rather than a scramble.
 
 Until the transfer happens, every link to records-ai in our docs uses `townlight/sunshine`. After the transfer, links will be updated and old links will redirect via GitHub's automatic forwarding.
 
@@ -106,7 +106,7 @@ Until the transfer happens, every link to records-ai in our docs uses `townlight
 
 ## Compatibility — How the matrix works and how to read it
 
-**Title:** Reading the civiccore↔module compatibility matrix
+**Title:** Reading the townlight_core↔module compatibility matrix
 
 **Body:**
 
@@ -115,15 +115,15 @@ The compatibility matrix lives at [docs/compatibility/index.md](../docs/compatib
 **How to read a row:**
 
 ```
-| civicrecords-ai | 1.6.1 | see matrix | see matrix | Records workflow compatibility ... |
+| townlight_records | 1.6.1 | see matrix | see matrix | Records workflow compatibility ... |
 ```
 
-Translation: civicrecords-ai version 1.6.1, released after the records 1.6 line, requires the pinned civiccore version recorded in the compatibility matrix. If you install records-ai with a different civiccore version than the matrix permits, behavior is undefined.
+Translation: townlight_records version 1.6.1, released after the records 1.6 line, requires the pinned townlight_core version recorded in the compatibility matrix. If you install records-ai with a different townlight_core version than the matrix permits, behavior is undefined.
 
 **When does the matrix get updated?**
 
-- Every time a module ships a new version that changes its civiccore pin.
-- Every time civiccore ships a new MINOR or MAJOR (PATCH releases of civiccore are pin-compatible by definition).
+- Every time a module ships a new version that changes its townlight_core pin.
+- Every time townlight_core ships a new MINOR or MAJOR (PATCH releases of townlight_core are pin-compatible by definition).
 
 **When does the matrix get audited?**
 

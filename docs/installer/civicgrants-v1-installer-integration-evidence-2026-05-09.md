@@ -8,13 +8,13 @@ Date: 2026-05-09
 
 ## Scope
 
-Controlled shared-infrastructure exception for the active CivicGrants v1.0.0 release. This evidence covers only CivicSuite installer/module-selection metadata and verifier assertions. No queued module product code was changed.
+Controlled shared-infrastructure exception for the active CivicGrants v1.0.0 release. This evidence covers only Townlight installer/module-selection metadata and verifier assertions. No queued module product code was changed.
 
 ## Manifest Evidence
 
 - `installer/modules.json` marks `civicgrants` selectable.
-- `civicgrants` requires CivicCore `1.0.0`.
-- `civicgrants` depends on `civiccore` and `civicrecords-ai`.
+- `civicgrants` requires Townlight Core `1.0.0`.
+- `civicgrants` depends on `townlight_core` and `townlight_records`.
 - `civicgrants` remains included in `full-suite`.
 - `civicgrants` proof requirements now include module selection, install plan, artifact resolution, health check, and restart.
 - `civicgrants` installer status is `v1_0_0_released_installer_plan_verified`.
@@ -24,10 +24,10 @@ Controlled shared-infrastructure exception for the active CivicGrants v1.0.0 rel
 `scripts/verify-installer-plan.py` now asserts:
 
 - the menu model exposes CivicGrants as selectable,
-- the CivicGrants selector requires CivicCore `1.0.0`,
+- the CivicGrants selector requires Townlight Core `1.0.0`,
 - a custom CivicGrants plan includes `civicgrants`,
-- a custom CivicGrants plan includes `civiccore` and `civicrecords-ai`,
-- the CivicGrants install action requires CivicCore `1.0.0`,
+- a custom CivicGrants plan includes `townlight_core` and `townlight_records`,
+- the CivicGrants install action requires Townlight Core `1.0.0`,
 - the CivicGrants install action includes all v1 proof requirements.
 
 ## Commands
@@ -41,7 +41,7 @@ python scripts\plan-installer.py --profile custom --module civicgrants --show-ar
 ## Results
 
 - `VERIFY-INSTALLER-PLAN: PASSED`
-- `modules`: `civiccore`, `civicrecords-ai`, `civicgrants`
+- `modules`: `townlight_core`, `townlight_records`, `civicgrants`
 - `blockers`: none
 - CivicGrants version: `1.0.0`
 - CivicGrants latest local tag after tag fetch: `v1.0.0`
@@ -53,7 +53,7 @@ python scripts\plan-installer.py --profile custom --module civicgrants --show-ar
 
 ## Warnings
 
-The custom plan reports inherited local artifact warnings for CivicCore checksum metadata and CivicRecords AI local `dist` artifacts. These warnings are not CivicGrants blockers; CivicGrants v1.0.0 artifact resolution is successful and the planner reports no blockers.
+The custom plan reports inherited local artifact warnings for Townlight Core checksum metadata and Townlight Records local `dist` artifacts. These warnings are not CivicGrants blockers; CivicGrants v1.0.0 artifact resolution is successful and the planner reports no blockers.
 
 ## Conclusion
 

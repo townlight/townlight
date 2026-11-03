@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115",
   "uvicorn[standard]>=0.30",
-  "civiccore @ {{CIVICCORE_RELEASE_WHEEL_URL}}#sha256={{CIVICCORE_SHA256}}",
+  "townlight_core @ {{TOWNLIGHT_CORE_RELEASE_WHEEL_URL}}#sha256={{TOWNLIGHT_CORE_SHA256}}",
 ]
 
 [project.optional-dependencies]

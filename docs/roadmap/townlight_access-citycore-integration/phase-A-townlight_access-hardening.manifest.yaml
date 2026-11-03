@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: Apache-2.0
+# DRAFT - awaiting Scott's APPROVE before the pipeline runs.
+# Phase A of TownlightAccess city-core integration: harden the MODULE (Postgres default + authz + audit
+# + backup/restore), close probe gaps #2/#3/#4, and cut TownlightAccess v0.4.0. Module-repo work only.
+pipeline_run:
+  id: "2026-06-28-townlight_access-city-core-phaseA-hardening"
+  type: feature
+  target_repo: "Townlight/townlight_access"
+  branch: "feature/citycore-hardening"
+
+  goal: >
+    Bring TownlightAccess to city-core readiness in its own repo by mirroring the shipped TownlightNotice
+    no-AI pattern: default persistence to the shared TownlightCore PostgreSQL, gate persistent writes
+    behind a trusted-write token, emit module audit events, and make backup/restore real. Close the
+    three probe gaps still open at v0.3.0 (#2 staff/public authz boundary, #3 audit logging,
+    #4 backup/restore proof) and cut a v0.4.0 release pinned to the TownlightCore v1.2.0 wheel.
+
+  advances_target: "TownlightAccess city-core integration (Windows Local) - Phase A of A-D"
+  pattern_precedent: "townlight_notice - the shipped no-AI city-core module (see Townlight/townlight_notice)"
+
+  active_scope:
+    summary: >
+      Module code + release only. Probe gap #1 (clean install) is ALREADY closed in v0.3.0 (pyproject
+      pins townlight_core via the v1.2.0 release-asset wheel + SHA256). This phase closes #2/#3/#4 and the
+      ADR-0008/0009 Postgres-baseline gap, then cuts v0.4.0. No umbrella/desktop changes here.
+
+  allowed_paths:
+    - "townlight_access/**"
+    - "pyproject.toml"
+    - "tests/**"
+    - "verify-release.sh"
+    - ".github/workflows/**"
+    - "CHANGELOG.md"
+    - "README.md"
+    - "PROBE-PROGRESS.md"
+
+  forbidden_paths:
+    - "the Townlight/townlight umbrella repo (Phases B-D)"
+    - "any other module repo"
+
+  non_goals:
+    - "No umbrella registry / installer / desktop changes (Phases B-C)."
+    - "No clean-VM gate (Phase D)."
+    - "Do NOT introduce background/queue work - TownlightAccess is deterministic with no tasks (ADR-0009 queue is N/A)."
+    - "Do NOT bump or pin to townlight_access v1.0.0 - that tag regressed to bare townlight_core==1.1.0 (the original probe-fail / a false release)."
+
+  work_items:
+    persistence:
+      - "Move psycopg2-binary from [dev]/optional-dependencies to a RUNTIME dependency."
+      - "Default the review store to the shared TownlightCore Postgres: read the supervisor's DATABASE_URL (postgresql+asyncpg://...:15432) and derive a sync psycopg2 URL for the SQLAlchemy engine; keep SQLite only as an explicit dev fallback, not the default."
+      - "Confirm the existing Postgres code path (CREATE SCHEMA IF NOT EXISTS townlight_access + schema_translate_map + schema_migrations) runs on first connect against Postgres; name the migration 'townlight_access-windows-local-state-v1' to match the record TownlightNotice-style id."
+      - "Add a mandatory Postgres release gate mirroring TownlightNotice's TOWNLIGHT_NOTICE_POSTGRES_TEST_URL: verify-release.sh / CI must run the persistence suite against a real Postgres (env TOWNLIGHT_ACCESS_POSTGRES_TEST_URL) so Postgres coverage cannot be skipped."
+    authz:
+      - "Add a trusted-write guard (TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN + X-Townlight-Access-Write-Token header), mirroring townlight_notice _authorize_persistent_write, on /townlight_access/staff and every persistence-write route (POST /api/v1/townlight_access/review, POST /reviews/{id}/records-export, POST export). Closes probe gap #2."
+    audit:
+      - "Emit module-level audit events on writes/exports (who/what/when), persisted, mirroring the city-core peers' audit posture. Closes probe gap #3."
+    backup_restore:
+      - "Ensure the review DB + exports live under predictable Data/.../access paths the desktop supervisor backup_action/restore_action will capture; add a module backup/restore round-trip test. Closes probe gap #4 (proof, not declaration)."
+
+  expected_outputs:
+    - "TownlightAccess v0.4.0 cut: annotated tag + release, pyproject still pinned to the townlight_core v1.2.0 wheel + SHA256 (NOT bare ==1.1.0); record the v0.4.0 commit SHA for the Phase-C pin."
+    - "Postgres-required release gate green; psycopg2 a runtime dep."
+    - "Write routes reject requests without a valid X-Townlight-Access-Write-Token; tests prove it."
+    - "Audit events emitted + persisted on writes/exports; tests prove it."
+    - "Module backup/restore round-trip test passes against Postgres."
+    - "PROBE-PROGRESS.md updated: gaps #1-#4 marked closed with evidence; #5 (installer) + #6 (current browser-QA) deferred to Phases B-D."
+
+  required_gates:
+    - human_approval_plan
+    - tests_passed         # includes the Postgres-required persistence gate
+    - release_cut_approval # human approves cutting v0.4.0
+    - human_approval_merge
+
+  risk: medium
+
+  rollback_plan: >
+    All changes are additive within the townlight_access repo. Revert the PR to return to v0.3.0 behavior;
+    SQLite dev fallback remains. v0.4.0, once cut, is a normal additive release (no city-core
+    consumption until Phase C pins it), so it can simply be left unreferenced if the plan pauses.
+
+  definition_of_done: >
+    TownlightAccess v0.4.0 is published, installs cleanly in a fresh venv with the townlight_core v1.2.0 wheel
+    pin, defaults its review store to TownlightCore Postgres with a mandatory Postgres release gate,
+    rejects unauthenticated persistent writes, emits audit events, and passes a backup/restore
+    round-trip - i.e. probe gaps #1-#4 are closed with evidence. The v0.4.0 commit SHA is recorded for
+    the Phase-C registry pin.
+
+  director_notes:
+    - "researcher: diff townlight_notice's _authorize_persistent_write + its Postgres release gate (TOWNLIGHT_NOTICE_POSTGRES_TEST_URL) and mirror them 1:1 for townlight_access."
+    - "executor: deterministic module - do NOT add any Ollama/model/queue dependency."
+    - "SUPERSEDED 2026-07-02 (owner directive, see the AMENDED note atop README.md in this directory): the DESKTOP PORT now uses the suite local AI engine with deterministic fallback (PR #220); the upstream Python module this phase hardened stays deterministic as shipped."
+    - "critic: verify the write-token guard actually covers /townlight_access/staff and ALL write routes (the v0.3.0 staff/public split is cosmetic); a missing guard repeats the exact reason TownlightAccess was demoted."

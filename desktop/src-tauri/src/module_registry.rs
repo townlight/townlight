@@ -60,13 +60,13 @@ struct ModuleDefinition {
     #[serde(default)]
     development_version: Option<String>,
     #[serde(default)]
-    development_civiccore_requirement: Option<String>,
+    development_townlight_core_requirement: Option<String>,
     #[serde(default)]
     required: bool,
     #[serde(default)]
     selectable: bool,
     #[serde(default)]
-    civiccore_requirement: Option<String>,
+    townlight_core_requirement: Option<String>,
     #[serde(default)]
     installer_status: Option<String>,
     #[serde(default)]
@@ -120,7 +120,7 @@ pub struct ModuleSummary {
     pub role: String,
     pub version: Option<String>,
     pub installer_status: Option<String>,
-    pub civiccore_requirement: Option<String>,
+    pub townlight_core_requirement: Option<String>,
     pub required: bool,
     pub selectable: bool,
     pub installed: bool,
@@ -284,7 +284,7 @@ fn registry_core_version(registry: &ModuleRegistry) -> Result<&str, String> {
     registry
         .modules
         .iter()
-        .find(|module| module.id == "civiccore")
+        .find(|module| module.id == "townlight_core")
         .and_then(|module| module.current_version.as_deref())
         .ok_or_else(|| "Townlight Core must define current_version".to_string())
 }
@@ -303,6 +303,13 @@ fn core_version_satisfies(installed: &str, required: &str) -> bool {
         Some(parsed)
     }
 
+    // A development cohort is compatible only with its exact pinned build.
+    if let Some((base, development)) = installed.rsplit_once(".dev") {
+        return installed == required
+            && parse_triplet(base).is_some()
+            && !development.is_empty()
+            && development.bytes().all(|value| value.is_ascii_digit());
+    }
     match (parse_triplet(installed), parse_triplet(required)) {
         (
             Some((installed_major, installed_minor, installed_patch)),
@@ -329,11 +336,11 @@ fn validate_installable_module_contract(
     if module.current_version.is_none() {
         return Err(format!("Module {} must define current_version", module.id));
     }
-    if module.id != "civiccore"
+    if module.id != "townlight_core"
         && !module
-            .development_civiccore_requirement
+            .development_townlight_core_requirement
             .as_ref()
-            .or(module.civiccore_requirement.as_ref())
+            .or(module.townlight_core_requirement.as_ref())
             .map(String::as_str)
             .is_some_and(|required| core_version_satisfies(core_version, required))
     {
@@ -402,7 +409,7 @@ fn validate_profile(registry: &ModuleRegistry, profile_id: &str) -> Result<(), S
     if !profile
         .modules
         .iter()
-        .any(|module_id| module_id == "civiccore")
+        .any(|module_id| module_id == "townlight_core")
     {
         return Err(format!(
             "Module profile {profile_id} must include Townlight Core"
@@ -422,7 +429,7 @@ fn validate_module_selection(
     let module_map = module_index(registry);
     let core_version = registry_core_version(registry)?;
     let selected_ids: HashSet<&str> = module_ids.iter().map(String::as_str).collect();
-    if selected_ids.contains("civicplan")
+    if selected_ids.contains("townlight_planning")
         && !matches!(
             label,
             "planning-preview" | "permitting-preview" | "inspections-preview"
@@ -433,14 +440,14 @@ fn validate_module_selection(
                 .into(),
         );
     }
-    if selected_ids.contains("civicpermit")
+    if selected_ids.contains("townlight_permitting")
         && !matches!(label, "permitting-preview" | "inspections-preview")
     {
         return Err(
             "Use the explicit permitting-preview development profile and matching payload.".into(),
         );
     }
-    if selected_ids.contains("civicinspect") && label != "inspections-preview" {
+    if selected_ids.contains("townlight_inspections") && label != "inspections-preview" {
         return Err("Use the explicit inspections-preview profile and matching payload.".into());
     }
     for module_id in module_ids {
@@ -476,15 +483,15 @@ fn resolve_custom_module_order(
     let selected_product_modules: Vec<&str> = selected_modules
         .iter()
         .map(String::as_str)
-        .filter(|module_id| *module_id != "civiccore")
+        .filter(|module_id| *module_id != "townlight_core")
         .collect();
-    if selected_product_modules.contains(&"civicinspect") {
+    if selected_product_modules.contains(&"townlight_inspections") {
         return Err("Use the explicit inspections-preview profile.".into());
     }
-    if selected_product_modules.contains(&"civicpermit") {
+    if selected_product_modules.contains(&"townlight_permitting") {
         return Err("Use the explicit permitting-preview development profile.".into());
     }
-    if selected_product_modules.contains(&"civicplan") {
+    if selected_product_modules.contains(&"townlight_planning") {
         return Err(
             "Use the explicit planning-preview development profile for Townlight Planning.".into(),
         );
@@ -514,7 +521,7 @@ fn resolve_custom_module_order(
         let module = module_map
             .get(module_id)
             .ok_or_else(|| format!("Custom selection references unknown module {module_id}"))?;
-        if module.id != "civiccore" && !module.selectable {
+        if module.id != "townlight_core" && !module.selectable {
             return Err(format!(
                 "Module {} cannot be selected in a custom Windows Local profile.",
                 module.id
@@ -538,7 +545,7 @@ fn resolve_custom_module_order(
     }
 
     visit(
-        "civiccore",
+        "townlight_core",
         &module_map,
         core_version,
         &mut visiting,
@@ -564,7 +571,7 @@ fn validate_custom_selection(
 ) -> Result<(), String> {
     let selected_product_modules: Vec<String> = installed_module_ids
         .iter()
-        .filter(|module_id| module_id.as_str() != "civiccore")
+        .filter(|module_id| module_id.as_str() != "townlight_core")
         .cloned()
         .collect();
     let expected = resolve_custom_module_order(registry, &selected_product_modules)?;
@@ -582,7 +589,7 @@ fn selection_from_installed_and_enabled(
     let module_map = module_index(registry);
     if !installed_module_ids
         .iter()
-        .any(|module_id| module_id == "civiccore")
+        .any(|module_id| module_id == "townlight_core")
     {
         return Err("Townlight Core must stay installed as the local foundation.".to_string());
     }
@@ -594,16 +601,16 @@ fn selection_from_installed_and_enabled(
 
     let mut ordered_module_ids = if installed_module_ids
         .iter()
-        .any(|module_id| module_id != "civiccore")
+        .any(|module_id| module_id != "townlight_core")
     {
         let product_modules = installed_module_ids
             .iter()
-            .filter(|module_id| module_id.as_str() != "civiccore")
+            .filter(|module_id| module_id.as_str() != "townlight_core")
             .cloned()
             .collect::<Vec<_>>();
         resolve_custom_module_order(registry, &product_modules)?
     } else {
-        vec!["civiccore".to_string()]
+        vec!["townlight_core".to_string()]
     };
     if let Some(profile) = registry.profiles.iter().find(|profile| {
         !profile.disabled
@@ -624,9 +631,9 @@ fn selection_from_installed_and_enabled(
         .collect::<Vec<_>>();
     if !enabled_module_ids
         .iter()
-        .any(|module_id| module_id == "civiccore")
+        .any(|module_id| module_id == "townlight_core")
     {
-        enabled_module_ids.insert(0, "civiccore".to_string());
+        enabled_module_ids.insert(0, "townlight_core".to_string());
     }
     let mut seen_enabled = HashSet::new();
     enabled_module_ids.retain(|module_id| seen_enabled.insert(module_id.clone()));
@@ -705,7 +712,7 @@ fn validate_enabled_modules(
         .iter()
         .map(String::as_str)
         .collect();
-    if !enabled.contains("civiccore") {
+    if !enabled.contains("townlight_core") {
         return Err("Townlight Core must stay enabled as the local foundation.".to_string());
     }
     for module_id in &selection.enabled_module_ids {
@@ -922,7 +929,7 @@ pub fn set_module_installed(
         let mut enabled_module_ids = selection.enabled_module_ids.clone();
         let product_modules = installed_module_ids
             .iter()
-            .filter(|installed_id| installed_id.as_str() != "civiccore")
+            .filter(|installed_id| installed_id.as_str() != "townlight_core")
             .cloned()
             .collect::<Vec<_>>();
         let ordered_module_ids = resolve_custom_module_order(&registry, &product_modules)?;
@@ -1053,11 +1060,11 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
         .modules
         .iter()
         .map(|module| {
-            let contract_result = if module.id == "civicinspect" && selection.profile_id != "inspections-preview" {
+            let contract_result = if module.id == "townlight_inspections" && selection.profile_id != "inspections-preview" {
                 Err("Select inspections-preview and its matching candidate payload.".into())
-            } else if module.id == "civicplan" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
+            } else if module.id == "townlight_planning" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
-            } else if module.id == "civicpermit" && !matches!(selection.profile_id.as_str(), "permitting-preview" | "inspections-preview") {
+            } else if module.id == "townlight_permitting" && !matches!(selection.profile_id.as_str(), "permitting-preview" | "inspections-preview") {
                 Err("Select permitting-preview and its matching unsigned candidate payload.".into())
             } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
@@ -1084,7 +1091,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
                     module.current_version.clone()
                 },
                 installer_status: module.installer_status.clone(),
-                civiccore_requirement: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") { module.development_civiccore_requirement.clone().or(module.civiccore_requirement.clone()) } else { module.civiccore_requirement.clone() },
+                townlight_core_requirement: if matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") { module.development_townlight_core_requirement.clone().or(module.townlight_core_requirement.clone()) } else { module.townlight_core_requirement.clone() },
                 required: module.required,
                 selectable: module.selectable,
                 contract_ready,
@@ -1132,15 +1139,15 @@ mod tests {
         let registry = parse_registry(MODULES_JSON).unwrap();
         let selection = selection_for_profile(&registry, "inspections-preview").unwrap();
         for module in [
-            "civicinspect",
-            "civicpermit",
-            "civicplan",
-            "civiccode",
-            "civicrecords-ai",
+            "townlight_inspections",
+            "townlight_permitting",
+            "townlight_planning",
+            "townlight_code",
+            "townlight_records",
         ] {
             assert!(selection.enabled_module_ids.contains(&module.to_string()));
         }
-        assert!(resolve_custom_module_order(&registry, &["civicinspect".into()]).is_err());
+        assert!(resolve_custom_module_order(&registry, &["townlight_inspections".into()]).is_err());
         for profile in [
             "records-beta",
             "meetings-beta",
@@ -1152,7 +1159,7 @@ mod tests {
             assert!(!selection_for_profile(&registry, profile)
                 .unwrap()
                 .enabled_module_ids
-                .contains(&"civicinspect".into()));
+                .contains(&"townlight_inspections".into()));
         }
     }
 
@@ -1161,17 +1168,17 @@ mod tests {
         let registry = parse_registry(MODULES_JSON).unwrap();
         let selected = selection_for_profile(&registry, "permitting-preview").unwrap();
         for id in [
-            "civicpermit",
-            "civicplan",
-            "civiczone",
-            "civiccode",
-            "civicrecords-ai",
+            "townlight_permitting",
+            "townlight_planning",
+            "townlight_zoning",
+            "townlight_code",
+            "townlight_records",
         ] {
             assert!(selected.enabled_module_ids.contains(&id.to_string()));
         }
-        let permit = module_index(&registry)["civicpermit"];
-        assert_eq!(permit.current_version.as_deref(), Some("0.2.2"));
-        assert_eq!(permit.development_version.as_deref(), Some("0.3.0+dev.1"));
+        let permit = module_index(&registry)["townlight_permitting"];
+        assert_eq!(permit.current_version.as_deref(), Some("0.3.0+dev.2"));
+        assert_eq!(permit.development_version.as_deref(), Some("0.3.0+dev.2"));
         for profile in [
             "records-beta",
             "meetings-beta",
@@ -1182,9 +1189,9 @@ mod tests {
             assert!(!selection_for_profile(&registry, profile)
                 .unwrap()
                 .enabled_module_ids
-                .contains(&"civicpermit".to_string()));
+                .contains(&"townlight_permitting".to_string()));
         }
-        assert!(resolve_custom_module_order(&registry, &["civicpermit".to_string()]).is_err());
+        assert!(resolve_custom_module_order(&registry, &["townlight_permitting".to_string()]).is_err());
     }
 
     #[test]
@@ -1193,21 +1200,21 @@ mod tests {
         let selected = selection_for_profile(&registry, "planning-preview").unwrap();
         assert!(selected
             .enabled_module_ids
-            .contains(&"civicplan".to_string()));
+            .contains(&"townlight_planning".to_string()));
         assert!(selected
             .enabled_module_ids
-            .contains(&"civicrecords-ai".to_string()));
-        let plan = module_index(&registry)["civicplan"];
-        assert_eq!(plan.current_version.as_deref(), Some("0.2.2"));
-        assert_eq!(plan.civiccore_requirement.as_deref(), Some("1.1.0"));
-        assert_eq!(plan.development_version.as_deref(), Some("0.3.0+dev.1"));
+            .contains(&"townlight_records".to_string()));
+        let plan = module_index(&registry)["townlight_planning"];
+        assert_eq!(plan.current_version.as_deref(), Some("0.4.0.dev2"));
+        assert_eq!(plan.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
+        assert_eq!(plan.development_version.as_deref(), Some("0.4.0.dev2"));
         assert!(validate_profile(&registry, "land-use").is_err());
-        assert!(resolve_custom_module_order(&registry, &["civicplan".to_string()]).is_err());
+        assert!(resolve_custom_module_order(&registry, &["townlight_planning".to_string()]).is_err());
         for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
             assert!(!selection_for_profile(&registry, profile)
                 .unwrap()
                 .enabled_module_ids
-                .contains(&"civicplan".to_string()));
+                .contains(&"townlight_planning".to_string()));
         }
     }
     use crate::first_run;
@@ -1216,13 +1223,13 @@ mod tests {
     fn with_temp_state_dir<T>(test: impl FnOnce(PathBuf) -> T) -> T {
         let _guard = first_run::test_env_lock().lock().expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-module-registry-test-{}",
+            "townlight-desktop-module-registry-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }
@@ -1237,12 +1244,12 @@ mod tests {
         with_temp_state_dir(|_| {
             let modules = module_summaries().expect("canonical summaries build");
             for (technical_id, expected_public_name) in [
-                ("civiccore", "Townlight Core"),
-                ("civicrecords-ai", "Townlight Records"),
-                ("civicclerk", "Townlight Meetings"),
-                ("civiccode", "Townlight Code"),
-                ("civicnotice", "Townlight Notice"),
-                ("civicaccess", "Townlight Access"),
+                ("townlight_core", "Townlight Core"),
+                ("townlight_records", "Townlight Records"),
+                ("townlight_meetings", "Townlight Meetings"),
+                ("townlight_code", "Townlight Code"),
+                ("townlight_notice", "Townlight Notice"),
+                ("townlight_access", "Townlight Access"),
             ] {
                 let module = modules
                     .iter()
@@ -1261,10 +1268,10 @@ mod tests {
             assert_eq!(
                 selection.installed_module_ids,
                 vec![
-                    "civiccore".to_string(),
-                    "civicrecords-ai".to_string(),
-                    "civicnotice".to_string(),
-                    "civicaccess".to_string()
+                    "townlight_core".to_string(),
+                    "townlight_records".to_string(),
+                    "townlight_notice".to_string(),
+                    "townlight_access".to_string()
                 ]
             );
             assert_eq!(selection.enabled_module_ids, selection.installed_module_ids);
@@ -1290,10 +1297,10 @@ mod tests {
             assert_eq!(
                 selection.installed_module_ids,
                 vec![
-                    "civiccore".to_string(),
-                    "civicrecords-ai".to_string(),
-                    "civicnotice".to_string(),
-                    "civicaccess".to_string(),
+                    "townlight_core".to_string(),
+                    "townlight_records".to_string(),
+                    "townlight_notice".to_string(),
+                    "townlight_access".to_string(),
                 ]
             );
             assert_eq!(selection.enabled_module_ids, selection.installed_module_ids);
@@ -1309,36 +1316,36 @@ mod tests {
             assert!(selected
                 .installed_module_ids
                 .iter()
-                .any(|id| id == "civicclerk"));
+                .any(|id| id == "townlight_meetings"));
             assert!(!selected
                 .installed_module_ids
                 .iter()
-                .any(|id| id == "civiccode"));
+                .any(|id| id == "townlight_code"));
             assert_eq!(
                 module_selection_state().unwrap().profile_id,
                 "meetings-beta"
             );
             assert_eq!(
-                set_module_enabled("civicclerk", false).unwrap().profile_id,
+                set_module_enabled("townlight_meetings", false).unwrap().profile_id,
                 "meetings-beta"
             );
         });
     }
 
     #[test]
-    fn custom_selection_locks_civiccore_and_resolves_ready_modules() {
+    fn custom_selection_locks_townlight_core_and_resolves_ready_modules() {
         with_temp_state_dir(|root| {
             let selection =
-                persist_custom_selection(&["civicclerk".to_string(), "civiccode".to_string()])
+                persist_custom_selection(&["townlight_meetings".to_string(), "townlight_code".to_string()])
                     .expect("custom selection persists");
 
             assert_eq!(selection.profile_id, "custom");
             assert_eq!(
                 selection.installed_module_ids,
                 vec![
-                    "civiccore".to_string(),
-                    "civicclerk".to_string(),
-                    "civiccode".to_string()
+                    "townlight_core".to_string(),
+                    "townlight_meetings".to_string(),
+                    "townlight_code".to_string()
                 ]
             );
             assert_eq!(selection.enabled_module_ids, selection.installed_module_ids);
@@ -1355,13 +1362,13 @@ mod tests {
             let modules = module_summaries().expect("summaries build");
             assert!(modules
                 .iter()
-                .any(|module| module.id == "civiccore" && module.installed));
+                .any(|module| module.id == "townlight_core" && module.installed));
             assert!(modules
                 .iter()
-                .any(|module| module.id == "civicclerk" && module.installed));
+                .any(|module| module.id == "townlight_meetings" && module.installed));
             assert!(modules
                 .iter()
-                .any(|module| module.id == "civicrecords-ai" && !module.installed));
+                .any(|module| module.id == "townlight_records" && !module.installed));
         });
     }
 
@@ -1370,32 +1377,32 @@ mod tests {
         with_temp_state_dir(|_| {
             persist_profile_selection("city-core").expect("profile selection persists");
             let disabled =
-                set_module_enabled("civiccode", false).expect("civiccode can be disabled");
+                set_module_enabled("townlight_code", false).expect("townlight_code can be disabled");
             assert!(disabled
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(!disabled
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             let modules = module_summaries().expect("summaries build");
-            let civiccode = modules
+            let townlight_code = modules
                 .iter()
-                .find(|module| module.id == "civiccode")
-                .expect("civiccode module");
-            assert!(civiccode.installed);
-            assert!(!civiccode.enabled);
+                .find(|module| module.id == "townlight_code")
+                .expect("townlight_code module");
+            assert!(townlight_code.installed);
+            assert!(!townlight_code.enabled);
 
             let enabled =
-                set_module_enabled("civiccode", true).expect("civiccode can be re-enabled");
+                set_module_enabled("townlight_code", true).expect("townlight_code can be re-enabled");
             assert!(enabled
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             let core_error =
-                set_module_enabled("civiccore", false).expect_err("civiccore cannot be disabled");
-            assert!(core_error.contains("Required module civiccore cannot be disabled"));
+                set_module_enabled("townlight_core", false).expect_err("townlight_core cannot be disabled");
+            assert!(core_error.contains("Required module townlight_core cannot be disabled"));
         });
     }
 
@@ -1404,40 +1411,40 @@ mod tests {
         with_temp_state_dir(|_| {
             persist_profile_selection("city-core").expect("profile selection persists");
             let removed =
-                set_module_installed("civiccode", false).expect("civiccode can be removed");
+                set_module_installed("townlight_code", false).expect("townlight_code can be removed");
             assert_eq!(removed.profile_id, "custom");
             assert!(!removed
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(removed
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civicnotice"));
+                .any(|module_id| module_id == "townlight_notice"));
             assert!(!removed
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(removed
                 .disabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             let removed_modules = module_summaries().expect("summaries build");
             assert!(removed_modules
                 .iter()
-                .any(|module| module.id == "civiccode" && !module.installed && !module.enabled));
+                .any(|module| module.id == "townlight_code" && !module.installed && !module.enabled));
 
             let installed =
-                set_module_installed("civiccode", true).expect("civiccode can be reinstalled");
+                set_module_installed("townlight_code", true).expect("townlight_code can be reinstalled");
             assert_eq!(installed.profile_id, "city-core");
             assert!(installed
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(installed
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
         });
     }
 
@@ -1445,53 +1452,53 @@ mod tests {
     fn module_install_remove_respects_contract_boundaries() {
         with_temp_state_dir(|_| {
             persist_profile_selection("minimal").expect("minimal profile persists");
-            let planned = set_module_installed("civicregwatch", true)
+            let planned = set_module_installed("removed-foundation", true)
                 .expect_err("planned module cannot be installed");
-            assert!(planned.contains("not available for Windows Local install"));
+            assert!(planned.contains("missing from the registry"));
 
             let required =
-                set_module_installed("civiccore", false).expect_err("civiccore cannot be removed");
-            assert!(required.contains("Required module civiccore cannot be removed"));
+                set_module_installed("townlight_core", false).expect_err("townlight_core cannot be removed");
+            assert!(required.contains("Required module townlight_core cannot be removed"));
 
             let installed =
-                set_module_installed("civicrecords-ai", true).expect("records can install");
+                set_module_installed("townlight_records", true).expect("records can install");
             assert_eq!(installed.profile_id, "custom");
             assert!(installed
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civicrecords-ai"));
+                .any(|module_id| module_id == "townlight_records"));
         });
     }
 
     #[test]
-    fn civicnotice_installs_with_core_dependency_from_custom_profile() {
+    fn townlight_notice_installs_with_core_dependency_from_custom_profile() {
         with_temp_state_dir(|_| {
             persist_profile_selection("minimal").expect("minimal profile persists");
             let installed =
-                set_module_installed("civicnotice", true).expect("civicnotice can install");
+                set_module_installed("townlight_notice", true).expect("townlight_notice can install");
             assert_eq!(installed.profile_id, "custom");
             assert_eq!(
                 installed.installed_module_ids,
-                vec!["civiccore".to_string(), "civicnotice".to_string()]
+                vec!["townlight_core".to_string(), "townlight_notice".to_string()]
             );
             assert_eq!(installed.enabled_module_ids, installed.installed_module_ids);
 
             let modules = module_summaries().expect("summaries build");
-            let civicnotice = modules
+            let townlight_notice = modules
                 .iter()
-                .find(|module| module.id == "civicnotice")
-                .expect("civicnotice module");
-            assert!(civicnotice.installed);
-            assert!(civicnotice.enabled);
-            assert!(civicnotice.contract_ready);
-            assert_eq!(civicnotice.version.as_deref(), Some("0.2.0"));
-            assert_eq!(civicnotice.civiccore_requirement.as_deref(), Some("1.2.1"));
-            assert!(civicnotice
+                .find(|module| module.id == "townlight_notice")
+                .expect("townlight_notice module");
+            assert!(townlight_notice.installed);
+            assert!(townlight_notice.enabled);
+            assert!(townlight_notice.contract_ready);
+            assert_eq!(townlight_notice.version.as_deref(), Some("0.3.0"));
+            assert_eq!(townlight_notice.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
+            assert!(townlight_notice
                 .backup_restore_hooks
                 .iter()
                 .any(|hook| hook == "Data/workflows/notice"));
-            assert_eq!(civicnotice.model_required, false);
-            assert!(civicnotice.blocked_reason.is_none());
+            assert_eq!(townlight_notice.model_required, false);
+            assert!(townlight_notice.blocked_reason.is_none());
         });
     }
 
@@ -1503,12 +1510,12 @@ mod tests {
                 .expect_err("empty custom selection fails")
                 .contains("at least one product module"));
 
-            let planned = persist_custom_selection(&["civicregwatch".to_string()]);
+            let planned = persist_custom_selection(&["removed-foundation".to_string()]);
             assert!(planned
                 .expect_err("planned module selection fails")
-                .contains("cannot be selected"));
+                .contains("unknown module removed-foundation"));
 
-            let not_ready = persist_custom_selection(&["civicplan".to_string()]);
+            let not_ready = persist_custom_selection(&["townlight_planning".to_string()]);
             assert!(not_ready
                 .expect_err("not-ready module selection fails")
                 .contains("planning-preview development profile"));
@@ -1530,7 +1537,7 @@ mod tests {
                         .disabled_reason
                         .as_deref()
                         .unwrap_or_default()
-                        .contains("not installable")
+                        .contains("remains disabled")
             }));
         });
     }
@@ -1540,58 +1547,58 @@ mod tests {
         with_temp_state_dir(|_| {
             persist_profile_selection("city-core").expect("city-core profile persists");
             let modules = module_summaries().expect("module summaries build");
-            let civiccode = modules
+            let townlight_code = modules
                 .iter()
-                .find(|module| module.id == "civiccode")
-                .expect("civiccode module");
-            assert!(civiccode.installed);
-            assert_eq!(civiccode.civiccore_requirement.as_deref(), Some("1.2.1"));
+                .find(|module| module.id == "townlight_code")
+                .expect("townlight_code module");
+            assert!(townlight_code.installed);
+            assert_eq!(townlight_code.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
             assert_eq!(
-                civiccode.lifecycle_uninstall.as_deref(),
+                townlight_code.lifecycle_uninstall.as_deref(),
                 Some("backup-first-module-data-removal")
             );
             assert_eq!(
-                civiccode.lifecycle_update.as_deref(),
+                townlight_code.lifecycle_update.as_deref(),
                 Some("manifest-versioned")
             );
-            assert!(civiccode
+            assert!(townlight_code
                 .backup_restore_hooks
                 .iter()
                 .any(|hook| hook == "Data/workflows/code"));
-            assert!(civiccode
+            assert!(townlight_code
                 .backup_restore_hooks
                 .iter()
                 .any(|hook| hook == "Data/exports/code"));
-            assert!(civiccode.route_count > 0);
-            assert!(civiccode.service_count > 0);
-            assert!(civiccode.permission_count > 0);
-            assert!(civiccode.task_count > 0);
-            assert!(civiccode.model_required);
-            assert!(civiccode.contract_ready);
-            assert!(civiccode.blocked_reason.is_none());
+            assert!(townlight_code.route_count > 0);
+            assert!(townlight_code.service_count > 0);
+            assert!(townlight_code.permission_count > 0);
+            assert!(townlight_code.task_count > 0);
+            assert!(townlight_code.model_required);
+            assert!(townlight_code.contract_ready);
+            assert!(townlight_code.blocked_reason.is_none());
 
-            let civicaccess = modules
+            let townlight_access = modules
                 .iter()
-                .find(|module| module.id == "civicaccess")
-                .expect("civicaccess module");
+                .find(|module| module.id == "townlight_access")
+                .expect("townlight_access module");
             assert!(
-                civicaccess.model_required,
-                "civicaccess AI features (plain-language, variants, review analysis) require the pinned local model"
+                townlight_access.model_required,
+                "townlight_access AI features (plain-language, variants, review analysis) require the pinned local model"
             );
-            assert!(civicaccess.contract_ready);
-            assert!(civicaccess.blocked_reason.is_none());
+            assert!(townlight_access.contract_ready);
+            assert!(townlight_access.blocked_reason.is_none());
 
-            let civiczone = modules
+            let townlight_zoning = modules
                 .iter()
-                .find(|module| module.id == "civiczone")
+                .find(|module| module.id == "townlight_zoning")
                 .expect("future module");
-            assert!(!civiczone.installed);
+            assert!(!townlight_zoning.installed);
             assert_eq!(
-                civiczone.installer_status.as_deref(),
-                Some("v0_2_2_connected_beta_candidate")
+                townlight_zoning.installer_status.as_deref(),
+                Some("naming_candidate_acceptance_pending")
             );
-            assert!(civiczone.contract_ready);
-            assert!(civiczone.blocked_reason.is_none());
+            assert!(townlight_zoning.contract_ready);
+            assert!(townlight_zoning.blocked_reason.is_none());
         });
     }
 }

@@ -47,7 +47,7 @@ Authenticode and signtool, including timestamps. Receipt source/run matched.
 | File | SHA-256 |
 | --- | --- |
 | `Townlight_1.3.0-1_x64_en-US.msi` (1,632,534,528 bytes) | `c73bc688923297395eac77fd1addcbc542c3b137df8f07ee1f11dea72fdec59e` |
-| Installed `civicsuite-desktop.exe` | `0936c70c0acf241a30c86f8914a90c5c88e4329ab73194e5c266f33907fcf6b7` |
+| Installed `townlight-desktop.exe` | `0936c70c0acf241a30c86f8914a90c5c88e4329ab73194e5c266f33907fcf6b7` |
 
 Signer: `CN=Scott Converse, O=Scott Converse, L=Longmont, S=co, C=US`.
 Certificate thumbprint: `211610DD3231B149519CA51093049E0F4BD50B6C`.

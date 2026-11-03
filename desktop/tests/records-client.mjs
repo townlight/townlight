@@ -28,15 +28,15 @@ const access = createAccessClient(async (command, args) => {accessCalls.push({co
 await access.action("accessibility-review", {title:"Notice", body:"Public text", hasAltText:false, actor:"admin", ai_analysis:"forged"});
 assert.equal(accessCalls[0].command, "access_domain_request");
 assert.deepEqual(accessCalls[0].request.payload, {title:"Notice", body:"Public text", language:"", hasAltText:false});
-await access.action("civicaccess-form-plan", {formName:"Request", fields:"name,contact\nrequest"});
+await access.action("townlight_access-form-plan", {formName:"Request", fields:"name,contact\nrequest"});
 assert.deepEqual(accessCalls[1].request.payload.fields, ["name","contact","request"]);
-assert.throws(() => access.action("civicaccess-tagged-pdf", {headingLevels:"1,2.5"}));
+assert.throws(() => access.action("townlight_access-tagged-pdf", {headingLevels:"1,2.5"}));
 assert.throws(() => access.action("unknown", {}));
 assert.equal(accessCalls.length, 2);
-await access.action("civicaccess-delete-review", {reviewId:"legacy-review"}, {reviews:[{
+await access.action("townlight_access-delete-review", {reviewId:"legacy-review"}, {reviews:[{
   review_id:"legacy-review", canonical_review_id:"a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78"}]});
 assert.equal(accessCalls[2].request.review_id, "a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78");
-assert.throws(() => access.action("civicaccess-records-export", {reviewId:"missing"}, {reviews:[]}));
+assert.throws(() => access.action("townlight_access-records-export", {reviewId:"missing"}, {reviews:[]}));
 console.log("PASS: Access client strips actor/AI injection, translates existing fields, and rejects unsupported actions.");
 const controllerCalls = [];
 const canonical = {records_requests:current.records_requests, authority:"python-records"};

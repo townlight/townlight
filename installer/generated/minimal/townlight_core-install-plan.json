@@ -1,0 +1,21 @@
+{
+  "townlight_core": {
+    "local_artifact": "C:/dev/Codex/townlight_core/dist/townlight_core-1.2.0-py3-none-any.whl",
+    "local_artifact_posix": "/mnt/c/dev/Codex/townlight_core/dist/townlight_core-1.2.0-py3-none-any.whl",
+    "repo_path": "C:\\dev\\Codex\\townlight_core",
+    "verify_command": "python -c \"import townlight_core; print(townlight_core.__version__)\"",
+    "version": "1.2.0"
+  },
+  "generated_by": "scripts/plan-installer.py --generate-install-kit",
+  "modules": [
+    "townlight_core"
+  ],
+  "mutates_host_when_run": true,
+  "operator_boundary": {
+    "does_not_install_system_dependencies": true,
+    "does_not_start_services": true,
+    "generator_mutates_host": false,
+    "installer_scripts_mutate_when_operator_runs_them": true
+  },
+  "profile": "minimal"
+}

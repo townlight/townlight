@@ -1,4 +1,4 @@
-"""City-core contract: one CivicCore suite session works across all four modules."""
+"""City-core contract: one TownlightCore suite session works across all four modules."""
 
 from __future__ import annotations
 
@@ -22,16 +22,16 @@ def _prepend_path(path: Path) -> None:
 
 
 def _load_city_core_modules() -> dict[str, object]:
-    _prepend_path(WORKSPACE_ROOT / "civiccore")
-    _prepend_path(WORKSPACE_ROOT / "civicrecords-ai" / "backend")
-    _prepend_path(WORKSPACE_ROOT / "civicclerk")
-    _prepend_path(WORKSPACE_ROOT / "civiccode")
+    _prepend_path(WORKSPACE_ROOT / "townlight_core")
+    _prepend_path(WORKSPACE_ROOT / "townlight_records" / "backend")
+    _prepend_path(WORKSPACE_ROOT / "townlight_meetings")
+    _prepend_path(WORKSPACE_ROOT / "townlight_code")
 
     records_suite_session_path = (
-        WORKSPACE_ROOT / "civicrecords-ai" / "backend" / "app" / "auth" / "suite_session.py"
+        WORKSPACE_ROOT / "townlight_records" / "backend" / "app" / "auth" / "suite_session.py"
     )
     records_spec = importlib.util.spec_from_file_location(
-        "civicrecords_ai_suite_session_contract",
+        "townlight_records_suite_session_contract",
         records_suite_session_path,
     )
     assert records_spec is not None
@@ -41,10 +41,10 @@ def _load_city_core_modules() -> dict[str, object]:
     records_spec.loader.exec_module(records_module)
 
     return {
-        "core": importlib.import_module("civiccore.auth.suite_session"),
+        "core": importlib.import_module("townlight_core.auth.suite_session"),
         "records": records_module,
-        "clerk": importlib.import_module("civicclerk.suite_session_compat"),
-        "code": importlib.import_module("civiccode.suite_session_auth"),
+        "clerk": importlib.import_module("townlight_meetings.suite_session_compat"),
+        "code": importlib.import_module("townlight_code.suite_session_auth"),
     }
 
 
@@ -54,8 +54,8 @@ def test_one_suite_session_validates_and_revokes_across_city_core_modules(
 ) -> None:
     secret = "city-core-suite-session-contract-secret"
     revocation_file = tmp_path / "shared-suite-session-revocations.json"
-    monkeypatch.setenv("CIVICCORE_SUITE_SESSION_SECRET", secret)
-    monkeypatch.setenv("CIVICCORE_SUITE_SESSION_REVOCATION_FILE", str(revocation_file))
+    monkeypatch.setenv("TOWNLIGHT_CORE_SUITE_SESSION_SECRET", secret)
+    monkeypatch.setenv("TOWNLIGHT_CORE_SUITE_SESSION_REVOCATION_FILE", str(revocation_file))
 
     modules = _load_city_core_modules()
     core = modules["core"]

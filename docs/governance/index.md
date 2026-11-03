@@ -15,11 +15,11 @@ Continuity is now an explicit suite gate, not a deferred governance aspiration.
 - Charter: [`../../CHARTER.md`](../../CHARTER.md)
 - Roadmap: [`../roadmap/index.md`](../roadmap/index.md)
 
-As of 2026-04-29, the `CivicSuite` GitHub org has two active owners: `scottconverse` and `APirateMonk`. The continuity gate is therefore no longer blocked on single-owner concentration; the current on-repo continuity baseline is documented in [`../../SUCCESSION.md`](../../SUCCESSION.md).
+As of 2026-04-29, the `Townlight` GitHub org has two active owners: `scottconverse` and `APirateMonk`. The continuity gate is therefore no longer blocked on single-owner concentration; the current on-repo continuity baseline is documented in [`../../SUCCESSION.md`](../../SUCCESSION.md).
 
 ## Maintainership
 
-Scott Converse is the founding maintainer of the `civicsuite` umbrella, `civiccore`, and `civicrecords-ai` repositories. `APirateMonk` is now the documented continuity backup owner at the organization level while the suite is still in its early governance posture.
+Scott Converse is the founding maintainer of the `townlight` umbrella, `townlight_core`, and `townlight_records` repositories. `APirateMonk` is now the documented continuity backup owner at the organization level while the suite is still in its early governance posture.
 
 Community contributions are welcomed via pull request to any repository. See [`../../CONTRIBUTING.md`](../../CONTRIBUTING.md) for the bug-routing decision tree and contribution process.
 

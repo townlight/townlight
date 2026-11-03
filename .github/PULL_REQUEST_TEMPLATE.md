@@ -26,7 +26,7 @@ If this PR changes a number, version, date, or named fact, confirm:
 ## Verification
 
 - [ ] `bash scripts/verify-docs.sh` passes locally (paste output if relevant)
-- [ ] No stale current-facing strings (Phase 0 scaffold for civiccore, civiccore 0.1.0, records-ai v1.3.0 pending, or old `scottconverse/civicrecords-ai` current-facing URLs)
+- [ ] No stale current-facing strings (Phase 0 scaffold for townlight_core, townlight_core 0.1.0, records-ai v1.3.0 pending, or old `scottconverse/townlight_records` current-facing URLs)
 - [ ] Links verified (no broken references)
 
 ## Related issues / discussions

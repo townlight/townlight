@@ -1,4 +1,4 @@
-"""Lightweight secret-pattern scan for the CivicSuite umbrella repo.
+"""Lightweight secret-pattern scan for the Townlight umbrella repo.
 
 This is not a replacement for a dedicated scanner such as gitleaks in product
 repos. It is a zero-dependency CI ratchet for the umbrella docs/scripts repo.

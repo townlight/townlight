@@ -8,6 +8,9 @@ param(
     [string]$ManifestPath = "",
     [string]$PayloadManifestPath = "",
     [string]$PayloadRoot = "",
+    [string]$CoreRoot = "",
+    [string]$NoticeRoot = "",
+    [string]$AccessRoot = "",
     [string]$RecordsBackendRoot = "",
     [switch]$ReuseInstalledServiceDependencies,
     [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")]
@@ -18,6 +21,7 @@ param(
     [string]$PlanningRoot = "",
     [string]$PermittingRoot = "",
     [string]$InspectionsRoot = "",
+    [string]$StationRoot = "",
     [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
@@ -73,8 +77,8 @@ function Install-PostgisPayload {
     $zipPath = Join-Path $CacheRoot 'postgis-bundle-pg17-3.6.2x64.zip'
     $ExpectedSha256 = $Source.download_sha256
 
-    Invoke-CivicDownload -Url $Source.download_url -Destination $zipPath -ExpectedSha256 $ExpectedSha256
-    $Hash = Test-CivicDownloadHash -Path $zipPath -ExpectedSha256 $ExpectedSha256 -Url $Source.download_url
+    Invoke-TownlightDownload -Url $Source.download_url -Destination $zipPath -ExpectedSha256 $ExpectedSha256
+    $Hash = Test-TownlightDownloadHash -Path $zipPath -ExpectedSha256 $ExpectedSha256 -Url $Source.download_url
 
     $expandRoot = Join-Path $CacheRoot 'postgis-3.6.2'
     Expand-Archive -Path $zipPath -DestinationPath $expandRoot -Force
@@ -112,7 +116,7 @@ function Get-Sha256 {
     }
 }
 
-function Test-CivicDownloadHash {
+function Test-TownlightDownloadHash {
     param(
         [string]$Path,
         [string]$ExpectedSha256,
@@ -125,7 +129,7 @@ function Test-CivicDownloadHash {
     return $ActualSha256
 }
 
-function Join-CivicPath {
+function Join-TownlightPath {
     param(
         [string]$Root,
         [string]$RelativePath
@@ -145,7 +149,7 @@ function Get-PayloadRequiredFileLock {
         [object]$Payload,
         [string]$ProductProfile
     )
-    $SourceRoot = Join-CivicPath -Root $PayloadRoot -RelativePath $Payload.source_dir
+    $SourceRoot = Join-TownlightPath -Root $PayloadRoot -RelativePath $Payload.source_dir
     $Files = @()
     $RequiredFiles = @($Payload.required_files)
     if ($Payload.profile_required_files) {
@@ -155,7 +159,7 @@ function Get-PayloadRequiredFileLock {
         }
     }
     foreach ($RequiredFile in ($RequiredFiles | Select-Object -Unique)) {
-        $Path = Join-CivicPath -Root $SourceRoot -RelativePath $RequiredFile
+        $Path = Join-TownlightPath -Root $SourceRoot -RelativePath $RequiredFile
         if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
             throw "Runtime payload $($Payload.id) is missing required file for lock: $RequiredFile"
         }
@@ -195,7 +199,7 @@ function New-RuntimePayloadLock {
     }
 }
 
-function Invoke-CivicDownload {
+function Invoke-TownlightDownload {
     param(
         [string]$Url,
         [string]$Destination,
@@ -239,7 +243,7 @@ function Invoke-CivicDownload {
                     "--speed-time", "60",
                     "--continue-at", "-",
                     "--output", $TempDestination,
-                    "--user-agent", "CivicSuite-WindowsLocalRuntime/1.0",
+                    "--user-agent", "Townlight-WindowsLocalRuntime/1.0",
                     $Url
                 )
                 & $CurlCommand.Source @CurlArguments
@@ -261,10 +265,10 @@ function Invoke-CivicDownload {
                 if (Test-Path -LiteralPath $TempDestination) {
                     Remove-Item -LiteralPath $TempDestination -Force
                 }
-                Invoke-WebRequest -Uri $Url -OutFile $TempDestination -UseBasicParsing -TimeoutSec 1800 -Headers @{ "User-Agent" = "CivicSuite-WindowsLocalRuntime/1.0" }
+                Invoke-WebRequest -Uri $Url -OutFile $TempDestination -UseBasicParsing -TimeoutSec 1800 -Headers @{ "User-Agent" = "Townlight-WindowsLocalRuntime/1.0" }
             }
             Move-Item -LiteralPath $TempDestination -Destination $Destination -Force
-            return Test-CivicDownloadHash -Path $Destination -ExpectedSha256 $ExpectedSha256 -Url $Url
+            return Test-TownlightDownloadHash -Path $Destination -ExpectedSha256 $ExpectedSha256 -Url $Url
         } catch {
             $LastError = $_
             if ($ExpectedSha256 -and (Test-Path -LiteralPath $Destination)) {
@@ -281,11 +285,11 @@ function Invoke-CivicDownload {
     throw $LastError
 }
 
-function Invoke-CivicRestMethod {
+function Invoke-TownlightRestMethod {
     param(
         [string]$Uri,
         [string]$Label,
-        [hashtable]$Headers = @{ "User-Agent" = "CivicSuite-WindowsLocalRuntime/1.0" }
+        [hashtable]$Headers = @{ "User-Agent" = "Townlight-WindowsLocalRuntime/1.0" }
     )
     $LastError = $null
     for ($Attempt = 1; $Attempt -le 5; $Attempt++) {
@@ -301,7 +305,7 @@ function Invoke-CivicRestMethod {
     throw "$Label failed after 5 attempts: $($LastError.Exception.Message)"
 }
 
-function Expand-CivicZip {
+function Expand-TownlightZip {
     param(
         [string]$Archive,
         [string]$Destination
@@ -591,7 +595,7 @@ function Install-PostgresPayload {
         $ExpectedSha256 = [string]$Source.download_sha256
     }
     try {
-        $Sha = Invoke-CivicDownload -Url $Url -Destination $Archive -ExpectedSha256 $ExpectedSha256
+        $Sha = Invoke-TownlightDownload -Url $Url -Destination $Archive -ExpectedSha256 $ExpectedSha256
     } catch {
         if (-not $Source.download_page) {
             throw
@@ -602,7 +606,7 @@ function Install-PostgresPayload {
             throw
         }
         $Url = $FallbackUrl
-        $Sha = Invoke-CivicDownload -Url $Url -Destination $Archive -ExpectedSha256 $ExpectedSha256
+        $Sha = Invoke-TownlightDownload -Url $Url -Destination $Archive -ExpectedSha256 $ExpectedSha256
     }
     Expand-PostgresServerPayload -Archive $Archive -Destination $Destination
     return @{ status = "installed"; url = $Url; sha256 = $Sha; path = $Destination }
@@ -622,8 +626,8 @@ function Install-PythonPayload {
         $Sha = $null
     } else {
         $Archive = Join-Path $CacheRoot ("python-{0}-embed-amd64.zip" -f $Source.version)
-        $Sha = Invoke-CivicDownload -Url $Source.download_url -Destination $Archive
-        Expand-CivicZip -Archive $Archive -Destination $Destination
+        $Sha = Invoke-TownlightDownload -Url $Source.download_url -Destination $Archive
+        Expand-TownlightZip -Archive $Archive -Destination $Destination
         $Pth = Join-Path $Destination $Source.pth_file
         if (Test-Path -LiteralPath $Pth) {
             $Content = Get-Content -LiteralPath $Pth
@@ -654,7 +658,7 @@ function Write-PythonNoUserSiteGuard {
     $SitePackages = Join-Path $PythonRoot "Lib\site-packages"
     New-Item -ItemType Directory -Force -Path $SitePackages | Out-Null
     @'
-"""Keep the CivicSuite embedded runtime isolated from user Python packages."""
+"""Keep the Townlight embedded runtime isolated from user Python packages."""
 
 from __future__ import annotations
 
@@ -737,7 +741,7 @@ function Ensure-PythonPip {
         return @{ status = "present" }
     }
     $GetPip = Join-Path $CacheRoot "get-pip.py"
-    $Sha = Invoke-CivicDownload -Url $Source.get_pip_url -Destination $GetPip
+    $Sha = Invoke-TownlightDownload -Url $Source.get_pip_url -Destination $GetPip
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
         $GetPip,
         "--no-warn-script-location",
@@ -752,28 +756,28 @@ function Test-PythonServiceImports {
         [string]$ProductProfile
     )
     $ImportNames = @(
-        "civiccore",
-        "app.main",
-        "civicnotice.main",
-        "civicaccess.main",
-        "civicsuite_runtime.services",
-        "civicsuite_runtime.migrate"
+        "townlight_core",
+        "townlight_records.main",
+        "townlight_notice.main",
+        "townlight_access.main",
+        "townlight_runtime.services",
+        "townlight_runtime.migrate"
     )
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $ImportNames += @("civicclerk.main", "civiccode.main")
+        $ImportNames += @("townlight_meetings.main", "townlight_code.main")
     }
     if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $ImportNames += @("civiczone.connected_sources", "civicsuite_runtime.zoning_bridge", "civicsuite_runtime.zoning_records")
+        $ImportNames += @("townlight_zoning.connected_sources", "townlight_runtime.zoning_bridge", "townlight_runtime.zoning_records")
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
-        $ImportNames += @("civicplan.migrations", "civicplan.workflow_store", "civicsuite_runtime.planning_bridge", "app.requests.planning_sources")
+        $ImportNames += @("townlight_planning.migrations", "townlight_planning.workflow_store", "townlight_runtime.planning_bridge", "townlight_records.requests.planning_sources")
     }
     if ($ProductProfile -eq "meetings-beta") {
         $ImportNames += @(
-            "civicclerk.main",
-            "civicclerk.desktop_delivery",
-            "civicclerk.records_sources",
-            "civicsuite_runtime.meetings_bridge"
+            "townlight_meetings.main",
+            "townlight_meetings.desktop_delivery",
+            "townlight_meetings.records_sources",
+            "townlight_runtime.meetings_bridge"
         )
     }
     $ImportCsv = $ImportNames -join ","
@@ -783,7 +787,7 @@ import os
 os.environ.setdefault('TESTING', 'true')
 os.environ.setdefault('PORTAL_MODE', 'private')
 os.environ.setdefault('TOWNLIGHT_PRODUCT_PROFILE', '$ProductProfile')
-os.environ.setdefault('DATABASE_URL', 'postgresql+asyncpg://civicsuite:civicsuite@127.0.0.1:15432/civicsuite')
+os.environ.setdefault('DATABASE_URL', 'postgresql+asyncpg://townlight:townlight@127.0.0.1:15432/townlight')
 for name in '$ImportCsv'.split(','):
     importlib.import_module(name)
 print('Townlight embedded Python service imports verified for $ProductProfile')
@@ -791,14 +795,14 @@ print('Townlight embedded Python service imports verified for $ProductProfile')
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @("-c", $ImportScript)
 }
 
-function Copy-CivicRecordsMigrations {
+function Copy-TownlightRecordsMigrations {
     param(
         [string]$PythonRoot,
         [string]$RepoRoot
     )
-    $SourceRoot = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path }
-    $Destination = Join-Path $PythonRoot "Lib\site-packages\civicsuite_runtime\civicrecords_alembic"
-    $DestinationRoot = [System.IO.Path]::GetFullPath((Join-Path $PythonRoot "Lib\site-packages\civicsuite_runtime"))
+    $SourceRoot = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\sunshine\backend")).Path }
+    $Destination = Join-Path $PythonRoot "Lib\site-packages\townlight_runtime\townlight_records_alembic"
+    $DestinationRoot = [System.IO.Path]::GetFullPath((Join-Path $PythonRoot "Lib\site-packages\townlight_runtime"))
     $DestinationPath = [System.IO.Path]::GetFullPath($Destination)
     if (-not $DestinationPath.StartsWith($DestinationRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "Refusing to reset Townlight Records migration payload outside embedded runtime: $DestinationPath"
@@ -820,51 +824,56 @@ function Install-PythonServicePackages {
         [string]$ProductProfile
     )
     $PipStatus = Ensure-PythonPip -Source $Source -CacheRoot $CacheRoot -PythonRoot $PythonRoot
-    $CivicRecords = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicrecords-ai\backend")).Path }
+    $TownlightRecords = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\sunshine\backend")).Path }
     $RuntimeBridge = (Resolve-Path (Join-Path $RepoRoot "desktop\runtime\python-services")).Path
 
-    $ServicePackages = @($CivicRecords, $RuntimeBridge)
+    $ServicePackages = @($TownlightRecords, $RuntimeBridge)
     if (-not $ReuseInstalledServiceDependencies) {
-        $CivicCore = (Resolve-Path (Join-Path $RepoRoot "..\civiccore")).Path
-        $CivicNotice = (Resolve-Path (Join-Path $RepoRoot "..\civicnotice")).Path
-        $CivicAccess = (Resolve-Path (Join-Path $RepoRoot "..\civicaccess")).Path
-        $ServicePackages += @($CivicNotice, $CivicAccess)
+        $TownlightCore = if ($CoreRoot) { (Resolve-Path $CoreRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\core")).Path }
+        $TownlightNotice = if ($NoticeRoot) { (Resolve-Path $NoticeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\notice")).Path }
+        $TownlightAccess = if ($AccessRoot) { (Resolve-Path $AccessRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\access")).Path }
+        $ServicePackages += @($TownlightNotice, $TownlightAccess)
     }
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
-        $CivicCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civiccode")).Path }
-        $ServicePackages += @($CivicClerk, $CivicCode)
+        $TownlightMeetings = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\meetings")).Path }
+        $TownlightCode = if ($CodeRoot) { (Resolve-Path $CodeRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\ordinances")).Path }
+        $ServicePackages += @($TownlightMeetings, $TownlightCode)
     }
     if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $CivicZone = if ($ZoningRoot) { (Resolve-Path $ZoningRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\zone")).Path }
-        $ServicePackages += @($CivicZone)
+        $TownlightZoning = if ($ZoningRoot) { (Resolve-Path $ZoningRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\zone")).Path }
+        $ServicePackages += @($TownlightZoning)
     }
     $DevelopmentSources = @()
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
         if (-not $PlanningRoot -or -not $RecordsBackendRoot) { throw "planning-preview requires explicit PlanningRoot and RecordsBackendRoot candidate sources." }
         if ($ReuseInstalledServiceDependencies) { throw 'Planning candidate provenance requires all pinned service sources; do not reuse unproven installed dependencies.' }
-        $CivicPlan = (Resolve-Path $PlanningRoot).Path
+        $TownlightPlanning = (Resolve-Path $PlanningRoot).Path
         $PlanningBuild = if ($ProductProfile -eq 'inspections-preview') { Get-InspectionsBuildContract -RepoRoot $RepoRoot } elseif ($ProductProfile -in @('permitting-preview', 'inspections-preview')) { Get-PermittingBuildContract -RepoRoot $RepoRoot } else { Get-PlanningBuildContract -Profile $PlanningBuildProfile -RepoRoot $RepoRoot }
         $CandidatePins = $PlanningBuild.Pins
         $SourceRoots = [ordered]@{
-            'townlight/core' = $CivicCore; 'townlight/sunshine' = $CivicRecords
-            'townlight/meetings' = $CivicClerk; 'townlight/ordinances' = $CivicCode
-            'townlight/zone' = $CivicZone; 'townlight/plan' = $CivicPlan
-            'townlight/notice' = $CivicNotice; 'townlight/access' = $CivicAccess
+            'townlight/core' = $TownlightCore; 'townlight/sunshine' = $TownlightRecords
+            'townlight/meetings' = $TownlightMeetings; 'townlight/ordinances' = $TownlightCode
+            'townlight/zone' = $TownlightZoning; 'townlight/plan' = $TownlightPlanning
+            'townlight/notice' = $TownlightNotice; 'townlight/access' = $TownlightAccess
         }
-        $CandidateSourceRoots = @($CivicRecords, $CivicPlan)
+        $CandidateSourceRoots = @($TownlightRecords, $TownlightPlanning)
         if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
             if (-not $PermittingRoot -or $PlanningBuildProfile -ne $ProductProfile) { throw 'Explicit Permitting source/build profile required.' }
-            $CivicPermit = (Resolve-Path $PermittingRoot).Path
-            $SourceRoots['townlight/permit'] = $CivicPermit
-            $CandidateSourceRoots += $CivicPermit
+            $TownlightPermitting = (Resolve-Path $PermittingRoot).Path
+            $SourceRoots['townlight/permit'] = $TownlightPermitting
+            $CandidateSourceRoots += $TownlightPermitting
         }
         if ($ProductProfile -eq 'inspections-preview') {
             if (-not $InspectionsRoot -or $PlanningBuildProfile -ne 'inspections-preview') { throw 'Explicit Inspections source/build profile required.' }
-            $CivicInspect = (Resolve-Path $InspectionsRoot).Path
-            $SourceRoots['townlight/inspect'] = $CivicInspect
-            $CandidateSourceRoots += $CivicInspect
-            $InspectionTranscriber = Join-Path $CivicInspect 'inspection-transcriber'
+            if (-not $StationRoot) { throw 'Explicit pinned Station Beta 1 source required.' }
+            $TownlightStation = (Resolve-Path -LiteralPath $StationRoot).Path
+            if (-not (Test-Path -LiteralPath (Join-Path $TownlightStation 'townlight_station\media-lock.json'))) { throw 'Station source must be the Beta 1 Python package.' }
+            $TownlightInspections = (Resolve-Path $InspectionsRoot).Path
+            $SourceRoots['townlight/inspect'] = $TownlightInspections
+            $SourceRoots['townlight/station'] = $TownlightStation
+            $CandidateSourceRoots += $TownlightInspections
+            $CandidateSourceRoots += $TownlightStation
+            $InspectionTranscriber = Join-Path $TownlightInspections 'inspection-transcriber'
             if (-not (Test-Path -LiteralPath (Join-Path $InspectionTranscriber 'pyproject.toml'))) { throw 'Pinned Inspections source is missing its accepted transcription package.' }
             $CandidateSourceRoots += $InspectionTranscriber
         }
@@ -885,7 +894,7 @@ function Install-PythonServicePackages {
             if ($LASTEXITCODE -ne 0 -or $Dirty) { throw "Commit candidate source before packaging: $CandidateSource" }
             Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '--no-index', '--wheel-dir', $WheelRoot, $CandidateSource)
         }
-        $ServicePackages = @($ServicePackages | Where-Object { $_ -ne $CivicRecords })
+        $ServicePackages = @($ServicePackages | Where-Object { $_ -ne $TownlightRecords })
         $CandidateWheels = @(Get-ChildItem -LiteralPath $WheelRoot -Filter '*.whl')
         if ($CandidateWheels.Count -ne $CandidateSourceRoots.Count) { throw "Expected one wheel for each pinned candidate package." }
         $ServicePackages += @($CandidateWheels | ForEach-Object { $_.FullName })
@@ -899,8 +908,8 @@ function Install-PythonServicePackages {
         }
     }
     if ($ProductProfile -eq "meetings-beta") {
-        $CivicClerk = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\civicclerk")).Path }
-        $ServicePackages += @($CivicClerk)
+        $TownlightMeetings = if ($MeetingsRoot) { (Resolve-Path $MeetingsRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\meetings")).Path }
+        $ServicePackages += @($TownlightMeetings)
     }
     $ServiceInstallArguments = @(
         "-m", "pip", "install",
@@ -917,7 +926,7 @@ function Install-PythonServicePackages {
         "--disable-pip-version-check",
         "--no-warn-script-location",
         "--no-build-isolation",
-        $CivicCore,
+        $TownlightCore,
         "psycopg2-binary>=2.9.0,<3.0.0",
         "PyMuPDF>=1.26.0,<2.0.0"
     )
@@ -932,26 +941,26 @@ function Install-PythonServicePackages {
     ) + $ServicePackages
     if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
-    Copy-CivicRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
+    Copy-TownlightRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
-        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', "import civicpermit.workflow_store, civicsuite_runtime.permitting_bridge") -ExtraEnvironment @{TESTING='1'}
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', "import townlight_permitting.workflow_store, townlight_runtime.permitting_bridge") -ExtraEnvironment @{TESTING='1'}
     }
     if ($ProductProfile -eq 'inspections-preview') {
-        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import civicinspect.workflow_store, civicsuite_runtime.inspections_bridge, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
-    $InstalledPackages = @("civiccore", "civicrecords-ai", "civicnotice", "civicaccess", "civicsuite-runtime")
+    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $InstalledPackages += @("civicclerk", "civiccode")
+        $InstalledPackages += @("townlight_meetings", "townlight_code")
     }
     if ($ProductProfile -in @("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
-        $InstalledPackages += @("civiczone")
+        $InstalledPackages += @("townlight_zoning")
     }
-    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicplan") }
-    if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("civicpermit") }
-    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("civicinspect", "townlight-inspection-transcriber") }
+    if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_planning") }
+    if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_permitting") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station") }
     if ($ProductProfile -eq "meetings-beta") {
-        $InstalledPackages += @("civicclerk")
+        $InstalledPackages += @("townlight_meetings")
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) {
         $UmbrellaCommit = (& git -C $RepoRoot rev-parse HEAD).Trim()
@@ -962,23 +971,24 @@ function Install-PythonServicePackages {
 import importlib.metadata as metadata
 import json
 from pathlib import Path
-from app.desktop_bridge.router import router
+from townlight_records.desktop_bridge.router import router
 from fastapi import FastAPI
-from civicplan.source_store import PlanSourceRepository
-from civicplan.workflow_store import WorkflowRepository
+from townlight_planning.source_store import PlanSourceRepository
+from townlight_planning.workflow_store import WorkflowRepository
 probe = FastAPI()
 probe.include_router(router)
 route_paths = set(probe.openapi()['paths'])
 assert hasattr(PlanSourceRepository, 'inventory') and hasattr(WorkflowRepository, 'preview_snapshot')
 assert '/desktop/v1/planning-sources/search' in route_paths
-assert metadata.version('civicplan') == '$($PlanningBuild.Contract.planning_package_version)'
-assert metadata.version('civicrecords-ai') == '$($PlanningBuild.RecordsVersion)'
-assert metadata.version('civiccore') == '$($PlanningBuild.Contract.core_package_version)'
+assert metadata.version('townlight_planning') == '$($PlanningBuild.Contract.planning_package_version)'
+assert metadata.version('townlight_records') == '$($PlanningBuild.RecordsVersion)'
+assert metadata.version('townlight_core') == '$($PlanningBuild.Contract.core_package_version)'
 if '$ProductProfile' in ('permitting-preview', 'inspections-preview'):
-    assert metadata.version('civicpermit') == '$($PlanningBuild.Contract.permitting_package_version)'
+    assert metadata.version('townlight_permitting') == '$($PlanningBuild.Contract.permitting_package_version)'
     assert '/desktop/v1/permitting-sources/search' in route_paths
 if '$ProductProfile' == 'inspections-preview':
-    assert metadata.version('civicinspect') == '$($PlanningBuild.Contract.inspections_package_version)'
+    assert metadata.version('townlight_inspections') == '$($PlanningBuild.Contract.inspections_package_version)'
+    assert metadata.version('townlight_station') == '$($PlanningBuild.Contract.station_package_version)'
     assert '/desktop/v1/inspections-sources/search' in route_paths
 path = Path(r'$PythonRoot') / '$ProvenanceName'
 receipt = json.loads(path.read_text(encoding='utf-8-sig'))
@@ -1017,8 +1027,8 @@ function Install-OllamaPayload {
         if ($Source.download_sha256) {
             $ExpectedSha256 = [string]$Source.download_sha256
         }
-        $Sha = Invoke-CivicDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $ExpectedSha256
-        Expand-CivicZip -Archive $Archive -Destination $Destination
+        $Sha = Invoke-TownlightDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $ExpectedSha256
+        Expand-TownlightZip -Archive $Archive -Destination $Destination
         if (-not (Test-Path -LiteralPath (Join-Path $Destination "ollama.exe"))) {
             $Ollama = Get-ChildItem -LiteralPath $Destination -Recurse -Filter "ollama.exe" | Select-Object -First 1
             if ($Ollama) {
@@ -1027,17 +1037,17 @@ function Install-OllamaPayload {
         }
         return @{ status = "installed"; url = $Source.download_url; sha256 = $Sha; version = $Source.version; path = $Destination }
     }
-    $Release = Invoke-CivicRestMethod `
+    $Release = Invoke-TownlightRestMethod `
         -Uri $Source.release_api `
         -Label "Ollama release lookup" `
-        -Headers @{ "User-Agent" = "CivicSuite-runtime-payload" }
+        -Headers @{ "User-Agent" = "Townlight-runtime-payload" }
     $Asset = $Release.assets | Where-Object { $_.name -eq $Source.asset_name_pattern } | Select-Object -First 1
     if (-not $Asset) {
         throw "Could not find Ollama asset $($Source.asset_name_pattern) in latest release."
     }
     $Archive = Join-Path $CacheRoot $Asset.name
-    $Sha = Invoke-CivicDownload -Url $Asset.browser_download_url -Destination $Archive
-    Expand-CivicZip -Archive $Archive -Destination $Destination
+    $Sha = Invoke-TownlightDownload -Url $Asset.browser_download_url -Destination $Archive
+    Expand-TownlightZip -Archive $Archive -Destination $Destination
     if (-not (Test-Path -LiteralPath (Join-Path $Destination "ollama.exe"))) {
         $Ollama = Get-ChildItem -LiteralPath $Destination -Recurse -Filter "ollama.exe" | Select-Object -First 1
         if ($Ollama) {
@@ -1055,14 +1065,14 @@ function Install-InspectionVoicePayload {
     $Archive = Join-Path $CacheRoot 'Townlight-Beta-1-Inspection-Voice-Assets.zip'
     if (-not (Test-Path -LiteralPath $Archive) -or (Get-Sha256 -Path $Archive) -ne $Source.download_sha256) {
         if ($SkipDownloads) { throw 'Pinned inspection voice assets are not cached.' }
-        Invoke-CivicDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $Source.download_sha256 | Out-Null
+        Invoke-TownlightDownload -Url $Source.download_url -Destination $Archive -ExpectedSha256 $Source.download_sha256 | Out-Null
     }
     $Hash = Get-Sha256 -Path $Archive
     if ($Hash -ne $Source.download_sha256) { throw 'Inspection voice archive hash mismatch.' }
     # Add this small asset subtree without resetting the provisioned interpreter.
     Expand-Archive -LiteralPath $Archive -DestinationPath $PythonRoot -Force
     foreach ($Entry in $Source.required_sha256.PSObject.Properties) {
-        $File = Join-CivicPath -Root $PythonRoot -RelativePath $Entry.Name
+        $File = Join-TownlightPath -Root $PythonRoot -RelativePath $Entry.Name
         if (-not (Test-Path -LiteralPath $File) -or (Get-Sha256 -Path $File) -ne $Entry.Value) {
             throw "Inspection voice asset hash mismatch: $($Entry.Name)"
         }

@@ -4,14 +4,14 @@ Use this checklist before creating or promoting any new Townlight module repo. T
 
 ## 1. Authority Read
 
-- Read `docs/CivicSuiteUnifiedSpec.md` and the module's spec section.
+- Read `docs/TownlightUnifiedSpec.md` and the module's spec section.
 - Confirm the module tier in `ARCHITECTURE.md` and `CONSISTENCY.md`.
 - Confirm whether the work is a new module, a planned spec-only module becoming real, or a replacement for an existing repo.
 - Do not use old chat, old release labels, or stale queue files as authority when they conflict with the spec or release-recovery docs.
 
 ## 2. Repository Skeleton
 
-Create the repo under the `CivicSuite` GitHub org with these baseline paths:
+Create the repo under the `Townlight` GitHub org with these baseline paths:
 
 - `pyproject.toml`
 - `README.md`
@@ -35,13 +35,13 @@ Create the repo under the `CivicSuite` GitHub org with these baseline paths:
 
 Use `docs/templates/module-scaffold/` as the starting shape, then replace placeholders before the first commit.
 
-<a id="3-civiccore-dependency"></a>
+<a id="3-townlight_core-dependency"></a>
 
 ## 3. Townlight Core Dependency
 
 - Pin Townlight Core through the current released wheel URL and sha256 when the module is part of a release train.
 - Do not use unreleased archive URLs except as explicitly documented audit evidence.
-- Do not duplicate Townlight Core-owned document ingestion, embeddings, or shared vector storage. Modules may keep domain-specific ranking, structuring, and query logic on top of `civiccore.ingest`.
+- Do not duplicate Townlight Core-owned document ingestion, embeddings, or shared vector storage. Modules may keep domain-specific ranking, structuring, and query logic on top of `townlight_core.ingest`.
 
 ## 4. Release Truth
 
@@ -64,7 +64,7 @@ Update the umbrella repo in the same release train or a dedicated suite-truth PR
 - `CHANGELOG.md`
 - `CONSISTENCY.md`
 - `ARCHITECTURE.md`
-- `docs/CivicSuiteUnifiedSpec.md` shipped-state notes, if any
+- `docs/TownlightUnifiedSpec.md` shipped-state notes, if any
 
 The module is not `v1.0.0` if it is not installable or selectable through the appropriate Townlight installer path.
 
@@ -99,7 +99,7 @@ Minimum checks before a module PR:
 Release workflow checks:
 
 - Use runner-temp caches such as `${RUNNER_TEMP}/.npm` or `${RUNNER_TEMP}/.cache/pip`; do not wipe user-home caches on shared runners.
-- Use label-scoped Docker cleanup only: `civicsuite-cleanroom=1`. Never use unscoped Docker prune commands on shared hosts.
+- Use label-scoped Docker cleanup only: `townlight-cleanroom=1`. Never use unscoped Docker prune commands on shared hosts.
 - Include an always-run cleanup step that tears down the run-specific compose project and removes only labeled cleanroom containers/networks.
 - Add a per-repo cleanroom concurrency mutex: `scott-desktop-cleanroom-${{ github.repository }}`.
 - Frontend modules must add cold `npm ci --prefer-online --no-cache --no-audit --no-fund` plus build/typecheck steps to the cleanroom job.

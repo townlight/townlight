@@ -1,4 +1,4 @@
-"""Run the CivicSuite clerk-core installer lifecycle from a release bundle."""
+"""Run the Townlight clerk-core installer lifecycle from a release bundle."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "installer" / "modules.json"
 REPORT_ROOT = ROOT / "installer" / "reports"
-DEFAULT_INSTALL_ROOT = Path(os.environ.get("CIVICSUITE_INSTALLER_INSTALL_ROOT", ROOT / "installer" / "runtime" / "clerk-core"))
+DEFAULT_INSTALL_ROOT = Path(os.environ.get("TOWNLIGHT_INSTALLER_INSTALL_ROOT", ROOT / "installer" / "runtime" / "clerk-core"))
 
 DEFAULT_RECORDS_PORTS = {"api": 18000, "web": 18080}
 DEFAULT_CLERK_PORTS = {"api": 18776, "web": 18081}
@@ -34,25 +34,25 @@ DEFAULT_ACCESS_PORTS = {"api": 18860}
 DEFAULT_SUITE_LAUNCHER_PORT = 18082
 SUITE_LAUNCHER_SOURCE = ROOT / "installer" / "runtime" / "suite-launcher"
 SUITE_LAUNCHER_DIR_NAME = "suite-launcher"
-SUITE_SESSION_ENV = "CIVICCORE_SUITE_SESSION_SECRET"
-SUITE_SESSION_REVOCATION_ENV = "CIVICCORE_SUITE_SESSION_REVOCATION_FILE"
-SUITE_SESSION_FILE_NAME = "civiccore_suite_session_value"
-SUITE_SESSION_REVOCATION_FILE_NAME = "civiccore_suite_session_revocations.json"
-SUITE_SESSION_REVOCATION_CONTAINER_PATH = f"/civicsuite-shared/{SUITE_SESSION_REVOCATION_FILE_NAME}"
-SUITE_SHARED_BIND = "../../shared:/civicsuite-shared"
-MODULE_RECORDS = "civicrecords-ai"
-MODULE_CLERK = "civicclerk"
-MODULE_CODE = "civiccode"
-MODULE_NOTICE = "civicnotice"
-MODULE_ACCESS = "civicaccess"
+SUITE_SESSION_ENV = "TOWNLIGHT_CORE_SUITE_SESSION_SECRET"
+SUITE_SESSION_REVOCATION_ENV = "TOWNLIGHT_CORE_SUITE_SESSION_REVOCATION_FILE"
+SUITE_SESSION_FILE_NAME = "townlight_core_suite_session_value"
+SUITE_SESSION_REVOCATION_FILE_NAME = "townlight_core_suite_session_revocations.json"
+SUITE_SESSION_REVOCATION_CONTAINER_PATH = f"/townlight-shared/{SUITE_SESSION_REVOCATION_FILE_NAME}"
+SUITE_SHARED_BIND = "../../shared:/townlight-shared"
+MODULE_RECORDS = "townlight_records"
+MODULE_CLERK = "townlight_meetings"
+MODULE_CODE = "townlight_code"
+MODULE_NOTICE = "townlight_notice"
+MODULE_ACCESS = "townlight_access"
 SELECTABLE_MODULES = (MODULE_RECORDS, MODULE_CLERK, MODULE_CODE, MODULE_NOTICE, MODULE_ACCESS)
 DEFAULT_SELECTED_MODULES = (MODULE_RECORDS, MODULE_CLERK)
-EXPECTED_CIVICCORE_VERSION = "1.2.0"
+EXPECTED_TOWNLIGHT_CORE_VERSION = "1.2.0"
 EXPECTED_RECORDS_VERSION = "1.7.3"
 EXPECTED_CLERK_VERSION = "1.0.4"
-EXPECTED_CLERK_CIVICCORE_VERSION = "1.2.1"
+EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION = "1.2.1"
 EXPECTED_CODE_VERSION = "1.0.8"
-EXPECTED_CODE_CIVICCORE_VERSION = "1.2.1"
+EXPECTED_CODE_TOWNLIGHT_CORE_VERSION = "1.2.1"
 EXPECTED_NOTICE_VERSION = "0.2.0"
 EXPECTED_ACCESS_VERSION = "0.4.0"
 SELECTED_MODULES_FILE = "selected-modules.json"
@@ -63,7 +63,7 @@ CLERK_STAFF_MODE_BEARER = "bearer"
 CLERK_WORKFLOW_PROOF_BEARER = "clerk-core-workflow-proof"
 WINDOWS_DOCKER_DESKTOP_BIN = Path("C:/Program Files/Docker/Docker/resources/bin")
 CLERK_OPEN_MODE_WARNING = (
-    "WARNING: --staff-mode open allows anonymous writes to civicclerk endpoints.\n"
+    "WARNING: --staff-mode open allows anonymous writes to townlight_meetings endpoints.\n"
     "WARNING: Use ONLY for local rehearsal. Never on a network-reachable host.\n"
     "WARNING: Re-run with --staff-mode protected for any deployment evaluation."
 )
@@ -103,7 +103,7 @@ def resolve_isolation(
     port_offset: int | None = None,
     compose_project_suffix: str | None = None,
 ) -> dict[str, object]:
-    env_offset = os.environ.get("CIVICSUITE_INSTALLER_PORT_OFFSET")
+    env_offset = os.environ.get("TOWNLIGHT_INSTALLER_PORT_OFFSET")
     resolved_offset = (
         port_offset
         if port_offset is not None
@@ -113,7 +113,7 @@ def resolve_isolation(
     )
     if resolved_offset < 0 or resolved_offset > 5000:
         raise InstallerError("--port-offset must be between 0 and 5000.")
-    suffix = slugify(compose_project_suffix or os.environ.get("CIVICSUITE_INSTALLER_PROJECT_SUFFIX") or run_id)
+    suffix = slugify(compose_project_suffix or os.environ.get("TOWNLIGHT_INSTALLER_PROJECT_SUFFIX") or run_id)
     records_ports = {
         "api": records_api_port or DEFAULT_RECORDS_PORTS["api"] + resolved_offset,
         "web": records_web_port or DEFAULT_RECORDS_PORTS["web"] + resolved_offset,
@@ -138,21 +138,21 @@ def resolve_isolation(
         "isolation_id": suffix,
         "port_offset": resolved_offset,
         "ports": {
-            "civicrecords-ai": records_ports,
-            "civicclerk": clerk_ports,
-            "civiccode": code_ports,
-            "civicnotice": notice_ports,
-            "civicaccess": access_ports,
+            "townlight_records": records_ports,
+            "townlight_meetings": clerk_ports,
+            "townlight_code": code_ports,
+            "townlight_notice": notice_ports,
+            "townlight_access": access_ports,
             "suite-launcher": launcher_ports,
         },
         "compose_projects": {
-            "civicrecords-ai": f"civicsuite-{suffix}-records",
-            "civicclerk": f"civicsuite-{suffix}-clerk",
-            "civiccode": f"civicsuite-{suffix}-code",
-            "civicnotice": f"civicsuite-{suffix}-notice",
-            "civicaccess": f"civicsuite-{suffix}-access",
+            "townlight_records": f"townlight-{suffix}-records",
+            "townlight_meetings": f"townlight-{suffix}-clerk",
+            "townlight_code": f"townlight-{suffix}-code",
+            "townlight_notice": f"townlight-{suffix}-notice",
+            "townlight_access": f"townlight-{suffix}-access",
         },
-        "shared_network": f"civicsuite-{suffix}-citycore",
+        "shared_network": f"townlight-{suffix}-citycore",
     }
 
 
@@ -348,7 +348,7 @@ def normalize_selected_modules(selected_modules: list[str] | tuple[str, ...] | N
     requested = list(selected_modules or DEFAULT_SELECTED_MODULES)
     if not requested:
         raise InstallerError(
-            "Select at least one module: civicrecords-ai, civicclerk, civiccode, civicnotice, or civicaccess."
+            "Select at least one module: townlight_records, townlight_meetings, townlight_code, townlight_notice, or townlight_access."
         )
     normalized: list[str] = []
     for module in requested:
@@ -464,7 +464,7 @@ def copy_suite_launcher_runtime(install_root: Path) -> Path:
         "modules": [
             {
                 "id": "records",
-                "name": "CivicRecords AI",
+                "name": "TownlightRecords",
                 "port": DEFAULT_RECORDS_PORTS["web"],
                 "href": f"http://127.0.0.1:{DEFAULT_RECORDS_PORTS['web']}/",
                 "staffAction": "Review requests",
@@ -473,7 +473,7 @@ def copy_suite_launcher_runtime(install_root: Path) -> Path:
             },
             {
                 "id": "clerk",
-                "name": "CivicClerk",
+                "name": "TownlightMeetings",
                 "port": DEFAULT_CLERK_PORTS["web"],
                 "href": f"http://127.0.0.1:{DEFAULT_CLERK_PORTS['web']}/",
                 "staffAction": "Prepare agendas and minutes",
@@ -482,7 +482,7 @@ def copy_suite_launcher_runtime(install_root: Path) -> Path:
             },
             {
                 "id": "code",
-                "name": "CivicCode",
+                "name": "TownlightCode",
                 "port": DEFAULT_CODE_PORTS["api"],
                 "href": f"http://127.0.0.1:{DEFAULT_CODE_PORTS['api']}/",
                 "staffAction": "Codify adopted ordinances",
@@ -496,12 +496,12 @@ def copy_suite_launcher_runtime(install_root: Path) -> Path:
             "value_persisted_in_report": False,
         },
     }
-    (target / "civicsuite-launcher-config.json").write_text(
+    (target / "townlight-launcher-config.json").write_text(
         json.dumps(config, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    (target / "civicsuite-launcher-config.js").write_text(
-        "window.CIVICSUITE_LAUNCHER_CONFIG = "
+    (target / "townlight-launcher-config.js").write_text(
+        "window.TOWNLIGHT_LAUNCHER_CONFIG = "
         + json.dumps(config, indent=2, sort_keys=True)
         + ";\n",
         encoding="utf-8",
@@ -546,7 +546,7 @@ def copy_source(source: Path, target: Path) -> None:
         "docs/playwright-report",
         "docs/superpowers",
         "superpowers",
-        "run-civicclerk-cleanroom.sh",
+        "run-townlight_meetings-cleanroom.sh",
         "dist",
         "build",
         ".venv",
@@ -599,11 +599,11 @@ def write_records_env(
     suite_session_value: str | None = None,
 ) -> None:
     if portal_mode not in {"private", "public"}:
-        raise InstallerError("CivicRecords PORTAL_MODE must be either 'private' or 'public'.")
+        raise InstallerError("TownlightRecords PORTAL_MODE must be either 'private' or 'public'.")
     ensure_records_secret_files(target.parent)
     values = {
-        "DATABASE_URL": "postgresql+asyncpg://civicrecords:civicrecords@postgres:5432/civicrecords",
-        "FIRST_ADMIN_EMAIL": os.environ.get("CIVICSUITE_FIRST_ADMIN_EMAIL", "admin@example.gov"),
+        "DATABASE_URL": "postgresql+asyncpg://townlight_records:townlight_records@postgres:5432/townlight_records",
+        "FIRST_ADMIN_EMAIL": os.environ.get("TOWNLIGHT_FIRST_ADMIN_EMAIL", "admin@example.gov"),
         "OLLAMA_BASE_URL": "http://ollama:11434",
         "REDIS_URL": "redis://redis:6379/0",
         "AUDIT_RETENTION_DAYS": "1095",
@@ -629,7 +629,7 @@ def write_records_env(
 
 
 def write_records_override(target: Path, ports: dict[str, int]) -> Path:
-    path = target / "docker-compose.civicsuite.override.yml"
+    path = target / "docker-compose.townlight.override.yml"
     path.write_text(
         f"""services:
   api:
@@ -650,7 +650,7 @@ def write_records_override(target: Path, ports: dict[str, int]) -> Path:
 
 
 def write_clerk_handoff_override(target: Path, shared_network: str) -> Path:
-    path = target / "docker-compose.civicsuite.override.yml"
+    path = target / "docker-compose.townlight.override.yml"
     path.write_text(
         f"""services:
   api:
@@ -673,7 +673,7 @@ networks:
 
 
 def write_code_handoff_override(target: Path, shared_network: str) -> Path:
-    path = target / "docker-compose.civicsuite.override.yml"
+    path = target / "docker-compose.townlight.override.yml"
     path.write_text(
         f"""services:
   api:
@@ -685,7 +685,7 @@ def write_code_handoff_override(target: Path, shared_network: str) -> Path:
       default: {{}}
       citycore_handoff:
         aliases:
-          - civiccode-api
+          - townlight_code-api
 networks:
   citycore_handoff:
     external: true
@@ -765,9 +765,9 @@ NGINX
     }
 }
 """
-    (target / "nginx-civicsuite.conf").write_text(config, encoding="utf-8", newline="\n")
+    (target / "nginx-townlight.conf").write_text(config, encoding="utf-8", newline="\n")
     dockerfile.write_text(
-        text.replace(heredoc, "# SPA fallback + API proxy\nCOPY nginx-civicsuite.conf /etc/nginx/conf.d/default.conf\n"),
+        text.replace(heredoc, "# SPA fallback + API proxy\nCOPY nginx-townlight.conf /etc/nginx/conf.d/default.conf\n"),
         encoding="utf-8",
         newline="\n",
     )
@@ -812,8 +812,8 @@ def write_clerk_env(
     *,
     staff_mode: str = CLERK_STAFF_MODE_PROTECTED,
     ports: dict[str, int] | None = None,
-    civiccode_intake_url: str | None = None,
-    civiccode_intake_secret: str | None = None,
+    townlight_code_intake_url: str | None = None,
+    townlight_code_intake_secret: str | None = None,
     suite_session_value: str | None = None,
 ) -> None:
     resolved_ports = ports or DEFAULT_CLERK_PORTS
@@ -823,35 +823,35 @@ def write_clerk_env(
             ensure_env_value(target, SUITE_SESSION_REVOCATION_ENV, SUITE_SESSION_REVOCATION_CONTAINER_PATH)
         return
     values = {
-        "CIVICCLERK_POSTGRES_USER": "civicclerk",
-        "CIVICCLERK_POSTGRES_PASSWORD": secrets.token_hex(24),
-        "CIVICCLERK_POSTGRES_DB": "civicclerk",
-        "CIVICCLERK_API_PORT": str(resolved_ports["api"]),
-        "CIVICCLERK_WEB_PORT": str(resolved_ports["web"]),
-        "CIVICCLERK_STAFF_AUTH_MODE": staff_mode,
-        "CIVICCLERK_DEMO_SEED": "1",
-        "CIVICCLERK_CONNECTOR_SYNC_ENABLED": "false",
-        "CIVICCLERK_CONNECTOR_SYNC_PAYLOAD_DIR_HOST": "./connector-imports",
-        "CIVICCLERK_CONNECTOR_SYNC_LEDGER_PATH": "/data/exports/connector-import-ledger.json",
-        "CIVICCLERK_CONNECTOR_SYNC_CONNECTORS": "",
-        "CIVICCLERK_CONNECTOR_SYNC_INTERVAL_SECONDS": "900",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_ENABLED": "false",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_SCHEDULE_ENABLED": "false",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_SOURCE_IDS": "",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_AUTH_SECRET_ENV": "CIVICCLERK_VENDOR_NETWORK_SYNC_SHARED_SECRET",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_AUTH_SECRET_ENV_PREFIX": "CIVICCLERK_VENDOR_SECRET_",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_SHARED_SECRET": "",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_REPORT_DIR": "/data/exports/vendor-network-sync",
-        "CIVICCLERK_VENDOR_NETWORK_SYNC_INTERVAL_SECONDS": "900",
-        "CIVICCODE_INTAKE_URL": civiccode_intake_url or "",
-        "CIVICCODE_INTAKE_SECRET": civiccode_intake_secret or "",
-        "CIVICCODE_INTAKE_ACTOR": "civicclerk-handoff@citycore.example.gov",
+        "TOWNLIGHT_MEETINGS_POSTGRES_USER": "townlight_meetings",
+        "TOWNLIGHT_MEETINGS_POSTGRES_PASSWORD": secrets.token_hex(24),
+        "TOWNLIGHT_MEETINGS_POSTGRES_DB": "townlight_meetings",
+        "TOWNLIGHT_MEETINGS_API_PORT": str(resolved_ports["api"]),
+        "TOWNLIGHT_MEETINGS_WEB_PORT": str(resolved_ports["web"]),
+        "TOWNLIGHT_MEETINGS_STAFF_AUTH_MODE": staff_mode,
+        "TOWNLIGHT_MEETINGS_DEMO_SEED": "1",
+        "TOWNLIGHT_MEETINGS_CONNECTOR_SYNC_ENABLED": "false",
+        "TOWNLIGHT_MEETINGS_CONNECTOR_SYNC_PAYLOAD_DIR_HOST": "./connector-imports",
+        "TOWNLIGHT_MEETINGS_CONNECTOR_SYNC_LEDGER_PATH": "/data/exports/connector-import-ledger.json",
+        "TOWNLIGHT_MEETINGS_CONNECTOR_SYNC_CONNECTORS": "",
+        "TOWNLIGHT_MEETINGS_CONNECTOR_SYNC_INTERVAL_SECONDS": "900",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_ENABLED": "false",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_SCHEDULE_ENABLED": "false",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_SOURCE_IDS": "",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_AUTH_SECRET_ENV": "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_SHARED_SECRET",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_AUTH_SECRET_ENV_PREFIX": "TOWNLIGHT_MEETINGS_VENDOR_SECRET_",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_SHARED_SECRET": "",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_REPORT_DIR": "/data/exports/vendor-network-sync",
+        "TOWNLIGHT_MEETINGS_VENDOR_NETWORK_SYNC_INTERVAL_SECONDS": "900",
+        "TOWNLIGHT_CODE_INTAKE_URL": townlight_code_intake_url or "",
+        "TOWNLIGHT_CODE_INTAKE_SECRET": townlight_code_intake_secret or "",
+        "TOWNLIGHT_CODE_INTAKE_ACTOR": "townlight_meetings-handoff@citycore.example.gov",
     }
     if suite_session_value:
         values[SUITE_SESSION_ENV] = suite_session_value
         values[SUITE_SESSION_REVOCATION_ENV] = SUITE_SESSION_REVOCATION_CONTAINER_PATH
     if staff_mode == CLERK_STAFF_MODE_BEARER:
-        values["CIVICCLERK_STAFF_AUTH_TOKEN_ROLES"] = json.dumps(
+        values["TOWNLIGHT_MEETINGS_STAFF_AUTH_TOKEN_ROLES"] = json.dumps(
             {CLERK_WORKFLOW_PROOF_BEARER: ["clerk_admin", "meeting_editor"]},
             separators=(",", ":"),
         )
@@ -862,7 +862,7 @@ def write_code_env(
     target: Path,
     ports: dict[str, int],
     *,
-    civiccode_intake_secret: str | None = None,
+    townlight_code_intake_secret: str | None = None,
     suite_session_value: str | None = None,
 ) -> None:
     if target.is_file():
@@ -871,18 +871,18 @@ def write_code_env(
             ensure_env_value(target, SUITE_SESSION_REVOCATION_ENV, SUITE_SESSION_REVOCATION_CONTAINER_PATH)
         return
     password = secrets.token_hex(24)
-    db_url = f"postgresql+psycopg2://civiccode:{password}@postgres:5432/civiccode"
+    db_url = f"postgresql+psycopg2://townlight_code:{password}@postgres:5432/townlight_code"
     values = {
-        "POSTGRES_DB": "civiccode",
-        "POSTGRES_USER": "civiccode",
+        "POSTGRES_DB": "townlight_code",
+        "POSTGRES_USER": "townlight_code",
         "POSTGRES_PASSWORD": password,
-        "CIVICCODE_PORT": str(ports["api"]),
+        "TOWNLIGHT_CODE_PORT": str(ports["api"]),
         "DATABASE_URL": db_url,
-        "CIVICCODE_SOURCE_REGISTRY_DB_URL": db_url,
-        "CIVICCODE_DEMO_SEED": "1",
-        "CIVICCODE_DEMO_ACTOR": "demo-seed@citycore.example.gov",
-        "CIVICCODE_STAFF_TRUSTED_PROXY_CIDRS": "127.0.0.1/32,::1/128",
-        "CIVICCODE_INTAKE_SECRET": civiccode_intake_secret or "",
+        "TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL": db_url,
+        "TOWNLIGHT_CODE_DEMO_SEED": "1",
+        "TOWNLIGHT_CODE_DEMO_ACTOR": "demo-seed@citycore.example.gov",
+        "TOWNLIGHT_CODE_STAFF_TRUSTED_PROXY_CIDRS": "127.0.0.1/32,::1/128",
+        "TOWNLIGHT_CODE_INTAKE_SECRET": townlight_code_intake_secret or "",
     }
     if suite_session_value:
         values[SUITE_SESSION_ENV] = suite_session_value
@@ -897,14 +897,14 @@ def write_notice_env(target: Path, ports: dict[str, int]) -> None:
     if target.is_file():
         return
     password = secrets.token_hex(24)
-    db_url = f"postgresql+psycopg2://civicnotice:{password}@postgres:5432/civicnotice"
+    db_url = f"postgresql+psycopg2://townlight_notice:{password}@postgres:5432/townlight_notice"
     values = {
-        "POSTGRES_DB": "civicnotice",
-        "POSTGRES_USER": "civicnotice",
+        "POSTGRES_DB": "townlight_notice",
+        "POSTGRES_USER": "townlight_notice",
         "POSTGRES_PASSWORD": password,
-        "CIVICNOTICE_API_PORT": str(ports["api"]),
-        "CIVICNOTICE_WORKPAPER_DB_URL": db_url,
-        "CIVICNOTICE_TRUSTED_WRITE_TOKEN": secrets.token_urlsafe(32),
+        "TOWNLIGHT_NOTICE_API_PORT": str(ports["api"]),
+        "TOWNLIGHT_NOTICE_WORKPAPER_DB_URL": db_url,
+        "TOWNLIGHT_NOTICE_TRUSTED_WRITE_TOKEN": secrets.token_urlsafe(32),
     }
     target.write_text(
         "\n".join(f"{key}={value}" for key, value in values.items()) + "\n",
@@ -913,7 +913,7 @@ def write_notice_env(target: Path, ports: dict[str, int]) -> None:
 
 
 def write_notice_compose(source: Path) -> None:
-    dockerfile = source / "Dockerfile.civicsuite"
+    dockerfile = source / "Dockerfile.townlight"
     if not dockerfile.is_file():
         dockerfile.write_text(
             """FROM python:3.11-slim
@@ -923,7 +923,7 @@ ENV PYTHONUNBUFFERED=1
 COPY . /app
 RUN pip install --no-cache-dir . "psycopg2-binary>=2.9,<3.0"
 EXPOSE 8000
-CMD ["uvicorn", "civicnotice.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "townlight_notice.main:app", "--host", "0.0.0.0", "--port", "8000"]
 """,
             encoding="utf-8",
             newline="\n",
@@ -935,11 +935,11 @@ CMD ["uvicorn", "civicnotice.main:app", "--host", "0.0.0.0", "--port", "8000"]
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-civicnotice}
-      POSTGRES_USER: ${POSTGRES_USER:-civicnotice}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-civicnotice}
+      POSTGRES_DB: ${POSTGRES_DB:-townlight_notice}
+      POSTGRES_USER: ${POSTGRES_USER:-townlight_notice}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-townlight_notice}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-civicnotice} -d ${POSTGRES_DB:-civicnotice}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-townlight_notice} -d ${POSTGRES_DB:-townlight_notice}"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -948,15 +948,15 @@ CMD ["uvicorn", "civicnotice.main:app", "--host", "0.0.0.0", "--port", "8000"]
   api:
     build:
       context: .
-      dockerfile: Dockerfile.civicsuite
+      dockerfile: Dockerfile.townlight
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      CIVICNOTICE_WORKPAPER_DB_URL: ${CIVICNOTICE_WORKPAPER_DB_URL}
-      CIVICNOTICE_TRUSTED_WRITE_TOKEN: ${CIVICNOTICE_TRUSTED_WRITE_TOKEN}
+      TOWNLIGHT_NOTICE_WORKPAPER_DB_URL: ${TOWNLIGHT_NOTICE_WORKPAPER_DB_URL}
+      TOWNLIGHT_NOTICE_TRUSTED_WRITE_TOKEN: ${TOWNLIGHT_NOTICE_TRUSTED_WRITE_TOKEN}
     ports:
-      - "${CIVICNOTICE_API_PORT:-18866}:8000"
+      - "${TOWNLIGHT_NOTICE_API_PORT:-18866}:8000"
     healthcheck:
       test:
         - CMD-SHELL
@@ -977,14 +977,14 @@ def write_access_env(target: Path, ports: dict[str, int]) -> None:
     if target.is_file():
         return
     password = secrets.token_hex(24)
-    db_url = f"postgresql+psycopg2://civicaccess:{password}@postgres:5432/civicaccess"
+    db_url = f"postgresql+psycopg2://townlight_access:{password}@postgres:5432/townlight_access"
     values = {
-        "POSTGRES_DB": "civicaccess",
-        "POSTGRES_USER": "civicaccess",
+        "POSTGRES_DB": "townlight_access",
+        "POSTGRES_USER": "townlight_access",
         "POSTGRES_PASSWORD": password,
-        "CIVICACCESS_API_PORT": str(ports["api"]),
-        "CIVICACCESS_REVIEW_DB_URL": db_url,
-        "CIVICACCESS_TRUSTED_WRITE_TOKEN": secrets.token_urlsafe(32),
+        "TOWNLIGHT_ACCESS_API_PORT": str(ports["api"]),
+        "TOWNLIGHT_ACCESS_REVIEW_DB_URL": db_url,
+        "TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN": secrets.token_urlsafe(32),
     }
     target.write_text(
         "\n".join(f"{key}={value}" for key, value in values.items()) + "\n",
@@ -993,7 +993,7 @@ def write_access_env(target: Path, ports: dict[str, int]) -> None:
 
 
 def write_access_compose(source: Path) -> None:
-    dockerfile = source / "Dockerfile.civicsuite"
+    dockerfile = source / "Dockerfile.townlight"
     if not dockerfile.is_file():
         dockerfile.write_text(
             """FROM python:3.11-slim
@@ -1003,7 +1003,7 @@ ENV PYTHONUNBUFFERED=1
 COPY . /app
 RUN pip install --no-cache-dir . "psycopg2-binary>=2.9,<3.0"
 EXPOSE 8000
-CMD ["uvicorn", "civicaccess.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "townlight_access.main:app", "--host", "0.0.0.0", "--port", "8000"]
 """,
             encoding="utf-8",
             newline="\n",
@@ -1015,11 +1015,11 @@ CMD ["uvicorn", "civicaccess.main:app", "--host", "0.0.0.0", "--port", "8000"]
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-civicaccess}
-      POSTGRES_USER: ${POSTGRES_USER:-civicaccess}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-civicaccess}
+      POSTGRES_DB: ${POSTGRES_DB:-townlight_access}
+      POSTGRES_USER: ${POSTGRES_USER:-townlight_access}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-townlight_access}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-civicaccess} -d ${POSTGRES_DB:-civicaccess}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-townlight_access} -d ${POSTGRES_DB:-townlight_access}"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -1028,15 +1028,15 @@ CMD ["uvicorn", "civicaccess.main:app", "--host", "0.0.0.0", "--port", "8000"]
   api:
     build:
       context: .
-      dockerfile: Dockerfile.civicsuite
+      dockerfile: Dockerfile.townlight
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      CIVICACCESS_REVIEW_DB_URL: ${CIVICACCESS_REVIEW_DB_URL}
-      CIVICACCESS_TRUSTED_WRITE_TOKEN: ${CIVICACCESS_TRUSTED_WRITE_TOKEN}
+      TOWNLIGHT_ACCESS_REVIEW_DB_URL: ${TOWNLIGHT_ACCESS_REVIEW_DB_URL}
+      TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN: ${TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN}
     ports:
-      - "${CIVICACCESS_API_PORT:-18860}:8000"
+      - "${TOWNLIGHT_ACCESS_API_PORT:-18860}:8000"
     healthcheck:
       test:
         - CMD-SHELL
@@ -1055,7 +1055,7 @@ volumes:
 
 def compose(project: str, source: Path, *args: str) -> list[str]:
     command = [docker_command(), "compose", "-p", project, "-f", "docker-compose.yml"]
-    override = source / "docker-compose.civicsuite.override.yml"
+    override = source / "docker-compose.townlight.override.yml"
     if override.is_file():
         command.extend(["-f", override.name])
     command.extend(args)
@@ -1294,10 +1294,10 @@ def verify_clerk_protected_default(ports: dict[str, int]) -> dict[str, object]:
     try:
         status, readiness = get_json(f"{base}/staff/auth-readiness")
     except (OSError, json.JSONDecodeError) as exc:
-        return {"name": "civicclerk_protected_default", "status": "failed", "error": str(exc), "checks": checks}
+        return {"name": "townlight_meetings_protected_default", "status": "failed", "error": str(exc), "checks": checks}
     checks.append({"name": "auth_readiness", "status_code": status, "payload": readiness})
     if status != 200 or readiness.get("mode") != CLERK_STAFF_MODE_PROTECTED:
-        return {"name": "civicclerk_protected_default", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_protected_default", "status": "failed", "checks": checks}
 
     write_probes = [
         ("meeting_bodies", "/meeting-bodies", {"name": "City Council", "body_type": "city_council"}),
@@ -1309,8 +1309,8 @@ def verify_clerk_protected_default(ports: dict[str, int]) -> dict[str, object]:
         status_code, body = post_json(f"{base}{path}", payload)
         checks.append({"name": name, "path": path, "status_code": status_code, "payload": body})
         if status_code != 401:
-            return {"name": "civicclerk_protected_default", "status": "failed", "checks": checks}
-    return {"name": "civicclerk_protected_default", "status": "passed", "checks": checks}
+            return {"name": "townlight_meetings_protected_default", "status": "failed", "checks": checks}
+    return {"name": "townlight_meetings_protected_default", "status": "passed", "checks": checks}
 
 
 def verify_records_portal_mode(ports: dict[str, int], *, expected_mode: str) -> dict[str, object]:
@@ -1332,7 +1332,7 @@ def verify_records_portal_mode(ports: dict[str, int], *, expected_mode: str) -> 
             }
         )
     except (OSError, json.JSONDecodeError) as exc:
-        return {"name": "civicrecords_portal_mode", "status": "failed", "error": str(exc), "checks": checks}
+        return {"name": "townlight_records_portal_mode", "status": "failed", "error": str(exc), "checks": checks}
 
     expected_public_routes = expected_mode == "public"
     mode_ok = mode_status == 200 and mode_payload.get("mode") == expected_mode
@@ -1342,14 +1342,14 @@ def verify_records_portal_mode(ports: dict[str, int], *, expected_mode: str) -> 
         and register_path_mounted is expected_public_routes
     )
     return {
-        "name": "civicrecords_portal_mode",
+        "name": "townlight_records_portal_mode",
         "status": "passed" if mode_ok and routes_ok else "failed",
         "expected_mode": expected_mode,
         "checks": checks,
     }
 
 
-def verify_civiccore_contract(
+def verify_townlight_core_contract(
     records_ports: dict[str, int],
     clerk_ports: dict[str, int],
     code_ports: dict[str, int] | None = None,
@@ -1387,7 +1387,7 @@ def verify_civiccore_contract(
             else (None, {})
         )
     except (OSError, json.JSONDecodeError) as exc:
-        return {"name": "starter_set_civiccore_contract", "status": "failed", "error": str(exc), "checks": checks}
+        return {"name": "starter_set_townlight_core_contract", "status": "failed", "error": str(exc), "checks": checks}
 
     records_ok = True
     clerk_ok = True
@@ -1395,63 +1395,63 @@ def verify_civiccore_contract(
     notice_ok = True
     access_ok = True
     if MODULE_RECORDS in modules:
-        checks.append({"name": "civicrecords_health", "status_code": records_status, "payload": records_health})
+        checks.append({"name": "townlight_records_health", "status_code": records_status, "payload": records_health})
         records_ok = records_status == 200 and records_health.get("version") == EXPECTED_RECORDS_VERSION
     if MODULE_CLERK in modules:
-        checks.append({"name": "civicclerk_health", "status_code": clerk_status, "payload": clerk_health})
+        checks.append({"name": "townlight_meetings_health", "status_code": clerk_status, "payload": clerk_health})
         clerk_ok = (
             clerk_status == 200
-            and clerk_health.get("service") == "civicclerk"
+            and clerk_health.get("service") == "townlight_meetings"
             and clerk_health.get("version") == EXPECTED_CLERK_VERSION
-            and clerk_health.get("civiccore") == EXPECTED_CLERK_CIVICCORE_VERSION
+            and clerk_health.get("townlight_core") == EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION
         )
     if MODULE_CODE in modules:
-        checks.append({"name": "civiccode_health", "status_code": code_status, "payload": code_health})
+        checks.append({"name": "townlight_code_health", "status_code": code_status, "payload": code_health})
         code_ok = (
             code_status == 200
-            and code_health.get("service") == "civiccode"
+            and code_health.get("service") == "townlight_code"
             and code_health.get("version") == EXPECTED_CODE_VERSION
-            and code_health.get("civiccore") == EXPECTED_CODE_CIVICCORE_VERSION
+            and code_health.get("townlight_core") == EXPECTED_CODE_TOWNLIGHT_CORE_VERSION
         )
     if MODULE_NOTICE in modules:
-        checks.append({"name": "civicnotice_health", "status_code": notice_status, "payload": notice_health})
+        checks.append({"name": "townlight_notice_health", "status_code": notice_status, "payload": notice_health})
         notice_ok = (
             notice_status == 200
-            and notice_health.get("service") == "civicnotice"
+            and notice_health.get("service") == "townlight_notice"
             and notice_health.get("version") == EXPECTED_NOTICE_VERSION
-            and notice_health.get("civiccore_version") == EXPECTED_CIVICCORE_VERSION
+            and notice_health.get("townlight_core_version") == EXPECTED_TOWNLIGHT_CORE_VERSION
         )
     if MODULE_ACCESS in modules:
-        checks.append({"name": "civicaccess_health", "status_code": access_status, "payload": access_health})
+        checks.append({"name": "townlight_access_health", "status_code": access_status, "payload": access_health})
         access_ok = (
             access_status == 200
-            and access_health.get("service") == "civicaccess"
+            and access_health.get("service") == "townlight_access"
             and access_health.get("version") == EXPECTED_ACCESS_VERSION
-            and access_health.get("civiccore_version") == EXPECTED_CIVICCORE_VERSION
+            and access_health.get("townlight_core_version") == EXPECTED_TOWNLIGHT_CORE_VERSION
         )
     expected: dict[str, object] = {}
     if MODULE_RECORDS in modules:
         expected[MODULE_RECORDS] = {"version": EXPECTED_RECORDS_VERSION}
     if MODULE_CLERK in modules:
-        expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "civiccore": EXPECTED_CLERK_CIVICCORE_VERSION}
+        expected[MODULE_CLERK] = {"version": EXPECTED_CLERK_VERSION, "townlight_core": EXPECTED_CLERK_TOWNLIGHT_CORE_VERSION}
     if MODULE_CODE in modules:
-        expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "civiccore": EXPECTED_CODE_CIVICCORE_VERSION}
+        expected[MODULE_CODE] = {"version": EXPECTED_CODE_VERSION, "townlight_core": EXPECTED_CODE_TOWNLIGHT_CORE_VERSION}
     if MODULE_NOTICE in modules:
         expected[MODULE_NOTICE] = {
             "version": EXPECTED_NOTICE_VERSION,
-            "civiccore_version": EXPECTED_CIVICCORE_VERSION,
+            "townlight_core_version": EXPECTED_TOWNLIGHT_CORE_VERSION,
         }
     if MODULE_ACCESS in modules:
         expected[MODULE_ACCESS] = {
             "version": EXPECTED_ACCESS_VERSION,
-            "civiccore_version": EXPECTED_CIVICCORE_VERSION,
+            "townlight_core_version": EXPECTED_TOWNLIGHT_CORE_VERSION,
         }
-    expected["civiccore"] = {
+    expected["townlight_core"] = {
         "role": "base dependency installed before selected modules through the installer plan"
     }
     status = "passed" if records_ok and clerk_ok and code_ok and notice_ok and access_ok else "failed"
     return {
-        "name": "starter_set_civiccore_contract",
+        "name": "starter_set_townlight_core_contract",
         "status": status,
         "selected_modules": modules,
         "expected": expected,
@@ -1462,12 +1462,12 @@ def verify_civiccore_contract(
 def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict[str, object]:
     base = f"http://127.0.0.1:{ports['api']}"
     checks: list[dict[str, object]] = []
-    first_admin_email = os.environ.get("CIVICSUITE_FIRST_ADMIN_EMAIL", "admin@example.gov")
+    first_admin_email = os.environ.get("TOWNLIGHT_FIRST_ADMIN_EMAIL", "admin@example.gov")
     password_path = records_source / "data" / "secrets" / "first_admin_password"
     try:
         password = password_path.read_text(encoding="utf-8").strip()
     except OSError as exc:
-        return {"name": "civicrecords_workflow", "status": "failed", "error": str(exc), "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "error": str(exc), "checks": checks}
 
     login_status, login_body = post_form(
         f"{base}/auth/jwt/login",
@@ -1482,7 +1482,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
     )
     token = str(login_body.get("access_token") or "")
     if login_status != 200 or not token:
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     headers = {"Authorization": f"Bearer {token}"}
     me_status, me_body = get_json(f"{base}/users/me", headers=headers)
@@ -1495,7 +1495,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if me_status != 200:
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
     if must_rotate:
         rotated_password = f"Rotated-{uuid4().hex}-A1!"
         rotate_status, rotate_body = patch_json(
@@ -1511,7 +1511,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
             }
         )
         if rotate_status != 200 or rotate_body.get("must_change_password") is not False:
-            return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+            return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
         rotated_login_status, rotated_login_body = post_form(
             f"{base}/auth/jwt/login",
             {"username": first_admin_email, "password": rotated_password},
@@ -1525,7 +1525,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         )
         token = str(rotated_login_body.get("access_token") or "")
         if rotated_login_status != 200 or not token:
-            return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+            return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
         headers = {"Authorization": f"Bearer {token}"}
 
     marker = f"starter-set workflow proof {uuid4().hex[:8]}"
@@ -1551,7 +1551,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if create_status != 201 or not request_id:
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     get_status, fetched = get_json(f"{base}/requests/{request_id}", headers=headers)
     checks.append(
@@ -1562,7 +1562,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if get_status != 200 or fetched.get("id") != request_id:
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     search_status, search_body = get_json(f"{base}/search/filters", headers=headers)
     checks.append(
@@ -1575,7 +1575,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if search_status != 200 or not isinstance(search_body.get("file_types"), list):
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     searching_status, searching_body = patch_json(
         f"{base}/requests/{request_id}",
@@ -1590,7 +1590,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if searching_status != 200 or searching_body.get("status") != "searching":
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     review_status, review_body = post_json(f"{base}/requests/{request_id}/submit-review", {}, headers=headers)
     checks.append(
@@ -1601,7 +1601,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if review_status != 200 or review_body.get("status") != "in_review":
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     letter_status, letter = post_json(f"{base}/requests/{request_id}/response-letter", {}, headers=headers)
     checks.append(
@@ -1615,7 +1615,7 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if letter_status != 201 or not letter.get("id") or letter.get("status") != "draft":
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
     ready_status, ready_body = post_json(f"{base}/requests/{request_id}/ready-for-release", {}, headers=headers)
     checks.append(
@@ -1626,9 +1626,9 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
         }
     )
     if ready_status != 200 or ready_body.get("status") != "ready_for_release":
-        return {"name": "civicrecords_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
 
-    return {"name": "civicrecords_workflow", "status": "passed", "checks": checks}
+    return {"name": "townlight_records_workflow", "status": "passed", "checks": checks}
 
 
 def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
@@ -1652,7 +1652,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if session_status != 200 or session.get("mode") != CLERK_STAFF_MODE_BEARER:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     marker = f"Starter set workflow proof {uuid4().hex[:8]}"
     actor = "clerk@example.gov"
@@ -1662,8 +1662,8 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
             "title": marker,
             "department_name": "Clerk",
             "submitted_by": actor,
-            "summary": "Runtime proof that CivicClerk can accept a protected staff agenda intake item.",
-            "source_references": [{"label": "Starter-set proof", "url": "https://civicsuite.org/starter-set"}],
+            "summary": "Runtime proof that TownlightMeetings can accept a protected staff agenda intake item.",
+            "source_references": [{"label": "Starter-set proof", "url": "https://townlight.org/starter-set"}],
         },
         headers=headers,
     )
@@ -1677,7 +1677,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if create_status != 201 or not item_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     review_status, reviewed = post_json(
         f"{base}/agenda-intake/{item_id}/review",
@@ -1685,9 +1685,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         headers=headers,
     )
     if not append_check("review_agenda_intake", review_status, reviewed, readiness_status=reviewed.get("readiness_status")):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if str(reviewed.get("readiness_status", "")).lower() != "ready":
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     promote_status, promoted = post_json(
         f"{base}/agenda-intake/{item_id}/promote",
@@ -1703,9 +1703,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         agenda_item_id_present=bool(agenda_item_id),
         next_step=promoted.get("next_step"),
     ):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not agenda_item_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     list_status, listed = get_json(f"{base}/agenda-intake", headers=headers)
     items = listed.get("items") if isinstance(listed.get("items"), list) else []
@@ -1718,7 +1718,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if list_status != 200 or not found:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     body_status, body = post_json(
         f"{base}/meeting-bodies",
@@ -1727,9 +1727,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     )
     meeting_body_id = body.get("id")
     if not append_check("create_meeting_body", body_status, body, meeting_body_id_present=bool(meeting_body_id)):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not meeting_body_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     scheduled_start = (datetime.now(UTC) + timedelta(days=5)).replace(microsecond=0).isoformat()
     meeting_status, meeting = post_json(
@@ -1745,9 +1745,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     )
     meeting_id = meeting.get("id")
     if not append_check("create_meeting", meeting_status, meeting, meeting_id_present=bool(meeting_id)):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not meeting_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     packet_status, packet = post_json(
         f"{base}/meetings/{meeting_id}/packet-assemblies",
@@ -1762,9 +1762,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     )
     packet_id = packet.get("id")
     if not append_check("create_packet_assembly", packet_status, packet, packet_id_present=bool(packet_id)):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not packet_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     finalize_status, finalized = post_json(
         f"{base}/packet-assemblies/{packet_id}/finalize",
@@ -1772,7 +1772,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         headers=headers,
     )
     if not append_check("finalize_packet_assembly", finalize_status, finalized, status=finalized.get("status")):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     posted_at = datetime.now(UTC).replace(microsecond=0).isoformat()
     notice_payload = {
@@ -1786,9 +1786,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     notice_status, notice = post_json(f"{base}/meetings/{meeting_id}/notice-checklists", notice_payload, headers=headers)
     notice_id = notice.get("id")
     if not append_check("create_notice_checklist", notice_status, notice, notice_id_present=bool(notice_id), compliant=notice.get("compliant")):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not notice_id or notice.get("compliant") is not True:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     proof_status, proof = post_json(
         f"{base}/notice-checklists/{notice_id}/posting-proof",
@@ -1803,7 +1803,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         headers=headers,
     )
     if not append_check("attach_notice_posting_proof", proof_status, proof, posting_proof_present=bool(proof.get("posting_proof"))):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     motion_status, motion = post_json(
         f"{base}/meetings/{meeting_id}/motions",
@@ -1817,9 +1817,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     )
     motion_id = motion.get("id")
     if not append_check("capture_motion", motion_status, motion, motion_id_present=bool(motion_id)):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not motion_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     vote_status, vote = post_json(
         f"{base}/motions/{motion_id}/votes",
@@ -1827,9 +1827,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         headers=headers,
     )
     if not append_check("capture_vote", vote_status, vote, vote_id_present=bool(vote.get("id"))):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not vote.get("id"):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     minutes_status, minutes = post_json(
         f"{base}/meetings/{meeting_id}/minutes/drafts",
@@ -1861,9 +1861,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         minute_id_present=bool(minute_id),
         human_review_required=bool(minutes.get("human_approver")),
     ):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not minute_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     post_minutes_status, post_minutes = post_json(f"{base}/minutes/{minute_id}/post", {}, headers=headers)
     checks.append(
@@ -1875,7 +1875,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if post_minutes_status != 409:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     archive_status, archive = post_json(
         f"{base}/meetings/{meeting_id}/public-record",
@@ -1893,9 +1893,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
     )
     archive_id = archive.get("id")
     if not append_check("publish_public_archive_record", archive_status, archive, archive_id_present=bool(archive_id)):
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
     if not archive_id:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     calendar_status, calendar = get_json(f"{base}/public/meetings")
     meetings = calendar.get("meetings") if isinstance(calendar.get("meetings"), list) else []
@@ -1908,7 +1908,7 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if calendar_status != 200 or not calendar_found:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
     query = urllib.parse.quote(marker)
     search_status, archive_search = get_json(f"{base}/public/archive/search?q={query}")
@@ -1923,9 +1923,9 @@ def verify_clerk_bearer_workflow(ports: dict[str, int]) -> dict[str, object]:
         }
     )
     if search_status != 200 or not search_found:
-        return {"name": "civicclerk_bearer_workflow", "status": "failed", "checks": checks}
+        return {"name": "townlight_meetings_bearer_workflow", "status": "failed", "checks": checks}
 
-    return {"name": "civicclerk_bearer_workflow", "status": "passed", "checks": checks}
+    return {"name": "townlight_meetings_bearer_workflow", "status": "passed", "checks": checks}
 
 
 def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
@@ -1936,42 +1936,42 @@ def verify_code_workflow(ports: dict[str, int]) -> dict[str, object]:
         checks.append({"name": "health", "status_code": health_status, "payload": health})
         if (
             health_status != 200
-            or health.get("service") != "civiccode"
+            or health.get("service") != "townlight_code"
             or health.get("version") != EXPECTED_CODE_VERSION
-            or health.get("civiccore") != EXPECTED_CODE_CIVICCORE_VERSION
+            or health.get("townlight_core") != EXPECTED_CODE_TOWNLIGHT_CORE_VERSION
         ):
-            return {"name": "civiccode_workflow", "status": "failed", "checks": checks}
-        public_status, _public = get_json(f"{base}/api/v1/civiccode/sections/lookup?section_number=13.40.020")
+            return {"name": "townlight_code_workflow", "status": "failed", "checks": checks}
+        public_status, _public = get_json(f"{base}/api/v1/townlight_code/sections/lookup?section_number=13.40.020")
         checks.append({"name": "seeded_section_lookup", "status_code": public_status})
         if public_status != 200:
-            return {"name": "civiccode_workflow", "status": "failed", "checks": checks}
+            return {"name": "townlight_code_workflow", "status": "failed", "checks": checks}
         forged_status, forged = get_json(
-            f"{base}/api/v1/civiccode/staff/audit-events",
+            f"{base}/api/v1/townlight_code/staff/audit-events",
             headers={
-                "X-CivicCode-Role": "staff",
-                "X-CivicCode-Actor": "installer-proof@example.gov",
+                "X-Townlight-Code-Role": "staff",
+                "X-Townlight-Code-Actor": "installer-proof@example.gov",
             },
         )
         checks.append({"name": "forged_staff_header_boundary", "status_code": forged_status, "payload": forged})
         if forged_status != 403:
-            return {"name": "civiccode_workflow", "status": "failed", "checks": checks}
+            return {"name": "townlight_code_workflow", "status": "failed", "checks": checks}
     except (OSError, json.JSONDecodeError) as exc:
-        return {"name": "civiccode_workflow", "status": "failed", "error": str(exc), "checks": checks}
-    return {"name": "civiccode_workflow", "status": "passed", "checks": checks}
+        return {"name": "townlight_code_workflow", "status": "failed", "error": str(exc), "checks": checks}
+    return {"name": "townlight_code_workflow", "status": "passed", "checks": checks}
 
 
 def verify_access_workflow(access_source: Path, ports: dict[str, int]) -> dict[str, object]:
     base = f"http://127.0.0.1:{ports['api']}"
     checks: list[dict[str, object]] = []
-    write_token = parse_env_file(access_source / ".env").get("CIVICACCESS_TRUSTED_WRITE_TOKEN", "")
+    write_token = parse_env_file(access_source / ".env").get("TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN", "")
     if not write_token:
         return {
-            "name": "civicaccess_workflow",
+            "name": "townlight_access_workflow",
             "status": "failed",
-            "error": f"CIVICACCESS_TRUSTED_WRITE_TOKEN missing from {access_source / '.env'}",
+            "error": f"TOWNLIGHT_ACCESS_TRUSTED_WRITE_TOKEN missing from {access_source / '.env'}",
             "checks": checks,
         }
-    write_headers = {"X-CivicAccess-Write-Token": write_token}
+    write_headers = {"X-Townlight-Access-Write-Token": write_token}
     review_payload = {
         "title": "Installer workflow proof publication",
         "body": "City-core installer proof: confirm this public notice reads clearly and remains accessible.",
@@ -1983,17 +1983,17 @@ def verify_access_workflow(access_source: Path, ports: dict[str, int]) -> dict[s
         checks.append({"name": "health", "status_code": health_status, "payload": health})
         if (
             health_status != 200
-            or health.get("service") != "civicaccess"
+            or health.get("service") != "townlight_access"
             or health.get("version") != EXPECTED_ACCESS_VERSION
-            or health.get("civiccore_version") != EXPECTED_CIVICCORE_VERSION
+            or health.get("townlight_core_version") != EXPECTED_TOWNLIGHT_CORE_VERSION
         ):
-            return {"name": "civicaccess_workflow", "status": "failed", "checks": checks}
-        create_status, created = post_json(f"{base}/api/v1/civicaccess/review", review_payload, headers=write_headers)
+            return {"name": "townlight_access_workflow", "status": "failed", "checks": checks}
+        create_status, created = post_json(f"{base}/api/v1/townlight_access/review", review_payload, headers=write_headers)
         review_id = created.get("review_id")
         checks.append({"name": "create_accessibility_review", "status_code": create_status, "review_id_present": bool(review_id)})
         if create_status != 200 or not review_id:
-            return {"name": "civicaccess_workflow", "status": "failed", "checks": checks}
-        read_status, read_back = get_json(f"{base}/api/v1/civicaccess/reviews/{review_id}")
+            return {"name": "townlight_access_workflow", "status": "failed", "checks": checks}
+        read_status, read_back = get_json(f"{base}/api/v1/townlight_access/reviews/{review_id}")
         checks.append(
             {
                 "name": "read_accessibility_review_back",
@@ -2003,31 +2003,31 @@ def verify_access_workflow(access_source: Path, ports: dict[str, int]) -> dict[s
             }
         )
         if read_status != 200 or read_back.get("review_id") != review_id or read_back.get("title") != review_payload["title"]:
-            return {"name": "civicaccess_workflow", "status": "failed", "checks": checks}
-        forged_status, forged = post_json(f"{base}/api/v1/civicaccess/review", review_payload)
+            return {"name": "townlight_access_workflow", "status": "failed", "checks": checks}
+        forged_status, forged = post_json(f"{base}/api/v1/townlight_access/review", review_payload)
         checks.append({"name": "missing_write_token_boundary", "status_code": forged_status, "payload": forged})
         if forged_status != 403:
-            return {"name": "civicaccess_workflow", "status": "failed", "checks": checks}
+            return {"name": "townlight_access_workflow", "status": "failed", "checks": checks}
     except (OSError, json.JSONDecodeError) as exc:
-        return {"name": "civicaccess_workflow", "status": "failed", "error": str(exc), "checks": checks}
-    return {"name": "civicaccess_workflow", "status": "passed", "checks": checks}
+        return {"name": "townlight_access_workflow", "status": "failed", "error": str(exc), "checks": checks}
+    return {"name": "townlight_access_workflow", "status": "passed", "checks": checks}
 
 
 def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
     ports = ctx["ports"]
     if not isinstance(ports, dict):
         return {"name": "clerk_to_code_handoff", "status": "failed", "error": "invalid ports"}
-    clerk_ports = ports["civicclerk"]
-    code_ports = ports["civiccode"]
+    clerk_ports = ports["townlight_meetings"]
+    code_ports = ports["townlight_code"]
     clerk_base = f"http://127.0.0.1:{clerk_ports['api']}"
     code_base = f"http://127.0.0.1:{code_ports['api']}"
     clerk_headers = {"Authorization": f"Bearer {CLERK_WORKFLOW_PROOF_BEARER}"}
     code_env = parse_env_file(Path(ctx["code_source"]) / ".env")  # type: ignore[arg-type]
-    intake_auth = code_env.get("CIVICCODE_INTAKE_SECRET", "")
+    intake_auth = code_env.get("TOWNLIGHT_CODE_INTAKE_SECRET", "")
     code_headers = {
-        "X-CivicCode-Role": "staff",
-        "X-CivicCode-Actor": "installer-handoff-proof@example.gov",
-        "X-CivicCode-Intake-Secret": intake_auth,
+        "X-Townlight-Code-Role": "staff",
+        "X-Townlight-Code-Actor": "installer-handoff-proof@example.gov",
+        "X-Townlight-Code-Intake-Secret": intake_auth,
     }
     checks: list[dict[str, object]] = []
     try:
@@ -2079,20 +2079,20 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
             },
             headers=clerk_headers,
         )
-        code_event_id = handoff.get("civiccode_event_id")
+        code_event_id = handoff.get("townlight_code_event_id")
         checks.append(
             {
                 "name": "clerk_emits_to_code",
                 "status_code": handoff_status,
-                "handoff_status": handoff.get("civiccode_handoff_status"),
-                "handoff_last_error": handoff.get("civiccode_handoff_last_error"),
-                "civiccode_event_id_present": bool(code_event_id),
+                "handoff_status": handoff.get("townlight_code_handoff_status"),
+                "handoff_last_error": handoff.get("townlight_code_handoff_last_error"),
+                "townlight_code_event_id_present": bool(code_event_id),
             }
         )
-        if handoff_status != 201 or handoff.get("civiccode_handoff_status") != "EMIT_DELIVERED" or not code_event_id:
+        if handoff_status != 201 or handoff.get("townlight_code_handoff_status") != "EMIT_DELIVERED" or not code_event_id:
             return {"name": "clerk_to_code_handoff", "status": "failed", "checks": checks}
 
-        warning_status, warning_lookup = get_json(f"{code_base}/api/v1/civiccode/sections/lookup?section_number=13.40.020")
+        warning_status, warning_lookup = get_json(f"{code_base}/api/v1/townlight_code/sections/lookup?section_number=13.40.020")
         warnings = warning_lookup.get("handoff_warnings") if isinstance(warning_lookup.get("handoff_warnings"), list) else []
         target_warning_visible = any(
             isinstance(warning, dict) and warning.get("ordinance_number") == "2026-041" for warning in warnings
@@ -2113,7 +2113,7 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
             project=str(ctx["code_project"]),
             source=Path(ctx["code_source"]),  # type: ignore[arg-type]
             service="api",
-            path="/api/v1/civiccode/sections/sec_portland_13_40_020/versions",
+            path="/api/v1/townlight_code/sections/sec_portland_13_40_020/versions",
             payload={
                 "version_id": version_id,
                 "section_id": "sec_portland_13_40_020",
@@ -2125,7 +2125,7 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
                 "is_current": True,
                 "adoption_event_id": str(code_event_id),
                 "amendment_event_id": str(code_event_id),
-                "amendment_summary": "Codifies the CivicClerk adopted ordinance handoff.",
+                "amendment_summary": "Codifies the TownlightMeetings adopted ordinance handoff.",
             },
             headers=code_headers,
         )
@@ -2134,7 +2134,7 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
             return {"name": "clerk_to_code_handoff", "status": "failed", "checks": checks}
 
         resolve_status, resolved = post_json(
-            f"{code_base}/api/v1/civiccode/staff/civicclerk/ordinance-events/{code_event_id}/resolve",
+            f"{code_base}/api/v1/townlight_code/staff/townlight_meetings/ordinance-events/{code_event_id}/resolve",
             {"section_version_id": version_id},
             headers=code_headers,
         )
@@ -2142,7 +2142,7 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
         if resolve_status != 200 or resolved.get("handoff_state") != "codified":
             return {"name": "clerk_to_code_handoff", "status": "failed", "checks": checks}
 
-        final_status, final_lookup = get_json(f"{code_base}/api/v1/civiccode/sections/lookup?section_number=13.40.020")
+        final_status, final_lookup = get_json(f"{code_base}/api/v1/townlight_code/sections/lookup?section_number=13.40.020")
         final_warnings = final_lookup.get("handoff_warnings") if isinstance(final_lookup.get("handoff_warnings"), list) else []
         target_warning_cleared = not any(
             isinstance(warning, dict) and warning.get("ordinance_number") == "2026-041" for warning in final_warnings
@@ -2161,7 +2161,7 @@ def verify_clerk_to_code_handoff(ctx: dict[str, object]) -> dict[str, object]:
             return {"name": "clerk_to_code_handoff", "status": "failed", "checks": checks}
 
         answer_status, answer = post_json(
-            f"{code_base}/api/v1/civiccode/questions/answer",
+            f"{code_base}/api/v1/townlight_code/questions/answer",
             {"question": "How many backyard chickens can residents keep?", "section_number": "13.40.020"},
         )
         answer_text = str(answer.get("answer") or "")
@@ -2194,16 +2194,16 @@ def verify_starter_set_workflow_contract(
         return {"name": "starter_set_runtime_workflows", "status": "failed", "error": "invalid ports"}
     checks: list[dict[str, object]] = []
     if MODULE_RECORDS in modules:
-        records_ports = ports["civicrecords-ai"]
+        records_ports = ports["townlight_records"]
         checks.append(verify_records_workflow(Path(ctx["records_source"]), records_ports))  # type: ignore[arg-type]
     if MODULE_CLERK in modules:
-        clerk_ports = ports["civicclerk"]
+        clerk_ports = ports["townlight_meetings"]
         checks.append(verify_clerk_bearer_workflow(clerk_ports))  # type: ignore[arg-type]
     if MODULE_CODE in modules:
-        code_ports = ports["civiccode"]
+        code_ports = ports["townlight_code"]
         checks.append(verify_code_workflow(code_ports))  # type: ignore[arg-type]
     if MODULE_ACCESS in modules:
-        access_ports = ports["civicaccess"]
+        access_ports = ports["townlight_access"]
         checks.append(verify_access_workflow(Path(ctx["access_source"]), access_ports))  # type: ignore[arg-type]
     if MODULE_CLERK in modules and MODULE_CODE in modules:
         checks.append(verify_clerk_to_code_handoff(ctx))
@@ -2212,7 +2212,7 @@ def verify_starter_set_workflow_contract(
         "name": "starter_set_runtime_workflows",
         "status": status,
         "selected_modules": modules,
-        "auth_contract": "CivicRecords uses first-admin JWT login; CivicClerk uses bearer staff auth.",
+        "auth_contract": "TownlightRecords uses first-admin JWT login; TownlightMeetings uses bearer staff auth.",
         "checks": checks,
     }
 
@@ -2233,16 +2233,16 @@ def lifecycle_context(
     return {
         "install_root": install_root,
         "selected_modules": modules,
-        "records_source": install_root / "sources" / "civicrecords-ai",
-        "clerk_source": install_root / "sources" / "civicclerk",
-        "code_source": install_root / "sources" / "civiccode",
-        "notice_source": install_root / "sources" / "civicnotice",
-        "access_source": install_root / "sources" / "civicaccess",
-        "records_project": compose_projects["civicrecords-ai"],
-        "clerk_project": compose_projects["civicclerk"],
-        "code_project": compose_projects["civiccode"],
-        "notice_project": compose_projects["civicnotice"],
-        "access_project": compose_projects["civicaccess"],
+        "records_source": install_root / "sources" / "townlight_records",
+        "clerk_source": install_root / "sources" / "townlight_meetings",
+        "code_source": install_root / "sources" / "townlight_code",
+        "notice_source": install_root / "sources" / "townlight_notice",
+        "access_source": install_root / "sources" / "townlight_access",
+        "records_project": compose_projects["townlight_records"],
+        "clerk_project": compose_projects["townlight_meetings"],
+        "code_project": compose_projects["townlight_code"],
+        "notice_project": compose_projects["townlight_notice"],
+        "access_project": compose_projects["townlight_access"],
         "ports": ports,
         "compose_projects": compose_projects,
         "isolation_id": isolation["isolation_id"],
@@ -2262,16 +2262,16 @@ def prepare_sources(
     persist_selected_modules(install_root, modules)
     ctx = lifecycle_context(install_root, isolation, selected_modules=modules)
     ports = ctx["ports"]  # type: ignore[assignment]
-    records_ports = ports["civicrecords-ai"]  # type: ignore[index]
-    clerk_ports = ports["civicclerk"]  # type: ignore[index]
-    code_ports = ports["civiccode"]  # type: ignore[index]
-    notice_ports = ports["civicnotice"]  # type: ignore[index]
-    access_ports = ports["civicaccess"]  # type: ignore[index]
+    records_ports = ports["townlight_records"]  # type: ignore[index]
+    clerk_ports = ports["townlight_meetings"]  # type: ignore[index]
+    code_ports = ports["townlight_code"]  # type: ignore[index]
+    notice_ports = ports["townlight_notice"]  # type: ignore[index]
+    access_ports = ports["townlight_access"]  # type: ignore[index]
     shared_network = str(ctx["shared_network"])
-    civiccode_intake_secret = secrets.token_urlsafe(32) if MODULE_CLERK in modules and MODULE_CODE in modules else ""
-    civiccode_intake_url = (
-        "http://civiccode-api:8000/api/v1/civiccode/staff/civicclerk/ordinance-events"
-        if civiccode_intake_secret
+    townlight_code_intake_secret = secrets.token_urlsafe(32) if MODULE_CLERK in modules and MODULE_CODE in modules else ""
+    townlight_code_intake_url = (
+        "http://townlight_code-api:8000/api/v1/townlight_code/staff/townlight_meetings/ordinance-events"
+        if townlight_code_intake_secret
         else ""
     )
     install_root.mkdir(parents=True, exist_ok=True)
@@ -2301,21 +2301,21 @@ def prepare_sources(
             ctx["clerk_source"] / ".env",
             staff_mode=staff_mode,
             ports=clerk_ports,  # type: ignore[arg-type]
-            civiccode_intake_url=civiccode_intake_url,
-            civiccode_intake_secret=civiccode_intake_secret,
+            townlight_code_intake_url=townlight_code_intake_url,
+            townlight_code_intake_secret=townlight_code_intake_secret,
             suite_session_value=suite_session_value,
         )  # type: ignore[operator]
-        if civiccode_intake_secret:
+        if townlight_code_intake_secret:
             write_clerk_handoff_override(ctx["clerk_source"], shared_network)  # type: ignore[arg-type]
     if MODULE_CODE in modules:
         copy_source(source_root(MODULE_CODE), ctx["code_source"])  # type: ignore[arg-type]
         write_code_env(
             ctx["code_source"] / ".env",
             code_ports,  # type: ignore[arg-type]
-            civiccode_intake_secret=civiccode_intake_secret,
+            townlight_code_intake_secret=townlight_code_intake_secret,
             suite_session_value=suite_session_value,
         )  # type: ignore[operator]
-        if civiccode_intake_secret:
+        if townlight_code_intake_secret:
             write_code_handoff_override(ctx["code_source"], shared_network)  # type: ignore[arg-type]
     if MODULE_NOTICE in modules:
         copy_source(source_root(MODULE_NOTICE), ctx["notice_source"])  # type: ignore[arg-type]
@@ -2373,11 +2373,11 @@ def install(
         if network.returncode != 0:
             return {"status": "failed", "steps": steps}
     for name, source_key, project_key, services in (
-        ("civicrecords-ai", "records_source", "records_project", ("api", "frontend")),
-        ("civicclerk", "clerk_source", "clerk_project", ("api", "frontend")),
-        ("civiccode", "code_source", "code_project", ("api",)),
-        ("civicnotice", "notice_source", "notice_project", ("api",)),
-        ("civicaccess", "access_source", "access_project", ("api",)),
+        ("townlight_records", "records_source", "records_project", ("api", "frontend")),
+        ("townlight_meetings", "clerk_source", "clerk_project", ("api", "frontend")),
+        ("townlight_code", "code_source", "code_project", ("api",)),
+        ("townlight_notice", "notice_source", "notice_project", ("api",)),
+        ("townlight_access", "access_source", "access_project", ("api",)),
     ):
         if name not in modules:
             steps.append({"module": name, "step": "compose_build", "status": "skipped_not_selected"})
@@ -2433,7 +2433,7 @@ def verify_suite_runtime_wiring(ctx: dict[str, object]) -> list[dict[str, object
     install_root = Path(ctx["install_root"])  # type: ignore[arg-type]
     modules = ctx["selected_modules"]  # type: ignore[assignment]
     launcher_root = install_root / SUITE_LAUNCHER_DIR_NAME
-    config_path = launcher_root / "civicsuite-launcher-config.json"
+    config_path = launcher_root / "townlight-launcher-config.json"
     config: dict[str, object] = {}
     if config_path.is_file():
         try:
@@ -2446,7 +2446,7 @@ def verify_suite_runtime_wiring(ctx: dict[str, object]) -> list[dict[str, object
         (launcher_root / relative).is_file()
         for relative in (
             "index.html",
-            "civicsuite-launcher-config.js",
+            "townlight-launcher-config.js",
             "package.json",
             "scripts/serve.mjs",
             "src/app.js",
@@ -2474,7 +2474,7 @@ def verify_suite_runtime_wiring(ctx: dict[str, object]) -> list[dict[str, object
             "path": str(config_path),
             "expected_port": DEFAULT_SUITE_LAUNCHER_PORT,
             "fix_steps": [
-                "Regenerate or repair the city-core runtime so civicsuite-launcher-config.json names the suite launcher port.",
+                "Regenerate or repair the city-core runtime so townlight-launcher-config.json names the suite launcher port.",
                 f"Expected localhost:{DEFAULT_SUITE_LAUNCHER_PORT} for the suite launcher.",
             ]
             if config.get("port") != DEFAULT_SUITE_LAUNCHER_PORT
@@ -2545,11 +2545,11 @@ def verify(
     ctx = lifecycle_context(install_root, isolation, selected_modules=selected_modules)
     modules = ctx["selected_modules"]  # type: ignore[assignment]
     ports = ctx["ports"]  # type: ignore[assignment]
-    records_ports = ports["civicrecords-ai"]  # type: ignore[index]
-    clerk_ports = ports["civicclerk"]  # type: ignore[index]
-    code_ports = ports["civiccode"]  # type: ignore[index]
-    notice_ports = ports["civicnotice"]  # type: ignore[index]
-    access_ports = ports["civicaccess"]  # type: ignore[index]
+    records_ports = ports["townlight_records"]  # type: ignore[index]
+    clerk_ports = ports["townlight_meetings"]  # type: ignore[index]
+    code_ports = ports["townlight_code"]  # type: ignore[index]
+    notice_ports = ports["townlight_notice"]  # type: ignore[index]
+    access_ports = ports["townlight_access"]  # type: ignore[index]
     checks: list[dict[str, object]] = []
     records_api_passed = False
     clerk_api_passed = False
@@ -2559,32 +2559,32 @@ def verify(
     if uses_suite_runtime(modules):
         checks.extend(verify_suite_runtime_wiring(ctx))
     if MODULE_RECORDS in modules:
-        records_api = {"name": "civicrecords_api", "url": f"http://127.0.0.1:{records_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{records_ports['api']}/health", timeout_seconds=180)}
+        records_api = {"name": "townlight_records_api", "url": f"http://127.0.0.1:{records_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{records_ports['api']}/health", timeout_seconds=180)}
         checks.append(records_api)
-        checks.append({"name": "civicrecords_web", "url": f"http://127.0.0.1:{records_ports['web']}/", **wait_for_url(f"http://127.0.0.1:{records_ports['web']}/", timeout_seconds=120)})
+        checks.append({"name": "townlight_records_web", "url": f"http://127.0.0.1:{records_ports['web']}/", **wait_for_url(f"http://127.0.0.1:{records_ports['web']}/", timeout_seconds=120)})
         records_api_passed = records_api["status"] == "passed"
     if MODULE_CLERK in modules:
-        clerk_api = {"name": "civicclerk_api", "url": f"http://127.0.0.1:{clerk_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{clerk_ports['api']}/health", timeout_seconds=180)}
+        clerk_api = {"name": "townlight_meetings_api", "url": f"http://127.0.0.1:{clerk_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{clerk_ports['api']}/health", timeout_seconds=180)}
         checks.append(clerk_api)
-        checks.append({"name": "civicclerk_web", "url": f"http://127.0.0.1:{clerk_ports['web']}/", **wait_for_url(f"http://127.0.0.1:{clerk_ports['web']}/", timeout_seconds=120)})
+        checks.append({"name": "townlight_meetings_web", "url": f"http://127.0.0.1:{clerk_ports['web']}/", **wait_for_url(f"http://127.0.0.1:{clerk_ports['web']}/", timeout_seconds=120)})
         clerk_api_passed = clerk_api["status"] == "passed"
     if MODULE_CODE in modules:
-        code_api = {"name": "civiccode_api", "url": f"http://127.0.0.1:{code_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{code_ports['api']}/health", timeout_seconds=180)}
+        code_api = {"name": "townlight_code_api", "url": f"http://127.0.0.1:{code_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{code_ports['api']}/health", timeout_seconds=180)}
         checks.append(code_api)
-        checks.append({"name": "civiccode_public_lookup", "url": f"http://127.0.0.1:{code_ports['api']}/civiccode/search?q=13.40.020", **wait_for_url(f"http://127.0.0.1:{code_ports['api']}/civiccode/search?q=13.40.020", timeout_seconds=120)})
+        checks.append({"name": "townlight_code_public_lookup", "url": f"http://127.0.0.1:{code_ports['api']}/townlight_code/search?q=13.40.020", **wait_for_url(f"http://127.0.0.1:{code_ports['api']}/townlight_code/search?q=13.40.020", timeout_seconds=120)})
         code_api_passed = code_api["status"] == "passed"
     if MODULE_NOTICE in modules:
-        notice_api = {"name": "civicnotice_api", "url": f"http://127.0.0.1:{notice_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{notice_ports['api']}/health", timeout_seconds=180)}
+        notice_api = {"name": "townlight_notice_api", "url": f"http://127.0.0.1:{notice_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{notice_ports['api']}/health", timeout_seconds=180)}
         checks.append(notice_api)
         notice_api_passed = notice_api["status"] == "passed"
     if MODULE_ACCESS in modules:
-        access_api = {"name": "civicaccess_api", "url": f"http://127.0.0.1:{access_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{access_ports['api']}/health", timeout_seconds=180)}
+        access_api = {"name": "townlight_access_api", "url": f"http://127.0.0.1:{access_ports['api']}/health", **wait_for_url(f"http://127.0.0.1:{access_ports['api']}/health", timeout_seconds=180)}
         checks.append(access_api)
         access_api_passed = access_api["status"] == "passed"
     if clerk_api_passed and not workflow_proof and staff_mode == CLERK_STAFF_MODE_PROTECTED:
         checks.append(verify_clerk_protected_default(clerk_ports))  # type: ignore[arg-type]
     if records_api_passed or clerk_api_passed or code_api_passed or notice_api_passed or access_api_passed:
-        checks.append(verify_civiccore_contract(records_ports, clerk_ports, code_ports, notice_ports, access_ports, selected_modules=modules))  # type: ignore[arg-type]
+        checks.append(verify_townlight_core_contract(records_ports, clerk_ports, code_ports, notice_ports, access_ports, selected_modules=modules))  # type: ignore[arg-type]
     if workflow_proof:
         checks.append(verify_starter_set_workflow_contract(ctx, selected_modules=modules))
     if records_api_passed:
@@ -2610,11 +2610,11 @@ def uninstall(
     modules = ctx["selected_modules"]  # type: ignore[assignment]
     steps: list[dict[str, object]] = []
     for name, source_key, project_key in (
-        ("civicrecords-ai", "records_source", "records_project"),
-        ("civicclerk", "clerk_source", "clerk_project"),
-        ("civiccode", "code_source", "code_project"),
-        ("civicnotice", "notice_source", "notice_project"),
-        ("civicaccess", "access_source", "access_project"),
+        ("townlight_records", "records_source", "records_project"),
+        ("townlight_meetings", "clerk_source", "clerk_project"),
+        ("townlight_code", "code_source", "code_project"),
+        ("townlight_notice", "notice_source", "notice_project"),
+        ("townlight_access", "access_source", "access_project"),
     ):
         if name not in modules:
             steps.append({"module": name, "step": "compose_down", "status": "skipped_not_selected"})
@@ -2678,8 +2678,8 @@ def module_database_contract(ctx: dict[str, object], module: str) -> dict[str, s
             "source": ctx["records_source"],  # type: ignore[dict-item]
             "project": str(ctx["records_project"]),
             "postgres_service": "postgres",
-            "postgres_user": "civicrecords",
-            "postgres_db": "civicrecords",
+            "postgres_user": "townlight_records",
+            "postgres_db": "townlight_records",
         }
     if module == MODULE_CLERK:
         source = ctx["clerk_source"]  # type: ignore[assignment]
@@ -2689,8 +2689,8 @@ def module_database_contract(ctx: dict[str, object], module: str) -> dict[str, s
             "source": source,
             "project": str(ctx["clerk_project"]),
             "postgres_service": "postgres",
-            "postgres_user": env_values.get("CIVICCLERK_POSTGRES_USER", "civicclerk"),
-            "postgres_db": env_values.get("CIVICCLERK_POSTGRES_DB", "civicclerk"),
+            "postgres_user": env_values.get("TOWNLIGHT_MEETINGS_POSTGRES_USER", "townlight_meetings"),
+            "postgres_db": env_values.get("TOWNLIGHT_MEETINGS_POSTGRES_DB", "townlight_meetings"),
         }
     if module == MODULE_CODE:
         source = ctx["code_source"]  # type: ignore[assignment]
@@ -2700,8 +2700,8 @@ def module_database_contract(ctx: dict[str, object], module: str) -> dict[str, s
             "source": source,
             "project": str(ctx["code_project"]),
             "postgres_service": "postgres",
-            "postgres_user": env_values.get("POSTGRES_USER", "civiccode"),
-            "postgres_db": env_values.get("POSTGRES_DB", "civiccode"),
+            "postgres_user": env_values.get("POSTGRES_USER", "townlight_code"),
+            "postgres_db": env_values.get("POSTGRES_DB", "townlight_code"),
         }
     if module == MODULE_NOTICE:
         source = ctx["notice_source"]  # type: ignore[assignment]
@@ -2711,8 +2711,8 @@ def module_database_contract(ctx: dict[str, object], module: str) -> dict[str, s
             "source": source,
             "project": str(ctx["notice_project"]),
             "postgres_service": "postgres",
-            "postgres_user": env_values.get("POSTGRES_USER", "civicnotice"),
-            "postgres_db": env_values.get("POSTGRES_DB", "civicnotice"),
+            "postgres_user": env_values.get("POSTGRES_USER", "townlight_notice"),
+            "postgres_db": env_values.get("POSTGRES_DB", "townlight_notice"),
         }
     if module == MODULE_ACCESS:
         source = ctx["access_source"]  # type: ignore[assignment]
@@ -2722,8 +2722,8 @@ def module_database_contract(ctx: dict[str, object], module: str) -> dict[str, s
             "source": source,
             "project": str(ctx["access_project"]),
             "postgres_service": "postgres",
-            "postgres_user": env_values.get("POSTGRES_USER", "civicaccess"),
-            "postgres_db": env_values.get("POSTGRES_DB", "civicaccess"),
+            "postgres_user": env_values.get("POSTGRES_USER", "townlight_access"),
+            "postgres_db": env_values.get("POSTGRES_DB", "townlight_access"),
         }
     raise InstallerError(f"Unsupported module for backup/restore: {module}")
 
@@ -2986,7 +2986,7 @@ def main() -> int:
     if args.staff_mode == CLERK_STAFF_MODE_OPEN:
         print(CLERK_OPEN_MODE_WARNING, file=sys.stderr)
 
-    run_id = args.run_id or os.environ.get("CIVICSUITE_INSTALLER_RUN_ID") or make_run_id()
+    run_id = args.run_id or os.environ.get("TOWNLIGHT_INSTALLER_RUN_ID") or make_run_id()
     report_dir = REPORT_ROOT / run_id
     install_root = Path(args.install_root).resolve()
     selected_modules = (
@@ -3008,7 +3008,7 @@ def main() -> int:
         "mode": args.mode,
         "install_root": str(install_root),
         "mutates_host": args.mode in {"install", "repair", "backup", "restore", "uninstall"} or args.workflow_proof,
-        "civicclerk_staff_mode": args.staff_mode,
+        "townlight_meetings_staff_mode": args.staff_mode,
         "status": "failed",
         "started_at": datetime.now(UTC).isoformat(),
         "ports": isolation["ports"],
