@@ -1459,7 +1459,11 @@ def verify_townlight_core_contract(
     }
 
 
-def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict[str, object]:
+def records_workflow_proof_scope(project: str) -> str:
+    return f"installer-proof-{hashlib.sha256(project.encode()).hexdigest()[:16]}"
+
+
+def verify_records_workflow(records_source: Path, project: str, ports: dict[str, int]) -> dict[str, object]:
     base = f"http://127.0.0.1:{ports['api']}"
     checks: list[dict[str, object]] = []
     first_admin_email = os.environ.get("TOWNLIGHT_FIRST_ADMIN_EMAIL", "admin@example.gov")
@@ -1528,10 +1532,53 @@ def verify_records_workflow(records_source: Path, ports: dict[str, int]) -> dict
             return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
         headers = {"Authorization": f"Bearer {token}"}
 
+    fixture_code = f"proof-{uuid4().hex[:12]}"
+    department_status, department = post_json(
+        f"{base}/departments/",
+        {"name": "Synthetic installer workflow department", "code": fixture_code},
+        headers=headers,
+    )
+    department_id = department.get("id")
+    checks.append({"name": "create_proof_department", "status_code": department_status, "department_id_present": bool(department_id)})
+    if department_status != 201 or not department_id:
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
+
+    grant_fixture = """
+import asyncio
+import sys
+from uuid import UUID
+from townlight_core.auth.department_scope import record_department_grant
+from townlight_records.config import settings
+from townlight_records.database import async_session_maker
+
+async def main():
+    if settings.authority_scope_id != sys.argv[1]:
+        raise RuntimeError("Expected isolated installer proof authority scope")
+    async with async_session_maker() as session:
+        await record_department_grant(
+            session, scope_id=settings.authority_scope_id, subject=sys.argv[2],
+            department_id=UUID(sys.argv[3]), roles=["admin"],
+            recorded_by="synthetic-installer-proof",
+        )
+        await session.commit()
+
+asyncio.run(main())
+"""
+    grant = run(
+        compose(project, records_source, "exec", "-T", "api", "python", "-c",
+                grant_fixture, records_workflow_proof_scope(project), first_admin_email, str(department_id)),
+        cwd=records_source,
+        timeout=60,
+    )
+    checks.append({"name": "grant_proof_department", "returncode": grant.returncode})
+    if grant.returncode != 0:
+        return {"name": "townlight_records_workflow", "status": "failed", "checks": checks}
+
     marker = f"starter-set workflow proof {uuid4().hex[:8]}"
     create_status, created = post_json(
         f"{base}/requests/",
         {
+            "department_id": department_id,
             "requester_name": "Starter Set Workflow Proof",
             "requester_email": None,
             "requester_type": "outside-test",
@@ -2195,7 +2242,7 @@ def verify_starter_set_workflow_contract(
     checks: list[dict[str, object]] = []
     if MODULE_RECORDS in modules:
         records_ports = ports["townlight_records"]
-        checks.append(verify_records_workflow(Path(ctx["records_source"]), records_ports))  # type: ignore[arg-type]
+        checks.append(verify_records_workflow(Path(ctx["records_source"]), str(ctx["records_project"]), records_ports))  # type: ignore[arg-type]
     if MODULE_CLERK in modules:
         clerk_ports = ports["townlight_meetings"]
         checks.append(verify_clerk_bearer_workflow(clerk_ports))  # type: ignore[arg-type]
@@ -2357,6 +2404,14 @@ def install(
         staff_mode=staff_mode,
     )
     modules = ctx["selected_modules"]  # type: ignore[assignment]
+    if workflow_proof and MODULE_RECORDS in modules:
+        records_env = Path(ctx["records_source"]) / ".env"
+        scope = f"AUTHORITY_SCOPE_ID={records_workflow_proof_scope(str(ctx['records_project']))}"
+        values = records_env.read_text(encoding="utf-8").splitlines()
+        if any(line.startswith("AUTHORITY_SCOPE_ID=") and line != scope for line in values):
+            raise InstallerError("Workflow proof requires its own isolated Records authority scope.")
+        if scope not in values:
+            records_env.write_text("\n".join([*values, scope]) + "\n", encoding="utf-8")
     steps: list[dict[str, object]] = []
     if MODULE_CLERK in modules and MODULE_CODE in modules:
         network = ensure_shared_network(str(ctx["shared_network"]))
