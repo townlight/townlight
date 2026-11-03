@@ -1,5 +1,13 @@
 # Townlight Architecture
 
+## Townlight Beta 1 portal integration candidate
+
+The separately deployed Wagtail portal presents public city pages and meeting archives. The private native runtime exports only an explicitly approved public Meetings archive and a matching completed Station recording's reviewed Records release copy. The authenticated publisher needs both module permissions; request fulfillment alone does not authorize publication. The portal validates IDs, current source approval, file hashes and lineage before updating its public projection. Approved release files remain outside public static/media directories and are streamed through published-only routes. Explicit withdrawal hides the page and file; a failed synchronization preserves the prior publication.
+
+![Portal and private service boundaries](docs/beta-1/assets/portal-architecture.svg)
+
+The [portal guide](docs/beta-1/manuals/portal.html) documents architecture, API, source deployment, active session authorization, file limits and recovery. The existing signed installer is unchanged and predates this bridge; the candidate native wheel is deployed separately into a matching prepared runtime. CivicCast remains separate, with its reused adapter notices retained. Townlight-owned additions are AGPL-3.0-only.
+
 ## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
 Published October 21, 2026. Four connected Townlight products run locally through

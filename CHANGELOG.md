@@ -1,5 +1,11 @@
 # Changelog
 
+## Townlight Beta 1 portal integration — local candidate
+
+- Add the Wagtail city-page and meeting portal inside this repository, retaining the synthetic PrimeGov adapter and upstream notices.
+- Connect public Meetings archives, completed Station recordings and approved Records release copies through an authenticated, explicit publication boundary. Add staff release lookup, streamed resident playback/download, public export and withdrawal.
+- Add the native runtime wheel deployment instructions, affected suite/product documentation, architecture and API reference, and synthetic real-service acceptance harness. Preserve existing component versions and the signed installer. No public deployment is implied by this local candidate.
+
 ## Townlight Planning 1.5.1 — fresh-install release
 
 - Promote the exact signed, installed-accepted 1.5.1-beta.1 candidate without

@@ -1,0 +1,6 @@
+[project]
+name = "townlight-portal"
+version = "0.1.0"
+requires-python = ">=3.13,<3.14"
+license = "AGPL-3.0-only"
+dependencies = ["Django>=5.2,<5.3", "wagtail>=7.4,<7.5", "httpx>=0.28,<1", "beautifulsoup4>=4.12,<5", "pypdf>=5,<7", "pydantic>=2,<3", "waitress==3.0.2"]

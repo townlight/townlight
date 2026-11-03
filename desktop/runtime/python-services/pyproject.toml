@@ -16,4 +16,4 @@ where = ["."]
 include = ["civicsuite_runtime*"]
 
 [tool.setuptools.package-data]
-civicsuite_runtime = ["fixtures/*.json"]
+civicsuite_runtime = ["fixtures/*.json", "civicrecords_alembic/*.ini", "civicrecords_alembic/alembic/*.mako"]

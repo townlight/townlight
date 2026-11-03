@@ -1,5 +1,9 @@
 # Townlight current status
 
+## Local portal integration candidate — 2 November 2026
+
+The [portal guide](docs/beta-1/manuals/portal.html) describes the separately deployed Wagtail capability and its Meetings → Station → Records publication workflow. It is prepared in this repository for a later authorized publication; the existing signed installer and public site are unchanged. The guide distinguishes the new native bridge package, explicit public approval, synthetic PrimeGov demonstration, operational limits and deployment requirements. [Local synthetic acceptance](docs/portal/acceptance.md) records the executed workflow and its limits.
+
 Reviewed 2026-10-26. All eight accepted product workflows and their boundaries are documented in the [overall manual](USER-MANUAL.md). Signed [Inspections 1.7](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-inspections-v1.7.0-beta.1) and [Permitting 1.6](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-planning-permitting-v1.6.0-beta.1) are public; Planning 1.5.1 is a fresh-install release. The [default 1.4 download](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) remains unchanged.
 
 **Are all specifications complete?** No. The [source-grounded assessment](docs/assessment/feature-and-integration-review.md) identifies confirmed gaps, accepted deferrals and unverified capabilities separately for every product. There is no unresolved Core blocker identified in accepted workflow receipts; that does not complete the broader deferred Core catalog/exemption/scaffold contracts.
