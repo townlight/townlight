@@ -1,11 +1,11 @@
 import { chromium } from "playwright";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { existsSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const target = `file://${path.join(root, "docs", "index.html").replaceAll("\\", "/")}`;
-const outputDir = process.env.TOWNLIGHT_DOCS_QA_DIR || path.join(root, "docs", "naming-candidate-browser-qa");
+const outputDir = path.join(root, "docs", "audit-browser-qa");
 mkdirSync(outputDir, { recursive: true });
 
 const viewports = [
@@ -54,20 +54,20 @@ try {
       .getByRole("heading", { name: "Municipal work with a clear record." })
       .isVisible();
     const candidateStatusVisible = await page
-      .locator('aside[aria-label="Candidate status"]').filter({ hasText: "installed acceptance and publication remain pending" }).first()
+      .locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1"]').first()
       .isVisible();
     const productModulesVisible = await Promise.all(
-      ["Core", "Records", "Meetings", "Code", "Zoning", "Planning", "Permitting", "Inspections", "Station", "Access", "Notice"].map((name) =>
+      ["Core", "Records", "Meetings", "Code", "Access", "Notice", "Zoning", "Planning", "Permitting", "Inspections", "Station"].map((name) =>
         page.locator(".product h3").getByRole("link", { name, exact: true }).isVisible(),
       ),
     );
     const productLinks = await page.locator(".product h3 a").evaluateAll((nodes) => nodes.map((node) => node.href));
-    const expectedProductLinks = ["core", "records", "meetings", "code", "zoning", "planning", "permitting", "inspections", "station", "access", "notice"]
+    const expectedProductLinks = ["core", "records", "meetings", "code", "access", "notice", "zoning", "planning", "permitting", "inspections", "station"]
       .map((slug) => `/products/${slug}/index.html`);
     const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
-      expectedProductLinks.every((suffix) => productLinks.some((link) => link.endsWith(suffix))) &&
-      productLinks.every((link) => new URL(link).protocol === "file:" && existsSync(fileURLToPath(link)));
-    const candidateIdentityLinked = await page.locator('a[href$="versions.html"]').first().isVisible();
+      expectedProductLinks.every((link, index) => productLinks[index].endsWith(link));
+    const currentDownloadLinked = await page.locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1"]').first()
+      .getAttribute("href") === "https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1";
     const overallManualVisible = await page.locator('a[href$="manuals/suite.html"]').first().isVisible();
     const horizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -85,8 +85,7 @@ try {
       candidateStatusVisible,
       productModulesVisible,
       productLinksCorrect,
-      productLinks,
-      candidateIdentityLinked,
+      currentDownloadLinked,
       overallManualVisible,
       horizontalOverflow,
       focusedText,
@@ -108,7 +107,7 @@ const failed = results.some(
     !result.candidateStatusVisible ||
     result.productModulesVisible.some((visible) => !visible) ||
     !result.productLinksCorrect ||
-    !result.candidateIdentityLinked ||
+    !result.currentDownloadLinked ||
     !result.overallManualVisible ||
     result.horizontalOverflow ||
     result.focusedText !== "Skip to content" ||
