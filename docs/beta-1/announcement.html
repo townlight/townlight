@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Download the signed Townlight Windows beta 1.7.0.1 and read its installed acceptance, setup limits and feedback routes."><title>Townlight Windows public beta 1.7.0.1 is available | Townlight</title><link rel="stylesheet" href="./assets/site.css"><link rel="icon" href="./brand/favicon.svg" type="image/svg+xml"><link rel="icon" href="./brand/favicon.ico" sizes="16x16 32x32 48x48"><link rel="apple-touch-icon" href="./brand/png/townlight-hall-app-icon-180.png"><meta property="og:image" content="https://townlight.github.io/brand/png/townlight-hall-social-preview.png"><meta name="twitter:card" content="summary_large_image"></head><body><a class="skip" href="#main">Skip to content</a><aside aria-label="Windows release" style="padding:1rem">The signed <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1">Windows x64 beta 1.7.0.1</a> passed the documented fresh Windows Sandbox checks with synthetic data. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md">Windows acceptance summary</a>.</aside><header><a class="brand" href="./index.html"><img src="./brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a><span class="edition">Townlight Beta 1</span><nav aria-label="Main"><a href="./index.html#products">Products</a><a href="./manuals/suite.html">Suite manual</a><a href="./reference/index.html">Technical reference</a><a href="./terms.html">Terms and license</a></nav></header><main id="main"><div class="wrap reading"><article class="hero docbody"><h1 id="townlight-windows-public-beta-1701-is-available">Townlight
+Windows public beta 1.7.0.1 is available</h1>
+<p>Municipal software cities can actually own.</p>
+<p>Townlight's signed Windows x64 public beta is available now. It
+brings municipal work into connected local workspaces, with a record of
+the sources, staff review and decisions behind it. The installer was
+published on 3 November 2026; this announcement was updated on 4
+November 2026.</p>
+<p><a
+href="https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi">Download
+the signed Windows MSI</a> Â· <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1">Release,
+corresponding source and checksums</a> Â· <a
+href="https://townlight.github.io/manuals/suite.html">Read the
+manual</a> Â· <a href="https://townlight.github.io/support.html">Get
+help or report a problem</a></p>
+<h2 id="what-you-can-evaluate">What you can evaluate</h2>
+<ul>
+<li><strong>Records:</strong> public-records request, review and export
+workflows.</li>
+<li><strong>Meetings:</strong> meeting and agenda preparation, packets,
+motions and votes, minutes, archives and proceedings readback.</li>
+<li><strong>Code:</strong> proposal and adoption work connected to
+Meetings.</li>
+<li><strong>Access:</strong> saved accessibility reviews, local-model
+rewrite and Spanish translation drafts, retained provenance and Records
+exports for human review.</li>
+<li><strong>Notice:</strong> content-bound review and approval, posting
+proof, verified archives and Records readback.</li>
+<li><strong>Zoning, Planning, Permitting and Inspections:</strong> staff
+workspaces whose exercised paths and limits are described in the manuals
+and acceptance.</li>
+<li><strong>Station:</strong> meeting media and the Meetings â†’ Station
+â†’ Records handoff. Standalone CivicCast remains separate.</li>
+</ul>
+<p>Core supplies shared platform services. Current owned code and
+manuals are AGPL-3.0-only; retained historical grants and third-party
+notices still apply.</p>
+<h2 id="what-was-verified">What was verified</h2>
+<p>The exact signed MSI passed fresh Windows Sandbox acceptance using
+synthetic data. Installed checks covered the Meetings and Code
+workflows, Access review/export and real local-model drafts, Notice
+review/proof/archive, the recorded-file Station/Records handoff,
+selected other product paths, backup/restore, legacy-profile protection
+and uninstall.</p>
+<p>Read the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md">acceptance
+summary and limits</a> for the precise coverage. Access local-model
+draft acceptance used a 16 GiB Sandbox. This evidence does not certify
+every screen, city configuration, physical broadcast system or external
+service. AI output remains a draft requiring staff review.</p>
+<h2 id="install-this-beta-on-a-fresh-profile">Install this beta on a
+fresh profile</h2>
+<ol type="1">
+<li>Download <code>Townlight-Candidate-Windows-x64.msi</code> and the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/SHA256SUMS-Windows-1.7.0.1.txt">published
+checksums</a> from this exact release.</li>
+<li>In PowerShell, run
+<code>Get-FileHash .\Townlight-Candidate-Windows-x64.msi -Algorithm SHA256</code>.
+The MSI SHA-256 must be
+<code>8cebaea95fa62f582326a1a0c1af3cb54233c40dbb41d88324170eb1b3f25ade</code>.</li>
+<li>Check the installer signature with
+<code>Get-AuthenticodeSignature .\Townlight-Candidate-Windows-x64.msi</code>.
+It must report <code>Valid</code>; confirm the signer matches the
+publisher named on the release page before installing.</li>
+<li>Follow the <a
+href="https://townlight.github.io/manuals/suite.html#first-run">first-run
+guide</a> and evaluate with synthetic data first.</li>
+</ol>
+<p><strong>This MSI does not upgrade an existing legacy
+profile.</strong> Preserve existing data and backups; follow the
+manual's recovery guidance. Use the explicit download above: GitHub's
+generic Latest shortcut currently points to an older release.</p>
+<h2 id="portal-and-branding">Portal and branding</h2>
+<p>The resident portal is a separately deployed beta with its own <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal">release</a>
+and <a href="https://townlight.github.io/manuals/portal.html">deployment
+guide</a>. Installing this Windows MSI does not deploy a public
+website.</p>
+<p>The website and documentation now use the selected <a
+href="https://townlight.github.io/brand/">Open Hall identity</a>.
+Application and installer icons will adopt it in the next software
+update. The existing signed MSI, corresponding source, checksums and
+original acceptance evidence are unchanged.</p>
+<h2 id="try-it-and-tell-us-what-happened">Try it and tell us what
+happened</h2>
+<p>Start with the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi">Windows
+download</a> and <a
+href="https://townlight.github.io/manuals/suite.html">Suite manual</a>.
+Report reproducible problems through the <a
+href="https://townlight.github.io/support.html">support page</a>,
+including version 1.7.0.1 and redacted evidence. Report vulnerabilities
+privately through the <a
+href="https://github.com/townlight/townlight/blob/main/SECURITY.md">security
+policy</a>.</p>
+</article></div></main><footer><span>Townlight Beta 1 · Townlight Beta 1 documentation · AGPL-3.0-only</span><span><a href="./versions.html">Exact versions and candidate</a> · CivicCast remains separate</span><span><a href="./brand/">Brand package</a></span><span><a href="./announcement.html">Announcement</a> · <a href="./support.html">Support and feedback</a></span></footer></body></html>

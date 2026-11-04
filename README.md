@@ -5,6 +5,10 @@
   </picture>
 </p>
 
+[Download Windows beta 1.7.0.1](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html)
+
+Fresh installation/profile only; this MSI does not upgrade an existing legacy profile.
+
 Windows x64 Beta 1 · MSI 1.7.0.1
 
 The signed [Windows x64 beta 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) passed the documented fresh Windows Sandbox checks with synthetic data.
