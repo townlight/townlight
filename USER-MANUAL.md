@@ -1,50 +1,80 @@
-> **Townlight Beta 1 — Station delivery update, 31 October 2026.** [Signed Windows installer, source, documentation and acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). This edition documents the Sandbox-tested Station delivery additions. Existing component versions are retained. Earlier baseline results remain identified as historical evidence; the new acceptance report identifies the new installer.
+Windows x64 Beta 1 · MSI 1.7.0.1
+
+The signed [Windows x64 beta 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) passed the documented fresh Windows Sandbox checks with synthetic data.
+
+- <a href="https://townlight.github.io/manuals/suite.html#townlight-suite-manual" id="toc-townlight-suite-manual">Townlight Suite Manual</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#using-this-manual" id="toc-using-this-manual">Using this manual</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#beta-identity" id="toc-beta-identity">Beta identity</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#first-run" id="toc-first-run">First run</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#daily-workflow" id="toc-daily-workflow">Daily workflow</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#connected-workflows" id="toc-connected-workflows">Connected workflows</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#architecture" id="toc-architecture">Architecture</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#existing-product-operating-guides" id="toc-existing-product-operating-guides">Existing product operating guides</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#technical-specifications" id="toc-technical-specifications">Technical specifications</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#configuration-and-administration" id="toc-configuration-and-administration">Configuration and administration</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#api-and-integration-examples" id="toc-api-and-integration-examples">API and integration examples</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#mcp-and-automation-boundary" id="toc-mcp-and-automation-boundary">MCP and automation boundary</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#security-and-permissions" id="toc-security-and-permissions">Security and permissions</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance" id="toc-backup-recovery-and-maintenance">Backup recovery and maintenance</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#troubleshooting" id="toc-troubleshooting">Troubleshooting</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#verified-workflows-and-limits" id="toc-verified-workflows-and-limits">Verified workflows and limits</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#terms-of-service-and-license" id="toc-terms-of-service-and-license">Terms of service and license</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#glossary" id="toc-glossary">Glossary</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#alphabetical-subject-index" id="toc-alphabetical-subject-index">Alphabetical subject index</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#source-and-document-control" id="toc-source-and-document-control">Source and document control</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#station-live-and-recorded-delivery" id="toc-station-live-and-recorded-delivery">Station live and recorded delivery</a>
+  - <a href="https://townlight.github.io/manuals/suite.html#delivery-subject-index" id="toc-delivery-subject-index">Delivery subject index</a>
+
+# Townlight Suite Manual
+
+> The signed [Windows x64 beta 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) passed the documented fresh Windows Sandbox checks with synthetic data. The [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) applies to this exact MSI.
 
 ## Using this manual
 
-Townlight Beta 1 connects nine municipal products around retained sources, named staff and explicit human decisions. This suite manual explains setup, shared operating procedures and cross-product handoffs. Each product has a complete staff and technical manual. The accepted desktop contains eight products; Station is separately configured. Standalone CivicCast remains a separate product.
+Townlight connects municipal workflows around retained sources, named staff and explicit human decisions. This suite manual explains setup, shared operating procedures and cross-product handoffs, including the bounded Access and Notice workflows. Station is separately configured. Standalone CivicCast remains a separate product.
 
-Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the full API reference and per-product source contracts. These instructions describe the Station delivery candidate rather than older public release selections.
+Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the API reference and per-product source contracts. Each acceptance result applies only to the artifact identified by its receipt.
 
 ## Beta identity
 
 | Identity | Value |
-| --- | --- |
+|----|----|
 | Public documentation identity | Townlight Beta 1 |
-| Installer version | 1.6.0.1 |
-| Native desktop source version | 1.6.0-1 |
-| Candidate artifact identity | Station delivery update; use the release SHA256SUMS.txt |
-| Corresponding source | Updated Station delivery candidate source companion |
+| Intended installer version | 1.7.0.1 |
+| Native desktop source version | 1.7.0-1 |
+| Candidate artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/SHA256SUMS-Windows-1.7.0.1.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) |
+| Corresponding source | Released Windows x64 beta |
 | Current owned software license | AGPL-3.0-only |
 | Supported acceptance profile | Windows x64 fresh install; inspections-preview; separate Station configuration |
 
-
-“Townlight Beta 1” identifies this coordinated beta delivery. It does not renumber the installer, native binary, Python packages or historical receipts. Component versions may differ. This edition accompanies the newly packaged and signed MSI containing the Station delivery additions. The native desktop and other native payload files retain their accepted signed bytes. Historical release pages and manuals describe their own versions and are not the download instructions for this Station delivery candidate.
+Use an empty database and fresh Windows profile. The installer refuses legacy profile initialization. The approved profile path is `%LOCALAPPDATA%\CivicSuite`. Keep existing profiles and backups.
 
 ### Component versions
 
-| Product | Package | Existing version |
-| --- | --- | --- |
-| Core | civiccore | 1.3.0.dev1 |
-| Records | civicrecords-ai | 1.8.0.dev1 |
-| Meetings | civicclerk | 1.0.4 |
-| Code | civiccode | 1.0.8 |
-| Zoning | civiczone | 0.2.2 |
-| Planning | civicplan | 0.4.0.dev1 |
-| Permitting | civicpermit | 0.3.0+dev.1 |
-| Inspections | civicinspect | 0.3.0+dev.1 |
-| Station | townlight-station | 0.3.0 |
-
+| Component     | Distribution          | Installed version |
+|---------------|-----------------------|-------------------|
+| Core          | townlight-core        | 1.3.0.dev2        |
+| Records       | townlight-records     | 1.8.0.dev2        |
+| Meetings      | townlight-meetings    | 1.0.5             |
+| Code          | townlight-code        | 1.0.9             |
+| Zoning        | townlight-zoning      | 0.2.3             |
+| Planning      | townlight-planning    | 0.4.0.dev2        |
+| Permitting    | townlight-permitting  | 0.3.0+dev.2       |
+| Inspections   | townlight-inspections | 0.3.0+dev.2       |
+| Station       | townlight-station     | 0.3.0             |
+| Access        | townlight-access      | 0.5.0             |
+| Notice        | townlight-notice      | 0.3.0             |
+| Local runtime | townlight-runtime     | 0.2.0             |
 
 ## First run
 
-1. Download the signed Windows installer and matching source/documentation companions from the [Station delivery release](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). Use that release’s checksums and publisher signature to identify the candidate.
-2. On the intended fresh Windows test installation, verify the MSI hash and publisher signature before installing. Preserve unrelated profiles and recovery material. This candidate has fresh-install acceptance; historical in-place upgrades are unverified.
-3. Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for all eight desktop products. A narrower default selection will not expose all workspaces.
-4. Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
-5. Run Health Check and wait for readiness. Open Townlight. In System Health select **Finish Records Migration** to activate the canonical Python/PostgreSQL runtime. Do not fabricate migration receipts or seed accounts.
-6. Create named staff through Settings. Import authorized sources using each product’s source library. All examples in this package are synthetic; they are not municipal authority.
-7. Provision Station separately if it is part of the beta exercise. Selecting the desktop composition does not start or configure Station. Configure vision explicitly only if automatic photo drafting is selected.
+1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) release.
+2.  Verify the MSI hash and Authenticode publisher before installing on a fresh Windows profile. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) for the tested setup.
+3.  Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for the bounded desktop composition, including Access and Notice. A narrower selection will not expose all workspaces.
+4.  Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
+5.  Run Health Check and wait for readiness. Open Townlight. In System Health select **Finish Records Migration** to activate the canonical Python/PostgreSQL runtime. Do not fabricate migration receipts or seed accounts.
+6.  Create named staff through Settings. Import authorized sources using each product’s source library. All examples in this package are synthetic; they are not municipal authority.
+7.  Provision Station separately if it is part of the beta exercise. Selecting the desktop composition does not start or configure Station. Configure vision explicitly only if automatic photo drafting is selected.
 
 ## Daily workflow
 
@@ -62,11 +92,11 @@ Drafting, review, approval, attachment, export, fulfillment and publication are 
 
 ### Meeting capture to a Records response
 
-1. Meetings staff create the meeting and assign agenda items; save the canonical records.
-2. An authorized Station operator opens a one-use staff launch, chooses that meeting and a configured live input or managed file, then starts capture.
-3. Stop and wait for completed validated media. Inspect the content and provenance. Partial/failed attempts stay separate.
-4. Records-authorized staff explicitly attach the completed recording to an existing request. The receiver verifies bytes/hash and retains one locked private original, including on an identical retry.
-5. Records separately prepares any release copy, records release/redact/exempt decisions, approves exact response text, exports the response/package and fulfills the request. Capture and handoff do not publish it.
+1.  Meetings staff create the meeting and assign agenda items; save the canonical records.
+2.  An authorized Station operator opens a one-use staff launch, chooses that meeting and a configured live input or managed file, then starts capture.
+3.  Stop and wait for completed validated media. Inspect the content and provenance. Partial/failed attempts stay separate.
+4.  Records-authorized staff explicitly attach the completed recording to an existing request. The receiver verifies bytes/hash and retains one locked private original, including on an identical retry.
+5.  Records separately prepares any release copy, records release/redact/exempt decisions, approves exact response text, exports the response/package and fulfills the request. Capture and handoff do not publish it.
 
 ### Legislation to cited staff guidance
 
@@ -83,7 +113,7 @@ Core provides shared contracts, named account/session support, ingestion/task he
 ### Product guide directory
 
 | Product | Purpose | Manual |
-| --- | --- | --- |
+|----|----|----|
 | Core | A shared foundation for accountable municipal work. | [Core](https://townlight.github.io/manuals/core.html) |
 | Records | From request intake to a deliberate release. | [Records](https://townlight.github.io/manuals/records.html) |
 | Meetings | Keep the agenda, decisions and evidence connected. | [Meetings](https://townlight.github.io/manuals/meetings.html) |
@@ -94,16 +124,15 @@ Core provides shared contracts, named account/session support, ingestion/task he
 | Inspections | Preserve evidence and review every draft finding. | [Inspections](https://townlight.github.io/manuals/inspections.html) |
 | Station | Capture the meeting and preserve its evidence. | [Station](https://townlight.github.io/manuals/station.html) |
 
-
 ## Architecture
 
-<img class="flow" src="https://townlight.github.io/assets/suite-architecture.svg" alt="Townlight Suite architecture and evidence flow">
+<img src="https://townlight.github.io/assets/suite-architecture.svg" class="flow" alt="Townlight Suite architecture and evidence flow" />
 
 The drawing shows the principal staff/evidence path. Native commands carry trusted identity to Python business services; PostgreSQL and retained original files hold durable state. A downstream copy does not silently transfer decision authority. Station has its own configured authority/media boundary, database and mutable files. The connected-workflow text supplies the drawing’s reading order and accessibility alternative.
 
 ## Existing product operating guides
 
-Use each product's operating chapter for its actual controls, inputs, readback and refusal states. The suite coordinates evidence and authority; it does not replace those product decisions. Station requires an explicitly configured paired runtime and its separate operating procedure. The Code importer submits directly; Planning's source library has its own preview/confirmation flow.
+Use each product’s operating chapter for its actual controls, inputs, readback and refusal states. The suite coordinates evidence and authority; it does not replace those product decisions. Station requires an explicitly configured paired runtime and its separate operating procedure. The Code importer submits directly; Planning’s source library has its own preview/confirmation flow.
 
 - [Core operating procedure](https://townlight.github.io/manuals/core.html#shared-catalog-rules-and-scaffolding).
 - [Records operating procedure](https://townlight.github.io/manuals/records.html#fees-messages-notifications-and-local-intake).
@@ -115,8 +144,8 @@ Use each product's operating chapter for its actual controls, inputs, readback a
 - [Inspections operating procedure](https://townlight.github.io/manuals/inspections.html#evidence-limits-outlines-and-previous-cases).
 - [Station operating procedure](https://townlight.github.io/manuals/station.html#scheduling-playout-and-recovery).
 
-
 ## Technical specifications
+
 ### Runtime and storage
 
 The accepted package targets **Windows x64 fresh installation**. Its native shell uses **Rust 2021, Tauri 2 and Microsoft WebView2**; browser assets are JavaScript built with **Vite 8.1.6**. This describes the native desktop frontend; Station has a separate React operator, specified below or in its product manual. Canonical business workflows use bundled **CPython 3.13.5, FastAPI, Pydantic, SQLAlchemy and Alembic**, with **PostgreSQL 17 / PostGIS** and managed original files. The installed runtime tested here contains FastAPI 0.162.0. Package minimum Python requirements can differ from the bundled executable; the metadata reference preserves both. No stack rewrite is implied by the beta label.
@@ -133,31 +162,33 @@ Versioned saves use expected prior revision identifiers where defined. Reopen an
 
 ### Capacity and platform statements
 
-This beta has synthetic single-profile workflow evidence. It does not have a published benchmark for concurrent staff capacity, minimum RAM/CPU, large-source limits or a field SLA. Do not turn a developer machine’s specification into a supported minimum. Installer size is 2,092,122,112 bytes before installation; allow additional disk for extracted runtime, database, originals, exports, media and backups. Select equipment/storage after sizing those actual workloads.
+This beta has synthetic single-profile workflow evidence. It does not have a published benchmark for concurrent staff capacity, minimum RAM/CPU, large-source limits or a field SLA. Do not turn a developer machine’s specification into a supported minimum. The signed MSI is 2,082,697,216 bytes; allow additional disk for extracted runtime, database, originals, exports, media and backups. Select equipment/storage after sizing those actual workloads.
 
 The exact [runtime payload lock](https://townlight.github.io/reference/runtime-payload-lock.json) records pinned files, sizes and hashes. The [component metadata](https://townlight.github.io/reference/component-metadata.json) records shipped dependency declarations. These references are more precise than a manually copied dependency list. Third-party and historical license notices must accompany their matching payloads.
 
 ### Station operator and media components
 
-The native desktop frontend above is distinct from Station's browser operator. The pinned operator package `townlight-station-operator` is version **0.1.0**, using **React/react-dom 19.1.1**, **TypeScript 5.9.2**, **Vite 7.3.7** and the React Vite plugin 5.0.2. Station serves its built assets through its own operator API. Its Python control/API package remains **townlight-station 0.3.0**, while its retained storage identity remains **0.1.0**. These identities have different purposes and are not renumbered.
+The native desktop frontend above is distinct from Station’s browser operator. The pinned operator package `townlight-station-operator` is version **0.1.0**, using **React/react-dom 19.1.1**, **TypeScript 5.9.2**, **Vite 7.3.7** and the React Vite plugin 5.0.2. Station serves its built assets through its own operator API. Its Python control/API package remains **townlight-station 0.3.0**, while its retained storage identity remains **0.1.0**. These identities have different purposes and are not renumbered.
 
-The separate pinned CivicCast-derived media engine uses Python/native GStreamer processing and bounded media children. It is not the standalone CivicCast application. Station's control database, data root, service/configuration and update identity remain independent. This describes the current mixed stack; no runtime rewrite or CivicCast migration is implied.
+The separate pinned CivicCast-derived media engine uses Python/native GStreamer processing and bounded media children. It is not the standalone CivicCast application. Station’s control database, data root, service/configuration and update identity remain independent. This describes the current mixed stack; no runtime rewrite or CivicCast migration is implied.
 
 ## Configuration and administration
+
 ### Native deployment configuration
 
-Use Setup, Settings and System Health for supported staff operation. Administrators provision folders, backup storage, named accounts and the city profile. Select `inspections-preview` for the full eight-workspace desktop. Station remains a separate service boundary. Do not use a standalone product’s demo server as a substitute for the installed workspace.
+Use Setup, Settings and System Health for supported staff operation. Administrators provision folders, backup storage, named accounts and the city profile. Select `inspections-preview` for the bounded desktop composition, including Access and Notice. Station remains a separate service boundary. Do not use a standalone product’s demo server as a substitute for the installed workspace.
 
-Technical deployments use `TOWNLIGHT_PRODUCT_PROFILE`, `TOWNLIGHT_PROFILE_ROOT`, `DATABASE_URL`, `CIVICSUITE_RUNTIME_PORT`, `PORTAL_MODE` and the runtime-managed secret files. Treat database URLs and native session proofs as secrets. The installed native domain runtime explicitly refuses non-loopback binding. `PORTAL_MODE=private` is the accepted posture; changing it does not by itself commission an internet portal, authentication provider or reverse proxy.
+Technical deployments use `TOWNLIGHT_PRODUCT_PROFILE`, `TOWNLIGHT_PROFILE_ROOT`, `DATABASE_URL`, `TOWNLIGHT_RUNTIME_PORT`, `PORTAL_MODE` and the runtime-managed secret files. Treat database URLs and native session proofs as secrets. The installed native domain runtime explicitly refuses non-loopback binding. `PORTAL_MODE=private` is the accepted posture; changing it does not by itself commission an internet portal, authentication provider or reverse proxy.
 
 The isolated documentation exporter sets a fictional profile and unusable synthetic database origin only to read schemas; those values are not deployment configuration. Keep deployment values in the intended process/account scope. An already-running process does not automatically inherit later environment edits.
 
 ## API and integration examples
+
 ### Native command example
 
 The following JavaScript belongs in the existing trusted Townlight frontend/development environment with `invoke` imported from `@tauri-apps/api/core`. It is not a command for an arbitrary web page or an instruction for nontechnical staff. IDs must come from records created in an isolated synthetic exercise.
 
-```javascript
+``` javascript
 import { invoke } from '@tauri-apps/api/core';
 const result = await invoke('meetings_domain_request', {request: {operation: 'get-proceedings', id: meetingId}});
 console.log(result);
@@ -167,7 +198,7 @@ console.log(result);
 
 An administrator/developer can inspect an already-configured isolated runtime from a trusted local process. This PowerShell example reads the signed-in synthetic profile’s existing proof into memory; it does not create a user, seed a session, reveal the proof in output or bypass a permission check. Do not use real city data in development examples. A read response does not prove approval or publication.
 
-```powershell
+``` powershell
 $profilePath = Join-Path $env:LOCALAPPDATA 'CivicSuite'
 $sessionPath = Join-Path $profilePath 'config\local-session.json'
 $session = Get-Content -LiteralPath $sessionPath -Raw | ConvertFrom-Json
@@ -180,7 +211,7 @@ Remove-Variable session, headers
 
 This example demonstrates the existing Meetings HTTP contract in an isolated exercise. It is intentionally fictional. It does not start a service. Its authentication setup is included so it can be run independently under the signed-in synthetic account. If a write times out, inspect current records before repeating it.
 
-```powershell
+``` powershell
 $profilePath = Join-Path $env:LOCALAPPDATA 'CivicSuite'
 $sessionPath = Join-Path $profilePath 'config/local-session.json'
 $session = Get-Content -LiteralPath $sessionPath -Raw | ConvertFrom-Json
@@ -214,14 +245,13 @@ The bundled transcription code includes a **TextFlowKit MCP adapter** as a separ
 
 For a transcription client already provisioned separately, an illustrative tool call is:
 
-```json
+``` json
 {"name":"get_job_status","arguments":{"job_id":"synthetic-existing-job-id"}}
 ```
 
 Use a job ID returned by that transcription service. This example does not create a Townlight record or bypass its review/Records handoff. The exact optional adapter tool signatures are supplied in the [MCP source reference](https://townlight.github.io/reference/mcp.html). Station meeting capture does not become live speech recognition because this optional donor adapter exists.
 
 ## Security and permissions
-
 
 Use your own named account and save before leaving a screen. A saved draft is durable; unsaved form text may not be. If a write has an unknown result, reopen its record before repeating it.
 
@@ -248,7 +278,7 @@ On failure, record the time, selected composition, component/installer versions 
 ## Troubleshooting
 
 | Symptom | Likely meaning | Next action |
-| --- | --- | --- |
+|----|----|----|
 | Workspace absent | Wrong product composition or unavailable canonical runtime. | Check selected composition; activate through Finish Records Migration; wait for readiness. |
 | Cannot sign in / 401 | Missing or expired named account session. | Sign in normally; reopen a Station launch ticket if applicable. |
 | Permission denied / 403 | Account, module, source or browser-origin permission. | Ask the authorized administrator to inspect the intended permission; do not invent role headers. |
@@ -258,11 +288,10 @@ On failure, record the time, selected composition, component/installer versions 
 | Export refused | Missing exact review, approval, audience or source authorization. | Read the refusal and complete the owning product’s explicit decision. |
 | Restore needs service start | The snapshot was restored but services have not resumed. | Use Start, then Check and verify a saved record; do not blindly repeat restore. |
 
-
 ## Verified workflows and limits
 
 | Product | Recorded result | Precisely exercised |
-| --- | --- | --- |
+|----|----|----|
 | Core | PASS | Normal empty-profile setup; canonical activation; UI-created staff and sign-in; staff denied user administration; coherent backup, mutation, restore, Start/Check and retained/absent record readback. |
 | Records | PASS | Intake, note, original attachment/readback, separate release copy, explicit release decision, draft/approval, approved response and release package exports, fulfillment/readback and native workspace. |
 | Meetings | PASS | Meeting/agenda, packet assembly, motion/vote, supplied transcript, reviewed/adopted minutes, restricted local archive and proceedings readback; Code decision integration. |
@@ -273,10 +302,9 @@ On failure, record the time, selected composition, component/installer versions 
 | Inspections | PASS | Retained original/hash, supplied observations and voice summary, saved/reviewed case/readback, separate exact Records copy and private handoff; address exclusion; native workspace. |
 | Station | PASS | Actual native staff session and normally created meeting; headless operator live start/stop, decoded generated audio/video, served hash, private Records readback, idempotent locked original and logout. |
 
+The [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) records the installed Windows checks for this MSI. The earlier Station delivery evidence applies to its original build.
 
-The following baseline results come from the previously accepted signed candidate’s fresh normal-profile Sandbox exercise: real native IPC/HTTP/PostgreSQL and selected headless controls. All accounts, source bundles and media were synthetic. The guest install/uninstall and recovery passed, and the owned Sandbox stopped. No host installed application or standalone CivicCast was changed. Those baseline receipts are retained for unchanged workflows. The accompanying ACCEPTANCE.md records the separate installed verification and exact identity of this new Station delivery candidate.
-
-The [workflow matrix](https://townlight.github.io/reference/workflow-matrix.json) identifies raw receipt filenames. The [evidence index](https://townlight.github.io/reference/sandbox-evidence-index.json) retains their original hashes; raw receipts remain in the private beta handoff rather than being silently republished with the documentation site.
+See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) for this MSI. The historical [evidence index](https://townlight.github.io/reference/sandbox-evidence-index.json) applies to its original build.
 
 The limits remain: actual city field acceptance and equipment/network commissioning; Station automatic provisioning/SCM commissioning; every UI/role combination; field recognition accuracy; and historical in-place upgrades are not certified. They are not five invented feature requirements. Fresh-install controlled beta handoff remains the accepted scope. This package makes no city-deployment, publication or general-availability claim.
 
@@ -323,7 +351,7 @@ When an organization ends testing, it controls retention/export and removes acce
 ## Glossary
 
 | Term | Meaning |
-| --- | --- |
+|----|----|
 | Approval | An explicit authorized decision on the saved text/artifact. It is separate from saving or attachment. |
 | Canonical record | The owning product’s retained identity and saved version, rather than an editable copied label. |
 | Composition | The selected set of desktop modules; inspections-preview exposes the eight staff products. |
@@ -339,31 +367,30 @@ When an organization ends testing, it controls retention/export and removes acce
 | Snapshot | A fixed audience-specific copy tied to a source/reviewed revision. |
 | Station | Townlight’s separate media boundary using a pinned CivicCast-derived engine; standalone CivicCast remains separate. |
 
-
 ## Alphabetical subject index
 
-- **Accounts and authentication** — [Security and permissions](#security-and-permissions).
-- **AGPL and source** — [Terms of service and license](#terms-of-service-and-license).
-- **API contracts** — [API and integration examples](#api-and-integration-examples).
-- **Architecture** — [Architecture](#architecture).
-- **Backup** — [Backup recovery and maintenance](#backup-recovery-and-maintenance).
-- **Beta version** — [Beta identity](#beta-identity).
-- **Configuration** — [Configuration and administration](#configuration-and-administration).
-- **Evidence and acceptance** — [Verified workflows and limits](#verified-workflows-and-limits).
-- **Fees and official decisions** — [Terms of service and license](#terms-of-service-and-license).
-- **First run** — [First run](#first-run).
-- **Handoffs and audience** — [Connected workflows](#connected-workflows).
-- **MCP** — [MCP and automation boundary](#mcp-and-automation-boundary).
-- **Originals and provenance** — [Security and permissions](#security-and-permissions).
-- **Recovery** — [Backup recovery and maintenance](#backup-recovery-and-maintenance).
-- **Staff procedures** — [Daily workflow](#daily-workflow).
-- **Station configuration** — [Configuration and administration](#configuration-and-administration).
-- **Technical stack** — [Technical specifications](#technical-specifications).
-- **Troubleshooting** — [Troubleshooting](#troubleshooting).
+- **Accounts and authentication** — [Security and permissions](https://townlight.github.io/manuals/suite.html#security-and-permissions).
+- **AGPL and source** — [Terms of service and license](https://townlight.github.io/manuals/suite.html#terms-of-service-and-license).
+- **API contracts** — [API and integration examples](https://townlight.github.io/manuals/suite.html#api-and-integration-examples).
+- **Architecture** — [Architecture](https://townlight.github.io/manuals/suite.html#architecture).
+- **Backup** — [Backup recovery and maintenance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
+- **Beta version** — [Beta identity](https://townlight.github.io/manuals/suite.html#beta-identity).
+- **Configuration** — [Configuration and administration](https://townlight.github.io/manuals/suite.html#configuration-and-administration).
+- **Evidence and acceptance** — [Verified workflows and limits](https://townlight.github.io/manuals/suite.html#verified-workflows-and-limits).
+- **Fees and official decisions** — [Terms of service and license](https://townlight.github.io/manuals/suite.html#terms-of-service-and-license).
+- **First run** — [First run](https://townlight.github.io/manuals/suite.html#first-run).
+- **Handoffs and audience** — [Connected workflows](https://townlight.github.io/manuals/suite.html#connected-workflows).
+- **MCP** — [MCP and automation boundary](https://townlight.github.io/manuals/suite.html#mcp-and-automation-boundary).
+- **Originals and provenance** — [Security and permissions](https://townlight.github.io/manuals/suite.html#security-and-permissions).
+- **Recovery** — [Backup recovery and maintenance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
+- **Staff procedures** — [Daily workflow](https://townlight.github.io/manuals/suite.html#daily-workflow).
+- **Station configuration** — [Configuration and administration](https://townlight.github.io/manuals/suite.html#configuration-and-administration).
+- **Technical stack** — [Technical specifications](https://townlight.github.io/manuals/suite.html#technical-specifications).
+- **Troubleshooting** — [Troubleshooting](https://townlight.github.io/manuals/suite.html#troubleshooting).
 
 ### Operating subject links
 
-- **Existing product operating guides** — [Existing product operating guides](#existing-product-operating-guides).
+- **Existing product operating guides** — [Existing product operating guides](https://townlight.github.io/manuals/suite.html#existing-product-operating-guides).
 
 ## Source and document control
 
@@ -375,12 +402,11 @@ This edition is authored from the immutable corresponding-source companion, the 
 - [Workflow matrix](https://townlight.github.io/reference/workflow-matrix.json)
 - [Full AGPL text](https://townlight.github.io/reference/AGPL-3.0.txt)
 
-
 ## Station live and recorded delivery
 
 Station now offers two explicit delivery paths. During a live recording, staff may select an administrator-configured encrypted SRT feed to the separate CivicCast product. The PEG operator controls local cable take-to-air. After completion, staff may approve an upload copy to the Station-configured YouTube account, select its title and visibility, and inspect the durable receipt. The private canonical recording and existing Meetings → Station → Records handoff remain independent.
 
-<img class="flow" src="https://townlight.github.io/assets/station-delivery-architecture.svg" alt="Station live delivery and completed video uploads">
+<img src="https://townlight.github.io/assets/station-delivery-architecture.svg" class="flow" alt="Station live delivery and completed video uploads" />
 
 These paths reuse the pinned CivicCast media and YouTube client code. A separate sender isolates network backpressure from capture, and a separate upload worker prevents long uploads from blocking recording. YouTube starts no live broadcast here. Standalone CivicCast has separate installation, identity, storage and operator control.
 
@@ -388,17 +414,14 @@ Administrators run the explicit Station schema4 migration and provision Station-
 
 See [the Station manual delivery section](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage) for full staff steps, architecture, configuration, API request examples, permissions and recovery. Existing eight-product workflows are unchanged; their accepted evidence is retained rather than presented as a new run.
 
-
 ## Delivery subject index
 
 - [CivicCast live feed](https://townlight.github.io/manuals/station.html#completed-recordings-on-youtube-and-live-civiccast-coverage)
 - YouTube: explicit completed recording upload; visibility; receipt and reconciliation.
 - Schema4: durable upload intent; existing evidence retained.
 
-## Public meeting portal (separately deployed beta)
+<div class="section" aria-label="Resident portal">
 
-The approved resident-facing website design is implemented in the portal: city identity and imagery, a resident task finder, editable service guidance, filtered meeting archives, approved recording playback and printable agenda/packet/minutes pages. City editors use Wagtail's existing page approval workflow. Service handoffs name the destination host; they do not create new resident accounts or transactions. Search covers public page and meeting titles only. Drafts, restricted pages and withdrawn records are excluded. City branding and guidance are exportable with referenced uploaded imagery. See the portal guide for field specifications, route examples, deployment and synthetic verification. Existing component versions remain unchanged; the label is Townlight Beta 1.
+The resident portal is deployed separately. See the [Townlight Portal Guide](https://townlight.github.io/manuals/portal.html) for its workflow and acceptance limits.
 
-Townlight's separately deployed portal can publish a reviewed Meetings archive with an explicitly selected, verified Records release copy of the matching completed Station recording. Staff must separately approve publication; fulfilling a Records request does not make the copy public. Review public text and the selected file, then use the Wagtail superuser publication form. Explicit withdrawal hides the published meeting and file. An unsuccessful sync preserves the previous publication. Keep the private original and never expose the native session proof. See the [portal guide](docs/beta-1/manuals/portal.html) for staff steps, setup, API, recovery and source obligations.
-
-This portal beta is distributed separately from the desktop installer. The existing signed Beta 1 installer and historical Sandbox results do not establish that it contains or deploys this portal. CivicCast remains separate.
+</div>
