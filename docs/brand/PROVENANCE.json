@@ -1,0 +1,150 @@
+{
+  "identity": "Townlight Open Hall",
+  "selected_by": "Scott",
+  "selected_on": "2026-11-04",
+  "source": "User-supplied Open Hall artwork and brand guide",
+  "assets": [
+    {
+      "file": "svg/townlight-hall-app-icon.svg",
+      "supplied_sha256": "94b5675dfcdc388865aa8d10edf4b3c7ea85ba34ef8f9fac06e1b6236349b40f",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup-mono-black.svg",
+      "supplied_sha256": "1fcdc63d13b11142d4c9b1f9d50895a23ad9f1a6de73beee2fb28961218c5e1d",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup-mono-white.svg",
+      "supplied_sha256": "670cbc86c1f606cea974b46660dc802796d4fc2098cc7c35f305f749e106ac22",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup-reversed.svg",
+      "supplied_sha256": "4337de90124b7ac14410a58d9ae096075d1ab51d3c1342417f6655bbbd13d0b2",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup-tagline-reversed.svg",
+      "supplied_sha256": "6d8c6642cf0c36dbeb6eedc2d83066e1a781a1e2f83f7776c751697533708424",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup-tagline.svg",
+      "supplied_sha256": "0c8f7c3fcd2624268a471b2f172daa04d11d073f1b76203ea924dd5d7cbdba24",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-lockup.svg",
+      "supplied_sha256": "ab0ca88fd26ba37139f753eb1c053f6144e7f6ec977cf8081380038e1781697a",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-mark-mono-black.svg",
+      "supplied_sha256": "e3e4a24261f314eb49e9df444f06acd24615716f21a7c2e4ff8784eceaccb599",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-mark-mono-white.svg",
+      "supplied_sha256": "51189e621f3b1276aca12f8a670e45f5fd40d0cdaaf1125430b580bc56789102",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-mark-reversed.svg",
+      "supplied_sha256": "e138806a9e99fdcf763ad2c49b537d432315d7bb159fcc696c553a234cfcd408",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-mark-small.svg",
+      "supplied_sha256": "08fb842d9c02b68045dc162e820adfcec8ed139d902103a4f1d5cf3d9ba27809",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-mark.svg",
+      "supplied_sha256": "41dba2157a6f42256934b37f5d2d56e1fef3fe3fa245e3a8967b7881e2ab9a7a",
+      "changed": false
+    },
+    {
+      "file": "svg/townlight-hall-social-preview.svg",
+      "supplied_sha256": "1a3dbbcb01a49f29cef9306d861944df4b18c6569ea274ba5cd679db7564d585",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-app-icon-1024.png",
+      "supplied_sha256": "fb9dd2f2628f599fcd25e29aadbad7a9a80ec8ab150b8f370b761af9d9ea860e",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-app-icon-180.png",
+      "supplied_sha256": "44e64abf3fba62d73aeb7cce013adb4f24df4a390811d426119ffdee5b798d17",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-app-icon-512.png",
+      "supplied_sha256": "1921a58140d923309e9b84bc04c6471fef8b1d2866df76a06e2025f474beda67",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-lockup-reversed.png",
+      "supplied_sha256": "ab59f9d56f0a7bfea9b6a6142b4b00802e7c6ad3255912160dc70ba4fce669ea",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-lockup-tagline.png",
+      "supplied_sha256": "0b41feeefe32878174867130575d411133ef95a3f67ba2043ea5c9af00929187",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-lockup.png",
+      "supplied_sha256": "637148779a9811accd21d7bf05701fea03c357e8653bbfc657e3af7990178915",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-mark-128.png",
+      "supplied_sha256": "3d90773a91735790a24d7f52d7e0cb55d09999a68b0ffb7b3197144a9a1ca82b",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-mark-512.png",
+      "supplied_sha256": "199ac383b51b1502d0e4fe8c69262f39b86195629feb60fed83869255bd2b3ac",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-mark-reversed-512.png",
+      "supplied_sha256": "36e1b2f38cdb505ea26080ed9728e62f9a7ae672d02f8f49722bdd4a7ce26e86",
+      "changed": false
+    },
+    {
+      "file": "png/townlight-hall-social-preview.png",
+      "supplied_sha256": "2565956248de86f9f8ac9931b939a5a670f20e87cc4fcbd8e349d118fabb2c22",
+      "changed": false
+    },
+    {
+      "file": "favicon.ico",
+      "supplied_sha256": "d634a06f4136a8ce941cf20fa06f7001ee425ae87c19717741ce201049ceb966",
+      "changed": false
+    },
+    {
+      "file": "favicon.svg",
+      "supplied_sha256": "95cb59c8f2345b4524b8baecd5d5c16bc506175933a76f81be115a123713e420",
+      "changed": true
+    },
+    {
+      "file": "png/favicon-16.png",
+      "supplied_sha256": "d861afbe496fa50e99a9c7846ce2c637d6581cb3da6c387b20a272ecd4545e60",
+      "changed": false
+    },
+    {
+      "file": "png/favicon-32.png",
+      "supplied_sha256": "fc9776e6544076e1d2a2233e912a9002eebc979e6a3cce45ca3db1735677d159",
+      "changed": false
+    },
+    {
+      "file": "png/favicon-48.png",
+      "supplied_sha256": "fad76497187b4d14d05ed6d11f0808cf1e9c8bf636d3d7371d5e67031fd9d0e1",
+      "changed": false
+    }
+  ],
+  "font_license_source": "https://raw.githubusercontent.com/adobe-fonts/source-serif/release/LICENSE.md",
+  "favicon_correction": "Restored missing color classes and prefers-color-scheme rules; removed superseded C2PA metadata."
+}
