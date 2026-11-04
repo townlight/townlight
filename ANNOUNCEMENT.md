@@ -1,143 +1,81 @@
-# Townlight 1.4.0-beta.1 public beta
+# Townlight Windows public beta 1.7.0.1 is available
 
-## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
+Municipal software cities can actually own.
 
-Published October 21, 2026. Four connected Townlight products run locally through
-bundled Python services and PostgreSQL, with Core, Notice and Access supporting
-them. This is a bounded Windows public beta, not general availability or completion
-of the full municipal suite.
+Townlight's signed Windows x64 public beta is available now. It brings municipal
+work into connected local workspaces, with a record of the sources, staff review
+and decisions behind it. The installer was published on 3 November 2026; this
+announcement was updated on 4 November 2026.
 
-[Download the signed Windows installer](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) ·
-[Signed acceptance and limits](docs/installer/townlight-zoning-beta1-signed-acceptance.md) · [User manual](USER-MANUAL.md)
+[Download the signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi) Â·
+[Release, corresponding source and checksums](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) Â·
+[Read the manual](https://townlight.github.io/manuals/suite.html) Â·
+[Get help or report a problem](https://townlight.github.io/support.html)
 
-Records-only remains the installation default. Explicitly select **zoning-beta**
-for Records, Meetings, Code and Zoning. Existing saved selections are preserved;
-**city-core** continues to select Records, Meetings and Code without Zoning.
-Planning, Permitting and Inspections are not enabled by zoning-beta.
+## What you can evaluate
 
-Zoning imports staff-supplied EPSG:4326 GeoJSON bundles using PostgreSQL
-17.10/PostGIS 3.6.2. Cited rules, human corrections, permitted Meetings history and
-explicitly public immutable Zoning snapshots connect to Records with source
-history and hashes preserved. Private notes remain protected. Answers are
-informational, not zoning determinations, permit approvals or legal advice.
+- **Records:** public-records request, review and export workflows.
+- **Meetings:** meeting and agenda preparation, packets, motions and votes,
+  minutes, archives and proceedings readback.
+- **Code:** proposal and adoption work connected to Meetings.
+- **Access:** saved accessibility reviews, local-model rewrite and Spanish
+  translation drafts, retained provenance and Records exports for human review.
+- **Notice:** content-bound review and approval, posting proof, verified archives
+  and Records readback.
+- **Zoning, Planning, Permitting and Inspections:** staff workspaces whose
+  exercised paths and limits are described in the manuals and acceptance.
+- **Station:** meeting media and the Meetings â†’ Station â†’ Records handoff.
+  Standalone CivicCast remains separate.
 
-The exact signed MSI and embedded EXE passed independent signature/hash checks,
-fresh installed workflows, populated signed 1.3 upgrade, backup/restore and
-retained-data uninstall. Optional local AI is not required for these deterministic
-workflows. Human response approval and final export remain separate from attaching
-a source; no automatic public publication is introduced.
+Core supplies shared platform services. Current owned code and manuals are
+AGPL-3.0-only; retained historical grants and third-party notices still apply.
 
-## Historical Records 1.1.0-beta.3 announcement
+## What was verified
 
-Townlight Records brings public-records intake, deadlines, cited search,
-human review, accessibility support, release packaging, fulfillment, public
-status, audit history, and backup/restore to one Windows desktop product.
-Fresh setup includes Core, Records, Notice, and Access. It requires no Docker,
-WSL, terminal, or paid AI account. The fictional Redstone Valley demo is
-explicitly loaded by a local admin; optional local AI is not needed to try
-deterministic Records work.
+The exact signed MSI passed fresh Windows
+Sandbox acceptance using synthetic data. Installed checks covered the Meetings
+and Code workflows, Access review/export and real local-model drafts, Notice
+review/proof/archive, the recorded-file Station/Records handoff, selected other
+product paths, backup/restore, legacy-profile protection and uninstall.
 
-Beta.3 moves active Records work to bundled Python/PostgreSQL after explicit
-administrator activation, preserving historical requests, audit and exports
-through validated import. There is no fallback to the old JSON after cutover.
-The existing approval rule requires fresh human approval when response text is
-successfully replaced. Failed generation and unrelated request changes preserve
-approval. Historical notes and exports remain intact. Both desktop executable
-and MSI are signed, independently verified, and installed-tested. See the
-[completed acceptance record](docs/installer/townlight-records-beta3-acceptance.md).
-Final signed fresh-install and direct-upgrade acceptance passed October 19, 2026;
-the project owner approved publication conditional on that result.
-[Download the signed beta and acceptance evidence](https://github.com/townlight/townlight/releases/tag/townlight-records-v1.1.0-beta.3).
-This is a beta prerelease, not a general-availability release.
+Read the [acceptance summary and limits](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) for the precise coverage.
+Access local-model draft acceptance used a 16 GiB Sandbox. This evidence does
+not certify every screen, city configuration, physical broadcast system or
+external service. AI output remains a draft requiring staff review.
 
-Read the [current manual](USER-MANUAL.md) and [release evidence status](STATUS.md).
-The beta tag is `townlight-records-v1.1.0-beta.3`.
-Earlier beta.2 drafts are preserved but not accepted releases.
+## Install this beta on a fresh profile
 
-## Historical Townlight Windows Local 1.0.2 announcement
+1. Download `Townlight-Candidate-Windows-x64.msi` and the
+   [published checksums](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/SHA256SUMS-Windows-1.7.0.1.txt) from this exact release.
+2. In PowerShell, run `Get-FileHash .\Townlight-Candidate-Windows-x64.msi -Algorithm SHA256`.
+   The MSI SHA-256 must be
+   `8cebaea95fa62f582326a1a0c1af3cb54233c40dbb41d88324170eb1b3f25ade`.
+3. Check the installer signature with
+   `Get-AuthenticodeSignature .\Townlight-Candidate-Windows-x64.msi`.
+   It must report `Valid`; confirm the signer matches the publisher named on the release page before installing.
+4. Follow the [first-run guide](https://townlight.github.io/manuals/suite.html#first-run)
+   and evaluate with synthetic data first.
 
-The original announcement below describes a predecessor. Its old download
-directions and six-module claims do not describe the Records candidate.
+**This MSI does not upgrade an existing legacy profile.** Preserve existing data
+and backups; follow the manual's recovery guidance. Use the explicit download
+above: GitHub's generic Latest shortcut currently points to an older release.
 
-**TL;DR:** Townlight city-core for Windows v1.0.2 is out. One MSI still installs the whole six-module suite — database, local AI model, and clerk workflows on one Windows machine — and this release makes the suite better in three ways: the **Accessibility tab is now on screen and three of its tools run on the suite's local AI**, a shared engine fix **improved the output quality of every AI feature in the suite**, and a clean-machine fix means **first-run setup now completes on a factory-fresh Windows PC**. No cloud, no signup, no telemetry. Download it, run it, try it.
+## Portal and branding
 
-Get it: <https://github.com/townlight/townlight/releases/latest>
+The resident portal is a separately deployed beta with its own
+[release](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal)
+and [deployment guide](https://townlight.github.io/manuals/portal.html). Installing
+this Windows MSI does not deploy a public website.
 
----
+The website and documentation now use the selected
+[Open Hall identity](https://townlight.github.io/brand/). Application and installer
+icons will adopt it in the next software update. The existing signed MSI,
+corresponding source, checksums and original acceptance evidence are unchanged.
 
-## What changed since v1.0.1
+## Try it and tell us what happened
 
-Three things, in plain English.
-
-**1. The Accessibility tab is here, and it uses the local AI.** The **Accessibility** primary-nav tab now ships in the desktop app (v1.0.1 bundled the Townlight Access module's code and database under the hood, but no on-screen tab). Three of its seven tools run on the suite's local AI engine:
-
-- **Plain-Language Rewrite** — drafts a real plain-language version of the text you paste.
-- **Multilingual Variant** — drafts a translation of your actual text into any language you name.
-- **Accessibility Review** — runs five deterministic WCAG checks (same as ever) and, new, stores a
-  short AI-drafted "fix this first, and here's why" analysis with the saved review.
-
-Everything runs on the model already on your machine — nothing leaves it. Every AI output is labeled as a draft; a human reviews before anything publishes; translations must go to a qualified human translator. The review's pass/fail status comes only from the deterministic checks — the AI never adds, removes, or reclassifies a finding. If the local model is ever missing or broken, the tab shows an explicit **"AI engine not ready"** banner with a one-click path to model setup, and every tool keeps working in clearly-labeled sample mode — the deterministic checks and checklist tools don't depend on the AI at all. Persisted reviews are advisory clerk support, not a certified accessibility audit; that disclaimer is on every page. The other four tools (accessible form planning, publishing-workflow checklist, ADA Title II review-support, tagged-PDF heading checks) are checklist-shaped on purpose and stay deterministic.
-
-**2. Every AI feature in the suite got better.** While wiring the Accessibility tools we found and fixed a bug in the suite's shared text-generation path that had been quietly degrading output quality. Because the fix is in the shared engine, it improves **all** the AI features — Townlight Meetings meeting-minutes drafts, Townlight Records response drafts, Townlight Code guidance, and the three new Accessibility tools alike. Same model, same machine, noticeably better drafts.
-
-**3. First-run setup now works on a truly fresh PC.** On a factory-fresh Windows machine with no other software installed, the bundled database could fail to start on the very first launch (a standard Microsoft runtime component that most PCs already have was missing). v1.0.2 bundles that component alongside the database, so setup completes on a clean machine with no extra downloads or installs. This affected every v1.0.x build, not just this one — v1.0.2 fixes it.
-
-The two-month Townlight Access city-core integration runway is complete: Phase A (module hardening to v0.4.0) done, Phase B (desktop runtime wiring) done, Phase C (city-core registry flip 5→6) done, and **Phase D (clean-machine acceptance) — PASS**. Phase D was two full runs of the real MSI in a clean Windows Sandbox — the canonical "fresh clerk PC." Run 1 verified the whole chain end to end — install → the full 10-step first-run wizard → admin sign-in → the ~6.97 GB model download with the app's own streamed SHA-256 verification and all six readiness checks green → all three Accessibility AI features producing clean, correctly-labeled output through the real app bridge — **and** caught the clean-machine database bug described above. The fix shipped in this release, and run 2 proved it: on a clean machine with no system runtime present, the bundled PostgreSQL initializes a full working database. The full Phase D story is in the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2).
-
-### For IT: the technical specifics
-
-- **Shared generation fix ([PR #220](https://github.com/townlight/townlight/pull/220), merge `0b0170a`).** The shared helper `generate_local_text` posted to Ollama's `/api/generate` with `raw: true` and a hand-built `<start_of_turn>` turn-format prompt. The pinned model loads with a `gemma4` renderer/parser, and `raw: true` bypasses it, so internal control tokens leaked and generation degenerated. The fix switches the helper to **`/api/chat`** with a single user message, letting Ollama apply the model's own template and parser — one shared-helper change that repairs every AI feature suite-wide. Generation config: temperature 0.2, `num_predict` 512, `num_ctx` 8192, 180 s timeout.
-- **Clean-machine fix ([PR #221](https://github.com/townlight/townlight/pull/221), merge `0b797c4`).** The portable PostgreSQL 17 binaries link against the Microsoft VC++ runtime, which a factory-fresh Windows doesn't have (CI never saw it — GitHub's `windows-latest` runners ship the redistributable preinstalled; only the clean-sandbox Phase D could catch it: `initdb.exe` died with "VCRUNTIME140.dll was not found"). The runtime payload now stages `vcruntime140.dll`, `vcruntime140_1.dll`, and `msvcp140.dll` into `postgres\bin` next to the binaries, and those DLLs are in the payload's required-files manifest, so any regression fails the build loudly. Pre-existing across v1.0.x, not a Townlight Access regression.
-- **Dual-path AI design.** Townlight Access is the suite's first dual-path AI module: a per-call readiness probe, an explicit "AI engine not ready" state, and deterministic fallbacks for every tool (the three older AI callers hard-stop when the model is absent). The Accessibility tab is a native Rust port with full audit-chain and cross-module-search integration.
-- **Release build.** The MSI is built by public GitHub Actions run `28626482190` on main merge commit `0b797c4` and passed the CI install → first-run → backup-restore → uninstall lifecycle before publication. SHA-256 and size are in the install section below.
-
-## What this is
-
-Townlight is open-source municipal software designed to run **locally on a city's own hardware**. The Windows Local "city-core" build is one MSI installer (~1.65 GB) that sets up, with no terminal and no developer tooling:
-
-- a bundled portable **PostgreSQL 17 + pgvector** data store,
-- a bundled portable **Ollama** runtime with a pinned **Gemma 4 12B QAT** model (~6.97 GB, downloaded and checksum-verified on first run) — the engine behind the records, minutes, code, and now accessibility AI features,
-- and **six city-core modules**: Townlight Core (shared platform), Townlight Records (public records / FOIA), Townlight Meetings (meetings / agendas / minutes), Townlight Code (municipal code), Townlight Notice (public notices), and **Townlight Access** (accessibility + records-ready export — tab and local-AI drafting new in v1.0.2).
-
-Everything — your data, your documents, your audit trail, the AI model — stays on the machine. There is no vendor cloud, no per-seat licensing, and no telemetry by design. Code is Apache-2.0; docs are CC BY 4.0.
-
-## Why "GA candidate" *and* "public beta"
-
-Same posture as v1.0.1; the bundled scope grew:
-
-- **GA candidate** describes maturity. The v1.0.2 MSI passed CI lifecycle validation (install → first-run → backup-restore → uninstall on a fresh `windows-latest` runner, run `28626482190`), and **Phase D clean-machine acceptance passed** — two full Windows Sandbox runs of the shipped installer covering install, the complete first-run wizard, admin sign-in, the model download/verify/load chain, and the three Accessibility AI features live against the real model, including the run that caught (and this release's fix that closed) the clean-machine database bug. See "What changed" above and the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2) for the full story.
-- **Public beta** describes the stage. The MSI is Authenticode code-signed via Azure Trusted Signing. A new certificate has no reputation yet, so Windows SmartScreen may still prompt on first run — click *More info*, confirm it shows a verified publisher (not "Unknown Publisher"), then *Run anyway*.
-
-## Install (60-second version)
-
-1. Download `Townlight_1.0.2_x64_en-US.msi` **and** `Townlight-msi-evidence.txt` from the [latest release](https://github.com/townlight/townlight/releases/latest).
-2. Verify the SHA-256 checksum in PowerShell: run `Get-FileHash Townlight_1.0.2_x64_en-US.msi -Algorithm SHA256` and check it matches the `SHA256=` line in the evidence file (and the value below). Matching hash = the file you have is byte-for-byte the file the public CI run built. If it doesn't match, delete and re-download from the official release page only.
-3. Follow the installer, open Townlight, and complete first-run setup (city profile, first admin, backup folder).
-4. On first run the app downloads and verifies the ~6.97 GB model. After that it's fully local — including all the AI features.
-
-**Recommended machine:** 64-bit Windows 10/11 with WebView2, **32 GB RAM** recommended (16 GB is a workable minimum; the model needs ~6.7 GB resident, plus headroom for the local database, services, and generation context), **~15 GB free disk**. No Docker, no WSL, no terminal.
-
-Verify your download: SHA-256 `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02` (1,646,999,452 bytes).
-
-## Upgrade from v1.0.1
-
-In-place upgrade supported via same product code. No uninstall needed. Your saved work (the `city-work.json` data file) loads unchanged — files saved by v1.0.1 simply don't have the new fields yet, and that's fine. No data loss. First run after upgrade does NOT re-download the Gemma model — the new AI features use the model you already have.
-
-## What it is *not* (yet)
-
-Being honest about the edges matters more than the launch:
-
-- Not production-ready, not city-ready, not procurement-ready. It's a beta.
-- Not a compliance tool. AI drafts are labeled drafts; humans decide; nothing in the Accessibility tab is a certified audit, legal determination, or certified translation.
-- Not the full suite. City-core is six modules; **Townlight Zoning / Townlight Planning / Townlight Permitting / Townlight Inspections** remain queued Tier 2.
-- macOS lifecycle is not certified; Windows Local is the supported operator path.
-- The MSI bundles module source pinned by commit; for two modules the bundled commit is *ahead* of the latest published release tag. The trust path is the `source_commit` pin plus the MSI checksum — see [PROVENANCE.md](PROVENANCE.md).
-
-## Help and feedback
-
-- Install help and recovery: [SUPPORT.md](SUPPORT.md) and the operator walkthrough in [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md).
-- Questions: [FAQ.md](FAQ.md).
-- Security issues: open a private advisory — see [SECURITY.md](SECURITY.md).
-- Found a bug? Open an issue. This is exactly what a public beta is for.
-
-Townlight is unfunded, volunteer-maintained open source. If it's useful to your city, the best thanks is to try it and tell us what broke.
+Start with the [Windows download](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi) and
+[Suite manual](https://townlight.github.io/manuals/suite.html). Report reproducible
+problems through the [support page](https://townlight.github.io/support.html),
+including version 1.7.0.1 and redacted evidence. Report vulnerabilities privately
+through the [security policy](https://github.com/townlight/townlight/blob/main/SECURITY.md).
