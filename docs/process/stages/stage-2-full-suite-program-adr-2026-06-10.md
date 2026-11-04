@@ -13,11 +13,11 @@ Branch:
 
 Base:
 
-- `CivicSuite/civicsuite` `main` at `8cd37559d769d58c11f21c1ca8e76872cd39950f`
+- `Townlight/townlight` `main` at `8cd37559d769d58c11f21c1ca8e76872cd39950f`
 
 Local worktree:
 
-- `C:\CivicSuiteDev\repos\civicsuite`
+- `C:\TownlightDev\repos\townlight`
 
 ## Planned Slices
 
@@ -33,15 +33,15 @@ Status: Complete
 
 Changed files:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\architecture\ADR-0008-portable-native-windows-runtime.md`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\architecture\ADR-0009-postgres-backed-queue-windows-profile.md`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\architecture\index.md`
-- `C:\CivicSuiteDev\repos\civicsuite\.claude\plans\2026-06-10-civicsuite-phase-0-foundation.md`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\architecture\ADR-0008-portable-native-windows-runtime.md`
+- `C:\TownlightDev\repos\townlight\docs\architecture\ADR-0009-postgres-backed-queue-windows-profile.md`
+- `C:\TownlightDev\repos\townlight\docs\architecture\index.md`
+- `C:\TownlightDev\repos\townlight\.claude\plans\2026-06-10-townlight-phase-0-foundation.md`
+- `C:\TownlightDev\repos\townlight\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
 
 Audit-lite report:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\audits\audit-lite-stage-2-slice-1-adrs-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\process\audits\audit-lite-stage-2-slice-1-adrs-2026-06-10.md`
 
 Local checks:
 
@@ -63,12 +63,12 @@ Slice 1 commit:
 
 Changed files:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\roadmap\full-suite-program.md`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\roadmap\full-suite-program.md`
+- `C:\TownlightDev\repos\townlight\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
 
 Audit-lite report:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\audits\audit-lite-stage-2-slice-2-program-doc-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\process\audits\audit-lite-stage-2-slice-2-program-doc-2026-06-10.md`
 
 Local checks:
 
@@ -89,14 +89,14 @@ Slice 2 commit:
 
 Changed files:
 
-- `C:\CivicSuiteDev\repos\civicsuite\README.md`
-- `C:\CivicSuiteDev\repos\civicsuite\README.txt`
-- `C:\CivicSuiteDev\repos\civicsuite\STATUS.md`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\README.md`
+- `C:\TownlightDev\repos\townlight\README.txt`
+- `C:\TownlightDev\repos\townlight\STATUS.md`
+- `C:\TownlightDev\repos\townlight\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
 
 Audit-lite report:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\audits\audit-lite-stage-2-slice-3-truth-sync-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\process\audits\audit-lite-stage-2-slice-3-truth-sync-2026-06-10.md`
 
 Local checks:
 
@@ -114,8 +114,8 @@ Slice 3 commit:
 
 Changed files:
 
-- `C:\CivicSuiteDev\repos\civicsuite\.github\workflows\verify.yml`
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\.github\workflows\verify.yml`
+- `C:\TownlightDev\repos\townlight\docs\process\stages\stage-2-full-suite-program-adr-2026-06-10.md`
 
 What and why:
 
@@ -126,13 +126,13 @@ What and why:
   runner image instead, and the workflow now runs `npx playwright install
   chromium` only. A passwordless-sudo rule for the runner account was
   considered and rejected as an unauthorized privilege escalation.
-- Runner image note: `civicsuite-wsl-linux-2` runs in WSL Ubuntu 24.04 (24.04,
+- Runner image note: `townlight-wsl-linux-2` runs in WSL Ubuntu 24.04 (24.04,
   not 26.04 — actions/setup-python has no 3.12 build for 26.04) with
   Playwright Chromium OS dependencies preinstalled.
 
 Audit-lite report:
 
-- `C:\CivicSuiteDev\repos\civicsuite\docs\process\audits\audit-lite-stage-2-slice-4-verify-runner-2026-06-10.md`
+- `C:\TownlightDev\repos\townlight\docs\process\audits\audit-lite-stage-2-slice-4-verify-runner-2026-06-10.md`
 
 Local checks:
 
@@ -151,4 +151,4 @@ Local checks:
   commit-per-slice with a single push when later slices are already drafted,
   since the pre-push clean-tree gate forbids per-slice pushes in that state.
 - PR, merge commit, tag, and CI run IDs: recorded on the PR
-  (`verify` runs on self-hosted runner `civicsuite-wsl-linux-2`).
+  (`verify` runs on self-hosted runner `townlight-wsl-linux-2`).

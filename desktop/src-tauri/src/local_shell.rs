@@ -20,7 +20,7 @@ fn explorer_path() -> PathBuf {
 pub(crate) fn open_local_folder(path: &Path) -> Result<(), String> {
     fs::create_dir_all(path)
         .map_err(|error| format!("Could not create folder {}: {error}", path.display()))?;
-    if cfg!(test) || env::var("CIVICSUITE_SUPPRESS_OPEN_FOLDER").ok().as_deref() == Some("1") {
+    if cfg!(test) || env::var("TOWNLIGHT_SUPPRESS_OPEN_FOLDER").ok().as_deref() == Some("1") {
         return Ok(());
     }
 
@@ -41,7 +41,7 @@ pub(crate) fn open_local_folder(path: &Path) -> Result<(), String> {
 }
 
 pub(crate) fn open_windows_uninstall_settings() -> Result<(), String> {
-    if cfg!(test) || env::var("CIVICSUITE_SUPPRESS_OPEN_FOLDER").ok().as_deref() == Some("1") {
+    if cfg!(test) || env::var("TOWNLIGHT_SUPPRESS_OPEN_FOLDER").ok().as_deref() == Some("1") {
         return Ok(());
     }
 

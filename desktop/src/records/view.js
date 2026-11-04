@@ -7,7 +7,7 @@ export function createRecordsRenderer({ state, currentNotification, workflowEmpt
 function renderRecordsNotificationOutbox(work) {
   const selectedNotification = currentNotification(work);
   const notifications = (work.notification_events || [])
-    .filter((event) => event.module_id === "civicrecords-ai");
+    .filter((event) => event.module_id === "townlight_records");
   return `
     <section class="workflow-list" aria-label="Records notification outbox">
       <div class="section-title">
@@ -238,8 +238,8 @@ function renderRecordsWorkflow() {
         <h3>Scope & Search</h3>
         ${["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources(selectedRequest?.request_id || "") : ""}
         ${["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources(selectedRequest?.request_id || "") : ""}
-        ${state.app.module_selection?.enabled_module_ids?.includes("civiczone") ? renderZoningSources(selectedRequest?.request_id || "") : ""}
-        ${state.app.module_selection?.enabled_module_ids?.includes("civicplan") ? renderPlanningSources(selectedRequest?.request_id || "") : ""}
+        ${state.app.module_selection?.enabled_module_ids?.includes("townlight_zoning") ? renderZoningSources(selectedRequest?.request_id || "") : ""}
+        ${state.app.module_selection?.enabled_module_ids?.includes("townlight_planning") ? renderPlanningSources(selectedRequest?.request_id || "") : ""}
         <label>Assign to <input type="text" data-work-field="assignedTo" value="${escapeHtml(state.workDraft.assignedTo)}" /></label>
         <label>Clarification note <textarea data-work-field="clarificationNote">${escapeHtml(state.workDraft.clarificationNote)}</textarea></label>
         <label>Search source note <textarea data-work-field="sourceNote">${escapeHtml(state.workDraft.sourceNote)}</textarea></label>

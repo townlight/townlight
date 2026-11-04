@@ -1,8 +1,8 @@
 {
-  "name": "@civicsuite/suite-launcher",
+  "name": "@townlight/suite-launcher",
   "version": "0.1.0",
   "private": true,
-  "description": "Static suite-level launcher for the CivicSuite city-core installer runtime.",
+  "description": "Static suite-level launcher for the Townlight city-core installer runtime.",
   "type": "module",
   "scripts": {
     "serve": "node scripts/serve.mjs",

@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cleanroom cache strip (scoped, CivicSuite-only)
+      - name: Cleanroom cache strip (scoped, Townlight-only)
         shell: bash
         run: |
           python - <<'PY'
@@ -47,10 +47,10 @@ jobs:
           for rel in (".npm", ".cache/pip"):
               shutil.rmtree(os.path.join(runner_temp, rel), ignore_errors=True)
           PY
-          docker builder prune --all --force --filter "label=civicsuite-cleanroom=1" || true
-          docker network ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker builder prune --all --force --filter "label=townlight-cleanroom=1" || true
+          docker network ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker network rm || true
-          docker volume ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker volume ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker volume rm || true
 
       - name: Install published wheel from release URL
@@ -79,10 +79,10 @@ jobs:
         if: always()
         shell: bash
         run: |
-          docker compose -p civicsuite-cleanroom-${{ github.run_id }} down -v --remove-orphans || true
-          docker ps -a --filter "label=civicsuite-cleanroom=1" -q \
+          docker compose -p townlight-cleanroom-${{ github.run_id }} down -v --remove-orphans || true
+          docker ps -a --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker container rm --force || true
-          docker network ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker network ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker network rm || true
 
   build:
@@ -164,7 +164,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cleanroom cache strip (scoped, CivicSuite-only)
+      - name: Cleanroom cache strip (scoped, Townlight-only)
         shell: bash
         run: |
           python - <<'PY'
@@ -175,10 +175,10 @@ jobs:
           for rel in (".npm", ".cache/pip"):
               shutil.rmtree(os.path.join(runner_temp, rel), ignore_errors=True)
           PY
-          docker builder prune --all --force --filter "label=civicsuite-cleanroom=1" || true
-          docker network ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker builder prune --all --force --filter "label=townlight-cleanroom=1" || true
+          docker network ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker network rm || true
-          docker volume ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker volume ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker volume rm || true
 
       - name: Download uploaded wheel from draft release
@@ -222,10 +222,10 @@ jobs:
         if: always()
         shell: bash
         run: |
-          docker compose -p civicsuite-cleanroom-${{ github.run_id }} down -v --remove-orphans || true
-          docker ps -a --filter "label=civicsuite-cleanroom=1" -q \
+          docker compose -p townlight-cleanroom-${{ github.run_id }} down -v --remove-orphans || true
+          docker ps -a --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker container rm --force || true
-          docker network ls --filter "label=civicsuite-cleanroom=1" -q \
+          docker network ls --filter "label=townlight-cleanroom=1" -q \
             | xargs -r docker network rm || true
 
   publish-release:

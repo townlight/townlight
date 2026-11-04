@@ -205,7 +205,7 @@ pub fn route(
         PlanExplore { payload } => (Method::POST, "/plan-explore".into(), Some(payload)),
     };
     let prefix = if public {
-        "/civicplan"
+        "/townlight_planning"
     } else {
         "/desktop/v1/planning"
     };
@@ -294,7 +294,7 @@ mod tests {
         )
         .is_err());
         let (_, path, _) = route(PlanningRequest::Snapshots { offset: 50 }, true).unwrap();
-        assert_eq!(path, "/civicplan/snapshots?offset=50");
+        assert_eq!(path, "/townlight_planning/snapshots?offset=50");
         assert!(serde_json::from_value::<PlanningRequest>(
             serde_json::json!({"operation":"snapshot","id":"../../private"})
         )

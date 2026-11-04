@@ -1,135 +1,35 @@
-# Starter-Set Release Contract
+# Starter-set candidate source contract
 
-Status: maintained installer contract for the Townlight Core + Townlight Records +
-Townlight Meetings starter set.
+Status: prepared naming, Access and Notice candidate, 2 November 2026. This current contract replaces the earlier component pairing for new candidate builds. Earlier releases and their historical evidence retain their original identities.
 
-Last verified: 2026-05-21.
+Townlight Core installs first. Townlight Records and Townlight Meetings are selectable in the `custom` profile and included in `clerk-core` in that order.
 
-## Scope
+| Component | Distribution | Candidate version |
+|---|---|---|
+| Core | townlight-core | 1.3.0.dev2 |
+| Records | townlight-records | 1.8.0.dev2 |
+| Meetings | townlight-meetings | 1.0.5 |
 
-The starter set is the first operator-facing Townlight install target:
+Townlight Meetings reports version 1.0.5 with Townlight Core 1.3.0.dev2 through `/health`. Install the matching exact local Core wheel first; these renamed packages are not yet published on an index. Principal imports are `townlight_core`, `townlight_records` and `townlight_meetings`. Use the coordinated source pins, not moving branch heads or renamed historical release URLs.
 
-- Townlight Core installs first and remains non-selectable because every module
-  depends on it.
-- Townlight Records and Townlight Meetings are selectable modules in the custom profile
-  and are both included by default in the `clerk-core` profile.
-- Windows and Linux package lifecycle proof are required for the Clerk-Core public-use gate.
-- macOS archives and wrapper manifests are generated and supported at beta
-  archive/readiness level; full matching-host macOS lifecycle evidence still
-  requires a Darwin/macOS Docker Desktop host before any macOS lifecycle certification claim.
+The exact signed Windows installed acceptance remains pending. The intended MSI is 1.7.0.1 with native source1.7.0-1 and runtime0.2.0. Package workflow proof and source-only checks do not certify an installer. The suite candidate checker binds the actual MSI, corresponding source, component wheels and acceptance to hashes; the old starter-set archive helper is not a substitute for that check.
 
-Outside-party testing instructions live in
-[`starter-set-outside-test-guide.md`](starter-set-outside-test-guide.md).
+The Windows candidate supports a new empty database and fresh profile. It refuses legacy initialization, preserves existing city data and uses the approved `%LOCALAPPDATA%\CivicSuite` path. No in-place upgrade or import shim is supported. Keep the previous release with its original existing profile.
 
-This contract does not promote the rest of the suite as product-ready. Later
-modules must earn their own installer proof before they become part of an
-operator default profile.
+The installed acceptance must exercise the agreed Meetings workflow, Code proposal/adoption integration and Meetings → Station → Records handoff, with actual saved records/readback and the stated external-service boundaries. Access and Notice have their separate complete bounded acceptance in the combined goal. No source gate authorizes an official publication, disclosure, model/provider change or release publication.
 
-## Version Pair
+## Authorization and evidence handling
 
-The maintained starter-set pair for this slice is:
+Installed acceptance includes first-admin authentication, bearer-protected staff
+actions, anonymous/unauthorized-write refusal, saved workflow readback after
+restart, and backup/restore evidence. Reports must not persist passwords or
+bearer tokens. Access exports must include the complete reviewed source and
+saved advice/model/actor/audit provenance. Notice requires durable draft, review,
+exact-content approval, actual proof attachments, verified archive bytes and a
+permission-bound Records handoff. Source or archive generation is not installed
+acceptance. Record new versus reused evidence for the exact candidate.
 
-| Component | Release | Contract |
-|---|---:|---|
-| Townlight Core | 1.2.0 current platform release | Installs first in the umbrella installer and provides the shared platform baseline. |
-| Townlight Records | 1.7.3 | Selectable records module; runtime line consumes Townlight Core 1.2.0 shared ingestion. |
-| Townlight Meetings | 1.0.4 | Selectable meetings module; `/health` must report `version=1.0.4` and `civiccore=1.2.0`. |
-
-The Townlight Core 1.2.0 release is the current shared-platform release for new
-suite planning. Townlight Records v1.7.3 and Townlight Meetings v1.0.4 consume the
-published Townlight Core v1.2.0 wheel, so their runtime proof must verify the module
-health surfaces instead of assuming the umbrella platform version is the same as
-the module dependency pin.
-
-## Installer Contract
-
-The umbrella installer contract is enforced by
-`python scripts/verify-installer-plan.py`:
-
-- `clerk-core` resolves to `civiccore`, `civicrecords-ai`, `civicclerk` in that
-  order.
-- `custom --module civicrecords-ai --module civicclerk` still resolves
-  Townlight Core first.
-- Generated Linux, Windows, and macOS archives exclude local state such as
-  virtual environments, test reports, `.agent-runs`, `.env`, build outputs, and
-  module-local generated artifacts.
-- Generated package README and launcher files warn that the public installer is
-  intentionally unsigned, explain expected OS warnings, and require SHA256 plus
-  official-source verification before bypassing those warnings.
-
-## Runtime Contract
-
-The maintained runtime proof path is
-`python scripts/run-clerk-core-installer.py install`, followed by `verify`,
-`repair`, `backup`, `restore`, and `uninstall` on the same host class.
-
-The `verify` mode must check:
-
-- Townlight Records API health.
-- Townlight Records web health.
-- Townlight Meetings API health.
-- Townlight Meetings web health.
-- Townlight Meetings protected-default staff auth, including denied anonymous staff
-  writes.
-- Starter-set Townlight Core contract: Townlight Records reports v1.7.3, and
-  Townlight Meetings reports v1.0.4 with Townlight Core v1.2.0.
-
-The maintained mutating workflow proof path is:
-
-```powershell
-python scripts\run-clerk-core-installer.py install --staff-mode bearer --workflow-proof
-python scripts\run-clerk-core-installer.py verify --staff-mode bearer --workflow-proof
-python scripts\run-clerk-core-installer.py backup
-python scripts\run-clerk-core-installer.py restore
-python scripts\run-clerk-core-installer.py uninstall
-```
-
-That proof must create and fetch a real Townlight Records records request through
-first-admin JWT auth, exercise the search surface, submit the request for review, draft
-a response letter that remains staff-reviewable, and mark the request ready for
-release. It must also prove the Townlight Meetings agenda intake/review/promotion,
-meeting, packet assembly/finalization, notice checklist/posting proof,
-motion/vote capture, citation-gated minutes draft, automatic-minutes-posting
-guardrail, and public archive calendar/search path through bearer-protected
-staff auth. Reports must not persist the Townlight Records admin password or bearer
-token.
-
-Proof phrase lock: bearer-protected staff auth. Reports must not persist the Townlight Records admin password or bearer token.
-
-Backup proof must create PostgreSQL custom dump files for each selected starter
-module and a `backup-manifest.json` with SHA256 digests. Restore proof must
-validate those dumps by restoring each one into a temporary restore-probe
-database and deleting that probe database after the check completes.
-
-## Package Cleanroom Contract
-
-The maintained outside-test proof must also run from the extracted
-distributable archive, not only from the source tree. The package cleanroom
-runner is the repo-level command for that proof:
-
-```powershell
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-windows-0.1.0.zip --platform windows --staff-mode bearer --workflow-proof
-```
-
-For Linux, use the matching Linux archive on a Linux Docker host:
-
-```bash
-python scripts/run-installer-package-cleanroom.py --archive installer/dist/CivicSuite-clerk-core-linux-0.1.0.tar.gz --platform linux --staff-mode bearer --workflow-proof
-```
-
-A package workflow-proof report must record
-`evidence_classification=matching_host_lifecycle`, `workflow_proof_requested=true`,
-and `civicclerk_staff_mode=bearer` when it is used as Linux or Windows lifecycle
-evidence. Main installer-cleanroom run `26115385070` proved the Linux
-matching-host package lifecycle after PR #153, including workflow proof,
-backup, restore, and uninstall from the extracted archive. Windows archive
-readiness now records cleanup-lock evidence without converting a passed
-readiness/plan run into a failed lifecycle claim. Windows package workflow proof has been run on a Windows 11 host with
-Docker Desktop and WSL 2. macOS remains archive/readiness only until a
-Darwin/macOS Docker Desktop host runs the same lifecycle class.
-
-This is a release contract for the starter-set installer and module runtime
-pairing. It is not yet a claim that Townlight Records and Townlight Meetings exchange workflow records with each other through a live cross-module business API.
-That workflow-level handoff remains a follow-on productization slice after the
-installer can reliably install, verify, repair, and remove the starter set on
-Linux and Windows.
+The [original starter-set release contract](../history/pre-naming-2026-11/docs/installer/starter-set-release-contract.md)
+preserves the earlier package pairings, platform claims and cleanroom commands
+byte for byte. The generating prototype/package checks continue to exercise
+their contracts; they do not certify the coordinated MSI or rename old artifacts.

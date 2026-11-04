@@ -1,4 +1,4 @@
-# ADR-0007: First production-depth workflow is CivicClerk agenda packet and notice
+# ADR-0007: First production-depth workflow is Townlight Meetings agenda packet and notice
 
 Status: Accepted
 
@@ -9,7 +9,7 @@ Date: 2026-04-28
 All 26 catalog modules now have v0.1.0 runtime foundations. The next suite
 phase must prove integrated municipal workflow depth, not just scaffold breadth.
 
-The strongest first candidate is CivicClerk's agenda packet and notice workflow
+The strongest first candidate is Townlight Meetings's agenda packet and notice workflow
 because it is:
 
 - High-value for clerks, council staff, city managers, and the public.
@@ -21,17 +21,17 @@ because it is:
 
 ## Decision
 
-The first production-depth sprint will center on CivicClerk agenda packet and
+The first production-depth sprint will center on Townlight Meetings agenda packet and
 notice workflow, integrated with:
 
-- CivicRecords AI for source-record visibility and export/provenance alignment.
-- CivicCode for cited code and ordinance references.
-- CivicZone for parcel/zoning context where agenda items involve land use.
-- CivicCore v0.3.0 candidate primitives for audit, provenance, manifests, city
+- Townlight Records for source-record visibility and export/provenance alignment.
+- Townlight Code for cited code and ordinance references.
+- Townlight Zoning for parcel/zoning context where agenda items involve land use.
+- Townlight Core v0.3.0 candidate primitives for audit, provenance, manifests, city
   profile, and export-bundle utilities once released.
 
 The implementation plan lives at
-`docs/roadmap/civicclerk-production-depth-workflow.md`.
+`docs/roadmap/townlight_meetings-production-depth-workflow.md`.
 
 ## Boundaries
 
@@ -56,10 +56,10 @@ Out of scope:
 
 ## Consequences
 
-- CivicClerk becomes the first module to move from foundation breadth to
+- Townlight Meetings becomes the first module to move from foundation breadth to
   operator-usable depth.
-- CivicCore v0.3.0 gets pulled by real workflow needs instead of speculation.
-- CivicRecords AI, CivicCode, and CivicZone integrations are exercised through
+- Townlight Core v0.3.0 gets pulled by real workflow needs instead of speculation.
+- Townlight Records, Townlight Code, and Townlight Zoning integrations are exercised through
   read/import/export and citation paths before any write-back connector work.
 - UX work stays visible and testable because staff screens are part of the
   sprint, not deferred.

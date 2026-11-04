@@ -56,7 +56,7 @@ Method: source tracing of mounted runtime/desktop calls, provider configuration,
 | A11 Meetings: optional cited minutes AI assist | O; product app has route; native runtime mounts manual `meetings_bridge` routes instead | Product staff workflow supplies source material/model/prompt version/approver metadata. Meeting text may include personal or restricted content. | Product `create_minutes_ai_assist` calls configured Ollama, persists model/prompt/source metadata; unavailability returns 503. E5. | Citation-gated draft; automatic posting endpoint refuses. This is available source capability, not proof of an enabled native beta AI workflow. Accepted native transcript/minutes entry is supplied/manual. |
 | A12 Records/Core: ingestion OCR and document embeddings | W/O supporting pipeline; worker/configuration required, not established as active in the native accepted workflow | Staff-authorized upload/source ingestion or separately configured scheduled sync; original images/scanned PDFs/document text can contain protected data. | Core image extraction tries Ollama `gemma4:e4b`, falls back to Tesseract OCR; chunk embeddings default to `nomic-embed-text`. Backend/asset versions and actual model success are not uniformly retained in each ingestion record. E11. | Extracted chunks/vectors and document ingestion state persist automatically. File hash/source identity retained; failure state records error. Original evidence custody does not prove extraction accuracy. |
 
-The supported native text model manifest identifies Google **Gemma 4 12B QAT Q4_0**, runtime name `civicsuite-gemma4-12b-qat:q4_0`, source revision `29d097773436b69ff9feafd636ab4cf873786537`, artifact SHA-256 `93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b`. This is a repository manifest fact, not proof that a city downloaded or runs those weights. Model setup permits deferral. The manifest declares Apache-2.0; the agency still records the actual acquired model grant and all ancillary asset terms. Core registry allows nullable version/license fields. Codex development models are not Townlight runtime models. E1/E12.
+The supported native text model manifest identifies Google **Gemma 4 12B QAT Q4_0**, runtime name `townlight-gemma4-12b-qat:q4_0`, source revision `29d097773436b69ff9feafd636ab4cf873786537`, artifact SHA-256 `93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b`. This is a repository manifest fact, not proof that a city downloaded or runs those weights. Model setup permits deferral. The manifest declares Apache-2.0; the agency still records the actual acquired model grant and all ancillary asset terms. Core registry allows nullable version/license fields. Codex development models are not Townlight runtime models. E1/E12.
 
 ### Resources, automatic steps, external effects and stop boundaries
 
@@ -332,7 +332,7 @@ Each E-reference below names the inspected implementation and relevant symbols. 
 
 ### E1 — Native composition and local text inference
 
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/services.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/services.py) — `_set_local_defaults, create_runtime_app`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/services.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/services.py) — `_set_local_defaults, create_runtime_app`.
 - [townlight/desktop/src-tauri/src/domain_client.rs](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/src-tauri/src/domain_client.rs) — `execute RecordsRequest::Suggest; execute_access Rewrite/Review branches`.
 - [townlight/desktop/src-tauri/src/model.rs](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/src-tauri/src/model.rs) — `generate_local_text, local_generation_request_body, local_model_ready`.
 - [townlight/desktop/runtime/gemma4-model.json](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/gemma4-model.json) — `pinned source/model/artifact metadata`.
@@ -355,42 +355,42 @@ Each E-reference below names the inspected implementation and relevant symbols. 
 
 ### E5 — Meetings native manual route and optional product assist
 
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/meetings_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/meetings_bridge.py) — `create_minutes, decide_minutes, capture_transcript, archive paths`.
-- [meetings/civicclerk/main.py](https://github.com/townlight/meetings/blob/581ca739e03e7a4d1161cd8c5edf1d36115f9ee6/civicclerk/main.py) — `create_minutes_ai_assist, _request_ollama_minutes_text, reject_automatic_minutes_posting`.
-- [meetings/civicclerk/minutes.py](https://github.com/townlight/meetings/blob/581ca739e03e7a4d1161cd8c5edf1d36115f9ee6/civicclerk/minutes.py) — `MinutesDraftRepository.create_draft, human_decision and citation/prompt validation`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/meetings_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/meetings_bridge.py) — `create_minutes, decide_minutes, capture_transcript, archive paths`.
+- [meetings/townlight_meetings/main.py](https://github.com/townlight/meetings/blob/581ca739e03e7a4d1161cd8c5edf1d36115f9ee6/townlight_meetings/main.py) — `create_minutes_ai_assist, _request_ollama_minutes_text, reject_automatic_minutes_posting`.
+- [meetings/townlight_meetings/minutes.py](https://github.com/townlight/meetings/blob/581ca739e03e7a4d1161cd8c5edf1d36115f9ee6/townlight_meetings/minutes.py) — `MinutesDraftRepository.create_draft, human_decision and citation/prompt validation`.
 
 ### E6 — Code citation answers and legal lifecycle
 
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/code_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/code_bridge.py) — `questions`.
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/code_public.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/code_public.py) — `answer: use_local_llm=False`.
-- [ordinances/civiccode/main.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/civiccode/main.py) — `answer_question`.
-- [ordinances/civiccode/qa_harness.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/civiccode/qa_harness.py) — `build_grounded_answer`.
-- [ordinances/civiccode/ai_answer.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/civiccode/ai_answer.py) — `load_local_llm_config, generate_local_llm_answer`.
-- [ordinances/civiccode/section_lifecycle.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/civiccode/section_lifecycle.py) — `create_version, lookup_section`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/code_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/code_bridge.py) — `questions`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/code_public.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/code_public.py) — `answer: use_local_llm=False`.
+- [ordinances/townlight_code/main.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/townlight_code/main.py) — `answer_question`.
+- [ordinances/townlight_code/qa_harness.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/townlight_code/qa_harness.py) — `build_grounded_answer`.
+- [ordinances/townlight_code/ai_answer.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/townlight_code/ai_answer.py) — `load_local_llm_config, generate_local_llm_answer`.
+- [ordinances/townlight_code/section_lifecycle.py](https://github.com/townlight/ordinances/blob/04c383be7798c51dcb14ec8bea47d9c81436127d/townlight_code/section_lifecycle.py) — `create_version, lookup_section`.
 
 ### E7 — Deterministic land-use context and reviewed Planning snapshots
 
-- [zone/civiczone/discretionary.py](https://github.com/townlight/zone/blob/fbebd695a67b2f5cbec088f12f443311b6dd0b9f/civiczone/discretionary.py) — `explain, flag_nonconformity`.
-- [plan/civicplan/policy_service.py](https://github.com/townlight/plan/blob/d463bd6b8e7acd1fe553ba433ee12736c3d55625/civicplan/policy_service.py) — `PolicyService.answer, resolve`.
-- [plan/civicplan/workflow_store.py](https://github.com/townlight/plan/blob/d463bd6b8e7acd1fe553ba433ee12736c3d55625/civicplan/workflow_store.py) — `preview_snapshot, snapshot, document`.
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/permitting_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/permitting_bridge.py) — `pathway`.
-- [permit/civicpermit/pathway.py](https://github.com/townlight/permit/blob/3d1bc2549da40f7a73954a2d10cc6bf8f5f680a9/civicpermit/pathway.py) — `explain_pathway; optional provider contract`.
+- [zone/townlight_zoning/discretionary.py](https://github.com/townlight/zone/blob/fbebd695a67b2f5cbec088f12f443311b6dd0b9f/townlight_zoning/discretionary.py) — `explain, flag_nonconformity`.
+- [plan/townlight_planning/policy_service.py](https://github.com/townlight/plan/blob/d463bd6b8e7acd1fe553ba433ee12736c3d55625/townlight_planning/policy_service.py) — `PolicyService.answer, resolve`.
+- [plan/townlight_planning/workflow_store.py](https://github.com/townlight/plan/blob/d463bd6b8e7acd1fe553ba433ee12736c3d55625/townlight_planning/workflow_store.py) — `preview_snapshot, snapshot, document`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/permitting_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/permitting_bridge.py) — `pathway`.
+- [permit/townlight_permitting/pathway.py](https://github.com/townlight/permit/blob/3d1bc2549da40f7a73954a2d10cc6bf8f5f680a9/townlight_permitting/pathway.py) — `explain_pathway; optional provider contract`.
 
 ### E8 — Inspection media analysis and configuration
 
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/inspections_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/inspections_bridge.py) — `media_analyse, retain`.
-- [inspect/civicinspect/adapters.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/civicinspect/adapters.py) — `configured_vision_provider, configured_transcription_provider`.
-- [inspect/civicinspect/media_analysis.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/civicinspect/media_analysis.py) — `retain_evidence, analyse_evidence, SYSTEM_PROMPT`.
-- [inspect/civicinspect/transcription.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/civicinspect/transcription.py) — `TextFlowKitTranscriptionProvider.transcribe_sync, transcribe`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/inspections_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/inspections_bridge.py) — `media_analyse, retain`.
+- [inspect/townlight_inspections/adapters.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/townlight_inspections/adapters.py) — `configured_vision_provider, configured_transcription_provider`.
+- [inspect/townlight_inspections/media_analysis.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/townlight_inspections/media_analysis.py) — `retain_evidence, analyse_evidence, SYSTEM_PROMPT`.
+- [inspect/townlight_inspections/transcription.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/townlight_inspections/transcription.py) — `TextFlowKitTranscriptionProvider.transcribe_sync, transcribe`.
 
 ### E9 — Reviewed case revisions and packets
 
-- [inspect/civicinspect/workflow_store.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/civicinspect/workflow_store.py) — `save_case, get_case, packet, _verified_analysis`.
-- [permit/civicpermit/workflow_store.py](https://github.com/townlight/permit/blob/3d1bc2549da40f7a73954a2d10cc6bf8f5f680a9/civicpermit/workflow_store.py) — `save_case, packet`.
+- [inspect/townlight_inspections/workflow_store.py](https://github.com/townlight/inspect/blob/b7a28525828306513c21a07efe4b892e6249846f/townlight_inspections/workflow_store.py) — `save_case, get_case, packet, _verified_analysis`.
+- [permit/townlight_permitting/workflow_store.py](https://github.com/townlight/permit/blob/3d1bc2549da40f7a73954a2d10cc6bf8f5f680a9/townlight_permitting/workflow_store.py) — `save_case, packet`.
 
 ### E10 — Supporting Access functions in the native suite
 
-- [townlight/desktop/runtime/python-services/civicsuite_runtime/access_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/civicsuite_runtime/access_bridge.py) — `review_context, save_review, rewrite_context, rewrite_result, delete_review`.
+- [townlight/desktop/runtime/python-services/townlight_runtime/access_bridge.py](https://github.com/townlight/townlight/blob/45bb73df5f78443299bcba9af61da3380199720b/desktop/runtime/python-services/townlight_runtime/access_bridge.py) — `review_context, save_review, rewrite_context, rewrite_result, delete_review`.
 
 ### E11 — Conditional Records web/API model functions
 
@@ -404,15 +404,15 @@ Each E-reference below names the inspected implementation and relevant symbols. 
 - [sunshine/backend/app/onboarding/router.py](https://github.com/townlight/sunshine/blob/dddb86c4bf1b8aaa365ab475a1ffffd67c13ee3e/backend/app/onboarding/router.py) — `get_next_question`.
 - [sunshine/backend/app/llm/client.py](https://github.com/townlight/sunshine/blob/dddb86c4bf1b8aaa365ab475a1ffffd67c13ee3e/backend/app/llm/client.py) — `_get_provider, generate`.
 - [sunshine/backend/app/ingestion/tasks.py](https://github.com/townlight/sunshine/blob/dddb86c4bf1b8aaa365ab475a1ffffd67c13ee3e/backend/app/ingestion/tasks.py) — `task_ingest_file`.
-- [core/civiccore/ingest/embedder.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/ingest/embedder.py) — `embed_text, embed_batch`.
-- [core/civiccore/ingest/pipeline.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/ingest/pipeline.py) — `ingest_file, ingest_structured_record`.
-- [core/civiccore/ingest/llm_extractor.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/ingest/llm_extractor.py) — `extract_text_from_image, extract_text_multimodal, extract_text_from_scanned_pdf`.
+- [core/townlight_core/ingest/embedder.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/ingest/embedder.py) — `embed_text, embed_batch`.
+- [core/townlight_core/ingest/pipeline.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/ingest/pipeline.py) — `ingest_file, ingest_structured_record`.
+- [core/townlight_core/ingest/llm_extractor.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/ingest/llm_extractor.py) — `extract_text_from_image, extract_text_multimodal, extract_text_from_scanned_pdf`.
 
 ### E12 — Shared provider, registry and context limits
 
-- [core/civiccore/llm/factory.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/llm/factory.py) — `build_provider`.
-- [core/civiccore/llm/registry/models.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/llm/registry/models.py) — `ModelRegistry nullable version/license`.
-- [core/civiccore/llm/context.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/civiccore/llm/context.py) — `TokenBudget, context/sanitization helpers; no monetary budget enforcement`.
+- [core/townlight_core/llm/factory.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/llm/factory.py) — `build_provider`.
+- [core/townlight_core/llm/registry/models.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/llm/registry/models.py) — `ModelRegistry nullable version/license`.
+- [core/townlight_core/llm/context.py](https://github.com/townlight/core/blob/f643c26b3429b1ab9202d0663e1e700b83fc4ed4/townlight_core/llm/context.py) — `TokenBudget, context/sanitization helpers; no monetary budget enforcement`.
 
 ### E13 — Station media and approved delivery
 

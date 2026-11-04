@@ -1,4 +1,4 @@
-# CivicSuite Installer Checkpoint - 2026-05-09
+# Townlight Installer Checkpoint - 2026-05-09
 
 Status: historical checkpoint. Current work is Linux/container-first with
 Windows and macOS wrappers around that core. The clerk-core archive generator
@@ -7,26 +7,26 @@ requires a macOS host or VM.
 
 Superseded note, 2026-05-14: the v1.0.0 module-selector claims below are
 historical release-recovery evidence, not current product-readiness claims.
-CivicInspect, CivicGrants, and CivicProcure are demoted recovery-label modules
-at v0.2.0, and CivicCore is currently v1.1.0.
+Townlight Inspections, CivicGrants, and CivicProcure are demoted recovery-label modules
+at v0.2.0, and Townlight Core is currently v1.1.0.
 
 Update: module v1.0.0 release gates now require installer/module-selection
-integration. CivicInspect was retroactively added to the land-use profile and
-verified as a selectable/custom module with CivicCore 1.0.0, CivicCode, and
-CivicPermit dependency resolution through the planner. macOS remains beta/YELLOW
+integration. Townlight Inspections was retroactively added to the land-use profile and
+verified as a selectable/custom module with Townlight Core 1.0.0, Townlight Code, and
+Townlight Permitting dependency resolution through the planner. macOS remains beta/YELLOW
 until real macOS lifecycle certification exists.
 
 Update: CivicGrants v1.0.0 was added to the installer/module-selection proof
 path after its module repo release. Custom CivicGrants selection now resolves
-`civiccore`, `civicrecords-ai`, and `civicgrants`; CivicGrants requires
-CivicCore 1.0.0 and uses the v1 proof list: module selection, install plan,
+`townlight_core`, `townlight_records`, and `civicgrants`; CivicGrants requires
+Townlight Core 1.0.0 and uses the v1 proof list: module selection, install plan,
 artifact resolution, health check, and restart. The CivicGrants artifact proof
 resolves `dist\civicgrants-1.0.0-py3-none-any.whl`,
 `dist\civicgrants-1.0.0.tar.gz`, `dist\SHA256SUMS.txt`, and tag `v1.0.0`.
 
 Update: CivicProcure v1.0.0 was added to the installer/module-selection proof
 path after its module repo release. Custom CivicProcure selection now resolves
-`civiccore` and `civicprocure`; CivicProcure requires CivicCore 1.0.0 and uses
+`townlight_core` and `civicprocure`; CivicProcure requires Townlight Core 1.0.0 and uses
 the v1 proof list: module selection, install plan, artifact resolution, health
 check, and restart. CivicContracts remains a context relationship, not an
 installer dependency, until CivicContracts has its own v1.0.0 release. The
@@ -36,7 +36,7 @@ CivicProcure artifact proof resolves
 
 ## Scope Completed
 
-This checkpoint records the first safe installer slice for CivicSuite. The work
+This checkpoint records the first safe installer slice for Townlight. The work
 created an umbrella-level installer contract, dry-run planner, and a first real
 `clerk-core` beta lifecycle. It does not change module runtime code and does
 not claim signed native installer binaries.
@@ -48,36 +48,36 @@ Completed surfaces:
   proves extracted archive readiness/plan on Windows, macOS, and Linux runners,
   and proves the full Linux archive install, repair, verify, and uninstall
   lifecycle on Ubuntu with uploaded evidence.
-- `installer/modules.json` covers all 26 tracked CivicSuite repos.
+- `installer/modules.json` covers all 26 tracked Townlight repos.
 - `scripts/plan-installer.py` resolves profiles, dependencies, menu styles,
   readiness states, artifact/version inputs, service/profile config,
   health-check plans, executor preflight, and the execution gate.
 - `scripts/plan-installer.py --profile minimal --generate-install-kit` writes
-  the first minimal CivicCore install kit under `installer/generated/minimal`.
-- `installer/generated/minimal/install-civiccore.ps1` has been executed once
-  and installed CivicCore 1.0.0 into the kit-local `.venv`.
-- `installer/generated/minimal/verify-civiccore.ps1` has been executed once and
-  verified `import civiccore` reports `1.0.0`.
-- `installer/reports/manual-minimal-civiccore-install/proof.json` records the
+  the first minimal Townlight Core install kit under `installer/generated/minimal`.
+- `installer/generated/minimal/install-townlight_core.ps1` has been executed once
+  and installed Townlight Core 1.0.0 into the kit-local `.venv`.
+- `installer/generated/minimal/verify-townlight_core.ps1` has been executed once and
+  verified `import townlight_core` reports `1.0.0`.
+- `installer/reports/manual-minimal-townlight_core-install/proof.json` records the
   execution proof and the generator bug found during the first proof run.
-- `installer/generated/minimal/reset-civiccore.ps1` and
-  `installer/generated/minimal/reset-civiccore.sh` reset only the kit-local
+- `installer/generated/minimal/reset-townlight_core.ps1` and
+  `installer/generated/minimal/reset-townlight_core.sh` reset only the kit-local
   `.venv`.
 - The generated Windows reset script removed the kit-local `.venv`, the install
-  script reinstalled CivicCore 1.0.0, and the verify script again reported
+  script reinstalled Townlight Core 1.0.0, and the verify script again reported
   `1.0.0`.
 - `scripts/run-minimal-cleanroom.py` runs the generated minimal kit in a
-  disposable Linux container with copied kit inputs and copied CivicCore wheel.
+  disposable Linux container with copied kit inputs and copied Townlight Core wheel.
 - `installer/reports/manual-minimal-linux-cleanroom-2/cleanroom-proof.json`
   records a passing cleanroom proof in `python:3.12-slim`.
-- `scripts/run-civicrecords-cleanroom.py` copies CivicRecords AI into an
+- `scripts/run-townlight_records-cleanroom.py` copies Townlight Records into an
   evidence workspace, starts an isolated Docker Compose project, verifies API
   and frontend health, runs live Playwright desktop/mobile checks, saves
   screenshots, and tears the stack down with volumes removed.
-- `installer/reports/manual-civicrecords-service-cleanroom-4/service-ui-proof.json`
+- `installer/reports/manual-townlight_records-service-cleanroom-4/service-ui-proof.json`
   records a passing service/UI cleanroom proof.
 - `scripts/plan-installer.py --profile clerk-core --run-cleanroom-proof` now
-  calls the passing CivicRecords service/UI cleanroom runner through the suite
+  calls the passing TownlightRecords service/UI cleanroom runner through the suite
   installer command surface.
 - `scripts/plan-installer.py --profile clerk-core --run-cleanroom-gate` now
   runs the same Docker proof and returns concise pass/fail gate output for API
@@ -92,14 +92,14 @@ Completed surfaces:
   unsigned OSS beta builds, explain expected Windows/macOS/Linux trust warnings,
   and direct operators to verify SHA256 checksums before continuing.
 - Release archives are now self-contained bundles with the selected platform
-  package, planner, lifecycle runner, manifest, and bundled CivicRecords AI plus
-  CivicClerk source trees.
+  package, planner, lifecycle runner, manifest, and bundled Townlight Records plus
+  Townlight Meetings source trees.
 - `scripts/run-clerk-core-installer.py` provides the real `clerk-core`
   lifecycle: readiness, install, verify, repair, and uninstall.
-- Package install builds and starts CivicRecords AI plus CivicClerk from the
+- Package install builds and starts Townlight Records plus Townlight Meetings from the
   bundled source trees on high ports.
-- Package verify checks CivicRecords API, CivicRecords web, CivicClerk API, and
-  CivicClerk web.
+- Package verify checks TownlightRecords API, TownlightRecords web, Townlight Meetings API, and
+  Townlight Meetings web.
 - Package repair preserves generated `.env` files, rebuilds/restarts services,
   and verifies health.
 - Package uninstall removes the profile Docker containers and volumes.
@@ -110,7 +110,7 @@ Completed surfaces:
   macOS, and Linux release archives through the platform-specific package
   launchers.
 - Windows zip packaging now preserves the Dockerfile-required
-  `backend/tests` path inside the bundled CivicRecords AI source by writing a
+  `backend/tests` path inside the bundled Townlight Records source by writing a
   `.bundle-placeholder` file before archive creation.
 - `installer/reports/installer-package-cleanroom-20260509T184534Z-72a08df7/installer-package-cleanroom.json`
   records a passing package lifecycle proof.
@@ -157,13 +157,13 @@ Allowed now:
 - render blocked executor preflight output
 - write non-mutating dry-run evidence reports for plan, readiness, approval
   gate, artifact/version, service-config, and health-check output
-- generate a minimal CivicCore install kit inside the repo
+- generate a minimal Townlight Core install kit inside the repo
 - generate cross-platform profile packages inside the repo
 - generate distributable release archives and native wrapper manifests
 - run the `clerk-core` package lifecycle from a self-contained archive
 - run the generated minimal Windows kit after explicit approval
 - run a disposable Linux cleanroom proof for the generated minimal kit
-- run a disposable CivicRecords service/UI cleanroom proof with Playwright
+- run a disposable TownlightRecords service/UI cleanroom proof with Playwright
 - run the clerk-core cleanroom gate for concise pass/fail installer evidence
 
 Not allowed yet:
@@ -197,11 +197,11 @@ python scripts\plan-installer.py --profile clerk-core --show-preflight --dry-run
 python scripts\plan-installer.py --profile minimal --generate-install-kit
 python scripts\plan-installer.py --profile clerk-core --generate-profile-package
 python scripts\plan-installer.py --profile clerk-core --generate-release-artifacts --installer-version 0.1.0
-powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\install-civiccore.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\verify-civiccore.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\reset-civiccore.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\install-townlight_core.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\verify-townlight_core.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File installer\generated\minimal\reset-townlight_core.ps1
 python scripts\run-minimal-cleanroom.py --run-id manual-minimal-linux-cleanroom-2
-python scripts\run-civicrecords-cleanroom.py --run-id manual-civicrecords-service-cleanroom-4
+python scripts\run-townlight_records-cleanroom.py --run-id manual-townlight_records-service-cleanroom-4
 python scripts\plan-installer.py --profile clerk-core --run-cleanroom-proof --run-id manual-clerk-core-integrated-proof
 python scripts\plan-installer.py --profile clerk-core --run-cleanroom-gate --run-id verify-clerk-core-gate
 python scripts\run-installer-package-cleanroom.py
@@ -273,9 +273,9 @@ Package cleanroom lifecycle passed:
 
 ```powershell
 python scripts\run-installer-package-cleanroom.py
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-windows-0.1.0.zip
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-linux-0.1.0.tar.gz
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-macos-0.1.0.tar.gz --skip-install
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-windows-0.1.0.zip
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-linux-0.1.0.tar.gz
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-macos-0.1.0.tar.gz --skip-install
 ```
 
 Evidence:
@@ -333,5 +333,5 @@ Stop before:
 - adding a mutating executor implementation
 - installing baseline dependencies
 - starting Docker containers
-- changing CivicCore or module code
+- changing Townlight Core or module code
 - packaging native installer binaries

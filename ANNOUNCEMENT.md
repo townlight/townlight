@@ -54,12 +54,12 @@ Read the [current manual](USER-MANUAL.md) and [release evidence status](STATUS.m
 The beta tag is `townlight-records-v1.1.0-beta.3`.
 Earlier beta.2 drafts are preserved but not accepted releases.
 
-## Historical CivicSuite Windows Local 1.0.2 announcement
+## Historical Townlight Windows Local 1.0.2 announcement
 
 The original announcement below describes a predecessor. Its old download
 directions and six-module claims do not describe the Records candidate.
 
-**TL;DR:** CivicSuite city-core for Windows v1.0.2 is out. One MSI still installs the whole six-module suite — database, local AI model, and clerk workflows on one Windows machine — and this release makes the suite better in three ways: the **Accessibility tab is now on screen and three of its tools run on the suite's local AI**, a shared engine fix **improved the output quality of every AI feature in the suite**, and a clean-machine fix means **first-run setup now completes on a factory-fresh Windows PC**. No cloud, no signup, no telemetry. Download it, run it, try it.
+**TL;DR:** Townlight city-core for Windows v1.0.2 is out. One MSI still installs the whole six-module suite — database, local AI model, and clerk workflows on one Windows machine — and this release makes the suite better in three ways: the **Accessibility tab is now on screen and three of its tools run on the suite's local AI**, a shared engine fix **improved the output quality of every AI feature in the suite**, and a clean-machine fix means **first-run setup now completes on a factory-fresh Windows PC**. No cloud, no signup, no telemetry. Download it, run it, try it.
 
 Get it: <https://github.com/townlight/townlight/releases/latest>
 
@@ -82,7 +82,7 @@ Everything runs on the model already on your machine — nothing leaves it. Ever
 
 **3. First-run setup now works on a truly fresh PC.** On a factory-fresh Windows machine with no other software installed, the bundled database could fail to start on the very first launch (a standard Microsoft runtime component that most PCs already have was missing). v1.0.2 bundles that component alongside the database, so setup completes on a clean machine with no extra downloads or installs. This affected every v1.0.x build, not just this one — v1.0.2 fixes it.
 
-The two-month Townlight Access city-core integration runway is complete: Phase A (module hardening to v0.4.0) done, Phase B (desktop runtime wiring) done, Phase C (city-core registry flip 5→6) done, and **Phase D (clean-machine acceptance) — PASS**. Phase D was two full runs of the real MSI in a clean Windows Sandbox — the canonical "fresh clerk PC." Run 1 verified the whole chain end to end — install → the full 10-step first-run wizard → admin sign-in → the ~6.97 GB model download with the app's own streamed SHA-256 verification and all six readiness checks green → all three Accessibility AI features producing clean, correctly-labeled output through the real app bridge — **and** caught the clean-machine database bug described above. The fix shipped in this release, and run 2 proved it: on a clean machine with no system runtime present, the bundled PostgreSQL initializes a full working database. The full Phase D story is in the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2).
+The two-month Townlight Access city-core integration runway is complete: Phase A (module hardening to v0.4.0) done, Phase B (desktop runtime wiring) done, Phase C (city-core registry flip 5→6) done, and **Phase D (clean-machine acceptance) — PASS**. Phase D was two full runs of the real MSI in a clean Windows Sandbox — the canonical "fresh clerk PC." Run 1 verified the whole chain end to end — install → the full 10-step first-run wizard → admin sign-in → the ~6.97 GB model download with the app's own streamed SHA-256 verification and all six readiness checks green → all three Accessibility AI features producing clean, correctly-labeled output through the real app bridge — **and** caught the clean-machine database bug described above. The fix shipped in this release, and run 2 proved it: on a clean machine with no system runtime present, the bundled PostgreSQL initializes a full working database. The full Phase D story is in the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2).
 
 ### For IT: the technical specifics
 
@@ -105,13 +105,13 @@ Everything — your data, your documents, your audit trail, the AI model — sta
 
 Same posture as v1.0.1; the bundled scope grew:
 
-- **GA candidate** describes maturity. The v1.0.2 MSI passed CI lifecycle validation (install → first-run → backup-restore → uninstall on a fresh `windows-latest` runner, run `28626482190`), and **Phase D clean-machine acceptance passed** — two full Windows Sandbox runs of the shipped installer covering install, the complete first-run wizard, admin sign-in, the model download/verify/load chain, and the three Accessibility AI features live against the real model, including the run that caught (and this release's fix that closed) the clean-machine database bug. See "What changed" above and the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2) for the full story.
+- **GA candidate** describes maturity. The v1.0.2 MSI passed CI lifecycle validation (install → first-run → backup-restore → uninstall on a fresh `windows-latest` runner, run `28626482190`), and **Phase D clean-machine acceptance passed** — two full Windows Sandbox runs of the shipped installer covering install, the complete first-run wizard, admin sign-in, the model download/verify/load chain, and the three Accessibility AI features live against the real model, including the run that caught (and this release's fix that closed) the clean-machine database bug. See "What changed" above and the [v1.0.2 release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2) for the full story.
 - **Public beta** describes the stage. The MSI is Authenticode code-signed via Azure Trusted Signing. A new certificate has no reputation yet, so Windows SmartScreen may still prompt on first run — click *More info*, confirm it shows a verified publisher (not "Unknown Publisher"), then *Run anyway*.
 
 ## Install (60-second version)
 
-1. Download `CivicSuite_1.0.2_x64_en-US.msi` **and** `CivicSuite-msi-evidence.txt` from the [latest release](https://github.com/townlight/townlight/releases/latest).
-2. Verify the SHA-256 checksum in PowerShell: run `Get-FileHash CivicSuite_1.0.2_x64_en-US.msi -Algorithm SHA256` and check it matches the `SHA256=` line in the evidence file (and the value below). Matching hash = the file you have is byte-for-byte the file the public CI run built. If it doesn't match, delete and re-download from the official release page only.
+1. Download `Townlight_1.0.2_x64_en-US.msi` **and** `Townlight-msi-evidence.txt` from the [latest release](https://github.com/townlight/townlight/releases/latest).
+2. Verify the SHA-256 checksum in PowerShell: run `Get-FileHash Townlight_1.0.2_x64_en-US.msi -Algorithm SHA256` and check it matches the `SHA256=` line in the evidence file (and the value below). Matching hash = the file you have is byte-for-byte the file the public CI run built. If it doesn't match, delete and re-download from the official release page only.
 3. Follow the installer, open Townlight, and complete first-run setup (city profile, first admin, backup folder).
 4. On first run the app downloads and verifies the ~6.97 GB model. After that it's fully local — including all the AI features.
 

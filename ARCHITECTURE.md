@@ -116,13 +116,13 @@ See [STATUS.md](STATUS.md) for current release evidence.
 
 **Last verified:** 2026-07-02
 
-This document is the suite-level architecture reference. For detailed per-module architecture, see each module's `docs/`. For the architectural intent and roadmap, see `docs/CivicSuiteUnifiedSpec.md`. For the current shipped reality, see [STATUS.md](STATUS.md).
+This document is the suite-level architecture reference. For detailed per-module architecture, see each module's `docs/`. For the architectural intent and roadmap, see `docs/TownlightUnifiedSpec.md`. For the current shipped reality, see [STATUS.md](STATUS.md).
 
 ---
 
 ## The single load-bearing rule
 
-**Modules depend on `civiccore`. `civiccore` never depends on modules.**
+**Modules depend on `townlight_core`. `townlight_core` never depends on modules.**
 
 This rule is non-negotiable. Every other architectural decision in Townlight serves it. Without it, modules become coupled, the suite becomes a monorepo by accident, and cities cannot deploy modules independently.
 
@@ -133,25 +133,25 @@ This rule is non-negotiable. Every other architectural decision in Townlight ser
 ```mermaid
 graph TD
     subgraph "Umbrella (no runtime)"
-      US[civicsuite umbrella<br/>roadmap, governance, ADRs<br/>compatibility, installer scaffolding]
+      US[townlight umbrella<br/>roadmap, governance, ADRs<br/>compatibility, installer scaffolding]
     end
 
     subgraph "Tier 0 — Foundation Platform"
-      CC[civiccore<br/>migrations, db.Base, llm,<br/>audit, provenance, manifests,<br/>connector primitives, search,<br/>schedule, security, auth helpers]
+      CC[townlight_core<br/>migrations, db.Base, llm,<br/>audit, provenance, manifests,<br/>connector primitives, search,<br/>schedule, security, auth helpers]
     end
 
     subgraph "Tier 1 — Clerk Core"
-      CR[civicrecords-ai<br/>FOIA / records]
-      CCK[civicclerk<br/>meetings / agendas]
-      CCD[civiccode<br/>municipal code]
-      CA[civicaccess<br/>accessibility / plain language]
+      CR[townlight_records<br/>FOIA / records]
+      CCK[townlight_meetings<br/>meetings / agendas]
+      CCD[townlight_code<br/>municipal code]
+      CA[townlight_access<br/>accessibility / plain language]
     end
 
     subgraph "Tier 2 — Land Use"
-      CZ[civiczone]
-      CP[civicplan]
-      CPT[civicpermit]
-      CI[civicinspect]
+      CZ[townlight_zoning]
+      CP[townlight_planning]
+      CPT[townlight_permitting]
+      CI[townlight_inspections]
     end
 
     subgraph "Tier 3 — Administrative"
@@ -159,7 +159,7 @@ graph TD
       CPR[civicprocure]
       CCT[civiccontracts]
       CB[civicboards]
-      CN[civicnotice]
+      CN[townlight_notice]
     end
 
     subgraph "Tier 4 — Operations"
@@ -287,7 +287,7 @@ modulename/
     prompts/           # YAML prompt library if AI-using
     public_ui.py       # Resident-facing surface
   alembic/
-    versions/          # Per-module migrations after civiccore baseline
+    versions/          # Per-module migrations after townlight_core baseline
   tests/
   docs/
     index.html         # GitHub Pages landing
@@ -295,7 +295,7 @@ modulename/
   scripts/
     verify-release.sh
     verify-docs.sh
-  pyproject.toml       # Pins civiccore to a versioned release wheel
+  pyproject.toml       # Pins townlight_core to a versioned release wheel
   README.md README.txt USER-MANUAL.md USER-MANUAL.txt
   CHANGELOG.md CONTRIBUTING.md SECURITY.md SUPPORT.md CODE_OF_CONDUCT.md
   LICENSE LICENSE-CODE
@@ -309,17 +309,17 @@ The repo skeleton is enforced by `scripts/verify-docs.sh` in the umbrella; modul
 ## Data flow rules
 
 ### Within a module
-- Per-module schema or clearly bounded table namespace (e.g., `civicclerk.meetings`, `civiczone.parcels`).
-- Foreign keys into Townlight Core shared tables (e.g., `civiccore.users`, `civiccore.audit_log`) where needed.
+- Per-module schema or clearly bounded table namespace (e.g., `townlight_meetings.meetings`, `townlight_zoning.parcels`).
+- Foreign keys into Townlight Core shared tables (e.g., `townlight_core.users`, `townlight_core.audit_log`) where needed.
 - Hash-chained audit logging via Townlight Core primitives.
 
 ### Across modules
 - Modules **may not** read each other's database directly. Cross-module reads go through internal HTTP APIs.
 - The "internal API" between modules is governed by the unified spec §13–14 and the per-module specs.
 - Examples:
-  - `civicclerk` writes adopted ordinances → `civiccode` ingests via the Townlight Meetings handoff API.
-  - `civiczone` reads code text from `civiccode` via the section resolution API.
-  - `civicgrants` searches `civicrecords-ai` for grant context via records-ai's query API.
+  - `townlight_meetings` writes adopted ordinances → `townlight_code` ingests via the Townlight Meetings handoff API.
+  - `townlight_zoning` reads code text from `townlight_code` via the section resolution API.
+  - `civicgrants` searches `townlight_records` for grant context via records-ai's query API.
 
 ### Public-facing data
 - Every module that has a public surface exposes it through its own `/<modulename>` route.
@@ -328,20 +328,20 @@ The repo skeleton is enforced by `scripts/verify-docs.sh` in the umbrella; modul
 
 ---
 
-<a id="civiccore-extraction-phasing"></a>
+<a id="townlight_core-extraction-phasing"></a>
 
 ## Townlight Core extraction phasing
 
-Townlight Core is built incrementally. The extraction model is from the v0.1 spec (`specs/02_CivicCore.md`):
+Townlight Core is built incrementally. The extraction model is from the v0.1 spec (`specs/02_Townlight Core.md`):
 
 - **Phase 0** — repo skeletons and baseline LICENSE / CHANGELOG / CONTRIBUTING.
-- **Phase 1** — User, Role, Department, audit_log models + Alembic baseline. Shipped at civiccore v0.1.0.
+- **Phase 1** — User, Role, Department, audit_log models + Alembic baseline. Shipped at townlight_core v0.1.0.
 - **Phase 2** — LLM provider abstraction. Shipped at v0.2.0.
 - **Phase 3** — Connectors, ingest contracts, search helpers, scheduling, security helpers. Shipped progressively v0.3.0–v0.22.x.
 - **Phase 4** — Auth/RBAC extraction (in progress).
 - **Phase 5** — Document storage, full search engine, exemption rules, sovereignty verification, scaffolding generators (planned).
 
-Reserved namespaces (`civiccore.catalog`, `civiccore.exemptions`, `civiccore.scaffold`, full `civiccore.notifications` runtime, sovereignty verification) are placeholder packages. Downstream modules **must not depend on planned Townlight Core behavior** unless that behavior is released in a versioned Townlight Core artifact.
+Reserved namespaces (`townlight_core.catalog`, `townlight_core.exemptions`, `townlight_core.scaffold`, full `townlight_core.notifications` runtime, sovereignty verification) are placeholder packages. Downstream modules **must not depend on planned Townlight Core behavior** unless that behavior is released in a versioned Townlight Core artifact.
 
 ---
 
@@ -352,7 +352,7 @@ Modules pin to Townlight Core as a released dependency. The exact form (example 
 ```toml
 [project]
 dependencies = [
-  "civiccore @ https://github.com/townlight/core/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl#sha256=561d7a8f73260d50de79351d330876d2cb3488c0e046a2888e82fe09d1e03969",
+  "townlight_core @ https://github.com/townlight/core/releases/download/v1.0.1/townlight_core-1.0.1-py3-none-any.whl#sha256=561d7a8f73260d50de79351d330876d2cb3488c0e046a2888e82fe09d1e03969",
   ...
 ]
 ```
@@ -421,7 +421,7 @@ These are explicitly out of scope for the suite:
 - **Vendor write-back without audit.** All write-back connectors must wait until read paths are stable and auditable.
 - **Auto-determination.** No auto-release, auto-denial, auto-redaction, auto-enforcement, or auto-codification. AI drafts; humans decide.
 
-These are documented at length in `specs/01_catalog.md` §16–20 and `docs/CivicSuiteUnifiedSpec.md` §3.
+These are documented at length in `specs/01_catalog.md` §16–20 and `docs/TownlightUnifiedSpec.md` §3.
 
 ---
 
@@ -429,8 +429,8 @@ These are documented at length in `specs/01_catalog.md` §16–20 and `docs/Civi
 
 Known gaps / planned diagrams:
 
-- A request-lifecycle sequence diagram for `civicrecords-ai` (received → assigned → in-review → released).
-- An agenda-and-meeting lifecycle sequence diagram for `civicclerk` (DRAFTED → SUBMITTED → ON_AGENDA → IN_PACKET → POSTED → HEARD → DISPOSED).
+- A request-lifecycle sequence diagram for `townlight_records` (received → assigned → in-review → released).
+- An agenda-and-meeting lifecycle sequence diagram for `townlight_meetings` (DRAFTED → SUBMITTED → ON_AGENDA → IN_PACKET → POSTED → HEARD → DISPOSED).
 - A connector data-flow diagram showing import / normalization / persistence / audit boundaries.
 - An audit-chain diagram showing how hash-chained audit primitives flow across module boundaries.
 

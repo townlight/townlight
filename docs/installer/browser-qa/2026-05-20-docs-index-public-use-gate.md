@@ -21,7 +21,7 @@ link and refreshing the current status table.
 - The Clerk-Core public-use readiness gate link appeared twice, in quick links
   and in the "Where to go next" section.
 - The status table renders the starter profile as 2 product modules plus
-  CivicCore.
+  Townlight Core.
 - Console messages: none.
 - Page errors: none.
 - Horizontal overflow: false at desktop and mobile widths.

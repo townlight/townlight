@@ -23,17 +23,17 @@ sys.path.insert(0, str(ROOT / "desktop/runtime/python-services"))
 def native_inspections(tmp_path, monkeypatch):
     from fastapi import FastAPI, Request
     from fastapi.testclient import TestClient
-    from app.database import get_async_session
-    from app.models.user import UserRole
-    from civicinspect.migrations import source_engine, upgrade
-    from civicsuite_runtime import inspections_bridge as bridge
+    from townlight_records.database import get_async_session
+    from townlight_records.models.user import UserRole
+    from townlight_inspections.migrations import source_engine, upgrade
+    from townlight_runtime import inspections_bridge as bridge
 
     url = f"sqlite:///{tmp_path / 'intake.db'}"
     engine = source_engine(url)
     upgrade(engine)
     monkeypatch.setenv("DATABASE_URL", url)
     monkeypatch.setattr(bridge, "source_engine", lambda _: source_engine(url))
-    monkeypatch.setattr("app.auth.desktop_session.time.time", lambda: 1792620000)
+    monkeypatch.setattr("townlight_records.auth.desktop_session.time.time", lambda: 1792620000)
     profile = tmp_path / "profile"
     config = profile / "config"
     config.mkdir(parents=True)
@@ -89,9 +89,9 @@ def native_inspections(tmp_path, monkeypatch):
     app = FastAPI()
     app.state.desktop_profile_root = profile
     app.state.desktop_enabled_modules = {
-        "civicinspect",
-        "civicrecords-ai",
-        "civiccode",
+        "townlight_inspections",
+        "townlight_records",
+        "townlight_code",
             }
     app.state.desktop_domain_enabled = True
     app.include_router(bridge.router)
@@ -134,7 +134,7 @@ def test_native_inspection_reopen_review_and_records_copy(native_inspections):
     assert client.post(base + "/repeat-cases", json={"property_reference":"PRIVATE parcel"}, headers=sign_in()).json()["items"][0]["entity_id"] == first["entity_id"]
     notice = client.post(base + "/notice-draft", json=data, headers=sign_in())
     assert notice.status_code == 200 and notice.json()["review_required"] is True
-    assert client.get("/civicinspect/cases").status_code == 404
+    assert client.get("/townlight_inspections/cases").status_code == 404
 
 
 @pytest.mark.parametrize(
@@ -152,7 +152,7 @@ def test_native_inspection_reopen_review_and_records_copy(native_inspections):
     ],
 )
 def test_native_inspections_denials_never_write(native_inspections, case):
-    from civicinspect.workflow_store import InspectionRepository
+    from townlight_inspections.workflow_store import InspectionRepository
 
     client, app, engine, sign_in, users, identities, config = native_inspections
     headers = sign_in()

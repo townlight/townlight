@@ -1,9 +1,9 @@
 name: Portal verification
 on:
   pull_request:
-    paths: ['portal/**', 'desktop/runtime/python-services/civicsuite_runtime/portal_publication.py', 'desktop/runtime/python-services/civicsuite_runtime/services.py', 'scripts/portal-e2e*', '.github/workflows/portal-verify.yml']
+    paths: ['portal/**', 'desktop/runtime/python-services/townlight_runtime/portal_publication.py', 'desktop/runtime/python-services/townlight_runtime/services.py', 'scripts/portal-e2e*', '.github/workflows/portal-verify.yml']
   push:
-    paths: ['portal/**', 'desktop/runtime/python-services/civicsuite_runtime/portal_publication.py', 'desktop/runtime/python-services/civicsuite_runtime/services.py', 'scripts/portal-e2e*', '.github/workflows/portal-verify.yml']
+    paths: ['portal/**', 'desktop/runtime/python-services/townlight_runtime/portal_publication.py', 'desktop/runtime/python-services/townlight_runtime/services.py', 'scripts/portal-e2e*', '.github/workflows/portal-verify.yml']
 permissions:
   contents: read
 jobs:
@@ -21,4 +21,4 @@ jobs:
         working-directory: portal
       - run: python manage.py makemigrations --check --dry-run
         working-directory: portal
-      - run: python -m py_compile desktop/runtime/python-services/civicsuite_runtime/portal_publication.py
+      - run: python -m py_compile desktop/runtime/python-services/townlight_runtime/portal_publication.py

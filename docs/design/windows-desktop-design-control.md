@@ -1,4 +1,4 @@
-<a id="civicsuite-windows-desktop-design-control"></a>
+<a id="townlight-windows-desktop-design-control"></a>
 
 # Townlight Windows Desktop Design Control
 
@@ -6,7 +6,7 @@ Status: active design control for Windows Local 1.0
 Applies to: Townlight desktop shell, installer, first-run, city-core modules, and future module manager
 Source anchors:
 
-- `docs/CivicSuiteUnifiedSpec.md`
+- `docs/TownlightUnifiedSpec.md`
 - `docs/design/ui-ux-prototype/README.md`
 - `docs/design/ui-ux-prototype/*.jsx`
 - `docs/design/ui-ux-prototype/styles.css`
@@ -15,8 +15,8 @@ Source anchors:
 - `docs/architecture/ADR-0009-postgres-backed-queue-windows-profile.md`
 - `docs/installer/suite-installer-plan.md`
 - `specs/01_catalog.md`
-- `specs/02_CivicCore.md`
-- `specs/03_civicclerk.md`
+- `specs/02_Townlight Core.md`
+- `specs/03_townlight_meetings.md`
 
 ## Product Promise
 
@@ -186,7 +186,8 @@ Forbidden release-facing behavior:
 
 **Token authority.** The suite's design **tokens** — color, ink ramp, status
 palette, type families, density metrics, radii — live in
-`civiccore-ui/tokens/tokens.css` (in the `civiccore` repo). That file is the
+`townlight_core-ui/tokens/tokens.css` (in the `townlight/core` repository, at the
+exact source pinned by `scripts/design/check_tokens_vendored.py`). That file is the
 single source of truth for token *values*. This prototype's
 `docs/design/ui-ux-prototype/styles.css` remains canonical for the **component
 layer** (the classes and layout that consume those tokens), but it no longer
@@ -196,7 +197,7 @@ redefine a `:root` custom property that `tokens.css` already defines.
 **Consumption rule (offline binaries cannot `@import` at runtime).** Every
 consumer — the Tauri/WebView2 desktop app (`desktop/src/styles.css`) and this
 prototype's `styles.css` — vendors a **generated copy** of `tokens.css` pinned
-to a `civiccore` version. A CI `--check` gate fails the build if a vendored copy
+to a `townlight_core` version. A CI `--check` gate fails the build if a vendored copy
 drifts from the pinned source, in the same idiom as the `source_commit` pins and
 the generated topology block. Any JS/JSON token mirror is **generated** from
 `tokens.css`, never hand-maintained.
@@ -212,9 +213,9 @@ load-bearing and encoded in the token comments:
   labels, or metadata.
 
 Changing a token value requires re-verifying its contrast pairings against the
-ledger in `civiccore-ui/tokens/tokens-reference.html`. The shipped desktop
+ledger in `townlight_core-ui/tokens/tokens-reference.html`. The shipped desktop
 interaction patterns that consume these tokens are documented in
-[civicsuite-ui-patterns.md](civicsuite-ui-patterns.md).
+[townlight-ui-patterns.md](townlight-ui-patterns.md).
 
 ## Accessibility And Density
 

@@ -1,8 +1,8 @@
-<a id="civicsuite-clerk-core-city-release-plan"></a>
+<a id="townlight-clerk-core-city-release-plan"></a>
 
 # Townlight Clerk-Core City Release Plan
 
-This is the canonical rung plan for the first installable Townlight starter product beta. `docs/CivicSuiteUnifiedSpec.md` is the product authority: the reconciled suite contains 27 product modules plus Townlight Core, and the first release target is Townlight Core plus the Tier 1 clerk-core products Townlight Records and Townlight Meetings.
+This is the canonical rung plan for the first installable Townlight starter product beta. `docs/TownlightUnifiedSpec.md` is the product authority: the reconciled suite contains 27 product modules plus Townlight Core, and the first release target is Townlight Core plus the Tier 1 clerk-core products Townlight Records and Townlight Meetings.
 
 ## Rung 1 - Clerk-Core City Release
 
@@ -34,4 +34,4 @@ Exit criteria:
 
 ## Rung 2 - Remaining Spec-Ordered Modules
 
-This rung starts only after Rung 1 passes. It builds the remaining 25 product modules one at a time using the dependency graph and current implementation state from `docs/CivicSuiteUnifiedSpec.md`, with module-specific docs, tests, browser QA, installer integration, release audit, CI, and release-truth gates before each advancement.
+This rung starts only after Rung 1 passes. It builds the remaining 25 product modules one at a time using the dependency graph and current implementation state from `docs/TownlightUnifiedSpec.md`, with module-specific docs, tests, browser QA, installer integration, release audit, CI, and release-truth gates before each advancement.

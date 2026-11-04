@@ -8,8 +8,8 @@ The `townlight/townlight` repository contains the Townlight desktop shell, insta
 
 If you found a vulnerability in a specific module's code, deployment, or runtime behavior, please report it on that module's repo:
 
-- **civicrecords-ai** (FOIA / public records management) — open a private GitHub Security Advisory at <https://github.com/townlight/sunshine/security/advisories/new>
-- **civiccore** (shared platform package) — open a private GitHub Security Advisory at <https://github.com/townlight/core/security/advisories/new>
+- **townlight_records** (FOIA / public records management) — open a private GitHub Security Advisory at <https://github.com/townlight/sunshine/security/advisories/new>
+- **townlight_core** (shared platform package) — open a private GitHub Security Advisory at <https://github.com/townlight/core/security/advisories/new>
 
 ### Suite-wide vulnerabilities
 
@@ -44,4 +44,4 @@ Out of scope:
 
 - Issues in third-party dependencies (report upstream; we will pin/patch when fixes are available)
 - Theoretical attacks without a demonstrated impact
-- Issues in deployments or forks not maintained by CivicSuite contributors
+- Issues in deployments or forks not maintained by Townlight contributors

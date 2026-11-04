@@ -15,30 +15,101 @@
     "modules"
   ],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {
+      "const": 1
+    },
     "brand": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "organization", "umbrella_repository", "domains", "legacy_organizations"],
+      "required": [
+        "name",
+        "organization",
+        "umbrella_repository",
+        "domains",
+        "legacy_organizations"
+      ],
       "properties": {
-        "name": {"const": "Townlight"},
-        "organization": {"const": "townlight"},
-        "umbrella_repository": {"const": "townlight/townlight"},
-        "domains": {"type": "array", "items": {"type": "string", "format": "hostname"}, "minItems": 1, "uniqueItems": true},
-        "legacy_organizations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        "name": {
+          "const": "Townlight"
+        },
+        "organization": {
+          "const": "townlight"
+        },
+        "umbrella_repository": {
+          "const": "townlight/townlight"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "hostname"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "legacy_organizations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
       }
     },
     "desktop_release": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "tag", "commit", "channel", "published_at", "asset_policy"],
+      "allOf": [
+        {
+          "if": {"properties": {"commit": {"type": "null"}}},
+          "then": {"properties": {"channel": {"const": "candidate"}, "published_at": {"type": "null"}}}
+        }
+      ],
+      "required": [
+        "version",
+        "tag",
+        "commit",
+        "channel",
+        "published_at",
+        "asset_policy",
+        "runtime_version"
+      ],
       "properties": {
-        "version": {"$ref": "#/$defs/semver"},
-        "tag": {"type": "string", "minLength": 1},
-        "commit": {"$ref": "#/$defs/sha1"},
-        "channel": {"enum": ["internal", "candidate", "public-beta", "stable"]},
-        "published_at": {"$ref": "#/$defs/date"},
-        "asset_policy": {"type": "string", "minLength": 1}
+        "version": {
+          "$ref": "#/$defs/semver"
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "anyOf": [{"$ref": "#/$defs/sha1"}, {"type": "null"}]
+        },
+        "channel": {
+          "enum": [
+            "internal",
+            "candidate",
+            "public-beta",
+            "stable"
+          ]
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "asset_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime_version": {
+          "$ref": "#/$defs/semver"
+        }
       }
     },
     "asset_policies": {
@@ -46,7 +117,10 @@
       "minProperties": 1,
       "additionalProperties": {
         "type": "array",
-        "items": {"type": "string", "minLength": 1},
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
         "uniqueItems": true
       }
     },
@@ -56,12 +130,33 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["public_name", "status", "modules", "public_website_status"],
+        "required": [
+          "public_name",
+          "status",
+          "modules",
+          "public_website_status"
+        ],
         "properties": {
-          "public_name": {"type": "string", "pattern": "^Townlight(?: |$)"},
-          "status": {"enum": ["planned", "stabilizing", "candidate", "public-beta", "stable"]},
-          "modules": {"$ref": "#/$defs/moduleRefs"},
-          "public_website_status": {"type": "string", "minLength": 1}
+          "public_name": {
+            "type": "string",
+            "pattern": "^Townlight(?: |$)"
+          },
+          "status": {
+            "enum": [
+              "planned",
+              "stabilizing",
+              "candidate",
+              "public-beta",
+              "stable"
+            ]
+          },
+          "modules": {
+            "$ref": "#/$defs/moduleRefs"
+          },
+          "public_website_status": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
@@ -71,54 +166,133 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["modules", "disabled"],
+        "required": [
+          "modules",
+          "disabled"
+        ],
         "properties": {
-          "modules": {"$ref": "#/$defs/moduleRefs"},
-          "disabled": {"type": "boolean"},
-          "development_only": {"type": "boolean"}
+          "modules": {
+            "$ref": "#/$defs/moduleRefs"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "development_only": {
+            "type": "boolean"
+          }
         }
       }
     },
     "module_order": {
       "type": "array",
-      "items": {"$ref": "#/$defs/moduleId"},
-      "minItems": 28,
-      "maxItems": 28,
+      "items": {
+        "$ref": "#/$defs/moduleId"
+      },
+      "minItems": 11,
+      "maxItems": 11,
       "uniqueItems": true
     },
     "modules": {
       "type": "object",
-      "minProperties": 28,
-      "maxProperties": 28,
-      "propertyNames": {"$ref": "#/$defs/moduleId"},
-      "additionalProperties": {"$ref": "#/$defs/module"}
+      "minProperties": 11,
+      "maxProperties": 11,
+      "propertyNames": {
+        "$ref": "#/$defs/moduleId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/module"
+      }
     }
   },
   "$defs": {
-    "moduleId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "moduleId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
     "moduleRefs": {
       "type": "array",
-      "items": {"$ref": "#/$defs/moduleId"},
+      "items": {
+        "$ref": "#/$defs/moduleId"
+      },
       "uniqueItems": true
     },
-    "semver": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$"},
-    "nullableSemver": {"oneOf": [{"$ref": "#/$defs/semver"}, {"type": "null"}]},
-    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
-    "nullableDate": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
-    "sha1": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
-    "nullableSha1": {"oneOf": [{"$ref": "#/$defs/sha1"}, {"type": "null"}]},
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[.+-][A-Za-z0-9.-]+)?$"
+    },
+    "nullableSemver": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/semver"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "nullableDate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sha1": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "nullableSha1": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/sha1"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "repository": {
       "oneOf": [
-        {"type": "null"},
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "aliases", "default_branch", "manifest_path"],
+          "required": [
+            "name",
+            "aliases",
+            "default_branch",
+            "manifest_path"
+          ],
           "properties": {
-            "name": {"type": "string", "pattern": "^townlight/[a-z0-9.-]+$"},
-            "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-            "default_branch": {"type": "string", "minLength": 1},
-            "manifest_path": {"type": "string", "minLength": 1}
+            "name": {
+              "type": "string",
+              "pattern": "^townlight/[a-z0-9.-]+$"
+            },
+            "aliases": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "default_branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manifest_path": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       ]
@@ -126,74 +300,211 @@
     "module": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["public_name", "public_slug", "legacy", "repository", "versions", "release", "compatibility", "dependencies", "maturity", "installer"],
+      "required": [
+        "public_name",
+        "public_slug",
+        "legacy",
+        "repository",
+        "versions",
+        "release",
+        "compatibility",
+        "dependencies",
+        "maturity",
+        "installer"
+      ],
       "properties": {
-        "public_name": {"type": "string", "pattern": "^Townlight(?: |$)"},
-        "public_slug": {"$ref": "#/$defs/moduleId"},
+        "public_name": {
+          "type": "string",
+          "pattern": "^Townlight(?: |$)"
+        },
+        "public_slug": {
+          "$ref": "#/$defs/moduleId"
+        },
         "legacy": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["technical_id", "product_names", "package_names"],
+          "required": [
+            "technical_id",
+            "product_names",
+            "package_names"
+          ],
           "properties": {
-            "technical_id": {"$ref": "#/$defs/moduleId"},
-            "product_names": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
-            "package_names": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+            "technical_id": {
+              "$ref": "#/$defs/moduleId"
+            },
+            "product_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "package_names": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
           }
         },
-        "repository": {"$ref": "#/$defs/repository"},
+        "repository": {
+          "$ref": "#/$defs/repository"
+        },
         "versions": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["development", "released", "installer", "public_status"],
+          "required": [
+            "development",
+            "released",
+            "installer",
+            "public_status"
+          ],
           "properties": {
-            "development": {"$ref": "#/$defs/nullableSemver"},
-            "released": {"$ref": "#/$defs/nullableSemver"},
-            "installer": {"$ref": "#/$defs/nullableSemver"},
-            "public_status": {"$ref": "#/$defs/nullableSemver"}
+            "development": {
+              "$ref": "#/$defs/nullableSemver"
+            },
+            "released": {
+              "$ref": "#/$defs/nullableSemver"
+            },
+            "installer": {
+              "$ref": "#/$defs/nullableSemver"
+            },
+            "public_status": {
+              "$ref": "#/$defs/nullableSemver"
+            }
           }
         },
         "release": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["tag", "published_at", "asset_policy"],
+          "required": [
+            "tag",
+            "published_at",
+            "asset_policy"
+          ],
           "properties": {
-            "tag": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
-            "published_at": {"$ref": "#/$defs/nullableDate"},
-            "asset_policy": {"type": "string", "minLength": 1}
+            "tag": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "published_at": {
+              "$ref": "#/$defs/nullableDate"
+            },
+            "asset_policy": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "compatibility": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["development_core", "installer_core", "public_status_core"],
+          "required": [
+            "development_core",
+            "installer_core",
+            "public_status_core"
+          ],
           "properties": {
-            "development_core": {"$ref": "#/$defs/nullableSemver"},
-            "installer_core": {"$ref": "#/$defs/nullableSemver"},
-            "public_status_core": {"$ref": "#/$defs/nullableSemver"}
+            "development_core": {
+              "$ref": "#/$defs/nullableSemver"
+            },
+            "installer_core": {
+              "$ref": "#/$defs/nullableSemver"
+            },
+            "public_status_core": {
+              "$ref": "#/$defs/nullableSemver"
+            }
           }
         },
-        "dependencies": {"$ref": "#/$defs/moduleRefs"},
+        "dependencies": {
+          "$ref": "#/$defs/moduleRefs"
+        },
         "maturity": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["state", "availability", "arch_tier", "legacy_grade", "public_status_released_at"],
+          "required": [
+            "state",
+            "availability",
+            "arch_tier",
+            "legacy_grade",
+            "public_status_released_at"
+          ],
           "properties": {
-            "state": {"enum": ["platform", "public-beta", "candidate", "queued", "early-scaffold", "foundation", "spec-only"]},
-            "availability": {"enum": ["runtime", "spec-only"]},
-            "arch_tier": {"type": "integer", "minimum": 0, "maximum": 6},
-            "legacy_grade": {"enum": ["platform", "released", "queued", "early-scaffold", "foundation", "planned"]},
-            "public_status_released_at": {"$ref": "#/$defs/nullableDate"}
+            "state": {
+              "enum": [
+                "platform",
+                "public-beta",
+                "candidate",
+                "queued",
+                "early-scaffold",
+                "foundation",
+                "spec-only"
+              ]
+            },
+            "availability": {
+              "enum": [
+                "runtime",
+                "spec-only"
+              ]
+            },
+            "arch_tier": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "legacy_grade": {
+              "enum": [
+                "platform",
+                "released",
+                "queued",
+                "early-scaffold",
+                "foundation",
+                "planned",
+                "candidate"
+              ]
+            },
+            "public_status_released_at": {
+              "$ref": "#/$defs/nullableDate"
+            }
           }
         },
         "installer": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["tier", "role", "status", "source_commit"],
+          "required": [
+            "tier",
+            "role",
+            "status",
+            "source_commit"
+          ],
           "properties": {
-            "tier": {"type": "integer", "minimum": 0, "maximum": 4},
-            "role": {"type": "string", "minLength": 1},
-            "status": {"type": "string", "minLength": 1},
-            "source_commit": {"$ref": "#/$defs/nullableSha1"}
+            "tier": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_commit": {
+              "$ref": "#/$defs/nullableSha1"
+            }
           }
         }
       }

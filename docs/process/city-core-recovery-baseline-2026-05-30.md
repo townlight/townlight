@@ -14,41 +14,41 @@ The active workspace path is:
 
 - `C:\dev\Claude`
 
-The CivicSuite gate was restored at:
+The Townlight gate was restored at:
 
-- `C:\dev\Claude\CIVICSUITE_AUDIT_GATE.md`
+- `C:\dev\Claude\TOWNLIGHT_AUDIT_GATE.md`
 
 The reboot memory was restored at:
 
-- `C:\dev\Claude\.codex-memory\civicsuite-live-install-fix-reboot-2026-05-29.md`
+- `C:\dev\Claude\.codex-memory\townlight-live-install-fix-reboot-2026-05-29.md`
 
 The surviving live-assembled temp bundle was copied to:
 
-- `C:\Users\scott\Documents\RECOVERY_civicsuite-live-assembled-np9lgjwm_2026-05-30`
+- `C:\Users\scott\Documents\RECOVERY_townlight-live-assembled-np9lgjwm_2026-05-30`
 
 ## Recreated Repositories
 
 The following repositories were recloned or recreated after recovery:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29`
-- `C:\dev\Claude\civiccore`
-- `C:\dev\Claude\civicrecords-ai`
-- `C:\dev\Claude\civicclerk`
-- `C:\dev\Claude\civiccode`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29`
+- `C:\dev\Claude\townlight_core`
+- `C:\dev\Claude\townlight_records`
+- `C:\dev\Claude\townlight_meetings`
+- `C:\dev\Claude\townlight_code`
 
 Observed recovery heads:
 
-- CivicSuite/civicsuite: `b07a03214e3e1c4e8f69fd74db45c9213cc9c18f`
-- CivicSuite/civiccore: `9f7e3a5a0156fca779b48076d49c13181d15151c`
-- CivicSuite/civicrecords-ai: `ae34a499c1e0794d3322146369f798f19bd0a146`
-- CivicSuite/civicclerk: `f39d0eeccc6804b86c542b4cdffe4fab0665d503`
-- CivicSuite/civiccode: `a960bba0a2249d118b593dd61bee3a65a69a9d77`
+- Townlight/townlight: `b07a03214e3e1c4e8f69fd74db45c9213cc9c18f`
+- Townlight/townlight_core: `9f7e3a5a0156fca779b48076d49c13181d15151c`
+- Townlight/townlight_records: `ae34a499c1e0794d3322146369f798f19bd0a146`
+- Townlight/townlight_meetings: `f39d0eeccc6804b86c542b4cdffe4fab0665d503`
+- Townlight/townlight_code: `a960bba0a2249d118b593dd61bee3a65a69a9d77`
 
 ## Lost State
 
 The deleted worktree contained uncommitted local changes under:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29`
 
 The actual edited patch files were not recoverable from `D:\To REview`, Recycle Bin, or the preserved temp bundle. The work remains reconstructable from the recovered reboot memory and surviving live-assembled evidence, but it is not a direct dirty-worktree restore.
 
@@ -68,15 +68,15 @@ Known lost uncommitted changes included:
 
 The preserved temp bundle contains runtime output from the latest live-assembled attempt:
 
-- `C:\Users\scott\Documents\RECOVERY_civicsuite-live-assembled-np9lgjwm_2026-05-30\bundle\CivicSuite-city-core-linux\installer\reports\post-fix-live-assembled-0.1.2-r2\clerk-core-installer-lifecycle.json`
+- `C:\Users\scott\Documents\RECOVERY_townlight-live-assembled-np9lgjwm_2026-05-30\bundle\Townlight-city-core-linux\installer\reports\post-fix-live-assembled-0.1.2-r2\clerk-core-installer-lifecycle.json`
 
 Recovered memory says the r2 attempt had:
 
 - install return code `0`
 - launcher HTTP status `200`
 - Records workflow passed in install output
-- CivicClerk bearer workflow passed in install output
-- CivicCode workflow passed in install output
+- Townlight Meetings bearer workflow passed in install output
+- Townlight Code workflow passed in install output
 - Clerk-to-Code handoff passed in install output
 - verify return code `1`
 - overall evidence status `failed`
@@ -85,7 +85,7 @@ The next technical task after recovery is to reconstruct the live-install patch 
 
 ## Restored Lockstep Pin
 
-Stage 0 also restored the CivicCode city-core source pin that was lost with the deleted dirty worktree. `python scripts\verify-suite-state.py --remote-only` initially failed because `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\installer\modules.json` still pinned CivicCode to post-PR-#75 head `9284fd1a0704541b3422e5dd0ba47bea3713825a` while `C:\dev\Claude\civiccode` and `CivicSuite/civiccode` were at post-PR-#76 head `a960bba0a2249d118b593dd61bee3a65a69a9d77`.
+Stage 0 also restored the Townlight Code city-core source pin that was lost with the deleted dirty worktree. `python scripts\verify-suite-state.py --remote-only` initially failed because `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\installer\modules.json` still pinned Townlight Code to post-PR-#75 head `9284fd1a0704541b3422e5dd0ba47bea3713825a` while `C:\dev\Claude\townlight_code` and `Townlight/townlight_code` were at post-PR-#76 head `a960bba0a2249d118b593dd61bee3a65a69a9d77`.
 
 The Stage 0 recovery branch restores the post-PR-#76 pin across the lockstep truth files without mutating already-published module release objects.
 
@@ -95,11 +95,11 @@ The city-core suite work now proceeds as nine stage branches. Each stage is spli
 
 Each fresh or recovered checkout must install the local pre-push gate before pushing:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\install-git-hooks.ps1`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\install-git-hooks.ps1`
 
 The tracked hook source is:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
 
 Per slice:
 
@@ -128,7 +128,7 @@ At the end of each stage:
 3. First-run readiness and disk sizing.
 4. Launcher boot and isolated ports.
 5. Shared session secret injection.
-6. CivicCode model and Ollama wiring.
+6. Townlight Code model and Ollama wiring.
 7. Structured harness errors and timeout fixes.
 8. Full live-assembled proof.
 9. Docs, status, lockstep truth, audit, merge, and tag.

@@ -19,7 +19,7 @@ its acceptance pass.
 
 The separate `desktop/src-tauri/tauri.planning-candidate.conf.json` overlay changes
 only the candidate version. Base release version, application identifier
-`org.civicsuite.desktop`, MSI upgrade code, compatibility/data paths, historical
+`org.townlight.desktop`, MSI upgrade code, compatibility/data paths, historical
 source pins and public download pointers stay unchanged. Permitting/Inspections
 and the wider land-use profile remain disabled.
 

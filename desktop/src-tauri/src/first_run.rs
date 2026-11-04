@@ -228,13 +228,10 @@ fn validate_manifest(manifest: &FirstRunManifest) -> Result<(), String> {
 }
 
 fn windows_path_from_template(template: &str) -> String {
-    if let Ok(root) = env::var("CIVICSUITE_DESKTOP_STATE_DIR") {
+    if let Ok(root) = env::var("TOWNLIGHT_DESKTOP_STATE_DIR") {
         return template
             .replace("{local_app_data}/CivicSuite", &root)
-            .replace(
-                "{documents}/CivicSuite Backups",
-                &format!("{root}\\Backups"),
-            )
+            .replace("{documents}/Townlight Backups", &format!("{root}\\Backups"))
             .replace('/', "\\");
     }
     let local_app_data =
@@ -1080,10 +1077,10 @@ mod tests {
     fn first_run_model_action_downloads_through_model_setup_and_blocks_low_disk() {
         with_temp_state_dir(|_| {
             mark_setup_ready_for_model_step();
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "1");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "1");
             let result = first_run_action("download-model", Some("model"), None)
                 .expect("action response is structured");
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
             assert!(!result.accepted);
             assert_eq!(result.status, "Needs attention");
             assert!(result.message.contains("needs at least 15000000000"));
@@ -1094,10 +1091,10 @@ mod tests {
     fn first_run_model_action_advances_when_model_is_verified() {
         with_temp_state_dir(|_| {
             mark_setup_ready_for_model_step();
-            env::set_var("CIVICSUITE_TEST_MODEL_VERIFIED", "1");
+            env::set_var("TOWNLIGHT_TEST_MODEL_VERIFIED", "1");
             let result = first_run_action("download-model", Some("model"), None)
                 .expect("action response is structured");
-            env::remove_var("CIVICSUITE_TEST_MODEL_VERIFIED");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_VERIFIED");
 
             assert!(result.accepted);
             assert_eq!(result.status, "Verified");
@@ -1189,10 +1186,10 @@ mod tests {
     fn first_run_health_action_bootstraps_runtime_before_completion() {
         with_temp_state_dir(|root| {
             mark_setup_ready_for_health_step();
-            env::set_var("CIVICSUITE_TEST_MODEL_VERIFIED", "1");
+            env::set_var("TOWNLIGHT_TEST_MODEL_VERIFIED", "1");
             let result = first_run_action("verify-health", Some("health"), None)
                 .expect("action response is structured");
-            env::remove_var("CIVICSUITE_TEST_MODEL_VERIFIED");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_VERIFIED");
             assert!(!result.accepted);
             assert_eq!(result.status, "Needs runtime files");
             assert!(result.message.contains("runtime files"));
@@ -1203,13 +1200,13 @@ mod tests {
     fn with_temp_state_dir<T>(test: impl FnOnce(PathBuf) -> T) -> T {
         let _guard = test_env_lock().lock().expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-first-run-test-{}",
+            "townlight-desktop-first-run-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }
@@ -1229,7 +1226,7 @@ mod tests {
     #[test]
     fn first_run_location_action_persists_custom_runtime_folders() {
         with_temp_state_dir(|root| {
-            let install = root.join("Program Files").join("CivicSuite");
+            let install = root.join("Program Files").join("Townlight");
             let data = root.join("City Data");
             let backups = root.join("City Backups");
             let payload = serde_json::json!({
@@ -1275,7 +1272,7 @@ mod tests {
             mark_setup_ready_for_module_step();
             let payload = serde_json::json!({
                 "profileId": "custom",
-                "selectedModuleIds": ["civicclerk", "civiccode"]
+                "selectedModuleIds": ["townlight_meetings", "townlight_code"]
             });
             let result = first_run_action("select-modules", Some("modules"), Some(&payload))
                 .expect("custom module selection can be saved");
@@ -1286,9 +1283,9 @@ mod tests {
             assert_eq!(
                 selection.installed_module_ids,
                 vec![
-                    "civiccore".to_string(),
-                    "civicclerk".to_string(),
-                    "civiccode".to_string()
+                    "townlight_core".to_string(),
+                    "townlight_meetings".to_string(),
+                    "townlight_code".to_string()
                 ]
             );
         });

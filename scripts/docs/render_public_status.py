@@ -2,10 +2,10 @@
 """Render public module status from the single machine source.
 
 Source of truth: installer/modules.public-status.json — the verified public
-status for all 28 modules (grades, dates, notes, badge labels). This script:
+status for the kept modules (grades, dates, notes, badge labels). This script:
 
   1. CROSS-CHECKS the status file against installer/modules.json
-     (same module id set; current_version and civiccore_requirement agree).
+     (same module id set; current_version and townlight_core_requirement agree).
      Note: the status file's `arch_tier` is ARCHITECTURE.md's public taxonomy;
      modules.json's `tier` is the installer's internal grouping — deliberately
      NOT compared.
@@ -63,14 +63,14 @@ def cross_check(status: dict, modules: dict) -> list[str]:
         sv = st_by_id[mid].get("current_version")
         if mv is not None and sv is not None and mv != sv:
             errors.append(f"{mid}: current_version disagrees (modules.json={mv}, public-status={sv})")
-        mr = mj_by_id[mid].get("civiccore_requirement")
-        sr = st_by_id[mid].get("civiccore_requirement")
+        mr = mj_by_id[mid].get("townlight_core_requirement")
+        sr = st_by_id[mid].get("townlight_core_requirement")
         if mr != sr:
-            errors.append(f"{mid}: civiccore_requirement disagrees (modules.json={mr}, public-status={sr})")
+            errors.append(f"{mid}: townlight_core_requirement disagrees (modules.json={mr}, public-status={sr})")
 
     # Compat matrix rows: | moduleid | repo | version | ...
     compat = COMPAT_MD.read_text(encoding="utf-8")
-    for row in re.finditer(r"^\|\s*([a-z0-9-]+)\s*\|\s*(?:CivicSuite|townlight)/[a-z0-9-]+\s*\|\s*([0-9.]+)\s*\|",
+    for row in re.finditer(r"^\|\s*([a-z0-9_-]+)\s*\|\s*(?:Townlight|townlight)/[a-z0-9.-]+\s*\|\s*([^\s|]+)\s*\|",
                            compat, re.MULTILINE):
         mid, ver = row.group(1), row.group(2)
         if mid in st_by_id and st_by_id[mid].get("current_version") not in (None, ver):
@@ -89,7 +89,7 @@ def explorer_payload(status: dict) -> str:
             {
                 "id": m["id"], "name": m["name"], "tier": m["arch_tier"],
                 "current_version": m["current_version"],
-                "civiccore_requirement": m["civiccore_requirement"],
+                "townlight_core_requirement": m["townlight_core_requirement"],
                 "public_status": m["public_status"],
             }
             for m in status["modules"]
@@ -108,7 +108,7 @@ def status_md_block(status: dict) -> str:
              ), ""]
     for g in status["grade_order"]:
         lines.append(f"- **{status['grade_labels'][g]}:** {status['grade_desc'][g]}")
-    lines += ["", "## Module Status (all 28)", "",
+    lines += ["", f"## Module Status ({len(status['modules'])} kept modules)", "",
               "| Module | Version | Status | Released | Note |",
               "|---|---|---|---|---|"]
     for m in status["modules"]:

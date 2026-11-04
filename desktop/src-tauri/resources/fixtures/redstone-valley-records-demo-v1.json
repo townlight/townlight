@@ -1,21 +1,48 @@
 {
   "expected": {
-    "counts": {"records": 3, "requests": 1, "sources": 1},
+    "counts": {
+      "records": 3,
+      "requests": 1,
+      "sources": 1
+    },
     "pii": {
       "expected_findings": [],
-      "record_ids": ["rv-record-council-0001", "rv-record-trails-0001", "rv-record-water-0001"]
+      "record_ids": [
+        "rv-record-council-0001",
+        "rv-record-trails-0001",
+        "rv-record-water-0001"
+      ]
     },
     "search": [
-      {"query": "trail maintenance schedule", "record_ids": ["rv-record-council-0001", "rv-record-trails-0001"]},
-      {"query": "utility sampling", "record_ids": ["rv-record-water-0001"]}
+      {
+        "query": "trail maintenance schedule",
+        "record_ids": [
+          "rv-record-council-0001",
+          "rv-record-trails-0001"
+        ]
+      },
+      {
+        "query": "utility sampling",
+        "record_ids": [
+          "rv-record-water-0001"
+        ]
+      }
     ],
     "workflow": {
       "human_approval_required": true,
       "request_id": "rv-request-2026-0001",
-      "status_sequence": ["received", "assigned", "searching", "in_review", "approved", "fulfilled", "closed"]
+      "status_sequence": [
+        "received",
+        "assigned",
+        "searching",
+        "in_review",
+        "approved",
+        "fulfilled",
+        "closed"
+      ]
     }
   },
-  "fixture_sha256": "a9c242a3f2618a69d7effb1d0d17d2df06f6744c8c351bba4065d315c94575b4",
+  "fixture_sha256": "d9aaa79403cfca2711e8031439fbab8bf9f70a20b8afc293faef8edd683ffbd6",
   "manifest": {
     "artifact_hashes": {
       "expected.json": "b3f85fb908b8e4eef8acc44245f25b9fff4680df9469c201bd08f3ab502a01c0",
@@ -25,10 +52,10 @@
     },
     "deterministic_seed": "townlight-records-demo-v1",
     "fixture_id": "redstone-valley-records-demo",
-    "fixture_version": "1.0.0",
+    "fixture_version": "1.0.1",
     "generated_at": "2026-08-17T00:00:00Z",
     "generation_mode": "static-canonical-v1",
-    "generator": "civiccore.testing.mock_city",
+    "generator": "townlight_core.testing.mock_city",
     "municipality": {
       "fictional": true,
       "municipality_id": "redstone-valley-fictional",
@@ -38,7 +65,9 @@
       "timezone": "America/Denver"
     },
     "network_calls": false,
-    "provenance_modes": ["fully-synthetic"],
+    "provenance_modes": [
+      "fully-synthetic"
+    ],
     "schema_version": "1.0.0",
     "synthetic": true,
     "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
@@ -52,11 +81,17 @@
       "created_at": "2026-08-04T20:00:00Z",
       "department": "Town Clerk",
       "derivation": "independently-authored",
-      "ground_truth_tags": ["council", "trail-maintenance", "public"],
+      "ground_truth_tags": [
+        "council",
+        "trail-maintenance",
+        "public"
+      ],
       "record_id": "rv-record-council-0001",
       "record_type": "meeting-summary",
       "retention_class": "fictional-permanent",
-      "source_refs": ["townlight-independent-authorship-v1"],
+      "source_refs": [
+        "townlight-independent-authorship-v1"
+      ],
       "synthetic": true,
       "title": "Council action summary for the demonstration calendar",
       "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
@@ -69,11 +104,17 @@
       "created_at": "2026-08-05T15:30:00Z",
       "department": "Parks and Open Space",
       "derivation": "independently-authored",
-      "ground_truth_tags": ["parks", "inspection", "trail-maintenance"],
+      "ground_truth_tags": [
+        "parks",
+        "inspection",
+        "trail-maintenance"
+      ],
       "record_id": "rv-record-trails-0001",
       "record_type": "inspection-summary",
       "retention_class": "fictional-operational",
-      "source_refs": ["townlight-independent-authorship-v1"],
+      "source_refs": [
+        "townlight-independent-authorship-v1"
+      ],
       "synthetic": true,
       "title": "Demonstration trail inspection summary",
       "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
@@ -86,11 +127,17 @@
       "created_at": "2026-08-06T14:15:00Z",
       "department": "Utilities",
       "derivation": "independently-authored",
-      "ground_truth_tags": ["utilities", "sampling", "public"],
+      "ground_truth_tags": [
+        "utilities",
+        "sampling",
+        "public"
+      ],
       "record_id": "rv-record-water-0001",
       "record_type": "sampling-summary",
       "retention_class": "fictional-operational",
-      "source_refs": ["townlight-independent-authorship-v1"],
+      "source_refs": [
+        "townlight-independent-authorship-v1"
+      ],
       "synthetic": true,
       "title": "Synthetic utility sampling summary",
       "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
@@ -105,14 +152,21 @@
       "request_id": "rv-request-2026-0001",
       "requester_category": "synthetic-public-requester",
       "synthetic": true,
-      "target_record_ids": ["rv-record-council-0001", "rv-record-trails-0001"],
+      "target_record_ids": [
+        "rv-record-council-0001",
+        "rv-record-trails-0001"
+      ],
       "watermark": "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD"
     }
   ],
   "sources": [
     {
       "acquisition_method": "independent-authorship",
-      "allowed_uses": ["testing", "demonstration", "redistribution"],
+      "allowed_uses": [
+        "testing",
+        "demonstration",
+        "redistribution"
+      ],
       "canonical_url": null,
       "contains_personal_data": false,
       "content": "Independent authorship source for Redstone Valley fixture version 1.0.0",

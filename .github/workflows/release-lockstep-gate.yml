@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     tags:
-      - "civicsuite-windows-local-v*"
+      - "townlight-windows-local-v*"
       - "installer-*-v*"
 
 jobs:
@@ -31,6 +31,8 @@ jobs:
         # by the suite-state check below instead.
         if: github.event_name == 'pull_request'
         run: python scripts/verify-release-lockstep.py
+      - name: Install suite schema validator
+        run: python -m pip install 'jsonschema>=4.23,<5'
       - name: Verify suite state (pins, versions, releases)
         env:
           GH_TOKEN: ${{ github.token }}

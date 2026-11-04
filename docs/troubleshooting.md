@@ -152,7 +152,7 @@ Backups are local files written under the configured backup folder.
 2. If writes fail, choose a folder the signed-in local user can write to and run **Backup Now** again.
 3. Keep backup folders somewhere the city can retain and protect according to its records and IT policy.
 
-<a id="civicaccess-city-core-status"></a>
+<a id="townlight_access-city-core-status"></a>
 
 ## Townlight Access City-Core Status
 

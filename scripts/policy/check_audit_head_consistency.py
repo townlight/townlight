@@ -168,7 +168,7 @@ def _gh_pr_has_release_tag(repo_root: Path) -> bool:
 
 
 def _release_tag_pr_detected(repo_root: Path) -> bool:
-    forced = os.environ.get("CIVICSUITE_RELEASE_TAG_PR", "").strip().lower()
+    forced = os.environ.get("TOWNLIGHT_RELEASE_TAG_PR", "").strip().lower()
     if forced in {"1", "true", "yes"}:
         return True
     if forced in {"0", "false", "no"}:

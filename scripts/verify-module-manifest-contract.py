@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the CivicSuite module package registry contract."""
+"""Verify the Townlight module package registry contract."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ CONTRACT = ROOT / "installer" / "module-manifest-contract.json"
 DESIGN_CONTROL = ROOT / "docs" / "design" / "windows-desktop-design-control.md"
 ADR = ROOT / "docs" / "architecture" / "ADR-0010-module-package-contract.md"
 
-MODULE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
-VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$")
+MODULE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:\.dev\d+)?(?:[-+][A-Za-z0-9.-]+)?$")
 SHA1_RE = re.compile(r"^[a-f0-9]{40}$")
 
 
@@ -130,7 +130,7 @@ def _validate_modules(data: dict[str, Any], contract: dict[str, Any]) -> tuple[l
         errors.extend(_field_errors(module, required_fields, context))
         module_id = module.get("id")
         if not isinstance(module_id, str) or not MODULE_ID_RE.match(module_id):
-            errors.append(fail(f"{context} id must be lower-case kebab/module id"))
+            errors.append(fail(f"{context} id must be a lower-case module id (underscores or hyphens allowed)"))
             continue
         if module_id in seen:
             errors.append(fail(f"module id {module_id} is duplicated"))
@@ -151,15 +151,15 @@ def _validate_modules(data: dict[str, Any], contract: dict[str, Any]) -> tuple[l
         if module.get("required") is True and module.get("selectable") is True:
             errors.append(fail(f"{module_id} cannot be both required and selectable"))
 
-        if module_id == "civiccore":
+        if module_id == "townlight_core":
             if module.get("required") is not True:
-                errors.append(fail("civiccore must be required"))
+                errors.append(fail("townlight_core must be required"))
             if module.get("selectable") is not False:
-                errors.append(fail("civiccore must not be selectable"))
-            if module.get("civiccore_requirement") is not None:
-                errors.append(fail("civiccore civiccore_requirement must be null"))
-        elif module.get("repo") is not None and "civiccore" not in dependencies:
-            errors.append(fail(f"{module_id} must depend on civiccore"))
+                errors.append(fail("townlight_core must not be selectable"))
+            if module.get("townlight_core_requirement") is not None:
+                errors.append(fail("townlight_core townlight_core_requirement must be null"))
+        elif module.get("repo") is not None and "townlight_core" not in dependencies:
+            errors.append(fail(f"{module_id} must depend on townlight_core"))
 
         if module.get("repo") is None:
             if module.get("selectable") is not False:
@@ -173,7 +173,7 @@ def _validate_modules(data: dict[str, Any], contract: dict[str, Any]) -> tuple[l
             if not isinstance(version, str) or not VERSION_RE.match(version):
                 errors.append(fail(f"{module_id} current_version must be semantic version text"))
             source_commit = module.get("source_commit")
-            if module_id != "civiccore":
+            if module_id != "townlight_core":
                 if not isinstance(source_commit, str) or not SHA1_RE.match(source_commit):
                     errors.append(fail(f"{module_id} source_commit must be a full 40-character SHA1"))
 
@@ -206,6 +206,7 @@ def _validate_docs(contract: dict[str, Any]) -> list[str]:
         text = path.read_text(encoding="utf-8")
         for phrase in (
             "Tauri/WebView2",
+            # The dated ADR is original evidence; its names are not current branding.
             "Townlight Core is always installed" if path == DESIGN_CONTROL else "CivicCore is always installed",
             "module manager",
             "Docker",

@@ -86,6 +86,13 @@ pub fn write_access_export(plan: ArtifactPlan) -> Result<String, String> {
     write_export_at(plan, &root)
 }
 
+pub fn write_notice_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {
+    let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
+        .join("exports")
+        .join("notice");
+    write_planning_file_at(&root, name, bytes, digest)
+}
+
 pub fn write_permitting_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {
     let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
         .join("exports")
@@ -116,7 +123,7 @@ fn write_planning_file_at(
     if name.is_empty()
         || name.len() > 300
         || name.contains(['/', '\\', ':'])
-        || ![".json", ".txt", ".md", ".pdf", ".docx"]
+        || ![".json", ".txt", ".md", ".pdf", ".docx", ".zip"]
             .iter()
             .any(|suffix| name.to_lowercase().ends_with(suffix))
         || Path::new(name).file_name().and_then(|p| p.to_str()) != Some(name)

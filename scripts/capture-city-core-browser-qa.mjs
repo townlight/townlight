@@ -20,7 +20,7 @@ const targets = [
   {
     id: "records-admin",
     url: process.env.CITY_CORE_RECORDS_URL || "http://127.0.0.1:19000/",
-    expected: "CivicRecords AI",
+    expected: "TownlightRecords",
   },
   {
     id: "clerk-public",
@@ -31,7 +31,7 @@ const targets = [
     id: "code-public-search",
     url:
       process.env.CITY_CORE_CODE_URL ||
-      "http://127.0.0.1:19740/civiccode/search?q=13.40.020",
+      "http://127.0.0.1:19740/townlight_code/search?q=13.40.020",
     expected: "Backyard Livestock",
   },
 ];

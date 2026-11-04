@@ -3,14 +3,14 @@ import {expect,test} from '@playwright/test';
 test('Inspections return to Records refreshes the canonical attached copy',async({page})=>{
  const sha='d'.repeat(64);
  await page.addInitScript(({sha})=>{
-  const ids=['civiccore','civicrecords-ai','civicclerk','civiccode','civicnotice','civicaccess','civiczone','civicplan','civicpermit','civicinspect'];
+  const ids=['townlight_core','townlight_records','townlight_meetings','townlight_code','townlight_notice','townlight_access','townlight_zoning','townlight_planning','townlight_permitting','townlight_inspections'];
   const record={id:'records-1',request_id:'22222222-2222-4222-8222-222222222222',requester:'Fictional inspection requester',summary:'Reviewed inspection copy',status:'received',deadline:'2026-11-04',documents:[],release_packages:[],exports:[],approved_at_unix_seconds:null,fulfilled_at_unix_seconds:null};
   const work=()=>({records_requests:[structuredClone(record)]});
   window.__attachCalls=0;
   window.__TAURI_INTERNALS__={invoke:async(cmd,args={})=>{
    if(cmd==='get_app_state')return {
     product_name:'Townlight',local_only:true,domain_authority:'python-records',
-    modules:ids.map(id=>({id,display_name:id,required:id==='civiccore',selectable:id!=='civiccore',installed:true,enabled:true,contract_ready:true})),
+    modules:ids.map(id=>({id,display_name:id,required:id==='townlight_core',selectable:id!=='townlight_core',installed:true,enabled:true,contract_ready:true})),
     module_selection:{profile_id:'inspections-preview',installed_module_ids:ids,enabled_module_ids:ids},
     first_run:{finished:true,steps:[],locations:{}},
     access:{configured:true,signed_in:true,role:'local-admin',operator_email:'inspector@example.invalid'},health:[]

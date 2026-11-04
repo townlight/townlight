@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Voice-standard gate for visitor-facing docs.
 
-Enforces docs/design/civicsuite-voice-standard.md Section 6. That doc is the
+Enforces docs/design/townlight-voice-standard.md Section 6. That doc is the
 source of truth for the words; this script is its enforcement. Denylist
 additions land in the doc first, then here.
 
@@ -181,7 +181,7 @@ def run() -> int:
         print("Voice gate — FAILURES:")
         for rel, ln, msg in hard:
             print(f"  FAIL  {rel}:{ln}  {msg}")
-        print(f"\n{len(hard)} hard finding(s). See docs/design/civicsuite-voice-standard.md.")
+        print(f"\n{len(hard)} hard finding(s). See docs/design/townlight-voice-standard.md.")
         return 1
     print(f"Voice gate PASS — {len(VISITOR_FILES)} visitor docs clean"
           + (f" ({len(soft)} warning(s))" if soft else "") + ".")

@@ -129,14 +129,14 @@ pipeline_run:
   # sibling's working-tree diff and enforces that sibling's allowed_paths.
   # The umbrella's `allowed_paths` continues to apply at the umbrella root.
   #
-  # Example (umbrella PR + civicrecords-ai PR + civicclerk PR in lockstep):
+  # Example (umbrella PR + townlight_records PR + townlight_meetings PR in lockstep):
   #
   # target_repos:
-  #   - path: ../civicrecords-ai
+  #   - path: ../townlight_records
   #     allowed_paths:
   #       - README.md
   #       - USER-MANUAL.md
-  #   - path: ../civicclerk
+  #   - path: ../townlight_meetings
   #     allowed_paths:
   #       - README.md
   #       - USER-MANUAL.md

@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 # SPDX-License-Identifier: Apache-2.0
 <#
-Installs the CivicSuite local Git hooks for this checkout.
+Installs the Townlight local Git hooks for this checkout.
 
 Git does not track files inside `.git/hooks`, so each recovered or fresh clone
 must run this installer once before pushing stage branches.
@@ -28,4 +28,4 @@ exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$source"
 
 Set-Content -LiteralPath $target -Value $hook -NoNewline -Encoding ascii
 
-Write-Output "Installed CivicSuite pre-push hook at $target"
+Write-Output "Installed Townlight pre-push hook at $target"

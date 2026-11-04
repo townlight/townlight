@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """Token vendored-copy drift gate.
 
-The token authority is civiccore-ui/tokens/tokens.css in the CivicSuite/civiccore
-repo (see docs/design/windows-desktop-design-control.md, Token Authority).
+The token authority is the exact Core source pinned below, in the
+townlight/core repository (see docs/design/windows-desktop-design-control.md).
 Consumers in this repo vendor a copy; this gate fails the build if a vendored
 copy drifts from the authority.
 
 Vendored copies checked:
   - docs/tokens.css (consumed by docs/module-explorer.html)
 
-Pinning: compared against civiccore main HEAD for now. TODO: once civiccore
-cuts a release containing civiccore-ui/, pin to the civiccore version the
-suite consumes (installer/modules.json source_commit) instead of main.
+The pin matches the coordinated Windows candidate's Core source. The vendored
+copy must match that authority, including its current naming.
 
 Requires: gh CLI authenticated (same requirement as verify-suite-state.py).
 Exit 0 = all vendored copies match; 1 = drift or fetch failure.
@@ -23,14 +22,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-AUTHORITY_REPO = "CivicSuite/civiccore"
-AUTHORITY_PATH = "civiccore-ui/tokens/tokens.css"
-# Pinned to the exact civiccore commit the vendored copy was taken from
-# (the PR #66 merge that established civiccore-ui/tokens/). This makes the gate
+AUTHORITY_REPO = "townlight/core"
+AUTHORITY_PATH = "townlight_core-ui/tokens/tokens.css"
+# Pinned to the coordinated candidate's exact renamed Core source. This makes the gate
 # deterministic: it fails only when OUR vendored copy drifts, never because an
-# unrelated change landed on civiccore main. Bump this SHA when re-vendoring.
-# TODO: switch to a civiccore release tag once one ships containing civiccore-ui/.
-AUTHORITY_REF = "78033cc8aa945446d7fb0576a9026d42e2f905d8"
+# unrelated change landed on townlight_core main. Bump this SHA when re-vendoring.
+# TODO: switch to a townlight_core release tag once one ships containing townlight_core-ui/.
+AUTHORITY_REF = "3021821bf9a92c790a399ad12aed821d65b09105"
 VENDORED = [ROOT / "docs" / "tokens.css"]
 
 

@@ -1,0 +1,115 @@
+# SPDX-License-Identifier: Apache-2.0
+# DRAFT - awaiting Scott's APPROVE before the pipeline runs. Predecessor: Phase A (v0.4.0 cut).
+# Phase B: wire TownlightAccess into the desktop runtime and author a runtime-VALID module record,
+# WITHOUT adding it to the city-core profile yet. The shipped 5-module profile stays untouched.
+pipeline_run:
+  id: "2026-06-28-townlight_access-city-core-phaseB-desktop-wiring"
+  type: feature
+  target_repo: "Townlight/townlight"
+  branch: "feature/townlight_access-desktop-wiring"
+  depends_on: "Phase A (TownlightAccess v0.4.0 must be cut; pin its commit SHA here)"
+
+  goal: >
+    Make TownlightAccess installable+startable by the desktop runtime and author its module record using
+    the REAL desktop-contract field shape (mirroring TownlightNotice), proven by a cargo test that a
+    candidate (city-core + townlight_access) profile validates - all WITHOUT changing the default city-core
+    profile.modules (still 5). This decouples "runtime is ready" from "profile is flipped" (Phase C),
+    so the GA city-core profile never fails validation.
+
+  active_scope:
+    summary: >
+      Desktop/runtime wiring + a runtime-valid townlight_access RECORD that is NOT in the city-core profile
+      and is selectable:false (not offered) until Phase C. Mirrors how TownlightNotice is wired.
+
+  allowed_paths:
+    - "installer/modules.json"                 # townlight_access RECORD only - NOT the city-core profile.modules list
+    - "desktop/src-tauri/**"
+    - "desktop/runtime/**"
+    - "docs/architecture/**"
+    - "docs/process/audits/**"
+
+  forbidden_paths:
+    - "installer/modules.json city-core profile.modules list (Phase C)"
+    - "installer/modules.json excluded_modules townlight_access entry (Phase C)"
+    - "installer/module-manifest-contract.json city_core_profile (Phase C)"
+    - "scripts/verify-suite-state.py / scripts/verify-installer-plan.py (Phase C)"
+    - "README.md / ANNOUNCEMENT.md / USER-MANUAL.md / STATUS.md / FAQ.md / CHANGELOG.md truth surfaces (Phase C)"
+    - "the townlight_access repo (Phase A)"
+
+  record_shape:
+    note: >
+      Author the townlight_access record by copying TownlightNotice's record in installer/modules.json verbatim
+      in SHAPE and swapping values. Use ONLY these desktop-deserialized field names; the contract
+      JSON's future_desktop_contract_fields names (health_checks/backup_hooks/restore_hooks/
+      uninstall_hooks/model_requirements/audit_events/surface_placement) are doc-only and MUST NOT appear.
+    townlight_access_record:
+      id: "townlight_access"
+      display_name: "TownlightAccess"
+      repo: "Townlight/townlight_access"
+      tier: 3
+      role: "accessibility + records-ready export"
+      selectable: false                         # not offered until Phase C
+      required: false
+      townlight_core_requirement: "1.2.0"
+      dependencies: ["townlight_core"]
+      default_port: 8060
+      installer_status: "contract_declared_runtime_pending"   # non-ready marker until Phase C
+      proof_required: ["module_selection","install_plan","artifact_resolution","health_check","restart","backup","restore","release_artifacts","accessibility_audit","export_correctness"]
+      current_version: "0.4.0"
+      source_commit: "<Phase A v0.4.0 commit SHA - 40 char>"
+      routes:
+        - {id: "accessibility-staff", label: "Accessibility", path: "/townlight_access/staff", surface: "Staff"}
+        - {id: "accessibility-public", label: "Accessible Content", path: "/townlight_access", surface: "Public"}
+      permissions: ["access.review","access.plainlanguage","access.export","access.audit"]
+      services:
+        - {id: "python-services", kind: "bundled-python", health_check: "python-services"}
+        - {id: "file-storage", kind: "local-file-store", health_check: "file-storage"}
+      migrations: ["townlight_access-windows-local-state-v1"]
+      tasks: ["accessibility-review","records-export"]   # workflow ids (deterministic; not queue jobs)
+      backup_restore_hooks: ["Data/workflows/access","Data/exports/access","Data/files/access"]
+      model_needs: []                            # EMPTY - deterministic, no AI  [SUPERSEDED 2026-07-02: now the pinned gemma-4-12b-it-qat-q4_0 required:true (PR #220, owner directive) -- see the AMENDED note atop README.md in this directory]
+      lifecycle: {install: "profile-selected", update: "manifest-versioned", disable: "allowed-after-backup", uninstall: "backup-first-module-data-removal"}
+
+  work_items:
+    python_services:
+      - "desktop/runtime/python-services .../services.py MODULE_IMPORTS += ('townlight_access','townlight_access.main'); also BACKFILL the latent ('townlight_notice','townlight_notice.main') hole so the shared /health actually verifies both load."
+      - "Ensure the shared python-services env sets the TownlightAccess store to Postgres (DATABASE_URL / TOWNLIGHT_ACCESS_REVIEW_DB_URL) consistent with Phase A."
+      - "migrate.py: reconcile townlight_access's schema_migrations with the per-module migration runner (add its root or invoke its migrate())."
+    rust_desktop:
+      - "main.rs: add townlight_access to the workflow->module and export-surface maps."
+      - "auth.rs: add townlight_access to the role->module map and enforce the staff boundary at the desktop layer (pairs with Phase A's write-token)."
+      - "module_registry.rs: the townlight_access record (above) deserializes cleanly; add/extend a cargo test that validate_profile over a CANDIDATE list (current 5 + townlight_access) returns Ok - WITHOUT changing the default city-core profile or its existing tests."
+    payloads:
+      - "desktop/runtime/windows-runtime-payloads.json required_files += 'Lib/site-packages/townlight_access/main.py'."
+
+  expected_outputs:
+    - "townlight_access record present in installer/modules.json with the real field shape, selectable:false, NOT in city-core profile.modules; excluded_modules entry untouched."
+    - "cargo test in desktop/src-tauri proves the candidate (5 + townlight_access) profile validates; all EXISTING tests (5-module default) stay green."
+    - "Shared python-services imports + /health include townlight_access (and townlight_notice backfilled)."
+    - "desktop cargo build succeeds (modules.json is include_str!-embedded)."
+
+  required_gates:
+    - human_approval_plan
+    - cargo_test_desktop          # the binding contract gate the old plan lacked
+    - tests_passed                # python-services + umbrella
+    - verify_green                # 5-module profile unchanged, so verify-suite-state/installer-plan still pass
+    - human_approval_merge
+
+  risk: medium
+
+  rollback_plan: >
+    Additive and inert to the shipped profile (townlight_access is NOT in city-core profile.modules and is
+    selectable:false). Revert the PR to remove the record + wiring; the GA 5-module city-core is
+    unaffected at every point because validate_profile never sees townlight_access in Phase B.
+
+  definition_of_done: >
+    TownlightAccess is fully wired into the desktop runtime (python imports, health, Rust maps, payload
+    manifest) and carries a runtime-valid module record that a cargo test proves would pass
+    validate_profile as a 6th member - while the shipped 5-module city-core profile and all its tests
+    remain green and unchanged. Nothing is offered to operators yet.
+
+  director_notes:
+    - "executor: copy TownlightNotice's record SHAPE exactly; do not invent fields. model_needs MUST be []."
+    - "SUPERSEDED 2026-07-02 (owner directive): model_needs now declares the pinned gemma-4-12b-it-qat-q4_0 required:true (PR #220); the record SHAPE rule stands."
+    - "executor: if making this contract-valid forces a change to the default city-core profile, STOP - that belongs in Phase C, not here."
+    - "critic: confirm cargo build still succeeds and the DEFAULT city-core profile is still exactly the 5 shipped modules in order."

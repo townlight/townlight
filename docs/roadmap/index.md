@@ -1,4 +1,4 @@
-<a id="civicsuite-roadmap"></a>
+<a id="townlight-roadmap"></a>
 
 # Townlight Roadmap
 
@@ -6,12 +6,12 @@ This roadmap starts from a hard truth: **"all repos have releases" is not the sa
 
 ## Current Status
 
-- Developer preview: `civicrecords-ai`
-- Productizing: `civicclerk`
+- Developer preview: `townlight_records`
+- Productizing: `townlight_meetings`
 - Foundation / planned: 26 additional product modules, including newly specified `CivicRegWatch` and `CivicAPI`
-- Shared platform: `civiccore v1.1.0`
+- Shared platform: `townlight_core v1.1.0`
 
-Current phase: **`Phase 1: Platform And Security Extraction` is underway.** `Phase 0: Continuity` is complete, the auth extraction pattern has already been proven across multiple consumers, and the shared notice-compliance helper is now proven in both `civicnotice` and `civicclerk`.
+Current phase: **`Phase 1: Platform And Security Extraction` is underway.** `Phase 0: Continuity` is complete, the auth extraction pattern has already been proven across multiple consumers, and the shared notice-compliance helper is now proven in both `townlight_notice` and `townlight_meetings`.
 
 New module scope added on 2026-04-30:
 
@@ -40,7 +40,7 @@ Exit criteria:
 
 ## Phase 1: Platform And Security Extraction
 
-Goal: turn `civiccore` into the real shared substrate for the suite, including the security posture required for municipal review.
+Goal: turn `townlight_core` into the real shared substrate for the suite, including the security posture required for municipal review.
 
 Sequencing rule:
 
@@ -54,7 +54,7 @@ Shared platform work:
 - ship `notifications`
 - ship `onboarding`
 - ship `ingest`
-- extract the highest-value reusable `civicrecords-ai` platform capabilities, including exemptions and secure connector primitives
+- extract the highest-value reusable `townlight_records` platform capabilities, including exemptions and secure connector primitives
 
 Shared security work:
 
@@ -66,14 +66,14 @@ Shared security work:
 
 Proof model:
 
-- each extracted capability must land in `civiccore`
+- each extracted capability must land in `townlight_core`
 - each must be proven in `2-3` consumer modules
 - each must have a documented rollout playbook
 - rollout is not considered complete until another module can adopt the pattern without bespoke work
 
 Exit criteria:
 
-- extracted subsystems are shipped and versioned in `civiccore`
+- extracted subsystems are shipped and versioned in `townlight_core`
 - `2-3` consumer modules pass release gates with each major shared pattern
 - rollout playbooks exist for the remaining modules
 - the threat model and platform security baseline are documented
@@ -85,10 +85,10 @@ Goal: prove the suite can produce more than one credible municipal product.
 
 Products:
 
-- keep `civicrecords-ai` hardening as the flagship
-- drive `civicclerk` to the second true product
+- keep `townlight_records` hardening as the flagship
+- drive `townlight_meetings` to the second true product
 
-Required work for `civicclerk`:
+Required work for `townlight_meetings`:
 
 - full auth/RBAC on real workflows
 - real operator UX, not just workflow scaffolding
@@ -109,7 +109,7 @@ Identity and security requirements:
 Integration ownership during this phase:
 
 - assign an interim owner for cross-module integration decisions during joint product deployment
-- `Phase 4` will formalize whether that ownership lives in `civiccore`, an umbrella deployment repo, or a formal suite integration contract
+- `Phase 4` will formalize whether that ownership lives in `townlight_core`, an umbrella deployment repo, or a formal suite integration contract
 
 Exit criteria:
 
@@ -134,10 +134,10 @@ Shared module pattern:
 
 Upgrade-path pattern:
 
-- define how `civiccore` upgrades flow into module upgrades
+- define how `townlight_core` upgrades flow into module upgrades
 - formalize the two-layer migration story: shared platform migration expectations plus per-module Alembic expectations
-- document a mechanical adoption sequence for future `civiccore` minor releases
-- require that a foundation module can absorb a new `civiccore` release in a known number of repeatable steps
+- document a mechanical adoption sequence for future `townlight_core` minor releases
+- require that a foundation module can absorb a new `townlight_core` release in a known number of repeatable steps
 
 Contributor path:
 
@@ -164,7 +164,7 @@ Exit criteria:
 
 - the productization pattern is documented and reused
 - the upgrade path is documented and repeatable
-- a new `civiccore` minor-version bump can be absorbed by a foundation module without bespoke redesign
+- a new `townlight_core` minor-version bump can be absorbed by a foundation module without bespoke redesign
 - outside contributors have a documented and proven contribution path that maps to the same pattern
 
 ## Phase 4: City Starter Set
@@ -173,15 +173,15 @@ Goal: define and prove the first deployable municipal bundle.
 
 Starter set:
 
-- `civicrecords-ai`
-- `civicclerk`
+- `townlight_records`
+- `townlight_meetings`
 - `civicbudget`
 - `civiclegal`
-- `civicnotice`
+- `townlight_notice`
 - `civicdata`
 - `civichr`
 
-This phase is about composition, not just product count. The suite needs an explicit owner for the cross-module integration surface. That ownership can live in `civiccore`, an umbrella deployment/integration repo, or a formal suite integration contract, but it must be named and maintained.
+This phase is about composition, not just product count. The suite needs an explicit owner for the cross-module integration surface. That ownership can live in `townlight_core`, an umbrella deployment/integration repo, or a formal suite integration contract, but it must be named and maintained.
 
 Cross-module integration scope:
 
@@ -293,9 +293,9 @@ Exit criteria:
 
 ## Immediate Sequence
 
-1. Use the shared extraction consumer rollout playbook for the next `civiccore` fan-out work.
-2. Keep extracting reusable `civicrecords-ai` and `civicclerk` capabilities into `civiccore` when they will serve more than one module.
-3. Use `civicclerk v1.0.1` as the second-product reference for mock-city contracts, integration-depth contracts, unsigned-installer operator guidance, and site-specific deployment proof slots.
+1. Use the shared extraction consumer rollout playbook for the next `townlight_core` fan-out work.
+2. Keep extracting reusable `townlight_records` and `townlight_meetings` capabilities into `townlight_core` when they will serve more than one module.
+3. Use `townlight_meetings v1.0.1` as the second-product reference for mock-city contracts, integration-depth contracts, unsigned-installer operator guidance, and site-specific deployment proof slots.
 4. Define the shared upgrade-path pattern before broadening more platform dependency fan-out.
 5. Stand up the explicit cross-module integration ownership model for the starter set.
 6. Resolve the Townlight API and Townlight Regulatory Watch ADRs before scaffolding runtime repos.

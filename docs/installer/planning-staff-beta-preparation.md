@@ -26,7 +26,7 @@ the default, and saved selections remain intact. Known density, hierarchy and
 overflow limitations remain. Functional evidence does not establish usability
 for broad public deployment. Conclusions still require staff planning judgment.
 
-Application ID `org.civicsuite.desktop`, MSI upgrade code
+Application ID `org.townlight.desktop`, MSI upgrade code
 `a63fc1d3-5437-5f55-89a2-fef93fb1f930`, package/API identifiers and data roots are
 unchanged. Preserve historical releases, receipts, source histories and signed
 1.4 bytes. The P5/P6 development candidate contract and source pins remain intact.

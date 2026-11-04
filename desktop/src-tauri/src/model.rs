@@ -339,13 +339,13 @@ fn windows_config_root() -> PathBuf {
 }
 
 fn windows_runtime_root() -> PathBuf {
-    if let Ok(root) = env::var("CIVICSUITE_RUNTIME_ROOT") {
+    if let Ok(root) = env::var("TOWNLIGHT_RUNTIME_ROOT") {
         return PathBuf::from(root);
     }
     local_paths::effective_locations()
         .map(|locations| PathBuf::from(locations.install_root))
         .unwrap_or_else(|_| {
-            env::var("CIVICSUITE_DESKTOP_STATE_DIR")
+            env::var("TOWNLIGHT_DESKTOP_STATE_DIR")
                 .map(PathBuf::from)
                 .unwrap_or_else(|_| {
                     env::var("LOCALAPPDATA")
@@ -459,7 +459,7 @@ fn ollama_models_dir() -> PathBuf {
 }
 
 fn ollama_executable() -> PathBuf {
-    env::var("CIVICSUITE_OLLAMA_PATH")
+    env::var("TOWNLIGHT_OLLAMA_PATH")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
             let bundled = bundled_ollama_path();
@@ -473,11 +473,11 @@ fn ollama_executable() -> PathBuf {
 }
 
 fn parse_available_disk_override() -> Option<Result<u64, String>> {
-    env::var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE")
+    env::var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE")
         .ok()
         .map(|value| {
             value.parse::<u64>().map_err(|error| {
-                format!("Invalid CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE value: {error}")
+                format!("Invalid TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE value: {error}")
             })
         })
 }
@@ -543,11 +543,11 @@ fn ensure_minimum_free_disk(path: &Path, minimum_free_disk_bytes: u64) -> Result
 }
 
 fn parse_available_memory_override() -> Option<Result<u64, String>> {
-    env::var("CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE")
+    env::var("TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE")
         .ok()
         .map(|value| {
             value.parse::<u64>().map_err(|error| {
-                format!("Invalid CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE value: {error}")
+                format!("Invalid TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE value: {error}")
             })
         })
 }
@@ -840,7 +840,7 @@ fn probe_model_runtime(manifest: &ModelManifest) -> ModelRuntimeProbe {
 
 #[cfg(test)]
 fn test_runtime_probe_from_env() -> Option<ModelRuntimeProbe> {
-    match env::var("CIVICSUITE_TEST_MODEL_RUNTIME_AFTER_START")
+    match env::var("TOWNLIGHT_TEST_MODEL_RUNTIME_AFTER_START")
         .ok()
         .as_deref()
     {
@@ -865,7 +865,7 @@ fn test_runtime_probe_from_env() -> Option<ModelRuntimeProbe> {
 
 fn start_model_runtime_service() -> Result<String, String> {
     #[cfg(test)]
-    if let Ok(value) = env::var("CIVICSUITE_TEST_MODEL_RUNTIME_START") {
+    if let Ok(value) = env::var("TOWNLIGHT_TEST_MODEL_RUNTIME_START") {
         return if value == "ok" {
             Ok("test model runtime start accepted".to_string())
         } else {
@@ -1284,7 +1284,7 @@ fn model_artifact_verified(local_path: &Path, artifact: &ArtifactDefinition) -> 
 
 pub(crate) fn local_model_artifact_verified() -> Result<bool, String> {
     #[cfg(test)]
-    if env::var("CIVICSUITE_TEST_MODEL_VERIFIED").ok().as_deref() == Some("1") {
+    if env::var("TOWNLIGHT_TEST_MODEL_VERIFIED").ok().as_deref() == Some("1") {
         return Ok(true);
     }
     let manifest = parse_manifest()?;
@@ -1297,7 +1297,7 @@ pub(crate) fn local_model_artifact_verified() -> Result<bool, String> {
 }
 
 fn curl_executable() -> String {
-    env::var("CIVICSUITE_CURL_PATH").unwrap_or_else(|_| {
+    env::var("TOWNLIGHT_CURL_PATH").unwrap_or_else(|_| {
         #[cfg(windows)]
         {
             win_system_exe("System32\\curl.exe")
@@ -1317,7 +1317,7 @@ fn run_model_download_curl(
     resume: bool,
 ) -> Result<(), String> {
     #[cfg(test)]
-    if let Ok(sequence) = env::var("CIVICSUITE_TEST_MODEL_DOWNLOAD_SEQUENCE") {
+    if let Ok(sequence) = env::var("TOWNLIGHT_TEST_MODEL_DOWNLOAD_SEQUENCE") {
         let attempt_path = partial_path.with_extension("attempt");
         if sequence == "corrupt-always" {
             fs::write(partial_path, b"zzz")
@@ -1753,18 +1753,18 @@ pub(crate) fn local_model_ready() -> Result<bool, String> {
 
 /// Whether an AI-generation call would succeed right now. Handlers that branch
 /// AI-vs-deterministic-fallback must use this instead of local_model_ready()
-/// directly: the CIVICSUITE_FAKE_MODEL_RESPONSE test seam fires inside
+/// directly: the TOWNLIGHT_FAKE_MODEL_RESPONSE test seam fires inside
 /// generate_local_text() before its readiness check, so a fallback branch keyed
 /// on raw readiness alone could never reach the AI path under cargo test (a
 /// temp state dir is never model-ready).
 pub(crate) fn local_generation_available() -> Result<bool, String> {
     if cfg!(test) {
-        if let Ok(fake_response) = env::var("CIVICSUITE_FAKE_MODEL_RESPONSE") {
+        if let Ok(fake_response) = env::var("TOWNLIGHT_FAKE_MODEL_RESPONSE") {
             if !fake_response.trim().is_empty() {
                 return Ok(true);
             }
         }
-        if let Ok(fake_error) = env::var("CIVICSUITE_FAKE_MODEL_ERROR") {
+        if let Ok(fake_error) = env::var("TOWNLIGHT_FAKE_MODEL_ERROR") {
             if !fake_error.trim().is_empty() {
                 return Ok(true);
             }
@@ -1817,7 +1817,7 @@ pub(crate) fn generate_local_text(prompt: &str) -> Result<(String, String), Stri
     validate_manifest(&manifest)?;
     let runtime_model = manifest.model.runtime_model.clone();
     if cfg!(test) {
-        if let Ok(fake_response) = env::var("CIVICSUITE_FAKE_MODEL_RESPONSE") {
+        if let Ok(fake_response) = env::var("TOWNLIGHT_FAKE_MODEL_RESPONSE") {
             if !fake_response.trim().is_empty() {
                 return Ok((runtime_model, fake_response.trim().to_string()));
             }
@@ -1827,7 +1827,7 @@ pub(crate) fn generate_local_text(prompt: &str) -> Result<(String, String), Stri
         // then generation fails mid-flight -- the only way cargo tests can
         // reach the handlers' generation-failure branches (a real not-ready
         // state is caught by the availability probe before generate is called).
-        if let Ok(fake_error) = env::var("CIVICSUITE_FAKE_MODEL_ERROR") {
+        if let Ok(fake_error) = env::var("TOWNLIGHT_FAKE_MODEL_ERROR") {
             if !fake_error.trim().is_empty() {
                 return Err(fake_error.trim().to_string());
             }
@@ -1947,7 +1947,7 @@ mod tests {
             .contains("gemma-4-12B-it-qat-q4_0-gguf"));
         assert_eq!(
             manifest.model.runtime_model,
-            "civicsuite-gemma4-12b-qat:q4_0"
+            "townlight-gemma4-12b-qat:q4_0"
         );
     }
 
@@ -1972,12 +1972,12 @@ mod tests {
     #[test]
     fn local_generation_request_uses_chat_api_through_model_parser() {
         let body = local_generation_request_body(
-            "civicsuite-gemma4-12b-qat:q4_0",
+            "townlight-gemma4-12b-qat:q4_0",
             "Draft a staff response for marker D100-AI-MODEL-MARKER-20260620.",
         );
         let payload: serde_json::Value = serde_json::from_str(&body).expect("valid json");
 
-        assert_eq!(payload["model"], "civicsuite-gemma4-12b-qat:q4_0");
+        assert_eq!(payload["model"], "townlight-gemma4-12b-qat:q4_0");
         assert_eq!(payload["stream"], false);
         // /api/chat, NOT raw /api/generate: the model's own template + parser
         // must run, so no raw flag, no hand-built turn markers, no stop tokens.
@@ -2010,7 +2010,7 @@ mod tests {
 
     #[test]
     fn ollama_generate_parser_accepts_non_streaming_response_text() {
-        let body = r#"{"model":"civicsuite-gemma4-12b-qat:q4_0","response":"Draft ready for review.","done":true}"#;
+        let body = r#"{"model":"townlight-gemma4-12b-qat:q4_0","response":"Draft ready for review.","done":true}"#;
 
         let parsed = parse_ollama_generate_text(body).expect("parse response");
 
@@ -2019,7 +2019,7 @@ mod tests {
 
     #[test]
     fn ollama_generate_parser_accepts_message_content_shape() {
-        let body = r#"{"model":"civicsuite-gemma4-12b-qat:q4_0","message":{"role":"assistant","content":"Guidance draft ready."},"done":true}"#;
+        let body = r#"{"model":"townlight-gemma4-12b-qat:q4_0","message":{"role":"assistant","content":"Guidance draft ready."},"done":true}"#;
 
         let parsed = parse_ollama_generate_text(body).expect("parse response");
 
@@ -2041,7 +2041,7 @@ mod tests {
 
     #[test]
     fn ollama_generate_parser_preserves_empty_output_detection() {
-        let body = r#"{"model":"civicsuite-gemma4-12b-qat:q4_0","done":true}"#;
+        let body = r#"{"model":"townlight-gemma4-12b-qat:q4_0","done":true}"#;
 
         let parsed = parse_ollama_generate_text(body).expect("parse empty response");
 
@@ -2098,11 +2098,11 @@ mod tests {
     #[test]
     fn local_generation_available_honors_fake_seam_and_fresh_state() {
         with_temp_state_dir(|_| {
-            env::remove_var("CIVICSUITE_FAKE_MODEL_RESPONSE");
+            env::remove_var("TOWNLIGHT_FAKE_MODEL_RESPONSE");
             assert!(!local_generation_available().expect("readiness computes"));
-            env::set_var("CIVICSUITE_FAKE_MODEL_RESPONSE", "Fake local draft.");
+            env::set_var("TOWNLIGHT_FAKE_MODEL_RESPONSE", "Fake local draft.");
             assert!(local_generation_available().expect("fake seam counts as available"));
-            env::remove_var("CIVICSUITE_FAKE_MODEL_RESPONSE");
+            env::remove_var("TOWNLIGHT_FAKE_MODEL_RESPONSE");
             assert!(!local_generation_available().expect("readiness computes again"));
         });
     }
@@ -2120,9 +2120,9 @@ mod tests {
     #[test]
     fn model_download_checks_free_disk_before_network() {
         with_temp_state_dir(|_| {
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "1");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "1");
             let result = model_action("download").expect("action response is structured");
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
             assert!(!result.accepted);
             assert_eq!(result.status, "Needs attention");
             assert!(result.message.contains("needs at least 15000000000"));
@@ -2143,31 +2143,31 @@ mod tests {
     #[test]
     fn memory_preflight_warns_below_floor_and_passes_above() {
         // approximate_weight_memory_gb (6.7) + 2GB headroom ~= 9.3GB required.
-        env::set_var("CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE", "1000000000");
+        env::set_var("TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE", "1000000000");
         let warning = ensure_minimum_free_memory(6.7);
-        env::remove_var("CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE");
+        env::remove_var("TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE");
         assert!(warning
             .as_deref()
             .unwrap_or_default()
             .contains("Low memory warning"));
 
-        env::set_var("CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE", "32000000000");
+        env::set_var("TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE", "32000000000");
         let ok = ensure_minimum_free_memory(6.7);
-        env::remove_var("CIVICSUITE_AVAILABLE_MEMORY_BYTES_OVERRIDE");
+        env::remove_var("TOWNLIGHT_AVAILABLE_MEMORY_BYTES_OVERRIDE");
         assert!(ok.is_none());
     }
 
     #[test]
     fn model_download_reports_missing_downloader() {
         with_temp_state_dir(|root| {
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
             env::set_var(
-                "CIVICSUITE_CURL_PATH",
+                "TOWNLIGHT_CURL_PATH",
                 root.join("missing-curl.exe").to_string_lossy().to_string(),
             );
             let result = model_action("download").expect("action response is structured");
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
-            env::remove_var("CIVICSUITE_CURL_PATH");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_CURL_PATH");
             assert!(!result.accepted);
             assert_eq!(result.status, "Needs attention");
             assert!(result
@@ -2179,16 +2179,16 @@ mod tests {
     #[test]
     fn model_download_failure_persists_status_for_resume() {
         with_temp_state_dir(|root| {
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
             env::set_var(
-                "CIVICSUITE_CURL_PATH",
+                "TOWNLIGHT_CURL_PATH",
                 root.join("missing-curl.exe").to_string_lossy().to_string(),
             );
 
             let result = model_action("download").expect("action response is structured");
 
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
-            env::remove_var("CIVICSUITE_CURL_PATH");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_CURL_PATH");
 
             assert!(!result.accepted);
             assert!(root
@@ -2324,17 +2324,17 @@ mod tests {
             manifest.model.artifact.sha256 = format!("{:x}", Sha256::digest(b"abc"));
             let local_path = model_path(&manifest.model.artifact);
 
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
             env::set_var(
-                "CIVICSUITE_TEST_MODEL_DOWNLOAD_SEQUENCE",
+                "TOWNLIGHT_TEST_MODEL_DOWNLOAD_SEQUENCE",
                 "corrupt-then-valid",
             );
 
             download_model_artifact(&manifest, &local_path)
                 .expect("corrupt first download is retried once with a clean file");
 
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
-            env::remove_var("CIVICSUITE_TEST_MODEL_DOWNLOAD_SEQUENCE");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_DOWNLOAD_SEQUENCE");
 
             assert_eq!(fs::read(&local_path).expect("local model"), b"abc");
             assert!(!partial_download_path(&local_path).exists());
@@ -2355,14 +2355,14 @@ mod tests {
             manifest.model.artifact.sha256 = format!("{:x}", Sha256::digest(b"abc"));
             let local_path = model_path(&manifest.model.artifact);
 
-            env::set_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
-            env::set_var("CIVICSUITE_TEST_MODEL_DOWNLOAD_SEQUENCE", "corrupt-always");
+            env::set_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE", "99999999999");
+            env::set_var("TOWNLIGHT_TEST_MODEL_DOWNLOAD_SEQUENCE", "corrupt-always");
 
             let error = download_model_artifact(&manifest, &local_path)
                 .expect_err("repeated corrupt downloads fail with a checksum error");
 
-            env::remove_var("CIVICSUITE_AVAILABLE_DISK_BYTES_OVERRIDE");
-            env::remove_var("CIVICSUITE_TEST_MODEL_DOWNLOAD_SEQUENCE");
+            env::remove_var("TOWNLIGHT_AVAILABLE_DISK_BYTES_OVERRIDE");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_DOWNLOAD_SEQUENCE");
 
             assert!(error.contains("checksum verification did not pass"));
             assert!(!error.contains("Could not inspect downloaded model"));
@@ -2483,9 +2483,9 @@ mod tests {
     fn model_runtime_start_waits_for_bundled_ollama_health() {
         with_temp_state_dir(|_| {
             env::set_var("OLLAMA_BASE_URL", "http://127.0.0.1:9");
-            env::set_var("CIVICSUITE_TEST_MODEL_RUNTIME_START", "ok");
+            env::set_var("TOWNLIGHT_TEST_MODEL_RUNTIME_START", "ok");
             env::set_var(
-                "CIVICSUITE_TEST_MODEL_RUNTIME_AFTER_START",
+                "TOWNLIGHT_TEST_MODEL_RUNTIME_AFTER_START",
                 "reachable-empty",
             );
             let manifest = parse_manifest().expect("manifest parses");
@@ -2494,8 +2494,8 @@ mod tests {
                 ensure_model_runtime_reachable(&manifest).expect("runtime starts in test");
 
             env::remove_var("OLLAMA_BASE_URL");
-            env::remove_var("CIVICSUITE_TEST_MODEL_RUNTIME_START");
-            env::remove_var("CIVICSUITE_TEST_MODEL_RUNTIME_AFTER_START");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_RUNTIME_START");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_RUNTIME_AFTER_START");
             assert!(runtime.reachable);
             assert!(!runtime.model_available);
             assert!(runtime.message.contains("reachable"));
@@ -2507,7 +2507,7 @@ mod tests {
         with_temp_state_dir(|_| {
             env::set_var("OLLAMA_BASE_URL", "http://127.0.0.1:9");
             env::set_var(
-                "CIVICSUITE_TEST_MODEL_RUNTIME_START",
+                "TOWNLIGHT_TEST_MODEL_RUNTIME_START",
                 "test runtime start refused",
             );
             let manifest = parse_manifest().expect("manifest parses");
@@ -2515,7 +2515,7 @@ mod tests {
             let error = ensure_model_runtime_reachable(&manifest).expect_err("start fails");
 
             env::remove_var("OLLAMA_BASE_URL");
-            env::remove_var("CIVICSUITE_TEST_MODEL_RUNTIME_START");
+            env::remove_var("TOWNLIGHT_TEST_MODEL_RUNTIME_START");
             assert!(error.contains("could not start"));
             assert!(error.contains("test runtime start refused"));
         });
@@ -2524,7 +2524,7 @@ mod tests {
     #[test]
     fn windows_ollama_executable_uses_bundled_runtime_path() {
         with_temp_state_dir(|root| {
-            env::remove_var("CIVICSUITE_OLLAMA_PATH");
+            env::remove_var("TOWNLIGHT_OLLAMA_PATH");
             let executable = ollama_executable();
 
             if cfg!(target_os = "windows") {
@@ -2551,7 +2551,7 @@ mod tests {
     #[test]
     fn checksum_marker_cannot_pass_without_model_file() {
         let missing_path = env::temp_dir().join(format!(
-            "civicsuite-missing-model-{}.gguf",
+            "townlight-missing-model-{}.gguf",
             std::process::id()
         ));
         let _ = std::fs::remove_file(&missing_path);
@@ -2583,13 +2583,13 @@ mod tests {
             .lock()
             .expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-model-test-{}",
+            "townlight-desktop-model-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }
@@ -2619,9 +2619,10 @@ mod tests {
         with_temp_state_dir(|root| {
             let model_path = root.join("Data").join("models").join("tiny.gguf");
             fs::create_dir_all(model_path.parent().expect("parent")).expect("mkdir");
-            fs::write(&model_path, b"civicsuite").expect("write model");
+            fs::write(&model_path, b"townlight").expect("write model");
             let expected = sha256_file(&model_path).expect("hash");
-            verify_file_checksum(&model_path, 10, &expected).expect("verify");
+            verify_file_checksum(&model_path, b"townlight".len() as u64, &expected)
+                .expect("verify");
             assert!(checksum_marker_matches(&model_path, &expected));
         });
     }

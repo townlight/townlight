@@ -9,7 +9,7 @@ outside-test beta line. It covers only the starter profile: Townlight Core,
 Townlight Records, Townlight Meetings, and the Townlight installer.
 
 This document does not promote the full suite, does not promote queued modules,
-does not certify procurement use, does not prove live CivicRecords/CivicClerk
+does not certify procurement use, does not prove live TownlightRecords/Townlight Meetings
 business-record exchange, and does not certify macOS lifecycle behavior.
 
 ## Current Evidence Baseline
@@ -22,7 +22,7 @@ protected API loading fix.
 
 Evidence already recorded:
 
-- Suite verifier passes with `[civicrecords-ai] PASS 1.6.1`.
+- Suite verifier passes with `[townlight_records] PASS 1.6.1`.
 - Suite verifier passes with `[clerk-core-workflow-proof] PASS`.
 - Docs verifier passes.
 - Installer-plan verifier passes.

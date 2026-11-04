@@ -1,4 +1,4 @@
-<a id="civicsuite-suite-launcher"></a>
+<a id="townlight-suite-launcher"></a>
 
 # Townlight Suite Launcher
 
@@ -12,7 +12,7 @@ no network fonts, no build step, and no dependency install is required.
 - `src/styles.css` defines the prototype paper, navy, and gold tokens plus the
   Inter, Source Serif, and JetBrains Mono font stack with local/system
   fallbacks.
-- `civicsuite-launcher-config.js` provides installer-written module URLs.
+- `townlight-launcher-config.js` provides installer-written module URLs.
 - `src/app.js` owns the Staff, Resident, and IT-Admin surfaces, module tiles,
   audit drawer, command palette, and QA state simulation.
 - `scripts/serve.mjs` starts a small local static server for browser QA.
@@ -35,5 +35,5 @@ State fixtures are selected only when QA mode is explicit:
 - `?qa=1&state=partial`
 
 The module links default to the city-core local ports and are overwritten by
-the installer-generated `window.CIVICSUITE_LAUNCHER_CONFIG` before `src/app.js`
+the installer-generated `window.TOWNLIGHT_LAUNCHER_CONFIG` before `src/app.js`
 loads.

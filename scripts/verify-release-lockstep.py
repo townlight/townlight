@@ -8,7 +8,7 @@ import sys
 
 
 REQUIRED_PATHS = (
-    "docs/CivicSuiteUnifiedSpec.md",
+    "docs/TownlightUnifiedSpec.md",
     "docs/release-recovery-status.md",
     "scripts/verify-suite-state.py",
     "installer/modules.json",

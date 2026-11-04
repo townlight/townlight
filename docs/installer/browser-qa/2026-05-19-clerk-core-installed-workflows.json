@@ -1,48 +1,48 @@
 {
   "name": "clerk-core-installed-browser-qa",
   "captured_at": "2026-05-19T05:34:35.593Z",
-  "baseline": "captured before CivicSuite PR #150; current merged truth is main 0e229e5db8972655002ded55add6cd0bf3701f2c with PR #150 port-isolation fix, PR #153 Windows cleanup-evidence fix, and main CI runs 26115385258/26115385070",
+  "baseline": "captured before Townlight PR #150; current merged truth is main 0e229e5db8972655002ded55add6cd0bf3701f2c with PR #150 port-isolation fix, PR #153 Windows cleanup-evidence fix, and main CI runs 26115385258/26115385070",
   "urls": {
     "recordsWeb": "http://127.0.0.1:18080",
     "recordsApi": "http://127.0.0.1:18000",
     "clerkWeb": "http://127.0.0.1:18081"
   },
   "health": {
-    "civicrecords": {
+    "townlight_records": {
       "status": "ok",
       "version": "1.6.1"
     },
-    "civicclerk": {
+    "townlight_meetings": {
       "status": "ok",
-      "service": "civicclerk",
+      "service": "townlight_meetings",
       "version": "1.0.1",
-      "civiccore": "1.0.1"
+      "townlight_core": "1.0.1"
     }
   },
   "checks": [
     {
       "id": "records-login-desktop",
-      "product": "CivicRecords AI",
+      "product": "TownlightRecords",
       "path": "/",
       "viewport": {
         "width": 1440,
         "height": 1000
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/records-login-desktop.png",
-      "body_sample": "CR CivicRecords AI Sign in to the admin panel Email Password Sign in",
+      "body_sample": "CR TownlightRecords Sign in to the admin panel Email Password Sign in",
       "expected_copy_found": true,
       "expected_copy": [
-        "CivicRecords AI",
+        "TownlightRecords",
         "Sign in"
       ],
       "headings": [
-        "CivicRecords AI"
+        "TownlightRecords"
       ],
       "controls": {
         "buttons": 1,
         "links": 0
       },
-      "active_element_after_tabs": "body CRCivicRecords AISign in to the admin panelEmailPasswordSign in",
+      "active_element_after_tabs": "body CRTownlightRecordsSign in to the admin panelEmailPasswordSign in",
       "horizontal_overflow": false,
       "console_messages": [],
       "page_errors": [],
@@ -51,27 +51,27 @@
     },
     {
       "id": "records-login-mobile",
-      "product": "CivicRecords AI",
+      "product": "TownlightRecords",
       "path": "/",
       "viewport": {
         "width": 390,
         "height": 844
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/records-login-mobile.png",
-      "body_sample": "CR CivicRecords AI Sign in to the admin panel Email Password Sign in",
+      "body_sample": "CR TownlightRecords Sign in to the admin panel Email Password Sign in",
       "expected_copy_found": true,
       "expected_copy": [
-        "CivicRecords AI",
+        "TownlightRecords",
         "Sign in"
       ],
       "headings": [
-        "CivicRecords AI"
+        "TownlightRecords"
       ],
       "controls": {
         "buttons": 1,
         "links": 0
       },
-      "active_element_after_tabs": "body CRCivicRecords AISign in to the admin panelEmailPasswordSign in",
+      "active_element_after_tabs": "body CRTownlightRecordsSign in to the admin panelEmailPasswordSign in",
       "horizontal_overflow": false,
       "console_messages": [],
       "page_errors": [],
@@ -80,17 +80,17 @@
     },
     {
       "id": "records-admin-desktop",
-      "product": "CivicRecords AI",
+      "product": "TownlightRecords",
       "path": "/",
       "viewport": {
         "width": 1440,
         "height": 1000
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/records-admin-desktop.png",
-      "body_sample": "Skip to main content CR CivicRecords AI WORKFLOW Search Requests Exemptions SETUP Onboarding City Profile ADMINISTRATION Sources Ingestion Dashboard Users Settings Audit Log System Administrator Sign out Help Dashboard CivicRecords AI v1.6.1 REGISTERED USERS 1 AUDIT LOG ENTRIES 16 SYSTEM VERSION 1.6.1 OPEN REQUESTS 1 OVERDUE REQUESTS 0 AVG RESPONSE TIME N/A DEADLINE COMPLIANCE 100.0% SERVICES Database (PostgreSQL) Ollama (LLM Engine) Redis (Task Queue) REQUESTS BY STATUS Ready for Release 1 APPROACHING DEADLINES (WITHIN 3 DAYS) No requests with upcoming deadlines. RECENT ACTIVITY System GET /admin/coverage-gaps on http_request 5/18/2026, 11:34:29 PM System POST /auth/jwt/login on http_request 5/18/2026, 11:34:29 PM System GET /admin/coverage-gaps on http_request 5/18/2026, 11:34:00 PM Syst",
+      "body_sample": "Skip to main content CR TownlightRecords WORKFLOW Search Requests Exemptions SETUP Onboarding City Profile ADMINISTRATION Sources Ingestion Dashboard Users Settings Audit Log System Administrator Sign out Help Dashboard TownlightRecords v1.6.1 REGISTERED USERS 1 AUDIT LOG ENTRIES 16 SYSTEM VERSION 1.6.1 OPEN REQUESTS 1 OVERDUE REQUESTS 0 AVG RESPONSE TIME N/A DEADLINE COMPLIANCE 100.0% SERVICES Database (PostgreSQL) Ollama (LLM Engine) Redis (Task Queue) REQUESTS BY STATUS Ready for Release 1 APPROACHING DEADLINES (WITHIN 3 DAYS) No requests with upcoming deadlines. RECENT ACTIVITY System GET /admin/coverage-gaps on http_request 5/18/2026, 11:34:29 PM System POST /auth/jwt/login on http_request 5/18/2026, 11:34:29 PM System GET /admin/coverage-gaps on http_request 5/18/2026, 11:34:00 PM Syst",
       "expected_copy_found": true,
       "expected_copy": [
-        "CivicRecords AI"
+        "TownlightRecords"
       ],
       "headings": [
         "Dashboard"
@@ -108,17 +108,17 @@
     },
     {
       "id": "clerk-staff-desktop",
-      "product": "CivicClerk",
+      "product": "TownlightMeetings",
       "path": "/staff",
       "viewport": {
         "width": 1440,
         "height": 1000
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/clerk-staff-desktop.png",
-      "body_sample": "B CivicSuite City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial CIVICCLERK STAFF WORKSPACE Good morning, City Clerk. Today's meeting work is grouped by urgency, public posting risk, and packet readiness. STAFF ACCESS Staff access verified Bearer token accepted for staff workflow access. Keep this token scoped to clerk workflow roles until the trusted-header SSO bridge is read",
+      "body_sample": "B Townlight City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial TOWNLIGHT_MEETINGS STAFF WORKSPACE Good morning, City Clerk. Today's meeting work is grouped by urgency, public posting risk, and packet readiness. STAFF ACCESS Staff access verified Bearer token accepted for staff workflow access. Keep this token scoped to clerk workflow roles until the trusted-header SSO bridge is read",
       "expected_copy_found": true,
       "expected_copy": [
-        "CivicClerk",
+        "TownlightMeetings",
         "Agenda",
         "Packet",
         "Notice",
@@ -145,17 +145,17 @@
     },
     {
       "id": "clerk-staff-mobile",
-      "product": "CivicClerk",
+      "product": "TownlightMeetings",
       "path": "/staff",
       "viewport": {
         "width": 390,
         "height": 844
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/clerk-staff-mobile.png",
-      "body_sample": "B CivicSuite City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial CIVICCLERK STAFF WORKSPACE Good morning, City Clerk. Today's meeting work is grouped by urgency, public posting risk, and packet readiness. STAFF ACCESS Staff access verified Bearer token accepted for staff workflow access. Keep this token scoped to clerk workflow roles until the trusted-header SSO bridge is ready. Mode: bearer Method: bearer clerk admin meeting editor ",
+      "body_sample": "B Townlight City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial TOWNLIGHT_MEETINGS STAFF WORKSPACE Good morning, City Clerk. Today's meeting work is grouped by urgency, public posting risk, and packet readiness. STAFF ACCESS Staff access verified Bearer token accepted for staff workflow access. Keep this token scoped to clerk workflow roles until the trusted-header SSO bridge is ready. Mode: bearer Method: bearer clerk admin meeting editor ",
       "expected_copy_found": true,
       "expected_copy": [
-        "CivicClerk",
+        "TownlightMeetings",
         "Agenda",
         "Packet",
         "Notice",
@@ -182,14 +182,14 @@
     },
     {
       "id": "clerk-public-desktop",
-      "product": "CivicClerk",
+      "product": "TownlightMeetings",
       "path": "/public",
       "viewport": {
         "width": 1440,
         "height": 1000
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/clerk-public-desktop.png",
-      "body_sample": "B CivicSuite City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial RESIDENT PUBLIC PORTAL Find posted meetings without needing to understand clerk workflows. Residents can open the official agenda, packet, and approved minutes that staff have published to the public archive. Restricted or closed-session material is never exposed or hinted here. CITY OF BROOKFIELD PUBLIC RECORDS ",
+      "body_sample": "B Townlight City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial RESIDENT PUBLIC PORTAL Find posted meetings without needing to understand clerk workflows. Residents can open the official agenda, packet, and approved minutes that staff have published to the public archive. Restricted or closed-session material is never exposed or hinted here. CITY OF BROOKFIELD PUBLIC RECORDS ",
       "expected_copy_found": true,
       "expected_copy": [
         "Public",
@@ -218,14 +218,14 @@
     },
     {
       "id": "clerk-public-mobile",
-      "product": "CivicClerk",
+      "product": "TownlightMeetings",
       "path": "/public",
       "viewport": {
         "width": 390,
         "height": 844
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/clerk-public-mobile.png",
-      "body_sample": "B CivicSuite City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial RESIDENT PUBLIC PORTAL Find posted meetings without needing to understand clerk workflows. Residents can open the official agenda, packet, and approved minutes that staff have published to the public archive. Restricted or closed-session material is never exposed or hinted here. CITY OF BROOKFIELD PUBLIC RECORDS Official meeting materials, in one place. Start with the p",
+      "body_sample": "B Townlight City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial RESIDENT PUBLIC PORTAL Find posted meetings without needing to understand clerk workflows. Residents can open the official agenda, packet, and approved minutes that staff have published to the public archive. Restricted or closed-session material is never exposed or hinted here. CITY OF BROOKFIELD PUBLIC RECORDS Official meeting materials, in one place. Start with the p",
       "expected_copy_found": true,
       "expected_copy": [
         "Public",
@@ -254,14 +254,14 @@
     },
     {
       "id": "clerk-protected-error-desktop",
-      "product": "CivicClerk",
+      "product": "TownlightMeetings",
       "path": "/staff",
       "viewport": {
         "width": 1440,
         "height": 1000
       },
       "screenshot": "docs/installer/browser-qa/screenshots/2026-05-19-clerk-core-installed-workflows/clerk-protected-error-desktop.png",
-      "body_sample": "B CivicSuite City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial E Could not load dashboard Meeting body API returned 401. Confirm the backend is running, verify staff auth mode, then retry. Retry after checking API",
+      "body_sample": "B Townlight City of Brookfield D Dashboard M Meetings A Agenda intake P Packet builder N Notice checklist O Outcomes M Minutes M Member packet P Public posting V Vendor sync SPEC PAGES A Agenda builder S Staff reports T Transcripts P Public comments C Closed session A Archive search A Admin settings P Prompt library PARTIAL INSTALL Clerk + Records + Code + Admin Search city work... Ctrl K Staff Member Resident IT/Admin Show audit QA states live success loading empty error partial E Could not load dashboard Meeting body API returned 401. Confirm the backend is running, verify staff auth mode, then retry. Retry after checking API",
       "expected_copy_found": true,
       "expected_copy": [
         "Confirm the backend is running",

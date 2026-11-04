@@ -2,23 +2,23 @@
 
 Date: 2026-05-25
 
-Scope: rebuilt Linux city-core installer archive with CivicRecords AI public portal mode enabled for the city-core profile and ran the matching-host lifecycle through WSL/Linux.
+Scope: rebuilt Linux city-core installer archive with Townlight Records public portal mode enabled for the city-core profile and ran the matching-host lifecycle through WSL/Linux.
 
 ## Artifact
 
-- Archive: `installer/dist/CivicSuite-city-core-linux-0.1.2.tar.gz`
+- Archive: `installer/dist/Townlight-city-core-linux-0.1.2.tar.gz`
 - SHA256: `6afbaa3791b5699b220b8046d6901e01d62b485ea75008db4087af3628d14648`
-- Release manifest: `installer/dist/CivicSuite-city-core-0.1.2-release-manifest.json`
+- Release manifest: `installer/dist/Townlight-city-core-0.1.2-release-manifest.json`
 - Evidence report: `installer/reports/track-b-city-core-0-1-2-linux-lifecycle/installer-package-cleanroom.json`
 - Local lifecycle run ID: `track-b-city-core-0-1-2-linux-lifecycle`
 - GitHub Actions lifecycle run: `26416891904`, job `77763184960`
 
 ## Module Sources
 
-- CivicCore: `f39f1af`
-- CivicRecords AI: `efc8a61`
-- CivicClerk: `3bf5293`
-- CivicCode: `d2eaf13`
+- Townlight Core: `f39f1af`
+- Townlight Records: `efc8a61`
+- Townlight Meetings: `3bf5293`
+- Townlight Code: `d2eaf13`
 
 The Records and Clerk SHAs include the Track B ignore-hygiene merges after the cleanroom-gate backfill. They do not change runtime behavior.
 
@@ -26,7 +26,7 @@ The Records and Clerk SHAs include the Track B ignore-hygiene merges after the c
 
 ```bash
 python3 scripts/run-installer-package-cleanroom.py \
-  --archive installer/dist/CivicSuite-city-core-linux-0.1.2.tar.gz \
+  --archive installer/dist/Townlight-city-core-linux-0.1.2.tar.gz \
   --platform linux \
   --staff-mode bearer \
   --workflow-proof \
@@ -55,11 +55,11 @@ python3 scripts/run-installer-package-cleanroom.py \
 }
 ```
 
-The verify phase included the starter runtime workflows for CivicRecords AI, CivicClerk, CivicCode, and the Clerk-to-Code handoff proof path.
+The verify phase included the starter runtime workflows for Townlight Records, Townlight Meetings, Townlight Code, and the Clerk-to-Code handoff proof path.
 
 ## Public Portal Evidence
 
-The lifecycle report includes the CivicRecords AI public portal verification in install, repair, and verify phases:
+The lifecycle report includes the Townlight Records public portal verification in install, repair, and verify phases:
 
 ```json
 {
@@ -79,9 +79,9 @@ The lifecycle report includes the CivicRecords AI public portal verification in 
     }
   ],
   "expected_mode": "public",
-  "name": "civicrecords_portal_mode",
+  "name": "townlight_records_portal_mode",
   "status": "passed"
 }
 ```
 
-This proves the city-core installed stack starts CivicRecords AI in public mode and mounts resident-facing public request routes without operator configuration.
+This proves the city-core installed stack starts Townlight Records in public mode and mounts resident-facing public request routes without operator configuration.

@@ -12,7 +12,7 @@ The next phase is not "build another module." The next phase is making the suite
 
 ## Governing Rules
 
-This plan follows the canonical rules in `docs/CivicSuiteUnifiedSpec.md`:
+This plan follows the canonical rules in `docs/TownlightUnifiedSpec.md`:
 
 - Staff workflows come before flashy resident features.
 - AI drafts; humans decide.
@@ -35,7 +35,7 @@ Deliverables:
    - Current version surfaces.
    - Branch protection.
    - Release assets and checksums.
-   - Current Townlight Core compatibility where applicable, with `civiccore==0.3.0` as the active foundation pin except for historical releases recorded in the compatibility matrix.
+   - Current Townlight Core compatibility where applicable, with `townlight_core==0.3.0` as the active foundation pin except for historical releases recorded in the compatibility matrix.
 2. A suite-wide verification script in the umbrella repo that calls each module's docs/release gate without hiding failures.
 3. A stale-state scanner that catches planned-vs-shipped drift across README files, landing pages, manuals, compatibility matrix rows, and the unified spec.
 4. A single post-foundation status report that replaces per-module sprint fragments as the operator-facing summary.
@@ -147,7 +147,7 @@ Initial status:
 connector boundary. The accepted sequence is read/import first, export bundles
 second, and vendor write-back only after a later ADR approves it.
 
-<a id="lane-5---civiccore-v030-extraction-candidate"></a>
+<a id="lane-5---townlight_core-v030-extraction-candidate"></a>
 
 ## Lane 5 - Townlight Core v0.3.0 Extraction Candidate
 
@@ -171,8 +171,8 @@ Auth/RBAC is important, but it hardens quickly into product policy. The first po
 
 Initial status:
 
-`docs/architecture/ADR-0006-civiccore-v0-3-extraction-scope.md` and
-`docs/civiccore/v0.3-extraction-proposal.md` define the recommended v0.3.0
+`docs/architecture/ADR-0006-townlight_core-v0-3-extraction-scope.md` and
+`docs/townlight_core/v0.3-extraction-proposal.md` define the recommended v0.3.0
 scope: audit primitives, source/provenance contracts, connector/export manifest
 schema, city profile configuration, and export-bundle utilities. Auth/RBAC,
 full ingestion/search, live connector runtime, notifications, and shared shell
@@ -200,7 +200,7 @@ Out of scope for the first depth pass:
 Initial status:
 
 `docs/architecture/ADR-0007-first-production-depth-workflow.md` and
-`docs/roadmap/civicclerk-production-depth-workflow.md` define the first
+`docs/roadmap/townlight_meetings-production-depth-workflow.md` define the first
 production-depth sprint: Townlight Meetings agenda packet and notice workflow,
 integrated through read-only source/provenance paths with Townlight Records,
 Townlight Code, and Townlight Zoning, and dependent on Townlight Core v0.3.0 primitives if those

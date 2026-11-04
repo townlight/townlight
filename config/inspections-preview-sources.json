@@ -2,15 +2,16 @@
   "profile": "inspections-preview",
   "development_only": false,
   "sources": {
-    "townlight/core": "6c3f340c530cd1972f3016924111f3f32a59012b",
-    "townlight/sunshine": "52309241c4e214e2979e0fe09423694335cff896",
-    "townlight/meetings": "dcc31159c902a098655b0e33a88464f106d9f134",
-    "townlight/ordinances": "beae47f43e895c2c45196cc6a762991384f95933",
-    "townlight/zone": "b0ba1a4f54015c099905b34605637cc28c74cd67",
-    "townlight/plan": "e7d8cc57c328d87b52f7fd806d79bfc1458c67a9",
-    "townlight/notice": "68d580efd9cb279cde5e878a3089831c9a8b18ea",
-    "townlight/access": "7e9021c1b9cdabeed5a4cf406c6dcede679a0ddc",
-    "townlight/permit": "0ca5036e026a72e057fc4c27fad23d58fcce27f8",
-    "townlight/inspect": "8780285da5a0cd878d18d503a8f4af17190a6a1b"
+    "townlight/core": "3021821bf9a92c790a399ad12aed821d65b09105",
+    "townlight/sunshine": "e1b712091c38fadeb00c19233d7f2bf1280fc248",
+    "townlight/meetings": "723a93c5877b4ae1b6c3e46d6d44de1e0c479c63",
+    "townlight/ordinances": "22d00f560cc45088a5b24a3f997787ee9c7a5e31",
+    "townlight/zone": "fb352955720db2e6e21caca816a8eb609a49f768",
+    "townlight/plan": "7de514f1afd720f93bd70a4866c3389ef621dc49",
+    "townlight/notice": "4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48",
+    "townlight/access": "f377a9a6e2a14d890333a20eab9277d644a9aaeb",
+    "townlight/permit": "224116d9c714f613646f2b6ce2cbb687cb5e0040",
+    "townlight/inspect": "a6861f262328e7645557ad2a2600db4a12a5046c",
+    "townlight/station": "7205ed1b07132b1649c994e190b381d773807aff"
   }
 }

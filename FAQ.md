@@ -73,9 +73,9 @@ Code and broader city-core convergence are not delivered by this update.
 The older product names, package versions, and download directions below are
 historical predecessor guidance, not current Townlight Records instructions.
 
-**Last verified:** 2026-07-02 (civicsuite-windows-local-v1.0.2)
+**Last verified:** 2026-07-02 (townlight-windows-local-v1.0.2)
 
-This FAQ is for civic operators (city CIO, clerk, IT lead, attorney, procurement officer) evaluating whether CivicSuite is right for them. For engineering-level questions, see [CONTRIBUTING.md](CONTRIBUTING.md). For module-by-module status, see [STATUS.md](STATUS.md).
+This FAQ is for civic operators (city CIO, clerk, IT lead, attorney, procurement officer) evaluating whether Townlight is right for them. For engineering-level questions, see [CONTRIBUTING.md](CONTRIBUTING.md). For module-by-module status, see [STATUS.md](STATUS.md).
 
 ---
 
@@ -83,7 +83,7 @@ This FAQ is for civic operators (city CIO, clerk, IT lead, attorney, procurement
 
 The supported operator path is the **Townlight Windows Local "city-core" desktop app**: a single Tauri/WebView2 MSI installer (about 1.65 GB) that you run like any normal Windows program. It bundles a portable PostgreSQL 17 with pgvector and a portable Ollama runtime. There is **no Docker, no WSL, no terminal, and no developer tooling** on this path.
 
-**Where to download:** get `CivicSuite_1.0.2_x64_en-US.msi` from the current release tag, <https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2>, and verify its SHA-256 before running: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
+**Where to download:** get `Townlight_1.0.2_x64_en-US.msi` from the current release tag, <https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2>, and verify its SHA-256 before running: `bbdeb1b69e846d3ccb8c961502f4b2f158e92623e7bf4dfa9d4c4bf2f9a0fd02`.
 
 What an operator does:
 
@@ -94,17 +94,17 @@ What an operator does:
 
 Recommended machine: **32 GB RAM** (16 GB is a workable minimum; the local model needs about 6.7 GB resident at runtime on top of Windows, PostgreSQL, and services, and 32 GB leaves headroom for the local database and the generation context) and **at least 15 GB free disk** (1.65 GB MSI + about 7 GB model + data/backup headroom; the installer enforces a 15 GB floor for the model download).
 
-The current release is **[civicsuite-windows-local-v1.0.2](https://github.com/townlight/townlight/releases/tag/civicsuite-windows-local-v1.0.2)** (Latest; it supersedes v1.0.1, which superseded v1.0.0; the earlier first-run-fix prerelease is retired). For the full step-by-step, see [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md).
+The current release is **[townlight-windows-local-v1.0.2](https://github.com/townlight/townlight/releases/tag/townlight-windows-local-v1.0.2)** (Latest; it supersedes v1.0.1, which superseded v1.0.0; the earlier first-run-fix prerelease is retired). For the full step-by-step, see [docs/installer/operator-walkthrough.md](docs/installer/operator-walkthrough.md).
 
 This is a **GA candidate, open for public beta**: feature-complete for city-core and validated end-to-end on a clean machine. The MSI is Authenticode code-signed via Azure Trusted Signing. Because the certificate is new, Windows SmartScreen may still show *"Windows protected your PC"* on first run — click **More info**, confirm it shows a **verified publisher** (not "Unknown Publisher"), then **Run anyway** (see [docs/troubleshooting.md](docs/troubleshooting.md#windows-smartscreen-when-you-run-the-installer)). You can download and use it now for real hands-on evaluation and early adoption. It is still a **beta** — **not yet production-, city-, or procurement-ready** — so do not run your city's system of record on it yet.
 
-<a id="can-my-city-rely-on-civicsuite-for-live-operations-today"></a>
+<a id="can-my-city-rely-on-townlight-for-live-operations-today"></a>
 
 ## Can my city rely on Townlight for live operations today?
 
 **No.** The honest current package is the city-core beta installer profile (version labels reconciled with what actually works): Townlight Core v1.2.0, Townlight Records v1.7.3, Townlight Meetings v1.0.4, Townlight Code v1.0.8, Townlight Notice v0.2.0, Townlight Access v0.4.0, and the suite installer. That profile has current install-lifecycle testing on Windows — the same operating system it ships for (older Linux lifecycle evidence is historical) — plus first-run browser QA, green PR CI, and audit-full evidence with zero unresolved Blocker or Critical findings in the active run record.
 
-That is still a bounded beta package. It is **not city-ready, not procurement-ready, not production-ready, not macOS lifecycle certified, and not a full-suite release**. Townlight Access v0.4.0 joined city-core as the sixth module on 2026-06-29 (a follow-up in-depth review qualified it for city-core, reversing the 2026-05-23 "needs work" demotion — a failed depth review); the current v1.0.2 MSI installs all six city-core modules — **the Townlight Access module code, database schema, and write-token secret are bundled, and its on-screen Accessibility workflow tab, with three local-AI tools, ships in the desktop UI as of v1.0.2** (see [docs/audits/civicaccess-citycore-deep-read-2026-06-29/FINAL-REPORT.md](docs/audits/civicaccess-citycore-deep-read-2026-06-29/FINAL-REPORT.md)). Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections remain queued Tier 2 modules on corrected version labels (versions lowered to match actual maturity).
+That is still a bounded beta package. It is **not city-ready, not procurement-ready, not production-ready, not macOS lifecycle certified, and not a full-suite release**. Townlight Access v0.4.0 joined city-core as the sixth module on 2026-06-29 (a follow-up in-depth review qualified it for city-core, reversing the 2026-05-23 "needs work" demotion — a failed depth review); the current v1.0.2 MSI installs all six city-core modules — **the Townlight Access module code, database schema, and write-token secret are bundled, and its on-screen Accessibility workflow tab, with three local-AI tools, ships in the desktop UI as of v1.0.2** (see [historical Access review](docs/audits/civicaccess-citycore-deep-read-2026-06-29/FINAL-REPORT.md)). Townlight Zoning, Townlight Planning, Townlight Permitting, and Townlight Inspections remain queued Tier 2 modules on corrected version labels (versions lowered to match actual maturity).
 
 Any vendor or integrator claiming a completed Townlight municipal deployment or a full-suite operational release is making a claim the project docs do not support.
 
@@ -114,11 +114,11 @@ A release tag means a repository has a version label on a commit. A reliable ope
 
 Townlight has many tags. Only the scoped package evidence in [STATUS.md](STATUS.md), [docs/release-recovery-status.md](docs/release-recovery-status.md), and the active run record should be treated as current truth.
 
-<a id="can-i-install-only-one-module-say-just-civicclerk-without-the-rest"></a>
+<a id="can-i-install-only-one-module-say-just-townlight_meetings-without-the-rest"></a>
 
 ## Can I install only one module, say just Townlight Meetings, without the rest?
 
-In principle, yes. The dependency rule is: every module depends on `civiccore`; modules do not depend on each other except where noted (for example, `civiccode` depends on `civicclerk` for adopted-ordinance handoff intake). A single-module install is a supported design goal.
+In principle, yes. The dependency rule is: every module depends on `townlight_core`; modules do not depend on each other except where noted (for example, `townlight_code` depends on `townlight_meetings` for adopted-ordinance handoff intake). A single-module install is a supported design goal.
 
 In practice, use the installer profile that has evidence for your evaluation. Clerk-Core has a bounded starter installer lineage for Townlight Core, Townlight Records, and Townlight Meetings. City-core is the active beta profile (version labels reconciled with what actually works) that adds Townlight Code, Townlight Notice, and Townlight Access. The Tier 2 land-use modules are not part of city-core today.
 
@@ -168,15 +168,15 @@ Architecturally yes; verified under the full standard no. Every module is design
 
 ## Can I migrate from Granicus / Legistar / PrimeGov / NovusAGENDA?
 
-Townlight Meetings's spec lists imports from these platforms as priority integrations, and `civicclerk` ships local-payload importers for them today. **Local-payload** means: you provide an export file from your incumbent system, and the Townlight Meetings import path normalizes it through Townlight Core's connector contract. This is **not** a live API connection to those vendors. There is no "click here to migrate from Legistar" flow yet. A real migration today is a hands-on exercise with a clerk, an integrator, and exported data files.
+Townlight Meetings's spec lists imports from these platforms as priority integrations, and `townlight_meetings` ships local-payload importers for them today. **Local-payload** means: you provide an export file from your incumbent system, and the Townlight Meetings import path normalizes it through Townlight Core's connector contract. This is **not** a live API connection to those vendors. There is no "click here to migrate from Legistar" flow yet. A real migration today is a hands-on exercise with a clerk, an integrator, and exported data files.
 
-<a id="does-civicaccess-satisfy-our-ada-title-ii-compliance-obligation"></a>
+<a id="does-townlight_access-satisfy-our-ada-title-ii-compliance-obligation"></a>
 
 ## Does Townlight Access satisfy our ADA Title II compliance obligation?
 
 No. **Persisted reviews are advisory clerk support, not a certified accessibility audit.** Townlight Access gives clerks a starting toolkit: WCAG sample review (five deterministic rule checks, plus an advisory analysis drafted by the local AI model when it is ready), plain-language rewrite drafts and multilingual variant drafts (drafted by the local AI model when it is ready, with deterministic sample fallbacks that say so when it is not), accessible form planning, publishing-workflow blockers, ADA Title II review-support planning, and tagged-PDF heading-order checks. Every output is advisory local compute — AI-drafted text is always labeled, never published without human review, and never changes a review's deterministic findings — not a legal or accessibility-vendor determination. Final ADA Title II compliance review must come from a qualified human reviewer or certified accessibility vendor. The same disclaimer is repeated on every page of the in-app Accessibility tab (see Part 1.6 of [USER-MANUAL.md](USER-MANUAL.md)).
 
-<a id="does-civicsuite-document-any-municipal-live-deployments"></a>
+<a id="does-townlight-document-any-municipal-live-deployments"></a>
 
 ## Does Townlight document any municipal live deployments?
 
@@ -196,7 +196,7 @@ Townlight is unfunded volunteer-maintained open source. There is no paid support
 
 ## How do I report a security issue?
 
-Open a private GitHub Security Advisory on the affected repo. See [SECURITY.md](SECURITY.md) for routing. For suite-wide architectural issues, advisories on the `civicsuite` umbrella are accepted.
+Open a private GitHub Security Advisory on the affected repo. See [SECURITY.md](SECURITY.md) for routing. For suite-wide architectural issues, advisories on the `townlight` umbrella are accepted.
 
 ## How do I follow progress?
 

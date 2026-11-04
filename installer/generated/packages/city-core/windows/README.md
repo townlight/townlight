@@ -1,16 +1,16 @@
-# CivicSuite Installer Package - windows
+# Townlight Installer Package - windows
 
 Profile: `city-core`
 Menu style: `guided`
 
 ## Unsigned City-Core Beta Notice
 
-This package is unsigned. CivicSuite city-core is an open-source beta installer package pending Linux and Windows matching-host lifecycle proof. Signing certificates are not used for this beta installer path. Windows may show SmartScreen or Unknown Publisher
+This package is unsigned. Townlight city-core is an open-source beta installer package pending Linux and Windows matching-host lifecycle proof. Signing certificates are not used for this beta installer path. Windows may show SmartScreen or Unknown Publisher
 warnings. macOS may show unidentified developer warnings. Linux package tools
 may show an unsigned/local package warning.
 
 This is expected for this beta distribution. Verify the SHA256 checksum from
-`installer/dist` and confirm the artifact came from the official CivicSuite
+`installer/dist` and confirm the artifact came from the official Townlight
 GitHub release source or your IT team's verified source build before running
 the package. If the checksum does not match, stop and download the artifact
 again from the project release source.
@@ -47,7 +47,7 @@ resources for the profile.
 1. For the non-technical operator path, run first-run:
 
    ```text
-   .\start-civicsuite-installer.ps1 -FirstRun
+   .\start-townlight-installer.ps1 -FirstRun
    ```
 
    The wizard asks for setup path, operator name, organization name, admin
@@ -60,30 +60,30 @@ resources for the profile.
     City-core packages include the suite launcher runtime under
     `suite-launcher` and plan it for
     `http://127.0.0.1:18082/`. The installer runtime also
-    creates `CIVICCORE_SUITE_SESSION_SECRET` on first install if it is missing, then shares
+    creates `TOWNLIGHT_CORE_SUITE_SESSION_SECRET` on first install if it is missing, then shares
     that value with the selected staff services for the local session boundary.
     To serve the launcher after install or during QA, run:
 
     ```text
-    .\start-civicsuite-installer.ps1 -SuiteLauncher
+    .\start-townlight-installer.ps1 -SuiteLauncher
     ```
 
 2. For IT/admin checks, run readiness:
 
    ```text
-   .\start-civicsuite-installer.ps1 -Readiness
+   .\start-townlight-installer.ps1 -Readiness
    ```
 
 3. Review the dry-run plan:
 
    ```text
-   .\start-civicsuite-installer.ps1 -Plan
+   .\start-townlight-installer.ps1 -Plan
    ```
 
 4. Install the selected profile manually:
 
    ```text
-   .\start-civicsuite-installer.ps1 -Install
+   .\start-townlight-installer.ps1 -Install
    ```
 
    Available lifecycle modes: readiness, plan, install, verify, repair,
@@ -93,34 +93,34 @@ resources for the profile.
 
 ## Selected Modules
 
-- civiccore
-- civicrecords-ai
-- civicclerk
-- civiccode
-- civicnotice
-- civicaccess
+- townlight_core
+- townlight_records
+- townlight_meetings
+- townlight_code
+- townlight_notice
+- townlight_access
 
 The default package selection installs this package profile on top of the
-CivicCore base contract. Operators can choose one module or the whole profile:
+Townlight Core base contract. Operators can choose one module or the whole profile:
 
 ```text
-.\start-civicsuite-installer.ps1 -Plan -Module civicrecords-ai
-.\start-civicsuite-installer.ps1 -Plan -Module civicclerk
-.\start-civicsuite-installer.ps1 -Plan -Module civiccode
-.\start-civicsuite-installer.ps1 -Plan -Module civicnotice
-.\start-civicsuite-installer.ps1 -Plan -Module civicaccess
-.\start-civicsuite-installer.ps1 -Install -Module civicrecords-ai -Module civicclerk -Module civiccode -Module civicnotice -Module civicaccess
+.\start-townlight-installer.ps1 -Plan -Module townlight_records
+.\start-townlight-installer.ps1 -Plan -Module townlight_meetings
+.\start-townlight-installer.ps1 -Plan -Module townlight_code
+.\start-townlight-installer.ps1 -Plan -Module townlight_notice
+.\start-townlight-installer.ps1 -Plan -Module townlight_access
+.\start-townlight-installer.ps1 -Install -Module townlight_records -Module townlight_meetings -Module townlight_code -Module townlight_notice -Module townlight_access
 ```
 
 When a module is selected explicitly, plan/readiness use the same selection
 and install/verify/repair/backup/restore/uninstall pass it through to the
 lifecycle runner.
 
-For a mutating workflow proof, use bearer staff mode so CivicClerk writes are
+For a mutating workflow proof, use bearer staff mode so Townlight Meetings writes are
 protected while the proof creates real starter-set test records:
 
 ```text
-.\start-civicsuite-installer.ps1 -Install -StaffMode bearer -WorkflowProof
+.\start-townlight-installer.ps1 -Install -StaffMode bearer -WorkflowProof
 ```
 
 ## Boundary
@@ -129,11 +129,11 @@ protected while the proof creates real starter-set test records:
 - Install/repair mode is mutating: it builds and starts the selected modules
   from the bundled source tree.
 - Verify mode checks live service endpoints. `--workflow-proof` /
-  `-WorkflowProof` also creates live CivicRecords AI request/search/review/
-  response proof records, CivicClerk agenda/packet/minutes/vote/notice/
-  archive proof records, CivicCode health/public lookup proof when
-  CivicCode is selected, and a CivicAccess accessibility-review record
-  round-trip proof when CivicAccess is selected.
+  `-WorkflowProof` also creates live Townlight Records request/search/review/
+  response proof records, Townlight Meetings agenda/packet/minutes/vote/notice/
+  archive proof records, Townlight Code health/public lookup proof when
+  Townlight Code is selected, and a Townlight Access accessibility-review record
+  round-trip proof when Townlight Access is selected.
 - Backup mode writes per-module PostgreSQL custom dumps plus a manifest under
   the installer runtime backup directory.
 - Restore mode verifies the latest backup by restoring each dump into a

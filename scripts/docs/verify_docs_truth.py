@@ -31,18 +31,18 @@ def check_faq_forbidden_context() -> list[str]:
     return errors
 
 
-def check_civicaccess_not_public_path() -> list[str]:
+def check_townlight_access_not_public_path() -> list[str]:
     text = FAQ.read_text(encoding="utf-8")
     patterns = [
-        r"CivicAccess[^\n]{0,120}public-use",
-        r"public-use[^\n]{0,120}CivicAccess",
-        r"CivicAccess\s+v1\.0\.0",
+        r"TownlightAccess[^\n]{0,120}public-use",
+        r"public-use[^\n]{0,120}TownlightAccess",
+        r"TownlightAccess\s+v1\.0\.0",
     ]
     errors: list[str] = []
     for pattern in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
-            errors.append(f"FAQ.md: CivicAccess appears in public-use/repaired-v1 framing: {match.group(0)}")
+            errors.append(f"FAQ.md: TownlightAccess appears in public-use/repaired-v1 framing: {match.group(0)}")
     return errors
 
 
@@ -62,7 +62,7 @@ def check_topology() -> list[str]:
 def main() -> int:
     errors: list[str] = []
     errors.extend(check_faq_forbidden_context())
-    errors.extend(check_civicaccess_not_public_path())
+    errors.extend(check_townlight_access_not_public_path())
     errors.extend(check_topology())
     for filename in ("USER-MANUAL.md", "USER-MANUAL.txt"):
         manual = (ROOT / filename).read_text(encoding="utf-8")

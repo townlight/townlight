@@ -1,19 +1,19 @@
-name: civicsuite-post-foundation-demo
+name: townlight-post-foundation-demo
 
 services:
   postgres:
     image: pgvector/pgvector:pg17
     environment:
-      POSTGRES_USER: civicrecords
-      POSTGRES_PASSWORD: civicrecords
-      POSTGRES_DB: civicrecords_test
+      POSTGRES_USER: townlight_records
+      POSTGRES_PASSWORD: townlight_records
+      POSTGRES_DB: townlight_records_test
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U civicrecords"]
+      test: ["CMD-SHELL", "pg_isready -U townlight_records"]
       interval: 5s
       timeout: 3s
       retries: 10
     volumes:
-      - civicrecords-pgdata:/var/lib/postgresql/data
+      - townlight_records-pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis:7.2-alpine
@@ -23,7 +23,7 @@ services:
       timeout: 3s
       retries: 10
     volumes:
-      - civicrecords-redisdata:/data
+      - townlight_records-redisdata:/data
 
   ollama:
     image: ollama/ollama:latest
@@ -36,14 +36,14 @@ services:
     volumes:
       - ollama-data:/root/.ollama
 
-  civicrecords-api:
+  townlight_records-api:
     build:
-      context: ../../civicrecords-ai
+      context: ../../sunshine
       dockerfile: Dockerfile.backend
     env_file:
-      - ../../civicrecords-ai/.env
+      - ../../sunshine/.env
     environment:
-      CIVICCORE_LLM_PROVIDER: ollama
+      TOWNLIGHT_CORE_LLM_PROVIDER: ollama
       OLLAMA_BASE_URL: http://ollama:11434
     ports:
       - "8000:8000"
@@ -63,14 +63,14 @@ services:
         aliases:
           - api
 
-  civicrecords-frontend:
+  townlight_records-frontend:
     build:
-      context: ../../civicrecords-ai
+      context: ../../sunshine
       dockerfile: Dockerfile.frontend
     ports:
       - "8080:80"
     depends_on:
-      civicrecords-api:
+      townlight_records-api:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:80/ || exit 1"]
@@ -78,19 +78,21 @@ services:
       timeout: 5s
       retries: 3
 
-  civicclerk:
+  townlight_meetings:
     image: python:3.12-slim
+    volumes:
+      - "${TOWNLIGHT_DEMO_WHEELS:-../.candidate-wheels}:/wheels:ro"
     command:
       - sh
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/townlight/core/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
-        https://github.com/townlight/meetings/releases/download/v1.0.0/civicclerk-1.0.0-py3-none-any.whl
-        && uvicorn civicclerk.main:app --host 0.0.0.0 --port 8010
+        /wheels/townlight_core-1.3.0.dev2-py3-none-any.whl
+        /wheels/townlight_meetings-1.0.5-py3-none-any.whl
+        && uvicorn townlight_meetings.main:app --host 0.0.0.0 --port 8010
     environment:
-      CIVICCORE_LLM_PROVIDER: ollama
-      CIVICSUITE_NETWORK_PROFILE: local-demo
+      TOWNLIGHT_CORE_LLM_PROVIDER: ollama
+      TOWNLIGHT_NETWORK_PROFILE: local-demo
     ports:
       - "8010:8010"
     healthcheck:
@@ -101,19 +103,21 @@ services:
       timeout: 5s
       retries: 10
 
-  civiccode:
+  townlight_code:
     image: python:3.12-slim
+    volumes:
+      - "${TOWNLIGHT_DEMO_WHEELS:-../.candidate-wheels}:/wheels:ro"
     command:
       - sh
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/townlight/core/releases/download/v0.22.0/civiccore-0.22.0-py3-none-any.whl
-        https://github.com/townlight/ordinances/releases/download/v0.1.18/civiccode-0.1.18-py3-none-any.whl
-        && uvicorn civiccode.main:app --host 0.0.0.0 --port 8020
+        /wheels/townlight_core-1.3.0.dev2-py3-none-any.whl
+        /wheels/townlight_code-1.0.9-py3-none-any.whl
+        && uvicorn townlight_code.main:app --host 0.0.0.0 --port 8020
     environment:
-      CIVICCORE_LLM_PROVIDER: ollama
-      CIVICSUITE_NETWORK_PROFILE: local-demo
+      TOWNLIGHT_CORE_LLM_PROVIDER: ollama
+      TOWNLIGHT_NETWORK_PROFILE: local-demo
     ports:
       - "8020:8020"
     healthcheck:
@@ -124,19 +128,21 @@ services:
       timeout: 5s
       retries: 10
 
-  civiczone:
+  townlight_zoning:
     image: python:3.12-slim
+    volumes:
+      - "${TOWNLIGHT_DEMO_WHEELS:-../.candidate-wheels}:/wheels:ro"
     command:
       - sh
       - -c
       - >
         pip install --no-cache-dir
-        https://github.com/townlight/core/releases/download/v0.3.0/civiccore-0.3.0-py3-none-any.whl
-        https://github.com/townlight/zone/releases/download/v0.1.1/civiczone-0.1.1-py3-none-any.whl
-        && uvicorn civiczone.main:app --host 0.0.0.0 --port 8030
+        /wheels/townlight_core-1.3.0.dev2-py3-none-any.whl
+        /wheels/townlight_zoning-0.2.3-py3-none-any.whl
+        && uvicorn townlight_zoning.main:app --host 0.0.0.0 --port 8030
     environment:
-      CIVICCORE_LLM_PROVIDER: ollama
-      CIVICSUITE_NETWORK_PROFILE: local-demo
+      TOWNLIGHT_CORE_LLM_PROVIDER: ollama
+      TOWNLIGHT_NETWORK_PROFILE: local-demo
     ports:
       - "8030:8030"
     healthcheck:
@@ -148,6 +154,6 @@ services:
       retries: 10
 
 volumes:
-  civicrecords-pgdata:
-  civicrecords-redisdata:
+  townlight_records-pgdata:
+  townlight_records-redisdata:
   ollama-data:

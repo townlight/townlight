@@ -1,4 +1,4 @@
-<a id="civicsuite--project-instructions-for-claude-code"></a>
+<a id="townlight--project-instructions-for-claude-code"></a>
 
 # Townlight — project instructions for Claude Code
 
@@ -10,7 +10,7 @@ Read this file before doing anything. The "Pipeline drafter notes" section is th
 
 When `agent-pipeline-claude:run` produces a manifest for Townlight work, the drafter must pull from these sources (in this order):
 
-1. **`docs/CivicSuiteUnifiedSpec.md`** — canonical product spec. Always cite the relevant section number when the manifest invokes a closed architectural decision, a module's canonical scope, or a non-negotiable.
+1. **`docs/TownlightUnifiedSpec.md`** — canonical product spec. Always cite the relevant section number when the manifest invokes a closed architectural decision, a module's canonical scope, or a non-negotiable.
    - §4 — suite-wide non-negotiables (product / AI / sovereignty / docs+QA principles)
    - §5 — standard module architecture (§5.1 backend, §5.2 frontend, §5.3 AI, §5.4 data+search, §5.5 connectors)
    - §8 Townlight Records, §9 Townlight Meetings, §10 Townlight Zoning, §11 Townlight Code, §12 Townlight Access — canonical scopes
@@ -67,7 +67,7 @@ Do not create, clone, write, branch, commit, push, or run Townlight product work
 
 ## Non-negotiables
 
-Read `docs/CivicSuiteUnifiedSpec.md` §4 before any work that touches:
+Read `docs/TownlightUnifiedSpec.md` §4 before any work that touches:
 
 - User-facing surfaces (§4.1) — design every state (loading, success-with-data, empty, error, partial); UI/UX prototype is authoritative.
 - AI artifacts (§4.2) — operator-approval-before-publish, refusal-on-uncertainty.
@@ -82,4 +82,4 @@ The maintainer-level enforcement of §4 is real, not aspirational.
 
 Per `docs/process/` standards (PR #125 added this rule), every push that touches code, docs, or status artifacts runs a hostile 5-lens self-audit on the actual diff: Engineering (grep every claim/path/SHA), UX (read every user-visible string cold; respect the UI/UX prototype), Tests (real assertions not just exercise), Docs (CHANGELOG/HANDOFF/spec moved where they should), QA (cross-file consistency, no forbidden status words). Report format goes in the push body.
 
-This rule is the implementation-side counterpart to the cross-agent verification protocol at `C:\dev\Claude\CIVICSUITE_AUDIT_PROTOCOL.md`.
+This rule is the implementation-side counterpart to the cross-agent verification protocol at `C:\dev\Claude\TOWNLIGHT_AUDIT_PROTOCOL.md`.

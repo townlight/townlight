@@ -41,7 +41,7 @@ children=[]; checks=[]; pg_process=None
 
 def save(name, obj): (root/name).write_text(json.dumps(obj,indent=2,default=str),encoding='utf-8')
 def identities():
-    files=[Path(__file__),repo/'scripts/portal-e2e-browser.cjs',runtime/'civicsuite_runtime/services.py',runtime/'civicsuite_runtime/portal_publication.py',repo/'portal/website/townlight.py',repo/'portal/website/views.py',repo/'portal/website/wagtail_hooks.py',repo/'portal/serve.py',source/'meetings/civicclerk/public_archive.py',source/'meetings/civicclerk/meeting_lifecycle.py',backend/'app/requests/artifacts.py',backend/'app/requests/files.py',backend/'app/desktop_bridge/station.py',station/'townlight_station/api.py',station/'townlight_station/worker.py',media/'pyproject.toml']
+    files=[Path(__file__),repo/'scripts/portal-e2e-browser.cjs',runtime/'townlight_runtime/services.py',runtime/'townlight_runtime/portal_publication.py',repo/'portal/website/townlight.py',repo/'portal/website/views.py',repo/'portal/website/wagtail_hooks.py',repo/'portal/serve.py',source/'meetings/townlight_meetings/public_archive.py',source/'meetings/townlight_meetings/meeting_lifecycle.py',backend/'townlight_records/requests/artifacts.py',backend/'townlight_records/requests/files.py',backend/'townlight_records/desktop_bridge/station.py',station/'townlight_station/api.py',station/'townlight_station/worker.py',media/'pyproject.toml']
     files += [p for p in (repo/'portal').rglob('*') if p.is_file() and p.suffix in ('.py','.html','.css','.js','.svg') and '__pycache__' not in p.parts]
     hashes={}
     for path in files:
@@ -95,7 +95,7 @@ def login(role):
 
 try:
     identities()
-    location_code=f"import civicsuite_runtime;from pathlib import Path;import json;p=Path(civicsuite_runtime.__file__).resolve();assert p.is_relative_to(Path({str(runtime)!r}).resolve()),str(p);Path({str(root/'imported-runtime.json')!r}).write_text(json.dumps({{'module_file':str(p)}}))"
+    location_code=f"import townlight_runtime;from pathlib import Path;import json;p=Path(townlight_runtime.__file__).resolve();assert p.is_relative_to(Path({str(runtime)!r}).resolve()),str(p);Path({str(root/'imported-runtime.json')!r}).write_text(json.dumps({{'module_file':str(p)}}))"
     cmd('runtime-import',boot(location_code))
     class MEMORYSTATUSEX(ctypes.Structure):
         _fields_=[('length',ctypes.c_ulong),('load',ctypes.c_ulong),('total',ctypes.c_ulonglong),('available',ctypes.c_ulonglong),('totalpage',ctypes.c_ulonglong),('availpage',ctypes.c_ulonglong),('totalvirtual',ctypes.c_ulonglong),('availvirtual',ctypes.c_ulonglong),('availvirtualextended',ctypes.c_ulonglong)]
@@ -124,9 +124,9 @@ try:
     with psycopg2.connect(host='127.0.0.1',port=pgport,user='test_admin',password=password,dbname='townlight_suite') as conn:
         with conn.cursor() as c: c.execute('CREATE EXTENSION vector')
     cmd('records-migrations',boot("import runpy;sys.argv=['alembic','upgrade','head'];runpy.run_module('alembic',run_name='__main__')"),cwd=backend)
-    migration=f"from alembic.config import Config;from alembic import command;import os;c=Config();c.set_main_option('script_location',{str(source/'meetings/civicclerk/migrations')!r});c.set_main_option('sqlalchemy.url',os.environ['DATABASE_URL'].replace('+asyncpg','+psycopg2'));command.upgrade(c,'head')"
+    migration=f"from alembic.config import Config;from alembic import command;import os;c=Config();c.set_main_option('script_location',{str(source/'meetings/townlight_meetings/migrations')!r});c.set_main_option('sqlalchemy.url',os.environ['DATABASE_URL'].replace('+asyncpg','+psycopg2'));command.upgrade(c,'head')"
     cmd('meetings-migrations',boot(migration))
-    cmd('runtime-extension-migration',boot("from sqlalchemy import create_engine;from civicsuite_runtime.records_import_store import ensure_schema;from civicsuite_runtime.services import _sync_database_url;import os;e=create_engine(_sync_database_url(os.environ['DATABASE_URL']));ensure_schema(e);e.dispose()"))
+    cmd('runtime-extension-migration',boot("from sqlalchemy import create_engine;from townlight_runtime.records_import_store import ensure_schema;from townlight_runtime.services import _sync_database_url;import os;e=create_engine(_sync_database_url(os.environ['DATABASE_URL']));ensure_schema(e);e.dispose()"))
     cmd('station-migrations',boot("import runpy;sys.argv=['townlight_station.cli','migrate'];runpy.run_module('townlight_station.cli',run_name='__main__')"))
     cmd('portal-migrate',[portal_python,'manage.py','migrate','--noinput'],cwd=repo/'portal')
     passed('real isolated PostgreSQL Records, Meetings, Station and portal migrations')
@@ -137,7 +137,7 @@ try:
     with psycopg2.connect(host='127.0.0.1',port=pgport,user='test_admin',password=password,dbname='townlight_suite') as conn:
         with conn.cursor() as c:
             for role,user in users.items(): c.execute("INSERT INTO users (id,email,hashed_password,is_active,is_superuser,is_verified,role,full_name,must_change_password) VALUES (%s,%s,'!fixture',true,false,true,'staff',%s,false)",(str(uuid.uuid4()),user['email'],user['display_name']))
-    suite_code=f"from civicsuite_runtime.services import create_runtime_app;import uvicorn;uvicorn.run(create_runtime_app(domain_enabled=True),host='127.0.0.1',port={suiteport},access_log=False)"
+    suite_code=f"from townlight_runtime.services import create_runtime_app;import uvicorn;uvicorn.run(create_runtime_app(domain_enabled=True),host='127.0.0.1',port={suiteport},access_log=False)"
     suite_proc=start('suite-http',boot(suite_code)); ready(env['TOWNLIGHT_NATIVE_ORIGIN']+'/desktop/v1/station/context?capability=read',suite_proc,401)
     station_proc=start('station-http',boot(f"import runpy;sys.argv=['townlight_station.cli','serve','--port','{stationport}'];runpy.run_module('townlight_station.cli',run_name='__main__')"));ready(env['TOWNLIGHT_STATION_URL']+'/health',station_proc)
     # Continuation below performs only synthetic HTTP and local files.
@@ -152,7 +152,7 @@ try:
         request(suite,'POST',f'/desktop/v1/meetings/meetings/{mid}/archive',clerk,{'visibility':'public','packet_id':packet['packet_id'],'minutes_id':minutes['id'],'plain_language_summary':'Synthetic public summary'},201)
         # The HTTP wrapper always copies the meeting title. The canonical repository
         # permits an independently approved public title, which this privacy case needs.
-        fixture_code = f"from civicclerk.public_archive import PublicArchiveRepository;from civicsuite_runtime.meetings_bridge import database_url;import json;from pathlib import Path;s=PublicArchiveRepository(db_url=database_url());r=s.publish(meeting_id={mid!r},title='Synthetic Council Session',visibility='public',posted_agenda='Synthetic Public Agenda',posted_packet='Synthetic public packet',approved_minutes='Synthetic minutes text',plain_language_summary='Synthetic public summary',actor='acceptance');Path({str(root/'domain-archive-fixture.json')!r}).write_text(json.dumps(r.public_dict()));s.engine.dispose()"
+        fixture_code = f"from townlight_meetings.public_archive import PublicArchiveRepository;from townlight_runtime.meetings_bridge import database_url;import json;from pathlib import Path;s=PublicArchiveRepository(db_url=database_url());r=s.publish(meeting_id={mid!r},title='Synthetic Council Session',visibility='public',posted_agenda='Synthetic Public Agenda',posted_packet='Synthetic public packet',approved_minutes='Synthetic minutes text',plain_language_summary='Synthetic public summary',actor='acceptance');Path({str(root/'domain-archive-fixture.json')!r}).write_text(json.dumps(r.public_dict()));s.engine.dispose()"
         cmd('domain-archive-fixture',boot(fixture_code))
         archive=json.loads((root/'domain-archive-fixture.json').read_text())
         closed=request(suite,'POST',f'/desktop/v1/meetings/meetings/{mid}/archive',clerk,{'visibility':'closed_session'},201).json()

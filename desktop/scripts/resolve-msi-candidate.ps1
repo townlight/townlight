@@ -11,11 +11,14 @@ $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
 $Contract = Get-Content (Join-Path $RepoRoot 'config/planning-msi-candidate.json') -Raw | ConvertFrom-Json
 $BetaContract = Get-Content (Join-Path $RepoRoot 'config/planning-staff-beta.json') -Raw | ConvertFrom-Json
+$CombinedContract = Get-Content (Join-Path $RepoRoot 'config/inspections-msi-candidate.json') -Raw | ConvertFrom-Json
+$Modules = Get-Content (Join-Path $RepoRoot 'installer/modules.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -eq $CombinedContract.source_branch -or $SourceBranch -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
-$RecordsRef = '45042345b5ca90ff837ae99275058b1ace733c9a'
+$RecordsRef = ($Modules.modules | Where-Object { $_.id -eq 'townlight_records' }).source_commit
+if ($RecordsRef -notmatch '^[0-9a-f]{40}$') { throw 'Default Records source requires an exact module-manifest pin.' }
 $PlanningRef = ''
 $PermittingRef = ''
 $InspectionsRef = ''

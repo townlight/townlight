@@ -65,7 +65,7 @@ Shared operations/consumers required by this profile:
 - `mark-notification-sent`: existing manually recorded outbox status, not a promise of SMTP delivery.
 - `search-city-knowledge`: filtered to enabled modules and native role; it writes an audit event. Preserve accepted local search behavior before considering new indexing.
 - `open-exports-folder`: native OS integration only, with existing module/path restrictions.
-- Access actions: `accessibility-review`, `civicaccess-records-export`, `civicaccess-delete-review`, `civicaccess-plain-language`, `civicaccess-language-variant`, `civicaccess-form-plan`, `civicaccess-publishing-workflow`, `civicaccess-ada-title-ii`, `civicaccess-tagged-pdf`. Reuse Python Access implementations; retain existing human/advisory boundaries and native file handling.
+- Access actions: `accessibility-review`, `townlight_access-records-export`, `townlight_access-delete-review`, `townlight_access-plain-language`, `townlight_access-language-variant`, `townlight_access-form-plan`, `townlight_access-publishing-workflow`, `townlight_access-ada-title-ii`, `townlight_access-tagged-pdf`. Reuse Python Access implementations; retain existing human/advisory boundaries and native file handling.
 - Notice publication/archive actions currently require both Meetings and Notice in the native gate. They are not newly enabled in Records. Records notification/outbox consumers remain in scope; dormant Meetings-dependent actions stay unchanged.
 - Startup, refresh, public projection, search, audit display, export references, demo loading, backup/restore, repair and upgrade must agree on authority. No loader may replace SQL-backed Records with an old JSON snapshot.
 
@@ -177,7 +177,7 @@ Public intake has a separate local-shell proof; anonymous work is not attributed
 to a fabricated staff account. Draft generation uses the existing Rust model
 runtime transport with a Python-owned prompt and stale-response guard.
 
-The runtime Access adapter calls the existing `civicaccess` engine and qualified
+The runtime Access adapter calls the existing `townlight_access` engine and qualified
 Access tables. It adds typed advice/export evidence tables after the existing
 Access bootstrap, not another copy of reviews in Records storage. Review AI
 failure preserves deterministic findings; failed rewrite/translation generation

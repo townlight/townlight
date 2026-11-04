@@ -1,4 +1,4 @@
-"""Generate a non-mutating CivicSuite installer plan."""
+"""Generate a non-mutating Townlight installer plan."""
 
 from __future__ import annotations
 
@@ -29,27 +29,27 @@ PACKAGE_ROOT = GENERATED_ROOT / "packages"
 NATIVE_ROOT = GENERATED_ROOT / "native"
 BUNDLE_ROOT = GENERATED_ROOT / "bundles"
 DIST_ROOT = ROOT / "installer" / "dist"
-SERVICE_CLEANROOM_RUNNER = ROOT / "scripts" / "run-civicrecords-cleanroom.py"
+SERVICE_CLEANROOM_RUNNER = ROOT / "scripts" / "run-townlight_records-cleanroom.py"
 INSTALLER_LIFECYCLE_RUNNER = ROOT / "scripts" / "run-clerk-core-installer.py"
 SUITE_LAUNCHER_SOURCE = ROOT / "installer" / "runtime" / "suite-launcher"
 SUITE_LAUNCHER_PACKAGE_DIR = "suite-launcher"
 SUITE_LAUNCHER_PORT = 18082
-SUITE_SESSION_ENV = "CIVICCORE_SUITE_SESSION_SECRET"
-SUITE_SESSION_REVOCATION_ENV = "CIVICCORE_SUITE_SESSION_REVOCATION_FILE"
-SUITE_SESSION_REVOCATION_FILE_NAME = "civiccore_suite_session_revocations.json"
-SUITE_SESSION_REVOCATION_CONTAINER_PATH = f"/civicsuite-shared/{SUITE_SESSION_REVOCATION_FILE_NAME}"
+SUITE_SESSION_ENV = "TOWNLIGHT_CORE_SUITE_SESSION_SECRET"
+SUITE_SESSION_REVOCATION_ENV = "TOWNLIGHT_CORE_SUITE_SESSION_REVOCATION_FILE"
+SUITE_SESSION_REVOCATION_FILE_NAME = "townlight_core_suite_session_revocations.json"
+SUITE_SESSION_REVOCATION_CONTAINER_PATH = f"/townlight-shared/{SUITE_SESSION_REVOCATION_FILE_NAME}"
 DEFAULT_SIGNING_STATUS = {
     "signed": False,
     "status": "unsigned_public_use_starter",
-    "reason": "CivicSuite is an open-source public-use starter release and the installer is intentionally unsigned.",
-    "trust_path": "Verify the release SHA256 checksum and official CivicSuite release source before running the installer package.",
+    "reason": "Townlight is an open-source public-use starter release and the installer is intentionally unsigned.",
+    "trust_path": "Verify the release SHA256 checksum and official Townlight release source before running the installer package.",
 }
 
 CITY_CORE_SIGNING_STATUS = {
     "signed": False,
     "status": "unsigned_city_core_beta",
-    "reason": "CivicSuite city-core is an unsigned beta installer package pending Linux and Windows matching-host lifecycle proof.",
-    "trust_path": "Verify the release SHA256 checksum and official CivicSuite release source before running the installer package.",
+    "reason": "Townlight city-core is an unsigned beta installer package pending Linux and Windows matching-host lifecycle proof.",
+    "trust_path": "Verify the release SHA256 checksum and official Townlight release source before running the installer package.",
 }
 
 INNO_APP_IDS = {
@@ -97,11 +97,11 @@ SOURCE_BUNDLE_FORBIDDEN_PREFIXES = (
 def _distribution_copy(profile_id: str) -> dict[str, str | dict[str, bool | str]]:
     if profile_id == "city-core":
         return {
-            "console_title": "CivicSuite city-core unsigned beta installer package",
+            "console_title": "Townlight city-core unsigned beta installer package",
             "project_status": "Project status: city-core beta; Linux and Windows matching-host lifecycle proof is required before promotion.",
             "notice_heading": "Unsigned City-Core Beta Notice",
             "notice_body": (
-                "This package is unsigned. CivicSuite city-core is an open-source beta "
+                "This package is unsigned. Townlight city-core is an open-source beta "
                 "installer package pending Linux and Windows matching-host lifecycle "
                 "proof. Signing certificates are not used for this beta installer path."
             ),
@@ -111,11 +111,11 @@ def _distribution_copy(profile_id: str) -> dict[str, str | dict[str, bool | str]
             "signing": CITY_CORE_SIGNING_STATUS,
         }
     return {
-        "console_title": "CivicSuite OSS public-use starter installer package",
+        "console_title": "Townlight OSS public-use starter installer package",
         "project_status": "Project status: public-use starter release; the installer is intentionally unsigned.",
         "notice_heading": "Unsigned OSS Beta Notice",
         "notice_body": (
-            "This package is unsigned. CivicSuite is an open-source public-use starter "
+            "This package is unsigned. Townlight is an open-source public-use starter "
             "release and signing certificates are not used for the public installer path."
         ),
         "native_wrapper_status": "manifests_generated",
@@ -135,7 +135,7 @@ READINESS_SCENARIOS = {
     "windows-missing-wsl": {"wsl2"},
     "low-resources": {"disk-memory"},
     "ollama-missing": {"ollama"},
-    "civiccore-mismatch": {"civiccore-compatibility"},
+    "townlight_core-mismatch": {"townlight_core-compatibility"},
 }
 
 EXECUTION_TOKEN = "_".join(("I", "UNDERSTAND", "THIS", "MUTATES", "HOST"))
@@ -165,7 +165,7 @@ EXECUTOR_PHASES = [
     {
         "id": "execute",
         "label": "Execute Install",
-        "purpose": "Future mutating phase that installs CivicCore first and then selected modules.",
+        "purpose": "Future mutating phase that installs TownlightCore first and then selected modules.",
         "mutates_host": True,
         "required_inputs": ["approved_plan", "module_artifacts"],
         "required_evidence": ["install_log", "artifact_versions", "service_config"],
@@ -824,7 +824,7 @@ def detect_host_dependencies(host: dict[str, str] | None = None) -> dict[str, An
                 "docker_probe": wsl_docker_probe,
             },
         }
-    checks["civiccore-compatibility"] = {
+    checks["townlight_core-compatibility"] = {
         "detected": True,
         "evidence": {
             "source": "installer/modules.json",
@@ -859,7 +859,7 @@ def detect_host_dependencies(host: dict[str, str] | None = None) -> dict[str, An
 def _readiness_messages() -> dict[str, dict[str, Any]]:
     return {
         "container-runtime": {
-            "ok": "Container runtime is available for CivicSuite services.",
+            "ok": "Container runtime is available for Townlight services.",
             "fail": "Docker Desktop or Docker Engine is not available.",
             "severity": "blocker",
             "fix_steps": [
@@ -898,14 +898,14 @@ def _readiness_messages() -> dict[str, dict[str, Any]]:
                 "Continue without Ollama only if local LLM behavior is not required.",
             ],
         },
-        "civiccore-compatibility": {
-            "ok": "Selected modules are compatible with their recorded CivicCore requirements.",
-            "fail": "One or more selected modules require a different CivicCore version.",
+        "townlight_core-compatibility": {
+            "ok": "Selected modules are compatible with their recorded TownlightCore requirements.",
+            "fail": "One or more selected modules require a different TownlightCore version.",
             "severity": "blocker",
             "fix_steps": [
-                "Review the selected module list and CivicCore requirement in installer/modules.json.",
+                "Review the selected module list and TownlightCore requirement in installer/modules.json.",
                 "Choose a compatible profile or update the compatibility matrix before install.",
-                "Do not install a module against an unverified CivicCore version.",
+                "Do not install a module against an unverified TownlightCore version.",
             ],
         },
         "suite-launcher-runtime": {
@@ -947,7 +947,7 @@ def build_menu_model(
             "role": module.get("role"),
             "tier": module.get("tier"),
             "dependencies": module.get("dependencies", []),
-            "civiccore_requirement": module.get("civiccore_requirement"),
+            "townlight_core_requirement": module.get("townlight_core_requirement"),
         }
         for module_id, module in modules.items()
         if module.get("selectable") is True
@@ -971,7 +971,7 @@ def build_menu_model(
         "profile_choices": profile_choices,
         "module_selector": {
             "source": "installer/modules.json",
-            "civiccore_is_required": True,
+            "townlight_core_is_required": True,
             "selectable_modules": selectable_modules,
         },
     }
@@ -1003,7 +1003,7 @@ def build_readiness_model(
     check_ids = [
         action["id"] for action in plan["actions"] if action.get("type") == "check"
     ]
-    check_ids.append("civiccore-compatibility")
+    check_ids.append("townlight_core-compatibility")
     for check_id in check_ids:
         message = messages[check_id]
         detected_check = None
@@ -1101,7 +1101,7 @@ def build_execution_gate(
 
 def _local_repo_path(repo: str) -> Path:
     name = repo.split("/")[-1]
-    if name == "civicsuite":
+    if name == "townlight":
         return ROOT
     return ROOT.parent / name
 
@@ -1236,7 +1236,7 @@ def build_artifact_resolution(
                 "local_checkout_found": local_exists,
                 "version": version,
                 "latest_local_tag": latest_tag,
-                "civiccore_requirement": module.get("civiccore_requirement"),
+                "townlight_core_requirement": module.get("townlight_core_requirement"),
                 "checksum_files": checksum_files,
                 "dist_assets": [
                     str(asset.relative_to(local_path)) for asset in dist_assets
@@ -1330,7 +1330,7 @@ def build_profile_config(
                 "depends_on": [
                     module_id.replace("-", "_")
                     for module_id in plan["modules"]
-                    if module_id != "civiccore"
+                    if module_id != "townlight_core"
                 ],
                 "health_endpoint": f"http://localhost:{SUITE_LAUNCHER_PORT}/",
                 "configuration_status": "planned_static_runtime",
@@ -1413,7 +1413,7 @@ def build_health_check_plan(
                 "status": "planned_only" if endpoint else "manual_check_required",
                 "starts_service": False,
                 "actionable_failure": (
-                    f"If {service['module']} health fails, inspect its install log, port assignment, and CivicCore compatibility before retrying."
+                    f"If {service['module']} health fails, inspect its install log, port assignment, and TownlightCore compatibility before retrying."
                     if endpoint
                     else f"{service['module']} has no default port; define a module-specific health proof before execution."
                 ),
@@ -1430,12 +1430,12 @@ def build_health_check_plan(
     }
 
 
-def _minimal_civiccore_artifact(artifact_resolution: dict[str, Any]) -> dict[str, Any]:
+def _minimal_townlight_core_artifact(artifact_resolution: dict[str, Any]) -> dict[str, Any]:
     artifacts = artifact_resolution.get("artifacts", [])
     for artifact in artifacts:
-        if isinstance(artifact, dict) and artifact.get("module") == "civiccore":
+        if isinstance(artifact, dict) and artifact.get("module") == "townlight_core":
             return artifact
-    raise PlannerError("CivicCore artifact metadata was not resolved.")
+    raise PlannerError("TownlightCore artifact metadata was not resolved.")
 
 
 def _windows_path_string(path: Path) -> str:
@@ -1458,29 +1458,29 @@ def _install_kit_files(*, artifact: dict[str, Any]) -> dict[str, str]:
     version = artifact.get("version")
     if not version:
         raise PlannerError(
-            "CivicCore version metadata is required before generating an install kit."
+            "TownlightCore version metadata is required before generating an install kit."
         )
     local_path = Path(str(artifact.get("local_path", "")))
     dist_assets = artifact.get("dist_assets", [])
     wheel_assets = [asset for asset in dist_assets if str(asset).endswith(".whl")]
     if not wheel_assets:
         raise PlannerError(
-            "CivicCore wheel artifact is required before generating an install kit."
+            "TownlightCore wheel artifact is required before generating an install kit."
         )
     wheel_path = local_path / str(wheel_assets[0])
     wheel_for_windows = _windows_path_string(wheel_path)
     wheel_for_posix = _posix_path_string(wheel_path)
     plan = {
         "profile": "minimal",
-        "modules": ["civiccore"],
+        "modules": ["townlight_core"],
         "mutates_host_when_run": True,
         "generated_by": "scripts/plan-installer.py --generate-install-kit",
-        "civiccore": {
+        "townlight_core": {
             "version": version,
             "local_artifact": _windows_path_string(wheel_path),
             "local_artifact_posix": wheel_for_posix,
             "repo_path": str(local_path),
-            "verify_command": 'python -c "import civiccore; print(civiccore.__version__)"',
+            "verify_command": 'python -c "import townlight_core; print(townlight_core.__version__)"',
         },
         "operator_boundary": {
             "generator_mutates_host": False,
@@ -1490,35 +1490,35 @@ def _install_kit_files(*, artifact: dict[str, Any]) -> dict[str, str]:
         },
     }
     return {
-        "README.md": f"""# CivicSuite Minimal Install Kit
+        "README.md": f"""# Townlight Minimal Install Kit
 
 Profile: `minimal`
 
-This generated kit installs CivicCore only. It does not install Docker, WSL,
+This generated kit installs TownlightCore only. It does not install Docker, WSL,
 Python, or other baseline system dependencies. It does not start services or
 containers.
 
 Run one of the platform scripts from this directory after reviewing
-`civiccore-install-plan.json`.
+`townlight_core-install-plan.json`.
 
 Windows:
 
 ```powershell
-.\\install-civiccore.ps1
-.\\verify-civiccore.ps1
-.\\reset-civiccore.ps1
+.\\install-townlight_core.ps1
+.\\verify-townlight_core.ps1
+.\\reset-townlight_core.ps1
 ```
 
 macOS/Linux:
 
 ```bash
-bash install-civiccore.sh
-bash verify-civiccore.sh
-bash reset-civiccore.sh
+bash install-townlight_core.sh
+bash verify-townlight_core.sh
+bash reset-townlight_core.sh
 ```
 
 The install scripts create a local `.venv` inside this generated kit and install
-CivicCore from the local wheel artifact:
+TownlightCore from the local wheel artifact:
 
 Windows artifact path:
 
@@ -1529,9 +1529,9 @@ macOS/Linux/WSL artifact path:
 `{wheel_for_posix}`
 """,
         "requirements.txt": f"{wheel_for_windows}\n",
-        "civiccore-install-plan.json": json.dumps(plan, indent=2, sort_keys=True)
+        "townlight_core-install-plan.json": json.dumps(plan, indent=2, sort_keys=True)
         + "\n",
-        "install-civiccore.ps1": f"""$ErrorActionPreference = "Stop"
+        "install-townlight_core.ps1": f"""$ErrorActionPreference = "Stop"
 $KitRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VenvPath = Join-Path $KitRoot ".venv"
 $WheelPath = "{wheel_for_windows}"
@@ -1545,73 +1545,73 @@ function Invoke-Step {{
 }}
 
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
-    throw "Python 3.11+ is required before installing CivicCore. Install Python, reopen this terminal, then rerun this script."
+    throw "Python 3.11+ is required before installing TownlightCore. Install Python, reopen this terminal, then rerun this script."
 }}
 
 Invoke-Step {{ python -m venv $VenvPath }}
 Invoke-Step {{ & (Join-Path $VenvPath "Scripts\\python.exe") -m pip install --upgrade pip }}
 Invoke-Step {{ & (Join-Path $VenvPath "Scripts\\python.exe") -m pip install $WheelPath }}
-Invoke-Step {{ & (Join-Path $VenvPath "Scripts\\python.exe") -c "import civiccore; print('CivicCore ' + civiccore.__version__ + ' installed')" }}
+Invoke-Step {{ & (Join-Path $VenvPath "Scripts\\python.exe") -c "import townlight_core; print('TownlightCore ' + townlight_core.__version__ + ' installed')" }}
 """,
-        "install-civiccore.sh": f"""#!/usr/bin/env bash
+        "install-townlight_core.sh": f"""#!/usr/bin/env bash
 set -euo pipefail
 KIT_ROOT="$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)"
 VENV_PATH="${{KIT_ROOT}}/.venv"
 WHEEL_PATH="{wheel_for_posix}"
 
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "Python 3.11+ is required before installing CivicCore. Install Python, reopen this terminal, then rerun this script." >&2
+  echo "Python 3.11+ is required before installing TownlightCore. Install Python, reopen this terminal, then rerun this script." >&2
   exit 1
 fi
 
 python3 -m venv "${{VENV_PATH}}"
 "${{VENV_PATH}}/bin/python" -m pip install --upgrade pip
 "${{VENV_PATH}}/bin/python" -m pip install "${{WHEEL_PATH}}"
-"${{VENV_PATH}}/bin/python" -c "import civiccore; print('CivicCore ' + civiccore.__version__ + ' installed')"
+"${{VENV_PATH}}/bin/python" -c "import townlight_core; print('TownlightCore ' + townlight_core.__version__ + ' installed')"
 """,
-        "verify-civiccore.ps1": """$ErrorActionPreference = "Stop"
+        "verify-townlight_core.ps1": """$ErrorActionPreference = "Stop"
 $KitRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $PythonPath = Join-Path $KitRoot ".venv\\Scripts\\python.exe"
 
 if (-not (Test-Path $PythonPath)) {
-    throw "CivicCore is not installed in this kit yet. Run .\\install-civiccore.ps1 first."
+    throw "TownlightCore is not installed in this kit yet. Run .\\install-townlight_core.ps1 first."
 }
 
-& $PythonPath -c "import civiccore; print(civiccore.__version__)"
+& $PythonPath -c "import townlight_core; print(townlight_core.__version__)"
 """,
-        "reset-civiccore.ps1": """$ErrorActionPreference = "Stop"
+        "reset-townlight_core.ps1": """$ErrorActionPreference = "Stop"
 $KitRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VenvPath = Join-Path $KitRoot ".venv"
 
 if (Test-Path $VenvPath) {
     Remove-Item -LiteralPath $VenvPath -Recurse -Force
-    Write-Host "Removed kit-local CivicCore virtual environment: $VenvPath"
+    Write-Host "Removed kit-local TownlightCore virtual environment: $VenvPath"
 } else {
-    Write-Host "No kit-local CivicCore virtual environment found. Nothing to reset."
+    Write-Host "No kit-local TownlightCore virtual environment found. Nothing to reset."
 }
 """,
-        "verify-civiccore.sh": """#!/usr/bin/env bash
+        "verify-townlight_core.sh": """#!/usr/bin/env bash
 set -euo pipefail
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_PATH="${KIT_ROOT}/.venv/bin/python"
 
 if [[ ! -x "${PYTHON_PATH}" ]]; then
-  echo "CivicCore is not installed in this kit yet. Run bash install-civiccore.sh first." >&2
+  echo "TownlightCore is not installed in this kit yet. Run bash install-townlight_core.sh first." >&2
   exit 1
 fi
 
-"${PYTHON_PATH}" -c "import civiccore; print(civiccore.__version__)"
+"${PYTHON_PATH}" -c "import townlight_core; print(townlight_core.__version__)"
 """,
-        "reset-civiccore.sh": """#!/usr/bin/env bash
+        "reset-townlight_core.sh": """#!/usr/bin/env bash
 set -euo pipefail
 KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_PATH="${KIT_ROOT}/.venv"
 
 if [[ -d "${VENV_PATH}" ]]; then
   rm -rf "${VENV_PATH}"
-  echo "Removed kit-local CivicCore virtual environment: ${VENV_PATH}"
+  echo "Removed kit-local TownlightCore virtual environment: ${VENV_PATH}"
 else
-  echo "No kit-local CivicCore virtual environment found. Nothing to reset."
+  echo "No kit-local TownlightCore virtual environment found. Nothing to reset."
 fi
 """,
     }
@@ -1625,12 +1625,12 @@ def generate_minimal_install_kit(
     plan = build_install_plan(
         manifest=manifest, profile_id="minimal", menu_style="guided"
     )
-    if plan["modules"] != ["civiccore"]:
-        raise PlannerError("Minimal install kit may only include CivicCore.")
+    if plan["modules"] != ["townlight_core"]:
+        raise PlannerError("Minimal install kit may only include TownlightCore.")
     artifacts = build_artifact_resolution(
         manifest=manifest, profile_id="minimal", menu_style="guided"
     )
-    artifact = _minimal_civiccore_artifact(artifacts)
+    artifact = _minimal_townlight_core_artifact(artifacts)
     files = _install_kit_files(artifact=artifact)
     target = output_root / "minimal"
     if not _is_within(target, output_root):
@@ -1648,9 +1648,9 @@ def generate_minimal_install_kit(
         path.write_text(content, encoding="utf-8", newline="\n")
         written.append(str(path.relative_to(ROOT)))
     for script_name in (
-        "install-civiccore.sh",
-        "verify-civiccore.sh",
-        "reset-civiccore.sh",
+        "install-townlight_core.sh",
+        "verify-townlight_core.sh",
+        "reset-townlight_core.sh",
     ):
         script = target / script_name
         try:
@@ -1661,7 +1661,7 @@ def generate_minimal_install_kit(
         "dry_run": False,
         "mutates_host": False,
         "profile": "minimal",
-        "modules": ["civiccore"],
+        "modules": ["townlight_core"],
         "generated_root": str(target.relative_to(ROOT)),
         "files_written": written,
         "installer_scripts_mutate_when_run": True,
@@ -1686,9 +1686,9 @@ def _package_platforms(host: dict[str, str] | None = None) -> list[str]:
 
 def _uses_suite_launcher(profile_id: str, module_ids: list[str]) -> bool:
     return profile_id == "city-core" or (
-        "civicrecords-ai" in module_ids
-        and "civicclerk" in module_ids
-        and "civiccode" in module_ids
+        "townlight_records" in module_ids
+        and "townlight_meetings" in module_ids
+        and "townlight_code" in module_ids
     )
 
 
@@ -1718,15 +1718,15 @@ def _suite_launcher_config(*, package_relative_path: str | None = None) -> dict[
 
 def _package_launcher_name(platform_id: str) -> str:
     if platform_id == "windows":
-        return "start-civicsuite-installer.ps1"
-    return "start-civicsuite-installer.sh"
+        return "start-townlight-installer.ps1"
+    return "start-townlight-installer.sh"
 
 
 def _package_launcher_text(
     *, platform_id: str, profile_id: str, menu_style: str
 ) -> str:
     copy = _distribution_copy(profile_id)
-    # Default-profile lifecycle modules = this profile's modules minus civiccore (always installed),
+    # Default-profile lifecycle modules = this profile's modules minus townlight_core (always installed),
     # derived from modules.json so a city-core membership change can never desync the launcher
     # (a hard-coded list here previously dropped the 6th module from install/verify/backup/restore).
     _manifest = load_manifest()
@@ -1737,7 +1737,7 @@ def _package_launcher_text(
     _default_modules = [
         str(module_id)
         for module_id in ((_profile or {}).get("modules", []) or [])
-        if module_id != "civiccore"
+        if module_id != "townlight_core"
     ]
     if profile_id == "city-core" and _default_modules:
         _ps_default_block = (
@@ -1777,7 +1777,7 @@ $PackageDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Resolve-Path (Join-Path $PackageDir "..\\..\\..\\..\\..")
 $Planner = Join-Path $RepoRoot "scripts\\plan-installer.py"
 $Lifecycle = Join-Path $RepoRoot "scripts\\run-clerk-core-installer.py"
-$script:CivicSuiteLastLifecycleExitCode = 0
+$script:TownlightLastLifecycleExitCode = 0
 
 function ConvertTo-WslArg([string]$Value) {{
     $SingleQuote = [char]39
@@ -1804,47 +1804,47 @@ function Test-WslDocker {{
     return $LASTEXITCODE -eq 0
 }}
 
-function Test-CivicSuiteAdmin {{
+function Test-TownlightAdmin {{
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($identity)
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }}
 
-function Get-CivicSuiteLastExitCode {{
+function Get-TownlightLastExitCode {{
     if ($null -eq $LASTEXITCODE) {{
         return 0
     }}
     return [int]$LASTEXITCODE
 }}
 
-function Get-CivicSuiteBootstrapReportDir {{
+function Get-TownlightBootstrapReportDir {{
     $ReportDir = Join-Path $RepoRoot "installer\\reports\\docker-wsl-bootstrap"
     New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
     return $ReportDir
 }}
 
-function Write-CivicSuiteBootstrapLog([string]$Name, [string]$Content) {{
-    $ReportDir = Get-CivicSuiteBootstrapReportDir
+function Write-TownlightBootstrapLog([string]$Name, [string]$Content) {{
+    $ReportDir = Get-TownlightBootstrapReportDir
     $Path = Join-Path $ReportDir $Name
     $Content | Out-File -FilePath $Path -Encoding utf8
     Write-Host "Bootstrap evidence: $Path"
 }}
 
-function Register-CivicSuiteRunOnce {{
+function Register-TownlightRunOnce {{
     $Command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -FirstRun"
-    New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" -Name "CivicSuiteInstallerResume" -Value $Command -PropertyType String -Force | Out-Null
-    Write-Host "CivicSuite will resume after reboot using Windows RunOnce."
+    New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" -Name "TownlightInstallerResume" -Value $Command -PropertyType String -Force | Out-Null
+    Write-Host "Townlight will resume after reboot using Windows RunOnce."
 }}
 
-function Get-CivicSuiteInstallRoot {{
-    if ($env:CIVICSUITE_INSTALLER_INSTALL_ROOT) {{
-        return $env:CIVICSUITE_INSTALLER_INSTALL_ROOT
+function Get-TownlightInstallRoot {{
+    if ($env:TOWNLIGHT_INSTALLER_INSTALL_ROOT) {{
+        return $env:TOWNLIGHT_INSTALLER_INSTALL_ROOT
     }}
     return (Join-Path $RepoRoot "installer\\runtime\\clerk-core")
 }}
 
-function Read-CivicSuiteWizardValue([string]$Label, [string]$Default = "", [switch]$Required) {{
-    $EnvName = "CIVICSUITE_" + ($Label.ToUpperInvariant() -replace "[^A-Z0-9]+", "_").Trim("_")
+function Read-TownlightWizardValue([string]$Label, [string]$Default = "", [switch]$Required) {{
+    $EnvName = "TOWNLIGHT_" + ($Label.ToUpperInvariant() -replace "[^A-Z0-9]+", "_").Trim("_")
     $Preset = [Environment]::GetEnvironmentVariable($EnvName)
     if ($Preset) {{
         Write-Host "$Label`: $Preset"
@@ -1855,12 +1855,12 @@ function Read-CivicSuiteWizardValue([string]$Label, [string]$Default = "", [swit
         $Value = Read-Host "$Label$Suffix"
         if (-not $Value -and $Default) {{ $Value = $Default }}
         if ($Value -or -not $Required) {{ return $Value }}
-        Write-Host "This field is required so CivicSuite can finish first-run setup."
+        Write-Host "This field is required so Townlight can finish first-run setup."
     }}
 }}
 
-function Invoke-CivicSuiteFirstRunWizard {{
-    $SetupPath = $env:CIVICSUITE_SETUP_PATH
+function Invoke-TownlightFirstRunWizard {{
+    $SetupPath = $env:TOWNLIGHT_SETUP_PATH
     if (-not $SetupPath) {{
         Write-Host ""
         Write-Host "Choose setup path:"
@@ -1875,24 +1875,24 @@ function Invoke-CivicSuiteFirstRunWizard {{
         exit 2
     }}
 
-    $OperatorName = Read-CivicSuiteWizardValue "operator name" -Required
-    $OrganizationName = Read-CivicSuiteWizardValue "organization name" -Required
-    $AdminEmail = Read-CivicSuiteWizardValue "admin email" "admin@example.gov" -Required
-    $TimeZone = Read-CivicSuiteWizardValue "time zone" ([TimeZoneInfo]::Local.Id) -Required
-    $LicenseAccept = $env:CIVICSUITE_LICENSE_ACCEPT
+    $OperatorName = Read-TownlightWizardValue "operator name" -Required
+    $OrganizationName = Read-TownlightWizardValue "organization name" -Required
+    $AdminEmail = Read-TownlightWizardValue "admin email" "admin@example.gov" -Required
+    $TimeZone = Read-TownlightWizardValue "time zone" ([TimeZoneInfo]::Local.Id) -Required
+    $LicenseAccept = $env:TOWNLIGHT_LICENSE_ACCEPT
     if (-not $LicenseAccept) {{
-        $LicenseAccept = Read-Host "Type ACCEPT to confirm CivicSuite terms and the Docker Desktop license prompt when Docker Desktop first starts"
+        $LicenseAccept = Read-Host "Type ACCEPT to confirm Townlight terms and the Docker Desktop license prompt when Docker Desktop first starts"
     }}
     if ($LicenseAccept -ne "ACCEPT") {{
         Write-Error "License acceptance is required before first-run install. No installation was started."
         exit 2
     }}
 
-    $env:CIVICSUITE_FIRST_ADMIN_EMAIL = $AdminEmail
+    $env:TOWNLIGHT_FIRST_ADMIN_EMAIL = $AdminEmail
 
     $ReportDir = Join-Path $RepoRoot "installer\\reports\\first-run"
     New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
-    $InstallRoot = Get-CivicSuiteInstallRoot
+    $InstallRoot = Get-TownlightInstallRoot
     $ReportPath = Join-Path $ReportDir "first-run-setup.json"
     @{{
         setup_path = $(if ($SetupPath -eq "1") {{ "guided" }} else {{ "manual-prerequisite" }})
@@ -1913,23 +1913,23 @@ function Invoke-CivicSuiteFirstRunWizard {{
     }}
 }}
 
-function Show-CivicSuitePostInstallDashboard([hashtable]$Wizard) {{
-    $CredentialPath = Join-Path $Wizard.install_root "sources\\civicrecords-ai\\data\\secrets\\first_admin_password"
+function Show-TownlightPostInstallDashboard([hashtable]$Wizard) {{
+    $CredentialPath = Join-Path $Wizard.install_root "sources\\townlight_records\\data\\secrets\\first_admin_password"
     Write-Host ""
-    Write-Host "CivicSuite staff dashboard is installed."
+    Write-Host "Townlight staff dashboard is installed."
     Write-Host "Admin email: $($Wizard.admin_email)"
     Write-Host "Initial administrator credential file: $CredentialPath"
     Write-Host "Open that file once, sign in, rotate the credential immediately, then store the rotated value in your municipal vault."
     Write-Host "Suite launcher: http://127.0.0.1:{SUITE_LAUNCHER_PORT}/"
     Write-Host "Shared staff session check: {SUITE_SESSION_ENV} is generated during install if missing."
     Write-Host "Records AI staff dashboard: http://127.0.0.1:18080/"
-    Write-Host "CivicClerk staff dashboard: http://127.0.0.1:18081/"
-    Write-Host "CivicCode API/search: http://127.0.0.1:18820/"
+    Write-Host "TownlightMeetings staff dashboard: http://127.0.0.1:18081/"
+    Write-Host "TownlightCode API/search: http://127.0.0.1:18820/"
 }}
 
-function Invoke-CivicSuiteGuidedSetup {{
-    if (-not (Test-CivicSuiteAdmin)) {{
-        Write-Host "CivicSuite needs Windows administrator consent to install WSL/Docker prerequisites."
+function Invoke-TownlightGuidedSetup {{
+    if (-not (Test-TownlightAdmin)) {{
+        Write-Host "Townlight needs Windows administrator consent to install WSL/Docker prerequisites."
         Start-Process powershell.exe -Verb RunAs -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $PSCommandPath, "-GuidedSetup")
         exit 0
     }}
@@ -1937,23 +1937,23 @@ function Invoke-CivicSuiteGuidedSetup {{
     $Build = [Environment]::OSVersion.Version.Build
     $Arch = $env:PROCESSOR_ARCHITECTURE
     if ($Build -lt 19041) {{
-        Write-Error "Windows 10 build 19041+ or Windows 11 is required. Ask IT to upgrade Windows, then rerun CivicSuite."
+        Write-Error "Windows 10 build 19041+ or Windows 11 is required. Ask IT to upgrade Windows, then rerun Townlight."
         exit 2
     }}
     if ($Arch -ne "AMD64") {{
-        Write-Error "This CivicSuite installer supports AMD64 Windows only in this run. ARM Windows is out of scope."
+        Write-Error "This Townlight installer supports AMD64 Windows only in this run. ARM Windows is out of scope."
         exit 2
     }}
 
-    $ReportDir = Get-CivicSuiteBootstrapReportDir
+    $ReportDir = Get-TownlightBootstrapReportDir
     $WslStatus = (& wsl --status 2>&1 | Out-String)
-    Write-CivicSuiteBootstrapLog "windows-wsl-status-before.txt" $WslStatus
+    Write-TownlightBootstrapLog "windows-wsl-status-before.txt" $WslStatus
     if ($LASTEXITCODE -ne 0) {{
         Write-Host "Installing WSL2 and Virtual Machine Platform with Microsoft's official wsl --install path."
         $WslInstall = (& wsl --install 2>&1 | Out-String)
-        Write-CivicSuiteBootstrapLog "windows-wsl-install.txt" $WslInstall
-        Register-CivicSuiteRunOnce
-        Write-Host "If Windows asks to reboot, reboot now. CivicSuite will resume automatically."
+        Write-TownlightBootstrapLog "windows-wsl-install.txt" $WslInstall
+        Register-TownlightRunOnce
+        Write-Host "If Windows asks to reboot, reboot now. Townlight will resume automatically."
         exit $LASTEXITCODE
     }}
 
@@ -1964,40 +1964,40 @@ function Invoke-CivicSuiteGuidedSetup {{
         Write-Host "Downloading Docker Desktop from the official Docker Desktop URL."
         Invoke-WebRequest -Uri $InstallerUrl -OutFile $InstallerPath
         $Hash = Get-FileHash -Algorithm SHA256 -Path $InstallerPath
-        Write-CivicSuiteBootstrapLog "docker-desktop-download.json" (@{{ url = $InstallerUrl; path = $InstallerPath; sha256 = $Hash.Hash; downloaded_at = (Get-Date).ToUniversalTime().ToString("o") }} | ConvertTo-Json)
+        Write-TownlightBootstrapLog "docker-desktop-download.json" (@{{ url = $InstallerUrl; path = $InstallerPath; sha256 = $Hash.Hash; downloaded_at = (Get-Date).ToUniversalTime().ToString("o") }} | ConvertTo-Json)
         $InstallLog = Join-Path $ReportDir "docker-desktop-install.txt"
         $Proc = Start-Process -FilePath $InstallerPath -ArgumentList @("install", "--quiet") -Wait -PassThru -RedirectStandardOutput $InstallLog -RedirectStandardError "$InstallLog.err"
-        Register-CivicSuiteRunOnce
+        Register-TownlightRunOnce
         if ($Proc.ExitCode -ne 0) {{
             Write-Error "Docker Desktop installer exited with $($Proc.ExitCode). Review $InstallLog and $InstallLog.err, then ask IT for help."
             exit $Proc.ExitCode
         }}
-        Write-Host "Docker Desktop installed. Start Docker Desktop, accept Docker's license at first start, then rerun CivicSuite if it does not resume automatically."
+        Write-Host "Docker Desktop installed. Start Docker Desktop, accept Docker's license at first start, then rerun Townlight if it does not resume automatically."
         exit 0
     }}
 
-    Write-Host "Guided setup prerequisites are present. Continuing with CivicSuite readiness."
+    Write-Host "Guided setup prerequisites are present. Continuing with Townlight readiness."
 }}
 
-function Invoke-CivicSuiteLifecycle([string]$Mode, [string[]]$LifecycleArgs, [switch]$ReturnAfter) {{
+function Invoke-TownlightLifecycle([string]$Mode, [string[]]$LifecycleArgs, [switch]$ReturnAfter) {{
     if (Test-WslDocker) {{
         $RepoRootWsl = ConvertTo-WslPath $RepoRoot
         $EnvParts = @()
-        if ($env:CIVICSUITE_INSTALLER_RUN_ID) {{
-            $EnvParts += "export CIVICSUITE_INSTALLER_RUN_ID=$(ConvertTo-WslArg $env:CIVICSUITE_INSTALLER_RUN_ID);"
+        if ($env:TOWNLIGHT_INSTALLER_RUN_ID) {{
+            $EnvParts += "export TOWNLIGHT_INSTALLER_RUN_ID=$(ConvertTo-WslArg $env:TOWNLIGHT_INSTALLER_RUN_ID);"
         }}
-        if ($env:CIVICSUITE_INSTALLER_INSTALL_ROOT) {{
-            $InstallRootWsl = ConvertTo-WslPath $env:CIVICSUITE_INSTALLER_INSTALL_ROOT
-            $EnvParts += "export CIVICSUITE_INSTALLER_INSTALL_ROOT=$(ConvertTo-WslArg $InstallRootWsl);"
+        if ($env:TOWNLIGHT_INSTALLER_INSTALL_ROOT) {{
+            $InstallRootWsl = ConvertTo-WslPath $env:TOWNLIGHT_INSTALLER_INSTALL_ROOT
+            $EnvParts += "export TOWNLIGHT_INSTALLER_INSTALL_ROOT=$(ConvertTo-WslArg $InstallRootWsl);"
         }}
-        if ($env:CIVICSUITE_INSTALLER_PORT_OFFSET) {{
-            $EnvParts += "export CIVICSUITE_INSTALLER_PORT_OFFSET=$(ConvertTo-WslArg $env:CIVICSUITE_INSTALLER_PORT_OFFSET);"
+        if ($env:TOWNLIGHT_INSTALLER_PORT_OFFSET) {{
+            $EnvParts += "export TOWNLIGHT_INSTALLER_PORT_OFFSET=$(ConvertTo-WslArg $env:TOWNLIGHT_INSTALLER_PORT_OFFSET);"
         }}
-        if ($env:CIVICSUITE_INSTALLER_PROJECT_SUFFIX) {{
-            $EnvParts += "export CIVICSUITE_INSTALLER_PROJECT_SUFFIX=$(ConvertTo-WslArg $env:CIVICSUITE_INSTALLER_PROJECT_SUFFIX);"
+        if ($env:TOWNLIGHT_INSTALLER_PROJECT_SUFFIX) {{
+            $EnvParts += "export TOWNLIGHT_INSTALLER_PROJECT_SUFFIX=$(ConvertTo-WslArg $env:TOWNLIGHT_INSTALLER_PROJECT_SUFFIX);"
         }}
-        if ($env:CIVICSUITE_FIRST_ADMIN_EMAIL) {{
-            $EnvParts += "export CIVICSUITE_FIRST_ADMIN_EMAIL=$(ConvertTo-WslArg $env:CIVICSUITE_FIRST_ADMIN_EMAIL);"
+        if ($env:TOWNLIGHT_FIRST_ADMIN_EMAIL) {{
+            $EnvParts += "export TOWNLIGHT_FIRST_ADMIN_EMAIL=$(ConvertTo-WslArg $env:TOWNLIGHT_FIRST_ADMIN_EMAIL);"
         }}
         if ($env:DOCKER_CONFIG) {{
             $DockerConfigWsl = ConvertTo-WslPath $env:DOCKER_CONFIG
@@ -2007,18 +2007,18 @@ function Invoke-CivicSuiteLifecycle([string]$Mode, [string[]]$LifecycleArgs, [sw
         $QuotedArgs = $AllArgs | ForEach-Object {{ ConvertTo-WslArg $_ }}
         $Command = ($EnvParts -join " ") + " cd $(ConvertTo-WslArg $RepoRootWsl) && python3 scripts/run-clerk-core-installer.py " + ($QuotedArgs -join " ")
         & wsl bash -lc $Command
-        $ExitCode = Get-CivicSuiteLastExitCode
+        $ExitCode = Get-TownlightLastExitCode
         if ($ReturnAfter) {{
-            $script:CivicSuiteLastLifecycleExitCode = $ExitCode
+            $script:TownlightLastLifecycleExitCode = $ExitCode
             return
         }}
         exit $ExitCode
     }}
 
     python $Lifecycle $Mode @LifecycleArgs
-    $ExitCode = Get-CivicSuiteLastExitCode
+    $ExitCode = Get-TownlightLastExitCode
     if ($ReturnAfter) {{
-        $script:CivicSuiteLastLifecycleExitCode = $ExitCode
+        $script:TownlightLastLifecycleExitCode = $ExitCode
         return
     }}
     exit $ExitCode
@@ -2026,7 +2026,7 @@ function Invoke-CivicSuiteLifecycle([string]$Mode, [string[]]$LifecycleArgs, [sw
 
 Write-Host "{copy['console_title']}"
 Write-Host "Signing status: unsigned. Windows may show SmartScreen or unknown publisher warnings."
-Write-Host "Trust path: verify the SHA256 checksum from installer\\dist and the official CivicSuite release source before running lifecycle commands."
+Write-Host "Trust path: verify the SHA256 checksum from installer\\dist and the official Townlight release source before running lifecycle commands."
 Write-Host "{copy['project_status']}"
 
 $PlannerArgs = @("--menu-style", "{menu_style}", "--dry-run")
@@ -2049,7 +2049,7 @@ if ($Module -and $Module.Count -gt 0) {{
 
 if ($Plan) {{
     python $Planner @PlannerArgs
-    exit (Get-CivicSuiteLastExitCode)
+    exit (Get-TownlightLastExitCode)
 }}
 
 if ($SuiteLauncher) {{
@@ -2063,63 +2063,63 @@ if ($SuiteLauncher) {{
         exit 2
     }}
     & node $SuiteLauncherScript --port {SUITE_LAUNCHER_PORT}
-    exit (Get-CivicSuiteLastExitCode)
+    exit (Get-TownlightLastExitCode)
 }}
 
 if ($GuidedSetup) {{
-    Invoke-CivicSuiteGuidedSetup
+    Invoke-TownlightGuidedSetup
     python $Planner @PlannerArgs --show-readiness --detect-host
-    exit (Get-CivicSuiteLastExitCode)
+    exit (Get-TownlightLastExitCode)
 }}
 
 if ($FirstRun) {{
-    $Wizard = Invoke-CivicSuiteFirstRunWizard
+    $Wizard = Invoke-TownlightFirstRunWizard
     if ($Wizard.setup_path -eq "1") {{
-        Invoke-CivicSuiteGuidedSetup
+        Invoke-TownlightGuidedSetup
     }}
     python $Planner @PlannerArgs --show-readiness --detect-host
-    $PlannerExit = Get-CivicSuiteLastExitCode
+    $PlannerExit = Get-TownlightLastExitCode
     if ($PlannerExit -ne 0) {{ exit $PlannerExit }}
-    if ($env:CIVICSUITE_FIRST_RUN_SMOKE_ONLY -eq "1") {{
+    if ($env:TOWNLIGHT_FIRST_RUN_SMOKE_ONLY -eq "1") {{
         Write-Host "First-run smoke only: setup wizard and readiness passed; install was not started."
         exit 0
     }}
-    Invoke-CivicSuiteLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs)) -ReturnAfter
-    $InstallExit = $script:CivicSuiteLastLifecycleExitCode
+    Invoke-TownlightLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs)) -ReturnAfter
+    $InstallExit = $script:TownlightLastLifecycleExitCode
     if ($InstallExit -ne 0) {{ exit $InstallExit }}
-    Show-CivicSuitePostInstallDashboard $Wizard
+    Show-TownlightPostInstallDashboard $Wizard
     exit 0
 }}
 
 if ($ManualPrerequisite) {{
     python $Planner @PlannerArgs --show-readiness --detect-host
-    $PlannerExit = Get-CivicSuiteLastExitCode
+    $PlannerExit = Get-TownlightLastExitCode
     if ($PlannerExit -ne 0) {{ exit $PlannerExit }}
-    Invoke-CivicSuiteLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
 }}
 
 if ($Install) {{
-    Invoke-CivicSuiteLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "install" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
 }}
 
 if ($Verify) {{
-    Invoke-CivicSuiteLifecycle "verify" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "verify" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
 }}
 
 if ($Repair) {{
-    Invoke-CivicSuiteLifecycle "repair" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "repair" (@($LifecycleModeArgs) + @($LifecycleModuleArgs))
 }}
 
 if ($Backup) {{
-    Invoke-CivicSuiteLifecycle "backup" (@($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "backup" (@($LifecycleModuleArgs))
 }}
 
 if ($Restore) {{
-    Invoke-CivicSuiteLifecycle "restore" (@($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "restore" (@($LifecycleModuleArgs))
 }}
 
 if ($Uninstall) {{
-    Invoke-CivicSuiteLifecycle "uninstall" (@($LifecycleModuleArgs))
+    Invoke-TownlightLifecycle "uninstall" (@($LifecycleModuleArgs))
 }}
 
 python $Planner @PlannerArgs --show-readiness --detect-host
@@ -2135,7 +2135,7 @@ LIFECYCLE="${{REPO_ROOT}}/scripts/run-clerk-core-installer.py"
 
 echo "{copy['console_title']}"
 echo "Signing status: unsigned. Your OS may show an unknown developer/publisher warning."
-echo "Trust path: verify the SHA256 checksum from installer/dist and the official CivicSuite release source before running lifecycle commands."
+echo "Trust path: verify the SHA256 checksum from installer/dist and the official Townlight release source before running lifecycle commands."
 echo "{copy['project_status']}"
 
 MODE="${{1:-readiness}}"
@@ -2148,7 +2148,7 @@ LIFECYCLE_MODULE_ARGS=({_sh_default_args})
 LIFECYCLE_MODE_ARGS=(--staff-mode protected)
 SELECTED_MODULES=()
 first_run_wizard() {{
-  local setup_path="${{CIVICSUITE_SETUP_PATH:-}}"
+  local setup_path="${{TOWNLIGHT_SETUP_PATH:-}}"
   if [[ -z "$setup_path" ]]; then
     echo ""
     echo "Choose setup path:"
@@ -2163,30 +2163,30 @@ first_run_wizard() {{
     echo "Choose 1 or 2. No installation was started." >&2
     exit 2
   fi
-  read_wizard_value "operator name" CIVICSUITE_OPERATOR_NAME "" required
+  read_wizard_value "operator name" TOWNLIGHT_OPERATOR_NAME "" required
   operator_name="$WIZARD_VALUE"
-  read_wizard_value "organization name" CIVICSUITE_ORGANIZATION_NAME "" required
+  read_wizard_value "organization name" TOWNLIGHT_ORGANIZATION_NAME "" required
   organization_name="$WIZARD_VALUE"
-  read_wizard_value "admin email" CIVICSUITE_ADMIN_EMAIL "admin@example.gov" required
+  read_wizard_value "admin email" TOWNLIGHT_ADMIN_EMAIL "admin@example.gov" required
   admin_email="$WIZARD_VALUE"
-  read_wizard_value "time zone" CIVICSUITE_TIME_ZONE "$(detect_timezone)" required
+  read_wizard_value "time zone" TOWNLIGHT_TIME_ZONE "$(detect_timezone)" required
   time_zone="$WIZARD_VALUE"
-  license_accept="${{CIVICSUITE_LICENSE_ACCEPT:-}}"
+  license_accept="${{TOWNLIGHT_LICENSE_ACCEPT:-}}"
   if [[ -z "$license_accept" ]]; then
-    printf "Type ACCEPT to confirm CivicSuite terms and any Docker license prompt shown by Docker: "
+    printf "Type ACCEPT to confirm Townlight terms and any Docker license prompt shown by Docker: "
     read -r license_accept
   fi
   if [[ "$license_accept" != "ACCEPT" ]]; then
     echo "License acceptance is required before first-run install. No installation was started." >&2
     exit 2
   fi
-  export CIVICSUITE_FIRST_ADMIN_EMAIL="$admin_email"
+  export TOWNLIGHT_FIRST_ADMIN_EMAIL="$admin_email"
   first_run_report_dir="${{REPO_ROOT}}/installer/reports/first-run"
   mkdir -p "$first_run_report_dir"
   first_run_report="${{first_run_report_dir}}/first-run-setup.json"
   setup_label="manual-prerequisite"
   if [[ "$setup_path" == "1" ]]; then setup_label="guided"; fi
-  python3 - "$first_run_report" "$setup_label" "$operator_name" "$organization_name" "$admin_email" "$time_zone" "${{CIVICSUITE_INSTALLER_INSTALL_ROOT:-${{REPO_ROOT}}/installer/runtime/clerk-core}}" <<'PY'
+  python3 - "$first_run_report" "$setup_label" "$operator_name" "$organization_name" "$admin_email" "$time_zone" "${{TOWNLIGHT_INSTALLER_INSTALL_ROOT:-${{REPO_ROOT}}/installer/runtime/clerk-core}}" <<'PY'
 import json, sys
 from datetime import datetime, UTC
 path, setup, operator, org, email, tz, root = sys.argv[1:]
@@ -2206,7 +2206,7 @@ PY
   echo "First-run setup evidence: $first_run_report"
   WIZARD_SETUP_PATH="$setup_path"
   WIZARD_ADMIN_EMAIL="$admin_email"
-  WIZARD_INSTALL_ROOT="${{CIVICSUITE_INSTALLER_INSTALL_ROOT:-${{REPO_ROOT}}/installer/runtime/clerk-core}}"
+  WIZARD_INSTALL_ROOT="${{TOWNLIGHT_INSTALLER_INSTALL_ROOT:-${{REPO_ROOT}}/installer/runtime/clerk-core}}"
 }}
 
 read_wizard_value() {{
@@ -2232,7 +2232,7 @@ read_wizard_value() {{
       WIZARD_VALUE="$value"
       return
     fi
-    echo "This field is required so CivicSuite can finish first-run setup."
+    echo "This field is required so Townlight can finish first-run setup."
   done
 }}
 
@@ -2243,17 +2243,17 @@ detect_timezone() {{
 }}
 
 show_post_install_dashboard() {{
-  local credential_path="${{WIZARD_INSTALL_ROOT}}/sources/civicrecords-ai/data/secrets/first_admin_password"
+  local credential_path="${{WIZARD_INSTALL_ROOT}}/sources/townlight_records/data/secrets/first_admin_password"
   echo ""
-  echo "CivicSuite staff dashboard is installed."
+  echo "Townlight staff dashboard is installed."
   echo "Admin email: $WIZARD_ADMIN_EMAIL"
   echo "Initial administrator credential file: $credential_path"
   echo "Open that file once, sign in, rotate the credential immediately, then store the rotated value in your municipal vault."
   echo "Suite launcher: http://127.0.0.1:{SUITE_LAUNCHER_PORT}/"
   echo "Shared staff session check: {SUITE_SESSION_ENV} is generated during install if missing."
   echo "Records AI staff dashboard: http://127.0.0.1:18080/"
-  echo "CivicClerk staff dashboard: http://127.0.0.1:18081/"
-  echo "CivicCode API/search: http://127.0.0.1:18820/"
+  echo "TownlightMeetings staff dashboard: http://127.0.0.1:18081/"
+  echo "TownlightCode API/search: http://127.0.0.1:18820/"
 }}
 
 while [[ "$#" -gt 0 ]]; do
@@ -2272,7 +2272,7 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --module)
       if [[ "$#" -lt 2 ]]; then
-        echo "--module requires civicrecords-ai, civicclerk, civiccode, civicnotice, or civicaccess" >&2
+        echo "--module requires townlight_records, townlight_meetings, townlight_code, townlight_notice, or townlight_access" >&2
         exit 2
       fi
       SELECTED_MODULES+=("$2")
@@ -2304,7 +2304,7 @@ case "${{MODE}}" in
       bash "$0" bootstrap-prerequisites
     fi
     python3 "${{PLANNER}}" "${{PLANNER_ARGS[@]}}" --show-readiness --detect-host
-    if [[ "${{CIVICSUITE_FIRST_RUN_SMOKE_ONLY:-}}" == "1" ]]; then
+    if [[ "${{TOWNLIGHT_FIRST_RUN_SMOKE_ONLY:-}}" == "1" ]]; then
       echo "First-run smoke only: setup wizard and readiness passed; install was not started."
       exit 0
     fi
@@ -2441,7 +2441,7 @@ case "${{MODE}}" in
     python3 "${{PLANNER}}" "${{PLANNER_ARGS[@]}}" --show-readiness --detect-host
     ;;
   *)
-    echo "Usage: $0 [first-run|bootstrap-prerequisites|readiness|plan|launcher|install|verify|repair|backup|restore|uninstall] [--staff-mode protected|bearer|open] [--workflow-proof] [--module civicrecords-ai] [--module civicclerk] [--module civiccode] [--module civicnotice] [--module civicaccess]" >&2
+    echo "Usage: $0 [first-run|bootstrap-prerequisites|readiness|plan|launcher|install|verify|repair|backup|restore|uninstall] [--staff-mode protected|bearer|open] [--workflow-proof] [--module townlight_records] [--module townlight_meetings] [--module townlight_code] [--module townlight_notice] [--module townlight_access]" >&2
     exit 2
     ;;
 esac
@@ -2454,17 +2454,17 @@ def _package_readme_text(
     copy = _distribution_copy(profile_id)
     launcher = _package_launcher_name(platform_id)
     module_lines = "\n".join(f"- {module_id}" for module_id in plan["modules"])
-    lifecycle_modules = [module_id for module_id in plan["modules"] if module_id != "civiccore"]
+    lifecycle_modules = [module_id for module_id in plan["modules"] if module_id != "townlight_core"]
     lifecycle_module_args_ps = " ".join(f"-Module {module_id}" for module_id in lifecycle_modules)
     lifecycle_module_args_sh = " ".join(f"--module {module_id}" for module_id in lifecycle_modules)
     if platform_id == "windows":
         readiness = f".\\{launcher} -Readiness"
         plan_command = f".\\{launcher} -Plan"
-        records_only_plan = f".\\{launcher} -Plan -Module civicrecords-ai"
-        clerk_only_plan = f".\\{launcher} -Plan -Module civicclerk"
-        code_only_plan = f".\\{launcher} -Plan -Module civiccode"
-        notice_only_plan = f".\\{launcher} -Plan -Module civicnotice"
-        access_only_plan = f".\\{launcher} -Plan -Module civicaccess"
+        records_only_plan = f".\\{launcher} -Plan -Module townlight_records"
+        clerk_only_plan = f".\\{launcher} -Plan -Module townlight_meetings"
+        code_only_plan = f".\\{launcher} -Plan -Module townlight_code"
+        notice_only_plan = f".\\{launcher} -Plan -Module townlight_notice"
+        access_only_plan = f".\\{launcher} -Plan -Module townlight_access"
         both_install = (
             f".\\{launcher} -Install {lifecycle_module_args_ps}".strip()
         )
@@ -2473,11 +2473,11 @@ def _package_readme_text(
     else:
         readiness = f"bash ./{launcher} readiness"
         plan_command = f"bash ./{launcher} plan"
-        records_only_plan = f"bash ./{launcher} plan --module civicrecords-ai"
-        clerk_only_plan = f"bash ./{launcher} plan --module civicclerk"
-        code_only_plan = f"bash ./{launcher} plan --module civiccode"
-        notice_only_plan = f"bash ./{launcher} plan --module civicnotice"
-        access_only_plan = f"bash ./{launcher} plan --module civicaccess"
+        records_only_plan = f"bash ./{launcher} plan --module townlight_records"
+        clerk_only_plan = f"bash ./{launcher} plan --module townlight_meetings"
+        code_only_plan = f"bash ./{launcher} plan --module townlight_code"
+        notice_only_plan = f"bash ./{launcher} plan --module townlight_notice"
+        access_only_plan = f"bash ./{launcher} plan --module townlight_access"
         both_install = (
             f"bash ./{launcher} install {lifecycle_module_args_sh}".strip()
         )
@@ -2485,7 +2485,7 @@ def _package_readme_text(
             f"bash ./{launcher} install --staff-mode bearer --workflow-proof"
         )
         suite_launcher_command = f"bash ./{launcher} launcher"
-    return f"""# CivicSuite Installer Package - {platform_id}
+    return f"""# Townlight Installer Package - {platform_id}
 
 Profile: `{profile_id}`
 Menu style: `{menu_style}`
@@ -2497,7 +2497,7 @@ warnings. macOS may show unidentified developer warnings. Linux package tools
 may show an unsigned/local package warning.
 
 This is expected for this beta distribution. Verify the SHA256 checksum from
-`installer/dist` and confirm the artifact came from the official CivicSuite
+`installer/dist` and confirm the artifact came from the official Townlight
 GitHub release source or your IT team's verified source build before running
 the package. If the checksum does not match, stop and download the artifact
 again from the project release source.
@@ -2583,7 +2583,7 @@ resources for the profile.
 {module_lines}
 
 The default package selection installs this package profile on top of the
-CivicCore base contract. Operators can choose one module or the whole profile:
+TownlightCore base contract. Operators can choose one module or the whole profile:
 
 ```text
 {records_only_plan}
@@ -2598,7 +2598,7 @@ When a module is selected explicitly, plan/readiness use the same selection
 and install/verify/repair/backup/restore/uninstall pass it through to the
 lifecycle runner.
 
-For a mutating workflow proof, use bearer staff mode so CivicClerk writes are
+For a mutating workflow proof, use bearer staff mode so TownlightMeetings writes are
 protected while the proof creates real starter-set test records:
 
 ```text
@@ -2611,11 +2611,11 @@ protected while the proof creates real starter-set test records:
 - Install/repair mode is mutating: it builds and starts the selected modules
   from the bundled source tree.
 - Verify mode checks live service endpoints. `--workflow-proof` /
-  `-WorkflowProof` also creates live CivicRecords AI request/search/review/
-  response proof records, CivicClerk agenda/packet/minutes/vote/notice/
-  archive proof records, CivicCode health/public lookup proof when
-  CivicCode is selected, and a CivicAccess accessibility-review record
-  round-trip proof when CivicAccess is selected.
+  `-WorkflowProof` also creates live TownlightRecords request/search/review/
+  response proof records, TownlightMeetings agenda/packet/minutes/vote/notice/
+  archive proof records, TownlightCode health/public lookup proof when
+  TownlightCode is selected, and a TownlightAccess accessibility-review record
+  round-trip proof when TownlightAccess is selected.
 - Backup mode writes per-module PostgreSQL custom dumps plus a manifest under
   the installer runtime backup directory.
 - Restore mode verifies the latest backup by restoring each dump into a
@@ -2660,7 +2660,7 @@ def _copy_suite_launcher_package(package_dir: Path) -> list[str]:
             ".DS_Store",
         ),
     )
-    config_path = target / "civicsuite-launcher-config.json"
+    config_path = target / "townlight-launcher-config.json"
     config_path.write_text(
         json.dumps(
             _suite_launcher_config(package_relative_path=SUITE_LAUNCHER_PACKAGE_DIR),
@@ -2780,12 +2780,12 @@ def _native_manifest_files(
     app_id = INNO_APP_IDS.get(profile_id, INNO_APP_IDS["clerk-core"])
     if platform_id == "windows":
         return {
-            "CivicSuiteInstaller.iss": f"""; CivicSuite Windows installer wrapper manifest.
+            "TownlightInstaller.iss": f"""; Townlight Windows installer wrapper manifest.
 ; {copy['console_title']}: build with Inno Setup after reviewing the generated package payload.
 
-#define AppName "CivicSuite"
+#define AppName "Townlight"
 #define AppVersion "{version}"
-#define AppPublisher "CivicSuite"
+#define AppPublisher "Townlight"
 #define PackageSource "..\\..\\packages\\{profile_id}\\windows"
 
 [Setup]
@@ -2793,9 +2793,9 @@ AppId={{{{{app_id}}}
 AppName={{#AppName}}
 AppVersion={{#AppVersion}}
 AppPublisher={{#AppPublisher}}
-DefaultDirName={{autopf}}\\CivicSuite
-DefaultGroupName=CivicSuite
-OutputBaseFilename=CivicSuite-{profile_id}-Setup-{version}
+DefaultDirName={{autopf}}\\Townlight
+DefaultGroupName=Townlight
+OutputBaseFilename=Townlight-{profile_id}-Setup-{version}
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
@@ -2804,19 +2804,19 @@ PrivilegesRequired=lowest
 Source: "{{#PackageSource}}\\*"; DestDir: "{{app}}"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{{group}}\\CivicSuite Installer"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\\start-civicsuite-installer.ps1"" -Readiness"
+Name: "{{group}}\\Townlight Installer"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\\start-townlight-installer.ps1"" -Readiness"
 """,
             "README.md": f"""# Windows Native Wrapper
 
 Payload source: `{package_rel}`
 
-Use `CivicSuiteInstaller.iss` with Inno Setup to build a Windows installer that
+Use `TownlightInstaller.iss` with Inno Setup to build a Windows installer that
 wraps the generated operator package. The wrapper opens the readiness flow by
 default and keeps privileged dependency installation outside silent mutation.
 
-This beta wrapper is intentionally unsigned for the public CivicSuite
+This beta wrapper is intentionally unsigned for the public Townlight
 open-source path. Windows SmartScreen or Unknown Publisher warnings are
-expected. Verify the release SHA256 checksum and official CivicSuite source
+expected. Verify the release SHA256 checksum and official Townlight source
 before running the installer, then use More info > Run anyway only if the
 checksum and source match.
 """,
@@ -2825,20 +2825,20 @@ checksum and source match.
         return {
             "distribution.xml": f"""<?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-  <title>CivicSuite {profile_id}</title>
+  <title>Townlight {profile_id}</title>
   <options customize="never" require-scripts="false"/>
   <domains enable_anywhere="true"/>
-  <pkg-ref id="gov.civicsuite.{profile_id}" version="{version}">CivicSuite-{profile_id}.pkg</pkg-ref>
+  <pkg-ref id="gov.townlight.{profile_id}" version="{version}">Townlight-{profile_id}.pkg</pkg-ref>
   <choices-outline>
     <line choice="default"/>
   </choices-outline>
-  <choice id="default" title="CivicSuite {profile_id}">
-    <pkg-ref id="gov.civicsuite.{profile_id}"/>
+  <choice id="default" title="Townlight {profile_id}">
+    <pkg-ref id="gov.townlight.{profile_id}"/>
   </choice>
 </installer-gui-script>
 """,
-            "pkgbuild.txt": f"""pkgbuild --root "{package_rel}" --identifier gov.civicsuite.{profile_id} --version {version} CivicSuite-{profile_id}.pkg
-productbuild --distribution distribution.xml --package-path . CivicSuite-{profile_id}-{version}.pkg
+            "pkgbuild.txt": f"""pkgbuild --root "{package_rel}" --identifier gov.townlight.{profile_id} --version {version} Townlight-{profile_id}.pkg
+productbuild --distribution distribution.xml --package-path . Townlight-{profile_id}-{version}.pkg
 """,
             "README.md": f"""# macOS Native Wrapper
 
@@ -2846,28 +2846,28 @@ Payload source: `{package_rel}`
 
 Use `pkgbuild` and `productbuild` with the included distribution file to create
 a macOS package. This beta wrapper is intentionally unsigned for the public
-CivicSuite open-source path. macOS unidentified developer warnings are
-expected. Verify the release SHA256 checksum and official CivicSuite source
+Townlight open-source path. macOS unidentified developer warnings are
+expected. Verify the release SHA256 checksum and official Townlight source
 before allowing the package in Privacy & Security.
 """,
         }
     return {
-        "debian/control": f"""Package: civicsuite-{profile_id}
+        "debian/control": f"""Package: townlight-{profile_id}
 Version: {version}
 Section: admin
 Priority: optional
 Architecture: all
-Maintainer: CivicSuite <support@civicsuite.local>
+Maintainer: Townlight <support@townlight.local>
 Depends: python3
-Description: CivicSuite {profile_id} installer package
- Operator-facing CivicSuite installer package with readiness, plan, verify,
+Description: Townlight {profile_id} installer package
+ Operator-facing Townlight installer package with readiness, plan, verify,
  repair, uninstall, and cleanroom gate entrypoints.
 """,
-        "debian/install": f"""../../packages/{profile_id}/linux/* opt/civicsuite/{profile_id}/
+        "debian/install": f"""../../packages/{profile_id}/linux/* opt/townlight/{profile_id}/
 """,
         "debian/postinst": """#!/usr/bin/env bash
 set -euo pipefail
-echo "CivicSuite package installed. Run /opt/civicsuite/*/start-civicsuite-installer.sh readiness"
+echo "Townlight package installed. Run /opt/townlight/*/start-townlight-installer.sh readiness"
 """,
         "README.md": f"""# Linux Native Wrapper
 
@@ -2875,8 +2875,8 @@ Payload source: `{package_rel}`
 
 Use the `debian/` metadata as the first `.deb` wrapper for the generated Linux
 operator package. Dependency installation remains explicit and operator-led.
-This beta wrapper is intentionally unsigned for the public CivicSuite
-open-source path. Verify the release SHA256 checksum and official CivicSuite
+This beta wrapper is intentionally unsigned for the public Townlight
+open-source path. Verify the release SHA256 checksum and official Townlight
 source before installing the local package.
 """,
     }
@@ -2978,7 +2978,7 @@ contains the sibling `{module_name}` checkout and must pass
             if name == ".agent-workflows":
                 ignored.add(name)
                 continue
-            if name == "docs" and module_name != "civicrecords-ai":
+            if name == "docs" and module_name != "townlight_records":
                 ignored.add(name)
                 continue
             if name == "tests":
@@ -2990,7 +2990,7 @@ contains the sibling `{module_name}` checkout and must pass
             if "installer" in rel_parts and name == "reports":
                 ignored.add(name)
                 continue
-            if name == "run-civicclerk-cleanroom.sh":
+            if name == "run-townlight_meetings-cleanroom.sh":
                 ignored.add(name)
         return ignored
 
@@ -3002,7 +3002,7 @@ contains the sibling `{module_name}` checkout and must pass
             encoding="utf-8",
             newline="\n",
         )
-    if module_name == "civicrecords-ai":
+    if module_name == "townlight_records":
         tests_dir = target / "backend" / "tests"
         tests_dir.mkdir(parents=True, exist_ok=True)
         (tests_dir / ".bundle-placeholder").write_text(
@@ -3025,7 +3025,7 @@ def _stage_release_bundle(
         BUNDLE_ROOT
         / profile_id
         / platform_id
-        / f"CivicSuite-{profile_id}-{platform_id}"
+        / f"Townlight-{profile_id}-{platform_id}"
     )
     if not _is_within(bundle_dir, BUNDLE_ROOT):
         raise PlannerError(
@@ -3056,7 +3056,7 @@ def _stage_release_bundle(
     )
     shutil.copy2(
         SERVICE_CLEANROOM_RUNNER,
-        bundle_dir / "scripts" / "run-civicrecords-cleanroom.py",
+        bundle_dir / "scripts" / "run-townlight_records-cleanroom.py",
     )
     (bundle_dir / "installer").mkdir(parents=True, exist_ok=True)
     shutil.copy2(MANIFEST, bundle_dir / "installer" / "modules.json")
@@ -3080,22 +3080,22 @@ def _stage_release_bundle(
         )
     modules_root = bundle_dir / "modules"
     modules_root.mkdir(parents=True, exist_ok=True)
-    bundled_modules = ["civicrecords-ai", "civicclerk"]
+    bundled_modules = ["townlight_records", "townlight_meetings"]
     if plan_modules:
         bundled_modules = [
             str(module_id)
             for module_id in plan_modules
-            if str(module_id) != "civiccore"
+            if str(module_id) != "townlight_core"
         ]
     for module_name in bundled_modules:
         _copy_bundle_source(module_name, modules_root / module_name)
     (bundle_dir / "README.md").write_text(
-        f"""# CivicSuite {profile_id} Installer Bundle
+        f"""# Townlight {profile_id} Installer Bundle
 
 {copy['notice_body']} This bundle is self-contained for the {profile_id}
 profile. It includes the installer lifecycle runner, the selected platform
 package, and the module source trees needed to build/start the selected
-CivicSuite modules with Docker.
+Townlight modules with Docker.
 
 Start here:
 
@@ -3126,20 +3126,20 @@ def _chunk_text(value: str, width: int = 76) -> list[str]:
 def _write_windows_one_click_installer(
     *, archive_path: Path, target_path: Path, profile_id: str, version: str
 ) -> None:
-    marker = b"\r\n__CIVICSUITE_ZIP_PAYLOAD_BELOW__\r\n"
+    marker = b"\r\n__TOWNLIGHT_ZIP_PAYLOAD_BELOW__\r\n"
     target_path.parent.mkdir(parents=True, exist_ok=True)
     script = f"""@echo off
 setlocal EnableExtensions
-title CivicSuite {profile_id} installer {version}
-set "RUNROOT=%TEMP%\\CivicSuite-%RANDOM%-%RANDOM%"
+title Townlight {profile_id} installer {version}
+set "RUNROOT=%TEMP%\\Townlight-%RANDOM%-%RANDOM%"
 mkdir "%RUNROOT%" >nul 2>nul
 set "ARCHIVE=%RUNROOT%\\payload.zip"
 set "EXTRACTED=%RUNROOT%\\bundle"
-set "CIVICSUITE_SELF=%~f0"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$self=$env:CIVICSUITE_SELF; $bytes=[IO.File]::ReadAllBytes($self); $markerText=([string][char]13)+([string][char]10)+'__CIVICSUITE_ZIP_PAYLOAD_BELOW__'+([string][char]13)+([string][char]10); $marker=[Text.Encoding]::ASCII.GetBytes($markerText); $start=-1; for($i=0; $i -le $bytes.Length-$marker.Length; $i++) {{ $ok=$true; for($j=0; $j -lt $marker.Length; $j++) {{ if($bytes[$i+$j] -ne $marker[$j]) {{ $ok=$false; break }} }} if($ok) {{ $start=$i+$marker.Length; break }} }} if($start -lt 0) {{ Write-Error 'Could not find the embedded CivicSuite installer payload. Fix: verify the downloaded file is complete, then run it again.'; exit 1 }} $payload=New-Object byte[] ($bytes.Length-$start); [Array]::Copy($bytes,$start,$payload,0,$payload.Length); [IO.File]::WriteAllBytes($env:ARCHIVE,$payload); Expand-Archive -LiteralPath $env:ARCHIVE -DestinationPath $env:EXTRACTED -Force; $launcher = Get-ChildItem -LiteralPath $env:EXTRACTED -Recurse -Filter start-civicsuite-installer.ps1 | Where-Object {{ $_.FullName -like '*\\installer\\generated\\packages\\*\\windows\\*' }} | Select-Object -First 1; if (-not $launcher) {{ Write-Error 'CivicSuite Windows launcher was not found after extraction.'; exit 1 }}; if ($env:CIVICSUITE_ONE_CLICK_SMOKE_ONLY -eq '1') {{ & $launcher.FullName -Readiness; exit $LASTEXITCODE }}; & $launcher.FullName -FirstRun"
+set "TOWNLIGHT_SELF=%~f0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$self=$env:TOWNLIGHT_SELF; $bytes=[IO.File]::ReadAllBytes($self); $markerText=([string][char]13)+([string][char]10)+'__TOWNLIGHT_ZIP_PAYLOAD_BELOW__'+([string][char]13)+([string][char]10); $marker=[Text.Encoding]::ASCII.GetBytes($markerText); $start=-1; for($i=0; $i -le $bytes.Length-$marker.Length; $i++) {{ $ok=$true; for($j=0; $j -lt $marker.Length; $j++) {{ if($bytes[$i+$j] -ne $marker[$j]) {{ $ok=$false; break }} }} if($ok) {{ $start=$i+$marker.Length; break }} }} if($start -lt 0) {{ Write-Error 'Could not find the embedded Townlight installer payload. Fix: verify the downloaded file is complete, then run it again.'; exit 1 }} $payload=New-Object byte[] ($bytes.Length-$start); [Array]::Copy($bytes,$start,$payload,0,$payload.Length); [IO.File]::WriteAllBytes($env:ARCHIVE,$payload); Expand-Archive -LiteralPath $env:ARCHIVE -DestinationPath $env:EXTRACTED -Force; $launcher = Get-ChildItem -LiteralPath $env:EXTRACTED -Recurse -Filter start-townlight-installer.ps1 | Where-Object {{ $_.FullName -like '*\\installer\\generated\\packages\\*\\windows\\*' }} | Select-Object -First 1; if (-not $launcher) {{ Write-Error 'Townlight Windows launcher was not found after extraction.'; exit 1 }}; if ($env:TOWNLIGHT_ONE_CLICK_SMOKE_ONLY -eq '1') {{ & $launcher.FullName -Readiness; exit $LASTEXITCODE }}; & $launcher.FullName -FirstRun"
 set "STATUS=%ERRORLEVEL%"
 if not "%STATUS%"=="0" (
-  echo CivicSuite installation did not pass.
+  echo Townlight installation did not pass.
   echo Fix: read the readiness message above, resolve the listed item, and run this installer again.
   pause
 )
@@ -3156,30 +3156,30 @@ def _write_linux_one_click_installer(
 ) -> None:
     script = f"""#!/usr/bin/env bash
 set -euo pipefail
-echo "CivicSuite {profile_id} one-click installer {version}"
-RUNROOT="${{TMPDIR:-/tmp}}/civicsuite-{profile_id}-$RANDOM-$$"
+echo "Townlight {profile_id} one-click installer {version}"
+RUNROOT="${{TMPDIR:-/tmp}}/townlight-{profile_id}-$RANDOM-$$"
 mkdir -p "$RUNROOT"
 ARCHIVE="$RUNROOT/payload.tar.gz"
-PAYLOAD_LINE=$(awk '/^__CIVICSUITE_PAYLOAD_BELOW__$/ {{ print NR + 1; exit 0; }}' "$0")
+PAYLOAD_LINE=$(awk '/^__TOWNLIGHT_PAYLOAD_BELOW__$/ {{ print NR + 1; exit 0; }}' "$0")
 if [[ -z "${{PAYLOAD_LINE:-}}" ]]; then
-  echo "Could not find the embedded CivicSuite installer payload." >&2
+  echo "Could not find the embedded Townlight installer payload." >&2
   echo "Fix: verify the downloaded file is complete, then run it again." >&2
   exit 1
 fi
 tail -n +"$PAYLOAD_LINE" "$0" > "$ARCHIVE"
 tar -xzf "$ARCHIVE" -C "$RUNROOT"
-launcher=$(find "$RUNROOT" -path "*/installer/generated/packages/*/linux/start-civicsuite-installer.sh" -print -quit)
+launcher=$(find "$RUNROOT" -path "*/installer/generated/packages/*/linux/start-townlight-installer.sh" -print -quit)
 if [[ -z "${{launcher:-}}" ]]; then
-  echo "CivicSuite Linux launcher was not found after extraction." >&2
+  echo "Townlight Linux launcher was not found after extraction." >&2
   echo "Fix: verify the downloaded file is complete, then run it again." >&2
   exit 1
 fi
 bash "$launcher" readiness
-if [[ "${{CIVICSUITE_ONE_CLICK_SMOKE_ONLY:-}}" == "1" ]]; then
+if [[ "${{TOWNLIGHT_ONE_CLICK_SMOKE_ONLY:-}}" == "1" ]]; then
   exit 0
 fi
 exec bash "$launcher" first-run
-__CIVICSUITE_PAYLOAD_BELOW__
+__TOWNLIGHT_PAYLOAD_BELOW__
 """
     target_path.parent.mkdir(parents=True, exist_ok=True)
     with target_path.open("wb") as handle:
@@ -3246,7 +3246,7 @@ def generate_release_artifacts(
             )
         )
         suffix = ".zip" if target_platform == "windows" else ".tar.gz"
-        archive_name = f"CivicSuite-{profile_id}-{target_platform}-{version}{suffix}"
+        archive_name = f"Townlight-{profile_id}-{target_platform}-{version}{suffix}"
         archive_path = DIST_ROOT / archive_name
         bundle_dir = _stage_release_bundle(
             profile_id=profile_id, platform_id=target_platform, package_dir=package_dir
@@ -3275,7 +3275,7 @@ def generate_release_artifacts(
             }
         )
         if target_platform == "windows":
-            installer_path = DIST_ROOT / f"CivicSuite-{profile_id}-{target_platform}-{version}.cmd"
+            installer_path = DIST_ROOT / f"Townlight-{profile_id}-{target_platform}-{version}.cmd"
             _write_windows_one_click_installer(
                 archive_path=archive_path,
                 target_path=installer_path,
@@ -3294,7 +3294,7 @@ def generate_release_artifacts(
                 }
             )
         elif target_platform == "linux":
-            installer_path = DIST_ROOT / f"CivicSuite-{profile_id}-{target_platform}-{version}.run"
+            installer_path = DIST_ROOT / f"Townlight-{profile_id}-{target_platform}-{version}.run"
             _write_linux_one_click_installer(
                 archive_path=archive_path,
                 target_path=installer_path,
@@ -3313,7 +3313,7 @@ def generate_release_artifacts(
                 }
             )
     checksum_artifacts = archives + one_click_installers
-    checksum_path = DIST_ROOT / f"CivicSuite-{profile_id}-{version}-SHA256SUMS.txt"
+    checksum_path = DIST_ROOT / f"Townlight-{profile_id}-{version}-SHA256SUMS.txt"
     checksum_path.parent.mkdir(parents=True, exist_ok=True)
     checksum_path.write_text(
         "".join(
@@ -3356,7 +3356,7 @@ def generate_release_artifacts(
         "next_action": copy["next_action"],
     }
     manifest_path = (
-        DIST_ROOT / f"CivicSuite-{profile_id}-{version}-release-manifest.json"
+        DIST_ROOT / f"Townlight-{profile_id}-{version}-release-manifest.json"
     )
     manifest_path.write_text(
         json.dumps(release_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -3658,7 +3658,7 @@ def build_install_plan(
         requested = selected_modules or []
         if not requested:
             raise PlannerError("Custom profile requires at least one selected module.")
-        requested_modules = ["civiccore", *requested]
+        requested_modules = ["townlight_core", *requested]
     else:
         if profile.get("disabled") is True:
             reason = profile.get("disabled_reason") or "profile is disabled"
@@ -3706,7 +3706,7 @@ def build_install_plan(
                 "module": module_id,
                 "display_name": module.get("display_name"),
                 "repo": module.get("repo"),
-                "civiccore_requirement": module.get("civiccore_requirement"),
+                "townlight_core_requirement": module.get("townlight_core_requirement"),
                 "proof_required": module.get("proof_required", []),
             }
         )

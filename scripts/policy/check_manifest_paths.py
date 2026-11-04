@@ -106,7 +106,7 @@ def _check_path_exists(
     p = (repo_root / value).resolve()
     # Don't allow escaping the repo root unless the manifest is naming an
     # explicit sibling target repo. target_repos is documented as a sibling
-    # repo mechanism, so rejecting ../civiccore here makes the documented
+    # repo mechanism, so rejecting ../townlight_core here makes the documented
     # multi-repo shape unusable.
     if not allow_outside_root:
         try:

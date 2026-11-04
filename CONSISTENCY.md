@@ -1,4 +1,4 @@
-<a id="civicsuite--consistency-reference"></a>
+<a id="townlight--consistency-reference"></a>
 
 # Townlight — Consistency Reference
 
@@ -37,33 +37,33 @@ Last verified: June 27, 2026.
 
 | Claim | Value | Source | Verified |
 |---|---|---|---|
-| Total product modules in catalog | **27** | `docs/CivicSuiteUnifiedSpec.md` module headings, `installer/modules.json`, and live `CivicSuite` GitHub org repo list | verified |
-| Shared platform modules | **1** (`CivicCore`) | `specs/01_catalog.md` Tier 0 and `specs/02_CivicCore.md` | verified |
+| Total product modules in catalog | **27** | `docs/TownlightUnifiedSpec.md` module headings, `installer/modules.json`, and live `Townlight` GitHub org repo list | verified |
+| Shared platform modules | **1** (`Townlight Core`) | `specs/01_catalog.md` Tier 0 and `specs/02_Townlight Core.md` | verified |
 | Total tiers in catalog | **7** (Tier 0 through Tier 6) | `specs/01_catalog.md` section headers 7–13 | ✅ |
-| Townlight Core extraction phases | **6** (Phase 0 through Phase 5) | `specs/02_CivicCore.md` §12 ("The six phases") | ✅ |
-| Townlight Records test modules (regression baseline) | **36** | `specs/02_CivicCore.md` §15 and §17 | ✅ |
-| Phase 1 scope (subsystems extracted) | **4** (User, Role, Department, audit_log) | `specs/02_CivicCore.md` §12 phase 1 row | ✅ |
-| Townlight Core directory layout subdirs | **14** (auth, audit, llm, ingest, search, connectors, notifications, onboarding, catalog, exemptions, verification, models, migrations, scaffold) | `specs/02_CivicCore.md` Appendix B | ✅ |
-| Townlight Meetings entity tables | **15** | `specs/03_civicclerk.md` §12 | ✅ |
-| Townlight Meetings REST endpoints | **25** | `specs/03_civicclerk.md` §29 | ✅ |
-| Townlight Meetings frontend pages | **20** | `specs/03_civicclerk.md` §30 | ✅ |
-| Townlight Meetings prompts | **9** | `specs/03_civicclerk.md` §17 | ✅ |
-| Townlight Meetings RBAC roles | **9** | `specs/03_civicclerk.md` §26 | ✅ |
-| Townlight Meetings connectors | **11** | `specs/03_civicclerk.md` §33 | ✅ |
-| Townlight Meetings test areas | **15** | `specs/03_civicclerk.md` §39 | ✅ |
-| Townlight Zoning entity tables | **11** | `specs/04_civiczone.md` §8 | ✅ |
-| Townlight Zoning REST endpoints | **17** | `specs/04_civiczone.md` §28 | ✅ |
-| Townlight Zoning frontend pages | **14** | `specs/04_civiczone.md` §29 | ✅ |
-| Townlight Zoning prompts | **7** | `specs/04_civiczone.md` §13 | ✅ |
-| Townlight Zoning RBAC roles | **7** | `specs/04_civiczone.md` §23 | ✅ |
-| Townlight Zoning connectors | **8** | `specs/04_civiczone.md` §32 | ✅ |
-| Townlight Zoning test areas | **13** | `specs/04_civiczone.md` §38 | ✅ |
+| Townlight Core extraction phases | **6** (Phase 0 through Phase 5) | `specs/02_Townlight Core.md` §12 ("The six phases") | ✅ |
+| Townlight Records test modules (regression baseline) | **36** | `specs/02_Townlight Core.md` §15 and §17 | ✅ |
+| Phase 1 scope (subsystems extracted) | **4** (User, Role, Department, audit_log) | `specs/02_Townlight Core.md` §12 phase 1 row | ✅ |
+| Townlight Core directory layout subdirs | **14** (auth, audit, llm, ingest, search, connectors, notifications, onboarding, catalog, exemptions, verification, models, migrations, scaffold) | `specs/02_Townlight Core.md` Appendix B | ✅ |
+| Townlight Meetings entity tables | **15** | `specs/03_townlight_meetings.md` §12 | ✅ |
+| Townlight Meetings REST endpoints | **25** | `specs/03_townlight_meetings.md` §29 | ✅ |
+| Townlight Meetings frontend pages | **20** | `specs/03_townlight_meetings.md` §30 | ✅ |
+| Townlight Meetings prompts | **9** | `specs/03_townlight_meetings.md` §17 | ✅ |
+| Townlight Meetings RBAC roles | **9** | `specs/03_townlight_meetings.md` §26 | ✅ |
+| Townlight Meetings connectors | **11** | `specs/03_townlight_meetings.md` §33 | ✅ |
+| Townlight Meetings test areas | **15** | `specs/03_townlight_meetings.md` §39 | ✅ |
+| Townlight Zoning entity tables | **11** | `specs/04_townlight_zoning.md` §8 | ✅ |
+| Townlight Zoning REST endpoints | **17** | `specs/04_townlight_zoning.md` §28 | ✅ |
+| Townlight Zoning frontend pages | **14** | `specs/04_townlight_zoning.md` §29 | ✅ |
+| Townlight Zoning prompts | **7** | `specs/04_townlight_zoning.md` §13 | ✅ |
+| Townlight Zoning RBAC roles | **7** | `specs/04_townlight_zoning.md` §23 | ✅ |
+| Townlight Zoning connectors | **8** | `specs/04_townlight_zoning.md` §32 | ✅ |
+| Townlight Zoning test areas | **13** | `specs/04_townlight_zoning.md` §38 | ✅ |
 
 ---
 
 ## 2. Module count by tier
 
-The product-module total is 27. `CivicCore` is the shared platform prerequisite and is counted separately so product-module math does not drift.
+The product-module total is 27. `Townlight Core` is the shared platform prerequisite and is counted separately so product-module math does not drift.
 
 | Tier | Name | Count | Modules |
 |---|---|---|---|
@@ -77,7 +77,7 @@ The product-module total is 27. `CivicCore` is the shared platform prerequisite 
 | **Product total** | | **27** | |
 | **Platform + product total** | | **28** | Includes Townlight Core plus all product modules |
 
-Source: `docs/CivicSuiteUnifiedSpec.md` Tier 0 through Tier 6 module headings, `installer/modules.json`, and the live `CivicSuite` GitHub org repo list checked on 2026-05-23.
+Source: `docs/TownlightUnifiedSpec.md` Tier 0 through Tier 6 module headings, `installer/modules.json`, and the live `Townlight` GitHub org repo list checked on 2026-05-23.
 
 ---
 
@@ -85,8 +85,8 @@ Source: `docs/CivicSuiteUnifiedSpec.md` Tier 0 through Tier 6 module headings, `
 
 The catalog uses two forms for some modules:
 
-- **Bare name** (`CivicCourt`, `CivicHR`, `CivicBudget`, `CivicSafety`, `CivicUtility`, `CivicProcure`, `CivicLegal`, `CivicElections`, `CivicData`, `CivicPermit`) used in tier rollout lists where context is implicit.
-- **"Assist" or "Bridge" suffix** (`CivicCourt Assist`, `CivicHR Assist`, `CivicBudget Assist`, `CivicSafety Assist`, `CivicUtility Assist`, `CivicProcure Assist`, `CivicLegal Research`, `CivicElections Assist`, `CivicData Bridge`, `CivicPermit Assist`) used when explaining scope and clarifying that the module is a copilot/bridge, not a system-of-record replacement.
+- **Bare name** (`CivicCourt`, `CivicHR`, `CivicBudget`, `CivicSafety`, `CivicUtility`, `CivicProcure`, `CivicLegal`, `CivicElections`, `CivicData`, `Townlight Permitting`) used in tier rollout lists where context is implicit.
+- **"Assist" or "Bridge" suffix** (`CivicCourt Assist`, `CivicHR Assist`, `CivicBudget Assist`, `CivicSafety Assist`, `CivicUtility Assist`, `CivicProcure Assist`, `CivicLegal Research`, `CivicElections Assist`, `CivicData Bridge`, `Townlight Permitting Assist`) used when explaining scope and clarifying that the module is a copilot/bridge, not a system-of-record replacement.
 
 Both forms are intentional and refer to the same module. The bare form is the casual reference; the suffixed form is the canonical product name. CHARTER.md uses bare forms in the do-not-spec list (which is informal); CONSISTENCY.md and the catalog tier table above use the canonical suffixed forms where they apply.
 
@@ -100,23 +100,23 @@ Every CHARTER reference to a spec section, verified against the actual spec sect
 
 | CHARTER reference | Target | Verified? |
 |---|---|---|
-| "Townlight Core Extraction Spec §8 (extraction inventory)" | `02_CivicCore.md` §8 = "The extraction inventory" | ✅ |
-| "Townlight Core Extraction Spec §9 (what stays in Townlight Records)" | `02_CivicCore.md` §9 = "What stays in Townlight Records" | ✅ |
-| "Townlight Core Extraction Spec §18 (Risks table, mitigation row 7)" | `02_CivicCore.md` §18 = "Risks and mitigations"; row 7 is "Contributor confusion about where to file a bug" → "Each repo's CONTRIBUTING.md has a 'where does this bug go' decision tree" | ✅ |
-| "Townlight Core Extraction Spec Appendix B" | `02_CivicCore.md` Appendix B = "Directory layout (civiccore repo)" | ✅ |
-| "Townlight Meetings spec §12 (Entity overview)" | `03_civicclerk.md` §12 = "Entity overview" (15 tables) | ✅ |
-| "Townlight Meetings spec §29 (REST API)" | `03_civicclerk.md` §29 = "REST API" (25 endpoints) | ✅ |
+| "Townlight Core Extraction Spec §8 (extraction inventory)" | `02_Townlight Core.md` §8 = "The extraction inventory" | ✅ |
+| "Townlight Core Extraction Spec §9 (what stays in Townlight Records)" | `02_Townlight Core.md` §9 = "What stays in Townlight Records" | ✅ |
+| "Townlight Core Extraction Spec §18 (Risks table, mitigation row 7)" | `02_Townlight Core.md` §18 = "Risks and mitigations"; row 7 is "Contributor confusion about where to file a bug" → "Each repo's CONTRIBUTING.md has a 'where does this bug go' decision tree" | ✅ |
+| "Townlight Core Extraction Spec Appendix B" | `02_Townlight Core.md` Appendix B = "Directory layout (townlight_core repo)" | ✅ |
+| "Townlight Meetings spec §12 (Entity overview)" | `03_townlight_meetings.md` §12 = "Entity overview" (15 tables) | ✅ |
+| "Townlight Meetings spec §29 (REST API)" | `03_townlight_meetings.md` §29 = "REST API" (25 endpoints) | ✅ |
 | "the catalog §16–20 (the 'what NOT to build' sections)" | `01_catalog.md` §16 = "Not a First-Wave ERP Replacement", §17 = "Not a First-Wave Utility Billing Replacement", §18 = "Not a First-Wave Permitting System of Record", §19 = "Not a CAD/RMS or Courts System", §20 = "Not a Cloud Service" | ✅ |
 
 ---
 
 ## 5. Phase 0 vs extraction inventory (avoid the trap)
 
-The Townlight Core Extraction Spec §12 defines Phase 0 as exactly: *"Create civiccore repo skeleton. Create civicsuite umbrella repo. Copy LICENSE, README, CI scaffolding. Agree on public API surface."*
+The Townlight Core Extraction Spec §12 defines Phase 0 as exactly: *"Create townlight_core repo skeleton. Create townlight umbrella repo. Copy LICENSE, README, CI scaffolding. Agree on public API surface."*
 
 The extraction inventory is **not** part of Phase 0. It is preparation work that produces the Phase 1 checklist. CHARTER.md is careful to use the phrase "extraction inventory (preparation for Phase 1)" rather than "Phase 0 inventory" when describing this work, so the labeling matches the spec.
 
-If a future doc says "Phase 0 inventory" or names the branch `civiccore-phase-0-inventory`, it has drifted. The canonical branch name in CHARTER.md is `civiccore-extraction-inventory`.
+If a future doc says "Phase 0 inventory" or names the branch `townlight_core-phase-0-inventory`, it has drifted. The canonical branch name in CHARTER.md is `townlight_core-extraction-inventory`.
 
 ---
 
@@ -124,11 +124,11 @@ If a future doc says "Phase 0 inventory" or names the branch `civiccore-phase-0-
 
 | Asset | License | Source of phrasing |
 |---|---|---|
-| Code (every repo) | Apache License 2.0 | `02_CivicCore.md` Appendix D |
-| Documentation | CC BY 4.0 | `02_CivicCore.md` Appendix D |
-| Prompt libraries (if separated) | CC BY-SA 4.0 | `02_CivicCore.md` Appendix D |
-| Third-party deps | Permissive or weak-copyleft only; AGPL and GPL-3.0 blocked | `02_CivicCore.md` Appendix D |
-| Redis | Pin `<8.0` (BSD); never SSPL releases | `02_CivicCore.md` Appendix D |
+| Code (every repo) | Apache License 2.0 | `02_Townlight Core.md` Appendix D |
+| Documentation | CC BY 4.0 | `02_Townlight Core.md` Appendix D |
+| Prompt libraries (if separated) | CC BY-SA 4.0 | `02_Townlight Core.md` Appendix D |
+| Third-party deps | Permissive or weak-copyleft only; AGPL and GPL-3.0 blocked | `02_Townlight Core.md` Appendix D |
+| Redis | Pin `<8.0` (BSD); never SSPL releases | `02_Townlight Core.md` Appendix D |
 
 Project standardized on Apache License 2.0 for code on 2026-04-23 (Scott confirmed in Townlight kickoff). Earlier drafts referenced MIT; those have been updated. The "MIT 2.0 does not exist" caveat is no longer load-bearing and was removed.
 
@@ -138,14 +138,14 @@ Project standardized on Apache License 2.0 for code on 2026-04-23 (Scott confirm
 
 | Asset | Version | Source |
 |---|---|---|
-| Default LLM | Gemma 4 (via Ollama, local) | `01_catalog.md` §3, `02_CivicCore.md` §6.1, all module specs |
+| Default LLM | Gemma 4 (via Ollama, local) | `01_catalog.md` §3, `02_Townlight Core.md` §6.1, all module specs |
 | Embeddings | nomic-embed-text (via Ollama, local) | All module specs |
-| Transcription (Townlight Meetings) | Whisper large-v3 default, configurable | `03_civicclerk.md` §19 |
-| Database | Bundled portable PostgreSQL 17 + pgvector | `installer/modules.json` (civiccore `portable-postgres` service), `docs/installer/operator-walkthrough.md` |
+| Transcription (Townlight Meetings) | Whisper large-v3 default, configurable | `03_townlight_meetings.md` §19 |
+| Database | Bundled portable PostgreSQL 17 + pgvector | `installer/modules.json` (townlight_core `portable-postgres` service), `docs/installer/operator-walkthrough.md` |
 | Local model runtime | Bundled Ollama serving the pinned Gemma 4 12B QAT model | `desktop/runtime/gemma4-model.json`, `docs/installer/operator-walkthrough.md` |
-| Desktop shell / frontend | Tauri + WebView2 (the `desktop-shell` service) | `installer/modules.json` (civiccore `tauri-webview` service), `docs/installer/operator-walkthrough.md` |
+| Desktop shell / frontend | Tauri + WebView2 (the `desktop-shell` service) | `installer/modules.json` (townlight_core `tauri-webview` service), `docs/installer/operator-walkthrough.md` |
 | City services | Embedded CPython (`bundled-python`) per module | `installer/modules.json` module `services` |
-| Task queue / workers | PostgreSQL-backed local task-queue worker (`local-worker`) | `installer/modules.json` (civiccore `task-queue` service) |
+| Task queue / workers | PostgreSQL-backed local task-queue worker (`local-worker`) | `installer/modules.json` (townlight_core `task-queue` service) |
 
 The Windows-Local desktop product does **not** ship Redis, Celery/Celery Beat,
 React, nginx, or a standalone FastAPI/Uvicorn server. Those belong only to the
@@ -162,24 +162,24 @@ stack.
 |---|---|---|
 | ADA Title II compliance — entities 50,000+ population | April 24, 2026 (deadline has passed) | DOJ ADA Title II web/mobile rule (April 2024) |
 | ADA Title II compliance — smaller entities and special districts | April 26, 2027 | same |
-| Open Meetings Act named examples | Florida §286.011 (Sunshine Law); California Brown Act; Texas Chapter 551; New York Open Meetings Law; Colorado §24-6-401 et seq. | `03_civicclerk.md` §21 |
+| Open Meetings Act named examples | Florida §286.011 (Sunshine Law); California Brown Act; Texas Chapter 551; New York Open Meetings Law; Colorado §24-6-401 et seq. | `03_townlight_meetings.md` §21 |
 
 ---
 
 ## 9. Repo names (lowercase, hyphenated where needed)
 
-- `civicsuite` (umbrella)
-- `civiccore` (shared platform package)
-- `civicrecords-ai` (existing records module — keeps the `-ai` suffix per Appendix A naming convention)
-- `civicclerk` (future)
-- `civiccode` (future)
-- `civiczone` (future)
+- `townlight` (umbrella)
+- `townlight_core` (shared platform package)
+- `townlight_records` (existing records module — keeps the `-ai` suffix per Appendix A naming convention)
+- `townlight_meetings` (future)
+- `townlight_code` (future)
+- `townlight_zoning` (future)
 - `civicregwatch` (future)
 - `civicapi` (future)
-- `civicsuite-prompts` (optional separate prompt library)
-- `civicsuite-deploy` (optional separate deployment manifests)
+- `townlight-prompts` (optional separate prompt library)
+- `townlight-deploy` (optional separate deployment manifests)
 
-Only `civicrecords-ai` keeps the `-ai` suffix; subsequent module repos drop it because suite identity carries it.
+Only `townlight_records` keeps the `-ai` suffix; subsequent module repos drop it because suite identity carries it.
 
 ---
 
@@ -192,7 +192,7 @@ These specific drifts have been introduced and fixed in this workspace's history
 3. **"Phase 0 inventory" labeling** — Phase 0 in the spec is repo skeleton only. Inventory is preparation for Phase 1, not part of Phase 0.
 4. **`.docx` vs `.md` filename references** — markdown is canonical in this workspace. Any reference to `.docx` filenames as the primary read target has drifted.
 5. **MIT vs. Apache 2.0** — project standardized on Apache 2.0 on 2026-04-23. Any new text claiming MIT for code has drifted from the current decision. The umbrella's documentation license (CC BY 4.0) and the optional prompt-library license (CC BY-SA 4.0) are unchanged.
-6. **Spec-vs-reality path drift** — Day-3 inventory (2026-04-23) found 6 places where spec 02 §8/§9 named paths in civicrecords-ai that didn't exist or had moved. Spec was updated to match reality. Future drift in either direction (renaming files in civicrecords-ai or rewriting spec paths) needs to be reconciled in the same PR.
+6. **Spec-vs-reality path drift** — Day-3 inventory (2026-04-23) found 6 places where spec 02 §8/§9 named paths in townlight_records that didn't exist or had moved. Spec was updated to match reality. Future drift in either direction (renaming files in townlight_records or rewriting spec paths) needs to be reconciled in the same PR.
 
 7. **27 product modules plus Townlight Core** - older text drifted between incompatible suite counts. The reconciled current suite has 27 product modules plus the Townlight Core shared platform. Do not collapse those into a single ambiguous count.
 

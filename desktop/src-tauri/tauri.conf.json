@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Townlight",
-  "version": "1.6.0-1",
-  "identifier": "org.civicsuite.desktop",
+  "version": "1.7.0-1",
+  "identifier": "org.townlight.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://127.0.0.1:5174",
@@ -63,7 +63,7 @@
     "windows": {
       "allowDowngrades": false,
       "wix": {
-        "upgradeCode": "a63fc1d3-5437-5f55-89a2-fef93fb1f930",
+        "upgradeCode": "77c47cc0-128e-50b0-acc1-0bdf84ac3b3c",
         "language": "en-US",
         "enableElevatedUpdateTask": false
       }

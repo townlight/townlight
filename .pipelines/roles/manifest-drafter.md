@@ -234,11 +234,11 @@ For runs that touch sibling repos in lockstep with the umbrella. Omit entirely f
 Shape (paths are relative to the umbrella repo root; sibling-repo refs use the standard parent-dir notation in YAML — shown here with `&parent;` placeholder for the documentation linter):
 ```yaml
 target_repos:
-  - path: "&parent;/civicrecords-ai"
+  - path: "&parent;/townlight_records"
     allowed_paths:
       - README.md
       - USER-MANUAL.md
-  - path: "&parent;/civicclerk"
+  - path: "&parent;/townlight_meetings"
     allowed_paths:
       - README.md
 ```

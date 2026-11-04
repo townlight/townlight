@@ -10,11 +10,11 @@ Branch:
 
 Base:
 
-- `CivicSuite/civicsuite` `main` at `b1193a6d400d4c9245ccb6a65faa0cd8a56c26a4`
+- `Townlight/townlight` `main` at `b1193a6d400d4c9245ccb6a65faa0cd8a56c26a4`
 
 Local worktree:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29`
 
 ## Planned Slices
 
@@ -30,12 +30,12 @@ Status: In progress
 
 Changed files:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\city-core-stage-execution-process.md`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\city-core-stage-execution-process.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
 
 Audit-lite report:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-1-stage-process-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-1-stage-process-2026-05-30.md`
 
 Local checks:
 
@@ -51,12 +51,12 @@ Status: In progress
 
 Changed files:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
 
 Audit-lite report:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-2-pre-push-enforcement-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-2-pre-push-enforcement-2026-05-30.md`
 
 Local checks:
 
@@ -73,16 +73,16 @@ Status: In progress
 
 Changed files:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\policy\check_stage_evidence.py`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\policy\test_check_stage_evidence_contract.py`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\policy\run_all.py`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\.github\workflows\verify.yml`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\.agent-runs\2026-05-30-stage-1-live-gate-policy-harness\workflow-cost-ledger.md`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\policy\check_stage_evidence.py`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\policy\test_check_stage_evidence_contract.py`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\policy\run_all.py`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\.github\workflows\verify.yml`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\.agent-runs\2026-05-30-stage-1-live-gate-policy-harness\workflow-cost-ledger.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
 
 Audit-lite report:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-3-ci-policy-evidence-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-3-ci-policy-evidence-2026-05-30.md`
 
 Local checks:
 
@@ -103,12 +103,12 @@ Status: In progress
 
 Changed files:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\scripts\hooks\pre-push.ps1`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
 
 Audit-lite report:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-4-hook-ci-parity-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-4-hook-ci-parity-2026-05-30.md`
 
 Local checks:
 
@@ -126,11 +126,11 @@ Status: In progress
 
 Changed files:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\stages\stage-1-live-gate-policy-harness-2026-05-30.md`
 
 Audit-lite report:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-5-ledger-closeout-2026-05-30.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-lite-stage-1-slice-5-ledger-closeout-2026-05-30.md`
 
 Local checks:
 
@@ -144,7 +144,7 @@ Pushed commit:
 
 Audit-full package:
 
-- `C:\dev\Claude\CivicSuite-live-install-fix-2026-05-29\docs\process\audits\audit-full-stage-1-live-gate-policy-harness-2026-05-30\00-executive-audit.md`
+- `C:\dev\Claude\Townlight-live-install-fix-2026-05-29\docs\process\audits\audit-full-stage-1-live-gate-policy-harness-2026-05-30\00-executive-audit.md`
 
 PR:
 

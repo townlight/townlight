@@ -1,5 +1,5 @@
 /* =============================================================================
-   CivicSuite design tokens — SINGLE SOURCE OF TRUTH
+   Townlight design tokens — SINGLE SOURCE OF TRUTH
    -----------------------------------------------------------------------------
    Palette: light civic / navy / warm gold. "Modern public infrastructure."
 
@@ -10,7 +10,7 @@
      See docs/design/windows-desktop-design-control.md.
 
    CONSUMPTION (offline binaries cannot @import at runtime)
-     Consumers VENDOR a generated copy of this file, pinned to a civiccore
+     Consumers VENDOR a generated copy of this file, pinned to a townlight_core
      version, and a CI --check gate fails the build if the vendored copy drifts.
      - Desktop app (Tauri/WebView2): desktop/src/styles.css consumes a vendored copy.
      - Prototype (docs/design/ui-ux-prototype/styles.css) consumes a vendored copy.

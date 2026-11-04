@@ -1,1 +1,1 @@
-C:/dev/Codex/civiccore/dist/civiccore-1.2.0-py3-none-any.whl
+C:/dev/Codex/townlight_core/dist/townlight_core-1.2.0-py3-none-any.whl

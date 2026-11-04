@@ -23,11 +23,12 @@ def test_committed_state_and_legacy_projections_pass() -> None:
     assert suite_state.validate_all() == []
 
 
-def test_catalog_has_28_stable_townlight_names_with_unique_legacy_ids() -> None:
+def test_catalog_has_11_kept_townlight_modules_with_unique_technical_ids() -> None:
     state = _load(suite_state.STATE_PATH)
     modules = state["modules"]
     assert isinstance(modules, dict)
-    assert len(modules) == 28
+    assert len(modules) == 11
+    assert "station" in modules
     assert set(state["module_order"]) == set(modules)
     assert all(
         module["public_name"].startswith("Townlight") for module in modules.values()
@@ -41,21 +42,19 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     records = state["products"]["records"]
     assert records["public_name"] == "Townlight Records"
     assert records["modules"] == ["core", "records", "notice", "access"]
-    assert records["status"] == "public-beta"
-    assert records["public_website_status"] == "published"
-    assert state["desktop_release"]["tag"] == "townlight-records-meetings-code-zoning-v1.4.0-beta.1"
-    assert state["desktop_release"]["commit"] == "5b22235f88a45da6e33fe7075654f724609a3921"
+    assert records["status"] == "candidate"
+    assert records["public_website_status"] == "prepared; unpublished candidate"
+    assert state["desktop_release"]["version"] == "1.7.0-1"
+    assert state["desktop_release"]["channel"] == "candidate"
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 
 
-def test_spec_only_modules_have_no_runtime_identity() -> None:
+def test_retired_foundations_are_absent_from_current_catalog() -> None:
     state = _load(suite_state.STATE_PATH)
-    for module_id in ("regulatory-watch", "api"):
-        module = state["modules"][module_id]
-        assert module["repository"] is None
-        assert set(module["versions"].values()) == {None}
-        assert module["maturity"]["availability"] == "spec-only"
+    for module_id in ("regulatory-watch", "api", "procurement", "boards", "grants"):
+        assert module_id not in state["modules"]
+        assert all(module_id not in profile["modules"] for profile in state["profiles"].values())
 
 
 def test_unknown_dependency_is_rejected() -> None:
@@ -84,12 +83,12 @@ def test_installer_version_drift_is_rejected() -> None:
     installer = copy.deepcopy(_load(suite_state.INSTALLER_PATH))
     public_status = _load(suite_state.PUBLIC_STATUS_PATH)
     module = next(
-        item for item in installer["modules"] if item["id"] == "civicrecords-ai"
+        item for item in installer["modules"] if item["id"] == "townlight_records"
     )
     module["current_version"] = "9.9.9"
     errors = suite_state.compare_legacy_sources(state, installer, public_status)
     assert any(
-        "installer.modules.civicrecords-ai.current_version" in error for error in errors
+        "installer.modules.townlight_records.current_version" in error for error in errors
     )
 
 
@@ -98,12 +97,12 @@ def test_public_status_maturity_drift_is_rejected() -> None:
     installer = _load(suite_state.INSTALLER_PATH)
     public_status = copy.deepcopy(_load(suite_state.PUBLIC_STATUS_PATH))
     module = next(
-        item for item in public_status["modules"] if item["id"] == "civicnotice"
+        item for item in public_status["modules"] if item["id"] == "townlight_notice"
     )
     module["public_status"]["grade"] = "foundation"
     errors = suite_state.compare_legacy_sources(state, installer, public_status)
     assert any(
-        "public_status.modules.civicnotice.public_status.grade" in error
+        "public_status.modules.townlight_notice.public_status.grade" in error
         for error in errors
     )
 
@@ -139,14 +138,15 @@ def test_json_schema_constraints_are_enforced() -> None:
 
 def test_duplicate_legacy_aliases_are_rejected() -> None:
     state = copy.deepcopy(_load(suite_state.STATE_PATH))
-    state["modules"]["access"]["legacy"]["product_names"] = ["CivicSunshine"]
-    state["modules"]["access"]["legacy"]["package_names"] = ["civicrecords-ai"]
-    state["modules"]["access"]["repository"]["aliases"] = ["CivicSuite/civicrecords-ai"]
+    state["modules"]["access"]["legacy"]["product_names"] = ["Townlight Records"]
+    state["modules"]["access"]["legacy"]["package_names"] = ["townlight-records"]
+    state["modules"]["core"]["repository"]["aliases"] = ["townlight/duplicate-test"]
+    state["modules"]["access"]["repository"]["aliases"] = ["townlight/duplicate-test"]
 
     errors = suite_state.validate_state(state)
 
-    assert any("duplicate alias CivicSunshine" in error for error in errors)
-    assert any("duplicate alias civicrecords-ai" in error for error in errors)
+    assert any("duplicate alias Townlight Records" in error for error in errors)
+    assert any("duplicate alias townlight-records" in error for error in errors)
     assert any(
-        "duplicate alias CivicSuite/civicrecords-ai" in error for error in errors
+        "duplicate alias townlight/duplicate-test" in error for error in errors
     )

@@ -3,9 +3,9 @@
 Status: package evidence for the Clerk-Core public-use starter release.
 
 Scope: regenerated unsigned public-use starter archives for the Clerk-Core starter profile
-after CivicClerk main `45eaccfcc69dd1ae7e2e45d7badd5d188b49397d` merged the
-staff-session-gated protected API loading fix. This evidence covers CivicCore,
-CivicRecords AI, CivicClerk, and the CivicSuite installer package path only.
+after Townlight Meetings main `45eaccfcc69dd1ae7e2e45d7badd5d188b49397d` merged the
+staff-session-gated protected API loading fix. This evidence covers Townlight Core,
+Townlight Records, Townlight Meetings, and the Townlight installer package path only.
 
 This document supports the Clerk-Core public-use starter release. It does not
 claim city-ready status for the full suite, production hosting certification,
@@ -20,7 +20,7 @@ Command:
 python scripts\plan-installer.py --profile clerk-core --generate-release-artifacts --installer-version 0.1.0
 ```
 
-Release manifest: `installer/dist/CivicSuite-clerk-core-0.1.0-release-manifest.json`
+Release manifest: `installer/dist/Townlight-clerk-core-0.1.0-release-manifest.json`
 
 Archive hygiene: passed. The manifest rejects `.agent-runs`, runtime proof
 folders, virtualenvs, caches, node modules, Playwright reports, test results,
@@ -29,13 +29,13 @@ and installer reports from release archives.
 SHA256 checksums:
 
 ```text
-93ea78ce038f7bae28f146497ab0b2567df0f8c08b546a0e1aa526b53edac4c7  CivicSuite-clerk-core-windows-0.1.0.zip
-c7023a4105f58ac8f066678bb8d2bbfcce29c19121e39a867b416e0525ac67c2  CivicSuite-clerk-core-macos-0.1.0.tar.gz
-7a07e148efc6f5d69cbfd397823779072df28d715527a3421f7fbb08101e9db4  CivicSuite-clerk-core-linux-0.1.0.tar.gz
+93ea78ce038f7bae28f146497ab0b2567df0f8c08b546a0e1aa526b53edac4c7  Townlight-clerk-core-windows-0.1.0.zip
+c7023a4105f58ac8f066678bb8d2bbfcce29c19121e39a867b416e0525ac67c2  Townlight-clerk-core-macos-0.1.0.tar.gz
+7a07e148efc6f5d69cbfd397823779072df28d715527a3421f7fbb08101e9db4  Townlight-clerk-core-linux-0.1.0.tar.gz
 ```
 
 Signing status: unsigned public-use starter. Operators must verify SHA256 checksums and
-the official CivicSuite release source before running package commands.
+the official Townlight release source before running package commands.
 
 Native installer status: wrapper manifests generated; signed native installers
 were not built.
@@ -47,7 +47,7 @@ Run id: `local-windows-package-lifecycle-public-use-v010-final3`
 Command:
 
 ```powershell
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-windows-0.1.0.zip --platform windows --run-id local-windows-package-lifecycle-public-use-v010-final3 --staff-mode bearer --workflow-proof
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-windows-0.1.0.zip --platform windows --run-id local-windows-package-lifecycle-public-use-v010-final3 --staff-mode bearer --workflow-proof
 ```
 
 Result: passed.
@@ -72,13 +72,13 @@ Lifecycle modes:
 | uninstall | passed |
 
 Workflow proof: requested and passed during the installed lifecycle. The proof
-covered CivicRecords AI request/search/review/response and CivicClerk
+covered Townlight Records request/search/review/response and Townlight Meetings
 agenda/packet/minutes/vote/notice/archive paths.
 
-Backup proof: both CivicRecords AI and CivicClerk emitted
+Backup proof: both Townlight Records and Townlight Meetings emitted
 `postgres_backup_dump` steps.
 
-Restore proof: both CivicRecords AI and CivicClerk emitted
+Restore proof: both Townlight Records and Townlight Meetings emitted
 `restore_probe_pg_restore` steps.
 
 ## macOS Beta-Level Package Check
@@ -88,7 +88,7 @@ Run id: `local-macos-package-skipinstall-public-use-v010-final3`
 Command:
 
 ```powershell
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-macos-0.1.0.tar.gz --platform macos --run-id local-macos-package-skipinstall-public-use-v010-final3 --skip-install
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-macos-0.1.0.tar.gz --platform macos --run-id local-macos-package-skipinstall-public-use-v010-final3 --skip-install
 ```
 
 Result: passed.
@@ -108,7 +108,7 @@ Run id: `local-linux-package-skipinstall-public-use-v010-final3`
 Command:
 
 ```powershell
-python scripts\run-installer-package-cleanroom.py --archive installer\dist\CivicSuite-clerk-core-linux-0.1.0.tar.gz --platform linux --run-id local-linux-package-skipinstall-public-use-v010-final3 --skip-install
+python scripts\run-installer-package-cleanroom.py --archive installer\dist\Townlight-clerk-core-linux-0.1.0.tar.gz --platform linux --run-id local-linux-package-skipinstall-public-use-v010-final3 --skip-install
 ```
 
 Result: passed.
@@ -122,9 +122,9 @@ final promotion SHA.
 
 ## Starter Repo Release Verifiers
 
-### CivicClerk
+### Townlight Meetings
 
-Source PR: CivicSuite/civicclerk#161.
+Source PR: Townlight/townlight_meetings#161.
 
 Merged source SHA: `45eaccfcc69dd1ae7e2e45d7badd5d188b49397d`.
 
@@ -134,7 +134,7 @@ Local command:
 bash scripts/verify-release.sh
 ```
 
-Result: passed before merge on the source-fix branch. CivicClerk main CI then
+Result: passed before merge on the source-fix branch. Townlight Meetings main CI then
 passed after the squash merge.
 
 Proof summary:
@@ -149,7 +149,7 @@ Proof summary:
 - Package build, SHA256 generation, runtime install proof, and release contract
   passed.
 
-### CivicRecords AI
+### Townlight Records
 
 Checked branch: `master` at `5fa6b9843e32b6bbe6cc885ffdd4339310f139f2`.
 

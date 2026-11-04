@@ -10,9 +10,11 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod notice_client;
 mod permitting_client;
 mod planning_client;
 mod profile_gate;
+mod profile_identity;
 mod records_authority;
 mod supervisor;
 mod workflows;
@@ -232,12 +234,14 @@ fn city_work_action_module_requirement(
         | "sign-minutes"
         | "record-closed-session"
         | "export-meeting-packet"
-        | "archive-meeting" => Some((vec!["civicclerk"], false)),
-        "civicnotice-calculate-deadline"
-        | "civicnotice-complete-checklist"
-        | "civicnotice-post-notice"
-        | "civicnotice-export-archive-packet" => Some((vec!["civicclerk", "civicnotice"], false)),
-        "record-adopted-legislation" => Some((vec!["civicclerk", "civiccode"], false)),
+        | "archive-meeting" => Some((vec!["townlight_meetings"], false)),
+        "townlight_notice-calculate-deadline"
+        | "townlight_notice-complete-checklist"
+        | "townlight_notice-post-notice"
+        | "townlight_notice-export-archive-packet" => {
+            Some((vec!["townlight_meetings", "townlight_notice"], false))
+        }
+        "record-adopted-legislation" => Some((vec!["townlight_meetings", "townlight_code"], false)),
         "create-records-request"
         | "load-demo-town"
         | "submit-public-records-request"
@@ -264,7 +268,7 @@ fn city_work_action_module_requirement(
         | "export-records-response"
         | "fulfill-records-request"
         | "close-records-request"
-        | "mark-notification-sent" => Some((vec!["civicrecords-ai"], false)),
+        | "mark-notification-sent" => Some((vec!["townlight_records"], false)),
         "import-code-source"
         | "record-codifier-sync"
         | "record-codifier-sync-failure"
@@ -276,14 +280,14 @@ fn city_work_action_module_requirement(
         | "publish-code-source"
         | "unpublish-code-source"
         | "create-code-handoff"
-        | "answer-code-question" => Some((vec!["civiccode"], false)),
+        | "answer-code-question" => Some((vec!["townlight_code"], false)),
         "search-city-knowledge" => Some((
             vec![
-                "civicclerk",
-                "civicrecords-ai",
-                "civiccode",
-                "civicnotice",
-                "civicaccess",
+                "townlight_meetings",
+                "townlight_records",
+                "townlight_code",
+                "townlight_notice",
+                "townlight_access",
             ],
             true,
         )),
@@ -291,28 +295,33 @@ fn city_work_action_module_requirement(
             .and_then(|value| value.get("folder"))
             .and_then(Value::as_str)
         {
-            Some("meetings") => Some((vec!["civicclerk"], false)),
-            Some("records") => Some((vec!["civicrecords-ai"], false)),
-            Some("code") => Some((vec!["civiccode"], false)),
-            Some("notice") => Some((vec!["civicnotice"], false)),
-            Some("access") => Some((vec!["civicaccess"], false)),
-            Some("planning") => Some((vec!["civicplan"], false)),
-            Some("permitting") => Some((vec!["civicpermit"], false)),
-            Some("inspections") => Some((vec!["civicinspect"], false)),
+            Some("meetings") => Some((vec!["townlight_meetings"], false)),
+            Some("records") => Some((vec!["townlight_records"], false)),
+            Some("code") => Some((vec!["townlight_code"], false)),
+            Some("notice") => Some((vec!["townlight_notice"], false)),
+            Some("access") => Some((vec!["townlight_access"], false)),
+            Some("planning") => Some((vec!["townlight_planning"], false)),
+            Some("permitting") => Some((vec!["townlight_permitting"], false)),
+            Some("inspections") => Some((vec!["townlight_inspections"], false)),
             _ => Some((
-                vec!["civicclerk", "civicrecords-ai", "civiccode", "civicnotice"],
+                vec![
+                    "townlight_meetings",
+                    "townlight_records",
+                    "townlight_code",
+                    "townlight_notice",
+                ],
                 true,
             )),
         },
         "accessibility-review"
-        | "civicaccess-records-export"
-        | "civicaccess-delete-review"
-        | "civicaccess-plain-language"
-        | "civicaccess-language-variant"
-        | "civicaccess-form-plan"
-        | "civicaccess-publishing-workflow"
-        | "civicaccess-ada-title-ii"
-        | "civicaccess-tagged-pdf" => Some((vec!["civicaccess"], false)),
+        | "townlight_access-records-export"
+        | "townlight_access-delete-review"
+        | "townlight_access-plain-language"
+        | "townlight_access-language-variant"
+        | "townlight_access-form-plan"
+        | "townlight_access-publishing-workflow"
+        | "townlight_access-ada-title-ii"
+        | "townlight_access-tagged-pdf" => Some((vec!["townlight_access"], false)),
         _ => None,
     }
 }
@@ -331,11 +340,11 @@ fn module_display_name(module_id: &str) -> String {
 
 fn module_exports_folder(module_id: &str) -> Option<(&'static str, &'static str)> {
     match module_id {
-        "civicclerk" => Some(("meetings", "meeting exports")),
-        "civicrecords-ai" => Some(("records", "records exports")),
-        "civiccode" => Some(("code", "code exports")),
-        "civicnotice" => Some(("notice", "notice exports")),
-        "civicaccess" => Some(("access", "accessibility/records exports")),
+        "townlight_meetings" => Some(("meetings", "meeting exports")),
+        "townlight_records" => Some(("records", "records exports")),
+        "townlight_code" => Some(("code", "code exports")),
+        "townlight_notice" => Some(("notice", "notice exports")),
+        "townlight_access" => Some(("access", "accessibility/records exports")),
         _ => None,
     }
 }
@@ -589,7 +598,7 @@ async fn supervisor_action(
 }
 
 fn picked_file_path_for_desktop() -> Result<Option<String>, String> {
-    if let Ok(path) = std::env::var("CIVICSUITE_TEST_FILE_PICKER_PATH") {
+    if let Ok(path) = std::env::var("TOWNLIGHT_TEST_FILE_PICKER_PATH") {
         let trimmed = path.trim();
         return Ok(if trimmed.is_empty() {
             None
@@ -613,7 +622,7 @@ fn picked_file_path_for_desktop() -> Result<Option<String>, String> {
 }
 
 fn picked_folder_path_for_desktop() -> Result<Option<String>, String> {
-    if let Ok(path) = std::env::var("CIVICSUITE_TEST_FOLDER_PICKER_PATH") {
+    if let Ok(path) = std::env::var("TOWNLIGHT_TEST_FOLDER_PICKER_PATH") {
         let trimmed = path.trim();
         return Ok(if trimmed.is_empty() {
             None
@@ -838,6 +847,28 @@ async fn access_domain_request(
 }
 
 #[tauri::command]
+async fn notice_domain_request(
+    request: notice_client::NoticeRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+    require_role_for_city_work(&access, "townlight_notice-complete-checklist", None)
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "townlight_notice")
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
+    notice_client::execute(request, proof).await
+}
+
+#[tauri::command]
 async fn suite_domain_request(
     request: domain_client::SuiteRequest,
 ) -> Result<Value, domain_client::DomainError> {
@@ -936,7 +967,7 @@ async fn zoning_domain_request(
     if !selection
         .enabled_module_ids
         .iter()
-        .any(|id| id == "civiczone")
+        .any(|id| id == "townlight_zoning")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -961,7 +992,7 @@ async fn zoning_public_request(
     if !selection
         .enabled_module_ids
         .iter()
-        .any(|id| id == "civiczone")
+        .any(|id| id == "townlight_zoning")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -977,7 +1008,7 @@ fn planning_capability(staff: bool) -> Result<String, domain_client::DomainError
     ) || !selection
         .enabled_module_ids
         .iter()
-        .any(|id| id == "civicplan")
+        .any(|id| id == "townlight_planning")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -1013,7 +1044,7 @@ fn permitting_capability() -> Result<String, domain_client::DomainError> {
     ) || !selection
         .enabled_module_ids
         .iter()
-        .any(|id| id == "civicpermit")
+        .any(|id| id == "townlight_permitting")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -1036,7 +1067,7 @@ fn inspections_capability() -> Result<String, domain_client::DomainError> {
         || !selection
             .enabled_module_ids
             .iter()
-            .any(|id| id == "civicinspect")
+            .any(|id| id == "townlight_inspections")
     {
         return Err(domain_client::DomainError::denied());
     }
@@ -1179,6 +1210,10 @@ async fn city_work_action(
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(|_| {
+            profile_identity::prepare().map_err(std::io::Error::other)?;
+            Ok(())
+        })
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             // A second launch was attempted. Do NOT start a second process that
             // would concurrently read-modify-write the system-of-record files.
@@ -1210,6 +1245,7 @@ pub fn run() {
             records_domain_request,
             records_public_request,
             access_domain_request,
+            notice_domain_request,
             suite_domain_request,
             meetings_domain_request,
             code_domain_request,
@@ -1242,13 +1278,13 @@ mod tests {
     fn with_clean_first_run_state<T>(test: impl FnOnce(PathBuf) -> T) -> T {
         let _guard = first_run::test_env_lock().lock().expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-app-state-test-{}",
+            "townlight-desktop-app-state-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }
@@ -1313,7 +1349,12 @@ mod tests {
     fn records_beta_modules_are_reported_installed() {
         module_registry::validate_default_registry().expect("module registry contract validates");
         let modules = module_summaries().expect("module registry parses");
-        for module_id in ["civiccore", "civicrecords-ai", "civicnotice", "civicaccess"] {
+        for module_id in [
+            "townlight_core",
+            "townlight_records",
+            "townlight_notice",
+            "townlight_access",
+        ] {
             let module = modules
                 .iter()
                 .find(|candidate| candidate.id == module_id)
@@ -1323,7 +1364,7 @@ mod tests {
                 "{module_id} should be installed in records-beta"
             );
         }
-        for module_id in ["civicclerk", "civiccode"] {
+        for module_id in ["townlight_meetings", "townlight_code"] {
             let module = modules
                 .iter()
                 .find(|candidate| candidate.id == module_id)
@@ -1487,7 +1528,7 @@ mod tests {
             create_first_admin();
 
             let signed_out_result =
-                module_action("disable-module".to_string(), "civiccode".to_string());
+                module_action("disable-module".to_string(), "townlight_code".to_string());
 
             assert!(signed_out_result.is_err());
             assert!(signed_out_result
@@ -1496,46 +1537,51 @@ mod tests {
                 .contains("Sign in as the Townlight admin"));
 
             sign_in_as_first_admin();
-            let disabled = module_action("disable-module".to_string(), "civiccode".to_string())
-                .expect("module disable allowed");
+            let disabled =
+                module_action("disable-module".to_string(), "townlight_code".to_string())
+                    .expect("module disable allowed");
             assert!(disabled.accepted);
             assert_eq!(disabled.status, "Module disabled");
             assert!(disabled
                 .selection
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(!disabled
                 .selection
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             assert!(disabled
                 .modules
                 .iter()
-                .any(|module| module.id == "civiccode" && module.installed && !module.enabled));
+                .any(|module| module.id == "townlight_code"
+                    && module.installed
+                    && !module.enabled));
 
-            let enabled = module_action("enable-module".to_string(), "civiccode".to_string())
+            let enabled = module_action("enable-module".to_string(), "townlight_code".to_string())
                 .expect("module enable allowed");
             assert!(enabled
                 .selection
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
 
-            let current = module_action("update-module".to_string(), "civiccode".to_string())
+            let current = module_action("update-module".to_string(), "townlight_code".to_string())
                 .expect("module update check allowed");
             assert_eq!(current.status, "Module current");
             assert!(current.message.contains("pinned version"));
 
-            let opened_exports =
-                module_action("open-module-exports".to_string(), "civiccode".to_string())
-                    .expect("module exports open");
+            let opened_exports = module_action(
+                "open-module-exports".to_string(),
+                "townlight_code".to_string(),
+            )
+            .expect("module exports open");
             assert_eq!(opened_exports.status, "Module exports opened");
             assert!(opened_exports.message.contains("code exports"));
             assert!(root.join("Data").join("exports").join("code").is_dir());
 
-            let removed = module_action("remove-module".to_string(), "civiccode".to_string())
+            let removed = module_action("remove-module".to_string(), "townlight_code".to_string())
                 .expect("module remove allowed");
             assert_eq!(removed.status, "Module removed");
             assert!(removed.message.contains("verified profile backup"));
@@ -1544,7 +1590,7 @@ mod tests {
                 .selection
                 .installed_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
             let backup_count = fs::read_dir(root.join("Backups"))
                 .expect("backup root exists")
                 .filter(|entry| {
@@ -1556,22 +1602,25 @@ mod tests {
                 .count();
             assert_eq!(backup_count, 1);
 
-            let removed_exports =
-                module_action("open-module-exports".to_string(), "civiccode".to_string());
+            let removed_exports = module_action(
+                "open-module-exports".to_string(),
+                "townlight_code".to_string(),
+            );
             assert!(removed_exports.is_err());
             assert!(removed_exports
                 .err()
                 .expect("removed module export error")
                 .contains("is not installed in this local profile"));
 
-            let installed = module_action("install-module".to_string(), "civiccode".to_string())
-                .expect("module install allowed");
+            let installed =
+                module_action("install-module".to_string(), "townlight_code".to_string())
+                    .expect("module install allowed");
             assert_eq!(installed.status, "Module installed");
             assert!(installed
                 .selection
                 .enabled_module_ids
                 .iter()
-                .any(|module_id| module_id == "civiccode"));
+                .any(|module_id| module_id == "townlight_code"));
         });
     }
 
@@ -1580,20 +1629,20 @@ mod tests {
         with_clean_first_run_state(|_| {
             create_first_admin();
             env::set_var(
-                "CIVICSUITE_TEST_FILE_PICKER_PATH",
+                "TOWNLIGHT_TEST_FILE_PICKER_PATH",
                 r"C:\City\Records\packet.pdf",
             );
             let signed_out = choose_file_path();
-            env::remove_var("CIVICSUITE_TEST_FILE_PICKER_PATH");
+            env::remove_var("TOWNLIGHT_TEST_FILE_PICKER_PATH");
             assert!(signed_out.is_err());
 
             sign_in_as_first_admin();
             env::set_var(
-                "CIVICSUITE_TEST_FILE_PICKER_PATH",
+                "TOWNLIGHT_TEST_FILE_PICKER_PATH",
                 r"C:\City\Records\packet.pdf",
             );
             let picked = choose_file_path().expect("signed-in file picker");
-            env::remove_var("CIVICSUITE_TEST_FILE_PICKER_PATH");
+            env::remove_var("TOWNLIGHT_TEST_FILE_PICKER_PATH");
 
             assert_eq!(picked.as_deref(), Some(r"C:\City\Records\packet.pdf"));
         });
@@ -1603,29 +1652,29 @@ mod tests {
     fn choose_folder_path_allows_first_run_then_requires_local_admin() {
         with_clean_first_run_state(|_| {
             env::set_var(
-                "CIVICSUITE_TEST_FOLDER_PICKER_PATH",
+                "TOWNLIGHT_TEST_FOLDER_PICKER_PATH",
                 r"C:\City\TownlightData",
             );
             let first_run_folder = choose_folder_path().expect("pre-admin folder picker");
-            env::remove_var("CIVICSUITE_TEST_FOLDER_PICKER_PATH");
+            env::remove_var("TOWNLIGHT_TEST_FOLDER_PICKER_PATH");
             assert_eq!(first_run_folder.as_deref(), Some(r"C:\City\TownlightData"));
 
             create_first_admin();
             env::set_var(
-                "CIVICSUITE_TEST_FOLDER_PICKER_PATH",
+                "TOWNLIGHT_TEST_FOLDER_PICKER_PATH",
                 r"C:\City\TownlightBackups",
             );
             let signed_out = choose_folder_path();
-            env::remove_var("CIVICSUITE_TEST_FOLDER_PICKER_PATH");
+            env::remove_var("TOWNLIGHT_TEST_FOLDER_PICKER_PATH");
             assert!(signed_out.is_err());
 
             sign_in_as_first_admin();
             env::set_var(
-                "CIVICSUITE_TEST_FOLDER_PICKER_PATH",
+                "TOWNLIGHT_TEST_FOLDER_PICKER_PATH",
                 r"C:\City\TownlightBackups",
             );
             let picked = choose_folder_path().expect("admin folder picker");
-            env::remove_var("CIVICSUITE_TEST_FOLDER_PICKER_PATH");
+            env::remove_var("TOWNLIGHT_TEST_FOLDER_PICKER_PATH");
 
             assert_eq!(picked.as_deref(), Some(r"C:\City\TownlightBackups"));
         });
@@ -1761,8 +1810,8 @@ mod tests {
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            module_action("disable-module".to_string(), "civiccode".to_string())
-                .expect("civiccode disabled");
+            module_action("disable-module".to_string(), "townlight_code".to_string())
+                .expect("townlight_code disabled");
 
             let code_payload = serde_json::json!({
                 "title": "Backyard Chicken Rules",
@@ -1781,11 +1830,16 @@ mod tests {
     }
 
     #[test]
-    fn civicaccess_only_profile_can_still_reach_search_city_knowledge() {
+    fn townlight_access_only_profile_can_still_reach_search_city_knowledge() {
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            for m in ["civiccode", "civicnotice", "civicclerk", "civicrecords-ai"] {
+            for m in [
+                "townlight_code",
+                "townlight_notice",
+                "townlight_meetings",
+                "townlight_records",
+            ] {
                 module_action("disable-module".to_string(), m.to_string()).unwrap();
             }
             require_enabled_city_modules("search-city-knowledge", None)
@@ -1805,7 +1859,7 @@ mod tests {
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            module_action("disable-module".to_string(), "civiccode".to_string()).unwrap();
+            module_action("disable-module".to_string(), "townlight_code".to_string()).unwrap();
             let mut result = CityWorkActionResult {
                 accepted: true,
                 action: "search-city-knowledge".into(),
@@ -1814,7 +1868,7 @@ mod tests {
                 next_action: String::new(),
                 state: CityWorkState::default(),
                 search_results: vec![workflows::SearchResult {
-                    module_id: "civiccode".into(),
+                    module_id: "townlight_code".into(),
                     record_id: "synthetic".into(),
                     title: "Synthetic".into(),
                     snippet: String::new(),

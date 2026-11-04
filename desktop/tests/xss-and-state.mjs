@@ -529,7 +529,7 @@ function finishedBase() {
 // ===========================================================================
 // T15 — a blocked (not-ready) module shows a plain-English reason, and the raw
 //   contract string is kept only as a hover tooltip, not visible text (C6).
-//   Renders the first-run 'modules' step in custom mode where civiczone is blocked.
+//   Renders the first-run 'modules' step in custom mode where townlight_zoning is blocked.
 // ===========================================================================
 {
   const modulesSteps = t.fallbackState.first_run.steps.map((step) => ({
@@ -538,7 +538,7 @@ function finishedBase() {
   }));
   const app = {
     ...t.fallbackState,
-    modules: t.fallbackState.modules.map(module => module.id === "civiczone" ? {...module, contract_ready:false, blocked_reason:"Module civiczone must target Townlight Core 1.2.0 for Windows Local 1.0"} : module),
+    modules: t.fallbackState.modules.map(module => module.id === "townlight_zoning" ? {...module, contract_ready:false, blocked_reason:"Module townlight_zoning must target Townlight Core 1.2.0 for Windows Local 1.0"} : module),
     first_run: {
       ...t.fallbackState.first_run,
       finished: false,
@@ -548,7 +548,7 @@ function finishedBase() {
   };
   invokeImpl = async (cmd) => (cmd === "get_app_state" ? app : {});
   await t.loadAppState();
-  t.state.moduleDraft.profileId = "custom"; // show the full selectable list incl. blocked civiczone
+  t.state.moduleDraft.profileId = "custom"; // show the full selectable list incl. blocked townlight_zoning
   const wiz = t.renderFirstRunWizard();
 
   if (!wiz.includes("not available in this release yet")) {
@@ -556,10 +556,10 @@ function finishedBase() {
   }
   // The raw contract string may appear ONLY inside a title="" tooltip, never as
   // the visible <small> body text.
-  if (!wiz.includes('title="Module civiczone must target Townlight Core 1.2.0 for Windows Local 1.0"')) {
+  if (!wiz.includes('title="Module townlight_zoning must target Townlight Core 1.2.0 for Windows Local 1.0"')) {
     fail("T15b: the raw contract reason must be preserved as a hover tooltip for support");
   }
-  if (wiz.includes("- Not ready for Windows Local 1.0: Module civiczone")) {
+  if (wiz.includes("- Not ready for Windows Local 1.0: Module townlight_zoning")) {
     fail("T15c: the raw contract string must NOT be shown as visible module body text");
   }
 }
@@ -599,7 +599,7 @@ function finishedBase() {
       demo_fixture: {
         fixture_id: "redstone-valley-records-demo",
         fixture_version: "1.0.0",
-        fixture_sha256: "a9c242a3f2618a69d7effb1d0d17d2df06f6744c8c351bba4065d315c94575b4",
+        fixture_sha256: "d9aaa79403cfca2711e8031439fbab8bf9f70a20b8afc293faef8edd683ffbd6",
         municipality_name: "Town of Redstone Valley (Fictional)",
         watermark: "SYNTHETIC DEMONSTRATION DATA - NOT A REAL MUNICIPAL RECORD",
         loaded_at_unix_seconds: 1786992000

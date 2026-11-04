@@ -11,14 +11,14 @@ const outputDir = resolve(
 const targets = [
   { name: "suite-launcher", url: "http://127.0.0.1:4179/" },
   { name: "records-ai", url: "http://127.0.0.1:4173/" },
-  { name: "civicclerk", url: "http://127.0.0.1:4180/" },
-  { name: "civiccode", url: "http://127.0.0.1:5174/civiccode/app/" },
+  { name: "townlight_meetings", url: "http://127.0.0.1:4180/" },
+  { name: "townlight_code", url: "http://127.0.0.1:5174/townlight_code/app/" },
 ];
 
 function loadPlaywright() {
   const candidates = [
-    "../civicrecords-ai/frontend/package.json",
-    "../civicclerk/frontend/package.json",
+    "../townlight_records/frontend/package.json",
+    "../townlight_meetings/frontend/package.json",
   ];
   for (const candidate of candidates) {
     try {
@@ -28,7 +28,7 @@ function loadPlaywright() {
       // Try the next module tree.
     }
   }
-  throw new Error("Could not load playwright from Records AI or CivicClerk node_modules.");
+  throw new Error("Could not load playwright from Records AI or TownlightMeetings node_modules.");
 }
 
 const { chromium } = loadPlaywright();

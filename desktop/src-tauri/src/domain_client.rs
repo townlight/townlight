@@ -368,6 +368,7 @@ pub enum AccessRequest {
     Review { payload: AccessReview },
     DeleteReview { review_id: Uuid },
     ExportReview { review_id: Uuid },
+    ExportDraft { draft_id: Uuid },
     Tool { payload: AccessTool },
     Rewrite { payload: AccessRewrite },
 }
@@ -429,37 +430,21 @@ pub struct AccessReview {
 }
 
 pub async fn execute_access(request: AccessRequest, proof: String) -> Result<Value, DomainError> {
-    match request {
+    let export_path = match &request {
         AccessRequest::ExportReview { review_id } => {
-            let plan = send(
-                Method::POST,
-                format!("/desktop/v1/access/reviews/{review_id}/export"),
-                None,
-                &proof,
-            )
-            .await?;
-            let plan: crate::domain_files::ArtifactPlan =
-                serde_json::from_value(plan).map_err(|_| DomainError::transport(true))?;
-            let artifact_id = plan.artifact_id;
-            let path = tauri::async_runtime::spawn_blocking(move || {
-                crate::domain_files::write_access_export(plan)
-            })
-            .await
-            .map_err(|_| DomainError::transport(true))?
-            .map_err(|_| {
-                DomainError::new(
-                    "export-incomplete",
-                    "Access export was not finalized. Prepared evidence is retained.",
-                    true,
-                )
-            })?;
-            send(
-                Method::POST,
-                format!("/desktop/v1/access/exports/{artifact_id}/complete"),
-                Some(serde_json::json!({"export_path":path})),
-                &proof,
-            )
-            .await
+            Some(format!("/desktop/v1/access/reviews/{review_id}/export"))
+        }
+        AccessRequest::ExportDraft { draft_id } => {
+            Some(format!("/desktop/v1/access/drafts/{draft_id}/export"))
+        }
+        _ => None,
+    };
+    if let Some(path) = export_path {
+        return execute_access_export(path, proof).await;
+    }
+    match request {
+        AccessRequest::ExportReview { .. } | AccessRequest::ExportDraft { .. } => {
+            Err(DomainError::transport(false))
         }
         AccessRequest::Tool { payload } => {
             send(
@@ -559,6 +544,32 @@ pub async fn execute_access(request: AccessRequest, proof: String) -> Result<Val
             .await
         }
     }
+}
+
+async fn execute_access_export(path: String, proof: String) -> Result<Value, DomainError> {
+    let plan = send(Method::POST, path, None, &proof).await?;
+    let plan: crate::domain_files::ArtifactPlan =
+        serde_json::from_value(plan).map_err(|_| DomainError::transport(true))?;
+    let artifact_id = plan.artifact_id;
+    let path = tauri::async_runtime::spawn_blocking(move || {
+        crate::domain_files::write_access_export(plan)
+    })
+    .await
+    .map_err(|_| DomainError::transport(true))?
+    .map_err(|_| {
+        DomainError::new(
+            "export-incomplete",
+            "Access export was not finalized. Prepared evidence is retained.",
+            true,
+        )
+    })?;
+    send(
+        Method::POST,
+        format!("/desktop/v1/access/exports/{artifact_id}/complete"),
+        Some(serde_json::json!({"export_path":path})),
+        &proof,
+    )
+    .await
 }
 
 #[derive(Deserialize)]

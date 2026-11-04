@@ -105,7 +105,7 @@ mod tests {
     }
 
     fn tmp_path(name: &str) -> std::path::PathBuf {
-        std::env::temp_dir().join(format!("civicsuite-atomic-{}-{}", std::process::id(), name))
+        std::env::temp_dir().join(format!("townlight-atomic-{}-{}", std::process::id(), name))
     }
 
     #[test]

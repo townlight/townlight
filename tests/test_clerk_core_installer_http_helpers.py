@@ -60,7 +60,7 @@ def test_cleanup_orphan_compose_project_removes_labeled_resources(monkeypatch) -
     monkeypatch.setattr(installer, "docker_command", lambda: "docker")
     monkeypatch.setattr(installer, "run", fake_run)
 
-    result = installer.cleanup_orphan_compose_project("civicsuite-test-clerk")
+    result = installer.cleanup_orphan_compose_project("townlight-test-clerk")
 
     assert result["status"] == "removed_or_absent"
     assert ["docker", "rm", "-f", "container-a"] in commands
@@ -74,21 +74,21 @@ def test_uninstall_uses_orphan_cleanup_when_source_tree_is_missing(monkeypatch, 
     cleanup_projects: list[str] = []
     isolation = {
         "ports": {
-            "civicrecords-ai": {"api": 18000, "web": 18080},
-            "civicclerk": {"api": 18776, "web": 18081},
-            "civiccode": {"api": 18820},
-            "civicnotice": {"api": 18866},
+            "townlight_records": {"api": 18000, "web": 18080},
+            "townlight_meetings": {"api": 18776, "web": 18081},
+            "townlight_code": {"api": 18820},
+            "townlight_notice": {"api": 18866},
             "suite-launcher": {"web": 18082},
         },
         "compose_projects": {
-            "civicrecords-ai": "civicsuite-test-records",
-            "civicclerk": "civicsuite-test-clerk",
-            "civiccode": "civicsuite-test-code",
-            "civicnotice": "civicsuite-test-notice",
+            "townlight_records": "townlight-test-records",
+            "townlight_meetings": "townlight-test-clerk",
+            "townlight_code": "townlight-test-code",
+            "townlight_notice": "townlight-test-notice",
         },
         "isolation_id": "test",
         "port_offset": 0,
-        "shared_network": "civicsuite-test-citycore",
+        "shared_network": "townlight-test-citycore",
     }
 
     def fake_cleanup(project: str) -> dict[str, object]:
@@ -109,18 +109,18 @@ def test_uninstall_uses_orphan_cleanup_when_source_tree_is_missing(monkeypatch, 
         install_root,
         isolation=isolation,
         report_dir=tmp_path / "reports",
-        selected_modules=["civicclerk"],
+        selected_modules=["townlight_meetings"],
     )
 
     assert result["status"] == "passed"
-    assert cleanup_projects == ["civicsuite-test-clerk"]
+    assert cleanup_projects == ["townlight-test-clerk"]
     assert result["steps"][0]["status"] == "skipped_not_selected"
     assert result["steps"][1]["status"] == "source_missing_orphan_cleanup"
 
 
 def test_normalize_clerk_frontend_dockerfile_installs_rolldown_musl_binding(tmp_path) -> None:
     installer = _load_installer_module()
-    source = tmp_path / "civicclerk"
+    source = tmp_path / "townlight_meetings"
     frontend = source / "frontend"
     frontend.mkdir(parents=True)
     (source / "Dockerfile.frontend").write_text(
@@ -158,11 +158,11 @@ def test_normalize_clerk_frontend_dockerfile_installs_rolldown_musl_binding(tmp_
     assert dockerfile.index(install_line) < dockerfile.index("RUN npm run build")
 
 
-def test_civicnotice_is_part_of_city_core_installer_lifecycle(monkeypatch, tmp_path) -> None:
+def test_townlight_notice_is_part_of_city_core_installer_lifecycle(monkeypatch, tmp_path) -> None:
     installer = _load_installer_module()
     monkeypatch.setattr(installer, "ROOT", tmp_path)
     install_root = tmp_path / "runtime" / "city-core"
-    isolation = installer.resolve_isolation(run_id="test-civicnotice-default", port_offset=0)
+    isolation = installer.resolve_isolation(run_id="test-townlight_notice-default", port_offset=0)
 
     default_ctx = installer.lifecycle_context(install_root, isolation, selected_modules=None)
     city_core_ctx = installer.lifecycle_context(
@@ -180,13 +180,13 @@ def test_civicnotice_is_part_of_city_core_installer_lifecycle(monkeypatch, tmp_p
     assert installer.MODULE_NOTICE not in installer.DEFAULT_SELECTED_MODULES
     assert installer.MODULE_NOTICE not in default_ctx["selected_modules"]
     assert installer.MODULE_NOTICE in city_core_ctx["selected_modules"]
-    assert city_core_ctx["notice_source"] == install_root / "sources" / "civicnotice"
-    assert city_core_ctx["notice_project"] == isolation["compose_projects"]["civicnotice"]
+    assert city_core_ctx["notice_source"] == install_root / "sources" / "townlight_notice"
+    assert city_core_ctx["notice_project"] == isolation["compose_projects"]["townlight_notice"]
 
 
-def test_civicnotice_database_contract_uses_generated_env(tmp_path) -> None:
+def test_townlight_notice_database_contract_uses_generated_env(tmp_path) -> None:
     installer = _load_installer_module()
-    notice_source = tmp_path / "sources" / "civicnotice"
+    notice_source = tmp_path / "sources" / "townlight_notice"
     notice_source.mkdir(parents=True)
     (notice_source / ".env").write_text(
         "POSTGRES_USER=notice_user\n"
@@ -195,21 +195,21 @@ def test_civicnotice_database_contract_uses_generated_env(tmp_path) -> None:
     )
     ctx = {
         "notice_source": notice_source,
-        "notice_project": "civicsuite-test-notice",
+        "notice_project": "townlight-test-notice",
     }
 
     contract = installer.module_database_contract(ctx, installer.MODULE_NOTICE)
 
     assert contract["source"] == notice_source
-    assert contract["project"] == "civicsuite-test-notice"
+    assert contract["project"] == "townlight-test-notice"
     assert contract["postgres_service"] == "postgres"
     assert contract["postgres_user"] == "notice_user"
     assert contract["postgres_db"] == "notice_db"
 
 
-def test_civicnotice_generated_compose_has_parseable_healthcheck(tmp_path) -> None:
+def test_townlight_notice_generated_compose_has_parseable_healthcheck(tmp_path) -> None:
     installer = _load_installer_module()
-    notice_source = tmp_path / "sources" / "civicnotice"
+    notice_source = tmp_path / "sources" / "townlight_notice"
     notice_source.mkdir(parents=True)
 
     installer.write_notice_compose(notice_source)

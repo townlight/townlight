@@ -5,7 +5,7 @@ title: "[docs] "
 labels: documentation
 ---
 
-> **Module-specific documentation issues** belong on the module repo. If you found a doc problem in `civicrecords-ai` or `civiccore`, file there.
+> **Module-specific documentation issues** belong on the module repo. If you found a doc problem in `townlight_records` or `townlight_core`, file there.
 
 ## What kind of issue?
 

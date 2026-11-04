@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-  <title>CivicSuite clerk-core</title>
+  <title>Townlight clerk-core</title>
   <options customize="never" require-scripts="false"/>
   <domains enable_anywhere="true"/>
-  <pkg-ref id="gov.civicsuite.clerk-core" version="0.1.0">CivicSuite-clerk-core.pkg</pkg-ref>
+  <pkg-ref id="gov.townlight.clerk-core" version="0.1.0">Townlight-clerk-core.pkg</pkg-ref>
   <choices-outline>
     <line choice="default"/>
   </choices-outline>
-  <choice id="default" title="CivicSuite clerk-core">
-    <pkg-ref id="gov.civicsuite.clerk-core"/>
+  <choice id="default" title="Townlight clerk-core">
+    <pkg-ref id="gov.townlight.clerk-core"/>
   </choice>
 </installer-gui-script>

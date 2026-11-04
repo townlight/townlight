@@ -47,7 +47,7 @@
       "kind": "python-services",
       "required": true,
       "binary": "runtime/python/python.exe",
-      "args": ["-m", "civicsuite_runtime.services"],
+      "args": ["-m", "townlight_runtime.services"],
       "health": {
         "kind": "http",
         "endpoint": "http://127.0.0.1:15480/health"
@@ -58,11 +58,11 @@
     {
       "id": "task-queue",
       "label": "Background work queue",
-      "admin_label": "PostgreSQL-backed CivicCore task queue",
+      "admin_label": "PostgreSQL-backed TownlightCore task queue",
       "kind": "postgres-task-queue",
       "required": true,
       "binary": "runtime/python/python.exe",
-      "args": ["-m", "civiccore.tasks.worker", "--backend", "postgres"],
+      "args": ["-m", "townlight_core.tasks.worker", "--backend", "postgres"],
       "health": {
         "kind": "supervisor",
         "service": "task-queue"
@@ -88,11 +88,11 @@
     {
       "id": "file-storage",
       "label": "Local document storage",
-      "admin_label": "CivicSuite local file storage",
+      "admin_label": "Townlight local file storage",
       "kind": "file-storage",
       "required": true,
       "binary": "runtime/python/python.exe",
-      "args": ["-m", "civicsuite_runtime.storage"],
+      "args": ["-m", "townlight_runtime.storage"],
       "health": {
         "kind": "filesystem",
         "path": "{data_dir}/files"

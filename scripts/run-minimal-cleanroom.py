@@ -1,4 +1,4 @@
-"""Run the generated minimal CivicCore kit in a disposable Linux container."""
+"""Run the generated minimal TownlightCore kit in a disposable Linux container."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED_KIT = ROOT / "installer" / "generated" / "minimal"
 REPORT_ROOT = ROOT / "installer" / "reports"
-WHEEL = ROOT.parent / "civiccore" / "dist" / "civiccore-1.0.0-py3-none-any.whl"
+WHEEL = ROOT.parent / "townlight_core" / "dist" / "townlight_core-1.0.0-py3-none-any.whl"
 
 
 def make_run_id() -> str:
@@ -46,14 +46,14 @@ def prepare_cleanroom(run_root: Path) -> dict[str, Path]:
     shutil.copy2(WHEEL, wheel_target)
 
     container_wheel = f"/cleanroom/artifacts/{WHEEL.name}"
-    install_sh = kit_target / "install-civiccore.sh"
+    install_sh = kit_target / "install-townlight_core.sh"
     requirements = kit_target / "requirements.txt"
-    plan = kit_target / "civiccore-install-plan.json"
-    old_path = "/mnt/c/dev/Claude/civiccore/dist/civiccore-1.0.0-py3-none-any.whl"
+    plan = kit_target / "townlight_core-install-plan.json"
+    old_path = "/mnt/c/dev/Claude/townlight_core/dist/townlight_core-1.0.0-py3-none-any.whl"
     replace_text(install_sh, old_path, container_wheel)
     requirements.write_text(f"{container_wheel}\n", encoding="utf-8", newline="\n")
     plan_data = json.loads(plan.read_text(encoding="utf-8"))
-    plan_data["civiccore"]["cleanroom_artifact"] = container_wheel
+    plan_data["townlight_core"]["cleanroom_artifact"] = container_wheel
     plan_data["cleanroom"] = {
         "runner": "scripts/run-minimal-cleanroom.py",
         "container_mount": "/cleanroom",
@@ -76,7 +76,7 @@ def run_container(*, run_root: Path, image: str) -> subprocess.CompletedProcess[
         image,
         "bash",
         "-lc",
-        "bash kit/reset-civiccore.sh && bash kit/install-civiccore.sh && bash kit/verify-civiccore.sh",
+        "bash kit/reset-townlight_core.sh && bash kit/install-townlight_core.sh && bash kit/verify-townlight_core.sh",
     ]
     return subprocess.run(
         command,
@@ -99,7 +99,7 @@ def main() -> int:
     if not GENERATED_KIT.is_dir():
         return fail("Generated minimal kit is missing. Run plan-installer.py --profile minimal --generate-install-kit first.")
     if not WHEEL.is_file():
-        return fail(f"CivicCore wheel is missing: {WHEEL}")
+        return fail(f"TownlightCore wheel is missing: {WHEEL}")
 
     run_id = args.run_id or make_run_id()
     run_root = REPORT_ROOT / run_id / "cleanroom"
@@ -109,14 +109,14 @@ def main() -> int:
     proof = {
         "run_id": run_id,
         "profile": "minimal",
-        "module": "civiccore",
+        "module": "townlight_core",
         "image": args.image,
         "mutates_host": False,
         "mutates_container": True,
         "generated_kit_source": str(GENERATED_KIT.relative_to(ROOT)),
         "cleanroom_root": str(run_root.relative_to(ROOT)),
         "prepared_files": {key: str(path.relative_to(ROOT)) for key, path in prepared.items()},
-        "command": "bash kit/reset-civiccore.sh && bash kit/install-civiccore.sh && bash kit/verify-civiccore.sh",
+        "command": "bash kit/reset-townlight_core.sh && bash kit/install-townlight_core.sh && bash kit/verify-townlight_core.sh",
         "returncode": proc.returncode,
         "stdout": proc.stdout,
         "stderr": proc.stderr,

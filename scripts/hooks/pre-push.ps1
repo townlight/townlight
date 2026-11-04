@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 # SPDX-License-Identifier: Apache-2.0
 <#
-Blocks pushes when the CivicSuite stage branch is in an unsafe state.
+Blocks pushes when the Townlight stage branch is in an unsafe state.
 
 This hook is intentionally small and deterministic. It does not replace the
 required audit-lite/audit-full process; it catches the recoverability failures

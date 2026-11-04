@@ -11,7 +11,7 @@
   "default_locations": {
     "install_root": "{local_app_data}/CivicSuite",
     "data_root": "{local_app_data}/CivicSuite/Data",
-    "backup_root": "{documents}/CivicSuite Backups"
+    "backup_root": "{documents}/Townlight Backups"
   },
   "actions": [
     "choose-location",

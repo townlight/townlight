@@ -1,4 +1,4 @@
-<a id="civicsuite-suite-installer-plan"></a>
+<a id="townlight-suite-installer-plan"></a>
 
 # Townlight Suite Installer Plan
 
@@ -97,7 +97,7 @@ The first profile package generator is:
 `python scripts/plan-installer.py --profile clerk-core --generate-profile-package`.
 It writes Windows, macOS, and Linux package directories under
 `installer/generated/packages/{profile}` with a platform README, resolved
-`install-plan.json`, and a `start-civicsuite-installer` entrypoint. Readiness
+`install-plan.json`, and a `start-townlight-installer` entrypoint. Readiness
 and plan modes are non-mutating. Gate mode is intentionally mutating and runs
 the current cleanroom gate. These profile packages are the operator UX package
 that future native installers should wrap; they are not native OS installers
@@ -138,7 +138,7 @@ a replacement for full Windows/macOS/Linux VM lifecycle evidence, but it is the
 fastest repeatable clean baseline for the Townlight Core-only package layer.
 
 The first service cleanroom proof uses
-`python scripts/run-civicrecords-cleanroom.py --run-id manual-civicrecords-service-cleanroom-4`
+`python scripts/run-townlight_records-cleanroom.py --run-id manual-townlight_records-service-cleanroom-4`
 to copy Townlight Records into an evidence workspace, start an isolated Docker
 Compose project on high ports, verify API and frontend health, run live
 Playwright desktop/mobile smoke checks, save screenshots, and tear the stack
@@ -245,7 +245,7 @@ Existing useful inputs:
 - `deploy/post-foundation-demo.compose.yml`
 - `scripts/verify-deployment-profile.py`
 - `scripts/verify-suite-state.py`
-- `civicrecords-ai/installer/windows`
+- `townlight_records/installer/windows`
 
 Those are inputs, not the suite installer. The suite installer must remain
 umbrella-level and profile-driven.
@@ -306,7 +306,7 @@ The first platform launchers exist as dry-run wrappers only:
 - `bash installer/linux/plan-installer.sh --profile clerk-core --generate-profile-package`
 - `bash installer/linux/plan-installer.sh --profile clerk-core --generate-release-artifacts`
 - `python scripts/run-minimal-cleanroom.py --run-id manual-minimal-linux-cleanroom-2`
-- `python scripts/run-civicrecords-cleanroom.py --run-id manual-civicrecords-service-cleanroom-4`
+- `python scripts/run-townlight_records-cleanroom.py --run-id manual-townlight_records-service-cleanroom-4`
 - `python scripts/plan-installer.py --profile clerk-core --run-cleanroom-proof --run-id manual-clerk-core-integrated-proof`
 - `python scripts/plan-installer.py --profile clerk-core --run-cleanroom-gate --run-id verify-clerk-core-gate`
 

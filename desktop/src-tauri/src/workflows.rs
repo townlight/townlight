@@ -777,7 +777,7 @@ pub struct CityWorkState {
     #[serde(default)]
     pub notification_events: Vec<NotificationEvent>,
     #[serde(default)]
-    pub access: CivicAccessState,
+    pub access: TownlightAccessState,
 }
 
 impl Default for CityWorkState {
@@ -796,17 +796,17 @@ impl Default for CityWorkState {
             audit_entries: Vec::new(),
             publication_events: Vec::new(),
             notification_events: Vec::new(),
-            access: CivicAccessState::default(),
+            access: TownlightAccessState::default(),
         }
     }
 }
 
 #[derive(Deserialize, Serialize, Clone, Default)]
-pub struct CivicAccessState {
+pub struct TownlightAccessState {
     #[serde(default)]
     pub reviews: Vec<StoredAccessibilityReview>,
     #[serde(default)]
-    pub audit_events: Vec<CivicAccessAuditEvent>,
+    pub audit_events: Vec<TownlightAccessAuditEvent>,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -846,7 +846,7 @@ pub struct StoredAccessibilityReview {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub struct CivicAccessAuditEvent {
+pub struct TownlightAccessAuditEvent {
     pub event_id: String,
     pub action: String,
     pub subject_id: Option<String>,
@@ -1178,7 +1178,7 @@ pub(crate) fn city_work_public_projection(state: &CityWorkState) -> CityWorkStat
             .cloned()
             .collect(),
         notification_events: Vec::new(),
-        access: CivicAccessState::default(),
+        access: TownlightAccessState::default(),
     }
 }
 
@@ -1215,13 +1215,13 @@ mod tests {
             .lock()
             .expect("test env lock");
         let root = env::temp_dir().join(format!(
-            "civicsuite-desktop-workflows-test-{}",
+            "townlight-desktop-workflows-test-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
-        env::set_var("CIVICSUITE_DESKTOP_STATE_DIR", &root);
+        env::set_var("TOWNLIGHT_DESKTOP_STATE_DIR", &root);
         let result = test(root.clone());
-        env::remove_var("CIVICSUITE_DESKTOP_STATE_DIR");
+        env::remove_var("TOWNLIGHT_DESKTOP_STATE_DIR");
         let _ = fs::remove_dir_all(root);
         result
     }

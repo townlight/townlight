@@ -15,13 +15,13 @@ small municipalities. It also orders connector work by risk:
 4. Vendor-specific integrations where high-value.
 5. Write-back connectors only after read/import paths are stable and audited.
 
-Most CivicSuite modules now have v0.1.0 runtime foundations. The next risk is
+Most Townlight modules now have v0.1.0 runtime foundations. The next risk is
 every module inventing its own connector shape. That would make imports harder
 to test, exports harder to archive, and write-back boundaries easier to blur.
 
 ## Decision
 
-CivicSuite will standardize connector work around a three-phase boundary:
+Townlight will standardize connector work around a three-phase boundary:
 
 1. **Read/import first.** Modules may ingest local files, CSV files, GeoJSON,
    ZIP bundles, or vendor exports. These paths must be repeatable, auditable,
@@ -48,10 +48,10 @@ must not weaken the safety boundary.
 
 ## Non-Goals
 
-- This ADR does not define a CivicCore connector runtime API.
+- This ADR does not define a Townlight Core connector runtime API.
 - This ADR does not approve live vendor write-back.
 - This ADR does not require every v0.1.0 module to implement imports now.
-- This ADR does not make CivicSuite a system of record for ERP, permitting,
+- This ADR does not make Townlight a system of record for ERP, permitting,
   courts, utilities, elections, public safety, or finance systems.
 
 ## Verification Expectations

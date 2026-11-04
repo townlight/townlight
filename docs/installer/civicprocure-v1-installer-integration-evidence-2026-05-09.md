@@ -12,14 +12,14 @@ module release.
 ## Scope
 
 Controlled shared-infrastructure exception for the active CivicProcure v1.0.0
-release. This evidence covers only CivicSuite installer/module-selection
+release. This evidence covers only Townlight installer/module-selection
 metadata and verifier assertions. No queued module product code was changed.
 
 ## Installer Contract
 
 - `installer/modules.json` marks `civicprocure` selectable.
-- `civicprocure` requires CivicCore `1.0.0`.
-- `civicprocure` depends on `civiccore`.
+- `civicprocure` requires Townlight Core `1.0.0`.
+- `civicprocure` depends on `townlight_core`.
 - `civicprocure` remains included in `full-suite`.
 - `civicprocure` proof requirements now include module selection, install plan,
   artifact resolution, health check, and restart.
@@ -33,10 +33,10 @@ metadata and verifier assertions. No queued module product code was changed.
 `scripts/verify-installer-plan.py` now asserts:
 
 - the menu model exposes CivicProcure as selectable,
-- the CivicProcure selector requires CivicCore `1.0.0`,
+- the CivicProcure selector requires Townlight Core `1.0.0`,
 - a custom CivicProcure plan includes `civicprocure`,
-- a custom CivicProcure plan includes `civiccore`,
-- the CivicProcure install action requires CivicCore `1.0.0`,
+- a custom CivicProcure plan includes `townlight_core`,
+- the CivicProcure install action requires Townlight Core `1.0.0`,
 - the CivicProcure install action includes all v1 proof requirements.
 
 ## Verification Commands
@@ -54,7 +54,7 @@ python scripts\verify-suite-state.py
 
 The custom CivicProcure plan must resolve:
 
-- `modules`: `civiccore`, `civicprocure`
+- `modules`: `townlight_core`, `civicprocure`
 - CivicProcure version: `1.0.0`
 - CivicProcure latest local tag after tag fetch: `v1.0.0`
 - CivicProcure artifacts:
@@ -66,11 +66,11 @@ The custom CivicProcure plan must resolve:
 
 ## Verification Result
 
-The custom plan reports one inherited local artifact warning for CivicCore
+The custom plan reports one inherited local artifact warning for Townlight Core
 checksum metadata:
 
 ```text
-civiccore: no local SHA256SUMS.txt found in standard artifact paths
+townlight_core: no local SHA256SUMS.txt found in standard artifact paths
 ```
 
 That warning is not a CivicProcure blocker. CivicProcure v1.0.0 artifact

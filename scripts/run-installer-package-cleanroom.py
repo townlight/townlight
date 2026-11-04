@@ -1,4 +1,4 @@
-"""Extract a CivicSuite release archive and run the installer lifecycle."""
+"""Extract a Townlight release archive and run the installer lifecycle."""
 
 from __future__ import annotations
 
@@ -21,27 +21,27 @@ REPORT_ROOT = ROOT / "installer" / "reports"
 DEFAULT_MIN_CLEANROOM_FREE_DISK_GB = 60
 BYTES_PER_GB = 1024 * 1024 * 1024
 PLATFORM_LAUNCHERS = {
-    "linux": Path("installer/generated/packages/clerk-core/linux/start-civicsuite-installer.sh"),
-    "macos": Path("installer/generated/packages/clerk-core/macos/start-civicsuite-installer.sh"),
-    "windows": Path("installer/generated/packages/clerk-core/windows/start-civicsuite-installer.ps1"),
+    "linux": Path("installer/generated/packages/clerk-core/linux/start-townlight-installer.sh"),
+    "macos": Path("installer/generated/packages/clerk-core/macos/start-townlight-installer.sh"),
+    "windows": Path("installer/generated/packages/clerk-core/windows/start-townlight-installer.ps1"),
 }
 LAUNCHER_NAMES = {
-    "linux": "start-civicsuite-installer.sh",
-    "macos": "start-civicsuite-installer.sh",
-    "windows": "start-civicsuite-installer.ps1",
+    "linux": "start-townlight-installer.sh",
+    "macos": "start-townlight-installer.sh",
+    "windows": "start-townlight-installer.ps1",
 }
 
 
 def minimum_cleanroom_free_disk_gb() -> int:
-    value = os.environ.get("CIVICSUITE_CLEANROOM_MIN_FREE_GB")
+    value = os.environ.get("TOWNLIGHT_CLEANROOM_MIN_FREE_GB")
     if not value:
         return DEFAULT_MIN_CLEANROOM_FREE_DISK_GB
     try:
         parsed = int(value)
     except ValueError as exc:
-        raise RuntimeError("CIVICSUITE_CLEANROOM_MIN_FREE_GB must be a positive integer.") from exc
+        raise RuntimeError("TOWNLIGHT_CLEANROOM_MIN_FREE_GB must be a positive integer.") from exc
     if parsed <= 0:
-        raise RuntimeError("CIVICSUITE_CLEANROOM_MIN_FREE_GB must be a positive integer.")
+        raise RuntimeError("TOWNLIGHT_CLEANROOM_MIN_FREE_GB must be a positive integer.")
     return parsed
 DEPENDENCY_GATE_MARKERS = (
     "toomanyrequests",
@@ -399,7 +399,7 @@ def dependency_gate_message(steps: list[dict[str, object]]) -> str | None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run a cleanroom installer package lifecycle.")
-    parser.add_argument("--archive", default=str(ROOT / "installer" / "dist" / "CivicSuite-clerk-core-linux-0.1.0.tar.gz"))
+    parser.add_argument("--archive", default=str(ROOT / "installer" / "dist" / "Townlight-clerk-core-linux-0.1.0.tar.gz"))
     parser.add_argument("--platform", choices=sorted(PLATFORM_LAUNCHERS), default=None)
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--skip-install", action="store_true", help="Only verify archive extraction, readiness, and plan.")
@@ -433,7 +433,7 @@ def main() -> int:
     hygiene_ok, hygiene = cleanroom_hygiene(
         report_dir=report_dir,
         allow_host_cleanup=args.allow_host_cleanup
-        or os.environ.get("CIVICSUITE_CLEANROOM_HOST_CLEANUP_APPROVED") == "1",
+        or os.environ.get("TOWNLIGHT_CLEANROOM_HOST_CLEANUP_APPROVED") == "1",
     )
     if not hygiene_ok:
         proof = {
@@ -468,9 +468,9 @@ def main() -> int:
     lifecycle_requested = (not args.skip_install) or args.gate
     lifecycle_blocked = lifecycle_requested and not host_platform_matches_target
     launcher_env = os.environ.copy()
-    launcher_env["CIVICSUITE_INSTALLER_RUN_ID"] = run_id
+    launcher_env["TOWNLIGHT_INSTALLER_RUN_ID"] = run_id
     if platform == "windows" and host_platform_matches_target:
-        launcher_env["CIVICSUITE_INSTALLER_INSTALL_ROOT"] = str(bundle_root / "r")
+        launcher_env["TOWNLIGHT_INSTALLER_INSTALL_ROOT"] = str(bundle_root / "r")
     modes = ["readiness", "plan"]
     if lifecycle_requested and not lifecycle_blocked:
         modes.extend(["preclean", "install", "repair", "verify", "backup", "restore", "uninstall"])
@@ -573,7 +573,7 @@ def main() -> int:
         "requested_mutating_lifecycle": lifecycle_requested,
         "workflow_proof_requested": args.workflow_proof,
         "workflow_proof_modes": workflow_proof_modes,
-        "civicclerk_staff_mode": args.staff_mode,
+        "townlight_meetings_staff_mode": args.staff_mode,
         "dependency_gate": {
             "blocked": dependency_gate is not None,
             "message": dependency_gate,
@@ -582,8 +582,8 @@ def main() -> int:
         "lifecycle_isolation": {
             "run_id": run_id,
             "environment": {
-                "CIVICSUITE_INSTALLER_RUN_ID": run_id,
-                "CIVICSUITE_INSTALLER_INSTALL_ROOT": launcher_env.get("CIVICSUITE_INSTALLER_INSTALL_ROOT"),
+                "TOWNLIGHT_INSTALLER_RUN_ID": run_id,
+                "TOWNLIGHT_INSTALLER_INSTALL_ROOT": launcher_env.get("TOWNLIGHT_INSTALLER_INSTALL_ROOT"),
             },
             "resolved_modes": lifecycle_summaries,
         },

@@ -15,7 +15,7 @@ RUNTIME_ROOT = (
 )
 sys.path.insert(0, str(RUNTIME_ROOT))
 
-from civicsuite_runtime import services
+from townlight_runtime import services
 
 
 def test_records_beta_is_the_default_embedded_runtime_profile(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -24,10 +24,10 @@ def test_records_beta_is_the_default_embedded_runtime_profile(monkeypatch: pytes
     profile = services._product_profile()
     assert profile == "records-beta"
     assert services._required_module_imports(profile) == [
-        ("civiccore", "civiccore"),
-        ("civicrecords-ai", "app.main"),
-        ("civicnotice", "civicnotice.main"),
-        ("civicaccess", "civicaccess.main"),
+        ("townlight_core", "townlight_core"),
+        ("townlight_records", "townlight_records.main"),
+        ("townlight_notice", "townlight_notice.main"),
+        ("townlight_access", "townlight_access.main"),
     ]
 
 
@@ -35,12 +35,12 @@ def test_city_core_is_an_explicit_compatibility_profile(monkeypatch: pytest.Monk
     monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "city-core")
 
     assert services._required_module_imports(services._product_profile()) == [
-        ("civiccore", "civiccore"),
-        ("civicrecords-ai", "app.main"),
-        ("civicnotice", "civicnotice.main"),
-        ("civicaccess", "civicaccess.main"),
-        ("civicclerk", "civicclerk.main"),
-        ("civiccode", "civiccode.main"),
+        ("townlight_core", "townlight_core"),
+        ("townlight_records", "townlight_records.main"),
+        ("townlight_notice", "townlight_notice.main"),
+        ("townlight_access", "townlight_access.main"),
+        ("townlight_meetings", "townlight_meetings.main"),
+        ("townlight_code", "townlight_code.main"),
     ]
 
 
@@ -54,14 +54,14 @@ def test_unknown_embedded_runtime_profile_fails_closed(monkeypatch: pytest.Monke
 def test_meetings_profile_adds_meetings_without_enabling_code(monkeypatch):
     monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "meetings-beta")
     modules = services._required_module_imports(services._product_profile())
-    assert modules == services.RECORDS_BETA_MODULE_IMPORTS + [("civicclerk", "civicclerk.main")]
+    assert modules == services.RECORDS_BETA_MODULE_IMPORTS + [("townlight_meetings", "townlight_meetings.main")]
 
 
 def test_runtime_hosts_real_records_app_without_activating_writes(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
 
     monkeypatch.setenv("TESTING", "1")
-    monkeypatch.setenv("CIVICSUITE_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TOWNLIGHT_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "records-beta")
     monkeypatch.setattr(services, "health_payload", lambda: {"status": "ok", "local_only": True})
     app = services.create_runtime_app()
@@ -81,7 +81,7 @@ def test_runtime_domain_readiness_is_not_an_import_health_result(monkeypatch, tm
     from fastapi.testclient import TestClient
 
     monkeypatch.setenv("TESTING", "1")
-    monkeypatch.setenv("CIVICSUITE_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TOWNLIGHT_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv(services.PRODUCT_PROFILE_ENV, "records-beta")
     monkeypatch.setattr(services, "health_payload", lambda: {"status": "ok", "local_only": True})
     monkeypatch.setattr(services, "_domain_database_status", lambda: {
@@ -96,7 +96,7 @@ def test_runtime_domain_readiness_is_not_an_import_health_result(monkeypatch, tm
 
 
 def test_native_runtime_refuses_non_loopback_bind(monkeypatch):
-    monkeypatch.setenv("CIVICSUITE_RUNTIME_HOST", "0.0.0.0")
+    monkeypatch.setenv("TOWNLIGHT_RUNTIME_HOST", "0.0.0.0")
     with pytest.raises(RuntimeError, match="127.0.0.1 only"):
         services.main()
 
@@ -110,12 +110,12 @@ def test_local_defaults_city_core_provides_code_db(monkeypatch):
         "DATABASE_URL",
         "postgresql+asyncpg://synthetic@127.0.0.1:25432/code",
     )
-    monkeypatch.setenv("CIVICCODE_SOURCE_REGISTRY_DB_URL", "memory")
+    monkeypatch.setenv("TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL", "memory")
 
     services._set_local_defaults()
 
     assert (
-        os.environ["CIVICCODE_SOURCE_REGISTRY_DB_URL"]
+        os.environ["TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL"]
         == "postgresql+psycopg2://synthetic@127.0.0.1:25432/code"
     )
 
@@ -130,21 +130,21 @@ def test_local_defaults_non_city_core_skips_code_db(monkeypatch, profile):
         "DATABASE_URL",
         "postgresql+asyncpg://synthetic@127.0.0.1:25432/code",
     )
-    monkeypatch.delenv("CIVICCODE_SOURCE_REGISTRY_DB_URL", raising=False)
+    monkeypatch.delenv("TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL", raising=False)
 
     services._set_local_defaults()
 
-    assert "CIVICCODE_SOURCE_REGISTRY_DB_URL" not in os.environ
+    assert "TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL" not in os.environ
 
 
 @pytest.mark.parametrize("code_schema_ok", [False, True])
 def test_ready_reflects_code_schema_status(monkeypatch, tmp_path, code_schema_ok):
     monkeypatch.setenv("TESTING", "1")
-    monkeypatch.setenv("CIVICSUITE_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("TOWNLIGHT_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("TOWNLIGHT_PRODUCT_PROFILE", "city-core")
     monkeypatch.setenv(
         "DATABASE_URL",
-        "postgresql+asyncpg://user:pass@localhost:5432/civicsuite_test",
+        "postgresql+asyncpg://user:pass@localhost:5432/townlight_test",
     )
     monkeypatch.setattr(
         services,
@@ -152,7 +152,7 @@ def test_ready_reflects_code_schema_status(monkeypatch, tmp_path, code_schema_ok
         lambda: {"ok": True, "reason": "domain-schema-ready"},
     )
 
-    import civicsuite_runtime.meetings_bridge as meetings_bridge
+    import townlight_runtime.meetings_bridge as meetings_bridge
 
     monkeypatch.setattr(meetings_bridge, "readiness", lambda: True)
     monkeypatch.setattr(
@@ -201,8 +201,8 @@ def test_ready_reflects_code_schema_status(monkeypatch, tmp_path, code_schema_ok
 def test_code_database_status_missing_registry_url(monkeypatch):
     import os
 
-    monkeypatch.delenv("CIVICCODE_SOURCE_REGISTRY_DB_URL", raising=False)
-    assert "CIVICCODE_SOURCE_REGISTRY_DB_URL" not in os.environ
+    monkeypatch.delenv("TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL", raising=False)
+    assert "TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL" not in os.environ
 
     status = services._code_database_status()
     assert status["ok"] is False
@@ -211,7 +211,7 @@ def test_code_database_status_missing_registry_url(monkeypatch):
 
 def test_public_code_source_refusal(monkeypatch):
     from types import SimpleNamespace
-    import civicsuite_runtime.code_public as p
+    import townlight_runtime.code_public as p
 
     monkeypatch.setattr(
         p.code,
@@ -232,7 +232,7 @@ def test_public_code_source_refusal(monkeypatch):
 
 def test_public_code_missing_refusal(monkeypatch):
     from types import SimpleNamespace
-    import civicsuite_runtime.code_public as p
+    import townlight_runtime.code_public as p
 
     def lookup(*args, **kwargs):
         raise p.code.SectionLifecycleError("RESTRICTED BODY", "RESTRICTED FIX")

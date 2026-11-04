@@ -58,6 +58,8 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: desktop/runtime/python-services/pyproject.toml
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -103,23 +105,26 @@ jobs:
         run: npm run verify:browser
 
       - name: Install deployment verifier dependency
-        run: python -m pip install pyyaml
+        run: python -m pip install pyyaml "build>=1.2,<2" "packaging>=24,<27"
 
       - name: Verify deployment profile statically
-        run: python scripts/verify-deployment-profile.py --static-only
+        run: |
+          python scripts/demo_wheels.py
+          python scripts/verify-deployment-profile.py --static-only
+          python -m pytest tests/test_deployment_wheels.py -q
 
       - name: Verify installer plan
-        run: python scripts/verify-installer-plan.py
+        run: python scripts/verify-installer-plan.py --platform windows
 
       - name: Verify suite state against GitHub releases
         env:
-          GH_TOKEN: ${{ secrets.CIVICSUITE_GITHUB_TOKEN || secrets.CIVICSUITE_GH_TOKEN || secrets.GH_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.TOWNLIGHT_GITHUB_TOKEN || secrets.TOWNLIGHT_GH_TOKEN || secrets.GH_TOKEN || github.token }}
         run: python scripts/verify-suite-state.py --remote-only
 
       - name: Verify public module status blocks
         run: python scripts/docs/render_public_status.py --check
 
-      - name: Verify vendored design tokens match the civiccore authority
+      - name: Verify vendored design tokens match the townlight_core authority
         env:
-          GH_TOKEN: ${{ secrets.CIVICSUITE_GITHUB_TOKEN || secrets.CIVICSUITE_GH_TOKEN || secrets.GH_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.TOWNLIGHT_GITHUB_TOKEN || secrets.TOWNLIGHT_GH_TOKEN || secrets.GH_TOKEN || github.token }}
         run: python scripts/design/check_tokens_vendored.py
