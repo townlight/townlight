@@ -3,5 +3,5 @@
 *.png binary
 *.sh text eol=lf
 
-docs/brand/** -text
-docs/beta-1/brand/** -text
+docs/brand/** -text whitespace=cr-at-eol
+docs/beta-1/brand/** -text whitespace=cr-at-eol
