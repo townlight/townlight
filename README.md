@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/svg/townlight-hall-lockup-tagline-reversed.svg">
+    <img alt="Townlight — Municipal software cities can actually own." src="docs/brand/svg/townlight-hall-lockup-tagline.svg" width="600">
+  </picture>
+</p>
+
 Windows x64 Beta 1 · MSI 1.7.0.1
 
 The signed [Windows x64 beta 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) passed the documented fresh Windows Sandbox checks with synthetic data.
@@ -425,3 +432,6 @@ See [the Station manual delivery section](https://townlight.github.io/manuals/st
 The resident portal is deployed separately. See the [Townlight Portal Guide](https://townlight.github.io/manuals/portal.html) for its workflow and acceptance limits.
 
 </div>
+
+
+[Open Hall brand package and usage guide](https://townlight.github.io/brand/).

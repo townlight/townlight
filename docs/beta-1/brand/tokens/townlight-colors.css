@@ -1,0 +1,14 @@
+/* Townlight brand colors — mirrors townlight/townlight docs/tokens.css (the authority). */
+:root {
+  --tl-navy: #1A3A52;       /* mark, wordmark, primary brand */
+  --tl-navy-2: #122A3D;     /* reversed field, app icon ground */
+  --tl-gold: #B08A2E;       /* the light in every mark; accent/large only (3.22:1 on white) */
+  --tl-gold-2: #8A6A1F;     /* gold text on paper/card (5.05:1) */
+  --tl-paper: #FAF8F3;      /* default background; knock-out color in marks */
+  --tl-ink: #1A2330;        /* body text, mono-black logo */
+  --tl-ink-2: #3A4554;      /* tagline on light */
+  --tl-navy-soft: #E6EDF3;  /* tagline on dark */
+  --tl-rule: #E3DCCB;       /* hairlines */
+  --tl-font-display: "Source Serif 4", Georgia, serif;
+  --tl-font-body: "Inter", system-ui, sans-serif;
+}

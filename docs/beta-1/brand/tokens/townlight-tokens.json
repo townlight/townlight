@@ -1,0 +1,29 @@
+{
+  "name": "Townlight",
+  "tagline": "Municipal software cities can actually own.",
+  "colors": {
+    "navy": "#1A3A52",
+    "navy2": "#122A3D",
+    "gold": "#B08A2E",
+    "gold2": "#8A6A1F",
+    "paper": "#FAF8F3",
+    "ink": "#1A2330",
+    "ink2": "#3A4554",
+    "navySoft": "#E6EDF3",
+    "rule": "#E3DCCB"
+  },
+  "fonts": {
+    "display": {
+      "family": "Source Serif 4",
+      "weights": [
+        400,
+        600
+      ],
+      "license": "OFL-1.1"
+    },
+    "body": {
+      "family": "Inter",
+      "license": "OFL-1.1"
+    }
+  }
+}
