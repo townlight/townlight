@@ -242,14 +242,14 @@ candidate wheel into a chosen output directory:</p>
 class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>python <span class="op">-</span>m pip wheel <span class="op">--</span>no-deps <span class="op">--</span>wheel-dir <span class="st">&#39;&lt;wheel-output&gt;&#39;</span> desktop<span class="op">/</span>runtime<span class="op">/</span>python-services</span></code></pre></div>
 <p>In the separately prepared matching runtime, use its Python
 executable to install the built
-<code>civicsuite_runtime-0.1.0-py3-none-any.whl</code> with
-<code>python -m pip install --no-deps --force-reinstall '&lt;wheel-output&gt;\civicsuite_runtime-0.1.0-py3-none-any.whl'</code>.
+<code>townlight_runtime-0.2.0-py3-none-any.whl</code> with
+<code>python -m pip install --no-deps --force-reinstall '&lt;wheel-output&gt;\townlight_runtime-0.2.0-py3-none-any.whl'</code>.
 Preserve the intended profile, activation and database configuration;
 use <code>meetings-beta</code> or a higher applicable product profile.
 With that runtime’s Python, start
-<code>python -m civicsuite_runtime.services</code>; it binds
+<code>python -m townlight_runtime.services</code>; it binds
 <code>127.0.0.1:15480</code> by default, or the port selected by
-<code>CIVICSUITE_RUNTIME_PORT</code>. Keep this private and provide the
+<code>TOWNLIGHT_RUNTIME_PORT</code>. Keep this private and provide the
 portal’s server-side active proof and trusted origin as described above.
 Verify the authenticated selections endpoint with a real eligible
 request in the prepared environment before relying on publication. See
@@ -316,8 +316,8 @@ architecture</figcaption>
 </figure>
 <p>The server calls <code>POST /desktop/v1/portal/bundle</code> with the
 selection JSON and the <code>X-Townlight-Session</code> header. The
-native principal must have both <code>civicclerk</code> and
-<code>civicrecords-ai</code> permissions. The returned ZIP contains
+native principal must have both <code>townlight_meetings</code> and
+<code>townlight_records</code> permissions. The returned ZIP contains
 <code>manifest.json</code> and, for publication,
 <code>release.bin</code>; the portal validates identity, hashes, sizes
 and allowable fields before an atomic update. Withdrawal carries a
