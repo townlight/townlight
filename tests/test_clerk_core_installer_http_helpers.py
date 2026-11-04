@@ -72,7 +72,24 @@ def test_uninstall_uses_orphan_cleanup_when_source_tree_is_missing(monkeypatch, 
     installer = _load_installer_module()
     install_root = tmp_path / "runtime" / "clerk-core"
     cleanup_projects: list[str] = []
-    isolation = installer.resolve_isolation(run_id="test", port_offset=0)
+    isolation = {
+        "ports": {
+            "townlight_records": {"api": 18000, "web": 18080},
+            "townlight_meetings": {"api": 18776, "web": 18081},
+            "townlight_code": {"api": 18820},
+            "townlight_notice": {"api": 18866},
+            "suite-launcher": {"web": 18082},
+        },
+        "compose_projects": {
+            "townlight_records": "townlight-test-records",
+            "townlight_meetings": "townlight-test-clerk",
+            "townlight_code": "townlight-test-code",
+            "townlight_notice": "townlight-test-notice",
+        },
+        "isolation_id": "test",
+        "port_offset": 0,
+        "shared_network": "townlight-test-citycore",
+    }
 
     def fake_cleanup(project: str) -> dict[str, object]:
         cleanup_projects.append(project)

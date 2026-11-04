@@ -25,7 +25,7 @@ def test_records_beta_is_the_default_embedded_runtime_profile(monkeypatch: pytes
     assert profile == "records-beta"
     assert services._required_module_imports(profile) == [
         ("townlight_core", "townlight_core"),
-        ("townlight_records", "app.main"),
+        ("townlight_records", "townlight_records.main"),
         ("townlight_notice", "townlight_notice.main"),
         ("townlight_access", "townlight_access.main"),
     ]
@@ -36,7 +36,7 @@ def test_city_core_is_an_explicit_compatibility_profile(monkeypatch: pytest.Monk
 
     assert services._required_module_imports(services._product_profile()) == [
         ("townlight_core", "townlight_core"),
-        ("townlight_records", "app.main"),
+        ("townlight_records", "townlight_records.main"),
         ("townlight_notice", "townlight_notice.main"),
         ("townlight_access", "townlight_access.main"),
         ("townlight_meetings", "townlight_meetings.main"),

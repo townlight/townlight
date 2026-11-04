@@ -238,7 +238,9 @@ fn city_work_action_module_requirement(
         "townlight_notice-calculate-deadline"
         | "townlight_notice-complete-checklist"
         | "townlight_notice-post-notice"
-        | "townlight_notice-export-archive-packet" => Some((vec!["townlight_meetings", "townlight_notice"], false)),
+        | "townlight_notice-export-archive-packet" => {
+            Some((vec!["townlight_meetings", "townlight_notice"], false))
+        }
         "record-adopted-legislation" => Some((vec!["townlight_meetings", "townlight_code"], false)),
         "create-records-request"
         | "load-demo-town"
@@ -302,7 +304,12 @@ fn city_work_action_module_requirement(
             Some("permitting") => Some((vec!["townlight_permitting"], false)),
             Some("inspections") => Some((vec!["townlight_inspections"], false)),
             _ => Some((
-                vec!["townlight_meetings", "townlight_records", "townlight_code", "townlight_notice"],
+                vec![
+                    "townlight_meetings",
+                    "townlight_records",
+                    "townlight_code",
+                    "townlight_notice",
+                ],
                 true,
             )),
         },
@@ -840,13 +847,21 @@ async fn access_domain_request(
 }
 
 #[tauri::command]
-async fn notice_domain_request(request: notice_client::NoticeRequest) -> Result<Value, domain_client::DomainError> {
-    let _operation = profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
-    let access = auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
+async fn notice_domain_request(
+    request: notice_client::NoticeRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _operation =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let access =
+        auth::require_signed_in_session().map_err(|_| domain_client::DomainError::denied())?;
     require_role_for_city_work(&access, "townlight_notice-complete-checklist", None)
         .map_err(|_| domain_client::DomainError::denied())?;
-    if !module_registry::module_selection_state().map_err(|_| domain_client::DomainError::denied())?
-        .enabled_module_ids.iter().any(|id| id == "townlight_notice") {
+    if !module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == "townlight_notice")
+    {
         return Err(domain_client::DomainError::denied());
     }
     let proof = auth::domain_session_proof().map_err(|_| domain_client::DomainError::denied())?;
@@ -1334,7 +1349,12 @@ mod tests {
     fn records_beta_modules_are_reported_installed() {
         module_registry::validate_default_registry().expect("module registry contract validates");
         let modules = module_summaries().expect("module registry parses");
-        for module_id in ["townlight_core", "townlight_records", "townlight_notice", "townlight_access"] {
+        for module_id in [
+            "townlight_core",
+            "townlight_records",
+            "townlight_notice",
+            "townlight_access",
+        ] {
             let module = modules
                 .iter()
                 .find(|candidate| candidate.id == module_id)
@@ -1517,8 +1537,9 @@ mod tests {
                 .contains("Sign in as the Townlight admin"));
 
             sign_in_as_first_admin();
-            let disabled = module_action("disable-module".to_string(), "townlight_code".to_string())
-                .expect("module disable allowed");
+            let disabled =
+                module_action("disable-module".to_string(), "townlight_code".to_string())
+                    .expect("module disable allowed");
             assert!(disabled.accepted);
             assert_eq!(disabled.status, "Module disabled");
             assert!(disabled
@@ -1534,7 +1555,9 @@ mod tests {
             assert!(disabled
                 .modules
                 .iter()
-                .any(|module| module.id == "townlight_code" && module.installed && !module.enabled));
+                .any(|module| module.id == "townlight_code"
+                    && module.installed
+                    && !module.enabled));
 
             let enabled = module_action("enable-module".to_string(), "townlight_code".to_string())
                 .expect("module enable allowed");
@@ -1549,9 +1572,11 @@ mod tests {
             assert_eq!(current.status, "Module current");
             assert!(current.message.contains("pinned version"));
 
-            let opened_exports =
-                module_action("open-module-exports".to_string(), "townlight_code".to_string())
-                    .expect("module exports open");
+            let opened_exports = module_action(
+                "open-module-exports".to_string(),
+                "townlight_code".to_string(),
+            )
+            .expect("module exports open");
             assert_eq!(opened_exports.status, "Module exports opened");
             assert!(opened_exports.message.contains("code exports"));
             assert!(root.join("Data").join("exports").join("code").is_dir());
@@ -1577,16 +1602,19 @@ mod tests {
                 .count();
             assert_eq!(backup_count, 1);
 
-            let removed_exports =
-                module_action("open-module-exports".to_string(), "townlight_code".to_string());
+            let removed_exports = module_action(
+                "open-module-exports".to_string(),
+                "townlight_code".to_string(),
+            );
             assert!(removed_exports.is_err());
             assert!(removed_exports
                 .err()
                 .expect("removed module export error")
                 .contains("is not installed in this local profile"));
 
-            let installed = module_action("install-module".to_string(), "townlight_code".to_string())
-                .expect("module install allowed");
+            let installed =
+                module_action("install-module".to_string(), "townlight_code".to_string())
+                    .expect("module install allowed");
             assert_eq!(installed.status, "Module installed");
             assert!(installed
                 .selection
@@ -1806,7 +1834,12 @@ mod tests {
         with_clean_first_run_state(|_| {
             create_first_admin();
             sign_in_as_first_admin();
-            for m in ["townlight_code", "townlight_notice", "townlight_meetings", "townlight_records"] {
+            for m in [
+                "townlight_code",
+                "townlight_notice",
+                "townlight_meetings",
+                "townlight_records",
+            ] {
                 module_action("disable-module".to_string(), m.to_string()).unwrap();
             }
             require_enabled_city_modules("search-city-knowledge", None)

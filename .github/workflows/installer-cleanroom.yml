@@ -41,32 +41,12 @@ jobs:
             os: windows-latest
             archive: installer/dist/Townlight-clerk-core-windows-0.1.0.zip
             installer_version: 0.1.0
-          - platform: macos
-            profile: clerk-core
-            os: ubuntu-latest
-            archive: installer/dist/Townlight-clerk-core-macos-0.1.0.tar.gz
-            installer_version: 0.1.0
-          - platform: linux
-            profile: clerk-core
-            os: ubuntu-latest
-            archive: installer/dist/Townlight-clerk-core-linux-0.1.0.tar.gz
-            installer_version: 0.1.0
           - platform: windows
             profile: city-core
             # workflow-cost: windows-pr-justification -- city-core release criteria require Windows one-click wrapper readiness evidence.
             os: windows-latest
             archive: installer/dist/Townlight-city-core-windows-0.1.0.zip
             installer_version: 0.1.0
-          - platform: macos
-            profile: city-core
-            os: ubuntu-latest
-            archive: installer/dist/Townlight-city-core-macos-0.1.0.tar.gz
-            installer_version: 0.1.0
-          - platform: linux
-            profile: city-core
-            os: ubuntu-latest
-            archive: installer/dist/Townlight-city-core-linux-0.1.2.tar.gz
-            installer_version: 0.1.2
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
@@ -131,6 +111,8 @@ jobs:
           retention-days: 7
 
   linux-package-lifecycle:
+    # Excluded from the Windows release closeout. Preserve implementation for later.
+    if: ${{ false }}
     name: linux archive full lifecycle
     runs-on: ubuntu-latest
     timeout-minutes: 120

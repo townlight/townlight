@@ -2621,7 +2621,8 @@ mod tests {
             fs::create_dir_all(model_path.parent().expect("parent")).expect("mkdir");
             fs::write(&model_path, b"townlight").expect("write model");
             let expected = sha256_file(&model_path).expect("hash");
-            verify_file_checksum(&model_path, b"townlight".len() as u64, &expected).expect("verify");
+            verify_file_checksum(&model_path, b"townlight".len() as u64, &expected)
+                .expect("verify");
             assert!(checksum_marker_matches(&model_path, &expected));
         });
     }

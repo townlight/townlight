@@ -22,9 +22,13 @@ fn prepare_at(root: &Path) -> Result<(), String> {
         return Err("This release supports a fresh Townlight profile only. An existing unmarked profile was detected and left unchanged. Keep its matching previous release; an in-place upgrade is not supported.".into());
     }
     fs::create_dir_all(root).map_err(|_| "Could not create the new profile folder.")?;
-    let mut file = fs::OpenOptions::new().write(true).create_new(true).open(&marker)
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&marker)
         .map_err(|_| "Could not establish a new profile identity. No city data was initialized.")?;
-    file.write_all(IDENTITY).and_then(|_| file.sync_all())
+    file.write_all(IDENTITY)
+        .and_then(|_| file.sync_all())
         .map_err(|_| "Could not persist profile identity. No city data was initialized.".into())
 }
 
@@ -33,7 +37,8 @@ mod tests {
     use super::*;
     #[test]
     fn refuses_existing_profile_without_mutation_and_accepts_new_identity() {
-        let root = std::env::temp_dir().join(format!("townlight-identity-{}", uuid::Uuid::new_v4()));
+        let root =
+            std::env::temp_dir().join(format!("townlight-identity-{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(root.join("config")).unwrap();
         let evidence = root.join("config/city.json");
         fs::write(&evidence, b"preserve existing profile").unwrap();

@@ -2076,10 +2076,7 @@ fn run_python_migrations() -> Result<(), String> {
     })? {
         command.env(name, value);
     }
-    command
-        .arg("-u")
-        .arg("-m")
-        .arg("townlight_runtime.migrate");
+    command.arg("-u").arg("-m").arg("townlight_runtime.migrate");
     command_output_with_timeout(
         &mut command,
         "City-core database migrations",
@@ -2202,7 +2199,10 @@ fn service_environment(service: &ServiceDefinition) -> Result<Vec<(String, Strin
             "LLM_MODEL".to_string(),
             crate::model::pinned_runtime_model()?,
         ),
-        ("TOWNLIGHT_CORE_LLM_PROVIDER".to_string(), "ollama".to_string()),
+        (
+            "TOWNLIGHT_CORE_LLM_PROVIDER".to_string(),
+            "ollama".to_string(),
+        ),
     ];
     if service.kind.contains("python") || service.binary.ends_with("python.exe") {
         env.push(("PYTHONNOUSERSITE".to_string(), "1".to_string()));

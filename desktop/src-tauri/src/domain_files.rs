@@ -88,7 +88,8 @@ pub fn write_access_export(plan: ArtifactPlan) -> Result<String, String> {
 
 pub fn write_notice_file(name: &str, bytes: &[u8], digest: &str) -> Result<String, String> {
     let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
-        .join("exports").join("notice");
+        .join("exports")
+        .join("notice");
     write_planning_file_at(&root, name, bytes, digest)
 }
 

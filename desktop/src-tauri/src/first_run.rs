@@ -231,10 +231,7 @@ fn windows_path_from_template(template: &str) -> String {
     if let Ok(root) = env::var("TOWNLIGHT_DESKTOP_STATE_DIR") {
         return template
             .replace("{local_app_data}/CivicSuite", &root)
-            .replace(
-                "{documents}/Townlight Backups",
-                &format!("{root}\\Backups"),
-            )
+            .replace("{documents}/Townlight Backups", &format!("{root}\\Backups"))
             .replace('/', "\\");
     }
     let local_app_data =

@@ -66,15 +66,12 @@ def test_records_beta_profile_is_dependency_closed_without_clerk() -> None:
     assert modules["townlight_notice"]["dependencies"] == ["townlight_core"]
 
 
-def test_planned_modules_without_runtime_repos_are_not_selectable() -> None:
+def test_kept_registry_does_not_include_planned_modules_without_runtime_repos() -> None:
     data = _registry()
     planned = {
         module["id"]: module for module in data["modules"] if module.get("repo") is None
     }
-    assert planned.keys() == {"civicregwatch", "civicapi"}
-    for module in planned.values():
-        assert module["selectable"] is False
-        assert module["installer_status"] == "planned_spec_module_no_runtime_repo"
+    assert planned == {}
 
 
 def test_promoted_ready_module_requires_version_and_source_commit() -> None:

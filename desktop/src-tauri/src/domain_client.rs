@@ -431,15 +431,21 @@ pub struct AccessReview {
 
 pub async fn execute_access(request: AccessRequest, proof: String) -> Result<Value, DomainError> {
     let export_path = match &request {
-        AccessRequest::ExportReview { review_id } => Some(format!("/desktop/v1/access/reviews/{review_id}/export")),
-        AccessRequest::ExportDraft { draft_id } => Some(format!("/desktop/v1/access/drafts/{draft_id}/export")),
+        AccessRequest::ExportReview { review_id } => {
+            Some(format!("/desktop/v1/access/reviews/{review_id}/export"))
+        }
+        AccessRequest::ExportDraft { draft_id } => {
+            Some(format!("/desktop/v1/access/drafts/{draft_id}/export"))
+        }
         _ => None,
     };
     if let Some(path) = export_path {
         return execute_access_export(path, proof).await;
     }
     match request {
-        AccessRequest::ExportReview { .. } | AccessRequest::ExportDraft { .. } => Err(DomainError::transport(false)),
+        AccessRequest::ExportReview { .. } | AccessRequest::ExportDraft { .. } => {
+            Err(DomainError::transport(false))
+        }
         AccessRequest::Tool { payload } => {
             send(
                 Method::POST,
@@ -547,11 +553,23 @@ async fn execute_access_export(path: String, proof: String) -> Result<Value, Dom
     let artifact_id = plan.artifact_id;
     let path = tauri::async_runtime::spawn_blocking(move || {
         crate::domain_files::write_access_export(plan)
-    }).await.map_err(|_| DomainError::transport(true))?.map_err(|_| {
-        DomainError::new("export-incomplete", "Access export was not finalized. Prepared evidence is retained.", true)
+    })
+    .await
+    .map_err(|_| DomainError::transport(true))?
+    .map_err(|_| {
+        DomainError::new(
+            "export-incomplete",
+            "Access export was not finalized. Prepared evidence is retained.",
+            true,
+        )
     })?;
-    send(Method::POST, format!("/desktop/v1/access/exports/{artifact_id}/complete"),
-        Some(serde_json::json!({"export_path":path})), &proof).await
+    send(
+        Method::POST,
+        format!("/desktop/v1/access/exports/{artifact_id}/complete"),
+        Some(serde_json::json!({"export_path":path})),
+        &proof,
+    )
+    .await
 }
 
 #[derive(Deserialize)]

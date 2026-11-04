@@ -1191,7 +1191,9 @@ mod tests {
                 .enabled_module_ids
                 .contains(&"townlight_permitting".to_string()));
         }
-        assert!(resolve_custom_module_order(&registry, &["townlight_permitting".to_string()]).is_err());
+        assert!(
+            resolve_custom_module_order(&registry, &["townlight_permitting".to_string()]).is_err()
+        );
     }
 
     #[test]
@@ -1206,10 +1208,15 @@ mod tests {
             .contains(&"townlight_records".to_string()));
         let plan = module_index(&registry)["townlight_planning"];
         assert_eq!(plan.current_version.as_deref(), Some("0.4.0.dev2"));
-        assert_eq!(plan.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
+        assert_eq!(
+            plan.townlight_core_requirement.as_deref(),
+            Some("1.3.0.dev2")
+        );
         assert_eq!(plan.development_version.as_deref(), Some("0.4.0.dev2"));
         assert!(validate_profile(&registry, "land-use").is_err());
-        assert!(resolve_custom_module_order(&registry, &["townlight_planning".to_string()]).is_err());
+        assert!(
+            resolve_custom_module_order(&registry, &["townlight_planning".to_string()]).is_err()
+        );
         for profile in ["records-beta", "meetings-beta", "city-core", "zoning-beta"] {
             assert!(!selection_for_profile(&registry, profile)
                 .unwrap()
@@ -1326,7 +1333,9 @@ mod tests {
                 "meetings-beta"
             );
             assert_eq!(
-                set_module_enabled("townlight_meetings", false).unwrap().profile_id,
+                set_module_enabled("townlight_meetings", false)
+                    .unwrap()
+                    .profile_id,
                 "meetings-beta"
             );
         });
@@ -1335,9 +1344,11 @@ mod tests {
     #[test]
     fn custom_selection_locks_townlight_core_and_resolves_ready_modules() {
         with_temp_state_dir(|root| {
-            let selection =
-                persist_custom_selection(&["townlight_meetings".to_string(), "townlight_code".to_string()])
-                    .expect("custom selection persists");
+            let selection = persist_custom_selection(&[
+                "townlight_meetings".to_string(),
+                "townlight_code".to_string(),
+            ])
+            .expect("custom selection persists");
 
             assert_eq!(selection.profile_id, "custom");
             assert_eq!(
@@ -1376,8 +1387,8 @@ mod tests {
     fn installed_product_modules_can_be_disabled_without_uninstalling() {
         with_temp_state_dir(|_| {
             persist_profile_selection("city-core").expect("profile selection persists");
-            let disabled =
-                set_module_enabled("townlight_code", false).expect("townlight_code can be disabled");
+            let disabled = set_module_enabled("townlight_code", false)
+                .expect("townlight_code can be disabled");
             assert!(disabled
                 .installed_module_ids
                 .iter()
@@ -1394,14 +1405,14 @@ mod tests {
             assert!(townlight_code.installed);
             assert!(!townlight_code.enabled);
 
-            let enabled =
-                set_module_enabled("townlight_code", true).expect("townlight_code can be re-enabled");
+            let enabled = set_module_enabled("townlight_code", true)
+                .expect("townlight_code can be re-enabled");
             assert!(enabled
                 .enabled_module_ids
                 .iter()
                 .any(|module_id| module_id == "townlight_code"));
-            let core_error =
-                set_module_enabled("townlight_core", false).expect_err("townlight_core cannot be disabled");
+            let core_error = set_module_enabled("townlight_core", false)
+                .expect_err("townlight_core cannot be disabled");
             assert!(core_error.contains("Required module townlight_core cannot be disabled"));
         });
     }
@@ -1410,8 +1421,8 @@ mod tests {
     fn product_modules_can_be_removed_and_reinstalled_without_data_deletion() {
         with_temp_state_dir(|_| {
             persist_profile_selection("city-core").expect("profile selection persists");
-            let removed =
-                set_module_installed("townlight_code", false).expect("townlight_code can be removed");
+            let removed = set_module_installed("townlight_code", false)
+                .expect("townlight_code can be removed");
             assert_eq!(removed.profile_id, "custom");
             assert!(!removed
                 .installed_module_ids
@@ -1432,10 +1443,12 @@ mod tests {
             let removed_modules = module_summaries().expect("summaries build");
             assert!(removed_modules
                 .iter()
-                .any(|module| module.id == "townlight_code" && !module.installed && !module.enabled));
+                .any(|module| module.id == "townlight_code"
+                    && !module.installed
+                    && !module.enabled));
 
-            let installed =
-                set_module_installed("townlight_code", true).expect("townlight_code can be reinstalled");
+            let installed = set_module_installed("townlight_code", true)
+                .expect("townlight_code can be reinstalled");
             assert_eq!(installed.profile_id, "city-core");
             assert!(installed
                 .installed_module_ids
@@ -1456,8 +1469,8 @@ mod tests {
                 .expect_err("planned module cannot be installed");
             assert!(planned.contains("missing from the registry"));
 
-            let required =
-                set_module_installed("townlight_core", false).expect_err("townlight_core cannot be removed");
+            let required = set_module_installed("townlight_core", false)
+                .expect_err("townlight_core cannot be removed");
             assert!(required.contains("Required module townlight_core cannot be removed"));
 
             let installed =
@@ -1474,8 +1487,8 @@ mod tests {
     fn townlight_notice_installs_with_core_dependency_from_custom_profile() {
         with_temp_state_dir(|_| {
             persist_profile_selection("minimal").expect("minimal profile persists");
-            let installed =
-                set_module_installed("townlight_notice", true).expect("townlight_notice can install");
+            let installed = set_module_installed("townlight_notice", true)
+                .expect("townlight_notice can install");
             assert_eq!(installed.profile_id, "custom");
             assert_eq!(
                 installed.installed_module_ids,
@@ -1492,7 +1505,10 @@ mod tests {
             assert!(townlight_notice.enabled);
             assert!(townlight_notice.contract_ready);
             assert_eq!(townlight_notice.version.as_deref(), Some("0.3.0"));
-            assert_eq!(townlight_notice.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
+            assert_eq!(
+                townlight_notice.townlight_core_requirement.as_deref(),
+                Some("1.3.0.dev2")
+            );
             assert!(townlight_notice
                 .backup_restore_hooks
                 .iter()
@@ -1552,7 +1568,10 @@ mod tests {
                 .find(|module| module.id == "townlight_code")
                 .expect("townlight_code module");
             assert!(townlight_code.installed);
-            assert_eq!(townlight_code.townlight_core_requirement.as_deref(), Some("1.3.0.dev2"));
+            assert_eq!(
+                townlight_code.townlight_core_requirement.as_deref(),
+                Some("1.3.0.dev2")
+            );
             assert_eq!(
                 townlight_code.lifecycle_uninstall.as_deref(),
                 Some("backup-first-module-data-removal")
