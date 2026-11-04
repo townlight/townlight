@@ -23,8 +23,8 @@ sys.path.insert(0, str(ROOT / "desktop/runtime/python-services"))
 def native_permitting(tmp_path, monkeypatch):
     from fastapi import FastAPI, Request
     from fastapi.testclient import TestClient
-    from app.database import get_async_session
-    from app.models.user import UserRole
+    from townlight_records.database import get_async_session
+    from townlight_records.models.user import UserRole
     from townlight_permitting.migrations import source_engine, upgrade
     from townlight_runtime import permitting_bridge as bridge
 
@@ -33,7 +33,7 @@ def native_permitting(tmp_path, monkeypatch):
     upgrade(engine)
     monkeypatch.setenv("DATABASE_URL", url)
     monkeypatch.setattr(bridge, "source_engine", lambda _: source_engine(url))
-    monkeypatch.setattr("app.auth.desktop_session.time.time", lambda: 1792620000)
+    monkeypatch.setattr("townlight_records.auth.desktop_session.time.time", lambda: 1792620000)
     profile = tmp_path / "profile"
     config = profile / "config"
     config.mkdir(parents=True)
