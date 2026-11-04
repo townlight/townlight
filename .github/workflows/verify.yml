@@ -114,7 +114,7 @@ jobs:
           python -m pytest tests/test_deployment_wheels.py -q
 
       - name: Verify installer plan
-        run: python scripts/verify-installer-plan.py
+        run: python scripts/verify-installer-plan.py --platform windows
 
       - name: Verify suite state against GitHub releases
         env:

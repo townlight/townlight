@@ -186,7 +186,8 @@ Forbidden release-facing behavior:
 
 **Token authority.** The suite's design **tokens** — color, ink ramp, status
 palette, type families, density metrics, radii — live in
-`townlight_core-ui/tokens/tokens.css` (in the `townlight_core` repo). That file is the
+`townlight_core-ui/tokens/tokens.css` (in the `townlight/core` repository, at the
+exact source pinned by `scripts/design/check_tokens_vendored.py`). That file is the
 single source of truth for token *values*. This prototype's
 `docs/design/ui-ux-prototype/styles.css` remains canonical for the **component
 layer** (the classes and layout that consume those tokens), but it no longer

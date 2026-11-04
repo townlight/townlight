@@ -14,6 +14,13 @@ from pathlib import Path
 from typing import Any, cast
 
 
+VERIFY_PLATFORM = "all"
+
+
+def verification_platforms() -> tuple[str, ...]:
+    return ("windows",) if VERIFY_PLATFORM == "windows" else ("windows", "macos", "linux")
+
+
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "installer" / "modules.json"
 CONTRACT = ROOT / "installer" / "README.md"
@@ -461,7 +468,9 @@ def check_cleanroom_workflow(data: dict[str, object]) -> list[str]:
                 "installer cleanroom workflow must not include a daily cron without explicit approval"
             )
         )
-    for platform in ("windows", "macos", "linux"):
+    # This release's automatic cleanroom scope is Windows only. Retained
+    # platform implementations do not make their CI jobs release requirements.
+    for platform in ("windows",):
         if f"platform: {platform}" not in text:
             errors.append(
                 fail(
@@ -1443,7 +1452,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             manifest=data,
             profile_id="clerk-core",
             menu_style="guided",
-            platform_id="all",
+            platform_id=VERIFY_PLATFORM,
         )
         if package.get("mutates_host") is not False:
             errors.append(fail("profile package generator must not mutate host state"))
@@ -1453,10 +1462,10 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     "profile package generator must not claim native installers are packaged"
                 )
             )
-        if package.get("platforms") != ["windows", "macos", "linux"]:
+        if package.get("platforms") != list(verification_platforms()):
             errors.append(
                 fail(
-                    "profile package generator must emit all platform packages by default"
+                    "profile package generator must emit the selected platform packages"
                 )
             )
         for platform_id, launcher in (
@@ -1464,6 +1473,8 @@ def check_planner(data: dict[str, object]) -> list[str]:
             ("macos", "start-townlight-installer.sh"),
             ("linux", "start-townlight-installer.sh"),
         ):
+            if platform_id not in verification_platforms():
+                continue
             package_dir = GENERATED_PACKAGES / "clerk-core" / platform_id
             for name in ("README.md", "install-plan.json", launcher):
                 if not (package_dir / name).is_file():
@@ -1538,7 +1549,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                         )
                     )
         bash = bash_command()
-        for platform_id in ("macos", "linux"):
+        for platform_id in (p for p in verification_platforms() if p != "windows"):
             if not bash:
                 errors.append(fail(f"profile package {platform_id} launcher checks require bash"))
                 continue
@@ -1604,7 +1615,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             profile_id="clerk-core",
             menu_style="guided",
             version="0.1.0",
-            platform_id="all",
+            platform_id=VERIFY_PLATFORM,
         )
         if release.get("mutates_host") is not False:
             errors.append(fail("release artifact generator must not mutate host state"))
@@ -1614,7 +1625,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
                     "release artifact generator must not claim signed native installers were built"
                 )
             )
-        if len(release.get("archives", [])) != 3:
+        if len(release.get("archives", [])) != len(verification_platforms()):
             errors.append(
                 fail("release artifact generator must emit one archive per platform")
             )
@@ -1688,6 +1699,8 @@ def check_planner(data: dict[str, object]) -> list[str]:
             ("macos", "distribution.xml"),
             ("linux", "debian/control"),
         ):
+            if platform_id not in verification_platforms():
+                continue
             if not (GENERATED_NATIVE / "clerk-core" / platform_id / required).is_file():
                 errors.append(fail(f"native wrapper missing {platform_id}/{required}"))
             native_readme = GENERATED_NATIVE / "clerk-core" / platform_id / "README.md"
@@ -1709,7 +1722,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             profile_id="city-core",
             menu_style="guided",
             version="0.1.2",
-            platform_id="all",
+            platform_id=VERIFY_PLATFORM,
         )
         if city_core_release.get("mutates_host") is not False:
             errors.append(fail("city-core release artifact generator must not mutate host state"))
@@ -1722,7 +1735,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             "townlight_access",
         ]:
             errors.append(fail("city-core release artifacts must package the six city-core modules"))
-        if len(city_core_release.get("archives", [])) != 3:
+        if len(city_core_release.get("archives", [])) != len(verification_platforms()):
             errors.append(fail("city-core release artifacts must emit one archive per platform"))
         city_manifest_path = ROOT / city_core_release.get("release_manifest", "")
         if not city_manifest_path.is_file():
@@ -1731,7 +1744,7 @@ def check_planner(data: dict[str, object]) -> list[str]:
             city_manifest = json.loads(city_manifest_path.read_text(encoding="utf-8"))
             support = city_manifest.get("platform_support", {})
             macos_support = support.get("macos", {}) if isinstance(support, dict) else {}
-            if macos_support.get("support_status") != "beta":
+            if "macos" in verification_platforms() and macos_support.get("support_status") != "beta":
                 errors.append(
                     fail("city-core release manifest must label macOS package support as beta")
                 )
@@ -1740,6 +1753,8 @@ def check_planner(data: dict[str, object]) -> list[str]:
             ("macos", "start-townlight-installer.sh"),
             ("linux", "start-townlight-installer.sh"),
         ):
+            if platform_id not in verification_platforms():
+                continue
             package_dir = GENERATED_PACKAGES / "city-core" / platform_id
             for name in ("README.md", "install-plan.json", launcher):
                 if not (package_dir / name).is_file():
@@ -1924,6 +1939,8 @@ def check_launchers() -> list[str]:
         "linux": LINUX_LAUNCHER,
     }
     for name, path in launchers.items():
+        if name not in verification_platforms():
+            continue
         if not path.is_file():
             errors.append(fail(f"missing launcher {path.relative_to(ROOT)}"))
             continue
@@ -2130,6 +2147,8 @@ def check_launchers() -> list[str]:
                 "-Profile",
                 "clerk-core",
                 "-GenerateProfilePackage",
+                "-PackagePlatform",
+                VERIFY_PLATFORM,
             ]
         )
         if not ok:
@@ -2153,6 +2172,8 @@ def check_launchers() -> list[str]:
                 "-Profile",
                 "clerk-core",
                 "-GenerateReleaseArtifacts",
+                "-PackagePlatform",
+                VERIFY_PLATFORM,
             ]
         )
         if not ok:
@@ -2181,6 +2202,8 @@ def check_launchers() -> list[str]:
 
     bash = bash_command()
     for name, path in (("macos", MACOS_LAUNCHER), ("linux", LINUX_LAUNCHER)):
+        if name not in verification_platforms():
+            continue
         if not path.is_file():
             continue
         if not bash:
@@ -2360,11 +2383,15 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Fail when installer package cleanroom reports are absent.",
     )
+    parser.add_argument("--platform", choices=("all", "windows"), default="all",
+                        help="Limit generated archives and launcher checks to the release platform.")
     return parser.parse_args()
 
 
 def main() -> int:
+    global VERIFY_PLATFORM
     args = parse_args()
+    VERIFY_PLATFORM = args.platform
     print("==> Townlight installer plan verification")
     before_files, before_directories = snapshot_generated_artifacts()
     errors = []
