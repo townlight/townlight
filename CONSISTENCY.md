@@ -2,9 +2,9 @@
 
 # Townlight — Consistency Reference
 
-## Current Windows release: 1.7.1.1
+## Current Windows release: 1.7.2.1
 
-The [published Windows beta](https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1) promotes the exact tested signed candidate, source `919f2492cf43a83e693db71fe1371001e529cf40`, tag `townlight-v1.7.1-beta.1`. Desktop 1.7.1-1, MSI 1.7.1.1, runtime 0.2.1; MSI SHA-256 `7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3`, 2,081,316,864 bytes. No rebuild or re-signing occurred during publication. [Acceptance and public verification](docs/installer/windows-1.7.1.1-release.md) distinguish new installed checks from reused evidence. [PR #302](https://github.com/townlight/townlight/pull/302) and post-merge Windows CI passed. The previous Windows 1.7.0.1 release remains intact at `townlight-beta-1-windows-1.7.0.1`. Older references below are historical.
+The [published Windows beta](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.7.2.1) changes installer metadata and the installed product name to **Townlight**. Installer recipe source: `72a03987ddcdf09b840af1c373c4fc00e4c3c05a`; unchanged application source: `919f2492cf43a83e693db71fe1371001e529cf40`. Desktop 1.7.1-1 and runtime 0.2.1 are unchanged. MSI 1.7.2.1 SHA-256: `10f811c2e19db1e11ddfd0dc89e082b164c1b9c3942bba91c8b170225b91cc73`, 2,081,316,864 bytes. The new outer MSI was Azure-signed by Scott Converse; the embedded application/runtime cabinet is identical to 1.7.1.1. [Release evidence](docs/installer/windows-1.7.2.1-release.md) distinguishes new installer checks from reused functional and fresh-install evidence. Scott authorized the metadata-only administrative merge exception; no new full-suite CI pass is claimed. Releases 1.7.1.1 and 1.7.0.1 remain intact. Older references below are historical.
 
 ## Historical connected release: Records + Meetings 1.2.0-beta.1 (2026-10-19)
 

@@ -17,10 +17,13 @@ All existing embedded executable signatures are preserved.
 
 Scott explicitly authorized the metadata-only merge exception on November 5, 2026.
 The full application/runtime build and suite CI are not acceptance for this metadata
-change. Required acceptance is the signed MSI's name/version, fresh installation,
-upgrade from 1.7.1.1 with retained user data, and uninstall. Other functional acceptance
+change. New installed checks cover the signed MSI's name/version, installation as an
+upgrade from 1.7.1.1 with retained user data, and uninstall. Fresh-install evidence
+is reused from the unchanged 1.7.1.1 application payload. Other functional acceptance
 is reused from 1.7.1.1 and must be identified as reused, not rerun.
 
 The separate installer tag is `townlight-windows-v1.7.2.1`. The public release must
 identify both the application source and the merged metadata-recipe source. Keep
 Windows 1.7.1.1 available. No Linux or Mac artifact is part of this release.
+
+Published installer: [Windows 1.7.2.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.7.2.1). See its dated metadata verification and installed acceptance assets for completed checks and evidence boundaries.
