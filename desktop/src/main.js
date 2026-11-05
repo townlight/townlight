@@ -1331,7 +1331,7 @@ function renderModuleSelectionControls() {
     {
       id: "zoning-beta",
       label: "Townlight Records + Meetings + Code + Zoning",
-      description: "Opt-in connected Zoning candidate with Core, Notice, and Access. Not a published release."
+      description: "Connected Zoning profile with Core, Notice, and Access."
     },
     {
       id: "custom",
@@ -1346,12 +1346,12 @@ function renderModuleSelectionControls() {
     {
       id: "permitting-preview",
       label: "Townlight Permitting development candidate",
-      description: "Explicit unsigned staff candidate; verifies its matching payload and preserves the coherent profile before migration."
+      description: "Staff intake workpapers with the matching payload and a coherent backup before migration."
     },
     {
       id: "planning-preview",
       label: "Townlight Planning development preview",
-      description: "Opt-in development profile. Verifies its matching candidate payload and backs up the coherent profile before migration."
+      description: "Staff Planning profile with the matching payload and a coherent backup before migration."
     }
   ];
   return `
@@ -1388,10 +1388,13 @@ function renderModuleSelectionControls() {
           const profileModuleIds = PRODUCT_MODULE_IDS_BY_PROFILE[state.moduleDraft.profileId] || [];
           const checked = customMode ? selectedIds.has(module.id) : profileModuleIds.includes(module.id);
           const disabled = !customMode || !ready;
-          const status = ready ? "Ready for Windows Local 1.0" : "Not ready for Windows Local 1.0";
+          const separateStation = module.id === "townlight-station";
+          const status = separateStation ? "Bundled separate service" : ready ? "Available in this Windows installation" : "Unavailable in this installation";
           // Clerk-facing plain reason; the raw technical contract string (e.g.
           // "must target Townlight Core 1.2.0") is kept only as a hover tooltip for support.
-          const plainReason = !ready ? " - not available in this release yet; check back after your next Townlight update" : "";
+          const plainReason = separateStation
+            ? " - configure Station separately; desktop module selection does not provision it"
+            : !ready ? " - this installation does not include the required module payload" : "";
           const rawTitle = !ready && module.blocked_reason ? ` title="${escapeHtml(module.blocked_reason)}"` : "";
           return `
             <label class="module-choice ${checked ? "selected" : ""} ${disabled ? "disabled" : ""}">
@@ -1412,7 +1415,7 @@ function renderModuleSelectionControls() {
       <p class="empty-note">
         ${customMode
           ? `Custom selection will install Townlight Core plus ${readySelectedCount} selected product module${readySelectedCount === 1 ? "" : "s"}.`
-          : "City Core installs the complete current 1.0 package: Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access."}
+          : "The selected profile installs its listed products with Townlight Core. Station is configured separately."}
       </p>
     </div>
   `;
@@ -4490,6 +4493,7 @@ function renderModuleRow(module, { actions = false } = {}) {
   const proofCount = module.proof_required?.length || 0;
   const lifecycle = moduleLifecycleItems(module);
   const backupHooks = module.backup_restore_hooks || [];
+  const separateStation = module.id === "townlight-station";
   const disabled = module.installed && module.enabled === false;
   const canToggle = actions && module.installed && !module.required;
   const canInstall = actions && !module.installed && module.selectable && module.contract_ready;
@@ -4521,7 +4525,8 @@ function renderModuleRow(module, { actions = false } = {}) {
       <div class="module-meta">
         <span class="${moduleStatusClass(module)}">${moduleStatusLabel(module)}</span>
         <small>${escapeHtml(module.version || "No release yet")}${proofCount ? ` - ${proofCount} proof checks` : ""}</small>
-        ${backupHooks.length ? `<small><strong>Backup includes:</strong> ${backupHooks.map((hook) => escapeHtml(backupHookLabel(hook))).join(", ")}</small>` : ""}
+        ${backupHooks.length ? `<small><strong>${separateStation ? "Separate Station backup:" : "Backup includes:"}</strong> ${backupHooks.map((hook) => escapeHtml(backupHookLabel(hook))).join(", ")}</small>` : ""}
+        ${separateStation ? `<p>Station is a bundled separate local service. See <a href="https://townlight.github.io/manuals/station.html" target="_blank" rel="noopener noreferrer">Station manual: Configuration and administration</a>. Configure its dedicated database and media directory, pair it with the suite process using named staff authority, and set TOWNLIGHT_STATION_URL. Back up Station database and media separately; the desktop profile backup does not include them.</p>` : ""}
         ${disabled ? `<small>Data remains installed. Re-enable this module to show its work area.</small>` : ""}
         ${lifecycle.map((item) => `<small><strong>${item.label}:</strong> ${escapeHtml(item.value)}</small>`).join("")}
         ${actionButtons.length ? `

@@ -2,8 +2,11 @@
 
 This unreleased work fixes findings from the November 4 installed audit of
 Windows MSI 1.7.0.1. The published MSI, tag, receipts and acceptance history stay
-unchanged. Candidate identity, packaging, signing and fresh-install acceptance
-are outstanding; these source changes are not an installed release claim.
+unchanged. The candidate uses desktop version 1.7.1-1 / Windows MSI version
+1.7.1.1, runtime 0.2.1 and a separate installer identity. Packaging, signing
+and fresh-install acceptance are outstanding; these source changes are not an
+installed release claim. The configured future release tag is an uncreated
+identifier, not authorization to tag or publish.
 
 | Finding | Candidate behavior | Required installed proof |
 | --- | --- | --- |
@@ -14,7 +17,7 @@ are outstanding; these source changes are not an installed release claim.
 | D5 | Records pickers follow enabled Meetings/Code capabilities. | Both pickers visible and usable in full composition; absent when corresponding module is disabled. |
 | D6 | Removal validates under maintenance exclusion before backup or service stops. Other module mutations cannot race maintenance. | Refused dependency removal leaves service health, selection and backup inventory unchanged. |
 | D7 | Known remaining preview compositions are recognized before custom-profile restrictions. | Remove Inspections, Permitting and Planning in order; verify remaining profiles and reinstall, retaining data. |
-| D9 | Catalog terminology and separate Station setup guidance still need correction. | Check installed catalog, Station instructions and actual separately configured handoff. |
+| D9 | Profile copy describes included capabilities without false unsigned/unpublished assertions. Station is identified as a bundled separate service, with manual/setup guidance and separate database/media backup labels. | Check installed catalog, Station instructions and actual separately configured handoff. |
 | D10 | Restore stages backup bytes, retains directory identities, journals file moves and rolls them back on failure. Existing model cache is preserved. | Keep exports open, mutate byte sentinel, restore, compare hashes and persisted database links; prove failure rollback too. |
 
 Restore leaves services stopped until the operator starts them. A backup

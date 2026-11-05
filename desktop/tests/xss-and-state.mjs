@@ -551,8 +551,8 @@ function finishedBase() {
   t.state.moduleDraft.profileId = "custom"; // show the full selectable list incl. blocked townlight_zoning
   const wiz = t.renderFirstRunWizard();
 
-  if (!wiz.includes("not available in this release yet")) {
-    fail("T15a: a blocked module must show the plain-English 'not available in this release yet' reason");
+  if (!wiz.includes("this installation does not include the required module payload")) {
+    fail("T15a: a blocked module must explain that the required payload is absent");
   }
   // The raw contract string may appear ONLY inside a title="" tooltip, never as
   // the visible <small> body text.

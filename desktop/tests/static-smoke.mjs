@@ -139,7 +139,9 @@ const requiredUiPhrases = [
   "Module Catalog",
   "Choose Product Modules",
   "Custom selection will install Townlight Core plus",
-  "Not ready for Windows Local 1.0",
+  "Unavailable in this installation",
+  "Bundled separate service",
+  "Separate Station backup:",
   "Apply Module Selection",
   "Save Local Folders",
   "City data folder",
@@ -261,7 +263,7 @@ for (const phrase of [
   "Downloading…",
   "Townlight may look frozen while it downloads",
   "too many failed sign-in attempts",
-  "not available in this release yet",
+  "this installation does not include the required module payload",
   'result.working ? "working"',
   "this local staff user is disabled"
 ]) {

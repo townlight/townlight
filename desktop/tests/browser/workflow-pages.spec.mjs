@@ -950,7 +950,7 @@ test("module manager presents the installed city-core package", async ({ page })
   await expect(page.locator('[data-module-toggle="townlight_zoning"]')).toBeDisabled();
   const townlight_zoningChoice = page.locator('label.module-choice').filter({ has: page.locator('[data-module-toggle="townlight_zoning"]') });
   await expect(townlight_zoningChoice.locator('[data-module-toggle="townlight_zoning"]')).not.toBeChecked();
-  await expect(townlight_zoningChoice).toContainText("Ready for Windows Local 1.0");
+  await expect(townlight_zoningChoice).toContainText("Available in this Windows installation");
   await page.getByLabel(/Custom/).check();
   await expect(page.getByText("Custom selection will install Townlight Core plus 5 selected product modules.")).toBeVisible();
   await page.locator('[data-module-toggle="townlight_records"]').uncheck();
