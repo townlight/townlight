@@ -1,28 +1,5 @@
 # Releasing the Townlight Records Windows MSI
 
-## Current authorization: Townlight Windows 1.7.2.1 product name
-
-Scott authorized this separate Windows update on November 5, 2026. The installed
-product/display name is `Townlight`; desktop version is `1.7.2-1`, MSI version is
-`1.7.2.1`, and the release tag is `townlight-v1.7.2-beta.1`. Preserve the exact
-released 1.7.1.1 MSI, tag, release and acceptance evidence.
-
-Keep the 1.7.1.1 application identifier and UpgradeCode. Do not replace these
-identifiers merely to change the visible name. Preserve all eleven component
-source pins and the compatibility profile directory. No other platform belongs
-to this release. Earlier release-specific instructions below are historical and
-do not override this authorization.
-
-After required PR checks and normal protected merge, use a manual main-branch
-`desktop-windows-msi.yml` run with `product_profile=inspections-preview` and
-`sign_for_publication=true`. Independently verify Azure Scott Converse signatures
-and timestamps. Before publication, establish exact signed installation, Add/Remove
-Programs identity, upgrade from 1.7.1.1, retained records/configuration and uninstall.
-Unchanged functional acceptance may be reused with its original source identity.
-Do not claim upgrades from older installer families. See
-[the bounded release record](docs/installer/windows-1.7.2.1-release.md).
-
-
 ## Current authorization: one signed connected Inspections beta
 
 Scott authorized signing, tagging and publishing Inspections 1.7.0-beta.1,

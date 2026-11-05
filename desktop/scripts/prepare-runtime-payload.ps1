@@ -41,12 +41,6 @@ if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 }
 
-# Preserve the accepted runtime cohort for this installer-identity release.
-if ($ProductProfile -eq 'inspections-preview' -and $PlanningBuildProfile -eq 'inspections-preview') {
-    & (Join-Path $PSScriptRoot 'prepare-accepted-runtime.ps1') -RepoRoot $RepoRoot -PayloadRoot $PayloadRoot -SkipDownloads:$SkipDownloads
-    return
-}
-
 function Read-JsonFile {
     param([string]$Path)
     return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json

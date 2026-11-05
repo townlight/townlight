@@ -1,6 +1,6 @@
 [package]
 name = "townlight-desktop"
-version = "1.7.2-1"
+version = "1.7.1-1"
 description = "Townlight Windows Local desktop shell"
 edition = "2021"
 license = "AGPL-3.0-only"

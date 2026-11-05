@@ -15,7 +15,6 @@ on:
         required: true
   push:
     tags:
-      - "townlight-v*"
       - "townlight-windows-local-v*"
       - "townlight-records-v*"
       - "townlight-records-meetings-v*"
@@ -46,7 +45,7 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($tag)) { throw "A release tag is required." }
           $isPlanning = $tag -like 'townlight-records-meetings-code-zoning-planning-v*'
           $isPermitting = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-v*'
-          $isInspections = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*' -or $tag -like 'townlight-v*'
+          $isInspections = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*'
           if ($isInspections) {
             . ./desktop/scripts/inspections-build-contract.ps1
             $inspections = Get-InspectionsBuildContract
@@ -155,14 +154,7 @@ jobs:
           $embedded = @(Get-ChildItem -LiteralPath $extract -Filter townlight-desktop.exe -Recurse -File)
           if ($embedded.Count -ne 1) { throw 'Expected one embedded desktop executable.' }
           & ./desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
-          $signedArtifacts = @($msi, $embedded[0])
-          if ($isInspections) {
-            $helper = @(Get-ChildItem -LiteralPath $extract -Filter townlight_access-db-status.exe -Recurse -File)
-            if ($helper.Count -ne 1) { throw 'Expected one accepted portable Access launcher.' }
-            & ./desktop/scripts/verify-publication-signature.ps1 -Path $helper[0].FullName
-            $signedArtifacts += $helper[0]
-          }
-          foreach ($artifact in $signedArtifacts) {
+          foreach ($artifact in @($msi, $embedded[0])) {
             $entries = @($receipt.files | Where-Object { $_.file -eq $artifact.Name })
             if ($entries.Count -ne 1) { throw 'Signing receipt artifact entry is missing or ambiguous.' }
             $sig = Get-AuthenticodeSignature -LiteralPath $artifact.FullName

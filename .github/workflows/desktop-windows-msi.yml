@@ -379,11 +379,6 @@ jobs:
           }
           "path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
           "sha256=$((Get-FileHash -LiteralPath $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant())" >> $env:GITHUB_OUTPUT
-          if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-            $access = Get-Item -LiteralPath 'townlight/desktop/runtime/payload/python/Scripts/townlight_access-db-status.exe'
-            & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path $access.FullName
-            if ((Get-FileHash -LiteralPath $access.FullName).Hash.ToLowerInvariant() -ne '2763cf69c1f3cf99dadfb653e28e30a7a57f5a6ed1931526b5254f8ebf6032da') { throw 'Accepted portable Access launcher changed.' }
-          }
 
       - name: Sign desktop executable (Azure Artifact Signing)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
@@ -496,13 +491,6 @@ jobs:
           if ((Get-FileHash -LiteralPath $embedded[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $exeHash) {
             throw "MSI does not contain the exact signed executable."
           }
-          $embeddedAccess = @()
-          if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-            $embeddedAccess = @(Get-ChildItem -LiteralPath $extract -Filter townlight_access-db-status.exe -Recurse -File)
-            if ($embeddedAccess.Count -ne 1) { throw 'Expected one accepted portable Access launcher.' }
-            & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path $embeddedAccess[0].FullName
-            if ((Get-FileHash -LiteralPath $embeddedAccess[0].FullName).Hash.ToLowerInvariant() -ne '2763cf69c1f3cf99dadfb653e28e30a7a57f5a6ed1931526b5254f8ebf6032da') { throw 'MSI changed the accepted portable Access launcher.' }
-          }
           $receipt = [ordered]@{ schema_version = 1; source_commit = '${{ github.sha }}'; workflow_run = '${{ github.run_id }}'; product_profile = '${{ steps.candidate.outputs.product_profile }}'; runtime_profile = '${{ steps.candidate.outputs.runtime_profile }}'; desktop_version = '${{ steps.candidate.outputs.desktop_version }}'; files = @() }
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $provenanceName = if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { 'inspections-candidate-provenance.json' } elseif ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { 'permitting-candidate-provenance.json' } else { 'planning-candidate-provenance.json' }
@@ -518,10 +506,6 @@ jobs:
           foreach ($item in @(@{path=$exe; unsigned='${{ steps.exe_intake.outputs.sha256 }}'}, @{path=$msi; unsigned='${{ steps.locate_msi.outputs.sha256 }}'})) {
             $sig = Get-AuthenticodeSignature -LiteralPath $item.path
             $receipt.files += [ordered]@{ file=(Split-Path $item.path -Leaf); unsigned_sha256=$item.unsigned; signed_sha256=(Get-FileHash -LiteralPath $item.path -Algorithm SHA256).Hash.ToLowerInvariant(); signer_subject=$sig.SignerCertificate.Subject; signer_thumbprint=$sig.SignerCertificate.Thumbprint; timestamp_subject=$sig.TimeStamperCertificate.Subject }
-          }
-          foreach ($helper in $embeddedAccess) {
-            $sig = Get-AuthenticodeSignature -LiteralPath $helper.FullName
-            $receipt.files += [ordered]@{file=$helper.Name; signed_sha256=(Get-FileHash -LiteralPath $helper.FullName).Hash.ToLowerInvariant(); signer_subject=$sig.SignerCertificate.Subject; signer_thumbprint=$sig.SignerCertificate.Thumbprint; timestamp_subject=$sig.TimeStamperCertificate.Subject; reused_from_msi_sha256='7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3'}
           }
           $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "townlight/desktop/src-tauri/target/release/bundle/msi/Townlight-signing-receipt.json" -Encoding utf8
 
@@ -577,7 +561,7 @@ jobs:
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
             if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-              "UpgradeCode=0b97efae-2a2e-4e88-a81c-3aad1a52c2cc"
+              "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
             } elseif ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
               "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
             } else {
