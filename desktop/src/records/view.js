@@ -236,8 +236,8 @@ function renderRecordsWorkflow() {
       </div>
       <div class="workflow-form">
         <h3>Scope & Search</h3>
-        ${["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources(selectedRequest?.request_id || "") : ""}
-        ${["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources(selectedRequest?.request_id || "") : ""}
+        ${state.app.module_selection?.enabled_module_ids?.includes("townlight_meetings") ? renderMeetingsSources(selectedRequest?.request_id || "") : ""}
+        ${state.app.module_selection?.enabled_module_ids?.includes("townlight_code") ? renderCodeSources(selectedRequest?.request_id || "") : ""}
         ${state.app.module_selection?.enabled_module_ids?.includes("townlight_zoning") ? renderZoningSources(selectedRequest?.request_id || "") : ""}
         ${state.app.module_selection?.enabled_module_ids?.includes("townlight_planning") ? renderPlanningSources(selectedRequest?.request_id || "") : ""}
         <label>Assign to <input type="text" data-work-field="assignedTo" value="${escapeHtml(state.workDraft.assignedTo)}" /></label>

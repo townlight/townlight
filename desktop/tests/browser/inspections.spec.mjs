@@ -13,10 +13,12 @@ async function mount(page) {
       if(command!=='inspections_domain_request')throw new Error('Unexpected command');
       if(r.operation==='cases')return {items:window.__saved?[{...window.__saved,...window.__saved.payload}]:[],next_offset:null};
       if(['create-case','revise-case'].includes(r.operation)){
+        if(r.payload.analysis?.cited_sections?.some(c=>!r.payload.linked_sources.some(s=>s.source_id===c.source_id)))throw new Error('Stale analysis citation');
         if(window.__conflict)throw new Error('Saved work changed; reload and reconcile before saving.');
         window.__saved={entity_id:revision,revision_id:revision,payload:{...r.payload,reviewer_id:r.payload.review_state==='reviewed'?'server-inspector':null,reviewed_on:'2026-10-26',report_draft:{summary:'Staff workpaper'}}};return window.__saved;
       }
       if(r.operation==='case')return window.__saved;
+      if(r.operation==='analyse-media')return {analysis_record:{observations:[],cited_sections:[{source_id:'code:fixture'}]},runtime:{executed:false}};
       if(r.operation==='search-connections')return {results:[{source_id:'code:fixture',sha256:'b'.repeat(64),title:'Fictional Code',citation:'<img src=x onerror=alert(1)>',excerpt:'Staff context'}]};
       if(r.operation==='create-packet')return {packet_id:revision,source_id:'inspections:'+revision,sha256:'c'.repeat(64),text:JSON.stringify({public_summary:window.__saved.payload.public_summary})};
       if(r.operation==='repeat-cases')return {items:[],next_offset:null};
@@ -68,4 +70,22 @@ test('conflict retains inspector edits and account reset discards private work',
   await page.evaluate(()=>{window.__view.reset();document.body.innerHTML=window.__view.render();window.__view.bind();});
   await expect(page.locator('[data-inspections-case]')).toHaveCount(0);
   await expect(page.locator('[data-inspections-status]')).toContainText('No saved inspections.');
+});
+
+test('removing an analysed citation invalidates analysis and saves without rerunning it',async({page})=>{
+  await mount(page);
+  await page.getByRole('button',{name:'New inspection case',exact:true}).click();
+  await page.getByLabel('Inspection title',{exact:true}).fill('Citation regression');
+  await page.getByLabel('Original file (photo, document, or voice memo) — up to 10MB total',{exact:true}).setInputFiles({name:'note.txt',mimeType:'text/plain',buffer:Buffer.from('original')});
+  await expect(page.locator('[data-inspections-status]')).toContainText('Original bytes and SHA256 selected');
+  await page.getByLabel('Search adopted Code',{exact:true}).fill('fixture');
+  await page.getByRole('button',{name:'Find cited Code',exact:true}).click();
+  await page.getByRole('button',{name:'Select cited Code',exact:true}).click();
+  await page.getByRole('button',{name:'Analyse originals into this draft',exact:true}).click();
+  await expect(page.locator('[data-inspections-content]')).toContainText('1 cited section(s)');
+  await page.getByLabel('Inspector review notes',{exact:true}).fill('Review notes preserve existing analysis');
+  await page.getByRole('button',{name:'Remove citation',exact:true}).click();
+  await page.getByRole('button',{name:'Save inspection draft',exact:true}).click();
+  await expect(page.locator('[data-inspections-status]')).toContainText('Inspection draft saved');
+  expect(await page.evaluate(()=>window.__saved.payload.analysis)).toBeNull();
 });

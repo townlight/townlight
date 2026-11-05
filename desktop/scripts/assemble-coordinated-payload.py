@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from demo_wheels import components, inspect_wheels  # noqa: E402
 
 PROFILE = 'inspections-preview'
+SUPPORTED_PROFILES = ('planning-preview', 'permitting-preview', PROFILE)
 NATIVE = {'.exe', '.dll', '.pyd'}
 SUBTREES = {'python', 'postgres', 'ollama', 'station'}
 SITE_CUSTOMIZE = 'python/Lib/site-packages/sitecustomize.py'
@@ -35,6 +36,15 @@ def write_json(path, value):
     with path.open('x', encoding='utf-8') as stream:
         json.dump(value, stream, indent=2)
         stream.write('\n')
+
+
+def write_profile_provenance(output, provenance):
+    # The full payload also supports its smaller preview compositions. Each
+    # activation validates its own provenance file against the payload lock.
+    for profile in SUPPORTED_PROFILES:
+        name = profile.removesuffix('-preview')
+        write_json(output / f'python/{name}-candidate-provenance.json',
+                   {**provenance, 'profile': profile, 'build_profile': PROFILE})
 
 
 def digest(path):
@@ -105,7 +115,9 @@ def stage_base(source, output, files, removed):
 def make_lock(output, payload_manifest):
     result = []
     for payload in payload_manifest['payloads']:
-        files = dict.fromkeys(payload['required_files'] + payload.get('profile_required_files', {}).get(PROFILE, []))
+        files = dict.fromkeys(payload['required_files'])
+        for profile in SUPPORTED_PROFILES:
+            files.update(dict.fromkeys(payload.get('profile_required_files', {}).get(profile, [])))
         entries = []
         for name in files:
             path = child(output, payload['source_dir'] + '/' + name)
@@ -236,7 +248,7 @@ def main():
                   'wheels': [dict(item) for item in wheel_receipt.values()], 'umbrella_source_commit': commit,
                   'reused_station_runtime': station_reuse,
                   'package_versions': {name.replace('-', '_'): version for name, version in installed.items()}}
-    write_json(output / 'python/inspections-candidate-provenance.json', provenance)
+    write_profile_provenance(output, provenance)
     lock = make_lock(output, read_json(ROOT / 'desktop/runtime/windows-runtime-payloads.json'))
     lock['accepted_native_base_sha256'] = contract['accepted_msi_sha256']
     lock['umbrella_source_commit'] = commit

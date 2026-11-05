@@ -1225,43 +1225,106 @@ fn rename_path_with_retries(source: &Path, destination: &Path) -> Result<(), Str
     ))
 }
 
+// Move file leaves, retaining directory identities. Explorer can hold an export
+// directory open without allowing its rename, while allowing its files to move.
+// Every completed move is journaled and reversed on failure in either phase.
 fn move_children_except(
     source_dir: &Path,
     destination_dir: &Path,
     excluded_names: &[&str],
 ) -> Result<Vec<String>, String> {
+    fn visit(
+        source: &Path,
+        destination: &Path,
+        journal: &mut Vec<(PathBuf, PathBuf)>,
+    ) -> Result<(), String> {
+        let metadata = fs::symlink_metadata(source)
+            .map_err(|error| format!("Could not inspect {}: {error}", source.display()))?;
+        if metadata.file_type().is_symlink() {
+            return Err("Restore cannot follow a symbolic link.".into());
+        }
+        #[cfg(windows)]
+        {
+            use std::os::windows::fs::MetadataExt;
+            if metadata.file_attributes() & 0x400 != 0 {
+                return Err("Restore cannot follow a reparse point.".into());
+            }
+        }
+        if metadata.is_dir() {
+            if destination.exists() && !destination.is_dir() {
+                return Err(format!(
+                    "Restore destination is not a directory: {}",
+                    destination.display()
+                ));
+            }
+            fs::create_dir_all(destination)
+                .map_err(|error| format!("Could not create {}: {error}", destination.display()))?;
+            let mut entries = fs::read_dir(source)
+                .map_err(|error| format!("Could not inspect {}: {error}", source.display()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|error| error.to_string())?;
+            entries.sort_by_key(|entry| entry.file_name());
+            for entry in entries {
+                visit(&entry.path(), &destination.join(entry.file_name()), journal)?;
+            }
+        } else if metadata.is_file() {
+            if destination.exists() {
+                return Err(format!(
+                    "Restore refuses to overwrite unstaged file {}",
+                    destination.display()
+                ));
+            }
+            rename_path_with_retries(source, destination)?;
+            journal.push((source.to_path_buf(), destination.to_path_buf()));
+        } else {
+            return Err(format!("Unsupported restore entry {}", source.display()));
+        }
+        Ok(())
+    }
     if !source_dir.exists() {
         return Ok(Vec::new());
     }
-    fs::create_dir_all(destination_dir).map_err(|error| {
-        format!(
-            "Could not create restore swap folder {}: {error}",
-            destination_dir.display()
-        )
-    })?;
-    let mut moved = Vec::new();
-    for entry in fs::read_dir(source_dir)
-        .map_err(|error| format!("Could not inspect {}: {error}", source_dir.display()))?
-    {
-        let entry = entry.map_err(|error| format!("Could not inspect restore entry: {error}"))?;
-        let file_name = entry.file_name();
-        let name = file_name.to_string_lossy();
-        if excluded_names
-            .iter()
-            .any(|excluded| name.eq_ignore_ascii_case(excluded))
-        {
-            continue;
+    fs::create_dir_all(destination_dir).map_err(|error| error.to_string())?;
+    let mut journal = Vec::new();
+    let outcome = (|| {
+        let mut names = Vec::new();
+        let mut entries = fs::read_dir(source_dir)
+            .map_err(|error| error.to_string())?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| error.to_string())?;
+        entries.sort_by_key(|entry| entry.file_name());
+        for entry in entries {
+            let name = entry.file_name();
+            if excluded_names
+                .iter()
+                .any(|excluded| name.to_string_lossy().eq_ignore_ascii_case(excluded))
+            {
+                continue;
+            }
+            visit(&entry.path(), &destination_dir.join(&name), &mut journal)?;
+            names.push(name.to_string_lossy().to_string());
         }
-        let source = entry.path();
-        let destination = destination_dir.join(&file_name);
-        if destination.exists() {
-            ensure_profile_child_for_delete(&destination)?;
-            remove_profile_dir(&destination)?;
+        Ok(names)
+    })();
+    if let Err(error) = outcome {
+        let mut rollback_errors = Vec::new();
+        for (original, moved) in journal.iter().rev() {
+            if let Err(problem) = rename_path_with_retries(moved, original) {
+                rollback_errors.push(problem);
+            }
         }
-        rename_path_with_retries(&source, &destination)?;
-        moved.push(name.to_string());
+        return Err(if rollback_errors.is_empty() {
+            format!("{error}. Completed file moves were rolled back.")
+        } else {
+            format!(
+                "{error}. Rollback needs recovery: {}. Retained files at {} and {}.",
+                rollback_errors.join("; "),
+                source_dir.display(),
+                destination_dir.display()
+            )
+        });
     }
-    Ok(moved)
+    outcome
 }
 
 fn replace_profile_dir_from_backup_with_options(
@@ -1299,9 +1362,11 @@ fn replace_profile_dir_from_backup_with_options(
         ensure_profile_child_for_delete(destination)?;
         let moved_old = move_children_except(destination, &old, &["models"])?;
         if let Err(error) = move_children_except(&stage, destination, &["models"]) {
-            let _ = move_children_except(&old, destination, &[]);
-            let _ = remove_profile_dir(&stage);
-            return Err(error);
+            let rollback = move_children_except(&old, destination, &[]);
+            return Err(match rollback {
+                Ok(_) => format!("{error} Original profile files restored; staged backup retained at {}.", stage.display()),
+                Err(problem) => format!("{error} Original profile rollback needs recovery: {problem}. Safety copies retained at {} and {}.",old.display(),stage.display()),
+            });
         }
         let mut notes = Vec::new();
         if destination.join("models").exists() {
@@ -3671,6 +3736,26 @@ fn open_windows_uninstall_action() -> Result<SupervisorActionResult, String> {
     })
 }
 
+pub fn remove_module_after_backup(
+    module_id: &str,
+) -> Result<
+    (
+        crate::module_registry::ModuleSelectionState,
+        SupervisorActionResult,
+    ),
+    String,
+> {
+    let _guard = crate::profile_gate::lifecycle()?;
+    // No service stop, backup write or selection mutation until validation passes.
+    crate::module_registry::plan_module_installed(module_id, false)?;
+    let backup = supervisor_action_under_gate("backup", None)?;
+    if !backup.accepted {
+        return Err(backup.message);
+    }
+    let selection = crate::module_registry::set_module_installed(module_id, false)?;
+    Ok((selection, backup))
+}
+
 pub fn supervisor_action(
     action: &str,
     service_id: Option<&str>,
@@ -3691,6 +3776,15 @@ pub fn supervisor_action(
     } else {
         None
     };
+    supervisor_action_under_gate(action, service_id)
+}
+
+// Caller must hold the profile lifecycle gate. Kept private so native commands
+// cannot bypass the exclusion used by backup/restore and file operations.
+fn supervisor_action_under_gate(
+    action: &str,
+    service_id: Option<&str>,
+) -> Result<SupervisorActionResult, String> {
     let manifest = parse_manifest()?;
     validate_manifest(&manifest)?;
     if !manifest
@@ -3747,6 +3841,101 @@ pub fn supervisor_action(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn refused_removal_does_not_create_backup_or_stop_services() {
+        with_temp_state_dir(|root| {
+            crate::module_registry::persist_profile_selection("inspections-preview").unwrap();
+            fs::create_dir_all(root.join("config")).unwrap();
+            let state = root.join("config/runtime-state.json");
+            fs::write(&state, "sentinel-live-service-state").unwrap();
+            let error = remove_module_after_backup("townlight_code")
+                .err()
+                .expect("dependent removal refused");
+            assert!(error.contains("dependent module"));
+            assert_eq!(
+                fs::read_to_string(state).unwrap(),
+                "sentinel-live-service-state"
+            );
+            assert!(!root.join("Backups").exists());
+        });
+    }
+
+    #[test]
+    fn restore_move_rolls_back_earlier_files_when_a_later_entry_conflicts() {
+        with_temp_state_dir(|root| {
+            let source = root.join("Data/source");
+            let destination = root.join("Data/destination");
+            fs::create_dir_all(&source).unwrap();
+            fs::create_dir_all(&destination).unwrap();
+            fs::write(source.join("a.txt"), "first-original").unwrap();
+            fs::write(source.join("z.txt"), "last-original").unwrap();
+            fs::write(destination.join("z.txt"), "preserve-conflict").unwrap();
+            let error = move_children_except(&source, &destination, &[]).unwrap_err();
+            assert!(error.contains("rolled back"));
+            assert_eq!(
+                fs::read_to_string(source.join("a.txt")).unwrap(),
+                "first-original"
+            );
+            assert_eq!(
+                fs::read_to_string(source.join("z.txt")).unwrap(),
+                "last-original"
+            );
+            assert_eq!(
+                fs::read_to_string(destination.join("z.txt")).unwrap(),
+                "preserve-conflict"
+            );
+            assert!(!destination.join("a.txt").exists());
+        });
+    }
+
+    #[test]
+    #[cfg(windows)]
+    fn restore_preserves_open_export_directory_and_model_cache() {
+        use std::os::windows::fs::OpenOptionsExt;
+        with_temp_state_dir(|root| {
+            let destination = root.join("Data");
+            let source = root.join("Backups/fixture/Data");
+            fs::create_dir_all(destination.join("exports/records")).unwrap();
+            fs::create_dir_all(destination.join("models")).unwrap();
+            fs::create_dir_all(source.join("exports/records")).unwrap();
+            fs::write(destination.join("exports/records/proof.txt"), "changed").unwrap();
+            fs::write(destination.join("models/cache.bin"), "keep-model").unwrap();
+            fs::write(source.join("exports/records/proof.txt"), "original").unwrap();
+            // Explorer-like directory handle: FILE_SHARE_READ|WRITE, no DELETE.
+            let held = fs::OpenOptions::new()
+                .read(true)
+                .share_mode(3)
+                .custom_flags(0x02000000)
+                .open(destination.join("exports"))
+                .unwrap();
+            assert!(fs::rename(
+                destination.join("exports"),
+                destination.join("cannot-rename")
+            )
+            .is_err());
+            replace_profile_dir_from_backup_with_options(
+                &source,
+                &destination,
+                "Test data",
+                RestoreProfileOptions {
+                    preserve_destination_model_cache: true,
+                    skip_source_model_cache: true,
+                    ..RestoreProfileOptions::default()
+                },
+            )
+            .unwrap();
+            assert_eq!(
+                fs::read_to_string(destination.join("exports/records/proof.txt")).unwrap(),
+                "original"
+            );
+            assert_eq!(
+                fs::read_to_string(destination.join("models/cache.bin")).unwrap(),
+                "keep-model"
+            );
+            drop(held);
+        });
+    }
 
     #[test]
     #[ignore = "Requires explicit disposable stopped database and cached PostgreSQL payload"]

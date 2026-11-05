@@ -139,7 +139,9 @@ const requiredUiPhrases = [
   "Module Catalog",
   "Choose Product Modules",
   "Custom selection will install Townlight Core plus",
-  "Not ready for Windows Local 1.0",
+  "Unavailable for this selection",
+  "Bundled separate service",
+  "Separate Station backup:",
   "Apply Module Selection",
   "Save Local Folders",
   "City data folder",
@@ -205,8 +207,8 @@ for (const phrase of [
 }
 
 for (const phrase of [
-  '["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources',
-  '["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources'
+  'enabled_module_ids?.includes("townlight_meetings") ? renderMeetingsSources',
+  'enabled_module_ids?.includes("townlight_code") ? renderCodeSources'
 ]) {
   if (!main.includes(phrase)) {
     throw new Error(`desktop zoning-beta source panel guard missing phrase: ${phrase}`);
@@ -261,7 +263,7 @@ for (const phrase of [
   "Downloading…",
   "Townlight may look frozen while it downloads",
   "too many failed sign-in attempts",
-  "not available in this release yet",
+  "choose a matching profile or resolve the module requirements",
   'result.working ? "working"',
   "this local staff user is disabled"
 ]) {

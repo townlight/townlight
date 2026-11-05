@@ -62,7 +62,7 @@
     {
       "id": "permitting-preview",
       "label": "Townlight Permitting development candidate",
-      "description": "Explicit unsigned staff candidate with reviewed intake, cited Code/Zoning and Records handoff.",
+      "description": "Staff intake workpapers with reviewed intake, cited Code/Zoning and Records handoff.",
       "modules": [
         "townlight_core",
         "townlight_records",
@@ -80,7 +80,7 @@
     {
       "id": "planning-preview",
       "label": "Townlight Planning development preview",
-      "description": "Opt-in unsigned development composition. Requires the matching Planning candidate payload; not a published release.",
+      "description": "Staff Planning composition. Requires the matching Planning payload.",
       "modules": [
         "townlight_core",
         "townlight_records",
@@ -97,7 +97,7 @@
     {
       "id": "zoning-beta",
       "label": "Townlight Records + Meetings + Code + Zoning",
-      "description": "Opt-in Records, Meetings, Code and Zoning in published desktop 1.4.0-beta.1; see signed acceptance and manual runtime upgrade steps.",
+      "description": "Connected Records, Meetings, Code and Zoning profile with Core, Notice and Access.",
       "modules": [
         "townlight_core",
         "townlight_records",
@@ -1000,7 +1000,7 @@
         "townlight_records",
         "townlight_meetings"
       ],
-      "default_port": 8066,
+      "default_port": 8756,
       "installer_status": "naming_candidate_acceptance_pending",
       "proof_required": [
         "module_selection",
@@ -1017,7 +1017,7 @@
       "routes": [
         {
           "id": "station-operator",
-          "label": "Station operator \u2014 separate local service",
+          "label": "Station operator — separate local service",
           "path": "http://127.0.0.1:8756/",
           "surface": "Staff"
         }
@@ -1040,16 +1040,15 @@
         "recording-worker"
       ],
       "backup_restore_hooks": [
-        "Data/workflows/notice",
-        "Data/exports/notice",
-        "Data/files/notice"
+        "Separate Station database",
+        "Separate Station media directory"
       ],
       "model_needs": [],
       "lifecycle": {
-        "install": "profile-selected",
-        "update": "manifest-versioned",
-        "disable": "allowed-after-backup",
-        "uninstall": "backup-first-module-data-removal"
+        "install": "configured-as-separate-service",
+        "update": "separate-service-versioned-update",
+        "disable": "stop-separate-station-service",
+        "uninstall": "backup-first-separate-station-removal"
       }
     }
   ]

@@ -1,11 +1,11 @@
 {
-  "version": "1.7.0-1",
-  "identifier": "org.townlight.naming.candidate",
-  "productName": "Townlight Candidate",
+  "version": "1.7.1-1",
+  "identifier": "org.townlight.windows.fixes.candidate",
+  "productName": "Townlight Windows Fix Candidate",
   "bundle": {
     "windows": {
       "wix": {
-        "upgradeCode": "77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
+        "upgradeCode": "0b97efae-2a2e-4e88-a81c-3aad1a52c2cc"
       }
     }
   }

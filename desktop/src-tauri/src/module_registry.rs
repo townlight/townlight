@@ -599,31 +599,30 @@ fn selection_from_installed_and_enabled(
             .ok_or_else(|| format!("Installed module {module_id} is missing from the registry"))?;
     }
 
-    let mut ordered_module_ids = if installed_module_ids
-        .iter()
-        .any(|module_id| module_id != "townlight_core")
-    {
-        let product_modules = installed_module_ids
+    // Recognize a coherent explicit preview before applying custom-selection
+    // restrictions. Removing a leaf preview does not opt into arbitrary mixes.
+    let matching_profile = registry.profiles.iter().find(|profile| {
+        !profile.disabled
+            && profile.id != "meetings-beta"
+            && profile.modules.len() == installed_module_ids.len()
+            && profile
+                .modules
+                .iter()
+                .all(|id| installed_module_ids.contains(id))
+    });
+    let ordered_module_ids = if let Some(profile) = matching_profile {
+        validate_profile(registry, &profile.id)?;
+        profile.modules.clone()
+    } else if installed_module_ids.iter().any(|id| id != "townlight_core") {
+        let products = installed_module_ids
             .iter()
-            .filter(|module_id| module_id.as_str() != "townlight_core")
+            .filter(|id| id.as_str() != "townlight_core")
             .cloned()
             .collect::<Vec<_>>();
-        resolve_custom_module_order(registry, &product_modules)?
+        resolve_custom_module_order(registry, &products)?
     } else {
         vec!["townlight_core".to_string()]
     };
-    if let Some(profile) = registry.profiles.iter().find(|profile| {
-        !profile.disabled
-            && profile.id != "meetings-beta"
-            && profile.modules.len() == ordered_module_ids.len()
-            && profile.modules.iter().all(|module_id| {
-                ordered_module_ids
-                    .iter()
-                    .any(|ordered| ordered == module_id)
-            })
-    }) {
-        ordered_module_ids = profile.modules.clone();
-    }
     let installed: HashSet<&str> = ordered_module_ids.iter().map(String::as_str).collect();
     let mut enabled_module_ids = enabled_module_ids
         .into_iter()
@@ -902,6 +901,15 @@ pub fn set_module_installed(
     module_id: &str,
     installed: bool,
 ) -> Result<ModuleSelectionState, String> {
+    let next = plan_module_installed(module_id, installed)?;
+    write_selection(&next)?;
+    Ok(next)
+}
+
+pub fn plan_module_installed(
+    module_id: &str,
+    installed: bool,
+) -> Result<ModuleSelectionState, String> {
     let registry = parse_registry(MODULES_JSON)?;
     let module_map = module_index(&registry);
     let module = module_map
@@ -927,12 +935,12 @@ pub fn set_module_installed(
         let mut installed_module_ids = selection.installed_module_ids.clone();
         installed_module_ids.push(module_id.to_string());
         let mut enabled_module_ids = selection.enabled_module_ids.clone();
-        let product_modules = installed_module_ids
-            .iter()
-            .filter(|installed_id| installed_id.as_str() != "townlight_core")
-            .cloned()
-            .collect::<Vec<_>>();
-        let ordered_module_ids = resolve_custom_module_order(&registry, &product_modules)?;
+        let ordered_module_ids = selection_from_installed_and_enabled(
+            &registry,
+            installed_module_ids.clone(),
+            installed_module_ids.clone(),
+        )?
+        .installed_module_ids;
         for installed_id in &ordered_module_ids {
             if !selection
                 .installed_module_ids
@@ -947,7 +955,6 @@ pub fn set_module_installed(
             ordered_module_ids,
             enabled_module_ids,
         )?;
-        write_selection(&next_selection)?;
         return Ok(next_selection);
     }
 
@@ -990,7 +997,6 @@ pub fn set_module_installed(
         .collect::<Vec<_>>();
     let next_selection =
         selection_from_installed_and_enabled(&registry, installed_module_ids, enabled_module_ids)?;
-    write_selection(&next_selection)?;
     Ok(next_selection)
 }
 
@@ -1065,7 +1071,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
             } else if module.id == "townlight_planning" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
             } else if module.id == "townlight_permitting" && !matches!(selection.profile_id.as_str(), "permitting-preview" | "inspections-preview") {
-                Err("Select permitting-preview and its matching unsigned candidate payload.".into())
+                Err("Select permitting-preview and its matching candidate payload.".into())
             } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
                 Ok(()) => (true, None),
@@ -1133,6 +1139,45 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn preview_leaf_removal_preserves_explicit_remaining_profile() {
+        with_temp_state_dir(|_| {
+            persist_profile_selection("inspections-preview").unwrap();
+            for (module, profile) in [
+                ("townlight_inspections", "permitting-preview"),
+                ("townlight_permitting", "planning-preview"),
+                ("townlight_planning", "zoning-beta"),
+            ] {
+                let before = module_selection_state().unwrap();
+                let planned = plan_module_installed(module, false).unwrap();
+                assert_eq!(
+                    module_selection_state().unwrap().installed_module_ids,
+                    before.installed_module_ids
+                );
+                assert_eq!(planned.profile_id, profile);
+                let removed = set_module_installed(module, false).unwrap();
+                assert_eq!(removed.profile_id, profile);
+                assert!(!removed.installed_module_ids.contains(&module.to_string()));
+            }
+            for module in [
+                "townlight_planning",
+                "townlight_permitting",
+                "townlight_inspections",
+            ] {
+                set_module_installed(module, true).unwrap();
+            }
+            assert_eq!(
+                module_selection_state().unwrap().profile_id,
+                "inspections-preview"
+            );
+            assert!(plan_module_installed("townlight_code", false).is_err());
+            assert_eq!(
+                module_selection_state().unwrap().profile_id,
+                "inspections-preview"
+            );
+        });
+    }
 
     #[test]
     fn inspections_requires_explicit_profile_and_retains_accepted_profiles() {

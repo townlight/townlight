@@ -4,6 +4,7 @@ import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
 import { createCodeView } from "./code/view.js";
+import { createPublishedView } from "./published/view.js";
 import { createPermittingView } from "./permitting/view.js";
 import { createInspectionsView } from "./inspections/view.js";
 import { createPlanningView } from "./planning/view.js";
@@ -18,6 +19,8 @@ const recordsController = createRecordsController(invoke);
 const noticeView = createNoticeView(invoke);
 const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
+const publicMeetingsView = createPublishedView(invoke, 'meetings');
+const publicCodeView = createPublishedView(invoke, 'code');
 const permittingView = createPermittingView(invoke);
 const inspectionsView = createInspectionsView(invoke);
 const planningView = createPlanningView(invoke);
@@ -868,6 +871,22 @@ const state = {
   appLoadError: null
 };
 
+const initialWorkDraft = structuredClone(state.workDraft);
+const initialWorkSelection = structuredClone(state.workSelection);
+let workGeneration = 0;
+function clearAccountWork() {
+  workGeneration++;
+  state.workActionResult = null;
+  state.actionResult = state.modelActionResult = state.supervisorActionResult = null;
+  state.workDraft = structuredClone(initialWorkDraft);
+  state.workSelection = structuredClone(initialWorkSelection);
+  state.searchResults = [];
+  state.pendingWorkReviewAction = null;
+  state.workActionInFlightTags.clear();
+  state.publicRecordsLookup = {trackingNumber: '', requesterContact: '', found: false};
+  state.auditOpen = false;
+}
+
 // First-run wizard focus management.
 // Reassigned (hence `let`). Tracks the current step we last auto-advanced to, so
 // scroll/focus fire ONLY when the backend advances current_step_id — never on
@@ -1108,6 +1127,7 @@ function visibleNavigationItems() {
 }
 
 function moduleStatusLabel(module) {
+  if (module.id === "townlight-station") return "Bundled separate service";
   if (module.required) return "Required";
   if (module.installed && module.enabled === false) return "Disabled";
   if (module.installed) return "Enabled";
@@ -1312,7 +1332,7 @@ function renderModuleSelectionControls() {
     {
       id: "zoning-beta",
       label: "Townlight Records + Meetings + Code + Zoning",
-      description: "Opt-in connected Zoning candidate with Core, Notice, and Access. Not a published release."
+      description: "Connected Zoning profile with Core, Notice, and Access."
     },
     {
       id: "custom",
@@ -1327,12 +1347,12 @@ function renderModuleSelectionControls() {
     {
       id: "permitting-preview",
       label: "Townlight Permitting development candidate",
-      description: "Explicit unsigned staff candidate; verifies its matching payload and preserves the coherent profile before migration."
+      description: "Staff intake workpapers with the matching payload and a coherent backup before migration."
     },
     {
       id: "planning-preview",
       label: "Townlight Planning development preview",
-      description: "Opt-in development profile. Verifies its matching candidate payload and backs up the coherent profile before migration."
+      description: "Staff Planning profile with the matching payload and a coherent backup before migration."
     }
   ];
   return `
@@ -1369,10 +1389,13 @@ function renderModuleSelectionControls() {
           const profileModuleIds = PRODUCT_MODULE_IDS_BY_PROFILE[state.moduleDraft.profileId] || [];
           const checked = customMode ? selectedIds.has(module.id) : profileModuleIds.includes(module.id);
           const disabled = !customMode || !ready;
-          const status = ready ? "Ready for Windows Local 1.0" : "Not ready for Windows Local 1.0";
+          const separateStation = module.id === "townlight-station";
+          const status = separateStation ? "Bundled separate service" : ready ? "Available in this Windows installation" : "Unavailable for this selection";
           // Clerk-facing plain reason; the raw technical contract string (e.g.
           // "must target Townlight Core 1.2.0") is kept only as a hover tooltip for support.
-          const plainReason = !ready ? " - not available in this release yet; check back after your next Townlight update" : "";
+          const plainReason = separateStation
+            ? " - configure Station separately; desktop module selection does not provision it"
+            : !ready ? " - choose a matching profile or resolve the module requirements" : "";
           const rawTitle = !ready && module.blocked_reason ? ` title="${escapeHtml(module.blocked_reason)}"` : "";
           return `
             <label class="module-choice ${checked ? "selected" : ""} ${disabled ? "disabled" : ""}">
@@ -1393,7 +1416,7 @@ function renderModuleSelectionControls() {
       <p class="empty-note">
         ${customMode
           ? `Custom selection will install Townlight Core plus ${readySelectedCount} selected product module${readySelectedCount === 1 ? "" : "s"}.`
-          : "City Core installs the complete current 1.0 package: Townlight Records, Townlight Meetings, Townlight Code, Townlight Notice, and Townlight Access."}
+          : "The selected profile installs its listed products with Townlight Core. Station is configured separately."}
       </p>
     </div>
   `;
@@ -4424,6 +4447,10 @@ function lifecycleStatusText(value) {
     "always-installed-with-profile": "Always installed with Townlight Core",
     "profile-selected": "Installed by selected package profile",
     "manifest-versioned": "Updated through the versioned module manifest",
+    "configured-as-separate-service": "Configure separately using the Station manual",
+    "separate-service-versioned-update": "Update the separate Station service",
+    "stop-separate-station-service": "Stop the separate Station service",
+    "backup-first-separate-station-removal": "Back up Station database and media before removing its service",
     "not-allowed-required-foundation": "Cannot be disabled because it is the required foundation",
     "allowed-after-backup": "Allowed after a backup is created",
     "backup-first-profile-removal": "Removed only through backup-first profile removal",
@@ -4471,6 +4498,7 @@ function renderModuleRow(module, { actions = false } = {}) {
   const proofCount = module.proof_required?.length || 0;
   const lifecycle = moduleLifecycleItems(module);
   const backupHooks = module.backup_restore_hooks || [];
+  const separateStation = module.id === "townlight-station";
   const disabled = module.installed && module.enabled === false;
   const canToggle = actions && module.installed && !module.required;
   const canInstall = actions && !module.installed && module.selectable && module.contract_ready;
@@ -4502,7 +4530,8 @@ function renderModuleRow(module, { actions = false } = {}) {
       <div class="module-meta">
         <span class="${moduleStatusClass(module)}">${moduleStatusLabel(module)}</span>
         <small>${escapeHtml(module.version || "No release yet")}${proofCount ? ` - ${proofCount} proof checks` : ""}</small>
-        ${backupHooks.length ? `<small><strong>Backup includes:</strong> ${backupHooks.map((hook) => escapeHtml(backupHookLabel(hook))).join(", ")}</small>` : ""}
+        ${backupHooks.length ? `<small><strong>${separateStation ? "Separate Station backup:" : "Backup includes:"}</strong> ${backupHooks.map((hook) => escapeHtml(backupHookLabel(hook))).join(", ")}</small>` : ""}
+        ${separateStation ? `<p>Station is a bundled separate local service. See <a href="https://townlight.github.io/manuals/station.html" target="_blank" rel="noopener noreferrer">Station manual: Configuration and administration</a>. Configure its dedicated database and media directory, pair it with the suite process using named staff authority, and set TOWNLIGHT_STATION_URL. Back up Station database and media separately; the desktop profile backup does not include them.</p>` : ""}
         ${disabled ? `<small>Data remains installed. Re-enable this module to show its work area.</small>` : ""}
         ${lifecycle.map((item) => `<small><strong>${item.label}:</strong> ${escapeHtml(item.value)}</small>`).join("")}
         ${actionButtons.length ? `
@@ -5058,7 +5087,7 @@ function renderActiveArea() {
   if (state.activeArea === "settings" && access.configured && access.role !== "local-admin") {
     return renderAccessPanel();
   }
-  if (state.domainLoadError && !["health", "settings"].includes(state.activeArea)) {
+  if (state.domainLoadError && ["home", "records", "access", "search"].includes(state.activeArea)) {
     return `<section class="section-band" role="alert"><h2>Records service is unavailable</h2>
       <p>Saved Records could not be refreshed. No legacy copy was loaded. Use System Health to start or repair the local services, then retry.</p>
       <pre>${escapeHtml(state.domainLoadError)}</pre>
@@ -5077,6 +5106,7 @@ function renderActiveArea() {
     case "zoning":
       return isPublicSurface() ? publicZoningView.render() : zoningView.render();
     case "meetings":
+      if (isPublicSurface() && state.app?.domain_authority === 'python-records') return publicMeetingsView.render();
       if (
         state.app?.module_selection?.profile_id === "meetings-beta" ||
         ((state.app?.module_selection?.profile_id === "city-core" ||
@@ -5088,6 +5118,7 @@ function renderActiveArea() {
     case "records":
       return renderRecordsWorkflow();
     case "code":
+      if (isPublicSurface() && state.app?.domain_authority === 'python-records') return publicCodeView.render();
       if (
         (state.app?.module_selection?.profile_id === "city-core" ||
           (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview", "inspections-preview"].includes(state.app?.module_selection?.profile_id))) &&
@@ -5171,8 +5202,13 @@ function renderStateLoadError(message) {
 function render() {
   // Never retain an in-memory Planning draft across accounts or session loss.
   const access = accessState();
-  const account = JSON.stringify([access.signed_in, access.operator_email, access.role]);
-  if (planningAccount !== account) { noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset(); planningAccount = account; }
+  const account = JSON.stringify([access.signed_in, access.operator_email, access.role, isPublicSurface()]);
+  if (planningAccount !== account) {
+    clearAccountWork();
+    publicMeetingsView.reset(); publicCodeView.reset();
+    noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset();
+    planningAccount = account;
+  }
   if (state.appLoadError) {
     byId("app").innerHTML = renderStateLoadError(state.appLoadError);
     byId("app").querySelector("[data-action='retry-load-state']")
@@ -5226,6 +5262,8 @@ function bindEvents() {
   }
   meetingsView.bind();
   codeView.bind();
+  publicMeetingsView.bind();
+  publicCodeView.bind();
   if (state.activeArea === "zoning") {
     (isPublicSurface() ? publicZoningView : zoningView).bind();
   }
@@ -5714,6 +5752,7 @@ function supervisorActionLabel(action) {
 }
 
 async function handleChooseFilePath(field) {
+  const expectedGeneration = workGeneration;
   if (!Object.prototype.hasOwnProperty.call(state.workDraft, field)) {
     return;
   }
@@ -5729,6 +5768,7 @@ async function handleChooseFilePath(field) {
   }
   try {
     const pickedPath = await invoke("choose_file_path");
+    if (expectedGeneration !== workGeneration) return;
     if (pickedPath) {
       state.workDraft[field] = pickedPath;
       state.workActionResult = {
@@ -6470,6 +6510,7 @@ function syncWorkSelectionAfterAction(action, work, previousWork = {}) {
 }
 
 async function handleCityWorkAction(action, { confirmed = false, overridePayload = null } = {}) {
+  const expectedGeneration = workGeneration;
   if (requiresGuidedWorkReview(action) && !confirmed) {
     state.pendingWorkReviewAction = action;
     state.workActionResult = null;
@@ -6527,6 +6568,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     const result = state.app.domain_authority === "python-records"
       ? await recordsController.action(action, payload, previousWork)
       : await invoke("city_work_action", { action, payload });
+    if (expectedGeneration !== workGeneration) return;
     state.workActionResult = result;
     state.app.city_work = result.state;
     syncWorkSelectionAfterAction(action, result.state, previousWork);
@@ -6551,6 +6593,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
       }
     }
   } catch (error) {
+    if (expectedGeneration !== workGeneration) return;
     state.workActionResult = {
       accepted: false,
       status: "Needs attention",
@@ -6564,12 +6607,12 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     // needed here, unlike the scalar this replaced. A different row's own tag
     // is a different Set entry, so it's untouched regardless of how many
     // actions are in flight at once.
-    state.workActionInFlightTags.delete(myWorkTag);
+    if (expectedGeneration === workGeneration) state.workActionInFlightTags.delete(myWorkTag);
     // accessDeleteReviewId is a different kind of value (which review the
     // single app-wide guided-review confirm panel currently targets, not a
     // busy/in-flight tracker) so it keeps its own equality guard: only clear
     // it if it still points at the review THIS call was processing.
-    if (action === "townlight_access-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
+    if (expectedGeneration === workGeneration && action === "townlight_access-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
       state.workSelection.accessDeleteReviewId = "";
     }
   }

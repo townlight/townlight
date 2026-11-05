@@ -259,9 +259,11 @@ def test_fresh_candidate_does_not_upgrade_the_accepted_installer_family() -> Non
     accepted_station_upgrade_code = "a63fc1d3-5437-5f55-89a2-fef93fb1f930"
     assert base["bundle"]["windows"]["wix"]["upgradeCode"] != accepted_station_upgrade_code
     assert candidate["bundle"]["windows"]["wix"]["upgradeCode"] != accepted_station_upgrade_code
-    assert candidate["productName"] == "Townlight Candidate"
+    assert candidate["productName"] == "Townlight Windows Fix Candidate"
     assert candidate["productName"] != base["productName"]
-    assert candidate["identifier"] == "org.townlight.naming.candidate"
+    assert candidate["identifier"] == "org.townlight.windows.fixes.candidate"
+    assert candidate["bundle"]["windows"]["wix"]["upgradeCode"] == "0b97efae-2a2e-4e88-a81c-3aad1a52c2cc"
+    assert candidate["bundle"]["windows"]["wix"]["upgradeCode"] != base["bundle"]["windows"]["wix"]["upgradeCode"]
 
 
 def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes() -> None:
@@ -349,12 +351,12 @@ function Resolve($Profile, $Branch, $Sign = $false) {
     & "$PSScriptRoot/desktop/scripts/resolve-msi-candidate.ps1" -RequestedProfile $Profile -SourceBranch $Branch -SignForPublication:$Sign | ConvertFrom-Json
 }
 if ((Resolve automatic main).product_profile -ne 'inspections-preview') { throw 'main must exercise the full Beta 1 composition' }
-if ((Resolve automatic work/naming-access-notice-2026-11-02).product_profile -ne 'inspections-preview') { throw 'Naming candidate branch must exercise the full composition' }
+if ((Resolve automatic fix/windows-installed-defects-2026-11-04).product_profile -ne 'inspections-preview') { throw 'Windows fix candidate branch must exercise the full composition' }
 if ((Resolve automatic release/townlight-beta-1).product_profile -ne 'inspections-preview') { throw 'Beta 1 branch must exercise the full composition' }
 $inspect = Resolve automatic inspections/connected-workflow
-if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.0-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Coordinated composition mismatch' }
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.7.1-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Coordinated composition mismatch' }
 $inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
-if ($inspectionOverlay.identifier -ne 'org.townlight.naming.candidate' -or $inspectionOverlay.productName -ne 'Townlight Candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -ne '77c47cc0-128e-50b0-acc1-0bdf84ac3b3c') { throw 'Separate coordinated candidate identity required' }
+if ($inspectionOverlay.identifier -ne 'org.townlight.windows.fixes.candidate' -or $inspectionOverlay.productName -ne 'Townlight Windows Fix Candidate' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -ne '0b97efae-2a2e-4e88-a81c-3aad1a52c2cc') { throw 'Separate Windows fix candidate identity required' }
 $permit = Resolve automatic permitting/connected-workflow
 if ($permit.product_profile -ne 'permitting-preview' -or $permit.runtime_profile -ne 'permitting-preview' -or $permit.desktop_version -ne '1.6.0-1' -or $permit.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Permitting composition mismatch' }
 $overlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.permitting-candidate.conf.json" -Raw | ConvertFrom-Json

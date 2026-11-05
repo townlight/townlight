@@ -26,7 +26,12 @@ async def suite_actor(request: Request, session: AsyncSession = Depends(get_asyn
         principal = validate_native_session(proof, profile_root=request.app.state.desktop_profile_root)
     except PermissionError as error:
         raise HTTPException(401, str(error)) from None
-    allowed = [module for module in ("townlight_records", "townlight_access")
+    # The shell snapshot also serves accounts whose only capability is Code,
+    # Meetings or a land-use product. Its data projection below still includes
+    # Records/Access only when that exact capability is authorized.
+    allowed = [module for module in ("townlight_records", "townlight_access", "townlight_code",
+               "townlight_meetings", "townlight_notice", "townlight_zoning", "townlight_planning",
+               "townlight_permitting", "townlight_inspections")
                if module in request.app.state.desktop_enabled_modules and principal.allows_module(module)]
     if not allowed:
         raise HTTPException(403, "No integrated capability is available to this account.")

@@ -12,13 +12,13 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.7.0-1",
-    "tag": "townlight-v1.7.0-beta.1",
-    "commit": "51866f7ad003eefa5a02f502ed74134b99817427",
+    "version": "1.7.1-1",
+    "tag": "townlight-v1.7.1-beta.1",
+    "commit": "919f2492cf43a83e693db71fe1371001e529cf40",
     "channel": "candidate",
     "published_at": null,
     "asset_policy": "windows-msi",
-    "runtime_version": "0.2.0"
+    "runtime_version": "0.2.1"
   },
   "asset_policies": {
     "windows-msi": [
