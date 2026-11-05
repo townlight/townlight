@@ -3,9 +3,10 @@
 This unreleased work fixes findings from the November 4 installed audit of
 Windows MSI 1.7.0.1. The published MSI, tag, receipts and acceptance history stay
 unchanged. The candidate uses desktop version 1.7.1-1 / Windows MSI version
-1.7.1.1, runtime 0.2.1 and a separate installer identity. Packaging, signing
-and fresh-install acceptance are outstanding; these source changes are not an
-installed release claim. The configured future release tag is an uncreated
+1.7.1.1, runtime 0.2.1 and a separate installer identity. Packaging, Scott Converse signing and bounded fresh-install acceptance are complete.
+The candidate remains unpublished; the public release still contains the original
+defects. See the [results and raw evidence](evidence/windows-installed-defect-candidate/README.md)
+and [handoff](windows-installed-defect-candidate-handoff.md). The configured future release tag is an uncreated
 identifier, not authorization to tag or publish.
 
 | Finding | Candidate behavior | Required installed proof |
@@ -31,9 +32,24 @@ entry on reinstallation after removal. The revised assembler writes and locks
 the Planning, Permitting and Inspections provenance files, all bound to the
 same full build inputs. It also corrects catalog wording that inferred an
 absent payload from a blocked selection and removes an inaccurate unsigned
-label. The revised packaging and copy require fresh installed verification;
-the earlier candidate's unaffected evidence must be identified as reused.
+label. Fresh installation of exact signed source `919f2492cf43a83e693db71fe1371001e529cf40`
+passed 34 control checks and three independent installed provenance checks,
+including all supported profile reinstalls with retained data. D1-D6/D10 and
+the unchanged workflow evidence from installed `806efe1` are explicitly reused.
+This is not a claim that every workflow was rerun on the revised MSI.
 
 The audit's unconfirmed readiness observation, missing media interpretation
 adapter, legacy Meetings controls and external broadcast outputs are outside
 this defect-fix scope. No Linux/macOS work or publication is authorized here.
+
+## Accepted candidate identity
+
+Desktop 1.7.1-1; MSI 1.7.1.1; runtime 0.2.1. Signed binary source is
+`919f2492cf43a83e693db71fe1371001e529cf40`; later evidence commits do not change it.
+MSI: 2,081,316,864 bytes, SHA-256
+`7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3`.
+Both MSI and desktop EXE independently verified Valid Scott Converse signatures
+and Microsoft timestamps. Both owned test installations were uninstalled and
+their Sandbox guests disposed. No tag or public release has been created.
+Required source integration CI is recorded on the containing pull request;
+routine unsigned CI build outputs do not replace this signed candidate.

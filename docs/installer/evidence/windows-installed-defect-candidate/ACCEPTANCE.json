@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "Windows D1-D7/D9/D10 fix candidate; release unchanged",
+  "binary_source": "919f2492cf43a83e693db71fe1371001e529cf40",
+  "earlier_installed_source": "806efe12df08fa2f9e542d9c8d3c9244ce9889cc",
+  "msi_sha256": "7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3",
+  "msi_bytes": 2081316864,
+  "exe_sha256": "76d341e69b2db05184715338b065e93a64dd5f19ad1e498706895279a5c92d0e",
+  "signer": "Scott Converse",
+  "timestamp": "Microsoft",
+  "signing_runs": {
+    "exe": 41956803118,
+    "msi": 41958130765
+  },
+  "fresh_919_controls": 34,
+  "fresh_919_controls_all_passed": true,
+  "fresh_profile_provenance_checks": 3,
+  "unaffected_806_evidence_reused": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D10",
+    "Meetings/Code/Station handoff",
+    "five restart outcomes"
+  ],
+  "owned_guests_disposed": true,
+  "released_msi_unchanged": true,
+  "publication_allowed": false,
+  "archive": {
+    "name": "installed-windows-evidence.zip",
+    "bytes": 38856053,
+    "sha256": "abc0a581e930e0327794c045371c39bfa20bcc005854e4ae623a0c067772a1ea",
+    "member_files": 1315
+  },
+  "delivery": "Installed proof complete; required PR CI and source merge tracked separately. No new release/tag."
+}

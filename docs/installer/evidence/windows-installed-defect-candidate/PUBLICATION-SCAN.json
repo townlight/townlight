@@ -1,0 +1,14 @@
+{
+  "scope": "All text members of final evidence ZIP",
+  "text_members_scanned": 1302,
+  "archive_sha256": "abc0a581e930e0327794c045371c39bfa20bcc005854e4ae623a0c067772a1ea",
+  "member_hashes_verified": 1315,
+  "patterns": [
+    "credential_url",
+    "provider_key",
+    "bearer_value",
+    "session_hash_value"
+  ],
+  "findings": [],
+  "limit": "Targeted publication credential scan, not a general security audit. No candidate values printed."
+}
