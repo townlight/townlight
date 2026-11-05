@@ -155,10 +155,14 @@ jobs:
           $embedded = @(Get-ChildItem -LiteralPath $extract -Filter townlight-desktop.exe -Recurse -File)
           if ($embedded.Count -ne 1) { throw 'Expected one embedded desktop executable.' }
           & ./desktop/scripts/verify-publication-signature.ps1 -Path $embedded[0].FullName
-          $embeddedAccess = @(Get-ChildItem -LiteralPath $extract -Filter townlight_access-db-status.exe -Recurse -File)
-          if ($embeddedAccess.Count -ne 1) { throw 'Expected one embedded portable Access launcher.' }
-          & ./desktop/scripts/verify-publication-signature.ps1 -Path $embeddedAccess[0].FullName
-          foreach ($artifact in @($msi, $embedded[0], $embeddedAccess[0])) {
+          $signedArtifacts = @($msi, $embedded[0])
+          if ($isInspections) {
+            $helper = @(Get-ChildItem -LiteralPath $extract -Filter townlight_access-db-status.exe -Recurse -File)
+            if ($helper.Count -ne 1) { throw 'Expected one accepted portable Access launcher.' }
+            & ./desktop/scripts/verify-publication-signature.ps1 -Path $helper[0].FullName
+            $signedArtifacts += $helper[0]
+          }
+          foreach ($artifact in $signedArtifacts) {
             $entries = @($receipt.files | Where-Object { $_.file -eq $artifact.Name })
             if ($entries.Count -ne 1) { throw 'Signing receipt artifact entry is missing or ambiguous.' }
             $sig = Get-AuthenticodeSignature -LiteralPath $artifact.FullName

@@ -11,6 +11,10 @@ and never stored locally.
 ### What is signed
 
 - Windows installer (MSI) artifacts published on GitHub Releases
+- The embedded Townlight desktop executable, signed before MSI packaging
+- The portable Access launcher in the Windows 1.7.2.1 cohort retains its verified
+  Azure Scott Converse signature and exact bytes from accepted Windows 1.7.1.1;
+  its provenance and signature are checked again inside the new MSI
 
 ### Build and signing process
 

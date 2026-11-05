@@ -274,7 +274,6 @@ def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes(
         "run: npm run tauri -- build --no-bundle",
         "name: Record unsigned executable intake",
         "name: Sign desktop executable (Azure Artifact Signing)",
-        "name: Sign portable Access launcher (Azure Artifact Signing)",
         "name: Verify executable before packaging",
         "name: Record executable bytes before bundling",
         "run: npm run tauri -- bundle --bundles msi --no-binary-patching",
@@ -284,10 +283,9 @@ def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes(
     ]
     positions = [workflow.index(stage) for stage in stages]
     assert positions == sorted(positions)
-    assert workflow.count("uses: azure/artifact-signing-action@v2") == 3
+    assert workflow.count("uses: azure/artifact-signing-action@v2") == 2
     assert "MSI does not contain the exact signed executable" in workflow
-    assert "MSI does not contain the exact signed portable Access launcher" in workflow
-    assert "steps.exe_intake.outputs.access_sha256" in workflow
+    assert "MSI changed the accepted portable Access launcher" in workflow
     assert "Verify installed executable trust and exact bytes" in workflow
     assert "Installed executable hash differs from packaged evidence" in workflow
     assert "Bundling changed executable bytes after signing intake." in workflow
@@ -295,13 +293,12 @@ def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes(
     assert package["devDependencies"]["@tauri-apps/cli"] == "2.12.0"
 
 
-def test_release_checks_signed_artifacts_and_receipt_against_selected_run() -> None:
+def test_release_checks_both_artifacts_and_receipt_against_selected_run() -> None:
     workflow = _read(RELEASE_WORKFLOW)
     assert "$receipt.source_commit -ne $tagSha" in workflow
     assert "$receipt.workflow_run -ne [string]$run.databaseId" in workflow
     assert "verify-publication-signature.ps1 -Path $embedded[0].FullName" in workflow
-    assert "verify-publication-signature.ps1 -Path $embeddedAccess[0].FullName" in workflow
-    assert "foreach ($artifact in @($msi, $embedded[0], $embeddedAccess[0]))" in workflow
+    assert "verify-publication-signature.ps1 -Path $helper[0].FullName" in workflow
     assert "$entries[0].signed_sha256 -ne $sha" in workflow
     assert "$entries[0].signer_thumbprint -ne $sig.SignerCertificate.Thumbprint" in workflow
     assert "--clobber" not in workflow

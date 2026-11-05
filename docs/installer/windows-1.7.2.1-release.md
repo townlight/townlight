@@ -49,17 +49,25 @@ upgrade. Only exact signed installed acceptance can establish that claim.
 The full prior functional evidence and its limitations remain applicable where
 inputs are unchanged; this release does not add features or expand acceptance.
 
+## Preserved runtime inputs
 
-## Rebuilt launcher correction
+The legacy fresh-pip recipe does not reproduce the accepted runtime: the first
+CI artifact omitted Station media and smaller-preview provenance, changed Python
+dependencies, and regenerated a non-portable unsigned Access console launcher.
+It was not signed or published. Sandbox application control rejected that
+unsigned helper before startup; no policy was weakened.
 
-The first PR304 CI MSI regenerated the Access console launcher with an absolute
-`D:\a\townlight\...` interpreter path and no signature. Sandbox application
-control rejected that unsigned launcher before it could start. The original
-1.7.1.1 release already contains a signed portable Rust launcher; its source is
-now part of the build recipe instead of being lost during pip installation.
-Runtime preparation compiles that same relative-interpreter implementation and
-checks actual `--help` after moving the Python directory. Publication signs it
-through the existing Azure account, independently verifies it before packaging,
-and verifies the identical signed helper inside the MSI and signing receipt.
-Application control is preserved. This corrects a rebuilt payload regression;
-no Access feature or component source pin changes.
+For this name-only release, runtime preparation verifies the exact signed
+1.7.1.1 MSI hash and publisher and preserves its complete runtime payload,
+including Station media and the already signed portable Access launcher.
+All eleven component source pins and the suite runtime source tree must match.
+Only the three preview provenance records and their lock entries are refreshed
+to the new umbrella identity. `accepted-runtime-reuse.json` identifies the input
+MSI, unchanged component pins, native hashes and changed metadata. The desktop
+and new MSI are built and Azure-signed by the normal hosted publication workflow;
+the accepted helper signature and exact embedded bytes are independently checked.
+
+The launcher implementation is included at
+`desktop/runtime/launchers/access-db-status.rs` for corresponding source. Its
+native bytes are reused from the accepted MSI, not rebuilt or re-signed here.
+

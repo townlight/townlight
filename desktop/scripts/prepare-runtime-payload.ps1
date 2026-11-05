@@ -41,6 +41,12 @@ if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 }
 
+# Preserve the accepted runtime cohort for this installer-identity release.
+if ($ProductProfile -eq 'inspections-preview' -and $PlanningBuildProfile -eq 'inspections-preview') {
+    & (Join-Path $PSScriptRoot 'prepare-accepted-runtime.ps1') -RepoRoot $RepoRoot -PayloadRoot $PayloadRoot -SkipDownloads:$SkipDownloads
+    return
+}
+
 function Read-JsonFile {
     param([string]$Path)
     return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
@@ -1150,7 +1156,6 @@ if ($ProductProfile -eq 'inspections-preview') {
 # Python imports generate __pycache__ paths that can exceed the WiX linker limit.
 # They are regenerable bytecode and must not be shipped; remove only those directories before hashing.
 $PythonRoot = Join-Path $PayloadRoot "python"
-& (Join-Path $PSScriptRoot 'build-access-launcher.ps1') -PythonRoot $PythonRoot -RepoRoot $RepoRoot
 $PythonRootFull = [System.IO.Path]::GetFullPath($PythonRoot)
 $PythonRootBoundary = $PythonRootFull.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
 Get-ChildItem -LiteralPath $PythonRoot -Directory -Recurse -Filter __pycache__ |
