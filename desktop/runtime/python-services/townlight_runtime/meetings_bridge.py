@@ -395,6 +395,17 @@ def public_active(request: Request):
         raise HTTPException(503,"Meetings archive schema unavailable.")
 
 
+@public_router.get("/data/index", dependencies=[Depends(public_active)])
+def public_archive_data(q: str = ""):
+    return {"records": legal_record(PublicArchiveRepository,
+        lambda store: [r.public_dict() for r in store.search(query=q)])}
+
+
+@public_router.get("/data/{record_id}", dependencies=[Depends(public_active)])
+def public_archive_record_data(record_id: UUID):
+    return legal_record(PublicArchiveRepository, lambda store: store.public_detail(str(record_id)))
+
+
 @public_router.get("",response_class=HTMLResponse,dependencies=[Depends(public_active)])
 def public_archive_index(q: str = ""):
     import html

@@ -62,6 +62,31 @@ def resolve_number(ref, as_of):
         raise HTTPException(status_code=503, detail="Service unavailable") from None
 
 
+@router.get("/public-data/search")
+def search_data(q: str = ""):
+    return public_search(q)
+
+
+@router.get("/public-data/section")
+def section_data(section_number: str, as_of: date | None = None):
+    return public_citation(section_number, as_of)
+
+
+@router.get("/public-data/export")
+async def export_data(section_number: str, as_of: date | None = None):
+    citation = public_citation(section_number, as_of)
+    if citation.get("status") != "ok":
+        return citation
+    return await code.export_section(section_number, as_of)
+
+
+@router.get("/public-data/answer")
+def answer_data(q: str, section_number: str | None = None, as_of: date | None = None):
+    return code.build_grounded_answer(
+        code.QuestionRequestContext(question=q, section_number=section_number, as_of=as_of),
+        search=public_search, build_citation=public_citation, use_local_llm=False)
+
+
 @router.get("", response_class=HTMLResponse)
 async def home():
     return await code.public_lookup_home()

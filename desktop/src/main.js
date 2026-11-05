@@ -4,6 +4,7 @@ import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
 import { createCodeView } from "./code/view.js";
+import { createPublishedView } from "./published/view.js";
 import { createPermittingView } from "./permitting/view.js";
 import { createInspectionsView } from "./inspections/view.js";
 import { createPlanningView } from "./planning/view.js";
@@ -18,6 +19,8 @@ const recordsController = createRecordsController(invoke);
 const noticeView = createNoticeView(invoke);
 const meetingsView = createMeetingsView(invoke, openConnectedWork);
 const codeView = createCodeView(invoke, openConnectedWork);
+const publicMeetingsView = createPublishedView(invoke, 'meetings');
+const publicCodeView = createPublishedView(invoke, 'code');
 const permittingView = createPermittingView(invoke);
 const inspectionsView = createInspectionsView(invoke);
 const planningView = createPlanningView(invoke);
@@ -867,6 +870,22 @@ const state = {
   app: fallbackState,
   appLoadError: null
 };
+
+const initialWorkDraft = structuredClone(state.workDraft);
+const initialWorkSelection = structuredClone(state.workSelection);
+let workGeneration = 0;
+function clearAccountWork() {
+  workGeneration++;
+  state.workActionResult = null;
+  state.actionResult = state.modelActionResult = state.supervisorActionResult = null;
+  state.workDraft = structuredClone(initialWorkDraft);
+  state.workSelection = structuredClone(initialWorkSelection);
+  state.searchResults = [];
+  state.pendingWorkReviewAction = null;
+  state.workActionInFlightTags.clear();
+  state.publicRecordsLookup = {trackingNumber: '', requesterContact: '', found: false};
+  state.auditOpen = false;
+}
 
 // First-run wizard focus management.
 // Reassigned (hence `let`). Tracks the current step we last auto-advanced to, so
@@ -5058,7 +5077,7 @@ function renderActiveArea() {
   if (state.activeArea === "settings" && access.configured && access.role !== "local-admin") {
     return renderAccessPanel();
   }
-  if (state.domainLoadError && !["health", "settings"].includes(state.activeArea)) {
+  if (state.domainLoadError && ["home", "records", "access", "search"].includes(state.activeArea)) {
     return `<section class="section-band" role="alert"><h2>Records service is unavailable</h2>
       <p>Saved Records could not be refreshed. No legacy copy was loaded. Use System Health to start or repair the local services, then retry.</p>
       <pre>${escapeHtml(state.domainLoadError)}</pre>
@@ -5077,6 +5096,7 @@ function renderActiveArea() {
     case "zoning":
       return isPublicSurface() ? publicZoningView.render() : zoningView.render();
     case "meetings":
+      if (isPublicSurface() && state.app?.domain_authority === 'python-records') return publicMeetingsView.render();
       if (
         state.app?.module_selection?.profile_id === "meetings-beta" ||
         ((state.app?.module_selection?.profile_id === "city-core" ||
@@ -5088,6 +5108,7 @@ function renderActiveArea() {
     case "records":
       return renderRecordsWorkflow();
     case "code":
+      if (isPublicSurface() && state.app?.domain_authority === 'python-records') return publicCodeView.render();
       if (
         (state.app?.module_selection?.profile_id === "city-core" ||
           (state.app?.module_selection?.profile_id === "zoning-beta" || ["planning-preview", "permitting-preview", "inspections-preview"].includes(state.app?.module_selection?.profile_id))) &&
@@ -5171,8 +5192,13 @@ function renderStateLoadError(message) {
 function render() {
   // Never retain an in-memory Planning draft across accounts or session loss.
   const access = accessState();
-  const account = JSON.stringify([access.signed_in, access.operator_email, access.role]);
-  if (planningAccount !== account) { noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset(); planningAccount = account; }
+  const account = JSON.stringify([access.signed_in, access.operator_email, access.role, isPublicSurface()]);
+  if (planningAccount !== account) {
+    clearAccountWork();
+    publicMeetingsView.reset(); publicCodeView.reset();
+    noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset();
+    planningAccount = account;
+  }
   if (state.appLoadError) {
     byId("app").innerHTML = renderStateLoadError(state.appLoadError);
     byId("app").querySelector("[data-action='retry-load-state']")
@@ -5226,6 +5252,8 @@ function bindEvents() {
   }
   meetingsView.bind();
   codeView.bind();
+  publicMeetingsView.bind();
+  publicCodeView.bind();
   if (state.activeArea === "zoning") {
     (isPublicSurface() ? publicZoningView : zoningView).bind();
   }
@@ -5714,6 +5742,7 @@ function supervisorActionLabel(action) {
 }
 
 async function handleChooseFilePath(field) {
+  const expectedGeneration = workGeneration;
   if (!Object.prototype.hasOwnProperty.call(state.workDraft, field)) {
     return;
   }
@@ -5729,6 +5758,7 @@ async function handleChooseFilePath(field) {
   }
   try {
     const pickedPath = await invoke("choose_file_path");
+    if (expectedGeneration !== workGeneration) return;
     if (pickedPath) {
       state.workDraft[field] = pickedPath;
       state.workActionResult = {
@@ -6470,6 +6500,7 @@ function syncWorkSelectionAfterAction(action, work, previousWork = {}) {
 }
 
 async function handleCityWorkAction(action, { confirmed = false, overridePayload = null } = {}) {
+  const expectedGeneration = workGeneration;
   if (requiresGuidedWorkReview(action) && !confirmed) {
     state.pendingWorkReviewAction = action;
     state.workActionResult = null;
@@ -6527,6 +6558,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     const result = state.app.domain_authority === "python-records"
       ? await recordsController.action(action, payload, previousWork)
       : await invoke("city_work_action", { action, payload });
+    if (expectedGeneration !== workGeneration) return;
     state.workActionResult = result;
     state.app.city_work = result.state;
     syncWorkSelectionAfterAction(action, result.state, previousWork);
@@ -6551,6 +6583,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
       }
     }
   } catch (error) {
+    if (expectedGeneration !== workGeneration) return;
     state.workActionResult = {
       accepted: false,
       status: "Needs attention",
@@ -6564,12 +6597,12 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     // needed here, unlike the scalar this replaced. A different row's own tag
     // is a different Set entry, so it's untouched regardless of how many
     // actions are in flight at once.
-    state.workActionInFlightTags.delete(myWorkTag);
+    if (expectedGeneration === workGeneration) state.workActionInFlightTags.delete(myWorkTag);
     // accessDeleteReviewId is a different kind of value (which review the
     // single app-wide guided-review confirm panel currently targets, not a
     // busy/in-flight tracker) so it keeps its own equality guard: only clear
     // it if it still points at the review THIS call was processing.
-    if (action === "townlight_access-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
+    if (expectedGeneration === workGeneration && action === "townlight_access-delete-review" && state.workSelection.accessDeleteReviewId === inFlightReviewId) {
       state.workSelection.accessDeleteReviewId = "";
     }
   }

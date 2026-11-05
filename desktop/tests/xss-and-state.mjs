@@ -131,7 +131,7 @@ rewritten = rewritten.replace(
 rewritten = rewritten.replace(/import\s+["']\.\/styles\.css["'];?/, "");
 rewritten +=
   "\nexport const __test__ = { get state() { return state; }, " +
-  "get appStateLoaded() { return appStateLoaded; }, loadAppState, render, " +
+  "get appStateLoaded() { return appStateLoaded; }, loadAppState, render, handleCityWorkAction, " +
   "renderFirstRunWizard, fallbackState };\n";
 
 globalThis.__TEST_INVOKE__ = (...args) => invokeImpl(...args);
@@ -618,4 +618,32 @@ function finishedBase() {
   }
 }
 
-console.log("PASS: xss-and-state (T4 + T7 + T8 + T9 + T10 + T11 + T12 + T13 + T14 + T15 + T16) checks passed");
+// Installed audit D1/D2/D5: account boundaries and capability-based source UI.
+{
+  const admin={...FINISHED_STATE,domain_authority:'legacy',
+    access:{configured:true,signed_in:true,role:'local-admin',operator_email:'synthetic-admin@example.invalid'},
+    module_selection:{profile_id:'inspections-preview',installed_module_ids:['townlight_core','townlight_records','townlight_meetings','townlight_code'],
+      enabled_module_ids:['townlight_core','townlight_records','townlight_meetings','townlight_code']}};
+  invokeImpl=async cmd=>cmd==='get_app_state'?structuredClone(admin):{};
+  await t.loadAppState();t.state.activeSurface='Staff';t.state.activeArea='records';t.render();
+  if(!appEl.innerHTML.includes('data-meetings-sources')||!appEl.innerHTML.includes('data-code-sources'))fail('D5: full profile must expose enabled Meetings/Code pickers');
+  t.state.app.module_selection.enabled_module_ids=['townlight_core','townlight_records'];t.render();
+  if(appEl.innerHTML.includes('data-meetings-sources')||appEl.innerHTML.includes('data-code-sources'))fail('D5: disabled modules must not expose source pickers');
+  t.state.workActionResult={accepted:true,message:'PRIVATE_EXPORT_PATH'};
+  t.state.workDraft.accessBody='PRIVATE_REVIEW_TEXT';
+  t.state.app.access={configured:true,signed_in:false,role:null,operator_email:null};t.render();
+  if(t.state.workActionResult!==null||t.state.workDraft.accessBody.includes('PRIVATE')||appEl.innerHTML.includes('PRIVATE_EXPORT_PATH'))fail('D2: signout must clear staff draft/results');
+  t.state.app=structuredClone(admin);t.state.activeArea='access';t.render();
+  let finish;const deferred=new Promise(resolve=>finish=resolve);
+  invokeImpl=async()=>deferred;
+  const pending=t.handleCityWorkAction('accessibility-review',{confirmed:true});
+  t.state.app.access={configured:true,signed_in:false,role:null,operator_email:null};t.render();
+  finish({accepted:true,message:'STALE_PRIVATE_RESULT',state:structuredClone(admin.city_work)});
+  await pending;
+  if(t.state.workActionResult!==null||appEl.innerHTML.includes('STALE_PRIVATE_RESULT'))fail('D2: old async result must not reappear after signout');
+  t.state.app=structuredClone(admin);t.state.app.domain_authority='python-records';
+  t.state.app.access={configured:true,signed_in:true,role:'code-staff',operator_email:'synthetic-code@example.invalid'};
+  t.state.domainLoadError='Records temporarily unavailable';t.state.activeArea='code';t.state.activeSurface='Staff';t.render();
+  if(appEl.innerHTML.includes('Records service is unavailable')||!appEl.innerHTML.includes('data-code-action="lookup"'))fail('D1: a Records outage must not replace authorized Code');
+}
+console.log("PASS: xss-and-state existing checks plus Windows audit D1/D2/D5 regressions");

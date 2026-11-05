@@ -205,8 +205,8 @@ for (const phrase of [
 }
 
 for (const phrase of [
-  '["meetings-beta", "city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderMeetingsSources',
-  '["city-core", "zoning-beta"].includes(state.app.module_selection?.profile_id) ? renderCodeSources'
+  'enabled_module_ids?.includes("townlight_meetings") ? renderMeetingsSources',
+  'enabled_module_ids?.includes("townlight_code") ? renderCodeSources'
 ]) {
   if (!main.includes(phrase)) {
     throw new Error(`desktop zoning-beta source panel guard missing phrase: ${phrase}`);

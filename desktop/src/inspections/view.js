@@ -19,7 +19,7 @@ export function createInspectionsView(invoke) {
     for(const name of ['title','property_reference','inspection_reference','dataset_kind','inspector_notes','voice_notes','assigned_to','staff_notes','notice_draft','review_notes','public_summary'])draft[name]=String(data.get(name)||'');
     draft.photo_observations=String(data.get('photo_observations')||'').split('\n').map(s=>s.trim()).filter(Boolean);
   }
-  function changed(){dirty=true;packet=null;if(draft)draft.review_state='draft';root?.querySelector('[data-inspections-packet]')?.replaceChildren();}
+  function changed(invalidateAnalysis=true){dirty=true;packet=null;if(draft){draft.review_state='draft';if(invalidateAnalysis)draft.analysis=null;}root?.querySelector('[data-inspections-packet]')?.replaceChildren();}
   async function run(action){
     if(busy)return;const expected=generation, actionRoot=root;busy=true;
     actionRoot?.setAttribute('inert','');actionRoot?.setAttribute('aria-busy','true');report('Working…');
@@ -48,7 +48,7 @@ export function createInspectionsView(invoke) {
       inspector_supplied_text:draft.inspector_notes}});
     if(expected!==generation)throw new Error('Account changed');
     if(!result.analysis_record)throw new Error('The analysis response was not recorded; nothing was added to the draft.');
-    draft.analysis=result.analysis_record;changed();
+    changed();draft.analysis=result.analysis_record;
     const observations=(result.draft_observations||[]).map(item=>
       `${item.adapter||item.source}: ${item.text}`);
     const cited=(result.cited_sections||[]).map(section=>
@@ -96,12 +96,12 @@ export function createInspectionsView(invoke) {
       if(action==='report')show('[data-inspections-history]',active.payload.report_draft);
       if(action==='repeat'){capture();show('[data-inspections-repeat]',await request('repeat-cases',{payload:{property_reference:draft.property_reference}}));report('Only actual saved cases at this exact property are listed.');}
       if(action==='analyse'){const outcome=await analyse();show('[data-inspections-analysis]',outcome.summary);}
-      if(action==='notice'){capture();const result=await request('draft-notice',{payload:draft});draft.notice_draft=result.draft;changed();paint();report('Draft notice prepared for editing and inspector review; nothing issued.');}
+      if(action==='notice'){capture();const result=await request('draft-notice',{payload:draft});draft.notice_draft=result.draft;changed(false);paint();report('Draft notice prepared for editing and inspector review; nothing issued.');}
       if(action==='staff-packet'||action==='records-packet')await createPacket(action==='staff-packet'?'staff_only':'records_copy');
       if(action==='export'){const result=await request('export-packet',{id:packet.packet_id,expected_sha256:packet.sha256});report(`Exact packet saved: ${result.path} · SHA256 ${result.sha256}`);}
     }));
     root.querySelectorAll('[data-inspections-open]').forEach(button=>button.onclick=()=>run(()=>open(cases[Number(button.dataset.inspectionsOpen)].entity_id)));
-    const form=root.querySelector('[data-inspections-case]');if(form){form.onsubmit=event=>{event.preventDefault();run(()=>save());};form.oninput=()=>{capture();changed();};}
+    const form=root.querySelector('[data-inspections-case]');if(form){form.onsubmit=event=>{event.preventDefault();run(()=>save());};form.oninput=event=>{capture();changed(event.target.name==='inspector_notes');};}
     const picker=root.querySelector('[data-inspections-file]');if(picker)picker.onchange=()=>run(async()=>{
       capture();const expected=generation,file=picker.files?.[0];if(!file)return;
       if(!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,150}$/.test(file.name)||!file.size||file.size>10000000)throw new Error('Use a safe filename and an original file up to 10MB.');

@@ -15,6 +15,7 @@ mod permitting_client;
 mod planning_client;
 mod profile_gate;
 mod profile_identity;
+mod published_client;
 mod records_authority;
 mod supervisor;
 mod workflows;
@@ -668,6 +669,13 @@ fn module_action(action: String, module_id: String) -> Result<ModuleActionResult
             "Sign in as the Townlight admin before changing installed modules.".to_string(),
         );
     }
+    // Removal holds the exclusive lifecycle guard across validation, backup and
+    // commit. Other module changes must not race that maintenance transaction.
+    let _operation = if action != "remove-module" {
+        Some(profile_gate::operation()?)
+    } else {
+        None
+    };
     let previous_selection = module_registry::module_selection_state()?;
     let was_installed = previous_selection
         .installed_module_ids
@@ -681,9 +689,9 @@ fn module_action(action: String, module_id: String) -> Result<ModuleActionResult
         "install-module" => module_registry::set_module_installed(&module_id, true)?,
         "remove-module" => {
             if was_installed {
-                let backup = supervisor::supervisor_action("backup", None)?;
+                let (selection, backup) = supervisor::remove_module_after_backup(&module_id)?;
                 removal_backup_message = Some(backup.message);
-                module_registry::set_module_installed(&module_id, false)?
+                selection
             } else {
                 previous_selection
             }
@@ -999,6 +1007,24 @@ async fn zoning_public_request(
     zoning_client::execute(request, String::new(), true).await
 }
 
+#[tauri::command]
+async fn published_domain_request(
+    request: published_client::PublishedRequest,
+) -> Result<Value, domain_client::DomainError> {
+    let _guard =
+        profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
+    let selection = module_registry::module_selection_state()
+        .map_err(|_| domain_client::DomainError::denied())?;
+    if !selection
+        .enabled_module_ids
+        .iter()
+        .any(|id| id == request.module_id())
+    {
+        return Err(domain_client::DomainError::denied());
+    }
+    published_client::execute(request).await
+}
+
 fn planning_capability(staff: bool) -> Result<String, domain_client::DomainError> {
     let selection = module_registry::module_selection_state()
         .map_err(|_| domain_client::DomainError::denied())?;
@@ -1251,6 +1277,7 @@ pub fn run() {
             code_domain_request,
             zoning_domain_request,
             zoning_public_request,
+            published_domain_request,
             planning_domain_request,
             permitting_domain_request,
             inspections_domain_request,
