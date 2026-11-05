@@ -31,7 +31,7 @@ Core supplies shared platform services. Current owned code and manuals are
 AGPL-3.0-only; retained historical grants and third-party notices still apply.
 
 ## What was verified
-The exact MSI is signed by **Scott Converse** with a valid Microsoft timestamp. Fresh Windows Sandbox installation passed **34 control checks and three independent provenance checks**, including supported profile removal/reinstallation and retained Records data. The revision fixes nine confirmed installed defects from the original beta audit.
+The exact MSI has a valid Authenticode signature and Microsoft timestamp; the published signing receipt identifies its publisher. Fresh Windows Sandbox installation passed **34 control checks and three independent provenance checks**, including supported profile removal/reinstallation and retained Records data. The revision fixes nine confirmed installed defects from the original beta audit.
 
 Other workflow evidence is reused for unchanged behavior, including Meetings/Code, Records links, separately provisioned finite Station recording, backup/restore and earlier real local-model drafts. Read the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/ACCEPTANCE-Windows-1.7.1.1.md) for the exact evidence boundary and remaining unimplemented or unexercised paths. This is not a claim that every workflow was rerun on 1.7.1.1. AI output remains a draft requiring staff review.
 
