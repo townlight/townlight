@@ -1,13 +1,14 @@
-Download Windows beta 1.7.1.1 · Public announcement · Support and
+Download Windows beta 1.7.2.1 · Public announcement · Support and
 feedback
 
-Fresh installation/profile only; this MSI does not upgrade an existing
-legacy profile.
+New installations use a fresh profile. Upgrade from 1.7.1.1 retains
+saved settings and data; older legacy-profile migration is not
+established.
 
-Windows x64 Beta 1 · MSI 1.7.1.1
+Windows x64 Beta 1 · MSI 1.7.2.1
 
-The signed Windows x64 beta 1.7.1.1 passed the documented fresh Windows
-Sandbox checks with synthetic data.
+The signed Windows x64 beta 1.7.2.1 updates installer metadata while
+preserving the accepted signed application/runtime cabinet.
 
 - Townlight Suite Manual
   - Using this manual
@@ -34,19 +35,19 @@ Sandbox checks with synthetic data.
 
 Townlight Suite Manual
 
-  Windows 1.7.1.1 acceptance. Windows 1.7.1.1 promotes the exact signed
-  candidate from source 919f2492cf43a83e693db71fe1371001e529cf40. Its
-  fresh installation passed 34 control checks and three independent
-  provenance checks. Other workflow evidence is reused as specified in
-  the acceptance summary; no claim that every workflow was rerun on this
-  build. The installer retains its tested name, Townlight Windows Fix
-  Candidate. Use a fresh Windows x64 installation/profile; upgrade from
-  1.7.0.1 is not established. Station still requires separate setup.
-  Evidence and limits.
+  Windows 1.7.2.1 acceptance. Windows 1.7.2.1 changes installer metadata
+  and displays Townlight as the installed product name. Its new outer
+  MSI is Azure-signed by Scott Converse and independently verified. The
+  signed application/runtime cabinet is unchanged from 1.7.1.1.
+  Functional and fresh-install evidence is reused from 1.7.1.1; no
+  full-suite or independent fresh-install rerun is claimed for this
+  metadata revision. See the release for separately dated installed
+  upgrade evidence. Upgrade from 1.7.0.1 is not established. Station
+  requires separate setup. Evidence and limits.
 
-  The signed Windows x64 beta 1.7.1.1 passed the documented fresh
-  Windows Sandbox checks with synthetic data. The Windows acceptance
-  summary applies to this exact MSI.
+  The signed Windows x64 beta 1.7.2.1 updates installer metadata while
+  preserving the accepted signed application/runtime cabinet. The
+  Windows acceptance summary applies to this exact MSI.
 
 Using this manual
 
@@ -67,7 +68,7 @@ Beta identity
   Identity                         Value
   -------------------------------- --------------------------------------------------------------------------------
   Public documentation identity    Townlight Beta 1
-  Intended installer version       1.7.1.1
+  Intended installer version       1.7.2.1
   Native desktop source version    1.7.1-1
   Candidate artifact identity      SHA-256 checksums and Windows acceptance summary
   Corresponding source             Released Windows x64 beta
@@ -98,10 +99,9 @@ Component versions
 First run
 
 1.  Download the signed MSI, matching source and checksums from the
-    Windows x64 beta 1.7.1.1 release.
-2.  Verify the MSI hash and Authenticode publisher before installing on
-    a fresh Windows profile. See the Windows acceptance summary for the
-    tested setup.
+    Windows x64 beta 1.7.2.1 release.
+2.  Verify the MSI hash and Authenticode publisher before installation.
+    See the Windows acceptance summary for the tested setup.
 3.  Launch Townlight under the intended named Windows account. Choose
     the storage folders. Select Townlight Inspections candidate
     (inspections-preview) for the bounded desktop composition, including
@@ -691,7 +691,7 @@ Source and document control
 
 This edition is authored from the immutable corresponding-source
 companion, the generated installed-domain schema and the retained
-workflow receipts. Component version numbers are retained. The private
+workflow receipts. Component version numbers are retained. The published
 MSI has its own new hash and signing receipt. Historical release tags
 and their artifacts remain unchanged.
 
