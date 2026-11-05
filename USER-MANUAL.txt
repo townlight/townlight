@@ -1,6 +1,6 @@
-Windows x64 Beta 1 · MSI 1.7.0.1
+Windows x64 Beta 1 · MSI 1.7.1.1
 
-The signed Windows x64 beta 1.7.0.1 passed the documented fresh Windows
+The signed Windows x64 beta 1.7.1.1 passed the documented fresh Windows
 Sandbox checks with synthetic data.
 
 - Townlight Suite Manual
@@ -28,7 +28,17 @@ Sandbox checks with synthetic data.
 
 Townlight Suite Manual
 
-  The signed Windows x64 beta 1.7.0.1 passed the documented fresh
+  Windows 1.7.1.1 acceptance. Windows 1.7.1.1 promotes the exact signed
+  candidate from source 919f2492cf43a83e693db71fe1371001e529cf40. Its
+  fresh installation passed 34 control checks and three independent
+  provenance checks. Other workflow evidence is reused as specified in
+  the acceptance summary; no claim that every workflow was rerun on this
+  build. The installer retains its tested name, Townlight Windows Fix
+  Candidate. Use a fresh Windows x64 installation/profile; upgrade from
+  1.7.0.1 is not established. Station still requires separate setup.
+  Evidence and limits.
+
+  The signed Windows x64 beta 1.7.1.1 passed the documented fresh
   Windows Sandbox checks with synthetic data. The Windows acceptance
   summary applies to this exact MSI.
 
@@ -51,8 +61,8 @@ Beta identity
   Identity                         Value
   -------------------------------- --------------------------------------------------------------------------------
   Public documentation identity    Townlight Beta 1
-  Intended installer version       1.7.0.1
-  Native desktop source version    1.7.0-1
+  Intended installer version       1.7.1.1
+  Native desktop source version    1.7.1-1
   Candidate artifact identity      SHA-256 checksums and Windows acceptance summary
   Corresponding source             Released Windows x64 beta
   Current owned software license   AGPL-3.0-only
@@ -77,12 +87,12 @@ Component versions
   Station         townlight-station       0.3.0
   Access          townlight-access        0.5.0
   Notice          townlight-notice        0.3.0
-  Local runtime   townlight-runtime       0.2.0
+  Local runtime   townlight-runtime       0.2.1
 
 First run
 
 1.  Download the signed MSI, matching source and checksums from the
-    Windows x64 beta 1.7.0.1 release.
+    Windows x64 beta 1.7.1.1 release.
 2.  Verify the MSI hash and Authenticode publisher before installing on
     a fresh Windows profile. See the Windows acceptance summary for the
     tested setup.
@@ -276,7 +286,7 @@ This beta has synthetic single-profile workflow evidence. It does not
 have a published benchmark for concurrent staff capacity, minimum
 RAM/CPU, large-source limits or a field SLA. Do not turn a developer
 machine’s specification into a supported minimum. The signed MSI is
-2,082,697,216 bytes; allow additional disk for extracted runtime,
+2,081,316,864 bytes; allow additional disk for extracted runtime,
 database, originals, exports, media and backups. Select
 equipment/storage after sizing those actual workloads.
 

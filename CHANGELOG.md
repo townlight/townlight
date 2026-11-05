@@ -1,5 +1,13 @@
 # Changelog
 
+## Windows 1.7.1.1 public beta - 2026-11-05
+
+- Promote the exact signed, installed-tested source `919f2492cf43a83e693db71fe1371001e529cf40` at `townlight-v1.7.1-beta.1`, without rebuilding or re-signing.
+- Fix nine confirmed installed defects: Code-only authorization, account/public state clearing, public Meetings/Code views, stale Inspection analysis, Records pickers, removal preflight, supported profile removal/reinstallation, catalog/Station guidance and Windows restore/rollback.
+- Publish matching corresponding source, checksums, acceptance and installed evidence; independently verify the anonymous downloaded MSI hash, Scott Converse signature and timestamp. Preserve Windows 1.7.0.1 and its history.
+- Current manuals and download links describe 1.7.1.1; acceptance distinguishes fresh checks from reused workflow evidence. Windows only.
+
+
 > Windows delivery: this package is included in [MSI 1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1); [installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) applies only to the identified artifact. Earlier entries retain their original release context.
 
 
