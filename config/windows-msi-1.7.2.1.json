@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "release_tag": "townlight-windows-v1.7.2.1",
+  "product_name": "Townlight",
+  "product_version": "1.7.2.1",
+  "application_source_commit": "919f2492cf43a83e693db71fe1371001e529cf40",
+  "input_msi_sha256": "7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3",
+  "upgrade_code": "{0B97EFAE-2A2E-4E88-A81C-3AAD1A52C2CC}",
+  "recipe": "scripts/release/relabel_windows_msi.py",
+  "scope": "Installer metadata only. No application/runtime rebuild. Accepted cabinet and embedded signatures preserved."
+}

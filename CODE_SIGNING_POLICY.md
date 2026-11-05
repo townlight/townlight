@@ -35,3 +35,13 @@ Releases are published at: <https://github.com/townlight/townlight/releases>
 
 This software will not transfer any information to other networked systems unless
 specifically requested by the user.
+
+## Windows 1.7.2.1 installer metadata exception
+
+Owner-authorized November 5, 2026: the metadata-only recipe may run against the
+accepted signed 1.7.1.1 MSI without rebuilding the application or runtime. It verifies
+that the embedded cabinet is unchanged, records the installer metadata changes, and
+submits only the new unsigned outer MSI to the established Azure sign-only workflow.
+The returned MSI requires independent signature/timestamp and installed upgrade/data
+retention checks. Existing embedded application signatures and original acceptance
+remain valid for unchanged bytes. Full desktop CI is not required for this exception.
