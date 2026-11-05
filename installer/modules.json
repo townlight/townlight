@@ -1000,7 +1000,7 @@
         "townlight_records",
         "townlight_meetings"
       ],
-      "default_port": 8066,
+      "default_port": 8756,
       "installer_status": "naming_candidate_acceptance_pending",
       "proof_required": [
         "module_selection",
@@ -1045,10 +1045,10 @@
       ],
       "model_needs": [],
       "lifecycle": {
-        "install": "profile-selected",
-        "update": "manifest-versioned",
-        "disable": "allowed-after-backup",
-        "uninstall": "backup-first-module-data-removal"
+        "install": "configured-as-separate-service",
+        "update": "separate-service-versioned-update",
+        "disable": "stop-separate-station-service",
+        "uninstall": "backup-first-separate-station-removal"
       }
     }
   ]

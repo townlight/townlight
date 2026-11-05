@@ -132,7 +132,7 @@ rewritten = rewritten.replace(/import\s+["']\.\/styles\.css["'];?/, "");
 rewritten +=
   "\nexport const __test__ = { get state() { return state; }, " +
   "get appStateLoaded() { return appStateLoaded; }, loadAppState, render, handleCityWorkAction, " +
-  "renderFirstRunWizard, fallbackState };\n";
+    "renderFirstRunWizard, renderModuleRow, fallbackState };\n";
 
 globalThis.__TEST_INVOKE__ = (...args) => invokeImpl(...args);
 
@@ -647,3 +647,20 @@ function finishedBase() {
   if(appEl.innerHTML.includes('Records service is unavailable')||!appEl.innerHTML.includes('data-code-action="lookup"'))fail('D1: a Records outage must not replace authorized Code');
 }
 console.log("PASS: xss-and-state existing checks plus Windows audit D1/D2/D5 regressions");
+
+// D9: the actual Station catalog metadata must describe the separate service.
+{
+  const raw = JSON.parse(readFileSync(join(root, "..", "installer", "modules.json"), "utf8"))
+    .modules.find(module => module.id === "townlight-station");
+  const row = t.renderModuleRow({ ...raw, version: raw.current_version,
+    lifecycle_install: raw.lifecycle.install, lifecycle_update: raw.lifecycle.update,
+    lifecycle_disable: raw.lifecycle.disable, lifecycle_uninstall: raw.lifecycle.uninstall });
+  for (const phrase of ["Bundled separate service", "Configure separately using the Station manual",
+    "Separate Station backup:", "Separate Station database", "Separate Station media directory"]) {
+    if (!row.includes(phrase)) fail("D9: Station catalog omits " + phrase);
+  }
+  if (row.includes("Installed by selected package profile") || row.includes("notice proof files") ||
+      row.includes(">Locked<") || raw.default_port !== 8756) {
+    fail("D9: Station catalog must not claim profile-managed installation, Notice backup or a locked product");
+  }
+}

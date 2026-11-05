@@ -1127,6 +1127,7 @@ function visibleNavigationItems() {
 }
 
 function moduleStatusLabel(module) {
+  if (module.id === "townlight-station") return "Bundled separate service";
   if (module.required) return "Required";
   if (module.installed && module.enabled === false) return "Disabled";
   if (module.installed) return "Enabled";
@@ -4446,6 +4447,10 @@ function lifecycleStatusText(value) {
     "always-installed-with-profile": "Always installed with Townlight Core",
     "profile-selected": "Installed by selected package profile",
     "manifest-versioned": "Updated through the versioned module manifest",
+    "configured-as-separate-service": "Configure separately using the Station manual",
+    "separate-service-versioned-update": "Update the separate Station service",
+    "stop-separate-station-service": "Stop the separate Station service",
+    "backup-first-separate-station-removal": "Back up Station database and media before removing its service",
     "not-allowed-required-foundation": "Cannot be disabled because it is the required foundation",
     "allowed-after-backup": "Allowed after a backup is created",
     "backup-first-profile-removal": "Removed only through backup-first profile removal",
