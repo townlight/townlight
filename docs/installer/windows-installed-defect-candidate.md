@@ -16,7 +16,7 @@ identifier, not authorization to tag or publish.
 | D4 | Original evidence, inspector input and citation changes invalidate derived analysis. Review notes preserve valid analysis. Saved prior revisions retain their evidence. | Analyze, remove citation, save without reanalysis; reopen and verify retained prior revision. |
 | D5 | Records pickers follow enabled Meetings/Code capabilities. | Both pickers visible and usable in full composition; absent when corresponding module is disabled. |
 | D6 | Removal validates under maintenance exclusion before backup or service stops. Other module mutations cannot race maintenance. | Refused dependency removal leaves service health, selection and backup inventory unchanged. |
-| D7 | Known remaining preview compositions are recognized before custom-profile restrictions. | Remove Inspections, Permitting and Planning in order; verify remaining profiles and reinstall, retaining data. |
+| D7 | Known remaining preview compositions are recognized before custom-profile restrictions. The full payload includes locked provenance for each supported smaller preview profile. | Remove Inspections, Permitting and Planning in order; verify remaining profiles and reinstall through their matching profiles, retaining data. |
 | D9 | Profile copy describes included capabilities without false unsigned/unpublished assertions. Station is identified as a bundled separate service, with manual/setup guidance and separate database/media backup labels. | Check installed catalog, Station instructions and actual separately configured handoff. |
 | D10 | Restore stages backup bytes, retains directory identities, journals file moves and rolls them back on failure. Existing model cache is preserved. | Keep exports open, mutate byte sentinel, restore, compare hashes and persisted database links; prove failure rollback too. |
 
@@ -25,6 +25,14 @@ verification failure or locked file must remain an explicit failure, never a
 success inferred from unchanged settings. Retained safety/staging paths must be
 reported if rollback cannot complete. Separate Station database/media are not
 part of the native profile snapshot.
+
+Installed testing of source `806efe1` reproduced a missing Planning provenance
+entry on reinstallation after removal. The revised assembler writes and locks
+the Planning, Permitting and Inspections provenance files, all bound to the
+same full build inputs. It also corrects catalog wording that inferred an
+absent payload from a blocked selection and removes an inaccurate unsigned
+label. The revised packaging and copy require fresh installed verification;
+the earlier candidate's unaffected evidence must be identified as reused.
 
 The audit's unconfirmed readiness observation, missing media interpretation
 adapter, legacy Meetings controls and external broadcast outputs are outside

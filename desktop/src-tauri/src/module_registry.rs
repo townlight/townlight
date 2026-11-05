@@ -1071,7 +1071,7 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
             } else if module.id == "townlight_planning" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
             } else if module.id == "townlight_permitting" && !matches!(selection.profile_id.as_str(), "permitting-preview" | "inspections-preview") {
-                Err("Select permitting-preview and its matching unsigned candidate payload.".into())
+                Err("Select permitting-preview and its matching candidate payload.".into())
             } else { validate_installable_module_contract(module, core_version) };
             let (contract_ready, blocked_reason) = match contract_result {
                 Ok(()) => (true, None),

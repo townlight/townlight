@@ -1390,12 +1390,12 @@ function renderModuleSelectionControls() {
           const checked = customMode ? selectedIds.has(module.id) : profileModuleIds.includes(module.id);
           const disabled = !customMode || !ready;
           const separateStation = module.id === "townlight-station";
-          const status = separateStation ? "Bundled separate service" : ready ? "Available in this Windows installation" : "Unavailable in this installation";
+          const status = separateStation ? "Bundled separate service" : ready ? "Available in this Windows installation" : "Unavailable for this selection";
           // Clerk-facing plain reason; the raw technical contract string (e.g.
           // "must target Townlight Core 1.2.0") is kept only as a hover tooltip for support.
           const plainReason = separateStation
             ? " - configure Station separately; desktop module selection does not provision it"
-            : !ready ? " - this installation does not include the required module payload" : "";
+            : !ready ? " - choose a matching profile or resolve the module requirements" : "";
           const rawTitle = !ready && module.blocked_reason ? ` title="${escapeHtml(module.blocked_reason)}"` : "";
           return `
             <label class="module-choice ${checked ? "selected" : ""} ${disabled ? "disabled" : ""}">

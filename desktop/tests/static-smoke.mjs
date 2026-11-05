@@ -139,7 +139,7 @@ const requiredUiPhrases = [
   "Module Catalog",
   "Choose Product Modules",
   "Custom selection will install Townlight Core plus",
-  "Unavailable in this installation",
+  "Unavailable for this selection",
   "Bundled separate service",
   "Separate Station backup:",
   "Apply Module Selection",
@@ -263,7 +263,7 @@ for (const phrase of [
   "Downloading…",
   "Townlight may look frozen while it downloads",
   "too many failed sign-in attempts",
-  "this installation does not include the required module payload",
+  "choose a matching profile or resolve the module requirements",
   'result.working ? "working"',
   "this local staff user is disabled"
 ]) {
