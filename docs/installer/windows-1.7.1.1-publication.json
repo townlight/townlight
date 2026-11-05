@@ -1,0 +1,77 @@
+{
+  "verified_at": "2026-11-05T09:26:10.709395-07:00",
+  "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1",
+  "release_id": 435434779,
+  "tag": "townlight-v1.7.1-beta.1",
+  "source_commit": "919f2492cf43a83e693db71fe1371001e529cf40",
+  "annotated_tag": "7ec7b239e0a3f7da2c8f0531d91e01ae503cf1e6",
+  "msi_version": "1.7.1.1",
+  "desktop_version": "1.7.1-1",
+  "runtime_version": "0.2.1",
+  "no_rebuild_or_resigning": true,
+  "old_release_immutable_metadata_and_assets_unchanged": true,
+  "assets": [
+    {
+      "name": "ACCEPTANCE-Windows-1.7.1.1.md",
+      "size": 3430,
+      "sha256": "7acf6823c36d545ca4ab5c764f81deafb4d05b0fbcb052cdff105b3176740035",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/ACCEPTANCE-Windows-1.7.1.1.md",
+      "github_digest_verified": true,
+      "anonymous_download_verified": true,
+      "http_status": 200
+    },
+    {
+      "name": "Installed-Windows-Evidence-1.7.1.1.zip",
+      "size": 38856053,
+      "sha256": "abc0a581e930e0327794c045371c39bfa20bcc005854e4ae623a0c067772a1ea",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Installed-Windows-Evidence-1.7.1.1.zip",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Signing-Receipt-Windows-1.7.1.1.json",
+      "size": 593,
+      "sha256": "ef004d0144f48b5092bc8d13333b998c4ed171e97a743082086589ccc70f29c1",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Signing-Receipt-Windows-1.7.1.1.json",
+      "github_digest_verified": true,
+      "anonymous_download_verified": true,
+      "http_status": 200
+    },
+    {
+      "name": "Townlight-Windows-1.7.1.1-Corresponding-Source.zip",
+      "size": 426886838,
+      "sha256": "30542733c8e7305fc4d3f56a68188d79c8ca06104694bbbcf0c881891f10b6a2",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-1.7.1.1-Corresponding-Source.zip",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Townlight-Windows-x64-1.7.1.1.msi",
+      "size": 2081316864,
+      "sha256": "7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-x64-1.7.1.1.msi",
+      "github_digest_verified": true,
+      "anonymous_download_verified": true,
+      "http_status": 200
+    },
+    {
+      "name": "SHA256SUMS-Windows-1.7.1.1.txt",
+      "size": 526,
+      "sha256": "0572c6b7506ed35c7876570a6ecf4b8d55bbc4064ac5d99e659077749996421b",
+      "public_url": "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/SHA256SUMS-Windows-1.7.1.1.txt",
+      "github_digest_verified": true,
+      "anonymous_download_verified": true,
+      "http_status": 200
+    }
+  ],
+  "signature_verification": {
+    "status": "Valid",
+    "publisher": "CN=Scott Converse, O=Scott Converse, L=Longmont, S=co, C=US",
+    "timestamp": "CN=Microsoft Public RSA Time Stamping Authority, OU=nShield TSS ESN:7800-05E0-D947, OU=Microsoft America Operations, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+    "sha256": "7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3",
+    "bytes": 2081316864,
+    "verified_at": "2026-11-05T16:26:18.7039302Z"
+  },
+  "installed_acceptance": "Exact bytes already passed fresh installed 34 control checks and three independent provenance checks; reused evidence boundary in ACCEPTANCE-Windows-1.7.1.1.md",
+  "latest_verified": true,
+  "prerelease": false,
+  "channel_authorization": "Scott explicitly approved making this public beta Latest on 2026-11-05; remove only prerelease flag. Title still public beta. All asset digests unchanged."
+}

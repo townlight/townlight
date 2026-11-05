@@ -1,6 +1,6 @@
 # Townlight current candidate status
 
-Prepared November 2, 2026. The coordinated naming, Access and Notice source candidate is in progress. Desktop source 1.7.0-1 / intended MSI 1.7.0.1 / runtime 0.2.0. Signing, exact installed Windows acceptance and publication remain pending. No earlier release receipt establishes acceptance of this changed candidate.
+Prepared November 2, 2026. The coordinated naming, Access and Notice source candidate is in progress. Desktop source 1.7.1-1 / intended MSI 1.7.1.1 / runtime 0.2.0. Signing, exact installed Windows acceptance and publication remain pending. No earlier release receipt establishes acceptance of this changed candidate.
 
 The Windows Local desktop uses Tauri and WebView2 with packaged local services. This candidate requires a fresh profile and empty database; it preserves the existing profile directory and refuses an in-place legacy upgrade. The prior signed release remains separate recovery evidence.
 

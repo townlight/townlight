@@ -1,9 +1,9 @@
 # Townlight Windows beta support
 
-These instructions cover the signed **Windows x64 public beta 1.7.0.1**.
+These instructions cover the signed **Windows x64 public beta 1.7.1.1**.
 
-[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/Townlight-Candidate-Windows-x64.msi) ·
-[Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) ·
+[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-x64-1.7.1.1.msi) ·
+[Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1) ·
 [Suite manual](https://townlight.github.io/manuals/suite.html) ·
 [Public beta announcement](https://townlight.github.io/announcement.html)
 
@@ -15,10 +15,9 @@ and [backup, recovery and maintenance guidance](https://townlight.github.io/manu
 Preserve existing data and backups. Do not rename or delete the compatibility
 profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
-Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/SHA256SUMS-Windows-1.7.0.1.txt) and check
+Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/SHA256SUMS-Windows-1.7.1.1.txt) and check
 its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact
-release link here; GitHub's generic Latest shortcut currently leads to an older
-release. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-beta-1-windows-1.7.0.1/ACCEPTANCE-Windows-1.7.0.1.md) describes the installed checks
+release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/ACCEPTANCE-Windows-1.7.1.1.md) describes the installed checks
 and their limits. Local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
 timed out without saving a draft.
 
@@ -49,7 +48,7 @@ For questions and evaluation feedback, use
 
 ## What to include
 
-- Installed version (**1.7.0.1**) and Windows version.
+- Installed version (**1.7.1.1**) and Windows version.
 - The selected products/profile and whether this was a fresh installation.
 - Steps to reproduce, what you expected and what happened.
 - Redacted error messages, logs or screenshots, using synthetic data where possible.

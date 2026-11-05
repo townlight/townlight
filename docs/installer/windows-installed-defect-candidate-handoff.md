@@ -1,17 +1,14 @@
 # Windows installed-defect candidate handoff
 
-The published Windows 1.7.0.1 MSI remains unchanged. Its fresh installed audit
-found nine confirmed defects. The separate 1.7.1.1 candidate fixes D1-D7/D9/D10
-and completed bounded installed acceptance. Tagging, release publication and
-replacement of public MSI assets require Scott's approval. Windows only.
+The exact signed Windows 1.7.1.1 candidate is now the [published Windows beta](https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1), tag `townlight-v1.7.1-beta.1` at `919f2492cf43a83e693db71fe1371001e529cf40`. Scott explicitly authorized publication on November 5. The previous 1.7.0.1 release and its assets remain intact. Windows only. See the [publication and download receipt](windows-1.7.1.1-release.md).
 
 ## Identities and recovery
 
 | Item | Exact identity |
 | --- | --- |
-| Public release | [townlight-beta-1-windows-1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) |
-| Released source | `706028abab771d0b4c8458e52c759a8bbd9ce3ba` |
-| Released MSI | 2,082,697,216 bytes; SHA-256 `8cebaea95fa62f582326a1a0c1af3cb54233c40dbb41d88324170eb1b3f25ade` |
+| Preserved previous release | [townlight-beta-1-windows-1.7.0.1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-windows-1.7.0.1) |
+| Previous released source | `706028abab771d0b4c8458e52c759a8bbd9ce3ba` |
+| Previous released MSI | 2,082,697,216 bytes; SHA-256 `8cebaea95fa62f582326a1a0c1af3cb54233c40dbb41d88324170eb1b3f25ade` |
 | Candidate binary source | `919f2492cf43a83e693db71fe1371001e529cf40` |
 | Candidate versions | Desktop 1.7.1-1; MSI 1.7.1.1; runtime 0.2.1 |
 | Candidate product | Townlight Windows Fix Candidate |
@@ -26,8 +23,7 @@ Signing results are [EXE run 41956803118](https://github.com/townlight/townlight
 and [MSI run 41958130765](https://github.com/townlight/townlight/actions/runs/41958130765).
 The MSI run's `signed-native-payload` artifact contains the signed result;
 artifact retention is finite. Verify exact size/hash, Scott Converse Valid
-Authenticode and Microsoft timestamp after retrieval. This is not a published
-candidate download. No MSI is stored in Git or LFS.
+Authenticode and Microsoft timestamp after retrieval. The [permanent published download](https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-x64-1.7.1.1.msi) now provides these exact bytes. No MSI is stored in Git or LFS.
 
 Source and evidence delivery use branch `fix/windows-installed-defects-2026-11-04`.
 The containing PR and its required checks record integration status. Preserve
@@ -78,6 +74,4 @@ and `prior-msi-preservation.json`, not path alone. Raw failures remain unchanged
 
 Do not replay archived worker commands blindly: they are historical execution
 evidence with disposed guest IDs and fixtures. Reuse unaffected proof. Additional
-retests or rebuilds need a changed input, named defect or required check. The only
-remaining release action is Scott's decision about publishing this exact candidate;
-source delivery itself is tracked by the containing PR and post-merge checks.
+retests or rebuilds need a changed input, named defect or required check. Publication of this exact candidate is authorized and complete. [PR #302](https://github.com/townlight/townlight/pull/302) merged at `f049be6aa880495be55e3c3584265acd3333a629`; all required PR checks and post-merge Windows run [41969783865](https://github.com/townlight/townlight/actions/runs/41969783865) passed. The [publication receipt](windows-1.7.1.1-publication.json) records public asset and tag verification. Later documentation commits do not change the signed source identity.

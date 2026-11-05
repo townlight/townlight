@@ -2,19 +2,9 @@
 
 # Townlight — Consistency Reference
 
-## Current Windows release and unpublished fix candidate
+## Current Windows release: 1.7.1.1
 
-Published Windows MSI 1.7.0.1 remains the release at
-`townlight-beta-1-windows-1.7.0.1`, source
-`706028abab771d0b4c8458e52c759a8bbd9ce3ba`, MSI SHA-256
-`8cebaea95fa62f582326a1a0c1af3cb54233c40dbb41d88324170eb1b3f25ade`.
-Its installed audit found nine confirmed defects. The separate signed Windows
-1.7.1.1 candidate, source `919f2492cf43a83e693db71fe1371001e529cf40`,
-MSI SHA-256 `7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3`,
-passed bounded installed acceptance with new/reused evidence distinguished in
-the [handoff](docs/installer/windows-installed-defect-candidate-handoff.md).
-It is not a new public release. No public MSI replacement or new tag is authorized.
-The older release references below retain their original identities.
+The [published Windows beta](https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1) promotes the exact tested signed candidate, source `919f2492cf43a83e693db71fe1371001e529cf40`, tag `townlight-v1.7.1-beta.1`. Desktop 1.7.1-1, MSI 1.7.1.1, runtime 0.2.1; MSI SHA-256 `7553bb3ca457360a99878953f86d54211d77a250129a6744d9d637a2fb4be9e3`, 2,081,316,864 bytes. No rebuild or re-signing occurred during publication. [Acceptance and public verification](docs/installer/windows-1.7.1.1-release.md) distinguish new installed checks from reused evidence. [PR #302](https://github.com/townlight/townlight/pull/302) and post-merge Windows CI passed. The previous Windows 1.7.0.1 release remains intact at `townlight-beta-1-windows-1.7.0.1`. Older references below are historical.
 
 ## Historical connected release: Records + Meetings 1.2.0-beta.1 (2026-10-19)
 

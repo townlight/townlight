@@ -1,13 +1,6 @@
-# Windows installed-defect candidate
+# Windows installed-defect fixes, released as 1.7.1.1
 
-This unreleased work fixes findings from the November 4 installed audit of
-Windows MSI 1.7.0.1. The published MSI, tag, receipts and acceptance history stay
-unchanged. The candidate uses desktop version 1.7.1-1 / Windows MSI version
-1.7.1.1, runtime 0.2.1 and a separate installer identity. Packaging, Scott Converse signing and bounded fresh-install acceptance are complete.
-The candidate remains unpublished; the public release still contains the original
-defects. See the [results and raw evidence](evidence/windows-installed-defect-candidate/README.md)
-and [handoff](windows-installed-defect-candidate-handoff.md). The configured future release tag is an uncreated
-identifier, not authorization to tag or publish.
+This work fixes the nine confirmed findings from the November 4 installed audit of Windows MSI 1.7.0.1. The exact signed 1.7.1.1 candidate is now [published](https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1) at source `919f2492cf43a83e693db71fe1371001e529cf40`. The previous MSI, tag, receipts and acceptance history remain unchanged. Desktop 1.7.1-1, runtime 0.2.1, tested product name Townlight Windows Fix Candidate. See [new versus reused acceptance and public verification](windows-1.7.1.1-release.md), [raw evidence](evidence/windows-installed-defect-candidate/README.md) and [handoff](windows-installed-defect-candidate-handoff.md).
 
 | Finding | Candidate behavior | Required installed proof |
 | --- | --- | --- |
