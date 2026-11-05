@@ -49,3 +49,17 @@ upgrade. Only exact signed installed acceptance can establish that claim.
 The full prior functional evidence and its limitations remain applicable where
 inputs are unchanged; this release does not add features or expand acceptance.
 
+
+## Rebuilt launcher correction
+
+The first PR304 CI MSI regenerated the Access console launcher with an absolute
+`D:\a\townlight\...` interpreter path and no signature. Sandbox application
+control rejected that unsigned launcher before it could start. The original
+1.7.1.1 release already contains a signed portable Rust launcher; its source is
+now part of the build recipe instead of being lost during pip installation.
+Runtime preparation compiles that same relative-interpreter implementation and
+checks actual `--help` after moving the Python directory. Publication signs it
+through the existing Azure account, independently verifies it before packaging,
+and verifies the identical signed helper inside the MSI and signing receipt.
+Application control is preserved. This corrects a rebuilt payload regression;
+no Access feature or component source pin changes.
