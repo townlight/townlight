@@ -561,7 +561,7 @@ jobs:
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
             if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-              "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
+              "UpgradeCode=0b97efae-2a2e-4e88-a81c-3aad1a52c2cc"
             } elseif ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
               "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
             } else {

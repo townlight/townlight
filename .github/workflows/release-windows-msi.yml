@@ -15,6 +15,7 @@ on:
         required: true
   push:
     tags:
+      - "townlight-v*"
       - "townlight-windows-local-v*"
       - "townlight-records-v*"
       - "townlight-records-meetings-v*"
@@ -45,7 +46,7 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($tag)) { throw "A release tag is required." }
           $isPlanning = $tag -like 'townlight-records-meetings-code-zoning-planning-v*'
           $isPermitting = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-v*'
-          $isInspections = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*'
+          $isInspections = $tag -like 'townlight-records-meetings-code-zoning-planning-permitting-inspections-v*' -or $tag -like 'townlight-v*'
           if ($isInspections) {
             . ./desktop/scripts/inspections-build-contract.ps1
             $inspections = Get-InspectionsBuildContract
