@@ -63,11 +63,13 @@ export function createMunicipalView(invoke, escape, openLinkedRecord) {
       + '<label>Signed agreement PDF (up to 8 MB) <input name="document" type="file" accept=".pdf,application/pdf" required></label>';
   }
 
+  const contractKeywords = record => html([record.title, record.vendor_name, record.owner, record.status].join(" ").toLowerCase());
+
   function contracts(data, selected) {
     return form("register-contract", "Register signed agreement", contractFields())
-      + section("Contract register", '<label>Search by title, vendor, owner, or status <input type="search" data-contract-filter></label>'
+      + section("Contract register", '<label>Search contracts and renewals by title, vendor, owner, or status <input type="search" data-contract-filter></label>'
         + (data.map(record => `<article data-contract-record="${html(record.id)}"
-          data-keywords="${html([record.title, record.vendor_name, record.owner, record.status].join(" ").toLowerCase())}">
+          data-keywords="${contractKeywords(record)}">
           <h4>${html(record.title)}</h4><p>${html(record.vendor_name)} · ${html(record.owner)} · ${record.status === "signed" ? "Signed" : "Draft"}</p>
           ${record.procurement_id ? link("procurement", record.procurement_id, "Open source procurement") : ""}
           ${record.status === "signed" ? `<p>Signed PDF: ${html(record.document_name)}</p>
@@ -76,7 +78,7 @@ export function createMunicipalView(invoke, escape, openLinkedRecord) {
                 ${form("sign-contract", "Save signed agreement", contractFields(record), record.id)}</details>`}</article>`).join("")
           || "<p>No contracts recorded.</p>"))
       + section("Renewal queue", data.filter(record => record.status === "signed")
-        .map(record => `<p>${html(record.renewal_due)} · ${html(record.title)} · ${html(record.owner)}</p>`).join("")
+        .map(record => `<p data-keywords="${contractKeywords(record)}">${html(record.renewal_due)} · ${html(record.title)} · ${html(record.owner)}</p>`).join("")
         || "<p>No signed agreements in the queue.</p>");
   }
 
@@ -158,7 +160,7 @@ export function createMunicipalView(invoke, escape, openLinkedRecord) {
       workspace.addEventListener("input", event => {
         if (!event.target.matches("[data-contract-filter]")) return;
         const query = event.target.value.trim().toLowerCase();
-        for (const record of content.querySelectorAll("[data-contract-record]")) {
+        for (const record of content.querySelectorAll("[data-keywords]")) {
           record.hidden = !record.dataset.keywords.includes(query);
         }
       });

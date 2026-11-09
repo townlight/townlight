@@ -23,7 +23,7 @@ changing its record.
 ## Contracts
 
 Register the signed agreement with its vendor, staff owner, dates and a PDF
-up to 8 MiB. Search the register by title, vendor, owner or status. The renewal
+up to 8 MiB. Search the register and renewal queue by title, vendor, owner or status. The renewal
 queue uses the deadline supplied by staff. Use Download signed PDF to retrieve
 the stored document. A draft from Procurement has a link back to its source.
 Record the signed agreement explicitly when it is available.
