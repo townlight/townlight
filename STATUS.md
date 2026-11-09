@@ -2,6 +2,8 @@
 
 Windows 1.8.0.1 adds Boards & Commissions, Contracts, and Procurement to the full Windows profile. The signed Windows Sandbox checks cover a fresh installation, the three staff workflows, role boundaries, record persistence, and upgrade from 1.7.2.1 with retained city data and settings. Station continues to use its separately configured local service. [Download and evidence](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1).
 
+The Windows desktop uses Tauri and Microsoft Edge WebView2 with packaged local services.
+
 <!-- BEGIN GENERATED MODULE STATUS (scripts/docs/render_public_status.py) -->
 
 ## Status Legend
