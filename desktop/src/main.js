@@ -27,7 +27,7 @@ function municipalAccess(area) {
 }
 
 function openMunicipalLink(area, id) {
-  if (!areaIsEnabled(area) || !municipalAccess(area)) return;
+  if (!areaIsEnabled(area) || !municipalAccess(area === "meetings" ? "boards" : area)) return;
   municipalRecord = id;
   state.activeArea = area;
   render();
