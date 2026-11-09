@@ -232,6 +232,30 @@ jobs:
           ref: 7205ed1b07132b1649c994e190b381d773807aff
           path: station
 
+      - name: Check out pinned Townlight Boards source
+        if: steps.candidate.outputs.boards_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/boards
+          ref: ${{ steps.candidate.outputs.boards_ref }}
+          path: boards
+
+      - name: Check out pinned Townlight Contracts source
+        if: steps.candidate.outputs.contracts_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/contracts
+          ref: ${{ steps.candidate.outputs.contracts_ref }}
+          path: contracts
+
+      - name: Check out pinned Townlight Procurement source
+        if: steps.candidate.outputs.procurement_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/procure
+          ref: ${{ steps.candidate.outputs.procurement_ref }}
+          path: procurement
+
       - name: Validate publication-signing context
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         shell: pwsh
@@ -344,7 +368,7 @@ jobs:
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement") }
             npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta @sourceRoots
@@ -561,7 +585,7 @@ jobs:
             "WorkflowEvent=${{ github.event_name }}"
             "WorkflowRun=${{ github.run_id }}"
             if ('${{ steps.candidate.outputs.product_profile }}' -eq 'inspections-preview') {
-              "UpgradeCode=77c47cc0-128e-50b0-acc1-0bdf84ac3b3c"
+              "UpgradeCode=0b97efae-2a2e-4e88-a81c-3aad1a52c2cc"
             } elseif ('${{ steps.candidate.outputs.product_profile }}' -eq 'permitting-preview') {
               "UpgradeCode=53211081-ea8b-4882-a752-d80a9363cda6"
             } else {
@@ -725,6 +749,30 @@ jobs:
           ref: 7205ed1b07132b1649c994e190b381d773807aff
           path: station
 
+      - name: Check out pinned Townlight Boards source
+        if: steps.candidate.outputs.boards_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/boards
+          ref: ${{ steps.candidate.outputs.boards_ref }}
+          path: boards
+
+      - name: Check out pinned Townlight Contracts source
+        if: steps.candidate.outputs.contracts_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/contracts
+          ref: ${{ steps.candidate.outputs.contracts_ref }}
+          path: contracts
+
+      - name: Check out pinned Townlight Procurement source
+        if: steps.candidate.outputs.procurement_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/procure
+          ref: ${{ steps.candidate.outputs.procurement_ref }}
+          path: procurement
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -760,7 +808,7 @@ jobs:
           )
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks

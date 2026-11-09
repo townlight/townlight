@@ -49,6 +49,9 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
         imports.append(("townlight_permitting", "townlight_permitting.workflow_store"))
     if profile == "inspections-preview":
         imports.append(("townlight_inspections", "townlight_inspections.workflow_store"))
+        imports.extend((name, f"{name}.staff_workflow") for name in (
+            "townlight_boards", "townlight_contracts", "townlight_procurement",
+        ))
     return imports
 
 
@@ -423,6 +426,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
         from townlight_runtime.inspections_bridge import router as inspections_router, configure
         configure(domain_app)
         domain_app.include_router(inspections_router)
+        from townlight_runtime.municipal_staff import router as municipal_staff_router
+        domain_app.include_router(municipal_staff_router)
     async def demo_marker(session):
         from sqlalchemy import select
         from townlight_runtime.records_import_store import imports

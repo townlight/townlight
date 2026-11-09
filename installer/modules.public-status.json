@@ -4,11 +4,11 @@
   "grade_labels": {
     "platform": "Shared platform",
     "released": "Published beta capability",
-    "queued": "Queued \u00b7 Tier 2",
+    "queued": "Queued · Tier 2",
     "early-scaffold": "Early scaffold",
     "foundation": "Foundation",
     "planned": "Planned",
-    "candidate": "Candidate \u2014 installed acceptance pending"
+    "candidate": "Candidate — installed acceptance pending"
   },
   "grade_desc": {
     "platform": "The shared platform every module depends on; always installed.",
@@ -184,6 +184,45 @@
         "released_date": null,
         "release_url_state": "candidate",
         "note": "Prepared naming/Access/Notice candidate; installed acceptance and publication pending."
+      }
+    },
+    {
+      "id": "townlight_boards",
+      "name": "Townlight Boards & Commissions",
+      "arch_tier": 3,
+      "current_version": "0.2.0",
+      "townlight_core_requirement": "1.3.0.dev2",
+      "public_status": {
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Windows staff workflow candidate pending installed acceptance."
+      }
+    },
+    {
+      "id": "townlight_contracts",
+      "name": "Townlight Contracts",
+      "arch_tier": 3,
+      "current_version": "0.2.0",
+      "townlight_core_requirement": "1.3.0.dev2",
+      "public_status": {
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Windows staff workflow candidate pending installed acceptance."
+      }
+    },
+    {
+      "id": "townlight_procurement",
+      "name": "Townlight Procurement",
+      "arch_tier": 3,
+      "current_version": "0.3.0",
+      "townlight_core_requirement": "1.3.0.dev2",
+      "public_status": {
+        "grade": "candidate",
+        "released_date": null,
+        "release_url_state": "candidate",
+        "note": "Windows staff workflow candidate pending installed acceptance."
       }
     }
   ]

@@ -19,7 +19,7 @@ Status labels below are the suite's shared status set, generated from
 - **Candidate — installed acceptance pending:** Prepared software; completion and publication require the recorded exact-candidate acceptance.
 - **Published beta capability:** Available in a published bounded Townlight desktop beta or recorded standalone release; select the documented profile and read its limits.
 
-## Module Status (11 kept modules)
+## Module Status (14 kept modules)
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
@@ -34,6 +34,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Inspections | 0.3.0+dev.2 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
 | Townlight Notice | 0.3.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
 | Townlight Station | 0.3.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
+| Townlight Boards & Commissions | 0.2.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
+| Townlight Contracts | 0.2.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
+| Townlight Procurement | 0.3.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
 
 <!-- END GENERATED MODULE STATUS -->
 

@@ -13,6 +13,11 @@ const SUITE_STATE_JSON: &str = include_str!("../../../config/suite-state.json");
 // selections are preserved verbatim by `module_selection_state`, so upgrades
 // from the broader historical city-core profile do not silently remove modules.
 const DEFAULT_PROFILE_ID: &str = "records-beta";
+const MUNICIPAL_MODULES: &[&str] = &[
+    "townlight_boards",
+    "townlight_contracts",
+    "townlight_procurement",
+];
 
 #[derive(Deserialize)]
 struct CanonicalSuiteState {
@@ -450,6 +455,11 @@ fn validate_module_selection(
     if selected_ids.contains("townlight_inspections") && label != "inspections-preview" {
         return Err("Use the explicit inspections-preview profile and matching payload.".into());
     }
+    if label != "inspections-preview"
+        && MUNICIPAL_MODULES.iter().any(|id| selected_ids.contains(id))
+    {
+        return Err("Boards, Contracts and Procurement require the full Windows payload.".into());
+    }
     for module_id in module_ids {
         let module = module_map
             .get(module_id.as_str())
@@ -816,6 +826,34 @@ pub fn module_selection_state() -> Result<ModuleSelectionState, String> {
         Some(selection) => selection,
         None => selection_for_profile(&registry, DEFAULT_PROFILE_ID)?,
     };
+    if selection.profile_id == "inspections-preview" {
+        let profile = profile_by_id(&registry, &selection.profile_id)?;
+        let prior: HashSet<_> = profile
+            .modules
+            .iter()
+            .filter(|id| !MUNICIPAL_MODULES.contains(&id.as_str()))
+            .collect();
+        let installed: HashSet<_> = selection.installed_module_ids.iter().collect();
+        if prior == installed {
+            normalize_enabled_modules(&registry, &mut selection)?;
+            for id in MUNICIPAL_MODULES {
+                selection.installed_module_ids.push((*id).to_string());
+                selection
+                    .disabled_module_ids
+                    .retain(|disabled| disabled != id);
+                if *id != "townlight_boards"
+                    || selection
+                        .enabled_module_ids
+                        .iter()
+                        .any(|enabled| enabled == "townlight_meetings")
+                {
+                    selection.enabled_module_ids.push((*id).to_string());
+                } else {
+                    selection.disabled_module_ids.push((*id).to_string());
+                }
+            }
+        }
+    }
     normalize_enabled_modules(&registry, &mut selection)?;
     if selection.profile_id == "custom" {
         validate_custom_selection(&registry, &selection.installed_module_ids)?;

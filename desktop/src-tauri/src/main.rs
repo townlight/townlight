@@ -10,6 +10,7 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod municipal_staff;
 mod notice_client;
 mod permitting_client;
 mod planning_client;
@@ -122,6 +123,21 @@ fn navigation() -> Vec<NavigationItem> {
             id: "planning",
             label: "Planning",
             description: "Adopted policy sources and reviewed staff analysis",
+        },
+        NavigationItem {
+            id: "boards",
+            label: "Boards & Commissions",
+            description: "Roster, terms, vacancies and attendance",
+        },
+        NavigationItem {
+            id: "contracts",
+            label: "Contracts",
+            description: "Signed agreements and renewal dates",
+        },
+        NavigationItem {
+            id: "procurement",
+            label: "Procurement",
+            description: "RFP drafts, proposal review and recorded awards",
         },
         NavigationItem {
             id: "search",
@@ -1101,6 +1117,32 @@ fn inspections_capability() -> Result<String, domain_client::DomainError> {
 }
 
 #[tauri::command]
+async fn municipal_staff_request(
+    request: municipal_staff::StaffRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    let (modules, grant, admin_only) = request.requirements();
+    if selection.profile_id != "inspections-preview"
+        || !modules
+            .iter()
+            .all(|id| selection.enabled_module_ids.iter().any(|item| item == id))
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, grant))
+        || (admin_only && !access_is_local_admin(&access))
+    {
+        return Err(DomainError::denied());
+    }
+    request
+        .execute(&auth::domain_session_proof().map_err(|_| DomainError::denied())?)
+        .await
+}
+
+#[tauri::command]
 async fn inspections_domain_request(
     request: inspections_client::InspectionsRequest,
 ) -> Result<Value, domain_client::DomainError> {
@@ -1281,6 +1323,7 @@ pub fn run() {
             planning_domain_request,
             permitting_domain_request,
             inspections_domain_request,
+            municipal_staff_request,
             permitting_pick_bundle,
             planning_public_request,
             planning_pick_bundle,

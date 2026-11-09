@@ -12,6 +12,9 @@
     "townlight/access": "f377a9a6e2a14d890333a20eab9277d644a9aaeb",
     "townlight/permit": "224116d9c714f613646f2b6ce2cbb687cb5e0040",
     "townlight/inspect": "a6861f262328e7645557ad2a2600db4a12a5046c",
-    "townlight/station": "7205ed1b07132b1649c994e190b381d773807aff"
+    "townlight/station": "7205ed1b07132b1649c994e190b381d773807aff",
+    "townlight/boards": "d14340b713c880908cc27e383a59271ed0471ac0",
+    "townlight/contracts": "873de5bbff0f596b2c7cf20da4c68e94c3c3934c",
+    "townlight/procure": "f10cd99f65f5f867d331af3bd6e60742bca61268"
   }
 }

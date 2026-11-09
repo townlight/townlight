@@ -54,7 +54,10 @@
         "townlight_zoning",
         "townlight_planning",
         "townlight_permitting",
-        "townlight_inspections"
+        "townlight_inspections",
+        "townlight_boards",
+        "townlight_contracts",
+        "townlight_procurement"
       ],
       "disabled": false,
       "development_only": false
@@ -1017,7 +1020,7 @@
       "routes": [
         {
           "id": "station-operator",
-          "label": "Station operator — separate local service",
+          "label": "Station operator â€” separate local service",
           "path": "http://127.0.0.1:8756/",
           "surface": "Staff"
         }
@@ -1050,6 +1053,170 @@
         "disable": "stop-separate-station-service",
         "uninstall": "backup-first-separate-station-removal"
       }
+    },
+    {
+      "id": "townlight_boards",
+      "display_name": "Townlight Boards & Commissions",
+      "repo": "townlight/boards",
+      "tier": 3,
+      "role": "board roster and attendance",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_meetings"
+      ],
+      "routes": [
+        {
+          "id": "boards",
+          "label": "Boards & Commissions",
+          "path": "/boards",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "boards.read",
+        "boards.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "townlight_boards_0001"
+      ],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/postgres"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "d14340b713c880908cc27e383a59271ed0471ac0",
+      "proof_required": [
+        "windows_installed_staff_workflow",
+        "existing_staff_roles",
+        "restart_readback"
+      ]
+    },
+    {
+      "id": "townlight_contracts",
+      "display_name": "Townlight Contracts",
+      "repo": "townlight/contracts",
+      "tier": 3,
+      "role": "contract register and renewal queue",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core"
+      ],
+      "routes": [
+        {
+          "id": "contracts",
+          "label": "Contracts",
+          "path": "/contracts",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "contracts.read",
+        "contracts.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "townlight_contracts_0001"
+      ],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/postgres"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "873de5bbff0f596b2c7cf20da4c68e94c3c3934c",
+      "proof_required": [
+        "windows_installed_staff_workflow",
+        "existing_staff_roles",
+        "restart_readback"
+      ]
+    },
+    {
+      "id": "townlight_procurement",
+      "display_name": "Townlight Procurement",
+      "repo": "townlight/procure",
+      "tier": 3,
+      "role": "RFP drafts, proposal review and staff awards",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.3.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_contracts"
+      ],
+      "routes": [
+        {
+          "id": "procurement",
+          "label": "Procurement",
+          "path": "/procurement",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "procurement.read",
+        "procurement.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "townlight_procurement_0001"
+      ],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/postgres"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "f10cd99f65f5f867d331af3bd6e60742bca61268",
+      "proof_required": [
+        "windows_installed_staff_workflow",
+        "existing_staff_roles",
+        "restart_readback"
+      ]
     }
   ]
 }
