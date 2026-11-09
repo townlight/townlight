@@ -156,7 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, default=ROOT / ".candidate-wheels")
     parser.add_argument("--workspace", type=Path)
     parser.add_argument("--allow-working-tree", action="store_true", help="Preparation only; not clean-pin/release evidence")
-    parser.add_argument("--all-products", action="store_true", help="Build all eleven suite components plus the runtime bridge")
+    parser.add_argument("--all-products", action="store_true", help="Build all suite components plus the runtime bridge")
     parser.add_argument("--only", nargs="+", help="Rebuild selected components in an existing receipt; reverify the entire cohort")
     parser.add_argument("--state", type=Path, help="Externally bound exact candidate state for the full suite")
     args = parser.parse_args()

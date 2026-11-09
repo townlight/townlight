@@ -22,6 +22,9 @@ param(
     [string]$PermittingRoot = "",
     [string]$InspectionsRoot = "",
     [string]$StationRoot = "",
+    [string]$BoardsRoot = "",
+    [string]$ContractsRoot = "",
+    [string]$ProcurementRoot = "",
     [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
@@ -873,6 +876,17 @@ function Install-PythonServicePackages {
             $SourceRoots['townlight/station'] = $TownlightStation
             $CandidateSourceRoots += $TownlightInspections
             $CandidateSourceRoots += $TownlightStation
+            $MunicipalRoots = [ordered]@{
+                'townlight/boards' = $BoardsRoot
+                'townlight/contracts' = $ContractsRoot
+                'townlight/procure' = $ProcurementRoot
+            }
+            foreach ($Repository in $MunicipalRoots.Keys) {
+                if (-not $MunicipalRoots[$Repository]) { throw "Explicit pinned source required: $Repository" }
+                $CandidateSource = (Resolve-Path -LiteralPath $MunicipalRoots[$Repository]).Path
+                $SourceRoots[$Repository] = $CandidateSource
+                $CandidateSourceRoots += $CandidateSource
+            }
             $InspectionTranscriber = Join-Path $TownlightInspections 'inspection-transcriber'
             if (-not (Test-Path -LiteralPath (Join-Path $InspectionTranscriber 'pyproject.toml'))) { throw 'Pinned Inspections source is missing its accepted transcription package.' }
             $CandidateSourceRoots += $InspectionTranscriber
@@ -947,7 +961,7 @@ function Install-PythonServicePackages {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', "import townlight_permitting.workflow_store, townlight_runtime.permitting_bridge") -ExtraEnvironment @{TESTING='1'}
     }
     if ($ProductProfile -eq 'inspections-preview') {
-        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, townlight_runtime.municipal_staff, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
     $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
@@ -958,7 +972,7 @@ function Install-PythonServicePackages {
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_planning") }
     if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_permitting") }
-    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station", "townlight_boards", "townlight_contracts", "townlight_procurement") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("townlight_meetings")
     }

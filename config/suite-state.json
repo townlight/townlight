@@ -12,13 +12,13 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.7.1-1",
-    "tag": "townlight-v1.7.1-beta.1",
-    "commit": "919f2492cf43a83e693db71fe1371001e529cf40",
+    "version": "1.8.0-1",
+    "tag": "townlight-windows-v1.8.0.1",
+    "commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c",
     "channel": "candidate",
     "published_at": null,
     "asset_policy": "windows-msi",
-    "runtime_version": "0.2.1"
+    "runtime_version": "0.3.0"
   },
   "asset_policies": {
     "windows-msi": [
@@ -62,7 +62,10 @@
         "zoning",
         "planning",
         "permitting",
-        "inspections"
+        "inspections",
+        "boards",
+        "contracts",
+        "procurement"
       ],
       "disabled": false,
       "development_only": false
@@ -194,7 +197,10 @@
     "planning",
     "permitting",
     "inspections",
-    "station"
+    "station",
+    "boards",
+    "contracts",
+    "procurement"
   ],
   "modules": {
     "core": {
@@ -237,7 +243,7 @@
         "availability": "runtime",
         "arch_tier": 0,
         "legacy_grade": "platform",
-        "public_status_released_at": null
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 0,
@@ -287,8 +293,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 1,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 1,
@@ -338,8 +344,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 1,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 1,
@@ -390,8 +396,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 1,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 1,
@@ -441,8 +447,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 1,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 3,
@@ -492,8 +498,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 3,
@@ -544,8 +550,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 2,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 2,
@@ -597,8 +603,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 2,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 2,
@@ -650,8 +656,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 2,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 2,
@@ -703,8 +709,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 2,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 2,
@@ -756,14 +762,169 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
       },
       "installer": {
         "tier": 1,
         "role": "meeting media and proceedings handoff",
         "status": "naming_candidate_acceptance_pending",
         "source_commit": "7205ed1b07132b1649c994e190b381d773807aff"
+      }
+    },
+    "boards": {
+      "public_name": "Townlight Boards & Commissions",
+      "public_slug": "boards",
+      "legacy": {
+        "technical_id": "townlight_boards",
+        "product_names": [
+          "Townlight Boards & Commissions"
+        ],
+        "package_names": [
+          "townlight-boards"
+        ]
+      },
+      "repository": {
+        "name": "townlight/boards",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": "0.2.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "meetings"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
+      },
+      "installer": {
+        "tier": 3,
+        "role": "board roster and attendance",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "d14340b713c880908cc27e383a59271ed0471ac0"
+      }
+    },
+    "contracts": {
+      "public_name": "Townlight Contracts",
+      "public_slug": "contracts",
+      "legacy": {
+        "technical_id": "townlight_contracts",
+        "product_names": [
+          "Townlight Contracts"
+        ],
+        "package_names": [
+          "townlight-contracts"
+        ]
+      },
+      "repository": {
+        "name": "townlight/contracts",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": "0.2.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
+      },
+      "installer": {
+        "tier": 3,
+        "role": "contract register and renewal queue",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "873de5bbff0f596b2c7cf20da4c68e94c3c3934c"
+      }
+    },
+    "procurement": {
+      "public_name": "Townlight Procurement",
+      "public_slug": "procurement",
+      "legacy": {
+        "technical_id": "townlight_procurement",
+        "product_names": [
+          "Townlight Procurement"
+        ],
+        "package_names": [
+          "townlight-procurement"
+        ]
+      },
+      "repository": {
+        "name": "townlight/procure",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.3.0",
+        "released": null,
+        "installer": "0.3.0",
+        "public_status": "0.3.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "contracts"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-09"
+      },
+      "installer": {
+        "tier": 3,
+        "role": "RFP drafts, proposal review and staff awards",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "f10cd99f65f5f867d331af3bd6e60742bca61268"
       }
     }
   }

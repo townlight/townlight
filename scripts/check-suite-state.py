@@ -56,7 +56,7 @@ def main() -> int:
             print(f"- {error}")
     else:
         print("CHECK-SUITE-STATE: PASSED")
-        print("- 11 canonical modules validated")
+        print("- 14 canonical modules validated")
         print("- stable Townlight identities and legacy aliases are unique")
         print("- products, profiles, and dependency references resolve")
         print("- installer/modules.json matches the recorded legacy projection")

@@ -1,5 +1,12 @@
 # Changelog
 
+## Windows 1.8.0.1 public beta
+
+- Add Boards & Commissions, Contracts and Procurement to the full Windows profile using existing staff roles.
+- Link board attendance to Meetings and link a recorded Procurement award to one Contracts draft. Retain signed agreements and searchable renewals.
+- Refresh the per-user bundled Python runtime on normal upgrade from Windows 1.7.2.1 while retaining city profile and data.
+- Update the Windows install guide, staff manual, package reference and release evidence. [Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1)
+
 ## Windows 1.7.1.1 public beta - 2026-11-05
 
 - Promote the exact signed, installed-tested source `919f2492cf43a83e693db71fe1371001e529cf40` at `townlight-v1.7.1-beta.1`, without rebuilding or re-signing.

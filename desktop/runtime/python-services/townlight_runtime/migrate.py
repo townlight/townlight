@@ -123,6 +123,12 @@ def upgrade_all() -> None:
         print("Townlight Permitting: schema migrated (townlight_permitting_0001)")
 
     if profile == "inspections-preview":
+        from townlight_runtime.municipal_staff import ensure_schema
+        staff_engine = create_engine(sync_url)
+        try:
+            ensure_schema(staff_engine)
+        finally:
+            staff_engine.dispose()
         from townlight_inspections.migrations import source_engine, upgrade
         engine = source_engine(sync_url)
         try:

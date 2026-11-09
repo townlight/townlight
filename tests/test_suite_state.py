@@ -23,11 +23,11 @@ def test_committed_state_and_legacy_projections_pass() -> None:
     assert suite_state.validate_all() == []
 
 
-def test_catalog_has_11_kept_townlight_modules_with_unique_technical_ids() -> None:
+def test_catalog_has_14_kept_townlight_modules_with_unique_technical_ids() -> None:
     state = _load(suite_state.STATE_PATH)
     modules = state["modules"]
     assert isinstance(modules, dict)
-    assert len(modules) == 11
+    assert len(modules) == 14
     assert "station" in modules
     assert set(state["module_order"]) == set(modules)
     assert all(
@@ -44,8 +44,10 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     assert records["modules"] == ["core", "records", "notice", "access"]
     assert records["status"] == "candidate"
     assert records["public_website_status"] == "prepared; unpublished candidate"
-    assert state["desktop_release"]["version"] == "1.7.1-1"
-    assert state["desktop_release"]["commit"] == "919f2492cf43a83e693db71fe1371001e529cf40"
+    assert state["desktop_release"]["version"] == "1.8.0-1"
+    commit = state["desktop_release"]["commit"]
+    acceptance = ROOT / "release" / "ACCEPTANCE-Windows-1.8.0.1.md"
+    assert commit and f"Application source `{commit}`" in acceptance.read_text(encoding="utf-8")
     assert state["desktop_release"]["channel"] == "candidate"
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
@@ -53,7 +55,7 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
 
 def test_retired_foundations_are_absent_from_current_catalog() -> None:
     state = _load(suite_state.STATE_PATH)
-    for module_id in ("regulatory-watch", "api", "procurement", "boards", "grants"):
+    for module_id in ("regulatory-watch", "api", "grants"):
         assert module_id not in state["modules"]
         assert all(module_id not in profile["modules"] for profile in state["profiles"].values())
 

@@ -10,6 +10,7 @@ mod local_paths;
 mod local_shell;
 mod model;
 mod module_registry;
+mod municipal_staff;
 mod notice_client;
 mod permitting_client;
 mod planning_client;
@@ -122,6 +123,21 @@ fn navigation() -> Vec<NavigationItem> {
             id: "planning",
             label: "Planning",
             description: "Adopted policy sources and reviewed staff analysis",
+        },
+        NavigationItem {
+            id: "boards",
+            label: "Boards & Commissions",
+            description: "Roster, terms, vacancies and attendance",
+        },
+        NavigationItem {
+            id: "contracts",
+            label: "Contracts",
+            description: "Signed agreements and renewal dates",
+        },
+        NavigationItem {
+            id: "procurement",
+            label: "Procurement",
+            description: "RFP drafts, proposal review and recorded awards",
         },
         NavigationItem {
             id: "search",
@@ -477,7 +493,11 @@ fn app_state() -> Result<AppState, String> {
 #[tauri::command]
 async fn get_app_state() -> Result<AppState, String> {
     tauri::async_runtime::spawn_blocking(move || {
-        catch_unwind(AssertUnwindSafe(app_state)).map_err(|_| {
+        catch_unwind(AssertUnwindSafe(|| {
+            #[cfg(windows)]
+            supervisor::refresh_upgraded_python_runtime()?;
+            app_state()
+        })).map_err(|_| {
             "App state stopped unexpectedly. Restart Townlight and retry; if this repeats, use Repair from System Health."
                 .to_string()
         })?
@@ -1101,6 +1121,32 @@ fn inspections_capability() -> Result<String, domain_client::DomainError> {
 }
 
 #[tauri::command]
+async fn municipal_staff_request(
+    request: municipal_staff::StaffRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    let (modules, grant, admin_only) = request.requirements();
+    if selection.profile_id != "inspections-preview"
+        || !modules
+            .iter()
+            .all(|id| selection.enabled_module_ids.iter().any(|item| item == id))
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, grant))
+        || (admin_only && !access_is_local_admin(&access))
+    {
+        return Err(DomainError::denied());
+    }
+    request
+        .execute(&auth::domain_session_proof().map_err(|_| DomainError::denied())?)
+        .await
+}
+
+#[tauri::command]
 async fn inspections_domain_request(
     request: inspections_client::InspectionsRequest,
 ) -> Result<Value, domain_client::DomainError> {
@@ -1281,6 +1327,7 @@ pub fn run() {
             planning_domain_request,
             permitting_domain_request,
             inspections_domain_request,
+            municipal_staff_request,
             permitting_pick_bundle,
             planning_public_request,
             planning_pick_bundle,
@@ -1415,10 +1462,9 @@ mod tests {
 
     #[test]
     fn navigation_matches_frontend_fallback_state() {
-        // The live shell renders navigation() while main.js keeps a hardcoded
-        // fallbackState list for the offline path. v1.0.2 shipped with `access`
-        // present in the fallback but absent here, so the Accessibility tab was
-        // unreachable on every install. Keep the two ids in lockstep.
+        // The offline preview has no staff session or municipal runtime.
+        // Keep the shared tabs in parity and require these tabs only in native navigation.
+        let native_staff_ids = ["boards", "contracts", "procurement"];
         let main_js = include_str!("../../src/main.js");
         let start = main_js
             .find("navigation: [")
@@ -1426,32 +1472,31 @@ mod tests {
         let end = main_js[start..]
             .find("].map(")
             .expect("end of fallbackState.navigation");
-        let block = &main_js[start..start + end];
+        let mut fallback_ids: Vec<&str> = main_js[start..start + end]
+            .lines()
+            .filter_map(|line| line.trim().strip_prefix("[\""))
+            .map(|line| line.split('"').next().expect("fallback navigation id"))
+            .collect();
+        let native_ids: Vec<&str> = navigation().into_iter().map(|item| item.id).collect();
 
-        for item in navigation() {
-            let needle = format!("[\"{}\"", item.id);
+        for id in native_staff_ids {
             assert!(
-                block.contains(&needle),
-                "navigation() id `{}` is missing from main.js fallbackState.navigation",
-                item.id
+                native_ids.contains(&id),
+                "native staff tab `{id}` is missing"
+            );
+            assert!(
+                !fallback_ids.contains(&id),
+                "staff tab `{id}` is in the offline preview"
             );
         }
-        let rust_ids: Vec<&str> = navigation().into_iter().map(|item| item.id).collect();
-        for line in block.lines() {
-            let trimmed = line.trim();
-            if !trimmed.starts_with("[\"") {
-                continue;
-            }
-            let id = trimmed
-                .trim_start_matches("[\"")
-                .split('"')
-                .next()
-                .expect("fallback nav id");
-            assert!(
-                rust_ids.contains(&id),
-                "main.js fallbackState.navigation id `{id}` is missing from navigation()"
-            );
-        }
+
+        let mut shared_native_ids: Vec<&str> = native_ids
+            .into_iter()
+            .filter(|id| !native_staff_ids.contains(id))
+            .collect();
+        shared_native_ids.sort_unstable();
+        fallback_ids.sort_unstable();
+        assert_eq!(shared_native_ids, fallback_ids);
     }
 
     #[test]

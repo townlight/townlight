@@ -1,13 +1,13 @@
-Download Windows beta 1.7.2.1 · Public announcement · Support and
+Download Windows beta 1.8.0.1 · Public announcement · Support and
 feedback
 
 New installations use a fresh profile. Upgrade from 1.7.1.1 retains
 saved settings and data; older legacy-profile migration is not
 established.
 
-Windows x64 Beta 1 · MSI 1.7.2.1
+Windows x64 Beta 1 · MSI 1.8.0.1
 
-The signed Windows x64 beta 1.7.2.1 updates installer metadata while
+The signed Windows x64 beta 1.8.0.1 updates installer metadata while
 preserving the accepted signed application/runtime cabinet.
 
 - Townlight Suite Manual
@@ -35,7 +35,7 @@ preserving the accepted signed application/runtime cabinet.
 
 Townlight Suite Manual
 
-  Windows 1.7.2.1 acceptance. Windows 1.7.2.1 changes installer metadata
+  Windows 1.8.0.1 acceptance. Windows 1.8.0.1 changes installer metadata
   and displays Townlight as the installed product name. Its new outer
   MSI is Azure-signed by Scott Converse and independently verified. The
   signed application/runtime cabinet is unchanged from 1.7.1.1.
@@ -45,7 +45,7 @@ Townlight Suite Manual
   upgrade evidence. Upgrade from 1.7.0.1 is not established. Station
   requires separate setup. Evidence and limits.
 
-  The signed Windows x64 beta 1.7.2.1 updates installer metadata while
+  The signed Windows x64 beta 1.8.0.1 updates installer metadata while
   preserving the accepted signed application/runtime cabinet. The
   Windows acceptance summary applies to this exact MSI.
 
@@ -68,12 +68,12 @@ Beta identity
   Identity                         Value
   -------------------------------- --------------------------------------------------------------------------------
   Public documentation identity    Townlight Beta 1
-  Intended installer version       1.7.2.1
-  Native desktop source version    1.7.1-1
-  Candidate artifact identity      SHA-256 checksums and Windows acceptance summary
+  Windows MSI version       1.8.0.1
+  Native desktop source version    1.8.0-1
+  Released artifact identity      SHA-256 checksums and Windows acceptance summary
   Corresponding source             Released Windows x64 beta
   Current owned software license   AGPL-3.0-only
-  Supported acceptance profile     Windows x64 fresh install; inspections-preview; separate Station configuration
+  Supported acceptance profile     Windows x64 fresh install and upgrade from 1.7.2.1; full profile; separate Station configuration
 
 Use an empty database and fresh Windows profile. The installer refuses
 legacy profile initialization. The approved profile path is
@@ -99,7 +99,7 @@ Component versions
 First run
 
 1.  Download the signed MSI, matching source and checksums from the
-    Windows x64 beta 1.7.2.1 release.
+    Windows x64 beta 1.8.0.1 release.
 2.  Verify the MSI hash and Authenticode publisher before installation.
     See the Windows acceptance summary for the tested setup.
 3.  Launch Townlight under the intended named Windows account. Choose

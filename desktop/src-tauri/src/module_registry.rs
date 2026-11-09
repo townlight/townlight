@@ -13,6 +13,11 @@ const SUITE_STATE_JSON: &str = include_str!("../../../config/suite-state.json");
 // selections are preserved verbatim by `module_selection_state`, so upgrades
 // from the broader historical city-core profile do not silently remove modules.
 const DEFAULT_PROFILE_ID: &str = "records-beta";
+const MUNICIPAL_MODULES: &[&str] = &[
+    "townlight_boards",
+    "townlight_contracts",
+    "townlight_procurement",
+];
 
 #[derive(Deserialize)]
 struct CanonicalSuiteState {
@@ -450,6 +455,11 @@ fn validate_module_selection(
     if selected_ids.contains("townlight_inspections") && label != "inspections-preview" {
         return Err("Use the explicit inspections-preview profile and matching payload.".into());
     }
+    if label != "inspections-preview"
+        && MUNICIPAL_MODULES.iter().any(|id| selected_ids.contains(id))
+    {
+        return Err("Boards, Contracts and Procurement require the full Windows payload.".into());
+    }
     for module_id in module_ids {
         let module = module_map
             .get(module_id.as_str())
@@ -816,6 +826,34 @@ pub fn module_selection_state() -> Result<ModuleSelectionState, String> {
         Some(selection) => selection,
         None => selection_for_profile(&registry, DEFAULT_PROFILE_ID)?,
     };
+    if selection.profile_id == "inspections-preview" {
+        let profile = profile_by_id(&registry, &selection.profile_id)?;
+        let prior: HashSet<_> = profile
+            .modules
+            .iter()
+            .filter(|id| !MUNICIPAL_MODULES.contains(&id.as_str()))
+            .collect();
+        let installed: HashSet<_> = selection.installed_module_ids.iter().collect();
+        if prior == installed {
+            normalize_enabled_modules(&registry, &mut selection)?;
+            for id in MUNICIPAL_MODULES {
+                selection.installed_module_ids.push((*id).to_string());
+                selection
+                    .disabled_module_ids
+                    .retain(|disabled| disabled != id);
+                if *id != "townlight_boards"
+                    || selection
+                        .enabled_module_ids
+                        .iter()
+                        .any(|enabled| enabled == "townlight_meetings")
+                {
+                    selection.enabled_module_ids.push((*id).to_string());
+                } else {
+                    selection.disabled_module_ids.push((*id).to_string());
+                }
+            }
+        }
+    }
     normalize_enabled_modules(&registry, &mut selection)?;
     if selection.profile_id == "custom" {
         validate_custom_selection(&registry, &selection.installed_module_ids)?;
@@ -921,6 +959,9 @@ pub fn plan_module_installed(
         .iter()
         .any(|installed_id| installed_id == module_id);
 
+    if MUNICIPAL_MODULES.contains(&module_id) && installed != currently_installed {
+        return Err("These modules are bundled in the full Windows profile. Use Enable or Disable to manage access.".into());
+    }
     if installed {
         if currently_installed {
             return Ok(selection);
@@ -934,6 +975,9 @@ pub fn plan_module_installed(
         validate_installable_module_contract(module, registry_core_version(&registry)?)?;
         let mut installed_module_ids = selection.installed_module_ids.clone();
         installed_module_ids.push(module_id.to_string());
+        if module_id == "townlight_inspections" {
+            installed_module_ids.extend(MUNICIPAL_MODULES.iter().map(|id| (*id).to_string()));
+        }
         let mut enabled_module_ids = selection.enabled_module_ids.clone();
         let ordered_module_ids = selection_from_installed_and_enabled(
             &registry,
@@ -986,13 +1030,21 @@ pub fn plan_module_installed(
     let installed_module_ids = selection
         .installed_module_ids
         .iter()
-        .filter(|installed_id| installed_id.as_str() != module_id)
+        .filter(|id| {
+            id.as_str() != module_id
+                && (module_id != "townlight_inspections"
+                    || !MUNICIPAL_MODULES.contains(&id.as_str()))
+        })
         .cloned()
         .collect::<Vec<_>>();
     let enabled_module_ids = selection
         .enabled_module_ids
         .iter()
-        .filter(|enabled_id| enabled_id.as_str() != module_id)
+        .filter(|id| {
+            id.as_str() != module_id
+                && (module_id != "townlight_inspections"
+                    || !MUNICIPAL_MODULES.contains(&id.as_str()))
+        })
         .cloned()
         .collect::<Vec<_>>();
     let next_selection =
@@ -1066,7 +1118,9 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
         .modules
         .iter()
         .map(|module| {
-            let contract_result = if module.id == "townlight_inspections" && selection.profile_id != "inspections-preview" {
+            let contract_result = if MUNICIPAL_MODULES.contains(&module.id.as_str()) && selection.profile_id != "inspections-preview" {
+                Err("Select the full Windows profile and its matching payload.".into())
+            } else if module.id == "townlight_inspections" && selection.profile_id != "inspections-preview" {
                 Err("Select inspections-preview and its matching candidate payload.".into())
             } else if module.id == "townlight_planning" && !matches!(selection.profile_id.as_str(), "planning-preview" | "permitting-preview" | "inspections-preview") {
                 Err("Select the planning-preview development profile and its matching candidate payload.".into())
@@ -1139,6 +1193,42 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn full_windows_profile_upgrade_preserves_disabled_meetings_and_other_modules() {
+        with_temp_state_dir(|_| {
+            let mut prior = persist_profile_selection("inspections-preview").unwrap();
+            prior
+                .installed_module_ids
+                .retain(|id| !MUNICIPAL_MODULES.contains(&id.as_str()));
+            prior.enabled_module_ids.retain(|id| {
+                matches!(
+                    id.as_str(),
+                    "townlight_core"
+                        | "townlight_records"
+                        | "townlight_notice"
+                        | "townlight_access"
+                )
+            });
+            write_selection(&prior).unwrap();
+            let current = module_selection_state().unwrap();
+            for id in MUNICIPAL_MODULES {
+                assert!(current.installed_module_ids.iter().any(|item| item == id));
+            }
+            assert!(current
+                .enabled_module_ids
+                .iter()
+                .any(|item| item == "townlight_procurement"));
+            assert!(!current
+                .enabled_module_ids
+                .iter()
+                .any(|item| item == "townlight_boards"));
+            assert!(!current
+                .enabled_module_ids
+                .iter()
+                .any(|item| item == "townlight_meetings"));
+        });
+    }
 
     #[test]
     fn preview_leaf_removal_preserves_explicit_remaining_profile() {

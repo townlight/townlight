@@ -1,5 +1,6 @@
 ﻿import { invoke } from "@tauri-apps/api/core";
 import "./styles.css";
+import { createMunicipalView } from "./municipal/view.js";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
@@ -14,6 +15,32 @@ import { createZoningView } from "./zoning/view.js";
 import { bindMeetingsSources } from "./records/meetings-sources.ts";
 import { bindCodeSources } from "./records/code-sources.ts";
 import { bindZoningSources } from "./records/zoning-sources.ts";
+
+const municipalAreas = ["boards", "contracts", "procurement"];
+const municipalView = createMunicipalView(invoke, escapeHtml, openMunicipalLink);
+let municipalRecord = null;
+
+function municipalAccess(area) {
+  const access = accessState();
+  return access.signed_in && !isPublicSurface()
+    && (["local-admin", "city-staff"].includes(access.role) || (area === "boards" && access.role === "clerk"));
+}
+
+function openMunicipalLink(area, id) {
+  if (!areaIsEnabled(area) || !municipalAccess(area === "meetings" ? "boards" : area)) return;
+  municipalRecord = id;
+  state.activeArea = area;
+  render();
+  if (area === "meetings") {
+    const form = document.querySelector("[data-meetings-read]");
+    if (form) {
+      form.elements.namedItem("kind").value = "meeting";
+      form.elements.namedItem("id").value = id;
+      form.requestSubmit();
+      form.scrollIntoView({ block: "center" });
+    }
+  }
+}
 
 const recordsController = createRecordsController(invoke);
 const noticeView = createNoticeView(invoke);
@@ -53,7 +80,7 @@ const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
   "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning"],
   "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning"],
-  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections"],
+  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections", "townlight_boards", "townlight_contracts", "townlight_procurement"],
   "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting"]
 };
 const MODULE_AREA_BY_ID = {
@@ -64,6 +91,9 @@ const MODULE_AREA_BY_ID = {
   planning: "townlight_planning",
   permitting: "townlight_permitting",
   inspections: "townlight_inspections",
+  boards: "townlight_boards",
+  contracts: "townlight_contracts",
+  procurement: "townlight_procurement",
   notice: "townlight_notice",
   access: "townlight_access"
 };
@@ -1123,7 +1153,7 @@ function areaIsEnabled(areaId) {
 }
 
 function visibleNavigationItems() {
-  return (state.app.navigation || fallbackState.navigation).filter((item) => areaIsEnabled(item.id));
+  return (state.app.navigation || fallbackState.navigation).filter((item) => areaIsEnabled(item.id) && (!municipalAreas.includes(item.id) || municipalAccess(item.id)));
 }
 
 function moduleStatusLabel(module) {
@@ -5093,6 +5123,10 @@ function renderActiveArea() {
       <pre>${escapeHtml(state.domainLoadError)}</pre>
       <button type="button" data-action="retry-domain-state">Retry Records</button></section>`;
   }
+  if (municipalAreas.includes(state.activeArea)) {
+    return municipalAccess(state.activeArea) ? municipalView.render(state.activeArea)
+      : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
+  }
   switch (state.activeArea) {
     case "inspections":
       return !isPublicSurface() && ["local-admin", "city-staff"].includes(access.role) ? inspectionsView.render() : `<section><h2>Inspections staff access required</h2><p>Sign in with an authorized city staff account.</p></section>`;
@@ -5204,6 +5238,7 @@ function render() {
   const access = accessState();
   const account = JSON.stringify([access.signed_in, access.operator_email, access.role, isPublicSurface()]);
   if (planningAccount !== account) {
+    municipalRecord = null;
     clearAccountWork();
     publicMeetingsView.reset(); publicCodeView.reset();
     noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset();
@@ -5248,6 +5283,9 @@ function render() {
 }
 
 function bindEvents() {
+  if (municipalAreas.includes(state.activeArea) && municipalAccess(state.activeArea)) {
+    void municipalView.bind(state.activeArea, accessState().role === "local-admin", municipalRecord);
+  }
   if (state.activeArea === "notice" && !isPublicSurface()) noticeView.bind();
   bindMeetingsSources(invoke, async () => { await loadAppState(); render(); });
   bindCodeSources(invoke, async () => { await loadAppState(); render(); });
@@ -5279,6 +5317,7 @@ function bindEvents() {
       if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
       if (state.activeArea === 'inspections' && button.dataset.area === 'records') await loadAppState();
+      municipalRecord = null;
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
       state.pendingSupervisorReviewAction = null;

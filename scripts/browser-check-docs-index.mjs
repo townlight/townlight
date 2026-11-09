@@ -54,20 +54,20 @@ try {
       .getByRole("heading", { name: "Municipal work with a clear record." })
       .isVisible();
     const candidateStatusVisible = await page
-      .locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-v1.7.1-beta.1"]').first()
+      .locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1"]').first()
       .isVisible();
     const productModulesVisible = await Promise.all(
-      ["Core", "Records", "Meetings", "Code", "Access", "Notice", "Zoning", "Planning", "Permitting", "Inspections", "Station"].map((name) =>
+      ["Core", "Records", "Meetings", "Code", "Access", "Notice", "Zoning", "Planning", "Permitting", "Inspections", "Station", "Boards & Commissions", "Contracts", "Procurement"].map((name) =>
         page.locator(".product h3").getByRole("link", { name, exact: true }).isVisible(),
       ),
     );
     const productLinks = await page.locator(".product h3 a").evaluateAll((nodes) => nodes.map((node) => node.href));
-    const expectedProductLinks = ["core", "records", "meetings", "code", "access", "notice", "zoning", "planning", "permitting", "inspections", "station"]
+    const expectedProductLinks = ["core", "records", "meetings", "code", "access", "notice", "zoning", "planning", "permitting", "inspections", "station", "boards", "contracts", "procurement"]
       .map((slug) => `/products/${slug}/index.html`);
     const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
       expectedProductLinks.every((link, index) => productLinks[index].endsWith(link));
-    const currentDownloadLinked = await page.locator('a[href="https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-x64-1.7.1.1.msi"]').first()
-      .getAttribute("href") === "https://github.com/townlight/townlight/releases/download/townlight-v1.7.1-beta.1/Townlight-Windows-x64-1.7.1.1.msi";
+    const currentDownloadLinked = await page.locator('a[href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/Townlight-Windows-x64-1.8.0.1.msi"]').first()
+      .getAttribute("href") === "https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/Townlight-Windows-x64-1.8.0.1.msi";
     const overallManualVisible = await page.locator('a[href$="manuals/suite.html"]').first().isVisible();
     const horizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,

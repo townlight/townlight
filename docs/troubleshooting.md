@@ -1,6 +1,19 @@
 # Townlight Troubleshooting
 
-## Current 1.4 installation and recovery
+## Current Windows beta 1.8.0.1
+
+1. Download the [signed Townlight Windows x64 MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/Townlight-Windows-x64-1.8.0.1.msi) from the [Windows beta 1.8.0.1 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1). Verify the published SHA-256 and timestamped Authenticode signature. Use a Windows x64 machine with Microsoft WebView2.
+2. For an upgrade from 1.7.2.1, back up the city profile and data, close Townlight, install the new MSI and reopen under the same Windows account. Keep `%LOCALAPPDATA%\CivicSuite`. On first launch, let Townlight finish refreshing the bundled Python runtime.
+3. For a new setup, choose the local storage and **Townlight Inspections candidate** full profile. Create the city profile and named administrator, choose backup storage and complete health verification. Finish the Records migration step when offered. Local AI setup can be deferred.
+4. Open the staff workspace using the role listed in the [Windows staff guide](https://townlight.github.io/manuals/windows-staff-workflows.html). Configure Station using its [separate local service guide](https://townlight.github.io/manuals/station.html).
+
+See the [installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the tested Windows configuration.
+
+If setup reports that services are still starting, leave Townlight open and let the health check finish. If it reports an error, keep the profile and backup intact. Use the displayed System Health details and include the failing check in a support report. Redact resident records and credentials.
+
+For a pending upgrade refresh, let the existing local operation finish before retrying. If the retry repeats the same failure, retain the data and collect the service details for [support](https://townlight.github.io/support.html).
+
+## Historical 1.4 installation and recovery
 
 1. Download `Townlight_1.4.0-1_x64_en-US.msi` and its signing receipt/evidence from
    the linked 1.4 release. Desktop version is **1.4.0-1**; Windows ProductVersion
@@ -29,7 +42,7 @@ Use System Health for backup, restore and support bundles. Ordinary uninstall
 preserves data; export and back up before removing the app. Keep real resident
 data, credentials and unredacted backups out of public issues.
 
-[Current signed release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) · [Manual](../USER-MANUAL.md).
+[Historical signed release](https://github.com/townlight/townlight/releases/tag/townlight-records-meetings-code-zoning-v1.4.0-beta.1) · [Manual](../USER-MANUAL.md).
 
 ## Historical Records + Meetings + Code 1.3.0-beta.1
 
