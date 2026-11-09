@@ -1,6 +1,15 @@
 # Townlight Windows Operator Walkthrough
 
-## Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
+## Current Windows beta 1.8.0.1
+
+1. Download the [signed Townlight Windows x64 MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/Townlight-Windows-x64-1.8.0.1.msi) from the [Windows beta 1.8.0.1 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1). Verify the published SHA-256 and timestamped Authenticode signature. Use a Windows x64 machine with Microsoft WebView2.
+2. For an upgrade from 1.7.2.1, back up the city profile and data, close Townlight, install the new MSI and reopen under the same Windows account. Keep `%LOCALAPPDATA%\CivicSuite`. On first launch, let Townlight finish refreshing the bundled Python runtime.
+3. For a new setup, choose the local storage and **Townlight Inspections candidate** full profile. Create the city profile and named administrator, choose backup storage and complete health verification. Finish the Records migration step when offered. Local AI setup can be deferred.
+4. Open the staff workspace using the role listed in the [Windows staff guide](https://townlight.github.io/manuals/windows-staff-workflows.html). Configure Station using its [separate local service guide](https://townlight.github.io/manuals/station.html).
+
+See the [installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the tested Windows configuration.
+
+## Historical Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 
 Published October 21, 2026. Four connected Townlight products run locally through
 bundled Python services and PostgreSQL, with Core, Notice and Access supporting

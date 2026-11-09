@@ -1,7 +1,6 @@
 # Windows staff workflows
 
-This guide applies to the unpublished Windows 1.8.0.1 candidate. The current
-public installer and its documentation remain the reference for released behavior.
+This guide applies to Windows x64 1.8.0.1. Existing 1.7.2.1 installations keep the same data folders and staff accounts. Townlight refreshes the local runtime on the first launch after upgrade.
 
 ## Staff access
 
@@ -40,12 +39,8 @@ supporting reference. Create draft contract produces one linked draft per
 award and returns that draft on retry. Record the final PDF in Contracts.
 
 Public applications, vendor submissions, signing, payments and award decisions
-remain city processes. The candidate records staff work and decisions.
+remain city processes. The Windows workspaces record staff work and decisions.
 
-## Candidate handoff
+## Release and support
 
-The suite's pinned source list is in `config/inspections-preview-sources.json`.
-The Windows workflow builds the application and payload from those sources.
-Record the exact signed MSI hash, signing receipt, Windows CI, fresh-install
-workflow and role evidence, and upgrade from public Windows 1.7.2.1 before
-promoting the candidate. This guide does not constitute installed acceptance.
+[Download Windows 1.8.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.

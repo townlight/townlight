@@ -1,12 +1,6 @@
-# Townlight current candidate status
+# Townlight Windows beta status
 
-Prepared November 2, 2026. The coordinated naming, Access and Notice source candidate is in progress. Desktop source 1.7.1-1 / intended MSI 1.7.2.1 / runtime 0.2.0. Signing, exact installed Windows acceptance and publication remain pending. No earlier release receipt establishes acceptance of this changed candidate.
-
-The Windows Local desktop uses Tauri and WebView2 with packaged local services. This candidate requires a fresh profile and empty database; it preserves the existing profile directory and refuses an in-place legacy upgrade. The prior signed release remains separate recovery evidence.
-
-Access retains review source/advice/audit and draft provenance with complete verified record exports. Notice implements a durable staff-reviewed and approved content revision, actual posting proof, verified archive and authorized Records attachment. Their bounded workflows require exact installed acceptance before completion.
-
-The kept product catalog below is generated from the installer source. Station remains a separate service; standalone CivicCast remains separate. See the [current manual](USER-MANUAL.md), [compatibility table](docs/compatibility/index.md) and [original historical status record](docs/history/pre-naming-2026-11/STATUS.md).
+Windows 1.8.0.1 adds Boards & Commissions, Contracts, and Procurement to the full Windows profile. The signed Windows Sandbox checks cover a fresh installation, the three staff workflows, role boundaries, record persistence, and upgrade from 1.7.2.1 with retained city data and settings. Station continues to use its separately configured local service. [Download and evidence](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1).
 
 <!-- BEGIN GENERATED MODULE STATUS (scripts/docs/render_public_status.py) -->
 
@@ -23,20 +17,20 @@ Status labels below are the suite's shared status set, generated from
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
-| Townlight Core | 1.3.0.dev2 | Shared platform | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Records | 1.8.0.dev2 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Meetings | 1.0.5 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Code | 1.0.9 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Access | 0.5.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Zoning | 0.2.3 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Planning | 0.4.0.dev2 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Permitting | 0.3.0+dev.2 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Inspections | 0.3.0+dev.2 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Notice | 0.3.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Station | 0.3.0 | Candidate — installed acceptance pending | — | Prepared naming/Access/Notice candidate; installed acceptance and publication pending. |
-| Townlight Boards & Commissions | 0.2.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
-| Townlight Contracts | 0.2.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
-| Townlight Procurement | 0.3.0 | Candidate — installed acceptance pending | — | Windows staff workflow candidate pending installed acceptance. |
+| Townlight Core | 1.3.0.dev2 | Shared platform | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Records | 1.8.0.dev2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Meetings | 1.0.5 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Code | 1.0.9 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Access | 0.5.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Zoning | 0.2.3 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Planning | 0.4.0.dev2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Permitting | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Inspections | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Notice | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Station | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Boards & Commissions | 0.2.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Contracts | 0.2.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
+| Townlight Procurement | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.0.1 beta. See release acceptance and scope. |
 
 <!-- END GENERATED MODULE STATUS -->
 

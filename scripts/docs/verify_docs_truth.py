@@ -66,7 +66,7 @@ def main() -> int:
     errors.extend(check_topology())
     for filename in ("USER-MANUAL.md", "USER-MANUAL.txt"):
         manual = (ROOT / filename).read_text(encoding="utf-8")
-        for value in ("Townlight Beta 1", "1.7.2.1", "1.3.0.dev2", "1.8.0.dev2", "Station", "AGPL"):
+        for value in ("Townlight Beta 1", "1.8.0.1", "1.3.0.dev2", "1.8.0.dev2", "Station", "AGPL"):
             if value not in manual:
                 errors.append(f"{filename}: missing accepted beta identity {value}")
     for filename in ("docs/beta-1/pdf/Townlight-Suite-Manual-Beta-1.pdf", "docs/beta-1/docx/Townlight-Suite-Manual-Beta-1.docx", "release/BETA-1-PROVENANCE.json"):
