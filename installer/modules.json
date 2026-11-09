@@ -1091,7 +1091,10 @@
       "migrations": [
         "townlight_boards_0001"
       ],
-      "tasks": [],
+      "tasks": [
+        "record-seat",
+        "record-attendance"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/postgres"
@@ -1145,7 +1148,10 @@
       "migrations": [
         "townlight_contracts_0001"
       ],
-      "tasks": [],
+      "tasks": [
+        "register-signed-contract",
+        "review-renewal-queue"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/postgres"
@@ -1200,7 +1206,11 @@
       "migrations": [
         "townlight_procurement_0001"
       ],
-      "tasks": [],
+      "tasks": [
+        "record-proposal",
+        "record-staff-award",
+        "create-contract-draft"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/postgres"
