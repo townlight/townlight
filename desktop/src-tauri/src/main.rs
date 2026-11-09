@@ -1462,10 +1462,9 @@ mod tests {
 
     #[test]
     fn navigation_matches_frontend_fallback_state() {
-        // The live shell renders navigation() while main.js keeps a hardcoded
-        // fallbackState list for the offline path. v1.0.2 shipped with `access`
-        // present in the fallback but absent here, so the Accessibility tab was
-        // unreachable on every install. Keep the two ids in lockstep.
+        // The offline preview has no staff session or municipal runtime.
+        // Keep the shared tabs in parity and require these tabs only in native navigation.
+        let native_staff_ids = ["boards", "contracts", "procurement"];
         let main_js = include_str!("../../src/main.js");
         let start = main_js
             .find("navigation: [")
@@ -1473,32 +1472,31 @@ mod tests {
         let end = main_js[start..]
             .find("].map(")
             .expect("end of fallbackState.navigation");
-        let block = &main_js[start..start + end];
+        let mut fallback_ids: Vec<&str> = main_js[start..start + end]
+            .lines()
+            .filter_map(|line| line.trim().strip_prefix("[\""))
+            .map(|line| line.split('"').next().expect("fallback navigation id"))
+            .collect();
+        let native_ids: Vec<&str> = navigation().into_iter().map(|item| item.id).collect();
 
-        for item in navigation() {
-            let needle = format!("[\"{}\"", item.id);
+        for id in native_staff_ids {
             assert!(
-                block.contains(&needle),
-                "navigation() id `{}` is missing from main.js fallbackState.navigation",
-                item.id
+                native_ids.contains(&id),
+                "native staff tab `{id}` is missing"
+            );
+            assert!(
+                !fallback_ids.contains(&id),
+                "staff tab `{id}` is in the offline preview"
             );
         }
-        let rust_ids: Vec<&str> = navigation().into_iter().map(|item| item.id).collect();
-        for line in block.lines() {
-            let trimmed = line.trim();
-            if !trimmed.starts_with("[\"") {
-                continue;
-            }
-            let id = trimmed
-                .trim_start_matches("[\"")
-                .split('"')
-                .next()
-                .expect("fallback nav id");
-            assert!(
-                rust_ids.contains(&id),
-                "main.js fallbackState.navigation id `{id}` is missing from navigation()"
-            );
-        }
+
+        let mut shared_native_ids: Vec<&str> = native_ids
+            .into_iter()
+            .filter(|id| !native_staff_ids.contains(id))
+            .collect();
+        shared_native_ids.sort_unstable();
+        fallback_ids.sort_unstable();
+        assert_eq!(shared_native_ids, fallback_ids);
     }
 
     #[test]
