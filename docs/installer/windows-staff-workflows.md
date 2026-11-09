@@ -5,7 +5,10 @@ public installer and its documentation remain the reference for released behavio
 
 ## Staff access
 
-Open the full Windows profile. Boards & Commissions is available to clerks,
+Select the full Windows profile, finish setup, then use **Finish Records
+Migration** in System Health if the workspace still uses legacy data. The
+migration enables the local Meetings records used by the Boards attendance
+picker and link. Boards & Commissions is available to clerks,
 city staff and Townlight administrators. Contracts and Procurement are available
 to city staff and administrators. A Townlight administrator records a completed
 award decision and can create the linked contract draft. Each save uses the
