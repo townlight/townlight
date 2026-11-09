@@ -138,6 +138,7 @@ export function createMunicipalView(invoke, escape, openLinkedRecord) {
 
   return {
     render: (area) => `<section data-municipal-workspace><h2>${names[area]}</h2>
+      <p><a href="https://townlight.github.io/manuals/windows-staff-workflows.html#${area}" target="_blank" rel="noopener noreferrer">Staff workflow guide</a></p>
       <p data-municipal-message role="status" aria-live="polite">Loading local staff work…</p>
       <div data-municipal-content></div></section>`,
     async bind(area, isAdmin, selected) {

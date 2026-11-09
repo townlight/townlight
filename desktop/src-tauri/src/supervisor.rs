@@ -1153,6 +1153,83 @@ fn install_runtime_payloads(payloads: &[&RuntimePayloadDefinition]) -> Result<Ve
     Ok(missing)
 }
 
+#[cfg(windows)]
+pub(crate) fn refresh_upgraded_python_runtime() -> Result<(), String> {
+    if !crate::first_run::first_run_state(&[])?.finished {
+        return Ok(());
+    }
+
+    let payload_manifest = parse_payload_manifest()?;
+    let payload = payload_manifest
+        .payloads
+        .iter()
+        .find(|payload| payload.id == "cpython-services")
+        .ok_or_else(|| {
+            "The bundled Python services are missing from the runtime manifest.".to_string()
+        })?;
+    let Some((root, source)) = first_payload_source(payload) else {
+        return Ok(());
+    };
+    let destination = payload_destination(payload);
+    let pending = config_dir().join("python-runtime-refresh-pending");
+    let needs_refresh = || {
+        pending.exists() || verify_payload_files_against_lock(payload, &root, &destination).is_err()
+    };
+    if !needs_refresh() {
+        return Ok(());
+    }
+
+    let _lifecycle = crate::profile_gate::lifecycle()?;
+    if !needs_refresh() {
+        return Ok(());
+    }
+    verify_payload_files_against_lock(payload, &root, &source)?;
+    let manifest = parse_manifest()?;
+    validate_manifest(&manifest)?;
+    validate_payload_manifest(&manifest, &payload_manifest)?;
+    let services = target_services_with_start_dependencies(&manifest, Some("task-queue"))?;
+    let executable = service_binary_path(service_by_id(&manifest, "python-services")?);
+
+    if fs::read_to_string(&pending).as_deref().ok() != Some("start")
+        || verify_payload_files_against_lock(payload, &root, &destination).is_err()
+    {
+        // An interrupted copy must be repeated before any updated service starts.
+        fs::write(&pending, "copy")
+            .map_err(|error| format!("Could not mark the runtime refresh: {error}"))?;
+        stop_processes_for_executable(&executable);
+        if !process_ids_for_executable(&executable).is_empty() {
+            return Err(
+                "Townlight Python services are still stopping. Retry the runtime refresh."
+                    .to_string(),
+            );
+        }
+        copy_path_recursive(&source, &destination)?;
+        verify_payload_files_against_lock(payload, &root, &destination)?;
+        let mut state = read_state()?;
+        for service in services.iter().filter(|service| service.id != "postgres") {
+            update_service_state(&mut state, &service.id, true, None, "refresh");
+        }
+        write_state(&state)?;
+        fs::write(&pending, "start").map_err(|error| {
+            format!("Could not mark the refreshed runtime ready to start: {error}")
+        })?;
+    }
+    let started = start_services(&services, false)?;
+    if !started.accepted {
+        return Err(started.message);
+    }
+    wait_for_services_health(&services)?;
+    let state = read_state()?;
+    if !services
+        .iter()
+        .all(|service| probe_service_health(service, &state))
+    {
+        return Err("The updated Townlight runtime is starting. Retry in a moment.".to_string());
+    }
+    fs::remove_file(&pending)
+        .map_err(|error| format!("Could not finish the runtime refresh: {error}"))
+}
+
 fn remove_profile_dir_once(path: &Path) -> Result<bool, String> {
     if !path.exists() {
         return Ok(false);
@@ -3374,7 +3451,7 @@ fn health_action(service_id: Option<&str>) -> Result<SupervisorActionResult, Str
 }
 
 fn wait_for_services_health(services: &[&ServiceDefinition]) -> Result<(), String> {
-    for _ in 0..40 {
+    for _ in 0..120 {
         let state = read_state()?;
         if services
             .iter()
@@ -3439,7 +3516,15 @@ pub(crate) fn bootstrap_required_runtime() -> Result<SupervisorActionResult, Str
     }
 
     wait_for_services_health(&services)?;
-    let health = health_action(None)?;
+    let mut health = health_action(None)?;
+    // The HTTP listener can respond before its database readiness check.
+    for _ in 0..30 {
+        if health.accepted {
+            break;
+        }
+        thread::sleep(Duration::from_secs(1));
+        health = health_action(None)?;
+    }
     if !health.accepted {
         return Ok(SupervisorActionResult {
             accepted: false,

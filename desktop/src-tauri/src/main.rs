@@ -493,7 +493,11 @@ fn app_state() -> Result<AppState, String> {
 #[tauri::command]
 async fn get_app_state() -> Result<AppState, String> {
     tauri::async_runtime::spawn_blocking(move || {
-        catch_unwind(AssertUnwindSafe(app_state)).map_err(|_| {
+        catch_unwind(AssertUnwindSafe(|| {
+            #[cfg(windows)]
+            supervisor::refresh_upgraded_python_runtime()?;
+            app_state()
+        })).map_err(|_| {
             "App state stopped unexpectedly. Restart Townlight and retry; if this repeats, use Repair from System Health."
                 .to_string()
         })?

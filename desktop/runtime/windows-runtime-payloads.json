@@ -63,6 +63,7 @@
         "Lib/site-packages/townlight_notice/main.py",
         "Lib/site-packages/townlight_access/main.py",
         "Lib/site-packages/townlight_runtime/__init__.py",
+        "Lib/site-packages/townlight_runtime/services.py",
         "Lib/site-packages/townlight_runtime/migrate.py",
         "Lib/site-packages/townlight_runtime/records_cutover.py",
         "Lib/site-packages/townlight_runtime/records_import.py",
