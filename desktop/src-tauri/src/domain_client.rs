@@ -13,40 +13,128 @@ const MAX_RESPONSE_BYTES: usize = 16 * 1024 * 1024;
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum MeetingsRequest {
     CodeConnections {},
-    CodeConnection { id: String },
-    RecordCodeDecision { id: String, payload: Value },
-    RecordMeetingStage { id: Uuid, payload: MeetingStage },
-    CapturePacket { id: Uuid, payload: PacketInput },
-    DeliverPacket { id: Uuid },
-    GetNoticeTemplate { id: Uuid },
-    DeliverNotice { id: Uuid, payload: NoticeDocument },
-    CaptureTranscript { id: Uuid, payload: TranscriptInput },
-    CaptureActionItem { id: Uuid, payload: ActionItemInput },
-    ArchiveMeeting { id: Uuid, payload: ArchiveInput },
-    CheckNotice { id: Uuid, payload: NoticeInput },
-    RecordNoticeProof { id: Uuid, payload: NoticeProof },
-    RecordMinutesDecision { id: Uuid, payload: MinutesDecision },
-    RecordAgendaReview { id: Uuid, payload: AgendaReview },
-    AssignAgendaMeeting { id: Uuid, payload: AgendaAssignment },
+    CodeConnection {
+        id: String,
+    },
+    RecordCodeDecision {
+        id: String,
+        payload: Value,
+    },
+    RecordMeetingStage {
+        id: Uuid,
+        payload: MeetingStage,
+    },
+    CapturePacket {
+        id: Uuid,
+        payload: PacketInput,
+    },
+    DeliverPacket {
+        id: Uuid,
+    },
+    GetNoticeTemplate {
+        id: Uuid,
+    },
+    DeliverNotice {
+        id: Uuid,
+        payload: NoticeDocument,
+    },
+    CaptureTranscript {
+        id: Uuid,
+        payload: TranscriptInput,
+    },
+    CaptureActionItem {
+        id: Uuid,
+        payload: ActionItemInput,
+    },
+    ArchiveMeeting {
+        id: Uuid,
+        payload: ArchiveInput,
+    },
+    CheckNotice {
+        id: Uuid,
+        payload: NoticeInput,
+    },
+    RecordNoticeProof {
+        id: Uuid,
+        payload: NoticeProof,
+    },
+    RecordMinutesDecision {
+        id: Uuid,
+        payload: MinutesDecision,
+    },
+    RecordAgendaReview {
+        id: Uuid,
+        payload: AgendaReview,
+    },
+    AssignAgendaMeeting {
+        id: Uuid,
+        payload: AgendaAssignment,
+    },
     ImportSources {},
-    FetchImport { payload: MeetingImportSource },
-    PreviewImport { payload: MeetingImportPreview },
-    CommitImport { payload: MeetingImportCommit },
-    GetImport { id: Uuid },
-    ImportLinkChoices { destination: ImportDestination, payload: ImportLinkSearch },
-    ImportLinks { destination: ImportDestination, target_id: Uuid },
-    LinkImport { destination: ImportDestination, target_id: Uuid, payload: ImportLink },
-    AttachImportDocument { id: Uuid, payload: MeetingImportRecords },
-    CreateMeeting { payload: MeetingIntake },
-    GetMeeting { id: Uuid },
-    CreateAgendaItem { payload: AgendaIntake },
-    GetAgendaItem { id: Uuid },
-    CaptureMotion { id: Uuid, payload: MotionInput },
-    CorrectMotion { id: Uuid, payload: MotionCorrection },
-    CaptureVote { id: Uuid, payload: VoteInput },
-    CorrectVote { id: Uuid, payload: VoteCorrection },
-    CreateMinutesDraft { id: Uuid, payload: MinutesInput },
-    GetProceedings { id: Uuid },
+    FetchImport {
+        payload: MeetingImportSource,
+    },
+    PreviewImport {
+        payload: MeetingImportPreview,
+    },
+    CommitImport {
+        payload: MeetingImportCommit,
+    },
+    GetImport {
+        id: Uuid,
+    },
+    ImportLinkChoices {
+        destination: ImportDestination,
+        payload: ImportLinkSearch,
+    },
+    ImportLinks {
+        destination: ImportDestination,
+        target_id: Uuid,
+    },
+    LinkImport {
+        destination: ImportDestination,
+        target_id: Uuid,
+        payload: ImportLink,
+    },
+    AttachImportDocument {
+        id: Uuid,
+        payload: MeetingImportRecords,
+    },
+    CreateMeeting {
+        payload: MeetingIntake,
+    },
+    GetMeeting {
+        id: Uuid,
+    },
+    CreateAgendaItem {
+        payload: AgendaIntake,
+    },
+    GetAgendaItem {
+        id: Uuid,
+    },
+    CaptureMotion {
+        id: Uuid,
+        payload: MotionInput,
+    },
+    CorrectMotion {
+        id: Uuid,
+        payload: MotionCorrection,
+    },
+    CaptureVote {
+        id: Uuid,
+        payload: VoteInput,
+    },
+    CorrectVote {
+        id: Uuid,
+        payload: VoteCorrection,
+    },
+    CreateMinutesDraft {
+        id: Uuid,
+        payload: MinutesInput,
+    },
+    GetProceedings {
+        id: Uuid,
+    },
 }
 
 #[derive(Deserialize, Serialize)]
@@ -427,17 +515,27 @@ pub async fn execute_meetings(
             format!("/desktop/v1/meetings/imports/{id}"),
             None,
         ),
-        MeetingsRequest::ImportLinkChoices { destination, payload } => (
+        MeetingsRequest::ImportLinkChoices {
+            destination,
+            payload,
+        } => (
             Method::POST,
             destination.path(),
             Some(serde_json::json!(payload)),
         ),
-        MeetingsRequest::ImportLinks { destination, target_id } => (
+        MeetingsRequest::ImportLinks {
+            destination,
+            target_id,
+        } => (
             Method::GET,
             format!("{}/{target_id}", destination.path()),
             None,
         ),
-        MeetingsRequest::LinkImport { destination, target_id, payload } => (
+        MeetingsRequest::LinkImport {
+            destination,
+            target_id,
+            payload,
+        } => (
             Method::POST,
             format!("{}/{target_id}", destination.path()),
             Some(serde_json::json!(payload)),
