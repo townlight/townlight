@@ -15,8 +15,8 @@
     "version": "1.8.0-1",
     "tag": "townlight-windows-v1.8.0.1",
     "commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c",
-    "channel": "candidate",
-    "published_at": null,
+    "channel": "public-beta",
+    "published_at": "2026-11-09",
     "asset_policy": "windows-msi",
     "runtime_version": "0.3.0"
   },

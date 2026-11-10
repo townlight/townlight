@@ -48,7 +48,8 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     commit = state["desktop_release"]["commit"]
     acceptance = ROOT / "release" / "ACCEPTANCE-Windows-1.8.0.1.md"
     assert commit and f"Application source `{commit}`" in acceptance.read_text(encoding="utf-8")
-    assert state["desktop_release"]["channel"] == "candidate"
+    assert state["desktop_release"]["channel"] == "public-beta"
+    assert state["desktop_release"]["published_at"] == "2026-11-09"
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 

@@ -9,9 +9,11 @@ These instructions cover the signed **Windows x64 public beta 1.8.0.1**.
 
 ## Installation and recovery
 
-Use a fresh installation/profile. This MSI does not upgrade an existing legacy
-profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run)
-and [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
+**Fresh installation.** For a fresh installation, run the signed Windows 1.8.0.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
+
+**Upgrade from 1.7.2.1.** For the tested upgrade from 1.7.2.1, back up city data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI, and reopen Townlight under the same Windows account with its existing profile. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service.
+
+Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
 Preserve existing data and backups. Do not rename or delete the compatibility
 profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
