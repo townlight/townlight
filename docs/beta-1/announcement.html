@@ -48,8 +48,7 @@ href="https://github.com/townlight/townlight/releases/download/townlight-windows
 summary</a> and <a
 href="https://townlight.github.io/manuals/windows-staff-workflows.html">Windows
 staff workflow guide</a>.</p>
-<h2 id="install-this-beta-on-a-fresh-profile">Install this beta on a
-fresh profile</h2>
+<h2 id="install-this-beta-on-a-fresh-profile">Install or upgrade this beta</h2>
 <ol type="1">
 <li>Download <code>Townlight-Windows-x64-1.8.0.1.msi</code> and the <a
 href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/SHA256SUMS-Windows-1.8.0.1.txt">published
@@ -61,14 +60,9 @@ The MSI SHA-256 must be <code>3085817377cf813debe558d280278e2b9d11311388aa41eb18
 <code>Get-AuthenticodeSignature .\Townlight-Windows-x64-1.8.0.1.msi</code>.
 It must report <code>Valid</code>; confirm the signer matches the
 publisher named on the release page before installing.</li>
-<li>Follow the <a
-href="https://townlight.github.io/manuals/suite.html#first-run">first-run
-guide</a> and evaluate with synthetic data first.</li>
 </ol>
-<p><strong>This MSI does not upgrade an existing legacy
-profile.</strong> Preserve existing data and backups; follow the
-manual's recovery guidance. Use the explicit download above: GitHub's
-Latest download now resolves to this public beta.</p>
+<p><strong>Fresh installation.</strong> For a fresh installation, run the signed Windows 1.8.0.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the <a href="https://townlight.github.io/manuals/suite.html#first-run">first-run guide</a> and evaluate with synthetic data first.</p>
+<p><strong>Upgrade from 1.7.2.1.</strong> For the tested upgrade from 1.7.2.1, back up city data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI, and reopen Townlight under the same Windows account with its existing profile. Keep the existing <code>%LOCALAPPDATA%\CivicSuite</code> directory. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service.</p>
 <h2 id="portal-and-branding">Portal and branding</h2>
 <p>The resident portal is a separately deployed beta with its own <a
 href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-resident-portal">release</a>

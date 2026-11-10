@@ -36,7 +36,7 @@ Windows 1.8.0.1 adds Boards & Commissions, Contracts, and Procurement to the ful
 
 The MSI and desktop executable have valid timestamped Authenticode signatures. Read the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) and [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html).
 
-## Install this beta on a fresh profile
+## Install or upgrade this beta
 
 1. Download `Townlight-Windows-x64-1.8.0.1.msi` and the
    [published checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/SHA256SUMS-Windows-1.8.0.1.txt) from this exact release.
@@ -46,12 +46,10 @@ The MSI and desktop executable have valid timestamped Authenticode signatures. R
 3. Check the installer signature with
    `Get-AuthenticodeSignature .\Townlight-Windows-x64-1.8.0.1.msi`.
    It must report `Valid`; confirm the signer matches the publisher named on the release page before installing.
-4. Follow the [first-run guide](https://townlight.github.io/manuals/suite.html#first-run)
-   and evaluate with synthetic data first.
 
-**This MSI does not upgrade an existing legacy profile.** Preserve existing data
-and backups; follow the manual's recovery guidance. Use the explicit download
-above: GitHub's Latest download now resolves to this public beta.
+**Fresh installation.** For a fresh installation, run the signed Windows 1.8.0.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run guide](https://townlight.github.io/manuals/suite.html#first-run) and evaluate with synthetic data first.
+
+**Upgrade from 1.7.2.1.** For the tested upgrade from 1.7.2.1, back up city data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI, and reopen Townlight under the same Windows account with its existing profile. Keep the existing `%LOCALAPPDATA%\CivicSuite` directory. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service.
 
 ## Portal and branding
 

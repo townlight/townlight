@@ -73,6 +73,12 @@ Start a new installation with an empty database and fresh Windows profile. For a
 
 ## First run
 
+**Upgrade from 1.7.2.1.** For the tested upgrade from 1.7.2.1, back up city data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI, and reopen Townlight under the same Windows account with its existing profile. Keep the existing `%LOCALAPPDATA%\CivicSuite` directory. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service.
+
+### Fresh installation
+
+Run the signed Windows 1.8.0.1 MSI and use an empty database and a new Townlight profile for first run.
+
 1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.8.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1) release.
 2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the tested setup.
 3.  Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for the bounded desktop composition, including Access, Notice, Boards & Commissions, Contracts, and Procurement. The full profile includes Boards & Commissions, Contracts, and Procurement.
@@ -276,7 +282,7 @@ Use protected local folders, account permissions and credential storage. Never i
 
 Save work and use Core’s canonical **Backup Now** before maintenance. That operation stops writers. Preserve the coherent profile/database/document backup and its receipt, then use **Start** to resume. A source export is not a full backup.
 
-Use **Restore Latest Backup** through the supported controls. If the result says **Restore needs service start**, use **Start**, then **Check**, and reopen a known record. Do not repeat restore merely because services need to start. The fresh-profile acceptance verified that a fulfilled request survived restore and a post-backup marker did not.
+Use **Restore Latest Backup** through the supported controls. If the result says **Restore needs service start**, use **Start**, then **Check**, and reopen a known record. Do not repeat restore merely because services need to start. The [Windows 1.6.0.1 Beta 1 fresh-install acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1) verified that a fulfilled request survived restore and a post-backup marker did not.
 
 Keep Station’s dedicated database and media evidence together in its own backup. Core’s native-profile backup must not be assumed to include an external Station data directory. Stop writers during a coordinated backup. Preserve failed media attempts and logs.
 
@@ -297,6 +303,8 @@ On failure, record the time, selected composition, component/installer versions 
 
 ## Verified workflows and limits
 
+The table records selected synthetic workflows from the original [Windows 1.6.0.1 Beta 1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1) Sandbox run. Station’s later delivery has [separate Windows 1.6.0.1 acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). See the [Windows 1.8.0.1 acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the workflows and upgrade path exercised on the current MSI.
+
 | Product | Recorded result | Precisely exercised |
 |----|----|----|
 | Core | PASS | Normal empty-profile setup; canonical activation; UI-created staff and sign-in; staff denied user administration; coherent backup, mutation, restore, Start/Check and retained/absent record readback. |
@@ -309,11 +317,7 @@ On failure, record the time, selected composition, component/installer versions 
 | Inspections | PASS | Retained original/hash, supplied observations and voice summary, saved/reviewed case/readback, separate exact Records copy and private handoff; address exclusion; native workspace. |
 | Station | PASS | Actual native staff session and normally created meeting; headless operator live start/stop, decoded generated audio/video, served hash, private Records readback, idempotent locked original and logout. |
 
-The [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) records the installed Windows checks for this MSI. The earlier Station delivery evidence applies to its original build.
-
-See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for this MSI. The historical [evidence index](https://townlight.github.io/reference/sandbox-evidence-index.json) applies to its original build.
-
-The limits remain: actual city field acceptance and equipment/network commissioning; Station automatic provisioning/SCM commissioning; every UI/role combination; field recognition accuracy; and historical in-place upgrades are not certified. They are not five invented feature requirements. Fresh-install controlled beta handoff remains the accepted scope. This package makes no city-deployment, publication or general-availability claim.
+The Windows 1.8.0.1 acceptance covers the tested installation paths and selected synthetic workflows, including Boards & Commissions, Contracts, and Procurement. Earlier results apply to their original builds. City field acceptance, physical equipment and network commissioning, Station automatic provisioning, and comprehensive UI and role coverage remain outside the 1.8.0.1 checks.
 
 ## Terms of service and license
 
@@ -341,7 +345,7 @@ Staff verify the jurisdiction, source currency, permissions, citations and propo
 
 ### Beta operation and recovery
 
-Use the identified candidate in its supported fresh-install scope. Preserve backups and original evidence. Test physical equipment and chosen network/service configuration before relying on them. The supplied acceptance describes selected synthetic workflows, not every screen, vendor, field condition or upgrade. Operators decide whether a particular deployment meets their own operational obligations.
+Windows 1.8.0.1 was tested for fresh installation and in-place upgrade from 1.7.2.1. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service. Keep backups and original evidence. Test your physical equipment and network and service configuration before relying on them. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the tested paths.
 
 ### Warranty and liability
 

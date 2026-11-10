@@ -1,14 +1,14 @@
 Download Windows beta 1.8.0.1 · Public announcement · Support and
 feedback
 
-New installations use a fresh profile. Upgrade from 1.7.1.1 retains
-saved settings and data; older legacy-profile migration is not
-established.
+New installations use a fresh profile. Upgrade from the previous public
+Windows 1.7.2.1 retains saved settings and data; older upgrade paths are
+unverified.
 
 Windows x64 Beta 1 · MSI 1.8.0.1
 
-The signed Windows x64 beta 1.8.0.1 updates installer metadata while
-preserving the accepted signed application/runtime cabinet.
+The signed Windows x64 beta 1.8.0.1 adds the three staff workspaces and
+automatically refreshes the bundled runtime when upgrading from 1.7.2.1.
 
 - Townlight Suite Manual
   - Using this manual
@@ -35,19 +35,16 @@ preserving the accepted signed application/runtime cabinet.
 
 Townlight Suite Manual
 
-  Windows 1.8.0.1 acceptance. Windows 1.8.0.1 changes installer metadata
-  and displays Townlight as the installed product name. Its new outer
-  MSI is Azure-signed by Scott Converse and independently verified. The
-  signed application/runtime cabinet is unchanged from 1.7.1.1.
-  Functional and fresh-install evidence is reused from 1.7.1.1; no
-  full-suite or independent fresh-install rerun is claimed for this
-  metadata revision. See the release for separately dated installed
-  upgrade evidence. Upgrade from 1.7.0.1 is not established. Station
-  requires separate setup. Evidence and limits.
+  Windows 1.8.0.1 acceptance. Windows 1.8.0.1 adds Boards & Commissions,
+  Contracts, and Procurement to the full Windows profile. The signed
+  Windows Sandbox checks cover a fresh installation, the three staff
+  workflows, role boundaries, record persistence, and upgrade from
+  1.7.2.1 with retained city data and settings. Station continues to use
+  its separately configured local service. Acceptance and limits.
 
-  The signed Windows x64 beta 1.8.0.1 updates installer metadata while
-  preserving the accepted signed application/runtime cabinet. The
-  Windows acceptance summary applies to this exact MSI.
+  The signed Windows x64 beta 1.8.0.1 adds the three staff workspaces
+  and automatically refreshes the bundled runtime when upgrading from
+  1.7.2.1. The Windows acceptance summary applies to this exact MSI.
 
 Using this manual
 
@@ -66,37 +63,53 @@ identified by its receipt.
 Beta identity
 
   Identity                         Value
-  -------------------------------- --------------------------------------------------------------------------------
+  -------------------------------- --------------------------------------------------------------------------------------------------
   Public documentation identity    Townlight Beta 1
-  Windows MSI version       1.8.0.1
+  Windows MSI version              1.8.0.1
   Native desktop source version    1.8.0-1
-  Released artifact identity      SHA-256 checksums and Windows acceptance summary
+  Released artifact identity       SHA-256 checksums and Windows acceptance summary
   Corresponding source             Released Windows x64 beta
   Current owned software license   AGPL-3.0-only
   Supported acceptance profile     Windows x64 fresh install and upgrade from 1.7.2.1; full profile; separate Station configuration
 
-Use an empty database and fresh Windows profile. The installer refuses
-legacy profile initialization. The approved profile path is
-%LOCALAPPDATA%\CivicSuite. Keep existing profiles and backups.
+Start a new installation with an empty database and fresh Windows
+profile. For an upgrade from Windows 1.7.2.1, keep the existing profile.
+The approved profile path is %LOCALAPPDATA%\CivicSuite. Keep existing
+profiles and backups.
 
 Component versions
 
-  Component       Distribution            Installed version
-  --------------- ----------------------- -------------------
-  Core            townlight-core          1.3.0.dev2
-  Records         townlight-records       1.8.0.dev2
-  Meetings        townlight-meetings      1.0.5
-  Code            townlight-code          1.0.9
-  Zoning          townlight-zoning        0.2.3
-  Planning        townlight-planning      0.4.0.dev2
-  Permitting      townlight-permitting    0.3.0+dev.2
-  Inspections     townlight-inspections   0.3.0+dev.2
-  Station         townlight-station       0.3.0
-  Access          townlight-access        0.5.0
-  Notice          townlight-notice        0.3.0
-  Local runtime   townlight-runtime       0.2.1
+  Component              Distribution            Installed version
+  ---------------------- ----------------------- -------------------
+  Core                   townlight-core          1.3.0.dev2
+  Records                townlight-records       1.8.0.dev2
+  Meetings               townlight-meetings      1.0.5
+  Code                   townlight-code          1.0.9
+  Zoning                 townlight-zoning        0.2.3
+  Planning               townlight-planning      0.4.0.dev2
+  Permitting             townlight-permitting    0.3.0+dev.2
+  Inspections            townlight-inspections   0.3.0+dev.2
+  Station                townlight-station       0.3.0
+  Access                 townlight-access        0.5.0
+  Notice                 townlight-notice        0.3.0
+  Boards & Commissions   townlight-boards        0.2.0
+  Contracts              townlight-contracts     0.2.0
+  Procurement            townlight-procurement   0.3.0
+  Local runtime          townlight-runtime       0.3.0
 
 First run
+
+Upgrade from 1.7.2.1. For the tested upgrade from 1.7.2.1, back up city
+data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI,
+and reopen Townlight under the same Windows account with its existing
+profile. Keep the existing %LOCALAPPDATA%\CivicSuite directory. Upgrade
+paths from versions older than 1.7.2.1 are unverified. Station uses its
+separately configured service.
+
+Fresh installation
+
+Run the signed Windows 1.8.0.1 MSI and use an empty database and a new
+Townlight profile for first run.
 
 1.  Download the signed MSI, matching source and checksums from the
     Windows x64 beta 1.8.0.1 release.
@@ -105,8 +118,9 @@ First run
 3.  Launch Townlight under the intended named Windows account. Choose
     the storage folders. Select Townlight Inspections candidate
     (inspections-preview) for the bounded desktop composition, including
-    Access and Notice. A narrower selection will not expose all
-    workspaces.
+    Access, Notice, Boards & Commissions, Contracts, and Procurement.
+    The full profile includes Boards & Commissions, Contracts, and
+    Procurement.
 4.  Enter the city profile, time zone and contacts. Create the first
     named local administrator, sign in and choose protected backup
     storage. Continue without local AI is valid for the deterministic
@@ -124,6 +138,9 @@ First run
     drafting is selected.
 
 Daily workflow
+
+Windows staff workflow guide covers Boards & Commissions, Contracts,
+Procurement, staff roles and linked records.
 
 Sign in with your own named account. Confirm the selected workspace,
 open a saved record and check its source/version before editing. Save
@@ -245,16 +262,16 @@ Technical specifications
 
 Runtime and storage
 
-The accepted package targets Windows x64 fresh installation. Its native
-shell uses Rust 2021, Tauri 2 and Microsoft WebView2; browser assets are
-JavaScript built with Vite 8.1.6. This describes the native desktop
-frontend; Station has a separate React operator, specified below or in
-its product manual. Canonical business workflows use bundled CPython
-3.13.5, FastAPI, Pydantic, SQLAlchemy and Alembic, with PostgreSQL 17 /
-PostGIS and managed original files. The installed runtime tested here
-contains FastAPI 0.162.0. Package minimum Python requirements can differ
-from the bundled executable; the metadata reference preserves both. No
-stack rewrite is implied by the beta label.
+The accepted package supports Windows x64 fresh installation and upgrade
+from 1.7.2.1. Its native shell uses Rust 2021, Tauri 2 and Microsoft
+WebView2; browser assets are JavaScript built with Vite 8.1.6. This
+describes the native desktop frontend; Station has a separate React
+operator, specified below or in its product manual. Canonical business
+workflows use bundled CPython 3.13.5, FastAPI, Pydantic, SQLAlchemy and
+Alembic, with PostgreSQL 17 / PostGIS and managed original files. The
+installed runtime tested here contains FastAPI 0.162.0. Package minimum
+Python requirements can differ from the bundled executable; the metadata
+reference preserves both. No stack rewrite is implied by the beta label.
 
 The native transport is fixed to loopback 127.0.0.1:15480; PostgreSQL
 uses the configured local runtime port (default 15432). Optional local
@@ -326,9 +343,10 @@ Native deployment configuration
 Use Setup, Settings and System Health for supported staff operation.
 Administrators provision folders, backup storage, named accounts and the
 city profile. Select inspections-preview for the bounded desktop
-composition, including Access and Notice. Station remains a separate
-service boundary. Do not use a standalone product’s demo server as a
-substitute for the installed workspace.
+composition, including Access, Notice, Boards & Commissions, Contracts,
+and Procurement. Station remains a separate service boundary. Do not use
+a standalone product’s demo server as a substitute for the installed
+workspace.
 
 Technical deployments use TOWNLIGHT_PRODUCT_PROFILE,
 TOWNLIGHT_PROFILE_ROOT, DATABASE_URL, TOWNLIGHT_RUNTIME_PORT,
@@ -486,8 +504,8 @@ a full backup.
 Use Restore Latest Backup through the supported controls. If the result
 says Restore needs service start, use Start, then Check, and reopen a
 known record. Do not repeat restore merely because services need to
-start. The fresh-profile acceptance verified that a fulfilled request
-survived restore and a post-backup marker did not.
+start. The Windows 1.6.0.1 Beta 1 fresh-install acceptance verified that
+a fulfilled request survived restore and a post-backup marker did not.
 
 Keep Station’s dedicated database and media evidence together in its own
 backup. Core’s native-profile backup must not be assumed to include an
@@ -516,6 +534,11 @@ Troubleshooting
 
 Verified workflows and limits
 
+The table records selected synthetic workflows from the original Windows
+1.6.0.1 Beta 1 Sandbox run. Station’s later delivery has separate
+Windows 1.6.0.1 acceptance. See the Windows 1.8.0.1 acceptance summary
+for the workflows and upgrade path exercised on the current MSI.
+
   Product       Recorded result   Precisely exercised
   ------------- ----------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   Core          PASS              Normal empty-profile setup; canonical activation; UI-created staff and sign-in; staff denied user administration; coherent backup, mutation, restore, Start/Check and retained/absent record readback.
@@ -528,20 +551,12 @@ Verified workflows and limits
   Inspections   PASS              Retained original/hash, supplied observations and voice summary, saved/reviewed case/readback, separate exact Records copy and private handoff; address exclusion; native workspace.
   Station       PASS              Actual native staff session and normally created meeting; headless operator live start/stop, decoded generated audio/video, served hash, private Records readback, idempotent locked original and logout.
 
-The Windows acceptance summary records the installed Windows checks for
-this MSI. The earlier Station delivery evidence applies to its original
-build.
-
-See the Windows acceptance summary for this MSI. The historical evidence
-index applies to its original build.
-
-The limits remain: actual city field acceptance and equipment/network
-commissioning; Station automatic provisioning/SCM commissioning; every
-UI/role combination; field recognition accuracy; and historical in-place
-upgrades are not certified. They are not five invented feature
-requirements. Fresh-install controlled beta handoff remains the accepted
-scope. This package makes no city-deployment, publication or
-general-availability claim.
+The Windows 1.8.0.1 acceptance covers the tested installation paths and
+selected synthetic workflows, including Boards & Commissions, Contracts,
+and Procurement. Earlier results apply to their original builds. City
+field acceptance, physical equipment and network commissioning, Station
+automatic provisioning, and comprehensive UI and role coverage remain
+outside the 1.8.0.1 checks.
 
 Terms of service and license
 
@@ -608,12 +623,12 @@ amounts do not become a new authoritative calculation.
 
 Beta operation and recovery
 
-Use the identified candidate in its supported fresh-install scope.
-Preserve backups and original evidence. Test physical equipment and
-chosen network/service configuration before relying on them. The
-supplied acceptance describes selected synthetic workflows, not every
-screen, vendor, field condition or upgrade. Operators decide whether a
-particular deployment meets their own operational obligations.
+Windows 1.8.0.1 was tested for fresh installation and in-place upgrade
+from 1.7.2.1. Upgrade paths from versions older than 1.7.2.1 are
+unverified. Station uses its separately configured service. Keep backups
+and original evidence. Test your physical equipment and network and
+service configuration before relying on them. See the acceptance summary
+for the tested paths.
 
 Warranty and liability
 

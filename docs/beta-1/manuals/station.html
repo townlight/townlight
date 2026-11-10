@@ -126,8 +126,7 @@ included with the same documentation companion.</p>
 </tr>
 <tr>
 <td>Acceptance composition</td>
-<td>Fresh Windows x64; inspections-preview; Station configured
-separately</td>
+<td>Windows x64 fresh install and upgrade from 1.7.2.1. Select the full profile. Station uses separate configuration.</td>
 </tr>
 <tr>
 <td>Candidate hashes/signature</td>
@@ -139,13 +138,11 @@ separately</td>
 </tr>
 </tbody>
 </table>
-<p>This edition updates the paired-runtime instructions for the naming
-candidate. It does not rename historical Station artifacts or claim new
-Station software features. Use an empty database and fresh profile; no
-in-place legacy upgrade or old import shim is supported. Preserve
-existing city data and the prior release. The approved profile path
-remains <code>%LOCALAPPDATA%\CivicSuite</code> for that path only.</p>
+<p>Station continues to use its separately configured service. The Windows MSI upgrade below applies to the desktop suite.</p>
 <h2 id="first-run">First run</h2>
+<p><strong>Upgrade from 1.7.2.1.</strong> For the tested upgrade from 1.7.2.1, back up city data and settings, close Townlight, run the signed Windows 1.8.0.1 MSI, and reopen Townlight under the same Windows account with its existing profile. Keep the existing <code>%LOCALAPPDATA%\CivicSuite</code> directory. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service.</p>
+<h3>Fresh installation</h3>
+<p>Run the signed Windows 1.8.0.1 MSI and use an empty database and a new Townlight profile for first run.</p>
 <ol type="1">
 <li>Download the signed MSI, matching source companion and checksums from the <a href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1">public Windows release</a>.</li>
 <li>Verify the MSI hash and Authenticode publisher before installation. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">Windows acceptance summary</a> for the tested setup.</li>
@@ -410,8 +407,7 @@ paths in its OpenAPI download are not the full separate <code>/v1</code>
 service schema.</p>
 <h2 id="technical-specifications">Technical specifications</h2>
 <h3 id="runtime-and-storage">Runtime and storage</h3>
-<p>The accepted package targets <strong>Windows x64 fresh
-installation</strong>. Its native shell uses <strong>Rust 2021, Tauri 2
+<p>The accepted package supports Windows x64 fresh installation and upgrade from 1.7.2.1. Its native shell uses <strong>Rust 2021, Tauri 2
 and Microsoft WebView2</strong>; browser assets are JavaScript built
 with <strong>Vite 8.1.6</strong>. This describes the native desktop
 frontend; Station has a separate React operator, specified below or in
@@ -1015,20 +1011,8 @@ completed media.</td>
 </table>
 <h2 id="verified-workflows-and-limits">Verified workflows and
 limits</h2>
-<p>The original accepted Station manual and its workflow claims are
-preserved <a href="../history/station/pre-naming-2026-11/USER-MANUAL.md">byte
-for byte</a>. Those results identify earlier artifacts; they are not
-installed signoff for this naming candidate. The current package retains
-the same Beta Python service and pinned CivicCast donor. Source presence
-and a successful wheel import do not establish the required Windows
-Meetings → Station → Records handoff.</p>
-<p>The new candidate must verify actual saved meeting/agenda context,
-authorized Station capture and stop, completed media/hash readback,
-private Records handoff, idempotency, authorization/logout, persistence
-and the agreed recovery path. Its ACCEPTANCE.md must distinguish new
-proof from justified reused evidence. This source documentation does not
-certify a signed MSI, live YouTube upload, physical PEG broadcast, city
-deployment or long-duration commissioning.</p>
+<p>The separately configured Station workflow was exercised on the original <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1">Windows 1.6.0.1 Beta 1</a>. The follow-up <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery">Windows 1.6.0.1 Station delivery</a> exercised encrypted live feed and recording delivery. The <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">Windows 1.8.0.1 acceptance summary</a> records the current MSI checks. Station capture and its Meetings-to-Records handoff were outside that run. Field equipment, city credentials, and live YouTube commissioning require separate local verification.</p>
+
 <p>The separate provisioning/service boundary and existing
 external-service limits remain as described below. Staff remain
 responsible for official release and publication decisions. No
@@ -1089,12 +1073,7 @@ enforcement notice or records-release decision. Official permit fee
 authority remains with the adopted source and responsible organization;
 imported amounts do not become a new authoritative calculation.</p>
 <h3 id="beta-operation-and-recovery">Beta operation and recovery</h3>
-<p>Use the identified candidate in its supported fresh-install scope.
-Preserve backups and original evidence. Test physical equipment and
-chosen network/service configuration before relying on them. The
-supplied acceptance describes selected synthetic workflows, not every
-screen, vendor, field condition or upgrade. Operators decide whether a
-particular deployment meets their own operational obligations.</p>
+<p>Windows 1.8.0.1 was tested for fresh installation and in-place upgrade from 1.7.2.1. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service. Keep backups and original evidence. Test your physical equipment and network and service configuration before relying on them. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">acceptance summary</a> for the tested paths.</p>
 <h3 id="warranty-and-liability">Warranty and liability</h3>
 <p>The covered software’s warranty and liability conditions are those in
 sections 15–17 of the supplied AGPL and any applicable separate written
