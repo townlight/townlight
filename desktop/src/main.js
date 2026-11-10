@@ -4,6 +4,7 @@ import { createMunicipalView } from "./municipal/view.js";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
+import { bindImportLinks, renderImportLinks } from "./meetings/import-links.js";
 import { createCodeView } from "./code/view.js";
 import { createPublishedView } from "./published/view.js";
 import { createPermittingView } from "./permitting/view.js";
@@ -44,7 +45,7 @@ function openMunicipalLink(area, id) {
 
 const recordsController = createRecordsController(invoke);
 const noticeView = createNoticeView(invoke);
-const meetingsView = createMeetingsView(invoke, openConnectedWork);
+const meetingsView = createMeetingsView(invoke, openConnectedWork, openImportDraft);
 const codeView = createCodeView(invoke, openConnectedWork);
 const publicMeetingsView = createPublishedView(invoke, 'meetings');
 const publicCodeView = createPublishedView(invoke, 'code');
@@ -69,6 +70,24 @@ function openConnectedWork(area, id) {
   const idField = target.elements.namedItem('id');
   if (idField) idField.value = id;
   target.requestSubmit();
+}
+
+function openImportDraft(area, {title, text, date, source, meetingId}) {
+  if (!areaIsEnabled(area) || isPublicSurface() || !accessState().signed_in) {
+    throw new Error("The selected staff workspace is unavailable.");
+  }
+  const citation = `Imported meeting ${meetingId}. Published source ${source}`;
+  if (area === "notice") {
+    if (!noticeView.canLeave()) return;
+    noticeView.prepareImportDraft({title, text, date, citation});
+  } else if (area === "access") {
+    state.workDraft.accessTitle = title;
+    state.workDraft.accessBody = `${text}\n\n${citation}`;
+  } else {
+    throw new Error("Select a destination for the imported text.");
+  }
+  state.activeArea = area;
+  render();
 }
 
 const LOCKED_FOUNDATION_MODULE_ID = "townlight_core";
@@ -5255,11 +5274,15 @@ function render() {
     if (!areaIsEnabled(state.activeArea)) {
       state.activeArea = "settings";
     }
+    const importLinksAvailable = state.app?.domain_authority === "python-records"
+      && areaIsEnabled("meetings") && access.signed_in && !isPublicSurface()
+      && (["local-admin", "city-staff"].includes(access.role)
+        || state.activeArea === "boards" && access.role === "clerk");
     byId("app").innerHTML = `
       ${renderTopbar()}
       <div class="layout">
         ${renderNav()}
-        <main id="main-content" tabindex="-1">${renderActiveArea()}</main>
+        <main id="main-content" tabindex="-1">${renderActiveArea()}${importLinksAvailable ? renderImportLinks(state.activeArea) : ""}</main>
         ${renderAuditDrawer()}
       </div>
     `;
@@ -5283,6 +5306,7 @@ function render() {
 }
 
 function bindEvents() {
+  bindImportLinks(invoke, id => openMunicipalLink("meetings", id));
   if (municipalAreas.includes(state.activeArea) && municipalAccess(state.activeArea)) {
     void municipalView.bind(state.activeArea, accessState().role === "local-admin", municipalRecord);
   }

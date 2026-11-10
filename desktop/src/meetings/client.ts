@@ -3,8 +3,62 @@ import type { CodeDecision, ConnectionView } from '../code/client';
 type Invoke = <T>(command: string, args: {request: object}) => Promise<T>;
 export interface MeetingInput {title: string; scheduled_start: string; location: string; meeting_type?: string}
 export interface AgendaInput {title: string; department_name: string}
+interface ImportPayload {
+  connector: string; input_format: string; source_url: string; content_base64: string;
+}
+interface ImportPreview {
+  source: {sha256: string};
+  meetings: Array<{external_id: string; title: string; meeting_date?: string; scheduled_start?: string}>;
+}
+interface ImportSource {
+  connector: string; input_format: string; label: string;
+}
+interface ImportReceipt {
+  payload: {documents?: Array<{kind: string; title?: string; url: string}>};
+}
+
+export async function readImportFile(source: ImportSource, data: {source_url: string; export_file: File}): Promise<ImportPayload> {
+  const file = data.export_file;
+  if (!file?.size || file.size > 16 * 1024 * 1024) {
+    throw new Error("Choose a saved source response up to 16 MiB.");
+  }
+  const content_base64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read the selected file."));
+    reader.onload = () => resolve(String(reader.result).split(",", 2)[1]);
+    reader.readAsDataURL(file);
+  });
+  const {connector, input_format} = source;
+  return {connector, input_format, source_url: data.source_url, content_base64};
+}
+
 export function createMeetingsClient(invoke: Invoke) {
   return {
+    importSources(): Promise<ImportSource[]> {
+      return invoke("meetings_domain_request", {request: {operation: "import-sources"}});
+    },
+    previewImport(payload: ImportPayload): Promise<ImportPreview> {
+      return invoke("meetings_domain_request", {request: {operation: "preview-import", payload}});
+    },
+    fetchImport(source: ImportSource, source_url: string): Promise<{payload: ImportPayload; preview: ImportPreview}> {
+      const {connector, input_format} = source;
+      return invoke("meetings_domain_request", {request: {operation: "fetch-import", payload: {
+        connector, input_format, source_url,
+      }}});
+    },
+    commitImport(payload: ImportPayload, external_id: string, expected_sha256: string) {
+      return invoke("meetings_domain_request", {request: {operation: "commit-import", payload: {
+        ...payload, external_id, expected_sha256,
+      }}});
+    },
+    getImport(id: string): Promise<ImportReceipt> {
+      return invoke("meetings_domain_request", {request: {operation: "get-import", id}});
+    },
+    attachImportDocument(id: string, request_id: string, document_index: number) {
+      return invoke("meetings_domain_request", {request: {operation: "attach-import-document", id, payload: {
+        request_id, document_index,
+      }}});
+    },
     codeConnections(_id?: string, _data?: unknown): Promise<ConnectionView[]> {
       return invoke('meetings_domain_request', {request: {operation: 'code-connections'}});
     },
@@ -89,7 +143,7 @@ export function createMeetingsClient(invoke: Invoke) {
         sentences: [{text: data.text, citations: data.source_id ? [data.source_id] : []}],
       }}});
     },
-    read(kind: "meeting" | "agenda-item" | "proceedings", id: string) {
+    read(kind: "meeting" | "agenda-item" | "proceedings" | "import", id: string) {
       return invoke("meetings_domain_request", {request: {operation: `get-${kind}`, id}});
     },
   };

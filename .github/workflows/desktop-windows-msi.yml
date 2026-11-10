@@ -193,7 +193,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
+          ref: c988c1a86e47836d48f189b2c4cc9e8fd622004a
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
@@ -229,7 +229,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/station
-          ref: 7205ed1b07132b1649c994e190b381d773807aff
+          ref: 5e65aa40795933ce2f39b195f869dacb9d4aa6a8
           path: station
 
       - name: Check out pinned Townlight Boards source
@@ -687,7 +687,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
+          ref: c988c1a86e47836d48f189b2c4cc9e8fd622004a
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
@@ -746,7 +746,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/station
-          ref: 7205ed1b07132b1649c994e190b381d773807aff
+          ref: 5e65aa40795933ce2f39b195f869dacb9d4aa6a8
           path: station
 
       - name: Check out pinned Townlight Boards source

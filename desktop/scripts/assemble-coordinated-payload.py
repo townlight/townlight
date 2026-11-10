@@ -135,28 +135,16 @@ def make_lock(output, payload_manifest):
             'payload_root': str(output), 'payloads': result}
 
 
-def verify_reused_station(output, wheel):
-    """Keep the accepted signed launcher when the Station payload code is unchanged."""
+def verify_station_launcher_contract(output, wheel):
+    """The accepted portable launcher can invoke the same entry point in a new wheel."""
     site = output / 'python/Lib/site-packages'
-    normalize = {'.py', '.json', '.html', '.css', '.js', '.txt'}
-    counts = {'exact': 0, 'line_endings_only': 0}
+    installed = list(site.glob('townlight_station-*.dist-info/entry_points.txt'))
     with zipfile.ZipFile(wheel) as archive:
-        expected = {name for name in archive.namelist() if name.startswith('townlight_station/') and not name.endswith('/')}
         entry_points = [name for name in archive.namelist() if name.endswith('.dist-info/entry_points.txt')]
-        if not expected or len(entry_points) != 1:
-            raise ValueError('Station wheel is missing its executable service or entry-point metadata')
-        actual = {path.relative_to(site).as_posix() for path in (site / 'townlight_station').rglob('*') if path.is_file()}
-        if actual != expected:
-            raise ValueError('Accepted Station runtime file inventory differs from the pinned wheel')
-        for name in sorted(expected | set(entry_points)):
-            accepted, current = child(site, name).read_bytes(), archive.read(name)
-            if accepted == current:
-                counts['exact'] += 1
-            elif Path(name).suffix in normalize and accepted.replace(b'\r\n', b'\n') == current.replace(b'\r\n', b'\n'):
-                counts['line_endings_only'] += 1
-            else:
-                raise ValueError(f'Accepted Station runtime differs from pinned source: {name}')
-    return counts
+        if len(installed) != 1 or len(entry_points) != 1:
+            raise ValueError('Station requires one installed and one wheel entry-point record')
+        if installed[0].read_bytes().splitlines() != archive.read(entry_points[0]).splitlines():
+            raise ValueError('Station launcher entry point differs from the accepted payload')
 
 
 def main():
@@ -169,13 +157,20 @@ def main():
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if head != commit or subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT):
         raise ValueError('Build checkout is not clean at the bound umbrella source commit')
-    canonical = read_json(ROOT / 'config/suite-state.json')
-    canonical['desktop_release']['commit'] = head
-    if manifest != canonical:
-        raise ValueError('Bound state differs from the committed suite contract')
     pins_path = ROOT / 'config/inspections-preview-sources.json'
     config_path = ROOT / 'config/inspections-msi-candidate.json'
     pins = read_json(pins_path)['sources']
+    candidate = read_json(config_path)
+    canonical = read_json(ROOT / 'config/suite-state.json')
+    canonical['desktop_release'].update(
+        commit=head, version=candidate['desktop_version'], runtime_version=candidate['runtime_package_version'],
+    )
+    for key in ('meetings', 'station'):
+        module = canonical['modules'][key]
+        module['versions']['installer'] = candidate[f'{key}_package_version']
+        module['installer']['source_commit'] = pins[module['repository']['name']]
+    if manifest != canonical:
+        raise ValueError('Bound state differs from the committed suite and candidate contracts')
     if pins != {item['repository']['name']: item['installer']['source_commit']
                 for item in manifest['modules'].values()}:
         raise ValueError('Coordinated wheel sources and desktop contract sources differ')
@@ -205,14 +200,21 @@ def main():
     modules = components(True, manifest)
     package_names = {module['legacy']['package_names'][0]: module['versions']['installer'] for module in modules.values()}
     python = output / 'python/python.exe'
-    station_reuse = verify_reused_station(output, args.wheels / wheel_receipt['station']['name'])
+    station_launcher = 'python/Scripts/townlight-station.exe'
+    verify_station_launcher_contract(output, args.wheels / wheel_receipt['station']['name'])
+    if station_launcher not in reused_native:
+        raise ValueError('Station launcher lacks signed native base evidence')
+    station_bytes = child(output, station_launcher).read_bytes()
     env = {key: value for key, value in os.environ.items() if key not in ('PYTHONPATH', 'PYTHONHOME')}
     env.update(TESTING='1', PIP_CONFIG_FILE=os.devnull, PIP_NO_INDEX='1')
     with tempfile.TemporaryDirectory(prefix='tl-embedded-probe-') as cwd:
         def invoke(*command):
             return subprocess.check_output([str(python), '-I', '-B', *command], cwd=cwd, env=env, text=True)
         print(invoke('-m', 'pip', 'install', '--no-index', '--no-deps', '--no-compile', '--force-reinstall',
-                     *(str((args.wheels / wheel_receipt[key]['name']).resolve()) for key in modules if key != 'station')), flush=True)
+                     *(str((args.wheels / wheel_receipt[key]['name']).resolve()) for key in modules)), flush=True)
+        child(output, station_launcher).write_bytes(station_bytes)
+        subprocess.run([str(child(output, station_launcher)), '--help'], cwd=cwd,
+                       env=env, check=True, stdout=subprocess.DEVNULL)
         print(invoke('-m', 'pip', 'check'), flush=True)
         probe = ('import importlib, importlib.metadata as metadata, json, pathlib\n'
                  'expected = json.loads(__import__("sys").argv[1])\n'
@@ -246,7 +248,7 @@ def main():
                   'sources': [{'repository': name, 'source_commit': sha} for name, sha in pins.items()],
                   'contract_sha256': digest(config_path), 'sources_manifest_sha256': digest(pins_path),
                   'wheels': [dict(item) for item in wheel_receipt.values()], 'umbrella_source_commit': commit,
-                  'reused_station_runtime': station_reuse,
+                  'reused_station_launcher': {'path': station_launcher, 'sha256': reused_native[station_launcher]},
                   'package_versions': {name.replace('-', '_'): version for name, version in installed.items()}}
     write_profile_provenance(output, provenance)
     lock = make_lock(output, read_json(ROOT / 'desktop/runtime/windows-runtime-payloads.json'))
@@ -257,7 +259,7 @@ def main():
                              'copied_files': copied, 'reused_signed_native_files': reused_native,
                              'new_native_files_requiring_signing': added_native,
                              'status': 'prepared payload; signing and installed acceptance pending'})
-    print(f'Prepared {len(installed) - 1} installed wheels, pinned Station reuse and {len(reused_native)} reused signed native files; '
+    print(f'Prepared {len(installed)} installed wheels and {len(reused_native)} reused signed native files; '
           f'{len(added_native)} new native files require signing.', flush=True)
 
 

@@ -4,7 +4,7 @@
   "sources": {
     "townlight/core": "3021821bf9a92c790a399ad12aed821d65b09105",
     "townlight/sunshine": "e1b712091c38fadeb00c19233d7f2bf1280fc248",
-    "townlight/meetings": "723a93c5877b4ae1b6c3e46d6d44de1e0c479c63",
+    "townlight/meetings": "c988c1a86e47836d48f189b2c4cc9e8fd622004a",
     "townlight/ordinances": "22d00f560cc45088a5b24a3f997787ee9c7a5e31",
     "townlight/zone": "fb352955720db2e6e21caca816a8eb609a49f768",
     "townlight/plan": "7de514f1afd720f93bd70a4866c3389ef621dc49",
@@ -12,7 +12,7 @@
     "townlight/access": "f377a9a6e2a14d890333a20eab9277d644a9aaeb",
     "townlight/permit": "224116d9c714f613646f2b6ce2cbb687cb5e0040",
     "townlight/inspect": "a6861f262328e7645557ad2a2600db4a12a5046c",
-    "townlight/station": "7205ed1b07132b1649c994e190b381d773807aff",
+    "townlight/station": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8",
     "townlight/boards": "d14340b713c880908cc27e383a59271ed0471ac0",
     "townlight/contracts": "873de5bbff0f596b2c7cf20da4c68e94c3c3934c",
     "townlight/procure": "f10cd99f65f5f867d331af3bd6e60742bca61268"

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import sys
+import base64
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -16,6 +18,37 @@ RUNTIME_ROOT = (
 sys.path.insert(0, str(RUNTIME_ROOT))
 
 from townlight_runtime import services
+
+IMPORT_PREVIEW = {
+    "connector": "legistar",
+    "source_url": "https://example.gov/meetings",
+    "input_format": "meeting-export",
+    "content_base64": "e30=",
+}
+
+
+def test_meetings_import_preview_normalizes_exact_export_bytes():
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from townlight_runtime import meetings_bridge
+
+    app = FastAPI()
+    app.include_router(meetings_bridge.router)
+    app.dependency_overrides[meetings_bridge.actor] = lambda: "staff-fixture"
+    export = b'{"MeetingId":"123","MeetingName":"Council","MeetingDate":"2026-10-20T18:00:00-06:00"}'
+    client = TestClient(app)
+    response = client.post(
+        "/desktop/v1/meetings/imports/preview",
+        json={**IMPORT_PREVIEW, "content_base64": base64.b64encode(export).decode("ascii")},
+    )
+    assert response.status_code == 200
+    preview = response.json()
+    assert preview["source"]["sha256"] == hashlib.sha256(export).hexdigest()
+    assert preview["meetings"][0]["scheduled_start"] == "2026-10-21T00:00:00Z"
+    malformed = client.post(
+        "/desktop/v1/meetings/imports/preview", json={**IMPORT_PREVIEW, "content_base64": "!"}
+    )
+    assert malformed.status_code == 422
 
 
 def test_records_beta_is_the_default_embedded_runtime_profile(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -74,6 +107,11 @@ def test_runtime_hosts_real_records_app_without_activating_writes(monkeypatch, t
             "requester": "Synthetic Resident", "summary": "Synthetic request", "deadline": "2026-10-15"
         })
         assert denied.status_code == 401
+        denied_import = client.post(
+            "/desktop/v1/meetings/imports/preview",
+            json=IMPORT_PREVIEW,
+        )
+        assert denied_import.status_code == 404
         assert client.get("/ready").status_code == 503
 
 
@@ -190,6 +228,11 @@ def test_ready_reflects_code_schema_status(monkeypatch, tmp_path, code_schema_ok
             "/desktop/v1/code/citation?section_number=1.01",
         ):
             assert client.get(path).status_code == 401
+        denied_import = client.post(
+            "/desktop/v1/meetings/imports/preview",
+            json=IMPORT_PREVIEW,
+        )
+        assert denied_import.status_code == 401
 
     expected_status = 200 if code_schema_ok else 503
     expected_reason = "code-schema-ready" if code_schema_ok else "code-schema-unavailable"
