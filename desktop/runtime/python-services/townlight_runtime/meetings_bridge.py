@@ -3,7 +3,12 @@
 Only explicitly integrated operations are exposed. No web-app mount with weaker authentication,
 memory fallback, or parallel municipal implementation.
 """
+import asyncio
+import base64
+import binascii
+import hashlib
 import os
+import tempfile
 from uuid import UUID
 from typing import Literal
 
@@ -27,6 +32,11 @@ from townlight_meetings.packet_assembly import PacketAssemblyRepository
 from townlight_meetings.desktop_delivery import deliver_packet, deliver_notice, verify_source
 from townlight_meetings.transcripts import TranscriptRepository
 from townlight_meetings.public_archive import PublicArchiveRepository
+from townlight_runtime.meeting_imports import (
+    ImportInputError, MAX_INPUT_BYTES, preview_export, source_formats,
+)
+from townlight_runtime.meeting_import_fetch import fetch_meeting_document, fetch_public
+from townlight_runtime import meeting_import_links
 from pathlib import Path
 
 router = APIRouter(prefix="/desktop/v1/meetings", tags=["native-meetings"])
@@ -62,6 +72,8 @@ def readiness():
             connection.execute(text("SELECT id, immutable_hash FROM townlight_meetings.votes LIMIT 0"))
             connection.execute(text("SELECT id FROM townlight_meetings.action_items LIMIT 0"))
             connection.execute(text("SELECT id, snapshot_hash FROM townlight_meetings.packet_versions LIMIT 0"))
+            connection.execute(text("SELECT source_key, meeting_id, payload FROM townlight_meetings.external_meeting_imports LIMIT 0"))
+            connection.execute(text("SELECT destination, target_id, meeting_id FROM townlight_meetings.external_meeting_links LIMIT 0"))
         return True
     except (SQLAlchemyError, HTTPException):
         return False
@@ -92,6 +104,217 @@ class AgendaInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     title: str = Field(min_length=1, max_length=500)
     department_name: str = Field(min_length=1, max_length=255)
+
+
+class ImportSourceInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    connector: str = Field(min_length=1, max_length=60)
+    source_url: str = Field(min_length=1, max_length=2048)
+    input_format: str = Field(min_length=1, max_length=60)
+
+
+class ImportPreviewInput(ImportSourceInput):
+    content_base64: str = Field(min_length=1, max_length=4 * ((MAX_INPUT_BYTES + 2) // 3))
+
+
+@router.post("/imports/preview")
+def preview_meeting_import(data: ImportPreviewInput, _actor_id: str = Depends(actor)):
+    return _import_preview(data)
+
+
+@router.get("/imports/sources")
+def meeting_import_sources(_actor_id: str = Depends(actor)):
+    return source_formats()
+
+
+@router.post("/imports/fetch")
+def fetch_meeting_import(data: ImportSourceInput, _actor_id: str = Depends(actor)):
+    if not any(
+        item["connector"] == data.connector and item["input_format"] == data.input_format
+        for item in source_formats()
+    ):
+        raise HTTPException(422, "Select a supported meeting source format.")
+    try:
+        url, content, _ = fetch_public(data.source_url, byte_limit=MAX_INPUT_BYTES)
+        preview = preview_export(data.connector, url, content, input_format=data.input_format)
+    except ImportInputError as error:
+        raise HTTPException(422, str(error)) from error
+    return {
+        "payload": {**data.model_dump(), "source_url": url, "content_base64": base64.b64encode(content).decode("ascii")},
+        "preview": preview,
+    }
+
+
+def _import_preview(data: ImportPreviewInput):
+    try:
+        content = base64.b64decode(data.content_base64, validate=True)
+        return preview_export(data.connector, data.source_url, content, input_format=data.input_format)
+    except binascii.Error as error:
+        raise HTTPException(422, "The selected export could not be read.") from error
+    except ImportInputError as error:
+        raise HTTPException(422, str(error)) from error
+
+
+class ImportCommitInput(ImportPreviewInput):
+    external_id: str = Field(min_length=1, max_length=2048)
+    expected_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+@router.post("/imports/commit")
+def commit_meeting_import(data: ImportCommitInput, actor_id: str = Depends(actor)):
+    from townlight_meetings.imported_meetings import commit_meeting_import as persist
+
+    preview = _import_preview(data)
+    source = preview["source"]
+    if source["sha256"] != data.expected_sha256:
+        raise HTTPException(409, "The source file changed. Preview it again before saving.")
+    matches = [meeting for meeting in preview["meetings"] if meeting["external_id"] == data.external_id]
+    if len(matches) != 1:
+        raise HTTPException(422, "Select one meeting from the current source preview.")
+    engine = create_engine(database_url(), pool_pre_ping=True)
+    try:
+        return persist(engine, actor=actor_id, source=source, meeting=matches[0])
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    except SQLAlchemyError:
+        raise HTTPException(503, "Could not confirm the import. Retry the same source to check its outcome.") from None
+    finally:
+        engine.dispose()
+
+
+@router.get("/imports/{meeting_id}")
+def get_meeting_import(meeting_id: UUID, _actor_id: str = Depends(actor)):
+    from townlight_meetings.imported_meetings import read_meeting_import
+
+    engine = create_engine(database_url(), pool_pre_ping=True)
+    try:
+        record = read_meeting_import(engine, str(meeting_id))
+        if record is None:
+            raise HTTPException(404, "No import receipt for this meeting.")
+        return record
+    except SQLAlchemyError:
+        raise HTTPException(503, "The meeting import receipt is unavailable.") from None
+    finally:
+        engine.dispose()
+
+
+class RecordsImportDocument(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: UUID
+    document_index: int = Field(ge=0, strict=True)
+
+
+class ImportLinkInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    meeting_id: UUID
+
+class ImportLinkSearch(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    target_query: str = Field(default="", max_length=255)
+    meeting_query: str = Field(default="", max_length=255)
+
+
+@router.post("/imports/links/{destination}")
+async def import_link_choices(
+    destination: meeting_import_links.Destination, data: ImportLinkSearch, request: Request,
+    session: AsyncSession = Depends(get_async_session), _actor_id: str = Depends(actor),
+    proof: str | None = Header(default=None, alias="X-Townlight-Session"),
+):
+    await meeting_import_links.authorize_destination(request, session, proof, destination)
+    return await meeting_import_links.choices(session, destination, data.target_query, data.meeting_query)
+
+
+@router.get("/imports/links/{destination}/{target_id}")
+async def list_import_links(
+    destination: meeting_import_links.Destination, target_id: UUID, request: Request,
+    session: AsyncSession = Depends(get_async_session), _actor_id: str = Depends(actor),
+    proof: str | None = Header(default=None, alias="X-Townlight-Session"),
+):
+    await meeting_import_links.authorize_destination(request, session, proof, destination, target_id)
+    return await meeting_import_links.list_links(session, destination, target_id)
+
+
+@router.post("/imports/links/{destination}/{target_id}")
+async def create_import_link(
+    destination: meeting_import_links.Destination, target_id: UUID, data: ImportLinkInput,
+    request: Request, session: AsyncSession = Depends(get_async_session), actor_id: str = Depends(actor),
+    proof: str | None = Header(default=None, alias="X-Townlight-Session"),
+):
+    await meeting_import_links.authorize_destination(request, session, proof, destination, target_id)
+    return await meeting_import_links.link_meeting(session, destination, target_id, data.meeting_id, actor_id)
+
+
+def _stage_import_pdf(root: Path, content: bytes, storage_key: str) -> Path:
+    directory = root / "meeting-imports" / storage_key
+    path = directory / "source.pdf"
+    if not path.resolve().is_relative_to(root):
+        raise ValueError("Meeting evidence path is outside the managed Records store.")
+    directory.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        with tempfile.NamedTemporaryFile(dir=directory, delete=False) as output:
+            staged = Path(output.name)
+            try:
+                output.write(content)
+                output.flush()
+                os.fsync(output.fileno())
+                output.close()
+                try:
+                    os.link(staged, path)
+                except FileExistsError:
+                    pass
+            finally:
+                output.close()
+                staged.unlink(missing_ok=True)
+    return path
+
+
+@router.post("/imports/{meeting_id}/records")
+async def attach_import_document(
+    meeting_id: UUID, data: RecordsImportDocument, request: Request,
+    session: AsyncSession = Depends(get_async_session), _actor_id: str = Depends(actor),
+    proof: str | None = Header(default=None, alias="X-Townlight-Session"),
+):
+    from townlight_records.desktop_bridge.router import native_records_user
+    from townlight_records.desktop_bridge.schemas import AttachDocument, ManagedFileReceipt
+    from townlight_records.models.request import RecordsRequest
+    from townlight_records.requests import files, workflow
+
+    records_actor = await native_records_user(request, session, proof)
+    receipt = await asyncio.to_thread(get_meeting_import, meeting_id, _actor_id)
+    documents = receipt["payload"].get("documents", [])
+    if data.document_index >= len(documents):
+        raise HTTPException(404, "The selected document is absent from the saved meeting import.")
+    document = documents[data.document_index]
+    original_url = document["url"]
+    try:
+        _, content, mime = await asyncio.to_thread(fetch_meeting_document, original_url, byte_limit=64 * 1024 * 1024)
+        if mime not in {"application/pdf", "application/octet-stream"} or not content.startswith(b"%PDF-"):
+            raise ImportInputError("Select a source that serves a PDF document.")
+        digest = hashlib.sha256(content).hexdigest()
+        req = await session.get(RecordsRequest, data.request_id, with_for_update=True)
+        if req is None:
+            raise HTTPException(404, "Records request not found.")
+        workflow.ensure_active(req)
+        profile_root = request.app.state.desktop_profile_root
+        storage_key = hashlib.sha256(f"{meeting_id}:{data.document_index}:{digest}".encode("ascii")).hexdigest()
+        path = await asyncio.to_thread(_stage_import_pdf, files.managed_records_root(profile_root), content, storage_key)
+        title = (document.get("title") or f"{receipt['payload']['title']} — {document['kind']}")[:500]
+        attachment = AttachDocument(
+            title=title,
+            citation=f"External meeting import {meeting_id}; source {original_url}; SHA256 {digest}",
+            file=ManagedFileReceipt(original_path=original_url, stored_path=str(path),
+                                    file_name=path.name, sha256=digest, size_bytes=len(content)),
+        )
+        message = await files.attach_document(
+            session, req, workflow.RecordsActor(records_actor, request.state.native_role), attachment, profile_root,
+        )
+        await session.commit()
+    except ImportInputError as error:
+        raise HTTPException(422, str(error)) from error
+    except (ValueError, OSError) as error:
+        await session.rollback()
+        raise HTTPException(422, "Records attachment could not be confirmed. Refresh Records before retrying.") from error
+    return {"message": message, "request_id": str(data.request_id), "sha256": digest, "size_bytes": len(content)}
 
 
 class MeetingStageInput(BaseModel):
@@ -566,11 +789,15 @@ def station_catalog(actor_id: str = Depends(actor)):
     try:
         with engine.connect() as conn:
             meetings = [dict(r) for r in conn.execute(text(
-                "SELECT id,title,scheduled_start FROM townlight_meetings.meetings ORDER BY scheduled_start DESC NULLS LAST LIMIT 100")).mappings()]
+                "SELECT m.id,m.title,m.scheduled_start,i.payload->>'meeting_date' AS source_date "
+                "FROM townlight_meetings.meetings m "
+                "LEFT JOIN townlight_meetings.external_meeting_imports i ON i.meeting_id = m.id "
+                "ORDER BY COALESCE(i.imported_at,m.scheduled_start) DESC NULLS LAST,m.id LIMIT 100"
+            )).mappings()]
             agenda = [dict(r) for r in conn.execute(text(
-                "SELECT id,title,meeting_id FROM townlight_meetings.agenda_items WHERE meeting_id IN "
-                "(SELECT id FROM townlight_meetings.meetings ORDER BY scheduled_start DESC NULLS LAST LIMIT 100) "
-                "ORDER BY title LIMIT 1000")).mappings()]
+                "SELECT id,title,meeting_id FROM townlight_meetings.agenda_items "
+                "WHERE meeting_id = ANY(:meeting_ids) ORDER BY title LIMIT 1000"
+            ), {"meeting_ids": [meeting["id"] for meeting in meetings]}).mappings()]
         return {'meetings': meetings, 'agenda': agenda}
     finally:
         engine.dispose()

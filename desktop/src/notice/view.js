@@ -65,5 +65,13 @@ export function createNoticeView(invoke) {
     container.querySelector('[data-notice-records]')?.addEventListener('submit',event=>{event.preventDefault();const request_id=String(new FormData(event.target).get('request_id'));run(async()=>{const result=await request('records',{id:active.archive_id,payload:{request_id}});report(`Records attachment confirmed for request ${result.request_id}; archive SHA256 ${result.sha256}. Open Records to read back the attached evidence.`);});});
   }
   function bind() {const next=window.document.querySelector('[data-notice]');if(!next||next===root)return;root=next;paint();run(async()=>{await load();if(active)await open(active.notice_id);});}
-  return {render,bind,reset,canLeave};
+  function prepareImportDraft({title, text, date, citation}) {
+    active = null;
+    history = [];
+    document = {title, body: `${text}\n\n${citation}`, notice_type: 'public hearing',
+      statutory_basis: '', event_date: date, lead_days: 10};
+    dirty = true;
+    status = 'Imported source loaded into an unsaved draft. Verify the notice type, date and legal basis before saving.';
+  }
+  return {render,bind,reset,canLeave,prepareImportDraft};
 }

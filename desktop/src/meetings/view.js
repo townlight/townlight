@@ -1,12 +1,182 @@
-import { createMeetingsClient } from "./client.ts";
+import { createMeetingsClient, readImportFile } from "./client.ts";
+
+function bindImport(form, client, output) {
+  if (!form) return;
+  const previewButton = form.querySelector("[data-import-preview]");
+  const commitButton = form.querySelector("[data-import-commit]");
+  const meetingSelect = form.elements.namedItem("external_id");
+  const sourceSelect = form.elements.namedItem("source");
+  const sourceStatus = form.querySelector("[data-import-source-status]");
+  let sources = [];
+  client.importSources().then(result => {
+    sources = result;
+    sourceSelect.replaceChildren(...sources.map((source, index) => new Option(source.label, String(index))));
+    previewButton.disabled = !sources.length;
+    sourceStatus.textContent = sources.length ? "" : "No import formats are available.";
+  }).catch(() => {
+    sourceStatus.textContent = "Could not load import formats. Reopen Meetings to retry.";
+  });
+  let preview = null;
+  let sourceRevision = 0;
+  for (const name of ["source", "source_url", "export_file"]) {
+    form.elements.namedItem(name).addEventListener("input", () => {
+      sourceRevision++;
+      preview = null;
+      meetingSelect.replaceChildren();
+      commitButton.disabled = true;
+    });
+  }
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (previewButton.disabled) return;
+    const commit = event.submitter === commitButton;
+    if (commit && !preview) return;
+    previewButton.disabled = true;
+    commitButton.disabled = true;
+    const fields = Object.fromEntries(new FormData(form));
+    const confirmed = preview;
+    const expectedRevision = sourceRevision;
+    try {
+      if (commit) {
+        const result = await client.commitImport(
+          confirmed.payload, fields.external_id, confirmed.result.source.sha256,
+        );
+        output.textContent = JSON.stringify(result, null, 2);
+      } else {
+        preview = null;
+        meetingSelect.replaceChildren();
+        const source = sources[Number(fields.source)];
+        let payload, result;
+        if (fields.export_file?.size) {
+          payload = await readImportFile(source, fields);
+          result = await client.previewImport(payload);
+        } else {
+          ({payload, preview: result} = await client.fetchImport(source, fields.source_url));
+        }
+        if (sourceRevision !== expectedRevision) return;
+        preview = {payload, result};
+        for (const meeting of result.meetings) {
+          const label = [meeting.title, meeting.scheduled_start || meeting.meeting_date].filter(Boolean).join(" · ");
+          meetingSelect.add(new Option(label || meeting.external_id, meeting.external_id));
+        }
+        output.textContent = JSON.stringify(result, null, 2);
+      }
+    } catch (error) {
+      const detail = typeof error === "string" ? error : error instanceof Error ? error.message : JSON.stringify(error);
+      output.textContent = `${commit ? "Could not confirm import" : "Could not preview the source"}.\n${detail}`;
+    } finally {
+      previewButton.disabled = false;
+      commitButton.disabled = !preview?.result.meetings.length;
+    }
+  });
+}
+
+function bindRecordsHandoff(form, client, output) {
+  const meeting = form.elements.namedItem("meeting_id");
+  const documents = form.elements.namedItem("document_index");
+  const load = form.querySelector("[data-load-import-documents]");
+  const attach = form.querySelector("[data-attach-import-document]");
+  let loadedMeeting = null;
+  const clear = () => {
+    loadedMeeting = null;
+    documents.replaceChildren();
+    attach.disabled = true;
+  };
+  meeting.addEventListener("input", clear);
+  load.addEventListener("click", async () => {
+    if (!meeting.reportValidity()) return;
+    const id = meeting.value.trim();
+    clear();
+    load.disabled = true;
+    try {
+      const receipt = await client.getImport(id);
+      if (meeting.value.trim() !== id) return;
+      loadedMeeting = id;
+      for (const [index, document] of (receipt.payload.documents || []).entries()) {
+        documents.add(new Option(`${document.title || document.kind} · ${document.url}`, String(index)));
+      }
+      attach.disabled = !documents.options.length;
+      output.textContent = documents.options.length ? "Choose a source document and a Records request." : "This import has no document links.";
+    } catch (error) {
+      output.textContent = `Could not load imported documents. ${error?.message || error || ""}`;
+    } finally {
+      load.disabled = false;
+    }
+  });
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (attach.disabled || !loadedMeeting || !documents.value) return;
+    const id = loadedMeeting;
+    const request = form.elements.namedItem("request_id").value.trim();
+    attach.disabled = true;
+    try {
+      const result = await client.attachImportDocument(id, request, Number(documents.value));
+      output.textContent = JSON.stringify(result, null, 2);
+    } catch (error) {
+      output.textContent = `Records attachment could not be confirmed. ${error?.message || error || ""}`;
+    } finally {
+      if (loadedMeeting === id) attach.disabled = false;
+    }
+  });
+}
+
+function bindTextHandoffs(form, client, output, openImportDraft) {
+  if (!form) return;
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = event.submitter;
+    if (!button || button.disabled) return;
+    const id = form.elements.namedItem("meeting_id").value.trim();
+    button.disabled = true;
+    try {
+      const receipt = await client.getImport(id);
+      if (!form.isConnected || form.elements.namedItem("meeting_id").value.trim() !== id) return;
+      const payload = receipt.payload;
+      const text = payload.notice?.text || payload.agenda_items?.map(item => item.title).join("\n");
+      if (!text || !payload.meeting_date && !payload.scheduled_start) {
+        throw new Error("The source has no dated notice or agenda text.");
+      }
+      openImportDraft(button.value, {
+        title: payload.notice?.title || payload.title,
+        text,
+        date: payload.meeting_date || payload.scheduled_start.slice(0, 10),
+        source: payload.url || receipt.source.url,
+        meetingId: id,
+      });
+    } catch (error) {
+      output.textContent = `Could not open the import in the selected workspace. ${error?.message || error || ""}`;
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
 
 /** Integrated controls only; later workflow steps remain explicitly unavailable. */
-export function createMeetingsView(invoke, navigate = () => {}) {
+export function createMeetingsView(invoke, navigate = () => {}, openImportDraft = () => {}) {
   const client = createMeetingsClient(invoke);
   return {
     render() {
       return `<section class="section-band"><h2>Townlight Meetings — integration candidate</h2>
         <p>Local integration candidate. Saved work uses Python/PostgreSQL. Packet delivery creates local staff files; notice checks are advisory. The local archive exposes only records you explicitly mark public. No external website upload.</p>
+        <form data-meetings-import><h3>Import meeting records</h3>
+          <label>Source <select name="source" required></select></label>
+          <span role="status" data-import-source-status>Loading import formats…</span>
+          <label>Original source URL <input name="source_url" type="url" required></label>
+          <label>Saved source file (optional for public URLs) <input name="export_file" type="file" accept=".json,.html,.htm,.ics,.pdf"></label>
+          <button type="submit" data-import-preview disabled>Preview import</button>
+          <label>Meeting to save <select name="external_id"></select></label>
+          <button type="submit" data-import-commit disabled>Save selected meeting</button></form>
+        <form data-meetings-import-text><h3>Review imported text</h3>
+          <label>Imported meeting ID <input name="meeting_id" required></label>
+          <button type="submit" value="notice">Prepare Notice draft</button>
+          <button type="submit" value="access">Open Accessibility Review</button></form>
+        <form data-meetings-import-records><h3>Attach an imported document to Records</h3>
+          <p>Copies a PDF from the saved source into the selected Records request for staff review.</p>
+          <label>Imported meeting ID <input name="meeting_id" required></label>
+          <button type="button" data-load-import-documents>Load imported documents</button>
+          <label>Document <select name="document_index" required></select></label>
+          <label>Records request ID <input name="request_id" required></label>
+          <button type="submit" data-attach-import-document disabled>Attach PDF to Records</button></form>
         <form data-meetings-create="meeting"><h3>Schedule a meeting</h3>
           <label>Title <input name="title" required maxlength="255"></label>
           <label>Start (include time zone) <input name="scheduled_start" required placeholder="2026-10-20T18:00:00-06:00"></label>
@@ -127,7 +297,7 @@ export function createMeetingsView(invoke, navigate = () => {}) {
           <label>Plain-language summary <textarea name="plain_language_summary"></textarea></label>
           <button type="submit">Save selected archive record</button></form>
         <form data-meetings-read><h3>Read saved work</h3>
-          <label>Record type <select name="kind"><option value="meeting">Meeting</option><option value="agenda-item">Agenda item</option><option value="proceedings">Proceedings and drafts</option></select></label>
+          <label>Record type <select name="kind"><option value="meeting">Meeting</option><option value="agenda-item">Agenda item</option><option value="proceedings">Proceedings and drafts</option><option value="import">Meeting import receipt</option></select></label>
           <label>Saved record ID <input name="id" required></label>
           <button type="submit">Read from database</button></form>
         <h3>Code proposals and recorded decisions</h3>
@@ -152,6 +322,10 @@ export function createMeetingsView(invoke, navigate = () => {}) {
     bind(root = document) {
       const output = root.querySelector("[data-meetings-result]");
       if (!output) return;
+      bindImport(root.querySelector("[data-meetings-import]"), client, output);
+      bindTextHandoffs(root.querySelector("[data-meetings-import-text]"), client, output, openImportDraft);
+      const recordsHandoff = root.querySelector("[data-meetings-import-records]");
+      if (recordsHandoff) bindRecordsHandoff(recordsHandoff, client, output);
       for (const form of root.querySelectorAll("[data-meetings-create], [data-meetings-read], [data-meetings-action]")) {
         form.addEventListener("submit", async event => {
           event.preventDefault();
@@ -191,7 +365,8 @@ export function createMeetingsView(invoke, navigate = () => {}) {
               target.elements.namedItem("text").value=result.text;
             }
           } catch (error) {
-            output.textContent = `Operation not confirmed. No fallback was used. Read saved work before retrying a write.\n${typeof error === "string" ? error : JSON.stringify(error)}`;
+            const detail = typeof error === "string" ? error : error instanceof Error ? error.message : JSON.stringify(error);
+            output.textContent = `Operation not confirmed. No fallback was used. Read saved work before retrying a write.\n${detail}`;
           } finally { button.disabled = false; }
         });
       }

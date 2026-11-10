@@ -28,6 +28,15 @@ pub enum MeetingsRequest {
     RecordMinutesDecision { id: Uuid, payload: MinutesDecision },
     RecordAgendaReview { id: Uuid, payload: AgendaReview },
     AssignAgendaMeeting { id: Uuid, payload: AgendaAssignment },
+    ImportSources {},
+    FetchImport { payload: MeetingImportSource },
+    PreviewImport { payload: MeetingImportPreview },
+    CommitImport { payload: MeetingImportCommit },
+    GetImport { id: Uuid },
+    ImportLinkChoices { destination: ImportDestination, payload: ImportLinkSearch },
+    ImportLinks { destination: ImportDestination, target_id: Uuid },
+    LinkImport { destination: ImportDestination, target_id: Uuid, payload: ImportLink },
+    AttachImportDocument { id: Uuid, payload: MeetingImportRecords },
     CreateMeeting { payload: MeetingIntake },
     GetMeeting { id: Uuid },
     CreateAgendaItem { payload: AgendaIntake },
@@ -148,6 +157,81 @@ pub struct MeetingIntake {
     location: String,
     #[serde(default = "regular_meeting_type")]
     meeting_type: String,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MeetingImportSource {
+    connector: String,
+    source_url: String,
+    input_format: String,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MeetingImportRecords {
+    request_id: Uuid,
+    document_index: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ImportDestination {
+    Boards,
+    Contracts,
+    Procurement,
+    Zoning,
+    Planning,
+    Permitting,
+    Inspections,
+}
+
+impl ImportDestination {
+    fn path(&self) -> String {
+        let name = match self {
+            Self::Boards => "boards",
+            Self::Contracts => "contracts",
+            Self::Procurement => "procurement",
+            Self::Zoning => "zoning",
+            Self::Planning => "planning",
+            Self::Permitting => "permitting",
+            Self::Inspections => "inspections",
+        };
+        format!("/desktop/v1/meetings/imports/links/{name}")
+    }
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ImportLink {
+    meeting_id: Uuid,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ImportLinkSearch {
+    target_query: String,
+    meeting_query: String,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MeetingImportPreview {
+    connector: String,
+    source_url: String,
+    input_format: String,
+    content_base64: String,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MeetingImportCommit {
+    connector: String,
+    source_url: String,
+    input_format: String,
+    content_base64: String,
+    external_id: String,
+    expected_sha256: String,
 }
 fn regular_meeting_type() -> String {
     "regular".into()
@@ -317,6 +401,51 @@ pub async fn execute_meetings(
             Method::GET,
             format!("/desktop/v1/meetings/meetings/{id}/proceedings"),
             None,
+        ),
+        MeetingsRequest::ImportSources {} => (
+            Method::GET,
+            "/desktop/v1/meetings/imports/sources".into(),
+            None,
+        ),
+        MeetingsRequest::PreviewImport { payload } => (
+            Method::POST,
+            "/desktop/v1/meetings/imports/preview".into(),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::FetchImport { payload } => (
+            Method::POST,
+            "/desktop/v1/meetings/imports/fetch".into(),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::CommitImport { payload } => (
+            Method::POST,
+            "/desktop/v1/meetings/imports/commit".into(),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::GetImport { id } => (
+            Method::GET,
+            format!("/desktop/v1/meetings/imports/{id}"),
+            None,
+        ),
+        MeetingsRequest::ImportLinkChoices { destination, payload } => (
+            Method::POST,
+            destination.path(),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::ImportLinks { destination, target_id } => (
+            Method::GET,
+            format!("{}/{target_id}", destination.path()),
+            None,
+        ),
+        MeetingsRequest::LinkImport { destination, target_id, payload } => (
+            Method::POST,
+            format!("{}/{target_id}", destination.path()),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::AttachImportDocument { id, payload } => (
+            Method::POST,
+            format!("/desktop/v1/meetings/imports/{id}/records"),
+            Some(serde_json::json!(payload)),
         ),
         MeetingsRequest::CreateMeeting { payload } => (
             Method::POST,
@@ -1005,6 +1134,12 @@ async fn send_with_header(
     proof_header: &'static str,
 ) -> Result<Value, DomainError> {
     let writing = method == Method::POST;
+    // Import fetch includes the bounded 16 MiB source encoded as base64.
+    let response_limit = if path == "/desktop/v1/meetings/imports/fetch" {
+        32 * 1024 * 1024
+    } else {
+        MAX_RESPONSE_BYTES
+    };
     // Do not forward the proof through a system proxy or a server redirect.
     let client = Client::builder()
         .no_proxy()
@@ -1035,7 +1170,7 @@ async fn send_with_header(
         .await
         .map_err(|_| DomainError::transport(writing))?
     {
-        if bytes.len().saturating_add(chunk.len()) > MAX_RESPONSE_BYTES {
+        if bytes.len().saturating_add(chunk.len()) > response_limit {
             return Err(DomainError::new("response-too-large", "Records returned more data than this client can safely load. No partial state was applied.", writing));
         }
         bytes.extend_from_slice(&chunk);
