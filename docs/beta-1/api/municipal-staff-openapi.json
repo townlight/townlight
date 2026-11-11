@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "Source schema generated from the bundled Windows 1.8.0.1 native domain runtime without starting services.",
+    "description": "Source schema generated from the bundled Windows 1.8.1.1 native domain runtime without starting services.",
     "version": "1.8.0.dev2"
   },
   "paths": {
@@ -4819,6 +4819,157 @@
         "title": "ImportBundleCreate",
         "description": "Request body for local fixture/file-drop import jobs."
       },
+      "ImportCommitInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          },
+          "content_base64": {
+            "type": "string",
+            "maxLength": 22369624,
+            "minLength": 1,
+            "title": "Content Base64"
+          },
+          "external_id": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "External Id"
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Expected Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format",
+          "content_base64",
+          "external_id",
+          "expected_sha256"
+        ],
+        "title": "ImportCommitInput"
+      },
+      "ImportLinkInput": {
+        "properties": {
+          "meeting_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Meeting Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "meeting_id"
+        ],
+        "title": "ImportLinkInput"
+      },
+      "ImportLinkSearch": {
+        "properties": {
+          "target_query": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Target Query",
+            "default": ""
+          },
+          "meeting_query": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Meeting Query",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ImportLinkSearch"
+      },
+      "ImportPreviewInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          },
+          "content_base64": {
+            "type": "string",
+            "maxLength": 22369624,
+            "minLength": 1,
+            "title": "Content Base64"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format",
+          "content_base64"
+        ],
+        "title": "ImportPreviewInput"
+      },
+      "ImportSourceInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format"
+        ],
+        "title": "ImportSourceInput"
+      },
       "InclusionStatus": {
         "type": "string",
         "enum": [
@@ -7959,6 +8110,27 @@
           "created_at_unix_seconds"
         ],
         "title": "RecordsDocumentView"
+      },
+      "RecordsImportDocument": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "document_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Document Index"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "document_index"
+        ],
+        "title": "RecordsImportDocument"
       },
       "RecordsOperationRead": {
         "properties": {
@@ -12053,5 +12225,5 @@
       }
     }
   },
-  "x-townlight-source-commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c"
+  "x-townlight-source-commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24"
 }

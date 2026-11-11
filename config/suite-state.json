@@ -12,13 +12,13 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.8.0-1",
-    "tag": "townlight-windows-v1.8.0.1",
-    "commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c",
+    "version": "1.8.1-1",
+    "tag": "townlight-windows-v1.8.1.1",
+    "commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24",
     "channel": "public-beta",
-    "published_at": "2026-11-09",
+    "published_at": "2026-11-11",
     "asset_policy": "windows-msi",
-    "runtime_version": "0.3.0"
+    "runtime_version": "0.3.1"
   },
   "asset_policies": {
     "windows-msi": [
@@ -322,10 +322,10 @@
         "manifest_path": "pyproject.toml"
       },
       "versions": {
-        "development": "1.0.5",
+        "development": "1.0.6",
         "released": null,
         "installer": "1.0.5",
-        "public_status": "1.0.5"
+        "public_status": "1.0.6"
       },
       "release": {
         "tag": null,
@@ -738,10 +738,10 @@
         "manifest_path": "beta-1/pyproject.toml"
       },
       "versions": {
-        "development": "0.3.0",
+        "development": "0.3.1",
         "released": null,
         "installer": "0.3.0",
-        "public_status": "0.3.0"
+        "public_status": "0.3.1"
       },
       "release": {
         "tag": null,

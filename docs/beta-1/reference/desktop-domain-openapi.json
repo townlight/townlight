@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "Source schema generated from the bundled Windows 1.8.0.1 native domain runtime without starting services.",
+    "description": "Source schema generated from the bundled Windows 1.8.1.1 native domain runtime without starting services.",
     "version": "1.8.0.dev2"
   },
   "paths": {
@@ -8888,6 +8888,581 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SearchInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/preview": {
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Preview Meeting Import",
+        "operationId": "preview_meeting_import_desktop_v1_meetings_imports_preview_post",
+        "parameters": [
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportPreviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/sources": {
+      "get": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Meeting Import Sources",
+        "operationId": "meeting_import_sources_desktop_v1_meetings_imports_sources_get",
+        "parameters": [
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/fetch": {
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Fetch Meeting Import",
+        "operationId": "fetch_meeting_import_desktop_v1_meetings_imports_fetch_post",
+        "parameters": [
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportSourceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/commit": {
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Commit Meeting Import",
+        "operationId": "commit_meeting_import_desktop_v1_meetings_imports_commit_post",
+        "parameters": [
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCommitInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/{meeting_id}": {
+      "get": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Get Meeting Import",
+        "operationId": "get_meeting_import_desktop_v1_meetings_imports__meeting_id__get",
+        "parameters": [
+          {
+            "name": "meeting_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Meeting Id"
+            }
+          },
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/links/{destination}": {
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Import Link Choices",
+        "operationId": "import_link_choices_desktop_v1_meetings_imports_links__destination__post",
+        "parameters": [
+          {
+            "name": "destination",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "boards",
+                "contracts",
+                "procurement",
+                "zoning",
+                "planning",
+                "permitting",
+                "inspections"
+              ],
+              "type": "string",
+              "title": "Destination"
+            }
+          },
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportLinkSearch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/links/{destination}/{target_id}": {
+      "get": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "List Import Links",
+        "operationId": "list_import_links_desktop_v1_meetings_imports_links__destination___target_id__get",
+        "parameters": [
+          {
+            "name": "destination",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "boards",
+                "contracts",
+                "procurement",
+                "zoning",
+                "planning",
+                "permitting",
+                "inspections"
+              ],
+              "type": "string",
+              "title": "Destination"
+            }
+          },
+          {
+            "name": "target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Id"
+            }
+          },
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Create Import Link",
+        "operationId": "create_import_link_desktop_v1_meetings_imports_links__destination___target_id__post",
+        "parameters": [
+          {
+            "name": "destination",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "boards",
+                "contracts",
+                "procurement",
+                "zoning",
+                "planning",
+                "permitting",
+                "inspections"
+              ],
+              "type": "string",
+              "title": "Destination"
+            }
+          },
+          {
+            "name": "target_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Id"
+            }
+          },
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportLinkInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/desktop/v1/meetings/imports/{meeting_id}/records": {
+      "post": {
+        "tags": [
+          "native-meetings"
+        ],
+        "summary": "Attach Import Document",
+        "operationId": "attach_import_document_desktop_v1_meetings_imports__meeting_id__records_post",
+        "parameters": [
+          {
+            "name": "meeting_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Meeting Id"
+            }
+          },
+          {
+            "name": "X-Townlight-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Townlight-Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordsImportDocument"
               }
             }
           }
@@ -21485,6 +22060,157 @@
         "title": "ImportBundleCreate",
         "description": "Request body for local fixture/file-drop import jobs."
       },
+      "ImportCommitInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          },
+          "content_base64": {
+            "type": "string",
+            "maxLength": 22369624,
+            "minLength": 1,
+            "title": "Content Base64"
+          },
+          "external_id": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "External Id"
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Expected Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format",
+          "content_base64",
+          "external_id",
+          "expected_sha256"
+        ],
+        "title": "ImportCommitInput"
+      },
+      "ImportLinkInput": {
+        "properties": {
+          "meeting_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Meeting Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "meeting_id"
+        ],
+        "title": "ImportLinkInput"
+      },
+      "ImportLinkSearch": {
+        "properties": {
+          "target_query": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Target Query",
+            "default": ""
+          },
+          "meeting_query": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Meeting Query",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ImportLinkSearch"
+      },
+      "ImportPreviewInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          },
+          "content_base64": {
+            "type": "string",
+            "maxLength": 22369624,
+            "minLength": 1,
+            "title": "Content Base64"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format",
+          "content_base64"
+        ],
+        "title": "ImportPreviewInput"
+      },
+      "ImportSourceInput": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Connector"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Url"
+          },
+          "input_format": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Input Format"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector",
+          "source_url",
+          "input_format"
+        ],
+        "title": "ImportSourceInput"
+      },
       "InclusionStatus": {
         "type": "string",
         "enum": [
@@ -24625,6 +25351,27 @@
           "created_at_unix_seconds"
         ],
         "title": "RecordsDocumentView"
+      },
+      "RecordsImportDocument": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "document_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Document Index"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "document_index"
+        ],
+        "title": "RecordsImportDocument"
       },
       "RecordsOperationRead": {
         "properties": {
@@ -28719,5 +29466,6 @@
       }
     }
   },
-  "x-townlight-source-commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c"
+  "x-townlight-source-commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24",
+  "x-townlight-health-version-discrepancy": "Distribution Runtime 0.3.1 and Meetings 1.0.6; health strings Runtime 0.3.0 and Meetings 1.0.5 in the accepted MSI."
 }

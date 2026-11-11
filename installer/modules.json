@@ -1020,7 +1020,7 @@
       "routes": [
         {
           "id": "station-operator",
-          "label": "Station operator â€” separate local service",
+          "label": "Station operator \u00e2\u20ac\u201d separate local service",
           "path": "http://127.0.0.1:8756/",
           "surface": "Staff"
         }
