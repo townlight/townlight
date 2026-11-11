@@ -88,7 +88,7 @@ services:
       - >
         pip install --no-cache-dir
         /wheels/townlight_core-1.3.0.dev2-py3-none-any.whl
-        /wheels/townlight_meetings-1.0.5-py3-none-any.whl
+        /wheels/townlight_meetings-1.0.6-py3-none-any.whl
         && uvicorn townlight_meetings.main:app --host 0.0.0.0 --port 8010
     environment:
       TOWNLIGHT_CORE_LLM_PROVIDER: ollama

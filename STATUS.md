@@ -32,7 +32,7 @@ Status labels below are the suite's shared status set, generated from
 |---|---|---|---|---|
 | Townlight Core | 1.3.0.dev2 | Shared platform | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Records | 1.8.0.dev2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
-| Townlight Meetings | 1.0.5 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
+| Townlight Meetings | 1.0.6 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Code | 1.0.9 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Access | 0.5.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Zoning | 0.2.3 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
@@ -40,7 +40,7 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Permitting | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Inspections | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Notice | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
-| Townlight Station | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
+| Townlight Station | 0.3.1 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Boards & Commissions | 0.2.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Contracts | 0.2.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
 | Townlight Procurement | 0.3.0 | Published beta capability | 2026-11-09 | Available in the Windows 1.8.1.1 beta. See release acceptance and scope. |
