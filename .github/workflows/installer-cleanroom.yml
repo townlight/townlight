@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
+          ref: 77ae8781f4a414f6f85c35a7e4394e29b0e0f21d
           path: modules/townlight_meetings
 
       - name: Check out TownlightCode bundle source
@@ -147,7 +147,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: 723a93c5877b4ae1b6c3e46d6d44de1e0c479c63
+          ref: 77ae8781f4a414f6f85c35a7e4394e29b0e0f21d
           path: modules/townlight_meetings
 
       - name: Check out TownlightCode bundle source

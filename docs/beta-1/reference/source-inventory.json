@@ -1,7 +1,7 @@
 {
-  "source_companion_sha256": "f2aac21de5ccc0a541f3d089d6d5744cb7c752a5d388b4c96770884f8c65aae5",
+  "source_companion_sha256": "8a52c5560b9b632b45892a06f17a7fe83f49f330a55b4d64ab3a19ce29d1a633",
   "source_companion_pending": false,
-  "basis": "Exact Windows 1.8.0.1 corresponding-source archives. Declarations are source references. The release acceptance records installed behavior.",
+  "basis": "Exact Windows 1.8.1.1 corresponding-source archives. Declarations are source references. The release acceptance records installed behavior.",
   "products": {
     "core": {
       "repository": "townlight/core",
@@ -15759,7 +15759,7 @@
     },
     "meetings": {
       "repository": "townlight/meetings",
-      "repository_head": "723a93c5877b4ae1b6c3e46d6d44de1e0c479c63",
+      "repository_head": "77ae8781f4a414f6f85c35a7e4394e29b0e0f21d",
       "working_tree_modified": false,
       "principal_import": "townlight_meetings",
       "source": [
@@ -15869,8 +15869,8 @@
         },
         {
           "source": "townlight_meetings/agenda_lifecycle.py",
-          "sha256": "aae33ddd60b2d18abfdc7cb83ab5eef396b68c882676da3e2fe0eb74d41f23a2",
-          "bytes": 16632,
+          "sha256": "eb796e25f98035207c8936277914ebcfbf4f34fdcbbc0a56d3ff0ecb83108160",
+          "bytes": 17059,
           "routes": [],
           "models": [
             {
@@ -15880,30 +15880,30 @@
                 {
                   "name": "allowed",
                   "type": "bool",
-                  "line": 40
+                  "line": 42
                 },
                 {
                   "name": "http_status",
                   "type": "int",
-                  "line": 41
+                  "line": 43
                 },
                 {
                   "name": "message",
                   "type": "str",
-                  "line": 42
+                  "line": 44
                 },
                 {
                   "name": "fix",
                   "type": "str",
-                  "line": 43
+                  "line": 45
                 },
                 {
                   "name": "audit_entry",
                   "type": "dict[str, object]",
-                  "line": 44
+                  "line": 46
                 }
               ],
-              "line": 39
+              "line": 41
             },
             {
               "name": "AgendaItemRecord",
@@ -15912,35 +15912,35 @@
                 {
                   "name": "id",
                   "type": "str",
-                  "line": 49
+                  "line": 51
                 },
                 {
                   "name": "title",
                   "type": "str",
-                  "line": 50
+                  "line": 52
                 },
                 {
                   "name": "department_name",
                   "type": "str",
-                  "line": 51
+                  "line": 53
                 },
                 {
                   "name": "status",
                   "type": "str",
-                  "line": 52
+                  "line": 54
                 },
                 {
                   "name": "audit_entries",
                   "type": "list[dict[str, object]]",
-                  "line": 53
+                  "line": 55
                 },
                 {
                   "name": "meeting_id",
                   "type": "str | None",
-                  "line": 54
+                  "line": 56
                 }
               ],
-              "line": 48
+              "line": 50
             }
           ],
           "configuration": []
@@ -16139,6 +16139,14 @@
           "source": "townlight_meetings/desktop_delivery.py",
           "sha256": "88a1c62a24a3e6d16b3ade8d2f4f6f0fcc9c9efd6eeee316651f2d76f496a0cd",
           "bytes": 5156,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "townlight_meetings/imported_meetings.py",
+          "sha256": "03c051947b67f3479326b660ee56dd9c762f6f5b3307fa0c22afa3a2e1c94390",
+          "bytes": 5817,
           "routes": [],
           "models": [],
           "configuration": []
@@ -17878,8 +17886,8 @@
         },
         {
           "source": "townlight_meetings/meeting_lifecycle.py",
-          "sha256": "8e85facc34e20861bf12bf4787094963057f731d908ba68c8369c347edcaee14",
-          "bytes": 22805,
+          "sha256": "2dd5b10a82ff2a51f7d8aa77b615a6ad54dcfe1f4321e08f6df20af1b7611ed0",
+          "bytes": 23039,
           "routes": [],
           "models": [
             {
@@ -17889,30 +17897,30 @@
                 {
                   "name": "allowed",
                   "type": "bool",
-                  "line": 75
+                  "line": 77
                 },
                 {
                   "name": "http_status",
                   "type": "int",
-                  "line": 76
+                  "line": 78
                 },
                 {
                   "name": "message",
                   "type": "str",
-                  "line": 77
+                  "line": 79
                 },
                 {
                   "name": "fix",
                   "type": "str",
-                  "line": 78
+                  "line": 80
                 },
                 {
                   "name": "audit_entry",
                   "type": "dict[str, object]",
-                  "line": 79
+                  "line": 81
                 }
               ],
-              "line": 74
+              "line": 76
             },
             {
               "name": "MeetingRecord",
@@ -17921,45 +17929,45 @@
                 {
                   "name": "id",
                   "type": "str",
-                  "line": 84
+                  "line": 86
                 },
                 {
                   "name": "title",
                   "type": "str",
-                  "line": 85
+                  "line": 87
                 },
                 {
                   "name": "meeting_type",
                   "type": "str",
-                  "line": 86
+                  "line": 88
                 },
                 {
                   "name": "scheduled_start",
                   "type": "datetime | None",
-                  "line": 87
+                  "line": 89
                 },
                 {
                   "name": "meeting_body_id",
                   "type": "str | None",
-                  "line": 88
+                  "line": 90
                 },
                 {
                   "name": "location",
                   "type": "str | None",
-                  "line": 89
+                  "line": 91
                 },
                 {
                   "name": "status",
                   "type": "str",
-                  "line": 90
+                  "line": 92
                 },
                 {
                   "name": "audit_entries",
                   "type": "list[dict[str, object]]",
-                  "line": 91
+                  "line": 93
                 }
               ],
-              "line": 83
+              "line": 85
             }
           ],
           "configuration": []
@@ -18173,6 +18181,14 @@
           "source": "townlight_meetings/migrations/versions/townlight_meetings_0021_sources_archive.py",
           "sha256": "bdfda03eb565680a2444b17bdb743dd1dff95e9c612f80accaab7f03c55b3121",
           "bytes": 923,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "townlight_meetings/migrations/versions/townlight_meetings_0022_external_imports.py",
+          "sha256": "9543eaeb9f06c4c11f145c20a5136f4fd2f1a38e9a84a55d6fdbf5eb87cde6fe",
+          "bytes": 1756,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31250,7 +31266,7 @@
     },
     "station": {
       "repository": "townlight/station",
-      "repository_head": "7205ed1b07132b1649c994e190b381d773807aff",
+      "repository_head": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8",
       "working_tree_modified": false,
       "principal_import": "townlight_station",
       "source": [
@@ -31280,62 +31296,62 @@
         },
         {
           "source": "beta-1/townlight_station/api.py",
-          "sha256": "fa99dd6f913fb5020ce4790db6043bd080424bcd99f2e8d97e576daa96432a36",
-          "bytes": 14339,
+          "sha256": "8df6352adb3b94d717fb024c1ce120faf2bcd478405bdaa518e8a7ff5b0c6c39",
+          "bytes": 14612,
           "routes": [
             {
               "method": "GET",
               "declared_path": "/health",
               "function": "health",
-              "line": 80
+              "line": 81
             },
             {
               "method": "GET",
               "declared_path": "/v1/identity",
               "function": "identity",
-              "line": 85
+              "line": 86
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings",
               "function": "capture",
-              "line": 90
+              "line": 91
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings/{identity}",
               "function": "get_record",
-              "line": 192
+              "line": 196
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings/{identity}/content",
               "function": "content",
-              "line": 196
+              "line": 200
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings/{identity}/retry",
               "function": "retry",
-              "line": 207
+              "line": 211
             },
             {
               "method": "GET",
               "declared_path": "/v1/live-sources",
               "function": "live_sources",
-              "line": 220
+              "line": 224
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings",
               "function": "list_records",
-              "line": 225
+              "line": 229
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings/{identity}/stop",
               "function": "stop_live",
-              "line": 231
+              "line": 235
             }
           ],
           "models": [
@@ -31348,40 +31364,40 @@
                 {
                   "name": "meeting_id",
                   "type": "UUID",
-                  "line": 36
+                  "line": 37
                 },
                 {
                   "name": "agenda_ids",
                   "type": "list[UUID]",
-                  "line": 37
+                  "line": 38
                 },
                 {
                   "name": "source_file",
                   "type": "str | None",
-                  "line": 38
+                  "line": 39
                 },
                 {
                   "name": "live_source_id",
                   "type": "str | None",
-                  "line": 39
+                  "line": 40
                 },
                 {
                   "name": "civiccast_feed_id",
                   "type": "str | None",
-                  "line": 40
+                  "line": 41
                 },
                 {
                   "name": "captions_file",
                   "type": "str | None",
-                  "line": 41
+                  "line": 42
                 },
                 {
                   "name": "idempotency_key",
                   "type": "str",
-                  "line": 42
+                  "line": 43
                 }
               ],
-              "line": 34
+              "line": 35
             }
           ],
           "configuration": []
@@ -31542,6 +31558,14 @@
           "source": "beta-1/townlight_station/feed_job.py",
           "sha256": "a2e08fa43b4fb5b7f036de8fdef256cff1a6c39f2b4adabc08b09aa3fedb21f1",
           "bytes": 4086,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "beta-1/townlight_station/imported_recording.py",
+          "sha256": "ebabc4d21a00c203f187c8a6e6844426695faed876481c52c81ecb2f1f7e4b1a",
+          "bytes": 3610,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31767,62 +31791,74 @@
         },
         {
           "source": "beta-1/townlight_station/operator.py",
-          "sha256": "6471894a1240b611a2bf006867ce79848630f6dc69270e29e54b71dbb26f3837",
-          "bytes": 6737,
+          "sha256": "9b88822016886adc86c6a4ec30620d4312b05871a4d5757379365e656053ac67",
+          "bytes": 7912,
           "routes": [
             {
               "method": "POST",
               "declared_path": "/v1/operator-ticket",
               "function": "issue",
-              "line": 51
+              "line": 57
             },
             {
               "method": "POST",
               "declared_path": "/operator/session",
               "function": "exchange",
-              "line": 60
+              "line": 66
             },
             {
               "method": "POST",
               "declared_path": "/operator/logout",
               "function": "logout",
-              "line": 75
+              "line": 81
             },
             {
               "method": "GET",
               "declared_path": "/operator/catalog",
               "function": "catalog",
-              "line": 82
+              "line": 88
             },
             {
               "method": "GET",
               "declared_path": "/operator/meeting/{identity}",
               "function": "meeting",
-              "line": 102
+              "line": 108
+            },
+            {
+              "method": "GET",
+              "declared_path": "/operator/meeting/{identity}/imported-recordings",
+              "function": "imported_recordings",
+              "line": 112
+            },
+            {
+              "method": "POST",
+              "declared_path": "/operator/meeting/{identity}/imported-recordings",
+              "function": "stage_imported_recording",
+              "line": 121
             },
             {
               "method": "POST",
               "declared_path": "/operator/handoff",
               "function": "handoff",
-              "line": 106
+              "line": 129
             },
             {
               "method": "GET",
               "declared_path": "/",
               "function": "page",
-              "line": 124
+              "line": 147
             },
             {
               "method": "GET",
               "declared_path": "/operator.js",
               "function": "script",
-              "line": 128
+              "line": 151
             },
             {
               "method": "GET",
               "declared_path": "/operator.css",
               "function": "style",
-              "line": 132
+              "line": 155
             }
           ],
           "models": [
@@ -31835,10 +31871,10 @@
                 {
                   "name": "ticket",
                   "type": "str",
-                  "line": 15
+                  "line": 16
                 }
               ],
-              "line": 13
+              "line": 14
             },
             {
               "name": "Handoff",
@@ -31849,20 +31885,34 @@
                 {
                   "name": "request_id",
                   "type": "UUID",
-                  "line": 20
+                  "line": 21
                 },
                 {
                   "name": "recording_id",
                   "type": "UUID",
-                  "line": 21
+                  "line": 22
                 },
                 {
                   "name": "expected_sha256",
                   "type": "str",
-                  "line": 22
+                  "line": 23
                 }
               ],
-              "line": 18
+              "line": 19
+            },
+            {
+              "name": "ImportedRecording",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "index",
+                  "type": "int",
+                  "line": 28
+                }
+              ],
+              "line": 26
             }
           ],
           "configuration": []
@@ -31901,8 +31951,8 @@
         },
         {
           "source": "beta-1/townlight_station/ui/operator.js",
-          "sha256": "0e55284e2359e62006879948dd6e0f90fc4d6f1095230cafd58e5af3651ae2e7",
-          "bytes": 202782,
+          "sha256": "06d6c6265783512f1819046708c69cba1d76df0ecec3f2a4a8a3b5ffdc77fe61",
+          "bytes": 203991,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31935,7 +31985,7 @@
     },
     "runtime": {
       "repository": "townlight/townlight",
-      "repository_head": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c",
+      "repository_head": "0afd59de52cb7ecb317188a89bcd1fec8c578a24",
       "working_tree_modified": false,
       "principal_import": "townlight_runtime",
       "source": [
@@ -32875,183 +32925,261 @@
           "configuration": []
         },
         {
+          "source": "desktop/runtime/python-services/townlight_runtime/meeting_import_fetch.py",
+          "sha256": "c56a56e1a156deaaad5e6f75496727e53d40f0488e69b298874f658627f511d1",
+          "bytes": 5987,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "desktop/runtime/python-services/townlight_runtime/meeting_import_links.py",
+          "sha256": "a84789caab54170907bfd13c758a166c152c371e4d75ea6cea9083ce23f213ef",
+          "bytes": 5268,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "desktop/runtime/python-services/townlight_runtime/meeting_imports.py",
+          "sha256": "b3f73c63c8e27a19912c648561ca0c1a8b125174d93a5e21848ee9e173c35c91",
+          "bytes": 70859,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
           "source": "desktop/runtime/python-services/townlight_runtime/meetings_bridge.py",
-          "sha256": "da01169035e75c3f0324e17e3d5e4c5dabfd683b2cfd21606e6281c2e8085d23",
-          "bytes": 29615,
+          "sha256": "d6d9e4894667ed61ed196396b845cdbee2d40a6b5d27e62f446d9e837285cbb2",
+          "bytes": 40433,
           "routes": [
+            {
+              "method": "POST",
+              "declared_path": "/imports/preview",
+              "function": "preview_meeting_import",
+              "line": 121
+            },
+            {
+              "method": "GET",
+              "declared_path": "/imports/sources",
+              "function": "meeting_import_sources",
+              "line": 126
+            },
+            {
+              "method": "POST",
+              "declared_path": "/imports/fetch",
+              "function": "fetch_meeting_import",
+              "line": 131
+            },
+            {
+              "method": "POST",
+              "declared_path": "/imports/commit",
+              "function": "commit_meeting_import",
+              "line": 164
+            },
+            {
+              "method": "GET",
+              "declared_path": "/imports/{meeting_id}",
+              "function": "get_meeting_import",
+              "line": 186
+            },
+            {
+              "method": "POST",
+              "declared_path": "/imports/links/{destination}",
+              "function": "import_link_choices",
+              "line": 218
+            },
+            {
+              "method": "GET",
+              "declared_path": "/imports/links/{destination}/{target_id}",
+              "function": "list_import_links",
+              "line": 228
+            },
+            {
+              "method": "POST",
+              "declared_path": "/imports/links/{destination}/{target_id}",
+              "function": "create_import_link",
+              "line": 238
+            },
+            {
+              "method": "POST",
+              "declared_path": "/imports/{meeting_id}/records",
+              "function": "attach_import_document",
+              "line": 272
+            },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/stages",
               "function": "record_meeting_stage",
-              "line": 106
+              "line": 329
             },
             {
               "method": "POST",
               "declared_path": "/meetings",
               "function": "create_meeting",
-              "line": 128
+              "line": 351
             },
             {
               "method": "GET",
               "declared_path": "/meetings/{meeting_id}",
               "function": "get_meeting",
-              "line": 136
+              "line": 359
             },
             {
               "method": "POST",
               "declared_path": "/agenda-items",
               "function": "create_agenda_item",
-              "line": 141
+              "line": 364
             },
             {
               "method": "GET",
               "declared_path": "/agenda-items/{item_id}",
               "function": "get_agenda_item",
-              "line": 148
+              "line": 371
             },
             {
               "method": "POST",
               "declared_path": "/agenda-items/{item_id}/reviews",
               "function": "record_agenda_review",
-              "line": 164
+              "line": 387
             },
             {
               "method": "POST",
               "declared_path": "/agenda-items/{item_id}/meeting",
               "function": "assign_agenda",
-              "line": 170
+              "line": 393
             },
             {
               "method": "GET",
               "declared_path": "/notices/{notice_id}/template",
               "function": "notice_template",
-              "line": 249
+              "line": 472
             },
             {
               "method": "POST",
               "declared_path": "/notices/{notice_id}/document",
               "function": "notice_document",
-              "line": 264
+              "line": 487
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/notice-checks",
               "function": "check_notice",
-              "line": 278
+              "line": 501
             },
             {
               "method": "POST",
               "declared_path": "/notices/{notice_id}/proof",
               "function": "record_notice_proof",
-              "line": 295
+              "line": 518
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/transcripts",
               "function": "capture_transcript",
-              "line": 332
+              "line": 555
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/action-items",
               "function": "capture_action_item",
-              "line": 344
+              "line": 567
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/archive",
               "function": "archive_meeting",
-              "line": 356
+              "line": 579
             },
             {
               "method": "GET",
               "declared_path": "/data/index",
               "function": "public_archive_data",
-              "line": 399
+              "line": 622
             },
             {
               "method": "GET",
               "declared_path": "/data/{record_id}",
               "function": "public_archive_record_data",
-              "line": 405
+              "line": 628
             },
             {
               "method": "GET",
               "declared_path": "",
               "function": "public_archive_index",
-              "line": 410
+              "line": 633
             },
             {
               "method": "GET",
               "declared_path": "/{record_id}",
               "function": "public_archive_detail",
-              "line": 418
+              "line": 641
             },
             {
               "method": "GET",
               "declared_path": "/{record_id}/{kind}.txt",
               "function": "public_archive_download",
-              "line": 428
+              "line": 651
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/packet-snapshots",
               "function": "capture_packet",
-              "line": 452
+              "line": 675
             },
             {
               "method": "POST",
               "declared_path": "/packets/{packet_id}/deliver",
               "function": "export_packet",
-              "line": 473
+              "line": 696
             },
             {
               "method": "POST",
               "declared_path": "/minutes/{draft_id}/decisions",
               "function": "decide_minutes",
-              "line": 486
+              "line": 709
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/motions",
               "function": "capture_motion",
-              "line": 509
+              "line": 732
             },
             {
               "method": "POST",
               "declared_path": "/motions/{motion_id}/corrections",
               "function": "correct_motion",
-              "line": 516
+              "line": 739
             },
             {
               "method": "POST",
               "declared_path": "/motions/{motion_id}/votes",
               "function": "capture_vote",
-              "line": 522
+              "line": 745
             },
             {
               "method": "POST",
               "declared_path": "/votes/{vote_id}/corrections",
               "function": "correct_vote",
-              "line": 528
+              "line": 751
             },
             {
               "method": "POST",
               "declared_path": "/meetings/{meeting_id}/minutes/drafts",
               "function": "create_minutes",
-              "line": 534
+              "line": 757
             },
             {
               "method": "GET",
               "declared_path": "/meetings/{meeting_id}/proceedings",
               "function": "proceedings",
-              "line": 543
+              "line": 766
             },
             {
               "method": "GET",
               "declared_path": "/station/catalog",
               "function": "station_catalog",
-              "line": 563
+              "line": 786
             }
           ],
           "models": [
@@ -33064,25 +33192,25 @@
                 {
                   "name": "title",
                   "type": "str",
-                  "line": 85
+                  "line": 97
                 },
                 {
                   "name": "scheduled_start",
                   "type": "AwareDatetime",
-                  "line": 86
+                  "line": 98
                 },
                 {
                   "name": "location",
                   "type": "str",
-                  "line": 87
+                  "line": 99
                 },
                 {
                   "name": "meeting_type",
                   "type": "Literal['regular', 'special', 'emergency', 'closed_session', 'executive']",
-                  "line": 88
+                  "line": 100
                 }
               ],
-              "line": 83
+              "line": 95
             },
             {
               "name": "AgendaInput",
@@ -33093,15 +33221,124 @@
                 {
                   "name": "title",
                   "type": "str",
-                  "line": 93
+                  "line": 105
                 },
                 {
                   "name": "department_name",
                   "type": "str",
-                  "line": 94
+                  "line": 106
                 }
               ],
-              "line": 91
+              "line": 103
+            },
+            {
+              "name": "ImportSourceInput",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "connector",
+                  "type": "str",
+                  "line": 111
+                },
+                {
+                  "name": "source_url",
+                  "type": "str",
+                  "line": 112
+                },
+                {
+                  "name": "input_format",
+                  "type": "str",
+                  "line": 113
+                }
+              ],
+              "line": 109
+            },
+            {
+              "name": "ImportPreviewInput",
+              "bases": [
+                "ImportSourceInput"
+              ],
+              "fields": [
+                {
+                  "name": "content_base64",
+                  "type": "str",
+                  "line": 117
+                }
+              ],
+              "line": 116
+            },
+            {
+              "name": "ImportCommitInput",
+              "bases": [
+                "ImportPreviewInput"
+              ],
+              "fields": [
+                {
+                  "name": "external_id",
+                  "type": "str",
+                  "line": 159
+                },
+                {
+                  "name": "expected_sha256",
+                  "type": "str",
+                  "line": 160
+                }
+              ],
+              "line": 158
+            },
+            {
+              "name": "RecordsImportDocument",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "request_id",
+                  "type": "UUID",
+                  "line": 203
+                },
+                {
+                  "name": "document_index",
+                  "type": "int",
+                  "line": 204
+                }
+              ],
+              "line": 201
+            },
+            {
+              "name": "ImportLinkInput",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "meeting_id",
+                  "type": "UUID",
+                  "line": 209
+                }
+              ],
+              "line": 207
+            },
+            {
+              "name": "ImportLinkSearch",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "target_query",
+                  "type": "str",
+                  "line": 213
+                },
+                {
+                  "name": "meeting_query",
+                  "type": "str",
+                  "line": 214
+                }
+              ],
+              "line": 211
             },
             {
               "name": "MeetingStageInput",
@@ -33112,15 +33349,15 @@
                 {
                   "name": "to_status",
                   "type": "Literal['SCHEDULED', 'NOTICED', 'PACKET_POSTED', 'IN_PROGRESS', 'RECESSED', 'ADJOURNED', 'TRANSCRIPT_READY', 'MINUTES_DRAFTED', 'MINUTES_POSTED', 'MINUTES_ADOPTED', 'MINUTES_SIGNED', 'ARCHIVED', 'CANCELLED']",
-                  "line": 99
+                  "line": 322
                 },
                 {
                   "name": "statutory_basis",
                   "type": "str | None",
-                  "line": 102
+                  "line": 325
                 }
               ],
-              "line": 97
+              "line": 320
             },
             {
               "name": "AgendaReviewInput",
@@ -33131,10 +33368,10 @@
                 {
                   "name": "to_status",
                   "type": "Literal['DRAFTED', 'SUBMITTED', 'DEPT_APPROVED', 'LEGAL_REVIEWED', 'CLERK_ACCEPTED', 'ON_AGENDA', 'IN_PACKET', 'POSTED', 'HEARD', 'DISPOSED', 'ARCHIVED']",
-                  "line": 154
+                  "line": 377
                 }
               ],
-              "line": 152
+              "line": 375
             },
             {
               "name": "AgendaAssignment",
@@ -33145,10 +33382,10 @@
                 {
                   "name": "meeting_id",
                   "type": "UUID",
-                  "line": 160
+                  "line": 383
                 }
               ],
-              "line": 158
+              "line": 381
             },
             {
               "name": "MotionInput",
@@ -33159,15 +33396,15 @@
                 {
                   "name": "text",
                   "type": "str",
-                  "line": 180
+                  "line": 403
                 },
                 {
                   "name": "seconded_by",
                   "type": "str | None",
-                  "line": 181
+                  "line": 404
                 }
               ],
-              "line": 178
+              "line": 401
             },
             {
               "name": "MotionCorrection",
@@ -33178,15 +33415,15 @@
                 {
                   "name": "text",
                   "type": "str",
-                  "line": 186
+                  "line": 409
                 },
                 {
                   "name": "reason",
                   "type": "str",
-                  "line": 187
+                  "line": 410
                 }
               ],
-              "line": 184
+              "line": 407
             },
             {
               "name": "VoteInput",
@@ -33197,15 +33434,15 @@
                 {
                   "name": "voter_name",
                   "type": "str",
-                  "line": 192
+                  "line": 415
                 },
                 {
                   "name": "vote",
                   "type": "str",
-                  "line": 193
+                  "line": 416
                 }
               ],
-              "line": 190
+              "line": 413
             },
             {
               "name": "VoteCorrection",
@@ -33216,15 +33453,15 @@
                 {
                   "name": "vote",
                   "type": "str",
-                  "line": 198
+                  "line": 421
                 },
                 {
                   "name": "reason",
                   "type": "str",
-                  "line": 199
+                  "line": 422
                 }
               ],
-              "line": 196
+              "line": 419
             },
             {
               "name": "SourceInput",
@@ -33235,20 +33472,20 @@
                 {
                   "name": "source_id",
                   "type": "str",
-                  "line": 204
+                  "line": 427
                 },
                 {
                   "name": "label",
                   "type": "str",
-                  "line": 205
+                  "line": 428
                 },
                 {
                   "name": "text",
                   "type": "str",
-                  "line": 206
+                  "line": 429
                 }
               ],
-              "line": 202
+              "line": 425
             },
             {
               "name": "SentenceInput",
@@ -33259,15 +33496,15 @@
                 {
                   "name": "text",
                   "type": "str",
-                  "line": 211
+                  "line": 434
                 },
                 {
                   "name": "citations",
                   "type": "list[str]",
-                  "line": 212
+                  "line": 435
                 }
               ],
-              "line": 209
+              "line": 432
             },
             {
               "name": "DraftInput",
@@ -33278,15 +33515,15 @@
                 {
                   "name": "source_materials",
                   "type": "list[SourceInput]",
-                  "line": 217
+                  "line": 440
                 },
                 {
                   "name": "sentences",
                   "type": "list[SentenceInput]",
-                  "line": 218
+                  "line": 441
                 }
               ],
-              "line": 215
+              "line": 438
             },
             {
               "name": "MinutesDecision",
@@ -33297,15 +33534,15 @@
                 {
                   "name": "action",
                   "type": "Literal['post', 'adopt', 'sign']",
-                  "line": 223
+                  "line": 446
                 },
                 {
                   "name": "note",
                   "type": "str",
-                  "line": 224
+                  "line": 447
                 }
               ],
-              "line": 221
+              "line": 444
             },
             {
               "name": "NoticeInput",
@@ -33316,30 +33553,30 @@
                 {
                   "name": "notice_type",
                   "type": "Literal['regular', 'special', 'emergency', 'closed_session', 'executive']",
-                  "line": 229
+                  "line": 452
                 },
                 {
                   "name": "posted_at",
                   "type": "AwareDatetime",
-                  "line": 230
+                  "line": 453
                 },
                 {
                   "name": "minimum_notice_hours",
                   "type": "int",
-                  "line": 231
+                  "line": 454
                 },
                 {
                   "name": "statutory_basis",
                   "type": "str | None",
-                  "line": 232
+                  "line": 455
                 },
                 {
                   "name": "approved_by",
                   "type": "str | None",
-                  "line": 233
+                  "line": 456
                 }
               ],
-              "line": 227
+              "line": 450
             },
             {
               "name": "NoticeProofInput",
@@ -33350,20 +33587,20 @@
                 {
                   "name": "location",
                   "type": "str",
-                  "line": 238
+                  "line": 461
                 },
                 {
                   "name": "note",
                   "type": "str",
-                  "line": 239
+                  "line": 462
                 },
                 {
                   "name": "document_delivery_id",
                   "type": "str | None",
-                  "line": 240
+                  "line": 463
                 }
               ],
-              "line": 236
+              "line": 459
             },
             {
               "name": "NoticeDocumentInput",
@@ -33374,10 +33611,10 @@
                 {
                   "name": "text",
                   "type": "str",
-                  "line": 245
+                  "line": 468
                 }
               ],
-              "line": 243
+              "line": 466
             },
             {
               "name": "PacketInput",
@@ -33388,15 +33625,15 @@
                 {
                   "name": "agenda_item_ids",
                   "type": "list[UUID]",
-                  "line": 305
+                  "line": 528
                 },
                 {
                   "name": "source_files",
                   "type": "list['ManagedSource']",
-                  "line": 306
+                  "line": 529
                 }
               ],
-              "line": 303
+              "line": 526
             },
             {
               "name": "TranscriptInput",
@@ -33407,20 +33644,20 @@
                 {
                   "name": "source_label",
                   "type": "str",
-                  "line": 311
+                  "line": 534
                 },
                 {
                   "name": "transcript_text",
                   "type": "str",
-                  "line": 312
+                  "line": 535
                 },
                 {
                   "name": "correction_of_id",
                   "type": "UUID | None",
-                  "line": 313
+                  "line": 536
                 }
               ],
-              "line": 309
+              "line": 532
             },
             {
               "name": "ActionItemInput",
@@ -33431,20 +33668,20 @@
                 {
                   "name": "description",
                   "type": "str",
-                  "line": 318
+                  "line": 541
                 },
                 {
                   "name": "assigned_to",
                   "type": "str | None",
-                  "line": 319
+                  "line": 542
                 },
                 {
                   "name": "source_motion_id",
                   "type": "UUID | None",
-                  "line": 320
+                  "line": 543
                 }
               ],
-              "line": 316
+              "line": 539
             },
             {
               "name": "ArchiveInput",
@@ -33455,25 +33692,25 @@
                 {
                   "name": "visibility",
                   "type": "Literal['public', 'closed_session']",
-                  "line": 325
+                  "line": 548
                 },
                 {
                   "name": "packet_id",
                   "type": "UUID | None",
-                  "line": 326
+                  "line": 549
                 },
                 {
                   "name": "minutes_id",
                   "type": "UUID | None",
-                  "line": 327
+                  "line": 550
                 },
                 {
                   "name": "plain_language_summary",
                   "type": "str",
-                  "line": 328
+                  "line": 551
                 }
               ],
-              "line": 323
+              "line": 546
             },
             {
               "name": "ManagedSource",
@@ -33484,40 +33721,40 @@
                 {
                   "name": "original_path",
                   "type": "str",
-                  "line": 437
+                  "line": 660
                 },
                 {
                   "name": "stored_path",
                   "type": "str",
-                  "line": 438
+                  "line": 661
                 },
                 {
                   "name": "file_name",
                   "type": "str",
-                  "line": 439
+                  "line": 662
                 },
                 {
                   "name": "sha256",
                   "type": "str",
-                  "line": 440
+                  "line": 663
                 },
                 {
                   "name": "size_bytes",
                   "type": "int",
-                  "line": 441
+                  "line": 664
                 }
               ],
-              "line": 435
+              "line": 658
             }
           ],
           "configuration": [
             {
               "environment": "DATABASE_URL",
-              "line": 38
+              "line": 48
             },
             {
               "environment": "TOWNLIGHT_PROFILE_ROOT",
-              "line": 445
+              "line": 668
             }
           ]
         },
@@ -35340,8 +35577,8 @@
         },
         {
           "source": "desktop/src-tauri/src/domain_client.rs",
-          "sha256": "b1d006a205a3e2b7f72fca60326b5020df3aed29d2d355336f70faba2dd58027",
-          "bytes": 41344,
+          "sha256": "2730a1f7b703472058d9a0beed2be640aeb8f0ccb6433947c05c12744d7ca78a",
+          "bytes": 45633,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35388,8 +35625,8 @@
         },
         {
           "source": "desktop/src-tauri/src/main.rs",
-          "sha256": "5402a230cd89922549e0d96edfd1f37549a4fbccd807bb6f443db41d87322dcb",
-          "bytes": 84172,
+          "sha256": "43be9346f7f64f40a2fa9bfb18fc7d15f9bdf3d437e1d80c542665e2b1d70b03",
+          "bytes": 84133,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35524,24 +35761,32 @@
         },
         {
           "source": "desktop/src/main.js",
-          "sha256": "217d4983c610c7e4d3872f301647b69b55213a712d4e23801fb059552a89316b",
-          "bytes": 360906,
+          "sha256": "11f4f61bf9bef7ec0249d15acdc5a9e9d494fc1eab1afc00d1f4ce314ad7dbf5",
+          "bytes": 362150,
           "routes": [],
           "models": [],
           "configuration": []
         },
         {
           "source": "desktop/src/meetings/client.ts",
-          "sha256": "ba12839650f17a66d5eff5782c0e5feb1a9ad7abfbe1442958b86d9f7813e1cc",
-          "bytes": 6896,
+          "sha256": "4a8ec25c9baa81c54db15b41c4f3493393ec2e4cf04af947e9cc7ce02bdd40bf",
+          "bytes": 9452,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "desktop/src/meetings/import-links.js",
+          "sha256": "ce29f4aec5624b33ed9d8b7e271efeb070865d4fd2c4c9317383501cb69b9a51",
+          "bytes": 4241,
           "routes": [],
           "models": [],
           "configuration": []
         },
         {
           "source": "desktop/src/meetings/view.js",
-          "sha256": "3d12d5fde231bd777eb3717aac068a8397afe4b2182debff3711592c9881ac24",
-          "bytes": 17252,
+          "sha256": "36fbcbc8632608ba0318b075f0ef4f9d7a16393bd68b89608891b1de35344968",
+          "bytes": 25982,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35556,8 +35801,8 @@
         },
         {
           "source": "desktop/src/notice/view.js",
-          "sha256": "e2eac0939224b68c99c7d2ed20c8ab55b9311169d604d16e22b8dc41b256a708",
-          "bytes": 9695,
+          "sha256": "80dd3abbbd96a40c6b62c3bc2bf00eb73a6dc1c0ccf62329bcd036b464e7d47c",
+          "bytes": 10113,
           "routes": [],
           "models": [],
           "configuration": []

@@ -75,7 +75,7 @@ def test_built_documentation_rejects_old_meetings_table():
                    for m in state["modules"].values())
     rows += f'<tr><td>townlight-runtime</td><td>{state["desktop_release"]["runtime_version"]}</td></tr>'
     assert verify_documentation(state, lambda name: rows.encode()) == []
-    errors = verify_documentation(state, lambda name: (rows.replace('1.0.5', '1.0.4') if name == 'manuals/meetings.html' else rows).encode())
+    errors = verify_documentation(state, lambda name: (rows.replace(state['modules']['meetings']['versions']['development'], '1.0.4') if name == 'manuals/meetings.html' else rows).encode())
     assert len(errors) == 1 and "manuals/meetings.html" in errors[0]
 
 

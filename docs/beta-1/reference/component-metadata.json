@@ -204,12 +204,12 @@
     ],
     "License-Expression": []
   },
-  "townlight_meetings-1.0.5.dist-info": {
+  "townlight_meetings-1.0.6.dist-info": {
     "Name": [
       "townlight-meetings"
     ],
     "Version": [
-      "1.0.5"
+      "1.0.6"
     ],
     "Requires-Python": [
       ">=3.11"
@@ -385,12 +385,12 @@
       "AGPL-3.0-only"
     ]
   },
-  "townlight_runtime-0.3.0.dist-info": {
+  "townlight_runtime-0.3.1.dist-info": {
     "Name": [
       "townlight-runtime"
     ],
     "Version": [
-      "0.3.0"
+      "0.3.1"
     ],
     "Requires-Python": [
       ">=3.11"
@@ -398,19 +398,20 @@
     "Requires-Dist": [
       "sqlalchemy>=2.0",
       "fastapi>=0.135.0",
-      "uvicorn>=0.44.0"
+      "uvicorn>=0.44.0",
+      "pdfplumber<1,>=0.11.10"
     ],
     "License": [],
     "License-Expression": [
       "AGPL-3.0-only"
     ]
   },
-  "townlight_station-0.3.0.dist-info": {
+  "townlight_station-0.3.1.dist-info": {
     "Name": [
       "townlight-station"
     ],
     "Version": [
-      "0.3.0"
+      "0.3.1"
     ],
     "Requires-Python": [
       ">=3.12"

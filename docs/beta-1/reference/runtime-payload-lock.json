@@ -269,8 +269,8 @@
         },
         {
           "path": "planning-candidate-provenance.json",
-          "size_bytes": 7207,
-          "sha256": "573b186e9a56bf12dbad844d034f1e72a5f66733ec097c2fd26e7018d616f717"
+          "size_bytes": 7297,
+          "sha256": "5f5505165c9b4851d7a0cd45bd8880fae0a5bb00082952388923f7c8649f2826"
         },
         {
           "path": "Lib/site-packages/townlight_planning/migrations/versions/townlight_planning_0004_neighborhoods.py",
@@ -294,13 +294,13 @@
         },
         {
           "path": "permitting-candidate-provenance.json",
-          "size_bytes": 7209,
-          "sha256": "a62f2b1427e46d001b535264f7326fe5ebcadba2c0bd47ac6bfc4e95093518a0"
+          "size_bytes": 7299,
+          "sha256": "db50d81d87cfb31e70917a6f47fbb79d10b626157cdf4347886a9f44e1544fdf"
         },
         {
           "path": "inspections-candidate-provenance.json",
-          "size_bytes": 7210,
-          "sha256": "7f3ca013eab2518c3c59f6c8e8babf855ab8e3f5e8c8b7902af9d32afd8a6fd2"
+          "size_bytes": 7300,
+          "sha256": "e20cdd562b68804de02840b5574c86b777abf7f58b30f30ed5f31961051fa2ed"
         },
         {
           "path": "Lib/site-packages/townlight_inspections/workflow_store.py",
@@ -377,5 +377,5 @@
     }
   ],
   "accepted_native_base_sha256": "173c032b874e2cf4091cd79213f53c0663d272070fc11712701892d490e09883",
-  "umbrella_source_commit": "9a2027ab81af6b8a36b8f0fe426a27fcea1fd41c"
+  "umbrella_source_commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24"
 }
