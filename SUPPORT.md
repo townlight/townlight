@@ -31,7 +31,7 @@ profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/SHA256SUMS-Windows-1.8.1.1.txt) and check
 its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact
 release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) describes the installed checks
-and their limits. Local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
+and their limits. Earlier local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
 timed out without saving a draft.
 
 For setup problems, consult [troubleshooting](https://townlight.github.io/manuals/suite.html#troubleshooting)
