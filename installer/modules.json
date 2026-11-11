@@ -403,8 +403,8 @@
         "backup",
         "restore"
       ],
-      "current_version": "1.0.5",
-      "source_commit": "723a93c5877b4ae1b6c3e46d6d44de1e0c479c63",
+      "current_version": "1.0.6",
+      "source_commit": "77ae8781f4a414f6f85c35a7e4394e29b0e0f21d",
       "routes": [
         {
           "id": "meetings-notices",
@@ -1015,8 +1015,8 @@
         "restore",
         "release_artifacts"
       ],
-      "current_version": "0.3.0",
-      "source_commit": "7205ed1b07132b1649c994e190b381d773807aff",
+      "current_version": "0.3.1",
+      "source_commit": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8",
       "routes": [
         {
           "id": "station-operator",
