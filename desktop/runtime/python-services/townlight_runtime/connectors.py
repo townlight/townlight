@@ -100,7 +100,10 @@ class ConnectorWorkspace:
             for key, target in targets.items():
                 if not isinstance(key, str) or not key or not isinstance(target, dict):
                     raise ValueError("Connector policy is invalid.")
-                source = Source.from_dict(target)
+                try:
+                    source = Source.from_dict(target)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError("Connector policy is invalid.") from exc
                 if source.namespace not in namespaces:
                     raise ValueError("Connector policy is invalid.")
         return policy

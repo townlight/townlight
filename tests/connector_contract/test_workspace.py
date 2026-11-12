@@ -372,3 +372,13 @@ def test_policy_revalidates_path_and_bounds_each_read(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="link rejected"):
         workspace.current_policy()
     assert seen == [(tmp_path.resolve(), "config/secrets/connectors.json")]
+
+
+def test_malformed_policy_target_has_generic_error(tmp_path):
+    workspace = ConnectorWorkspace(tmp_path)
+    path = tmp_path / "config" / "secrets" / "connectors.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"admin": {"namespaces": ["ns"], "write_sources": {"id": {"token": "never-echo"}}}}), encoding="utf-8")
+    with pytest.raises(ValueError, match=r"^Connector policy is invalid\.$") as error:
+        workspace.current_policy()
+    assert "never-echo" not in str(error.value)
