@@ -143,9 +143,24 @@ pub enum MeetingsRequest {
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ConnectorOperation {
-    Providers, Capabilities, Identify, Sources, ConfigureSource, Discover, Fetch,
-    Search, Preview, SaveEvidence, SaveMeeting, Export, PlanWrite, CommitWrite,
-    Receipt, Status, Cancel, Inspect,
+    Providers,
+    Capabilities,
+    Identify,
+    Sources,
+    ConfigureSource,
+    Discover,
+    Fetch,
+    Search,
+    Preview,
+    SaveEvidence,
+    SaveMeeting,
+    Export,
+    PlanWrite,
+    CommitWrite,
+    Receipt,
+    Status,
+    Cancel,
+    Inspect,
 }
 
 #[derive(Deserialize, Serialize)]
