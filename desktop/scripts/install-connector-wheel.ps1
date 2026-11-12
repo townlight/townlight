@@ -10,7 +10,14 @@ param(
 $ErrorActionPreference = 'Stop'
 if ($ExpectedSha256 -notmatch '^[a-fA-F0-9]{64}$') { throw 'An exact connector wheel SHA256 is required.' }
 $Wheel = (Resolve-Path -LiteralPath $WheelPath).Path
-$Actual = (Get-FileHash -LiteralPath $Wheel -Algorithm SHA256).Hash.ToLowerInvariant()
+$stream = [System.IO.File]::OpenRead($Wheel)
+$hasher = [System.Security.Cryptography.SHA256]::Create()
+try {
+    $Actual = -join ($hasher.ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+} finally {
+    $hasher.Dispose()
+    $stream.Dispose()
+}
 if ($Actual -ne $ExpectedSha256.ToLowerInvariant()) { throw 'Connector wheel hash mismatch; nothing installed.' }
 $Check = @'
 import email.parser,sys,zipfile
