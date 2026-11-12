@@ -973,7 +973,7 @@ function Install-PythonServicePackages {
     if ($ProductProfile -eq 'inspections-preview') {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, townlight_runtime.municipal_staff, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
-    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime", "civic_data_connectors")
+    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime", "quorumrelay")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $InstalledPackages += @("townlight_meetings", "townlight_code")
     }
