@@ -13,6 +13,28 @@ function Get-StationPayloadSha256 {
     }
 }
 
+function Get-StationMsiAuthenticodeSignature {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    # PowerShell may inherit a PSModulePath that does not include this host's
+    # inbox modules (notably when Windows PowerShell is launched by pwsh/npm).
+    # Resolve the security module from this exact host installation and fail
+    # closed if it cannot be loaded; signature validation remains mandatory.
+    $SecurityManifest = Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1'
+    if (-not (Test-Path -LiteralPath $SecurityManifest -PathType Leaf)) {
+        throw "Microsoft.PowerShell.Security manifest is missing from this PowerShell host: $SecurityManifest"
+    }
+    Import-Module -Name $SecurityManifest -ErrorAction Stop
+    $SignatureCommand = Get-Command -Name 'Microsoft.PowerShell.Security\Get-AuthenticodeSignature' `
+        -CommandType Cmdlet -ErrorAction Stop
+    $Signature = & $SignatureCommand -LiteralPath $Path -ErrorAction Stop
+    if ($null -eq $Signature) {
+        throw "Microsoft.PowerShell.Security returned no Authenticode signature result for: $Path"
+    }
+    return $Signature
+}
+
 function Join-StationPayloadPath {
     param(
         [Parameter(Mandatory=$true)][string]$Root,
@@ -156,7 +178,7 @@ function Install-AcceptedStationMediaPayload {
         },
         [scriptblock]$SignatureAction = {
             param($Path)
-            Get-AuthenticodeSignature -LiteralPath $Path
+            Get-StationMsiAuthenticodeSignature -Path $Path
         },
         [scriptblock]$ExtractAction = {
             param($Path, $TargetRoot)

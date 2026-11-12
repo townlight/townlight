@@ -186,6 +186,40 @@ MustReject { Install-AcceptedStationMediaPayload -Source $Source -CacheRoot $Cac
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+@pytest.mark.parametrize("host", ["powershell.exe", "pwsh.exe"])
+def test_station_msi_signature_resolves_security_module_for_each_host(host: str, tmp_path: Path) -> None:
+    if os.name != "nt":
+        pytest.skip("Authenticode verification requires Windows")
+    executable = shutil.which(host)
+    if not executable:
+        pytest.skip(f"{host} is not installed")
+
+    signed_probe = Path(os.environ.get("WINDIR", r"C:\Windows")) / "System32/kernel32.dll"
+    assert signed_probe.is_file(), f"Signed Windows probe file is missing: {signed_probe}"
+    env = os.environ.copy()
+    env["STATION_PAYLOAD_HELPER"] = str(HELPER)
+    env["STATION_SIGNED_PROBE"] = str(signed_probe)
+    # Exercise the explicit host-local manifest import independently of an
+    # inherited module search path from the parent PowerShell/npm process.
+    env["PSModulePath"] = str(tmp_path / "empty-module-path")
+    command = r'''
+$ErrorActionPreference = 'Stop'
+. $env:STATION_PAYLOAD_HELPER
+$signature = Get-StationMsiAuthenticodeSignature -Path $env:STATION_SIGNED_PROBE
+if ([string]$signature.Status -ne 'Valid') { throw "Signed probe was not Valid: $($signature.Status)" }
+[pscustomobject]@{ edition=$PSVersionTable.PSEdition; status=[string]$signature.Status } | ConvertTo-Json -Compress
+'''
+    result = subprocess.run(
+        [executable, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", command],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert '"status":"Valid"' in result.stdout
+
+
 def test_station_source_is_pinned_and_prepare_path_is_profile_limited() -> None:
     import json
 
