@@ -26,16 +26,16 @@ with zipfile.ZipFile(sys.argv[1]) as wheel:
     assert len(metadata)==1, 'Expected one wheel distribution'
     msg=email.parser.BytesParser().parsebytes(wheel.read(metadata[0]))
     assert msg['Name'].replace('_','-')=='quorumrelay', 'Wrong connector distribution'
-    assert msg['Version']=='0.1.0.dev4', 'Wrong connector version'
+    assert msg['Version']=='0.1.0.dev6', 'Wrong connector version'
 '@
 & $Python -c $Check $Wheel
 if ($LASTEXITCODE -ne 0) { throw 'Connector wheel metadata verification failed.' }
 & $Python -m pip install --no-index --no-deps --force-reinstall --disable-pip-version-check $Wheel
 if ($LASTEXITCODE -ne 0) { throw 'Connector wheel installation failed.' }
-& $Python -c "import importlib.metadata as m; from quorumrelay import create_engine; from civic_data_connectors.legacy import legacy_previews; assert m.version('quorumrelay')=='0.1.0.dev4'; assert len(create_engine().execute('providers',{}).data['providers'])==31"
+& $Python -c "import importlib.metadata as m; from quorumrelay import create_engine; from civic_data_connectors.legacy import legacy_previews; assert m.version('quorumrelay')=='0.1.0.dev6'; assert len(create_engine().execute('providers',{}).data['providers'])==31"
 if ($LASTEXITCODE -ne 0) { throw 'Installed connector import/version/roster verification failed.' }
 $Receipt = [ordered]@{
-    package = 'quorumrelay'; version = '0.1.0.dev4'; schema_version = '2.0.0'
+    package = 'quorumrelay'; version = '0.1.0.dev6'; schema_version = '2.0.0'
     wheel = [System.IO.Path]::GetFileName($Wheel); sha256 = $Actual
     verified_at = [DateTime]::UtcNow.ToString('o'); acceptance = 'local-development-only'
 }

@@ -9,7 +9,7 @@ description = "Local Windows runtime bridge for Townlight Records desktop servic
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"
 license-files = ["LICENSE"]
-dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0", "pdfplumber>=0.11.10,<1", "quorumrelay==0.1.0.dev4"]
+dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0", "pdfplumber>=0.11.10,<1", "quorumrelay==0.1.0.dev6"]
 
 [tool.setuptools.packages.find]
 where = ["."]
