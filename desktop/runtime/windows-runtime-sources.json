@@ -55,6 +55,24 @@
         "inspections/whistle/whistle.cact": "b6e02f048568ac5d01a2042556c658061e699acbc0aa2a1439f52f3d461dffeb",
         "inspections/whistle/windows-x86_64/needle.exe": "298d76c6ae944611369b3f04e5873b03f69f0d1d8d62c1363a535331d5efc76a"
       }
+    },
+    "station_media": {
+      "id": "station-media",
+      "label": "Townlight Station media tools",
+      "version": "1.8.1.1",
+      "archive_name": "Townlight-Windows-x64-1.8.1.1.msi",
+      "download_url": "https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/Townlight-Windows-x64-1.8.1.1.msi",
+      "download_sha256": "9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da",
+      "signer_common_name": "Scott Converse",
+      "payload_relative_path": "PFiles/Townlight/_up_/runtime/payload/station",
+      "required_files": [
+        "bin/ffmpeg.exe",
+        "bin/ffprobe.exe",
+        "bin/FFMPEG-LICENSE.txt",
+        "runtime/python.exe",
+        "media-source/civiccast/app.py",
+        "media-source/civiccast/cli.py"
+      ]
     }
   }
 }
