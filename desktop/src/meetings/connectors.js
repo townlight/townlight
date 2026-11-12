@@ -1,7 +1,7 @@
 /** Shared SDK workflow, without provider logic, credentials or implicit writes. */
 export function renderConnectors() {
   return `<section data-connectors><h3>External meeting evidence</h3>
-    <p>Discover and search with QuorumRelay 0.1.0.dev7. Captured evidence and provider coverage are separate from canonical Townlight records and publication. Missing text or media does not complete transcription or a writing workflow.</p>
+    <p>Discover and search with QuorumRelay 0.1.0.dev8. Captured evidence and provider coverage are separate from canonical Townlight records and publication. Missing text or media does not complete transcription or a writing workflow.</p>
     <form data-connector-config>
       <label>Provider and saved format <select name="format" required></select></label>
       <label>Original source URL <input name="url" type="url" required maxlength="2048"></label>

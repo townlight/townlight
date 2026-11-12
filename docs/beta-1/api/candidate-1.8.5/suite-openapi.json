@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "QuorumRelay 0.1.0.dev7 / Townlight 1.8.5 source-candidate schema. The native route composition is unchanged from the generated 1.8.4 schema; this is not installed endpoint acceptance or publication.",
+    "description": "QuorumRelay 0.1.0.dev8 / Townlight 1.8.5 source-candidate schema. The native route composition is unchanged from the generated 1.8.4 schema; this is not installed endpoint acceptance or publication.",
     "version": "1.8.0.dev2"
   },
   "paths": {
@@ -29569,9 +29569,9 @@
   },
   "x-townlight-source-candidate": {
     "townlight": "1.8.5 source candidate",
-    "quorumrelay": "0.1.0.dev7",
-    "wheel_sha256": "6b39f51174b2988a4240e1b7beb9d5c41dc731cc0826dbbaf0042827e410a44c",
-    "quorumrelay_source_commit": "de6204e1861e27af366cdc9973cf52ce53276add",
+    "quorumrelay": "0.1.0.dev8",
+    "wheel_sha256": "bcfe691b4d1eb0de162f5f94985d0242a97b5d3d89bd5eeb9306d1ef28caf692",
+    "quorumrelay_source_commit": "3862e5f4ad7064aee722e09bb438899c3566477f",
     "evidence": "unchanged native route composition inherited from generated 1.8.4 source schema"
   }
 }
