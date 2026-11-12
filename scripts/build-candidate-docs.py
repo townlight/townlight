@@ -41,7 +41,8 @@ def run(arguments, **kwargs):
                            + result.stderr.decode('utf-8', errors='replace'))
 
 
-def render(source, destination, title, css, prefix):
+def render(source, destination, title, css, prefix, edition_label,
+           status_href=None):
     # Pandoc generates the body and TOC from the same Markdown; all script and
     # stylesheet inputs are local and the resulting HTML works offline.
     fragment = subprocess.check_output([
@@ -54,16 +55,17 @@ def render(source, destination, title, css, prefix):
     body = body.replace('href="docs/beta-1/', 'href="../')
     if prefix == '..' and source.parent.name == 'beta-1':
         body = body.replace('href="docs/history/', 'href="../history/station/')
+    status_href = status_href or f"{prefix}/versions.html"
     document = f'''<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} | Townlight candidate</title><style>{css}</style></head>
 <body><a class="skip" href="#main">Skip to content</a>
 <header><a class="brand" href="{prefix}/index.html">Townlight</a>
 <nav aria-label="Main"><a href="{prefix}/manuals/suite.html">Suite manual</a>
-<a href="{prefix}/versions.html">Versions and candidate status</a>
+<a href="{html.escape(status_href, quote=True)}">Candidate status</a>
 <a href="{prefix}/terms.html">Terms and license</a></nav></header>
-<main id="main" class="reading wrap"><p class="edition">Naming, Access and Notice source candidate · 2 November 2026</p>
-<p>Prepared documentation. Build, signing, installed acceptance and publication remain pending.</p>
+<main id="main" class="reading wrap"><p class="edition">{html.escape(edition_label)}</p>
+<p>Prepared source-candidate documentation; this page does not establish a built, signed or installed package.</p>
 {body}</main><footer>Townlight · AGPL-3.0-only · Candidate evidence applies only to its identified artifacts.</footer></body></html>'''
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(document, encoding='utf-8', newline='\n')
@@ -105,6 +107,9 @@ def main():
     parser.add_argument('--docx', action='store_true')
     parser.add_argument('--pdf', action='store_true', help='Convert generated Word files using an isolated LibreOffice profile')
     parser.add_argument('--versions', action='store_true', help='Render the current candidate table from suite-state.json')
+    parser.add_argument('--edition-label', default='Naming, Access and Notice source candidate · 2 November 2026',
+                        help='Edition label shown on generated manual pages')
+    parser.add_argument('--status-href', help='Candidate-status link used by generated manual navigation')
     parser.add_argument('--sync-owner', action='store_true', help='Refresh existing current manual copies in owning repositories')
     parser.add_argument('--landing', action='store_true', help='Refresh existing owning current landing status and identities')
     args = parser.parse_args()
@@ -117,7 +122,8 @@ def main():
     for slug in args.products:
         repo, title = PRODUCTS[slug]
         source = ROOT.parent / repo / 'USER-MANUAL.md'
-        render(source, args.site_root / 'manuals' / f'{slug}.html', title + ' Manual', css, '..')
+        render(source, args.site_root / 'manuals' / f'{slug}.html', title + ' Manual', css, '..',
+               args.edition_label, args.status_href)
         if args.docx or args.pdf:
             destination = args.site_root / 'docx' / f'Townlight-{slug.title()}-Manual-Beta-1.docx'
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -180,7 +186,8 @@ def main():
                   'Station remains the existing Beta 1 Python service. Its separate Rust development line and standalone CivicCast are outside this migration.']
         source = ROOT / 'docs/current-versions.md'
         source.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-        render(source, args.site_root / 'versions.html', 'Component versions', css, '.')
+        render(source, args.site_root / 'versions.html', 'Component versions', css, '.',
+               args.edition_label, args.status_href)
     if args.sync_owner:
         for slug in args.products:
             repo, _title = PRODUCTS[slug]

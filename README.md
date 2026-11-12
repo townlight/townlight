@@ -7,6 +7,12 @@
 
 [Download Windows beta 1.8.1.1](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/Townlight-Windows-x64-1.8.1.1.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html)
 
+## Prepared connector source candidate · Townlight 1.8.2
+
+This checkout pins QuorumRelay `0.1.0.dev4` in Townlight Runtime. The vendored wheel SHA-256 is `f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1`; QuorumRelay source commit `58d609c960212b62504d4d320e11c238e5bb221e` is integrated in Townlight source commit `79e4080ce4c4611a20de3f6b9f5864948e486983`. The candidate retains the 31-provider roster and 34 baseline input-format paths. Those counts describe compatibility coverage, not complete live discovery or full capability acceptance for every provider.
+
+This is prepared source documentation for a Townlight 1.8.2 candidate, not a released or installed Windows artifact. The current public download and its acceptance remain Windows 1.8.1.1 below. In the Meetings workspace, the candidate adds an **External meeting evidence** panel backed by Townlight's authenticated native runtime. Provider actions require an exact server-owned source policy and local administrator role; provider credentials are configured server-side where the provider requires them. Live provider acceptance remains NOT_RUN because no authorized provider test tenant or credentials were supplied. See the [connector source-candidate guide](docs/meeting-imports.md#quorumrelay-source-candidate) and [suite manual](USER-MANUAL.md#connector-candidate).
+
 Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to 1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an existing-city evaluation, back up city data and settings, close Townlight, keep the existing %LOCALAPPDATA%\CivicSuite profile, and use the same Windows account. Keep the prior installer and a restore path. Station continues to use its separately configured service.
 
 Windows x64 Beta 1 · MSI 1.8.1.1

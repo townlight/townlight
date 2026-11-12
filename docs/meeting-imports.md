@@ -1,6 +1,46 @@
 # Shared meeting imports
 
-Use **Meetings → Import meeting records** in Windows 1.8.1.1. Select a
+<a id="quorumrelay-source-candidate"></a>
+## QuorumRelay source candidate
+
+This Townlight source checkout pins QuorumRelay `0.1.0.dev4` in the bundled runtime. Vendored wheel SHA-256: `f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1`. QuorumRelay source commit `58d609c960212b62504d4d320e11c238e5bb221e` is integrated in Townlight source commit `79e4080ce4c4611a20de3f6b9f5864948e486983`. The compatibility baseline remains 31 provider families and 34 input-format paths; it does not certify full discovery, pagination or every operation for each provider.
+
+The source candidate adds the profile-scoped connector workspace at authenticated native route `POST /desktop/v1/meetings/connectors/run`. Its operation contract covers provider/capability listing, source identification/configuration, bounded discovery and fetch, local search, import preview/save, evidence persistence, export, write planning/commit, and receipt/status operations. This route remains inside the Townlight runtime and existing staff authorization boundary; it is not a separate public service or an independent MCP endpoint. The source bridge and workspace are `desktop/runtime/python-services/townlight_runtime/connector_bridge.py` and `connectors.py`. See the [candidate native API schema](https://townlight.github.io/api/candidate-1.8.2/suite-openapi.json); it is generated from source composition and does not establish installed endpoint behavior.
+
+### Meetings panel workflow
+
+The source candidate adds **External meeting evidence** to the Meetings workspace. The panel loads the provider and saved-format lists, plus sources and captured results for the current Townlight profile.
+
+1. Use **Identify URL** or **Inspect provider capabilities**, select the provider/format, enter the original URL and optional body, and **Save validated source**. The live-discovery checkbox defaults on; uncheck it to configure a saved-format reader. Optional provider options are JSON and must use documented fields. Do not enter passwords or tokens. A transition to a different source identity requires a local administrator and explicit evidence-backed ID mappings; the **new source** checkbox is only for a separate source.
+2. For ordinary discovery, choose inclusive from/through dates and submit **Discover / read saved response**. A selected capture can be up to 16 MiB. For a namespace-bound account read, use **Authorized account fetch** with credentials already configured server-side and only documented provider request fields; the UI does not accept credentials. Account fetch clears the ordinary date bounds because those filters do not apply to this request.
+3. Inspect the result status, errors and coverage. `partial` is not complete coverage. **Reopen result** reads saved output. **Save searchable evidence** stores evidence for local search; terms and phrases are entered as exact lines, with optional date filters. **Next result page** continues the selected result's display.
+4. **Preview canonical import** lists meeting selections. Review the selected source and use **Save selected canonical meeting** to save the exact selection; a new preview is required if the source changes. **Export evidence** offers ZIP, JSON, JSONL, CSV meetings, CSV items and iCalendar.
+5. **Explicit provider action** is disabled unless an exact server-owned source grant and local administrator role enable it. Review the displayed plan and hash, explicitly approve that exact plan, then commit. Provider credentials are required where the provider requires them and are configured server-side; the panel never accepts credential values. Ingestion, search, import and export do not perform provider writes.
+
+For a failed or uncertain local response, reopen saved results before retrying the same operation. This UI guide is source-candidate guidance and is not 1.8.2 installed acceptance.
+
+### Service-admin credential and write policy
+
+The optional policy file is `config/secrets/connectors.json` beneath the selected Townlight profile. Its top-level keys are local actor UUIDs. Each actor entry has a nonempty exact `namespaces` array; optional `credentials` maps provider IDs to provider-specific credential objects; optional `write_sources` maps configured source IDs to the exact full source object. The six source fields are `provider`, `url`, `namespace`, `body`, `input_format` and `options`; a write plan is accepted only when the configured source and namespace match the policy target exactly. No secret is entered into or returned to the Meetings UI. The policy file is limited to 1 MiB. A missing file disables account credentials and write authorization; malformed content fails closed.
+
+**Find the native actor UUID.** Townlight Settings → Local Users shows names and emails, not UUIDs. Use the bundled runtime's `townlight_runtime.records_import.stable_id` helper with the resolved Townlight profile root and lowercase email in `config/first-admin.json` or `config/staff-users.json`. Resolve the profile root using the runtime's precedence: absolute `TOWNLIGHT_PROFILE_ROOT` when set; otherwise the parent of `TOWNLIGHT_DATA_DIR` when set; otherwise `%LOCALAPPDATA%\CivicSuite` (or `%USERPROFILE%\AppData\Local\CivicSuite` when `LOCALAPPDATA` is unset). Resolve the path before calculating the UUID:
+
+```python
+from pathlib import Path
+from townlight_runtime.records_import import stable_id
+
+profile_root = Path(r"<resolved Townlight profile root>")
+native_email = "<email from Settings → Local Users>".strip().lower()
+print(stable_id(profile_root, "native-user", native_email))
+```
+
+For Essential and TelVue account credentials, SDK credential objects require the exact authorized `origin` and `namespace`, plus `tenant` equal to the SHA-256 hex digest of the UTF-8 string form of the resolved profile root. Use the provider's documented credential fields and a verified account origin. Do not guess token keys or production hosts. No authorized provider test tenant or credentials were supplied, so account-read and live-write acceptance remains NOT_RUN. This is an access blocker, not evidence that a provider operation is unsupported.
+
+Candidate completeness remains limited by the verified per-provider matrix: live discovery and paging are not complete for every tenant; captures and provider fields may be partial; per-operation statuses remain distinct. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Account-read and live-write acceptance is NOT_RUN because no authorized provider test tenant or credentials were supplied. Do not use public city data for write testing. The dev4 pin and baseline counts do not establish completion of the connector project's full acceptance plan.
+
+This documentation describes prepared source for Townlight 1.8.2, not a signed, installed or released Windows build. Windows 1.8.1.1 remains the current public release and its links and acceptance evidence below are historical evidence for that exact release.
+
+For the released Windows 1.8.1.1 workflow, use **Meetings → Import meeting records**. Select a
 source and format, enter the original public URL, then choose **Preview import**.
 For a saved response, select the file before previewing. Choose a meeting and
 use **Save selected meeting**. Townlight records the source URL, format, stable
@@ -73,9 +113,10 @@ municipality and by meeting.
 
 ## Shared interface
 
-The installed Townlight Python runtime exposes a read-only CLI. CivicCast and
+The Windows 1.8.1.1 installed Townlight Python runtime exposes a read-only CLI. CivicCast and
 other local clients can consume its normalized JSON and apply their own access
-and persistence rules.
+and persistence rules. The source candidate's authenticated connector route and
+operation boundary are described above; that source is not installed acceptance.
 
 ```powershell
 python -m townlight_runtime.meeting_imports champ PUBLIC_EVENT_URL saved-event.json --format champ-event-json
@@ -91,31 +132,33 @@ and the CLI above. A saved response can also be read from stdin using `-`.
 Inputs are limited to 16 MiB. Preview is read-only; the consuming application
 owns persistence, staff authorization and its own data.
 
-The installed native HTTP bridge exposes `GET /desktop/v1/meetings/imports/sources`,
+In released Windows 1.8.1.1, the installed native HTTP bridge exposes `GET /desktop/v1/meetings/imports/sources`,
 `POST /desktop/v1/meetings/imports/preview`, `POST /desktop/v1/meetings/imports/fetch`,
 `POST /desktop/v1/meetings/imports/commit`, and meeting/link/document handoff
 operations in the [native API schema](https://townlight.github.io/api/suite-openapi.json).
 Use the existing `X-Townlight-Session` authentication, mapped staff roles and
 configured local PostgreSQL service. This is a native application interface;
-there is no independent anonymous importer HTTP service or importer MCP server.
+there is no independent anonymous importer HTTP service or importer MCP server
+in that release. The candidate connector API schema linked above is source-only.
 
-**CivicCast:** opt in through its Townlight shared importer source setting and
+**CivicCast (Windows 1.8.1.1 baseline):** opt in through its Townlight shared importer source setting and
 `TOWNLIGHT_IMPORT_PYTHON` (the absolute Python executable), `TOWNLIGHT_IMPORT_CONNECTOR`,
 `TOWNLIGHT_IMPORT_FORMAT`, `TOWNLIGHT_IMPORT_URL` and optional `TOWNLIGHT_IMPORT_CAPTURE`.
 The adapter saves normalized items through the existing AgendaStore. Structured
 agenda availability depends on the source response; a video listing can contain
 meeting metadata without agenda items. Existing sources remain the default.
 
-**CivicCast Brief:** its existing PrimeGov and Granicus discovery routes can opt
-into the shared reader using `TOWNLIGHT_IMPORT_PYTHON`. Brief does not expose all
-31 sources as a new selection menu. Its existing caption/media workflow remains
-the consuming path. See each project's shared-import client documentation.
+**CivicCast Brief (Windows 1.8.1.1 baseline):** its existing PrimeGov and Granicus discovery routes can opt
+into the shared reader using `TOWNLIGHT_IMPORT_PYTHON`. That release did not expose all
+31 sources as a new selection menu. Its existing caption/media workflow remained
+the consuming path. See the current candidate's Brief client documentation for
+the newer QuorumRelay integration.
 
-**TownReporter, Describer Workbench and Textflowkit:** no shared-import adapter
-was added to these products. TownReporter retains its own PrimeGov path.
+**TownReporter, Describer Workbench and Textflowkit (Windows 1.8.1.1 baseline):** no shared-import adapter
+was added to these products in that release. TownReporter retained its own PrimeGov path.
 Describer Workbench and Textflowkit expose their existing transcription APIs/MCP
 interfaces, which do not constitute meeting-import integration. The shared engine
-ships inside Townlight Runtime; a standalone library is outside this release.
+shipped inside Townlight Runtime; a standalone library was outside that release.
 
 ## Windows acceptance and limits
 
