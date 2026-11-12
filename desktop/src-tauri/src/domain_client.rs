@@ -12,6 +12,9 @@ const MAX_RESPONSE_BYTES: usize = 16 * 1024 * 1024;
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum MeetingsRequest {
+    Connector {
+        payload: ConnectorRequest,
+    },
     CodeConnections {},
     CodeConnection {
         id: String,
@@ -135,6 +138,21 @@ pub enum MeetingsRequest {
     GetProceedings {
         id: Uuid,
     },
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ConnectorOperation {
+    Providers, Capabilities, Identify, Sources, ConfigureSource, Discover, Fetch,
+    Search, Preview, SaveEvidence, SaveMeeting, Export, PlanWrite, CommitWrite,
+    Receipt, Status, Cancel, Inspect,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ConnectorRequest {
+    operation: ConnectorOperation,
+    payload: Value,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -360,6 +378,11 @@ pub async fn execute_meetings(
     proof: String,
 ) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
+        MeetingsRequest::Connector { payload } => (
+            Method::POST,
+            "/desktop/v1/meetings/connectors/run".into(),
+            Some(serde_json::json!(payload)),
+        ),
         MeetingsRequest::CodeConnections {} => (
             Method::GET,
             "/desktop/v1/meetings/code-connections".to_string(),

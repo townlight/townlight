@@ -12,6 +12,8 @@ param(
     [string]$NoticeRoot = "",
     [string]$AccessRoot = "",
     [string]$RecordsBackendRoot = "",
+    [string]$ConnectorWheel = "",
+    [string]$ConnectorWheelSha256 = "",
     [switch]$ReuseInstalledServiceDependencies,
     [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")]
     [string]$ProductProfile = "records-beta",
@@ -829,6 +831,14 @@ function Install-PythonServicePackages {
     $PipStatus = Ensure-PythonPip -Source $Source -CacheRoot $CacheRoot -PythonRoot $PythonRoot
     $TownlightRecords = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\sunshine\backend")).Path }
     $RuntimeBridge = (Resolve-Path (Join-Path $RepoRoot "desktop\runtime\python-services")).Path
+    if (-not $ConnectorWheel) {
+        $ConnectorLock = Read-JsonFile (Join-Path $RepoRoot 'desktop/runtime/connectors-lock.json')
+        $ConnectorWheel = Join-Path $RepoRoot $ConnectorLock.wheel
+        $ConnectorWheelSha256 = $ConnectorLock.sha256
+    }
+    & (Join-Path $PSScriptRoot 'install-connector-wheel.ps1') `
+        -Python (Join-Path $PythonRoot 'python.exe') -WheelPath $ConnectorWheel `
+        -ExpectedSha256 $ConnectorWheelSha256 -ReceiptPath (Join-Path $PythonRoot 'connectors-package.json')
 
     $ServicePackages = @($TownlightRecords, $RuntimeBridge)
     if (-not $ReuseInstalledServiceDependencies) {
@@ -963,7 +973,7 @@ function Install-PythonServicePackages {
     if ($ProductProfile -eq 'inspections-preview') {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, townlight_runtime.municipal_staff, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
-    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime")
+    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime", "civic_data_connectors")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $InstalledPackages += @("townlight_meetings", "townlight_code")
     }

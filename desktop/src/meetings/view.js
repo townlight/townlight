@@ -1,4 +1,5 @@
 import { createMeetingsClient, readImportFile } from "./client.ts";
+import { bindConnectors, renderConnectors } from "./connectors.js";
 
 function bindImport(form, client, output) {
   if (!form) return;
@@ -166,6 +167,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           <button type="submit" data-import-preview disabled>Preview import</button>
           <label>Meeting to save <select name="external_id"></select></label>
           <button type="submit" data-import-commit disabled>Save selected meeting</button></form>
+        ${renderConnectors()}
         <form data-meetings-import-text><h3>Review imported text</h3>
           <label>Imported meeting ID <input name="meeting_id" required></label>
           <button type="submit" value="notice">Prepare Notice draft</button>
@@ -322,6 +324,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
     bind(root = document) {
       const output = root.querySelector("[data-meetings-result]");
       if (!output) return;
+      bindConnectors(root, client);
       bindImport(root.querySelector("[data-meetings-import]"), client, output);
       bindTextHandoffs(root.querySelector("[data-meetings-import-text]"), client, output, openImportDraft);
       const recordsHandoff = root.querySelector("[data-meetings-import-records]");

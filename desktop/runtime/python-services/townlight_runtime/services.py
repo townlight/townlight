@@ -374,6 +374,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
     if _product_profile() in ("meetings-beta", "city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"):
         from townlight_runtime.meetings_bridge import router as meetings_router
         domain_app.include_router(meetings_router)
+        from townlight_runtime.connector_bridge import router as connector_router
+        domain_app.include_router(connector_router)
         from townlight_runtime.meetings_bridge import public_router as meetings_public_router
         domain_app.include_router(meetings_public_router)
         from townlight_runtime.portal_publication import router as portal_publication_router
