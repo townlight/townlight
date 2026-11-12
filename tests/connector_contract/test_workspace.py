@@ -220,7 +220,7 @@ class WriteNetwork:
 
 def test_authorized_exact_mock_write_plan_commit_receipt_and_revocation(tmp_path):
     network = WriteNetwork()
-    workspace = ConnectorWorkspace(tmp_path, write_adapters=default_adapters(network))
+    workspace = ConnectorWorkspace(tmp_path, write_adapters=default_adapters(network), policy={})
     source_id = call(workspace, "configure_source", {"source": {
         "provider": "legistar", "url": "https://webapi.legistar.com/v1/mock-city/events",
     }, "new_source": True}, actor="admin", role="local-admin")["data"]["source_id"]
@@ -228,10 +228,11 @@ def test_authorized_exact_mock_write_plan_commit_receipt_and_revocation(tmp_path
                 "fields": {"EventDate": "2026-11-11T00:00:00", "EventBodyId": 4}}]
     request = {"source_id": source_id, "changes": changes}
     assert call(workspace, "plan_write", request, actor="admin", role="local-admin")["status"] == "failed"
-    target = {"provider": "legistar", "url": "https://webapi.legistar.com/v1/mock-city/events", "namespace": "mock-city"}
+    target = workspace.get("townlight_sources", source_id, workspace.context("admin", "local-admin"))["source"]
+    namespace = target["namespace"]
     workspace.policy["admin"] = {
-        "credentials": {"legistar": {"namespace": "mock-city", "token": "synthetic-secret", "permissions": ["event:create"]}},
-        "write_sources": {source_id: target},
+        "credentials": {"legistar": {"namespace": namespace, "token": "synthetic-secret", "permissions": ["event:create"]}},
+        "write_sources": {source_id: target}, "namespaces": [namespace],
     }
     planned = call(workspace, "plan_write", request, actor="admin", role="local-admin")
     assert planned["status"] == "completed", planned
@@ -273,3 +274,83 @@ def test_all_31_capabilities_and_34_saved_discovery_preview_adapters(tmp_path):
         assert preview["data"]["selections"], (case["connector"], preview)
         assert preview["status"] == "partial"
     assert len(call(workspace, "sources")["data"]["sources"]) == 34
+
+
+def test_server_owned_policy_reload_denies_staff_and_revoked_plans(tmp_path):
+    network = WriteNetwork()
+    workspace = ConnectorWorkspace(tmp_path, write_adapters=default_adapters(network))
+    source_id = call(workspace, "configure_source", {"source": {
+        "provider": "legistar", "url": "https://webapi.legistar.com/v1/mock-city/events",
+    }}, actor="admin", role="local-admin")["data"]["source_id"]
+    target = workspace.get("townlight_sources", source_id, workspace.context("admin", "local-admin"))["source"]
+    namespace = target["namespace"]
+    policy = {"admin": {"namespaces": [namespace], "write_sources": {source_id: target},
+                         "credentials": {"legistar": {"namespace": namespace, "token": "synthetic-secret", "permissions": ["event:create"]}}}}
+    path = tmp_path / "config" / "secrets" / "connectors.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(policy), encoding="utf-8")
+    changes = [{"key": "council-1", "entity": "event", "operation": "create",
+                "fields": {"EventDate": "2026-11-11T00:00:00", "EventBodyId": 4}}]
+    request = {"source_id": source_id, "changes": changes}
+    assert call(workspace, "plan_write", request, actor="admin", role="staff")["status"] == "failed"
+    planned = call(workspace, "plan_write", request, actor="admin", role="local-admin")
+    assert planned["status"] == "completed", planned
+    approval = {key: planned["data"][key] for key in ("plan_id", "plan_hash")}
+    assert "synthetic-secret" not in json.dumps(planned)
+    policy["admin"]["write_sources"] = {}
+    path.write_text(json.dumps(policy), encoding="utf-8")
+    assert call(workspace, "commit_write", approval, actor="admin", role="local-admin")["status"] == "failed"
+    assert network.writes == 0
+    path.write_text('{"admin": {"namespaces": "*"}}', encoding="utf-8")
+    with pytest.raises(ValueError):
+        call(workspace, "sources", actor="admin", role="local-admin")
+
+
+def test_default_workspace_registers_standard_adapters_without_grant(tmp_path):
+    workspace = ConnectorWorkspace(tmp_path)
+    assert "legistar" in workspace.adapters
+    assert workspace.adapters["legistar"].mock is False
+    assert call(workspace, "sources", actor="admin", role="local-admin")["data"]["can_write"] is False
+
+
+def test_server_policy_supplies_account_credentials_only_to_admin(tmp_path, monkeypatch):
+    workspace = ConnectorWorkspace(tmp_path)
+    source_id = call(workspace, "configure_source", {"source": {
+        "provider": "municode-meetings", "url": "https://meetingsgov.devmunicode.com",
+        "namespace": "account-a"}}, actor="admin", role="local-admin")["data"]["source_id"]
+    path = tmp_path / "config" / "secrets" / "connectors.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"admin": {"namespaces": ["account-a"], "credentials": {
+        "municode-meetings": {"origin": "https://meetingsgov.devmunicode.com", "namespace": "account-a", "token": "test-only-token"}}}}), encoding="utf-8")
+    observed = []
+    def fetch(operation, request, **kwargs):
+        observed.append(kwargs["context"])
+        return OperationResult("completed", data={"records": []})
+    monkeypatch.setattr(workspace.engine, "execute", fetch)
+    result = call(workspace, "fetch", {"source_id": source_id, "fetch_options": {
+        "api_resource": "meeting", "external_id": "42"}}, actor="admin", role="local-admin")
+    assert result["status"] == "completed"
+    assert observed[0].credentials["municode-meetings"]["token"] == "test-only-token"
+    assert observed[0].allowed_namespaces == frozenset({"account-a"})
+    assert "test-only-token" not in json.dumps(result)
+    assert workspace.context("admin", "staff").credentials == {}
+
+
+def test_server_policy_drives_real_sdk_account_fetch(tmp_path):
+    import hashlib
+    network = ReadNetwork()
+    workspace = ConnectorWorkspace(tmp_path, provider_transport=network)
+    configured = call(workspace, "configure_source", {"source": {
+        "provider": "municode-meetings", "url": "https://meetingsgov.devmunicode.com",
+        "namespace": "account-a"}}, actor="admin", role="local-admin")
+    source_id = configured["data"]["source_id"]
+    tenant = hashlib.sha256(str(tmp_path.resolve()).encode()).hexdigest()
+    path = tmp_path / "config" / "secrets" / "connectors.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"admin": {"namespaces": ["account-a"], "credentials": {
+        "municode-meetings": {"origin": "https://meetingsgov.devmunicode.com", "namespace": "account-a",
+                              "tenant": tenant, "token": "test-only-token"}}}}), encoding="utf-8")
+    result = call(workspace, "fetch", {"source_id": source_id, "fetch_options": {
+        "api_resource": "meeting", "external_id": "42"}}, actor="admin", role="local-admin")
+    assert result["status"] == "partial", result
+    assert network.calls and "test-only-token" not in json.dumps(result)

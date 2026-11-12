@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
 from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,6 +19,7 @@ from civic_data_connectors.interchange import open_artifact
 from civic_data_connectors.legacy import LegacyIdentityMapping, legacy_previews
 from civic_data_connectors.models import Bounds, Error
 from civic_data_connectors.storage import SQLiteStorage
+from civic_data_connectors.write_adapters import default_adapters
 
 OPERATIONS = {
     "providers", "capabilities", "identify", "sources", "configure_source", "discover",
@@ -63,9 +65,8 @@ class ConnectorWorkspace:
         self.root = Path(profile_root).resolve()
         self.storage = SQLiteStorage(safe_child(self.root, "data/connectors/evidence.sqlite"))
         self.policy = deepcopy(policy or {})
-        self.adapters = write_adapters or {}
-        if any(adapter.mock is not True for adapter in self.adapters.values()):
-            raise ValueError("This candidate permits synthetic write transports only.")
+        self.policy_path = safe_child(self.root, "config/secrets/connectors.json") if policy is None else None
+        self.adapters = default_adapters() if write_adapters is None else write_adapters
         self.engine = create_engine(
             storage=self.storage, provider_transport=provider_transport,
             provider_browser=provider_browser, write_adapters=self.adapters,
@@ -73,14 +74,43 @@ class ConnectorWorkspace:
         )
         self.canonical_save = canonical_save
 
+    def current_policy(self):
+        # The profile owner provisions this file through the existing server secrets
+        # directory. It is never accepted from browser requests or returned to them.
+        if self.policy_path is None:
+            policy = deepcopy(self.policy)
+        elif not self.policy_path.exists():
+            return {}
+        else:
+            if self.policy_path.stat().st_size > 1024 * 1024:
+                raise ValueError("Connector policy is invalid.")
+            policy = json.loads(self.policy_path.read_text(encoding="utf-8"))
+        if not isinstance(policy, dict):
+            raise ValueError("Connector policy is invalid.")
+        for actor, entry in policy.items():
+            if not isinstance(actor, str) or not actor or not isinstance(entry, dict) or set(entry) - {"credentials", "namespaces", "write_sources"}:
+                raise ValueError("Connector policy is invalid.")
+            credentials, namespaces, targets = entry.get("credentials", {}), entry.get("namespaces"), entry.get("write_sources", {})
+            if not isinstance(credentials, dict) or not isinstance(namespaces, list) or not namespaces or any(not isinstance(n, str) or not n for n in namespaces) or not isinstance(targets, dict):
+                raise ValueError("Connector policy is invalid.")
+            for key, target in targets.items():
+                if not isinstance(key, str) or not key or not isinstance(target, dict):
+                    raise ValueError("Connector policy is invalid.")
+                source = Source.from_dict(target)
+                if source.namespace not in namespaces:
+                    raise ValueError("Connector policy is invalid.")
+        return policy
+
     def approve_write(self, plan, _digest, context):
-        targets = self.policy.get(context.principal, {}).get("write_sources", {}).values()
-        return any(Source.from_dict(target).public_dict() == plan["source"] for target in targets)
+        entry = self.current_policy().get(context.principal, {})
+        targets = entry.get("write_sources", {}).values()
+        return (plan["source"].get("namespace") in entry.get("namespaces", []) and
+                any(Source.from_dict(target).public_dict() == plan["source"] for target in targets))
 
     def context(self, actor, role, *, operation_id=None):
-        policy = self.policy.get(str(actor), {}) if role == "local-admin" else {}
-        granted = bool(policy and self.adapters)
-        return OperationContext(
+        policy = self.current_policy().get(str(actor), {}) if role == "local-admin" else {}
+        granted = bool(policy.get("write_sources") and self.adapters)
+        context = OperationContext(
             principal=str(actor), client_id="townlight-runtime",
             tenant=hashlib.sha256(str(self.root).encode()).hexdigest(),
             authorization=frozenset({"write:plan", "write:commit"}) if granted else frozenset(),
@@ -88,6 +118,8 @@ class ConnectorWorkspace:
             allowed_namespaces=frozenset(policy["namespaces"]) if "namespaces" in policy else None,
             operation_id=operation_id,
         )
+        context.townlight_policy = policy
+        return context
 
     def get(self, collection, key, context):
         if not isinstance(key, str) or not key or len(key) > 128:
@@ -157,7 +189,7 @@ class ConnectorWorkspace:
                     (item.value for item in self.storage.list("townlight_result_index", scope=context.scope)),
                     key=lambda row: row["captured_at"], reverse=True,
                 )[:100],
-                "can_write": bool(context.authorization), "write_mode": "mock_only",
+                "can_write": bool(context.authorization), "write_mode": ("configured" if context.authorization else "disabled"),
             }).public_dict()
         if operation == "configure_source":
             only(payload, {"source", "new_source", "identity_mappings"})
@@ -310,15 +342,15 @@ class ConnectorWorkspace:
                                    errors=saved.errors, coverage=saved.coverage).public_dict()
         if operation in {"plan_write", "commit_write", "receipt"}:
             if not context.authorization:
-                return failure("permission_denied", "Outbound requires a local administrator and explicit server-owned mock policy.")
+                return failure("permission_denied", "Outbound requires a local administrator and explicit server-owned policy.")
             if operation == "plan_write":
                 only(payload, {"source_id", "changes"})
                 configured = self.get("townlight_sources", payload["source_id"], context)
-                target = self.policy.get(context.principal, {}).get("write_sources", {}).get(payload["source_id"])
+                target = context.townlight_policy.get("write_sources", {}).get(payload["source_id"])
                 if target is None:
                     return failure("permission_denied", "No exact provider write target is bound to this configured source.")
-                if target["provider"] != configured["source"]["provider"]:
-                    raise ValueError("Write provider must match the configured source.")
+                if Source.from_dict(target).public_dict() != configured["source"]:
+                    return failure("permission_denied", "The write target must exactly match the configured source.")
                 request = {"source": target, "changes": payload["changes"]}
             else:
                 only(payload, {"plan_id", "plan_hash"} if operation == "commit_write" else {"plan_id"})

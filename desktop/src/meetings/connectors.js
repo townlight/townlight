@@ -43,14 +43,14 @@ export function renderConnectors() {
       <button name="action" value="next">Next result page</button>
     </form>
     <form data-connector-write>
-      <h4>Explicit provider action (mock-only candidate)</h4>
-      <p>Disabled without a server-owned mock adapter/policy and local administrator role. Ingestion, search, import and export never perform these actions. Review the exact returned plan before approving it. No live provider acceptance is claimed.</p>
+      <h4>Explicit provider action</h4>
+      <p>Disabled without an exact server-owned source policy and local administrator role. Provider credentials are required where the provider requires them. Ingestion, search, import and export never perform these actions. Review the exact returned plan before approving it. No live provider acceptance is claimed.</p>
       <label>Documented changes (JSON array) <textarea name="changes">[]</textarea></label>
-      <button name="action" value="plan_write" disabled>Create mock change plan</button>
+      <button name="action" value="plan_write" disabled>Create change plan</button>
       <label>Exact saved plan ID <input name="plan_id" readonly></label>
       <label>Exact saved plan hash <input name="plan_hash" readonly></label>
-      <label><input name="approve" type="checkbox"> I authorize only the exact displayed mock plan</label>
-      <button name="action" value="commit_write" disabled>Commit exact authorized mock plan</button>
+      <label><input name="approve" type="checkbox"> I authorize only the exact displayed plan</label>
+      <button name="action" value="commit_write" disabled>Commit exact authorized plan</button>
       <button name="action" value="receipt" disabled>Read saved receipt</button>
     </form>
     <form data-connector-progress><label>Operation ID <input name="operation_id" required></label>
