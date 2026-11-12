@@ -354,3 +354,21 @@ def test_server_policy_drives_real_sdk_account_fetch(tmp_path):
         "api_resource": "meeting", "external_id": "42"}}, actor="admin", role="local-admin")
     assert result["status"] == "partial", result
     assert network.calls and "test-only-token" not in json.dumps(result)
+
+
+def test_policy_revalidates_path_and_bounds_each_read(tmp_path, monkeypatch):
+    from townlight_runtime import connectors
+    workspace = ConnectorWorkspace(tmp_path)
+    path = tmp_path / "config" / "secrets" / "connectors.json"
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b" " * (1024 * 1024 + 1))
+    with pytest.raises(ValueError):
+        workspace.current_policy()
+    seen = []
+    def reject_changed_path(root, relative):
+        seen.append((root, relative))
+        raise ValueError("link rejected")
+    monkeypatch.setattr(connectors, "safe_child", reject_changed_path)
+    with pytest.raises(ValueError, match="link rejected"):
+        workspace.current_policy()
+    assert seen == [(tmp_path.resolve(), "config/secrets/connectors.json")]

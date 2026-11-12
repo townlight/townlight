@@ -44,7 +44,7 @@ export function renderConnectors() {
     </form>
     <form data-connector-write>
       <h4>Explicit provider action</h4>
-      <p>Disabled without an exact server-owned source policy and local administrator role. Provider credentials are required where the provider requires them. Ingestion, search, import and export never perform these actions. Review the exact returned plan before approving it. No live provider acceptance is claimed.</p>
+      <p>Disabled without an explicit server-owned source grant and local administrator role. Provider credentials are required where the provider requires them. Ingestion, search, import and export never perform these actions. Review the exact returned plan before approving it. No live provider acceptance is claimed.</p>
       <label>Documented changes (JSON array) <textarea name="changes">[]</textarea></label>
       <button name="action" value="plan_write" disabled>Create change plan</button>
       <label>Exact saved plan ID <input name="plan_id" readonly></label>

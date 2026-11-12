@@ -65,7 +65,7 @@ class ConnectorWorkspace:
         self.root = Path(profile_root).resolve()
         self.storage = SQLiteStorage(safe_child(self.root, "data/connectors/evidence.sqlite"))
         self.policy = deepcopy(policy or {})
-        self.policy_path = safe_child(self.root, "config/secrets/connectors.json") if policy is None else None
+        self.policy_path = "config/secrets/connectors.json" if policy is None else None
         self.adapters = default_adapters() if write_adapters is None else write_adapters
         self.engine = create_engine(
             storage=self.storage, provider_transport=provider_transport,
@@ -79,12 +79,16 @@ class ConnectorWorkspace:
         # directory. It is never accepted from browser requests or returned to them.
         if self.policy_path is None:
             policy = deepcopy(self.policy)
-        elif not self.policy_path.exists():
-            return {}
         else:
-            if self.policy_path.stat().st_size > 1024 * 1024:
+            path = safe_child(self.root, self.policy_path)
+            try:
+                with path.open("rb") as stream:
+                    content = stream.read(1024 * 1024 + 1)
+            except FileNotFoundError:
+                return {}
+            if len(content) > 1024 * 1024:
                 raise ValueError("Connector policy is invalid.")
-            policy = json.loads(self.policy_path.read_text(encoding="utf-8"))
+            policy = json.loads(content.decode("utf-8"))
         if not isinstance(policy, dict):
             raise ValueError("Connector policy is invalid.")
         for actor, entry in policy.items():
