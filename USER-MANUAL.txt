@@ -2,7 +2,7 @@ Windows x64 Beta 1 · MSI 1.8.1.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
-- Prepared connector source candidate · Townlight 1.8.3
+- Prepared connector source candidate · Townlight 1.8.4
 - Townlight Suite Manual
   - Using this manual
   - Beta identity
@@ -28,13 +28,13 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 Townlight Suite Manual
 
-Prepared connector source candidate · Townlight 1.8.3
+Prepared connector source candidate · Townlight 1.8.4
 
-This Townlight 1.8.3 source candidate pins QuorumRelay 0.1.0.dev6 in Townlight Runtime. The vendored wheel SHA-256 is ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1; QuorumRelay source commit 4b1c27ca571d1b781233fcd03389ce99ddf58932 is integrated in Townlight source commit 438c9bbeeeddcccf967ecea8e02b1c3a556699b3. The shared connector source retains all 31 provider families and 34 baseline input-format paths, while per-provider live discovery, schemas and supported operations have different evidence and completion levels.
+This Townlight 1.8.4 source candidate (Windows product version 1.8.4.0) pins QuorumRelay 0.1.0.dev6 in Townlight Runtime. The vendored wheel SHA-256 is ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1; QuorumRelay source commit 4b1c27ca571d1b781233fcd03389ce99ddf58932 is integrated in Townlight source commit 438c9bbeeeddcccf967ecea8e02b1c3a556699b3. The shared connector source retains all 31 provider families and 34 baseline input-format paths, while per-provider live discovery, schemas and supported operations have different evidence and completion levels.
 
-This is candidate-source guidance only. It does not identify a released or installed 1.8.3 Windows package. Use the currently released Windows 1.8.1.1 installer and acceptance links below for the public release. In this candidate, the Meetings workspace includes an External meeting evidence panel backed by the authenticated Townlight runtime. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Live provider acceptance remains NOT_RUN because no authorized provider test tenant or credentials were supplied. The dev6 core includes bounded Granicus Clip metadata search and CivicClerk captured MP4 preview mapping; these do not establish complete provider coverage or a completed Station handoff. The connector guide describes evidence limits and file-preparation details. See the provider and format guide for interface details, panel steps, limits and remaining acceptance.
+This is candidate-source guidance only. It does not identify a released or installed 1.8.4 Windows package. Use the currently released Windows 1.8.1.1 installer and acceptance links below for the public release. In this candidate, the Meetings workspace includes an External meeting evidence panel backed by the authenticated Townlight runtime. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Live provider acceptance remains NOT_RUN because no authorized provider test tenant or credentials were supplied. The dev6 core includes bounded Granicus Clip metadata search and CivicClerk captured MP4 preview mapping; these do not establish complete provider coverage or a completed Station handoff. The connector guide describes evidence limits and file-preparation details. See the provider and format guide for interface details, panel steps, limits and remaining acceptance.
 
-External meeting evidence · Townlight 1.8.3 source candidate
+External meeting evidence · Townlight 1.8.4 source candidate
 
 This panel is prepared in source; its presence here does not establish that it is installed in the released 1.8.1.1 package.
 
