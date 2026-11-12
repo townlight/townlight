@@ -40,6 +40,8 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'station-media-payload.ps1')
+. (Join-Path $PSScriptRoot 'station-python-dependency.ps1')
+. (Join-Path $PSScriptRoot 'station-python-dependency.ps1')
 
 if ($PlanningBuildProfile -eq 'planning-staff-beta' -and $ProductProfile -ne 'planning-preview') {
     throw 'The staff beta build requires the existing planning-preview runtime composition.'
@@ -981,6 +983,13 @@ function Install-PythonServicePackages {
     ) + $ServicePackages
     if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
+    $StationPythonDependency = $null
+    $StationPythonVerification = $null
+    if ($ProductProfile -eq 'inspections-preview') {
+        $StationPythonDependency = Install-StationPythonDependency `
+            -Source $Source.station_pywin32 -PythonRoot $PythonRoot -CacheRoot $CacheRoot
+        $StationPythonVerification = Test-StationPythonDependencyRuntime -PythonRoot $PythonRoot
+    }
     Copy-TownlightRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
@@ -1038,10 +1047,15 @@ path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
 "@
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $ProvenanceScript) -ExtraEnvironment @{ TESTING = '1' }
     }
-    return @{
+    $Result = @{
         pip = $PipStatus
         installed = $InstalledPackages
     }
+    if ($ProductProfile -eq 'inspections-preview') {
+        $Result.station_python_dependency = $StationPythonDependency
+        $Result.station_python_verification = $StationPythonVerification
+    }
+    return $Result
 }
 
 function Install-OllamaPayload {
