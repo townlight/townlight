@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -111,7 +112,7 @@ MustReject { Install-StationPythonDependency -Source $BadHash -PythonRoot $Pytho
         encoding="utf-8",
     )
     fake_wheel = tmp_path / "fake-pywin32.whl"
-    env = __import__("os").environ.copy()
+    env = os.environ.copy()
     env["STATION_DEPENDENCY_HELPER"] = str(HELPER)
     env["STATION_SOURCES"] = str(SOURCES)
     env["STATION_FAKE_WHEEL"] = str(fake_wheel)
@@ -124,3 +125,74 @@ MustReject { Install-StationPythonDependency -Source $BadHash -PythonRoot $Pytho
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("host", ["powershell.exe", "pwsh.exe"])
+def test_real_native_python_probes_preserve_arguments_under_each_host(host: str, tmp_path: Path) -> None:
+    if os.name != "nt":
+        pytest.skip("The embedded Windows runtime requires Windows")
+    executable = shutil.which(host)
+    if not executable:
+        pytest.skip(f"{host} is not installed")
+
+    python_root = ROOT / "desktop/runtime/payload/python"
+    if not (python_root / "python.exe").is_file():
+        pytest.skip("Prepared inspections-preview Python runtime is not available")
+    wheel = ROOT / ".runtime-cache/windows-local-1.0/pywin32-312-cp313-cp313-win_amd64.whl"
+
+    script = tmp_path / "station-python-native-probes.ps1"
+    script.write_text(
+        r'''$ErrorActionPreference = 'Stop'
+$tokens = $null
+$parseErrors = $null
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($env:STATION_PREPARE_SCRIPT, [ref]$tokens, [ref]$parseErrors)
+if ($parseErrors.Count) { throw ($parseErrors | Out-String) }
+$definition = @($ast.EndBlock.Statements | Where-Object {
+    $_ -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -eq 'Invoke-PythonPayloadCommand'
+})
+if ($definition.Count -ne 1) { throw 'Expected exactly one production Invoke-PythonPayloadCommand definition.' }
+Invoke-Expression $definition[0].Extent.Text
+. $env:STATION_DEPENDENCY_HELPER
+
+$PythonRoot = $env:STATION_PYTHON_ROOT
+Test-StationPythonTarget -PythonRoot $PythonRoot
+$Verification = Test-StationPythonDependencyRuntime -PythonRoot $PythonRoot
+if ($Verification.pip_check -ne 'passed' -or $Verification.declared_dependency_imports -ne 'passed' -or
+    $Verification.read_only_process_token_probe -ne 'passed' -or $Verification.station_cli_help -ne 'passed') {
+    throw 'Production Station runtime probes returned an incomplete verification result.'
+}
+
+function Get-TestSha256([string]$Path) {
+    $Stream = [System.IO.File]::OpenRead($Path)
+    $Hasher = [System.Security.Cryptography.SHA256]::Create()
+    try { return -join ($Hasher.ComputeHash($Stream) | ForEach-Object { $_.ToString('x2') }) }
+    finally { $Stream.Dispose(); $Hasher.Dispose() }
+}
+
+if (Test-Path -LiteralPath $env:STATION_PYWIN32_WHEEL -PathType Leaf) {
+    $WheelShaBefore = Get-TestSha256 -Path $env:STATION_PYWIN32_WHEEL
+    $InstallArguments = @(Get-StationPythonInstallArguments -WheelPath $env:STATION_PYWIN32_WHEEL)
+    $DryRunArguments = @($InstallArguments[0], $InstallArguments[1], $InstallArguments[2], '--dry-run', '--no-cache-dir') +
+        @($InstallArguments[3..($InstallArguments.Count - 1)])
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $DryRunArguments `
+        -ExtraEnvironment @{ PYTHONDONTWRITEBYTECODE = '1' }
+    $WheelShaAfter = Get-TestSha256 -Path $env:STATION_PYWIN32_WHEEL
+    if ($WheelShaAfter -ne $WheelShaBefore) { throw 'Read-only pywin32 wheel argument probe changed the pinned wheel.' }
+}
+''',
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["STATION_PREPARE_SCRIPT"] = str(PREPARE)
+    env["STATION_DEPENDENCY_HELPER"] = str(HELPER)
+    env["STATION_PYTHON_ROOT"] = str(python_root)
+    env["STATION_PYWIN32_WHEEL"] = str(wheel)
+    result = subprocess.run(
+        [executable, "-NoLogo", "-NoProfile", "-NonInteractive", "-File", str(script)],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Station dependencies and read-only Windows process-token probe passed" in result.stdout

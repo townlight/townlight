@@ -30,16 +30,9 @@ function Install-StationPythonDependency {
         throw "Station pywin32 wheel SHA-256 mismatch: expected $($Source.download_sha256), got $WheelSha256"
     }
 
-    $TargetCheck = @'
-import struct, sys
-if sys.platform != "win32" or sys.version_info[:2] != (3, 13) or struct.calcsize("P") != 8:
-    raise SystemExit(f"Station pywin32 wheel requires CPython 3.13 Windows x86-64; got {sys.version} / {sys.platform} / {struct.calcsize('P') * 8}-bit")
-'@
-    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $TargetCheck)
-    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
-        '-m', 'pip', 'install', '--disable-pip-version-check', '--no-warn-script-location',
-        '--no-index', '--no-deps', '--force-reinstall', $WheelPath
-    )
+    Test-StationPythonTarget -PythonRoot $PythonRoot
+    $InstallArguments = Get-StationPythonInstallArguments -WheelPath $WheelPath
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $InstallArguments
     return [pscustomobject]@{
         status = 'installed'
         distribution = $Source.distribution
@@ -49,11 +42,38 @@ if sys.platform != "win32" or sys.version_info[:2] != (3, 13) or struct.calcsize
     }
 }
 
+function Get-StationPythonInstallArguments {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$WheelPath)
+
+    return @(
+        '-m', 'pip', 'install', '--disable-pip-version-check', '--no-warn-script-location',
+        '--no-index', '--no-deps', '--force-reinstall', $WheelPath
+    )
+}
+
+function Test-StationPythonTarget {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$PythonRoot)
+
+    # Keep Python code free of embedded double quotes: Windows PowerShell 5's
+    # native-argument marshaller strips them while forwarding `python -c`.
+    $TargetCheck = @'
+import struct, sys
+if sys.platform != 'win32' or sys.version_info[:2] != (3, 13) or struct.calcsize('P') != 8:
+    raise SystemExit('Station pywin32 wheel requires CPython 3.13 Windows x86-64; got {} / {} / {}-bit'.format(sys.version, sys.platform, struct.calcsize('P') * 8))
+'@
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $TargetCheck) `
+        -ExtraEnvironment @{ PYTHONDONTWRITEBYTECODE = '1' }
+}
+
 function Test-StationPythonDependencyRuntime {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$PythonRoot)
 
-    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'check')
+    $ReadOnlyEnvironment = @{ PYTHONDONTWRITEBYTECODE = '1' }
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'pip', 'check') `
+        -ExtraEnvironment $ReadOnlyEnvironment
     $DependencyProbe = @'
 import fastapi, httpx, psycopg2, pydantic, sqlalchemy, uvicorn
 import win32api, win32security
@@ -61,14 +81,16 @@ token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32securi
 try:
     sid = win32security.GetTokenInformation(token, win32security.TokenUser)[0]
     caller = win32security.ConvertSidToStringSid(sid)
-    if not caller.startswith("S-1-"):
-        raise RuntimeError("Read-only process-token SID probe returned an invalid SID")
+    if not caller.startswith('S-1-'):
+        raise RuntimeError('Read-only process-token SID probe returned an invalid SID')
 finally:
     token.Close()
-print("Station dependencies and read-only Windows process-token probe passed")
+print('Station dependencies and read-only Windows process-token probe passed')
 '@
-    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $DependencyProbe)
-    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'townlight_station.cli', '--help')
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $DependencyProbe) `
+        -ExtraEnvironment $ReadOnlyEnvironment
+    Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-m', 'townlight_station.cli', '--help') `
+        -ExtraEnvironment $ReadOnlyEnvironment
     return [pscustomobject]@{
         pip_check = 'passed'
         declared_dependency_imports = 'passed'
