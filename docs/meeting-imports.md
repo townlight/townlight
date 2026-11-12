@@ -1,11 +1,18 @@
 # Shared meeting imports
 
-<a id="quorumrelay-source-candidate"></a>
 ## QuorumRelay source candidate
 
-This Townlight source checkout pins QuorumRelay `0.1.0.dev4` in the bundled runtime. Vendored wheel SHA-256: `f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1`. QuorumRelay source commit `58d609c960212b62504d4d320e11c238e5bb221e` is integrated in Townlight source commit `79e4080ce4c4611a20de3f6b9f5864948e486983`. The compatibility baseline remains 31 provider families and 34 input-format paths; it does not certify full discovery, pagination or every operation for each provider.
+This Townlight 1.8.2 source candidate pins QuorumRelay `0.1.0.dev6` in the bundled runtime. Vendored wheel SHA-256: `ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1`. QuorumRelay source commit `4b1c27ca571d1b781233fcd03389ce99ddf58932` is integrated in Townlight source commit `438c9bbeeeddcccf967ecea8e02b1c3a556699b3`. The compatibility baseline remains 31 provider families and 34 input-format paths; it does not certify full discovery, pagination or every operation for each provider.
 
 The source candidate adds the profile-scoped connector workspace at authenticated native route `POST /desktop/v1/meetings/connectors/run`. Its operation contract covers provider/capability listing, source identification/configuration, bounded discovery and fetch, local search, import preview/save, evidence persistence, export, write planning/commit, and receipt/status operations. This route remains inside the Townlight runtime and existing staff authorization boundary; it is not a separate public service or an independent MCP endpoint. The source bridge and workspace are `desktop/runtime/python-services/townlight_runtime/connector_bridge.py` and `connectors.py`. See the [candidate native API schema](https://townlight.github.io/api/candidate-1.8.2/suite-openapi.json); it is generated from source composition and does not establish installed endpoint behavior.
+
+### Bounded dev6 capabilities and limits
+
+- **Granicus Clip metadata search:** QuorumRelay has a native same-origin ViewPublisher search route. A bounded public read against Superior returned five results on the first page and five distinct results after resume; both are `partial`. The provider supplies candidates from its observed first-expression form, and local exact matching is limited to title and meeting-date metadata. It does not establish a complete catalog, document search, transcript search or Townlight panel access to native search. The Townlight panel's **Save searchable evidence** action remains local search over captured evidence.
+- **CivicClerk media preview:** captured Erie event 1277 contains the provider's exact HTTPS `.mp4` `mediaStreamPath`; preview retains that URL and exposes it as `video_url` for the Station recording handoff. This one captured URL does not establish live portal coverage, video playback or a completed Station handoff.
+- **CivicPlus Select file preparation:** the bounded exporter recognizes `Agenda`, `Agenda Packet`, `Minutes`, `Notice` and `Other` PDF files plus `Media` MP4 files, using the linked filename tester as a classifier. A captured MP4 passed bounded container framing and byte/hash preservation. This is file preparation only: it does not establish codec/playability, consultant or vendor acceptance, ZIP import or FTP upload. The panel's neutral evidence exports are not the CivicPlus vendor importer.
+
+These examples describe bounded core behavior and its current evidence, not full provider acceptance. Per-provider read/write acceptance remains separate; no authorized provider test tenant or credentials were supplied.
 
 ### Meetings panel workflow
 
@@ -36,7 +43,7 @@ print(stable_id(profile_root, "native-user", native_email))
 
 For Essential and TelVue account credentials, SDK credential objects require the exact authorized `origin` and `namespace`, plus `tenant` equal to the SHA-256 hex digest of the UTF-8 string form of the resolved profile root. Use the provider's documented credential fields and a verified account origin. Do not guess token keys or production hosts. No authorized provider test tenant or credentials were supplied, so account-read and live-write acceptance remains NOT_RUN. This is an access blocker, not evidence that a provider operation is unsupported.
 
-Candidate completeness remains limited by the verified per-provider matrix: live discovery and paging are not complete for every tenant; captures and provider fields may be partial; per-operation statuses remain distinct. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Account-read and live-write acceptance is NOT_RUN because no authorized provider test tenant or credentials were supplied. Do not use public city data for write testing. The dev4 pin and baseline counts do not establish completion of the connector project's full acceptance plan.
+Candidate completeness remains limited by the verified per-provider matrix: live discovery and paging are not complete for every tenant; captures and provider fields may be partial; per-operation statuses remain distinct. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Account-read and live-write acceptance is NOT_RUN because no authorized provider test tenant or credentials were supplied. Do not use public city data for write testing. The dev6 pin and baseline counts do not establish completion of the connector project's full acceptance plan.
 
 This documentation describes prepared source for Townlight 1.8.2, not a signed, installed or released Windows build. Windows 1.8.1.1 remains the current public release and its links and acceptance evidence below are historical evidence for that exact release.
 

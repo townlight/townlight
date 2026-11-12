@@ -17,7 +17,7 @@ header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:
 <nav aria-label="Main"><a href="../manuals/suite.html">Suite manual</a>
 <a href="../index.html#connector-candidate">Candidate status</a>
 <a href="../terms.html">Terms and license</a></nav></header>
-<main id="main" class="reading wrap"><p class="edition">QuorumRelay dev4 integration · Townlight 1.8.2 source candidate</p>
+<main id="main" class="reading wrap"><p class="edition">QuorumRelay dev6 integration · Townlight 1.8.2 source candidate</p>
 <p>Prepared source-candidate documentation; this page does not establish a built, signed or installed package.</p>
 
 <nav id="TOC" role="doc-toc">
@@ -25,6 +25,9 @@ header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:
 <li><a href="#shared-meeting-imports"
 id="toc-shared-meeting-imports">Shared meeting imports</a>
 <ul>
+<li><a href="#quorumrelay-source-candidate"
+id="toc-quorumrelay-source-candidate">QuorumRelay source
+candidate</a></li>
 <li><a href="#staff-handoffs" id="toc-staff-handoffs">Staff
 handoffs</a></li>
 <li><a href="#shared-interface" id="toc-shared-interface">Shared
@@ -39,15 +42,14 @@ limits</a></li>
 </ul>
 </nav>
 <h1 id="shared-meeting-imports">Shared meeting imports</h1>
-<p><a id="quorumrelay-source-candidate"></a> ## QuorumRelay source
-candidate</p>
-<p>This Townlight source checkout pins QuorumRelay
-<code>0.1.0.dev4</code> in the bundled runtime. Vendored wheel SHA-256:
-<code>f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1</code>.
+<h2 id="quorumrelay-source-candidate">QuorumRelay source candidate</h2>
+<p>This Townlight 1.8.2 source candidate pins QuorumRelay
+<code>0.1.0.dev6</code> in the bundled runtime. Vendored wheel SHA-256:
+<code>ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1</code>.
 QuorumRelay source commit
-<code>58d609c960212b62504d4d320e11c238e5bb221e</code> is integrated in
+<code>4b1c27ca571d1b781233fcd03389ce99ddf58932</code> is integrated in
 Townlight source commit
-<code>79e4080ce4c4611a20de3f6b9f5864948e486983</code>. The compatibility
+<code>438c9bbeeeddcccf967ecea8e02b1c3a556699b3</code>. The compatibility
 baseline remains 31 provider families and 34 input-format paths; it does
 not certify full discovery, pagination or every operation for each
 provider.</p>
@@ -66,6 +68,39 @@ and <code>connectors.py</code>. See the <a
 href="https://townlight.github.io/api/candidate-1.8.2/suite-openapi.json">candidate
 native API schema</a>; it is generated from source composition and does
 not establish installed endpoint behavior.</p>
+<h3 id="bounded-dev6-capabilities-and-limits">Bounded dev6 capabilities
+and limits</h3>
+<ul>
+<li><strong>Granicus Clip metadata search:</strong> QuorumRelay has a
+native same-origin ViewPublisher search route. A bounded public read
+against Superior returned five results on the first page and five
+distinct results after resume; both are <code>partial</code>. The
+provider supplies candidates from its observed first-expression form,
+and local exact matching is limited to title and meeting-date metadata.
+It does not establish a complete catalog, document search, transcript
+search or Townlight panel access to native search. The Townlight panel’s
+<strong>Save searchable evidence</strong> action remains local search
+over captured evidence.</li>
+<li><strong>CivicClerk media preview:</strong> captured Erie event 1277
+contains the provider’s exact HTTPS <code>.mp4</code>
+<code>mediaStreamPath</code>; preview retains that URL and exposes it as
+<code>video_url</code> for the Station recording handoff. This one
+captured URL does not establish live portal coverage, video playback or
+a completed Station handoff.</li>
+<li><strong>CivicPlus Select file preparation:</strong> the bounded
+exporter recognizes <code>Agenda</code>, <code>Agenda Packet</code>,
+<code>Minutes</code>, <code>Notice</code> and <code>Other</code> PDF
+files plus <code>Media</code> MP4 files, using the linked filename
+tester as a classifier. A captured MP4 passed bounded container framing
+and byte/hash preservation. This is file preparation only: it does not
+establish codec/playability, consultant or vendor acceptance, ZIP import
+or FTP upload. The panel’s neutral evidence exports are not the
+CivicPlus vendor importer.</li>
+</ul>
+<p>These examples describe bounded core behavior and its current
+evidence, not full provider acceptance. Per-provider read/write
+acceptance remains separate; no authorized provider test tenant or
+credentials were supplied.</p>
 <h3 id="meetings-panel-workflow">Meetings panel workflow</h3>
 <p>The source candidate adds <strong>External meeting evidence</strong>
 to the Meetings workspace. The panel loads the provider and saved-format
@@ -161,7 +196,7 @@ remain distinct. Provider actions require an exact server-owned source
 grant and local administrator role; provider credentials are configured
 server-side where required. Account-read and live-write acceptance is
 NOT_RUN because no authorized provider test tenant or credentials were
-supplied. Do not use public city data for write testing. The dev4 pin
+supplied. Do not use public city data for write testing. The dev6 pin
 and baseline counts do not establish completion of the connector
 project’s full acceptance plan.</p>
 <p>This documentation describes prepared source for Townlight 1.8.2, not

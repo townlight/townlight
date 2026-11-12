@@ -17,7 +17,7 @@ header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:
 <nav aria-label="Main"><a href="../manuals/suite.html">Suite manual</a>
 <a href="../index.html#connector-candidate">Candidate status</a>
 <a href="../terms.html">Terms and license</a></nav></header>
-<main id="main" class="reading wrap"><p class="edition">QuorumRelay dev4 integration · Townlight 1.8.2 source candidate</p>
+<main id="main" class="reading wrap"><p class="edition">QuorumRelay dev6 integration - Townlight 1.8.2 source candidate</p>
 <p>Prepared source-candidate documentation; this page does not establish a built, signed or installed package.</p>
 
 <nav id="TOC" role="doc-toc">
@@ -25,6 +25,9 @@ header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:
 <li><a href="#townlight-suite-manual"
 id="toc-townlight-suite-manual">Townlight Suite Manual</a>
 <ul>
+<li><a href="#prepared-connector-source-candidate-townlight-1.8.2"
+id="toc-prepared-connector-source-candidate-townlight-1.8.2">Prepared
+connector source candidate · Townlight 1.8.2</a></li>
 <li><a href="#shared-meeting-imports-windows-1.8.1.1"
 id="toc-shared-meeting-imports-windows-1.8.1.1">Shared meeting imports ·
 Windows 1.8.1.1</a></li>
@@ -134,15 +137,17 @@ subject index</a></li>
 </ul></li>
 </ul>
 <h1 id="townlight-suite-manual">Townlight Suite Manual</h1>
-<p><a id="connector-candidate"></a> ## Prepared connector source
-candidate · Townlight 1.8.2</p>
-<p>This checkout pins QuorumRelay <code>0.1.0.dev4</code> in Townlight
-Runtime. The vendored wheel SHA-256 is
-<code>f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1</code>;
+<p><a id="connector-candidate"></a></p>
+<h2 id="prepared-connector-source-candidate-townlight-1.8.2">Prepared
+connector source candidate · Townlight 1.8.2</h2>
+<p>This Townlight 1.8.2 source candidate pins QuorumRelay
+<code>0.1.0.dev6</code> in Townlight Runtime. The vendored wheel SHA-256
+is
+<code>ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1</code>;
 QuorumRelay source commit
-<code>58d609c960212b62504d4d320e11c238e5bb221e</code> is integrated in
+<code>4b1c27ca571d1b781233fcd03389ce99ddf58932</code> is integrated in
 Townlight source commit
-<code>79e4080ce4c4611a20de3f6b9f5864948e486983</code>. The shared
+<code>438c9bbeeeddcccf967ecea8e02b1c3a556699b3</code>. The shared
 connector source retains all 31 provider families and 34 baseline
 input-format paths, while per-provider live discovery, schemas and
 supported operations have different evidence and completion levels.</p>
@@ -155,7 +160,11 @@ authenticated Townlight runtime. Provider actions require an exact
 server-owned source grant and local administrator role; provider
 credentials are configured server-side where required. Live provider
 acceptance remains NOT_RUN because no authorized provider test tenant or
-credentials were supplied. See the <a
+credentials were supplied. The dev6 core includes bounded Granicus Clip
+metadata search and CivicClerk captured MP4 preview mapping; these do
+not establish complete provider coverage or a completed Station handoff.
+The connector guide describes evidence limits and file-preparation
+details. See the <a
 href="https://townlight.github.io/manuals/meeting-imports.html#quorumrelay-source-candidate">provider
 and format guide</a> for interface details, panel steps, limits and
 remaining acceptance.</p>

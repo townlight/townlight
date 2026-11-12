@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "QuorumRelay 0.1.0.dev4 / Townlight 1.8.2 source-candidate schema. Generated from the actual native composition without application lifespan, migrations, database or network access. This documents source routes and validation contracts; it does not establish endpoint behavior, installed acceptance or publication.",
+    "description": "QuorumRelay 0.1.0.dev6 / Townlight 1.8.2 source-candidate schema. Generated from the actual native composition without application lifespan, migrations, database or network access. This documents source routes and validation contracts; it does not establish endpoint behavior, installed acceptance or publication.",
     "version": "1.8.0.dev2"
   },
   "paths": {
@@ -29569,10 +29569,10 @@
   },
   "x-townlight-source-candidate": {
     "townlight": "1.8.2 source candidate",
-    "quorumrelay": "0.1.0.dev4",
-    "wheel_sha256": "f0f9bc97d549785458d8ac1d879258dc7750d5d420b1c9043d97026b41187ee1",
-    "quorumrelay_source_commit": "58d609c960212b62504d4d320e11c238e5bb221e",
-    "townlight_native_source_commit": "79e4080ce4c4611a20de3f6b9f5864948e486983",
+    "quorumrelay": "0.1.0.dev6",
+    "wheel_sha256": "ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1",
+    "quorumrelay_source_commit": "4b1c27ca571d1b781233fcd03389ce99ddf58932",
+    "townlight_native_source_commit": "438c9bbeeeddcccf967ecea8e02b1c3a556699b3",
     "evidence": "source-schema-only; database/network connections rejected during export"
   }
 }
