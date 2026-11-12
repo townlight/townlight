@@ -1,0 +1,7 @@
+{
+  "package": "quorumrelay",
+  "version": "0.1.0.dev8",
+  "wheel": "desktop/runtime/vendor/quorumrelay-0.1.0.dev8-py3-none-any.whl",
+  "sha256": "bcfe691b4d1eb0de162f5f94985d0242a97b5d3d89bd5eeb9306d1ef28caf692",
+  "source_commit": "3862e5f4ad7064aee722e09bb438899c3566477f"
+}

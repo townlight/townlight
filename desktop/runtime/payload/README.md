@@ -9,7 +9,17 @@ Tauri MSI bundle is built:
 - `postgres/` contains portable PostgreSQL 17 with pgvector.
 - `python/` contains bundled CPython plus Townlight Core and city-core services.
 - `ollama/` contains the native Ollama runtime.
-- `station/` contains the paired Station media tools and corresponding notices.
+- `station/` contains the complete accepted Station media subtree, including the
+  media tools, runtime, CivicCast media source, and notices.
+
+For `inspections-preview`, `prepare-runtime-payload.ps1` restores `station/`
+from the pinned signed Windows 1.8.1.1 MSI. The script checks the published MSI
+SHA-256 and requires a `Valid` Authenticode signature from Scott Converse
+before administrative extraction. It validates the extracted media files
+against the pinned Station `townlight_station/media-lock.json`, copies the full
+subtree without changing file bytes, and adds the six required Station files to
+the generated payload lock. The MSI source and extraction are build inputs;
+they do not change the compiled `windows-runtime-payloads.json` manifest.
 
 The desktop supervisor copies these payloads into the local Townlight runtime
 profile during install or repair and refuses to report required services as

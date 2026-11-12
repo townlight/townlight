@@ -265,6 +265,18 @@ def test_candidate_upgrades_the_public_townlight_family() -> None:
     assert candidate["bundle"]["windows"]["wix"]["upgradeCode"] != base["bundle"]["windows"]["wix"]["upgradeCode"]
 
 
+def test_inspections_candidate_uses_coherent_desktop_and_wix_versions() -> None:
+    contract = json.loads(_read(ROOT / "config/inspections-msi-candidate.json"))
+    overlay = json.loads(_read(ROOT / "desktop/src-tauri/tauri.inspections-candidate.conf.json"))
+    build_contract = _read(ROOT / "desktop/scripts/inspections-build-contract.ps1")
+
+    assert contract["desktop_version"] == "1.8.5"
+    assert contract["windows_product_version"] == "1.8.5.0"
+    assert overlay["version"] == contract["desktop_version"]
+    assert "$Contract.desktop_version -ne '1.8.5'" in build_contract
+    assert "$Contract.windows_product_version -ne '1.8.5.0'" in build_contract
+
+
 def test_publication_signs_executable_before_bundling_and_checks_embedded_bytes() -> None:
     workflow = _read(BUILD_WORKFLOW)
     stages = [
@@ -351,9 +363,10 @@ function Resolve($Profile, $Branch, $Sign = $false) {
 }
 if ((Resolve automatic main).product_profile -ne 'inspections-preview') { throw 'main must exercise the full Beta 1 composition' }
 if ((Resolve automatic feature/shared-meeting-imports).product_profile -ne 'inspections-preview') { throw 'Shared import candidate branch must exercise the full composition' }
+if ((Resolve automatic feature/quorumrelay-integration).product_profile -ne 'inspections-preview') { throw 'QuorumRelay candidate branch must exercise the full composition' }
 if ((Resolve automatic release/townlight-beta-1).product_profile -ne 'inspections-preview') { throw 'Beta 1 branch must exercise the full composition' }
 $inspect = Resolve automatic inspections/connected-workflow
-if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.8.1-1' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Coordinated composition mismatch' }
+if ($inspect.product_profile -ne 'inspections-preview' -or $inspect.runtime_profile -ne 'inspections-preview' -or $inspect.desktop_version -ne '1.8.5' -or $inspect.inspections_ref -notmatch '^[0-9a-f]{40}$' -or $inspect.permitting_ref -notmatch '^[0-9a-f]{40}$') { throw 'Coordinated composition mismatch' }
 $inspectionOverlay = Get-Content "$PSScriptRoot/desktop/src-tauri/tauri.inspections-candidate.conf.json" -Raw | ConvertFrom-Json
 if ($inspectionOverlay.identifier -ne 'org.townlight.windows.fixes.candidate' -or $inspectionOverlay.productName -ne 'Townlight' -or $inspectionOverlay.bundle.windows.wix.upgradeCode -ne '0b97efae-2a2e-4e88-a81c-3aad1a52c2cc') { throw 'Current Windows product and upgrade family required' }
 $permit = Resolve automatic permitting/connected-workflow
