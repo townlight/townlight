@@ -382,3 +382,25 @@ def test_malformed_policy_target_has_generic_error(tmp_path):
     with pytest.raises(ValueError, match=r"^Connector policy is invalid\.$") as error:
         workspace.current_policy()
     assert "never-echo" not in str(error.value)
+
+
+def test_dev7_towncloud_published_listing_through_installed_workspace(tmp_path):
+    """The pinned SDK listing reaches the durable workspace with its supplied ID."""
+    workspace = ConnectorWorkspace(tmp_path)
+    source_id = configure(workspace, {
+        "provider": "towncloud",
+        "url": "https://towncloud.io/go/woodford-vt/published_agendas.json",
+    })
+    content = json.dumps([{
+        "template": "Planning Commission", "date": "11/09/2026", "time": "5:15 pm",
+        "agendaRead": "https://towncloud.io/go/woodford-vt/agendas/452",
+        "agendaDownload": "https://towncloud.io/go/woodford-vt/agendas/452/PDF/get_agenda_document_link",
+        "futureField": {"supplied": True},
+    }]).encode()
+    found = call(workspace, "discover", {"source_id": source_id,
+        "content_base64": base64.b64encode(content).decode(), "bounds": {
+            "date_from": "2026-11-09", "date_to": "2026-11-09"}})
+    assert found["status"] in {"completed", "partial"}, found
+    assert found["data"]["total_records"] == 1
+    preview = call(workspace, "preview", {"result_id": found["data"]["result_id"]})
+    assert preview["data"]["selections"][0]["external_id"] == "452"

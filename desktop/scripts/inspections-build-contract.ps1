@@ -10,7 +10,7 @@ function Get-InspectionsBuildContract {
         $Contract.publication_requires_signed_acceptance -ne $true -or
         $null -ne $Contract.release_tag -or
         $Pins.profile -ne 'inspections-preview' -or $Pins.development_only -ne $false -or
-        $Contract.desktop_version -ne '1.8.4' -or $Contract.windows_product_version -ne '1.8.4.0' -or
+        $Contract.desktop_version -ne '1.8.5' -or $Contract.windows_product_version -ne '1.8.5.0' -or
         $Overlay.version -ne $Contract.desktop_version -or $Overlay.identifier -ne 'org.townlight.windows.fixes.candidate' -or
         $Overlay.productName -ne 'Townlight' -or
         $Overlay.bundle.windows.wix.upgradeCode -ne '0b97efae-2a2e-4e88-a81c-3aad1a52c2cc' -or

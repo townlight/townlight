@@ -1,8 +1,8 @@
 {
   "profile": "inspections-preview",
   "source_branch": "feature/quorumrelay-integration",
-  "desktop_version": "1.8.4",
-  "windows_product_version": "1.8.4.0",
+  "desktop_version": "1.8.5",
+  "windows_product_version": "1.8.5.0",
   "permitting_package_version": "0.3.0+dev.2",
   "planning_package_version": "0.4.0.dev2",
   "records_package_version": "1.8.0.dev2",

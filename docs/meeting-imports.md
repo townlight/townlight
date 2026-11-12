@@ -2,9 +2,9 @@
 
 ## QuorumRelay source candidate
 
-This Townlight 1.8.4 source candidate (Windows product version 1.8.4.0) pins QuorumRelay `0.1.0.dev6` in the bundled runtime. Vendored wheel SHA-256: `ec1e6c55dc29338dcf3033a1f8bba92bec1975f0108cbb92e2e2e18a4ec19ee1`. QuorumRelay source commit `4b1c27ca571d1b781233fcd03389ce99ddf58932` is integrated in Townlight source commit `438c9bbeeeddcccf967ecea8e02b1c3a556699b3`. The compatibility baseline remains 31 provider families and 34 input-format paths; it does not certify full discovery, pagination or every operation for each provider.
+This Townlight 1.8.5 source candidate (Windows product version 1.8.5.0) pins QuorumRelay `0.1.0.dev7` in the bundled runtime. Vendored wheel SHA-256: `6b39f51174b2988a4240e1b7beb9d5c41dc731cc0826dbbaf0042827e410a44c`. QuorumRelay source commit `de6204e1861e27af366cdc9973cf52ce53276add` is pinned by the candidate connector lock. The compatibility baseline remains 31 provider families and 34 input-format paths; it does not certify full discovery, pagination or every operation for each provider.
 
-The source candidate adds the profile-scoped connector workspace at authenticated native route `POST /desktop/v1/meetings/connectors/run`. Its operation contract covers provider/capability listing, source identification/configuration, bounded discovery and fetch, local search, import preview/save, evidence persistence, export, write planning/commit, and receipt/status operations. This route remains inside the Townlight runtime and existing staff authorization boundary; it is not a separate public service or an independent MCP endpoint. The source bridge and workspace are `desktop/runtime/python-services/townlight_runtime/connector_bridge.py` and `connectors.py`. See the [candidate native API schema](https://townlight.github.io/api/candidate-1.8.4/suite-openapi.json); it is generated from source composition and does not establish installed endpoint behavior.
+The source candidate adds the profile-scoped connector workspace at authenticated native route `POST /desktop/v1/meetings/connectors/run`. Its operation contract covers provider/capability listing, source identification/configuration, bounded discovery and fetch, local search, import preview/save, evidence persistence, export, write planning/commit, and receipt/status operations. This route remains inside the Townlight runtime and existing staff authorization boundary; it is not a separate public service or an independent MCP endpoint. The source bridge and workspace are `desktop/runtime/python-services/townlight_runtime/connector_bridge.py` and `connectors.py`. See the [candidate native API schema](https://townlight.github.io/api/candidate-1.8.5/suite-openapi.json); it is generated from source composition and does not establish installed endpoint behavior.
 
 ### Bounded dev6 capabilities and limits
 
@@ -24,7 +24,7 @@ The source candidate adds **External meeting evidence** to the Meetings workspac
 4. **Preview canonical import** lists meeting selections. Review the selected source and use **Save selected canonical meeting** to save the exact selection; a new preview is required if the source changes. **Export evidence** offers ZIP, JSON, JSONL, CSV meetings, CSV items and iCalendar.
 5. **Explicit provider action** is disabled unless an exact server-owned source grant and local administrator role enable it. Review the displayed plan and hash, explicitly approve that exact plan, then commit. Provider credentials are required where the provider requires them and are configured server-side; the panel never accepts credential values. Ingestion, search, import and export do not perform provider writes.
 
-For a failed or uncertain local response, reopen saved results before retrying the same operation. This UI guide is source-candidate guidance and is not 1.8.4 installed acceptance.
+For a failed or uncertain local response, reopen saved results before retrying the same operation. This UI guide is source-candidate guidance and is not 1.8.5 installed acceptance.
 
 ### Service-admin credential and write policy
 
@@ -45,7 +45,7 @@ For Essential and TelVue account credentials, SDK credential objects require the
 
 Candidate completeness remains limited by the verified per-provider matrix: live discovery and paging are not complete for every tenant; captures and provider fields may be partial; per-operation statuses remain distinct. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Account-read and live-write acceptance is NOT_RUN because no authorized provider test tenant or credentials were supplied. Do not use public city data for write testing. The dev6 pin and baseline counts do not establish completion of the connector project's full acceptance plan.
 
-This documentation describes prepared source for Townlight 1.8.4, not a signed, installed or released Windows build. Windows 1.8.1.1 remains the current public release and its links and acceptance evidence below are historical evidence for that exact release.
+This documentation describes prepared source for Townlight 1.8.5, not a signed, installed or released Windows build. Windows 1.8.1.1 remains the current public release and its links and acceptance evidence below are historical evidence for that exact release.
 
 For the released Windows 1.8.1.1 workflow, use **Meetings → Import meeting records**. Select a
 source and format, enter the original public URL, then choose **Preview import**.
