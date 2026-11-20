@@ -1,6 +1,11 @@
 name: Windows signing OIDC probe
 on:
   workflow_dispatch:
+    inputs:
+      configure_federation:
+        description: Configure the exact main-only federated credential using existing app authority
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -24,6 +29,31 @@ jobs:
           Write-Host "Federation subject: $($claims.sub)"
           Write-Host "Federation issuer: $($claims.iss)"
           Write-Host "Federation audience: $($claims.aud)"
+      - name: Configure exact main-only federation if authorized by Entra
+        if: inputs.configure_federation
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $auth = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token" -Body @{client_id=$env:CLIENT_ID; client_secret=$env:CLIENT_SECRET; grant_type='client_credentials'; scope='https://graph.microsoft.com/.default'}
+          $headers = @{Authorization="Bearer $($auth.access_token)"}
+          $uri = "https://graph.microsoft.com/v1.0/applications(appId='$env:CLIENT_ID')/federatedIdentityCredentials"
+          $subject = 'repo:townlight@316295879/townlight@1219689730:ref:refs/heads/main'
+          try {
+            $existing = Invoke-RestMethod -Uri $uri -Headers $headers
+            $match = $existing.value | Where-Object { $_.subject -eq $subject -and $_.issuer -eq 'https://token.actions.githubusercontent.com' -and 'api://AzureADTokenExchange' -in $_.audiences }
+            if (-not $match) {
+              $body = @{name='townlight-main-github-oidc'; issuer='https://token.actions.githubusercontent.com'; subject=$subject; audiences=@('api://AzureADTokenExchange'); description='Townlight main-only Windows signing; no PR or arbitrary branch trust'} | ConvertTo-Json
+              $null = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -ContentType 'application/json' -Body $body
+              Write-Host 'Created exact main-only federated credential.'
+            } else { Write-Host 'Exact main-only federated credential already exists.' }
+          } catch {
+            $code = [int]$_.Exception.Response.StatusCode
+            throw "Entra denied federation administration (HTTP $code). The existing signing app cannot configure its own federation; an Entra application administrator must add the documented exact credential."
+          }
       - uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
