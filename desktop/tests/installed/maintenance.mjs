@@ -56,6 +56,22 @@ try {
       await readback(ids);
     }
   }
+  if (mode === "recorder") {
+    await page.evaluate(async () => {
+      const a = window.audit;
+      if ((await a.native("get_app_state")).domain_authority !== "python-records") {
+        await a.click('[data-surface="IT/Admin"]', { confirm: false });
+        await a.nav("health");
+        await a.click('[data-supervisor-action="activate-records"]', { timeout: 600000 });
+        await a.until(async () => (await a.native("get_app_state")).domain_authority === "python-records", 600000);
+      }
+    });
+    const domainAuthority = (await native("get_app_state")).domain_authority;
+    await save("domain_authority", domainAuthority);
+    if (domainAuthority !== "python-records") {
+      throw new Error(`expected domain_authority python-records, got ${domainAuthority}`);
+    }
+  }
   let recording;
   if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin});
   if (mode==='fresh'||mode==='recorder') {
