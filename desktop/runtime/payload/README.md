@@ -26,6 +26,7 @@ corresponding source; they describe the immutable previous artifact. Assembly
 refuses to overlay a populated payload and never uses the host's installed app.
 Use a short checkout path for the Windows bundle.
 
-The prepared receipt lists any newly generated native files that still require
-signing. A prepared payload is only a build input. The new installer signature,
+The prepared receipt distinguishes reused signed native files from new hash-pinned dependency inputs.
+The desktop EXE and MSI require signing. Pass --station-source with the exact pinned beta-1 checkout;
+the stager verifies all 730 CivicCast media source files and the pinned native dependency archives. A prepared payload is only a build input. The new installer signature,
 hash, corresponding source and installed acceptance are separate evidence.

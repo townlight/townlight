@@ -319,8 +319,8 @@
         "backup",
         "restore"
       ],
-      "current_version": "1.8.0.dev3",
-      "source_commit": "f63fe0e30a92eee2141ecc16bdbed6b2ad901f0e",
+      "current_version": "1.8.0.dev4",
+      "source_commit": "d46547976f69760461de89a1a6d086cd41c701dc",
       "routes": [
         {
           "id": "records-requests",
@@ -1015,12 +1015,12 @@
         "restore",
         "release_artifacts"
       ],
-      "current_version": "0.3.1",
-      "source_commit": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8",
+      "current_version": "0.4.0",
+      "source_commit": "99785365c3afa00faa7dc9d0fe9b9ec38c992f12",
       "routes": [
         {
           "id": "station-operator",
-          "label": "Station operator \u00e2\u20ac\u201d separate local service",
+          "label": "Station meeting recorder",
           "path": "http://127.0.0.1:8756/",
           "surface": "Staff"
         }
@@ -1032,7 +1032,7 @@
       "services": [
         {
           "id": "station",
-          "kind": "python-windows-service",
+          "kind": "python-windows-logon-task",
           "health_check": "http://127.0.0.1:8756/health"
         }
       ],
@@ -1048,10 +1048,10 @@
       ],
       "model_needs": [],
       "lifecycle": {
-        "install": "configured-as-separate-service",
-        "update": "separate-service-versioned-update",
-        "disable": "stop-separate-station-service",
-        "uninstall": "backup-first-separate-station-removal"
+        "install": "first-run-recorder-provisioning",
+        "update": "versioned-windows-runtime-update",
+        "disable": "stop-owned-recorder-after-recording",
+        "uninstall": "backup-first-recorder-removal"
       }
     },
     {

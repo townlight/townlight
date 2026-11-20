@@ -618,6 +618,14 @@ async fn supervisor_action(
     .map_err(|error| format!("System Health action could not complete: {error}"))?
 }
 
+#[tauri::command]
+async fn station_action(action: String, selected_directory: Option<String>) -> Result<Value, String> {
+    if matches!(action.as_str(), "setup" | "backup" | "restore" | "stop") { auth::require_admin_session()?; }
+    else { auth::require_signed_in_session()?; }
+    tauri::async_runtime::spawn_blocking(move || supervisor::station_action(&action, selected_directory.as_deref()))
+        .await.map_err(|e| format!("Recorder action could not complete: {e}"))?
+}
+
 fn picked_file_path_for_desktop() -> Result<Option<String>, String> {
     if let Ok(path) = std::env::var("TOWNLIGHT_TEST_FILE_PICKER_PATH") {
         let trimmed = path.trim();
@@ -1310,6 +1318,7 @@ pub fn run() {
             first_run_action,
             auth_action,
             supervisor_action,
+            station_action,
             choose_file_path,
             choose_folder_path,
             module_action,

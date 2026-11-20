@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
-  [ValidateSet('fresh','upgrade')][string]$Mode,
+  [ValidateSet('fresh','upgrade','recorder')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
   [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA
 )
@@ -8,6 +8,7 @@ $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$candidateVersion = (Get-Content (Join-Path $repo 'config/inspections-msi-candidate.json') -Raw | ConvertFrom-Json).windows_product_version
 $EvidenceRoot = [IO.Path]::GetFullPath($EvidenceRoot)
 New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
 $profile = Join-Path $env:LOCALAPPDATA 'CivicSuite'
@@ -80,9 +81,9 @@ try {
       $retained+=@{path=$relative;sha256=(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash}
     }
   }
-  Install-Candidate $MsiPath 'candidate-1.8.2.1'
+  Install-Candidate $MsiPath ('candidate-'+$candidateVersion)
   $registered=@(Product-Registration)
-  if ($registered.Count -ne 1 -or $registered[0].DisplayVersion -ne '1.8.2.1') { throw 'Candidate registration/version or upgrade replacement failed.' }
+  if ($registered.Count -ne 1 -or $registered[0].DisplayVersion -ne $candidateVersion) { throw 'Candidate registration/version or upgrade replacement failed.' }
   Run-Installed $Mode
   foreach ($entry in $retained) {
     if ((Get-FileHash -LiteralPath (Join-Path $profile $entry.path) -Algorithm SHA256).Hash -ne $entry.sha256) { throw "Upgrade changed retained $($entry.path)" }
@@ -93,7 +94,7 @@ try {
   foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
     if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }
-  [ordered]@{passed=$true;mode=$Mode;version='1.8.2.1';source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
+  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
   elseif (Test-Path -LiteralPath $debugPolicy) { Remove-ItemProperty -LiteralPath $debugPolicy -Name $appName -ErrorAction SilentlyContinue }

@@ -24,6 +24,9 @@ def test_subset_preview_activation_has_locked_provenance(tmp_path):
     station.mkdir(parents=True)
     for filename in ('ffmpeg.exe', 'ffprobe.exe', 'FFMPEG-LICENSE.txt'):
         (station / filename).write_text('test native input')
+    (station.parent / 'media-input-receipt.json').write_text(json.dumps({'files': {
+        'bin/'+name: {} for name in ('ffmpeg.exe', 'ffprobe.exe', 'FFMPEG-LICENSE.txt')
+    }}))
     lock = assembly.make_lock(tmp_path, {'profile': 'windows-local-1.0', 'payloads': [{
         'id': 'cpython-services', 'label': 'Python services', 'source_dir': 'python',
         'required_files': [], 'profile_required_files': profiles}]})

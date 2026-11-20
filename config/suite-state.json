@@ -271,9 +271,9 @@
         "manifest_path": "backend/pyproject.toml"
       },
       "versions": {
-        "development": "1.8.0.dev3",
+        "development": "1.8.0.dev4",
         "released": null,
-        "installer": "1.8.0.dev3",
+        "installer": "1.8.0.dev4",
         "public_status": "1.8.0.dev3"
       },
       "release": {
@@ -300,7 +300,7 @@
         "tier": 1,
         "role": "records workflow",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "f63fe0e30a92eee2141ecc16bdbed6b2ad901f0e"
+        "source_commit": "d46547976f69760461de89a1a6d086cd41c701dc"
       }
     },
     "meetings": {
@@ -738,9 +738,9 @@
         "manifest_path": "beta-1/pyproject.toml"
       },
       "versions": {
-        "development": "0.3.1",
+        "development": "0.4.0",
         "released": null,
-        "installer": "0.3.1",
+        "installer": "0.4.0",
         "public_status": "0.3.1"
       },
       "release": {
@@ -769,7 +769,7 @@
         "tier": 1,
         "role": "meeting media and proceedings handoff",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8"
+        "source_commit": "99785365c3afa00faa7dc9d0fe9b9ec38c992f12"
       }
     },
     "boards": {
