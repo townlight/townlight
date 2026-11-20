@@ -49,11 +49,11 @@ Scott explicitly removed OIDC migration on November 19, 2026. It is not a releas
 
 ## Dependency-alert configuration
 
-Checked all 31 organization repositories through the authenticated GitHub API. Thirty already had Dependabot alerts enabled; Records (`sunshine`) had them disabled. Enabled Records alerts and verified its alert response. All 31 repositories reported zero alerts when checked on November 19, 2026. This is a dated observation, not a guarantee that future alerts cannot appear. No dependency upgrade or new release gate was added.
+Checked all 31 organization repositories through the authenticated GitHub API. Thirty already had Dependabot alerts enabled; Records (`sunshine`) had them disabled. Enabled Records alerts and verified its alert response. The first API read returned zero alerts, but the delayed Records scan subsequently found 22 alerts, all in the documentation exporter lockfile. Records PR #135 updates that toolchain and its patched Nano ID dependency; npm audit reports zero vulnerabilities, and the existing exporter produced six readable isolated outputs headlessly. These tools are not Windows runtime dependencies. The final API alert state is recorded in the verification summary. This is a dated observation, not a guarantee that future alerts cannot appear. No application/runtime dependency upgrade or new release gate was added.
 
 ## Historical storage attribution
 
-The full mirror contains a 2.05 GiB Git pack. Historical `installer/dist` objects account for 6,457,213,460 raw uncompressed bytes across 485 distinct blobs; compression and delta storage make this different from actual clone size. Current-tree removals total 21,883,763 bytes. Retained evidence and historical installer identities are unchanged. The temporary measurement mirror is disposable after its attribution receipt is saved.
+The full mirror contains a 2.05 GiB Git pack. Historical `installer/dist` objects account for 6,457,213,460 raw uncompressed bytes across 485 distinct blobs; compression and delta storage make this different from actual clone size. Current-tree removals total 21,883,763 bytes. Retained evidence and historical installer identities are unchanged. The temporary measurement mirror was removed after its attribution receipt was saved, recovering 2,202,519,642 local bytes. Historical repository storage remains intact.
 
 ## Original pull-request dispositions
 
@@ -74,6 +74,22 @@ The two retained PRs are separate existing work, not new release requirements in
 
 Historical Suite release closeout #298 and inner-executable signing #253 are closed as resolved by their existing release evidence. Records transfer #27 and obsolete footer #88 are closed against current repository/source readback. OIDC #249 is closed as not planned by explicit owner decision. Records #98 remains an explicitly nonblocking runtime-guidance backlog item; this cleanup does not turn it into a release requirement.
 
-The current hosted Windows image exposed an archive-module/.NET overload incompatibility under Windows PowerShell 5.1. Runtime ZIP staging now uses compatible entry-level extraction, preserving overlay files and path-escape protection. Four real-shell regression checks passed locally across Windows PowerShell 5.1 and PowerShell 7; required Windows CI reruns against the corrected source. This packaging fix does not replace the published MSI.
+The current hosted Windows image exposed an archive-module/.NET overload incompatibility under Windows PowerShell 5.1. Runtime ZIP staging now uses compatible entry-level extraction, preserving overlay files and path-escape protection. Four real-shell regression checks passed locally across Windows PowerShell 5.1 and PowerShell 7; required Windows CI passed against the corrected source before merge. This packaging fix does not replace the published MSI.
 
 OSGeo moved the pinned PostGIS 3.6.2 ZIP into its `pg17/archive/` directory. The source URL now follows that location; the full downloaded ZIP matches the existing SHA-256. Version and dependency bytes are unchanged.
+
+
+## Delivery and evidence
+
+The approved cleanup is merged across the affected repositories. Source/runtime cleanup landed in [Suite #315](https://github.com/townlight/townlight/pull/315), component CI in [Records #134](https://github.com/townlight/sunshine/pull/134), and documentation dependency alerts in [Records #135](https://github.com/townlight/sunshine/pull/135). Each passed its existing required checks before merge. The runtime build and lifecycle jobs exercise a CI candidate; they do not replace or re-sign the released Windows 1.8.1.1 artifact.
+
+- [Verification summary and exact final source/CI identities](cleanup-verification-2026-11.json).
+- [Fourteen bounded Windows component results](windows-component-evidence.json): 531 passed, three explicit PostgreSQL skips. These are component tests, not a new full installed-suite acceptance claim.
+- Standalone authorization and related existing tests: 109 passed across Boards, Contracts and Procurement. Runtime configuration/database identity checks: four passed. Archive extraction: four passed across actual Windows PowerShell 5.1 and PowerShell 7.
+- Nine manuals regenerated in HTML, tagged PDF and Word. All 27 deployed files matched their committed exports; 286 tracked mirror files matched the canonical exports across ten default branches. Thirteen parked repository notices and Station's implementation boundary were verified on GitHub. Public announcement, support, terms, versions, Station manual and organization profile were checked against the current release.
+- [Original PR dispositions](original-pr-dispositions.json). Suite #311 and Core #79 remain separate existing work; Records #98 remains a preexisting nonblocking documentation backlog item. None is represented as delivered by this cleanup.
+- [Release preservation readback](release-preservation-verification.json): all ten published asset IDs, sizes, digests and timestamps match the pre-cleanup record; the release tag still resolves to the exact signed-build source.
+
+The signed MSI remains 2,081,554,432 bytes with SHA-256 `9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da`, source commit `0afd59de52cb7ecb317188a89bcd1fec8c578a24`, tag `townlight-windows-v1.8.1.1`. Current source fixes await a future software build. Historical receipts, tags, source archive and evidence ZIP were preserved. No Linux/macOS product work or new release was performed.
+
+OIDC is excluded by [Scott's explicit owner decision](SIGNING-SCOPE.md), not an unfinished requirement. No cleanup work may reintroduce it without new explicit approval.

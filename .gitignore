@@ -49,3 +49,6 @@ specs/short.md
 
 # Exact local candidate wheel staging
 .candidate-wheels/
+
+# Disposable browser/runtime debug output
+/debug.log

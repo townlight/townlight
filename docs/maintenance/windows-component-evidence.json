@@ -1,0 +1,184 @@
+[
+  {
+    "repository": "townlight/core",
+    "pr": 89,
+    "pr_state": "MERGED",
+    "head": "63e1006a6991485b816443a2e1350853b64aa24a",
+    "merge": {
+      "oid": "ab68baac0384a593e9161dde7c0cbbd4a12a5a03"
+    },
+    "run_id": 44651416200,
+    "check_url": "https://github.com/townlight/core/actions/runs/44651416200/job/136006956634",
+    "conclusion": "SUCCESS",
+    "test_summary": "33 passed in 1.66s"
+  },
+  {
+    "repository": "townlight/sunshine",
+    "pr": 134,
+    "pr_state": "MERGED",
+    "head": "ee83028d2250bb0f5c8822c8ce4fec5fb09d5955",
+    "merge": {
+      "oid": "38ebb4a55238c2e19f5e0e93e3f7bd684c377ec0"
+    },
+    "run_id": 44653516583,
+    "check_url": "https://github.com/townlight/sunshine/actions/runs/44653516583/job/136013970940",
+    "conclusion": "SUCCESS",
+    "test_summary": "11 passed, 10 warnings in 19.26s"
+  },
+  {
+    "repository": "townlight/meetings",
+    "pr": 199,
+    "pr_state": "MERGED",
+    "head": "6f8fbe970c6a385677b011274ce6c9d44c620a47",
+    "merge": {
+      "oid": "064fc8d7817cdd602ffe193ed79cd687fe86bc1c"
+    },
+    "run_id": 44652159653,
+    "check_url": "https://github.com/townlight/meetings/actions/runs/44652159653/job/136009440648",
+    "conclusion": "SUCCESS",
+    "test_summary": "41 passed, 1 warning in 0.95s"
+  },
+  {
+    "repository": "townlight/ordinances",
+    "pr": 99,
+    "pr_state": "MERGED",
+    "head": "1e7d093de910c35332919315f21d1418366201ef",
+    "merge": {
+      "oid": "a041d1e692fade92df7539f694018e6374dcb798"
+    },
+    "run_id": 44651428225,
+    "check_url": "https://github.com/townlight/ordinances/actions/runs/44651428225/job/136006996868",
+    "conclusion": "SUCCESS",
+    "test_summary": "22 passed in 1.73s"
+  },
+  {
+    "repository": "townlight/zone",
+    "pr": 38,
+    "pr_state": "MERGED",
+    "head": "aaf1544f10a1ab9bcb34cf75013e90de510e2c53",
+    "merge": {
+      "oid": "4d3884afe5b24bab8d73a9a838bda5f0b41489e3"
+    },
+    "run_id": 44651433994,
+    "check_url": "https://github.com/townlight/zone/actions/runs/44651433994/job/136007016840",
+    "conclusion": "SUCCESS",
+    "test_summary": "19 passed, 1 warning in 0.86s"
+  },
+  {
+    "repository": "townlight/plan",
+    "pr": 34,
+    "pr_state": "MERGED",
+    "head": "48e4bb6e16a6f0e3ca035434eaba4d72ea7f1697",
+    "merge": {
+      "oid": "d047e869b5f208a2df4af00a4c6b1a6670906119"
+    },
+    "run_id": 44652015105,
+    "check_url": "https://github.com/townlight/plan/actions/runs/44652015105/job/136008958761",
+    "conclusion": "SUCCESS",
+    "test_summary": "92 passed, 1 warning in 20.87s"
+  },
+  {
+    "repository": "townlight/permit",
+    "pr": 33,
+    "pr_state": "MERGED",
+    "head": "88c79cd3ec5476dbc84b7fc79188fc967b4b2832",
+    "merge": {
+      "oid": "d74802e6abb3bb6a58dd45dd0b36fb8b34015c58"
+    },
+    "run_id": 44651442632,
+    "check_url": "https://github.com/townlight/permit/actions/runs/44651442632/job/136007044521",
+    "conclusion": "SUCCESS",
+    "test_summary": "47 passed, 1 warning in 3.83s"
+  },
+  {
+    "repository": "townlight/inspect",
+    "pr": 30,
+    "pr_state": "MERGED",
+    "head": "d4eabb051cea1cce5b5c48bad4a1aee7c1146042",
+    "merge": {
+      "oid": "6400a5a086c8fe6d4dadd6b9742ffbec8afb9073"
+    },
+    "run_id": 44651449096,
+    "check_url": "https://github.com/townlight/inspect/actions/runs/44651449096/job/136007066188",
+    "conclusion": "SUCCESS",
+    "test_summary": "47 passed, 1 warning in 4.71s"
+  },
+  {
+    "repository": "townlight/access",
+    "pr": 25,
+    "pr_state": "MERGED",
+    "head": "7d2d53367a455d3a85c23e99db10e71e489afe55",
+    "merge": {
+      "oid": "940655a473b15ce08b66be12757aa1661b13adf0"
+    },
+    "run_id": 44650362996,
+    "check_url": "https://github.com/townlight/access/actions/runs/44650362996/job/136003424233",
+    "conclusion": "SUCCESS",
+    "test_summary": "53 passed, 2 skipped, 1 warning in 2.66s"
+  },
+  {
+    "repository": "townlight/notice",
+    "pr": 21,
+    "pr_state": "MERGED",
+    "head": "87530314b4388cc117ad888ae8b60965d4ffcca7",
+    "merge": {
+      "oid": "648421f2bdffed5fe08868091d6e89cdf595626d"
+    },
+    "run_id": 44650378376,
+    "check_url": "https://github.com/townlight/notice/actions/runs/44650378376/job/136003474920",
+    "conclusion": "SUCCESS",
+    "test_summary": "39 passed, 1 skipped, 5 warnings in 2.81s"
+  },
+  {
+    "repository": "townlight/station",
+    "pr": 18,
+    "pr_state": "MERGED",
+    "head": "34725c6eaecf513b650e295aba5fbf48acaf87cd",
+    "merge": {
+      "oid": "17fd84b48f592b97824c1fc7529f3da2463f698f"
+    },
+    "run_id": 44650420459,
+    "check_url": "https://github.com/townlight/station/actions/runs/44650420459/job/136003608983",
+    "conclusion": "SUCCESS",
+    "test_summary": "18 passed in 0.72s"
+  },
+  {
+    "repository": "townlight/boards",
+    "pr": 10,
+    "pr_state": "MERGED",
+    "head": "f4db26385b3627b700c6af18be40523d7ea0cdf7",
+    "merge": {
+      "oid": "429fa363179539b0957556fbe834afb8010d8c39"
+    },
+    "run_id": 44650046063,
+    "check_url": "https://github.com/townlight/boards/actions/runs/44650046063/job/136002377714",
+    "conclusion": "SUCCESS",
+    "test_summary": "43 passed, 1 warning in 2.29s"
+  },
+  {
+    "repository": "townlight/contracts",
+    "pr": 11,
+    "pr_state": "MERGED",
+    "head": "780bc9fe1ae45ce3506fe359d03e4f0c36d6322e",
+    "merge": {
+      "oid": "82f36b4e46fd21558b23924f151178ecd3feb973"
+    },
+    "run_id": 44650061289,
+    "check_url": "https://github.com/townlight/contracts/actions/runs/44650061289/job/136002430659",
+    "conclusion": "SUCCESS",
+    "test_summary": "43 passed, 1 warning in 1.38s"
+  },
+  {
+    "repository": "townlight/procure",
+    "pr": 15,
+    "pr_state": "MERGED",
+    "head": "1c5e08630e4ed560e9a6aafcb4312914ca2348cd",
+    "merge": {
+      "oid": "f027bb8327bae6d6a884884a9d89d7625ed69c93"
+    },
+    "run_id": 44650080356,
+    "check_url": "https://github.com/townlight/procure/actions/runs/44650080356/job/136002496445",
+    "conclusion": "SUCCESS",
+    "test_summary": "23 passed, 1 warning in 2.26s"
+  }
+]

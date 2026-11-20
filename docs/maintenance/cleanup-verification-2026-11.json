@@ -1,0 +1,357 @@
+{
+  "scope": "Townlight org cleanup; Windows only; released artifact preserved",
+  "owner_scope_decision": "OIDC explicitly removed by Scott; not a completion requirement; issue249closednotplanned; probe removed frommain; new explicit approval required to reconsider",
+  "released_msi": {
+    "version": "1.8.1.1",
+    "source_commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24",
+    "bytes": 2081554432,
+    "sha256": "9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da",
+    "asset_timestamp_unchanged": "2026-11-11T06:48:25Z"
+  },
+  "windows_component_checks": {
+    "repositories": 14,
+    "passed": 531,
+    "explicit_skips": 3,
+    "coverage": "Existing bounded component tests; not a new full installed-suite acceptance claim"
+  },
+  "standalone_auth_tests": {
+    "combined_boards_contracts_procurement_passed": 109
+  },
+  "runtime_configuration_tests_passed": 4,
+  "archive_regression_tests_passed": 4,
+  "docs": {
+    "regenerated_manuals": 9,
+    "live_verified_html_pdf_word_files": 27,
+    "default_branch_mirror_files_verified": 286,
+    "parked_notices": 13,
+    "station_status_scope_corrected": true
+  },
+  "dependency_alerts": {
+    "repositories_checked": 31,
+    "enabled": 31,
+    "alerts_at_check": 0,
+    "records_enabled_during_cleanup": true,
+    "delayed_scan_documentation_alerts_found": 22,
+    "resolution": "Records docs-only Puppeteer chain and Nano ID updated in PR135; npm audit zero; headless isolated exports passed."
+  },
+  "storage": {
+    "full_history_git_pack": "2.05GiB",
+    "historical_installer_dist_raw_bytes": 6457213460,
+    "historical_installer_dist_unique_blobs": 485,
+    "current_tree_removed_bytes": 21883763,
+    "temporary_measurement_mirror_removed_bytes": 2202519642,
+    "lfs": "Evaluated; not used because current-file conversion would not shrink old history; no history rewrite authorized"
+  },
+  "retained_separate_work": [
+    "townlight/townlight#311",
+    "townlight/core#79"
+  ],
+  "not_new_requirements": [
+    "Records#98preexistingnonblockingruntimeguidancebacklog"
+  ],
+  "completion": "Approved four-phase cleanup merged; OIDC removed by explicit owner direction.",
+  "verified_at": "2026-11-20T03:04:30.996628+00:00",
+  "final_source_prs": [
+    {
+      "repository": "townlight/townlight",
+      "number": 315,
+      "headRefOid": "76ccf780d1e505f6f0b49fc714c326c21db9ffc9",
+      "mergeCommit": {
+        "oid": "fb8c4cba8de997a6ac1adda3bc9af6d6cc35319f"
+      },
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:51:12Z",
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656598031/job/136024235224",
+          "name": "release-lockstep-gate",
+          "startedAt": "2026-11-20T01:51:13Z",
+          "status": "COMPLETED",
+          "workflowName": "release-lockstep-gate"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:51:42Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656598359/job/136024233780",
+          "name": "django",
+          "startedAt": "2026-11-20T01:51:14Z",
+          "status": "COMPLETED",
+          "workflowName": "Portal verification"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:52:18Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597888/job/136024442239",
+          "name": "detect desktop changes",
+          "startedAt": "2026-11-20T01:51:46Z",
+          "status": "COMPLETED",
+          "workflowName": "desktop-windows-msi"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:52:43Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597851/job/136024232663",
+          "name": "windows archive readiness and plan",
+          "startedAt": "2026-11-20T01:51:14Z",
+          "status": "COMPLETED",
+          "workflowName": "installer-cleanroom"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:51:49Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597939/job/136024232942",
+          "name": "detect verify-relevant changes",
+          "startedAt": "2026-11-20T01:51:14Z",
+          "status": "COMPLETED",
+          "workflowName": "verify"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:52:35Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597851/job/136024232995",
+          "name": "windows archive readiness and plan",
+          "startedAt": "2026-11-20T01:51:14Z",
+          "status": "COMPLETED",
+          "workflowName": "installer-cleanroom"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:51:12Z",
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597851/job/136024234522",
+          "name": "linux archive full lifecycle",
+          "startedAt": "2026-11-20T01:51:12Z",
+          "status": "COMPLETED",
+          "workflowName": "installer-cleanroom"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:52:27Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597888/job/136024650292",
+          "name": "stage accepted inspection voice build input",
+          "startedAt": "2026-11-20T01:52:19Z",
+          "status": "COMPLETED",
+          "workflowName": "desktop-windows-msi"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:53:07Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597939/job/136024469289",
+          "name": "verify",
+          "startedAt": "2026-11-20T01:51:51Z",
+          "status": "COMPLETED",
+          "workflowName": "verify"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:32:31Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597888/job/136024708810",
+          "name": "build Windows Local MSI",
+          "startedAt": "2026-11-20T01:52:29Z",
+          "status": "COMPLETED",
+          "workflowName": "desktop-windows-msi"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:16:52Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597888/job/136024708918",
+          "name": "desktop<->TownlightCore real-runtime integration test",
+          "startedAt": "2026-11-20T01:52:29Z",
+          "status": "COMPLETED",
+          "workflowName": "desktop-windows-msi"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:43:43Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/townlight/actions/runs/44656597888/job/136040666946",
+          "name": "Windows MSI install/first-run/backup-restore/uninstall lifecycle",
+          "startedAt": "2026-11-20T02:32:33Z",
+          "status": "COMPLETED",
+          "workflowName": "desktop-windows-msi"
+        }
+      ],
+      "url": "https://github.com/townlight/townlight/pull/315"
+    },
+    {
+      "repository": "townlight/sunshine",
+      "number": 134,
+      "headRefOid": "ee83028d2250bb0f5c8822c8ce4fec5fb09d5955",
+      "mergeCommit": {
+        "oid": "38ebb4a55238c2e19f5e0e93e3f7bd684c377ec0"
+      },
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:47:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516509/job/136014181266",
+          "name": "Backend (pytest via docker compose)",
+          "startedAt": "2026-11-20T01:26:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:27:27Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516583/job/136013970940",
+          "name": "windows-contracts",
+          "startedAt": "2026-11-20T01:25:31Z",
+          "status": "COMPLETED",
+          "workflowName": "Windows component contracts"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:27:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516509/job/136014181050",
+          "name": "T2C bootstrap-failure smoke test",
+          "startedAt": "2026-11-20T01:26:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:27:15Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516509/job/136014180713",
+          "name": "Frontend (vitest + build)",
+          "startedAt": "2026-11-20T01:26:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:26:09Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516509/job/136014181056",
+          "name": "Release recovery gates",
+          "startedAt": "2026-11-20T01:26:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T01:27:26Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44653516509/job/136014181097",
+          "name": "ruff (lint)",
+          "startedAt": "2026-11-20T01:26:06Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        }
+      ],
+      "url": "https://github.com/townlight/sunshine/pull/134"
+    },
+    {
+      "repository": "townlight/sunshine",
+      "number": 135,
+      "headRefOid": "77a38eb3495c4fa15cf7feff99548cd99a42ef52",
+      "mergeCommit": {
+        "oid": "5c5eb7d1090c50190101a419848532293a38caa4"
+      },
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T03:03:10Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44661935390/job/136041977455",
+          "name": "Backend (pytest via docker compose)",
+          "startedAt": "2026-11-20T02:35:55Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:37:13Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44661935390/job/136041977214",
+          "name": "T2C bootstrap-failure smoke test",
+          "startedAt": "2026-11-20T02:35:55Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:37:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44661935390/job/136041977219",
+          "name": "Frontend (vitest + build)",
+          "startedAt": "2026-11-20T02:35:56Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:36:02Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44661935390/job/136041977016",
+          "name": "Release recovery gates",
+          "startedAt": "2026-11-20T02:35:55Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-11-20T02:36:46Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/townlight/sunshine/actions/runs/44661935390/job/136041977426",
+          "name": "ruff (lint)",
+          "startedAt": "2026-11-20T02:35:56Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        }
+      ],
+      "url": "https://github.com/townlight/sunshine/pull/135"
+    }
+  ],
+  "records_required_backend_tests": {
+    "passed": 725,
+    "warnings": 150,
+    "run": "https://github.com/townlight/sunshine/actions/runs/44661935390"
+  },
+  "suite_required_windows_checks": {
+    "run": "https://github.com/townlight/townlight/actions/runs/44656597888",
+    "browser_tests_passed": 48,
+    "desktop_rust_tests_passed": 186,
+    "desktop_rust_tests_ignored": 3,
+    "integration_python_tests_passed": 48,
+    "real_runtime_rust_tests_passed": 2,
+    "lifecycle_filtered_tests_passed": 52,
+    "lifecycle_filtered_tests_ignored": 2,
+    "installed_lifecycle": "Install, binary verification, launch, repair, first-run/backup/restore logic and uninstall passed."
+  },
+  "docs_toolchain": {
+    "npm_audit_open_vulnerabilities": 0,
+    "isolated_export_outputs_verified": [
+      {
+        "document": "README",
+        "pdf_pages": 22,
+        "pdf_text_readable": true,
+        "word_zip_valid": true,
+        "text_valid": true
+      },
+      {
+        "document": "USER-MANUAL",
+        "pdf_pages": 21,
+        "pdf_text_readable": true,
+        "word_zip_valid": true,
+        "text_valid": true
+      }
+    ]
+  }
+}
