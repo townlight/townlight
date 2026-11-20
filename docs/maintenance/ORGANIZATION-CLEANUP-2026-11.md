@@ -43,8 +43,33 @@ Measured full Git pack: 2.05 GiB. Repeated historical generated installers domin
 
 LFS was permitted and evaluated. Converting current files would leave old blobs in history, so this change does not claim to reduce historical clone size. No history rewrite or evidence deletion was performed.
 
-## Signing migration
+## Signing: owner scope decision
 
-The main-only OIDC probe is separate from software release generation. Azure initially returned AADSTS70025 because no federation was configured. The actual immutable GitHub subject is `repo:townlight@316295879/townlight@1219689730:ref:refs/heads/main`; broad PR or arbitrary-branch trust is not acceptable. The existing signing route stays available until OIDC signing and independent signature verification pass. Shared organization credentials must not be revoked for sibling repositories.
+Scott explicitly removed OIDC migration on November 19, 2026. It is not a release gate, remaining cleanup obligation or implied authorization. The temporary probe/bootstrap workflow was removed; issue #249 is closed as not planned. Keep the existing supported client-secret signing method and every signature/timestamp verification safeguard. Any future OIDC project requires new explicit owner approval. See [the owner decision](SIGNING-SCOPE.md). No Azure credential or role changed.
 
-The opt-in setup attempt also returned HTTP 403 from Microsoft Graph: the signing app lacks authority to administer its Entra application. CivicCast `CODE_SIGNING_POLICY.md` confirms its existing path uses the same client secret and has no federation. OIDC migration remains incomplete pending tenant application-admin authority; do not remove the proven signing route or shared sibling secrets.
+## Dependency-alert configuration
+
+Checked all 31 organization repositories through the authenticated GitHub API. Thirty already had Dependabot alerts enabled; Records (`sunshine`) had them disabled. Enabled Records alerts and verified its alert response. All 31 repositories reported zero alerts when checked on November 19, 2026. This is a dated observation, not a guarantee that future alerts cannot appear. No dependency upgrade or new release gate was added.
+
+## Historical storage attribution
+
+The full mirror contains a 2.05 GiB Git pack. Historical `installer/dist` objects account for 6,457,213,460 raw uncompressed bytes across 485 distinct blobs; compression and delta storage make this different from actual clone size. Current-tree removals total 21,883,763 bytes. Retained evidence and historical installer identities are unchanged. The temporary measurement mirror is disposable after its attribution receipt is saved.
+
+## Original pull-request dispositions
+
+- [townlight/townlight #311](https://github.com/townlight/townlight/pull/311): retained open. Preserve separate QuorumRelay integration work in flight; not merged or changed by this cleanup.
+- [townlight/core #79](https://github.com/townlight/core/pull/79): retained open. Preserve the independent catalog-collation fix for its own validation; not part of documentation/maintenance delivery and absent from unchanged released MSI.
+- [townlight/ordinances #79](https://github.com/townlight/ordinances/pull/79): closed without merging; source retained. Superseded dependency/release preparation for old CivicCore 1.2.1; current package uses Townlight Core 1.3.0.dev2.
+- [townlight/meetings #179](https://github.com/townlight/meetings/pull/179): closed without merging; source retained. Superseded rename to CivicSunshine conflicts with current Townlight Records branding and current source pairing.
+- [townlight/sunshine #103](https://github.com/townlight/sunshine/pull/103): closed without merging; source retained. Superseded SignPath proposal; current Windows releases use the documented Azure Scott Converse signing path.
+- [townlight/core #63](https://github.com/townlight/core/pull/63): closed without merging; source retained. Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates.
+- [townlight/meetings #170](https://github.com/townlight/meetings/pull/170): closed without merging; source retained. Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates.
+- [townlight/ordinances #74](https://github.com/townlight/ordinances/pull/74): closed without merging; source retained. Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates.
+- [townlight/core #59](https://github.com/townlight/core/pull/59): closed without merging; source retained. Historical proof-document clarification predating current naming and release documentation. Preserve this proposed patch in the closed PR; do not rewrite historical evidence during current cleanup.
+- [townlight/sunshine #23](https://github.com/townlight/sunshine/pull/23): closed without merging; source retained. Historical Phase 1 extraction inventory draft predating the completed Core extraction and naming migration; retained as historical proposed documentation, not a current implementation obligation.
+
+The two retained PRs are separate existing work, not new release requirements introduced by this cleanup. Closed proposals retain their branches/commits and review history.
+
+## Issue reconciliation
+
+Historical Suite release closeout #298 and inner-executable signing #253 are closed as resolved by their existing release evidence. Records transfer #27 and obsolete footer #88 are closed against current repository/source readback. OIDC #249 is closed as not planned by explicit owner decision. Records #98 remains an explicitly nonblocking runtime-guidance backlog item; this cleanup does not turn it into a release requirement.
