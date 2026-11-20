@@ -2,6 +2,7 @@ Windows x64 Beta 1 · MSI 1.8.1.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
+- <a href="https://townlight.github.io/manuals/suite.html#connector-candidate" id="toc-connector-candidate">Prepared connector source candidate · Townlight 1.8.5</a>
 - <a href="https://townlight.github.io/manuals/suite.html#townlight-suite-manual" id="toc-townlight-suite-manual">Townlight Suite Manual</a>
   - <a href="https://townlight.github.io/manuals/suite.html#using-this-manual" id="toc-using-this-manual">Using this manual</a>
   - <a href="https://townlight.github.io/manuals/suite.html#beta-identity" id="toc-beta-identity">Beta identity</a>
@@ -26,6 +27,43 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
   - <a href="https://townlight.github.io/manuals/suite.html#delivery-subject-index" id="toc-delivery-subject-index">Delivery subject index</a>
 
 # Townlight Suite Manual
+
+<a id="connector-candidate"></a>
+
+## Prepared connector source candidate · Townlight 1.8.5
+
+This Townlight 1.8.5 source candidate (Windows product version 1.8.5.0) pins QuorumRelay `0.1.0.dev8` in Townlight Runtime. The vendored wheel SHA-256 is `bcfe691b4d1eb0de162f5f94985d0242a97b5d3d89bd5eeb9306d1ef28caf692`; QuorumRelay source commit `3862e5f4ad7064aee722e09bb438899c3566477f` is pinned by the candidate connector lock. The shared connector source retains all 31 provider families and 34 baseline input-format paths, while per-provider live discovery, schemas and supported operations have different evidence and completion levels.
+
+This is candidate-source guidance only. It does not identify a released or installed 1.8.5 Windows package. Use the currently released Windows 1.8.1.1 installer and acceptance links below for the public release. In this candidate, the Meetings workspace includes an **External meeting evidence** panel backed by the authenticated Townlight runtime. Provider actions require an exact server-owned source grant and local administrator role; provider credentials are configured server-side where required. Live provider acceptance remains NOT_RUN because no authorized provider test tenant or credentials were supplied. The dev8 core adds bounded public-source discovery and search paths with provider-specific limits; these do not establish complete provider coverage. A separate installed 1.8.4 candidate passed a captured MP4 Station-to-Records handoff and restart readback; this 1.8.5 candidate requires its own affected acceptance. The connector guide describes evidence limits and file-preparation details. See the [provider and format guide](https://townlight.github.io/manuals/meeting-imports.html#quorumrelay-source-candidate) for interface details, panel steps, limits and remaining acceptance.
+
+### External meeting evidence · Townlight 1.8.5 source candidate
+
+This panel is prepared in source; its presence here does not establish that it is installed in the released 1.8.1.1 package.
+
+1. In the Meetings workspace, open **External meeting evidence**. Use **Identify URL** and **Inspect provider capabilities** to inspect a source. Select its provider/format, enter the original URL and optional body, then choose **Save validated source**. Keep provider options to documented fields. Never enter passwords or tokens in the panel.
+2. For an existing source, use the configured namespace. A source identity transition requires a local administrator to provide the original URL, namespace and evidence-backed ID mappings. Mark **new source** only when it is a genuinely separate source.
+3. Choose an inclusive date range and **Discover / read saved response**. You may attach a saved capture up to 16 MiB. For a namespace-bound account read, open **Authorized account fetch**; credentials must already be configured by the service administrator, and the panel accepts only documented provider request fields.
+4. Review result status and coverage. A `partial` result has missing or incomplete coverage. Use **Reopen result** to inspect saved output, **Save searchable evidence** before searching, or enter exact terms/phrases for local search. Use **Preview canonical import**, select the meeting and choose **Save selected canonical meeting** only after review. Use **Export evidence** for ZIP, JSON, JSONL, meeting/item CSV or iCalendar output.
+5. **Explicit provider action** is disabled unless an exact server-owned source grant and local administrator role enable it. Review the displayed plan and hash, then explicitly approve that exact plan before commit. Provider credentials are required where the provider requires them and are configured on the server; the panel never accepts credential values. These controls do not establish live write acceptance.
+
+#### Service-admin connector configuration
+
+The candidate reads optional policy from `config/secrets/connectors.json` under the selected Townlight profile. Each top-level key is the local actor UUID. An entry includes a nonempty exact `namespaces` array; optional `credentials` maps provider IDs to provider-specific credential objects; optional `write_sources` maps a configured source ID to the exact full source object (`provider`, `url`, `namespace`, `body`, `input_format` and `options`). The saved source and namespace must match exactly for a write plan. No secret is entered in the Meetings panel or sent in browser requests. The policy file is limited to 1 MiB. A missing file disables account credentials and write authorization; malformed content fails closed.
+
+**Find the native actor UUID.** Townlight Settings → Local Users shows the account email but not its UUID. Use the bundled runtime's `townlight_runtime.records_import.stable_id` helper with the resolved Townlight profile root and the lowercase email from the existing native account configuration (`config/first-admin.json` or `config/staff-users.json`). Resolve the profile root using the same precedence as the runtime: absolute `TOWNLIGHT_PROFILE_ROOT` when set; otherwise the parent of `TOWNLIGHT_DATA_DIR` when set; otherwise `%LOCALAPPDATA%\CivicSuite` (or `%USERPROFILE%\AppData\Local\CivicSuite` when `LOCALAPPDATA` is unset). Resolve that path before calculating the UUID:
+
+```python
+from pathlib import Path
+from townlight_runtime.records_import import stable_id
+
+profile_root = Path(r"<resolved Townlight profile root>")
+native_email = "<email from Settings → Local Users>".strip().lower()
+print(stable_id(profile_root, "native-user", native_email))
+```
+
+For Essential and TelVue account credentials, bind each SDK credential object to its exact authorized `origin` and `namespace`; set `tenant` to the SHA-256 hex digest of the UTF-8 string form of the resolved profile root. Use provider-documented credential fields. Do not guess token names or production origins. Account-read and live-write acceptance remains NOT_RUN until an authorized provider test tenant and credentials are available.
+
+If an operation reports that its outcome could not be confirmed, reopen saved results before retrying. Incomplete provider coverage, missing text or unavailable media does not complete a transcription or publication workflow. The [candidate native API reference](https://townlight.github.io/api/candidate-1.8.5/suite.html) describes source routes and validation contracts, not installed endpoint acceptance.
 
 ## Shared meeting imports · Windows 1.8.1.1
 

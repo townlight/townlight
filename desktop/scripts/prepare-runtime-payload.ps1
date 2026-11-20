@@ -12,6 +12,8 @@ param(
     [string]$NoticeRoot = "",
     [string]$AccessRoot = "",
     [string]$RecordsBackendRoot = "",
+    [string]$ConnectorWheel = "",
+    [string]$ConnectorWheelSha256 = "",
     [switch]$ReuseInstalledServiceDependencies,
     [ValidateSet("records-beta", "city-core", "meetings-beta", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")]
     [string]$ProductProfile = "records-beta",
@@ -25,6 +27,8 @@ param(
     [string]$BoardsRoot = "",
     [string]$ContractsRoot = "",
     [string]$ProcurementRoot = "",
+    [string]$StationMsiPath = "",
+    [string]$StationMsiExtractRoot = "",
     [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
@@ -35,6 +39,9 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
+. (Join-Path $PSScriptRoot 'station-media-payload.ps1')
+. (Join-Path $PSScriptRoot 'station-python-dependency.ps1')
+. (Join-Path $PSScriptRoot 'station-python-dependency.ps1')
 
 if ($PlanningBuildProfile -eq 'planning-staff-beta' -and $ProductProfile -ne 'planning-preview') {
     throw 'The staff beta build requires the existing planning-preview runtime composition.'
@@ -186,11 +193,24 @@ function New-RuntimePayloadLock {
     param(
         [object]$PayloadManifest,
         [string]$PayloadRoot,
-        [string]$ProductProfile
+        [string]$ProductProfile,
+        [object]$StationMediaSource
     )
     $PayloadLocks = @()
     foreach ($Payload in $PayloadManifest.payloads) {
         $PayloadLocks += Get-PayloadRequiredFileLock -PayloadRoot $PayloadRoot -Payload $Payload -ProductProfile $ProductProfile
+    }
+    if ($ProductProfile -eq 'inspections-preview') {
+        if (-not $StationMediaSource -or -not $StationMediaSource.required_files) {
+            throw 'inspections-preview requires the pinned Station media payload source contract.'
+        }
+        $StationPayload = [pscustomobject]@{
+            id = $StationMediaSource.id
+            label = $StationMediaSource.label
+            source_dir = 'station'
+            required_files = @($StationMediaSource.required_files)
+        }
+        $PayloadLocks += Get-PayloadRequiredFileLock -PayloadRoot $PayloadRoot -Payload $StationPayload -ProductProfile $ProductProfile
     }
     return [ordered]@{
         schema_version = 1
@@ -829,6 +849,14 @@ function Install-PythonServicePackages {
     $PipStatus = Ensure-PythonPip -Source $Source -CacheRoot $CacheRoot -PythonRoot $PythonRoot
     $TownlightRecords = if ($RecordsBackendRoot) { (Resolve-Path $RecordsBackendRoot).Path } else { (Resolve-Path (Join-Path $RepoRoot "..\sunshine\backend")).Path }
     $RuntimeBridge = (Resolve-Path (Join-Path $RepoRoot "desktop\runtime\python-services")).Path
+    if (-not $ConnectorWheel) {
+        $ConnectorLock = Read-JsonFile (Join-Path $RepoRoot 'desktop/runtime/connectors-lock.json')
+        $ConnectorWheel = Join-Path $RepoRoot $ConnectorLock.wheel
+        $ConnectorWheelSha256 = $ConnectorLock.sha256
+    }
+    & (Join-Path $PSScriptRoot 'install-connector-wheel.ps1') `
+        -Python (Join-Path $PythonRoot 'python.exe') -WheelPath $ConnectorWheel `
+        -ExpectedSha256 $ConnectorWheelSha256 -ReceiptPath (Join-Path $PythonRoot 'connectors-package.json')
 
     $ServicePackages = @($TownlightRecords, $RuntimeBridge)
     if (-not $ReuseInstalledServiceDependencies) {
@@ -955,6 +983,13 @@ function Install-PythonServicePackages {
     ) + $ServicePackages
     if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
+    $StationPythonDependency = $null
+    $StationPythonVerification = $null
+    if ($ProductProfile -eq 'inspections-preview') {
+        $StationPythonDependency = Install-StationPythonDependency `
+            -Source $Source.station_pywin32 -PythonRoot $PythonRoot -CacheRoot $CacheRoot
+        $StationPythonVerification = Test-StationPythonDependencyRuntime -PythonRoot $PythonRoot
+    }
     Copy-TownlightRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
@@ -963,7 +998,7 @@ function Install-PythonServicePackages {
     if ($ProductProfile -eq 'inspections-preview') {
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', 'import townlight_inspections.workflow_store, townlight_runtime.inspections_bridge, townlight_runtime.municipal_staff, textflowkit.core.whistle') -ExtraEnvironment @{TESTING='1'}
     }
-    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime")
+    $InstalledPackages = @("townlight_core", "townlight_records", "townlight_notice", "townlight_access", "townlight_runtime", "quorumrelay")
     if ($ProductProfile -in @("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview")) {
         $InstalledPackages += @("townlight_meetings", "townlight_code")
     }
@@ -1012,10 +1047,15 @@ path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
 "@
         Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @('-c', $ProvenanceScript) -ExtraEnvironment @{ TESTING = '1' }
     }
-    return @{
+    $Result = @{
         pip = $PipStatus
         installed = $InstalledPackages
     }
+    if ($ProductProfile -eq 'inspections-preview') {
+        $Result.station_python_dependency = $StationPythonDependency
+        $Result.station_python_verification = $StationPythonVerification
+    }
+    return $Result
 }
 
 function Install-OllamaPayload {
@@ -1160,6 +1200,15 @@ $Report.postgres_vcruntime = Copy-PostgresVcRuntime -PostgresRoot (Join-Path $Pa
 $Report.python_vcruntime = Copy-PythonVcRuntime -PythonRoot (Join-Path $PayloadRoot "python")
 if ($ProductProfile -eq 'inspections-preview') {
     $Report.inspection_voice = Install-InspectionVoicePayload -Source $Manifest.sources.inspection_voice -CacheRoot $CacheRoot -PythonRoot (Join-Path $PayloadRoot 'python')
+    if (-not $StationRoot) { throw 'Explicit pinned Station source is required to validate the accepted media lock.' }
+    $ResolvedStationRoot = (Resolve-Path -LiteralPath $StationRoot).Path
+    $Report.station_media = Install-AcceptedStationMediaPayload `
+        -Source $Manifest.sources.station_media `
+        -CacheRoot $CacheRoot `
+        -PayloadRoot $PayloadRoot `
+        -MediaLockPath (Join-Path $ResolvedStationRoot 'townlight_station\media-lock.json') `
+        -MsiPath $StationMsiPath `
+        -ExistingMsiExtractRoot $StationMsiExtractRoot
 }
 # Python imports generate __pycache__ paths that can exceed the WiX linker limit.
 # They are regenerable bytecode and must not be shipped; remove only those directories before hashing.
@@ -1175,7 +1224,7 @@ Get-ChildItem -LiteralPath $PythonRoot -Directory -Recurse -Filter __pycache__ |
         }
         Remove-Item -LiteralPath $CachePath -Recurse -Force
     }
-$PayloadLock = New-RuntimePayloadLock -PayloadManifest $PayloadManifest -PayloadRoot $PayloadRoot -ProductProfile $ProductProfile
+$PayloadLock = New-RuntimePayloadLock -PayloadManifest $PayloadManifest -PayloadRoot $PayloadRoot -ProductProfile $ProductProfile -StationMediaSource $Manifest.sources.station_media
 $Report.payloads = $PayloadLock.payloads
 
 Write-JsonFile -Path (Join-Path $PayloadRoot "runtime-payload-lock.json") -Value $Report

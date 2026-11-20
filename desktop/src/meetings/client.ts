@@ -34,6 +34,9 @@ export async function readImportFile(source: ImportSource, data: {source_url: st
 
 export function createMeetingsClient(invoke: Invoke) {
   return {
+    connector(operation: string, payload: object = {}): Promise<any> {
+      return invoke("meetings_domain_request", {request: {operation: "connector", payload: {operation, payload}}});
+    },
     importSources(): Promise<ImportSource[]> {
       return invoke("meetings_domain_request", {request: {operation: "import-sources"}});
     },

@@ -1,0 +1,10 @@
+{
+  "MeetingId": "meeting-α",
+  "MeetingName": "Council café",
+  "MeetingDate": "2026-11-11T18:00:00-07:00",
+  "AgendaItems": [
+    {"FileNumber": "item-1", "Title": "Water review", "DepartmentName": "Public Works"},
+    {"FileNumber": "item-2", "Title": "Budget review", "DepartmentName": null}
+  ],
+  "UnknownExtension": {"zero": 0, "false": false, "null": null, "empty": ""}
+}

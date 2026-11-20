@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Townlight Suite Manual | Townlight Windows Beta 1</title><style>
+<title>Townlight Suite Manual | Townlight candidate</title><style>
 :root{--ink:#1A2330;--muted:#3A4554;--accent:#1A3A52;--paper:#FAF8F3;--wash:#E6EDF3;--line:#E3DCCB;--warm:#B08A2E}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 "Segoe UI",Arial,sans-serif}a{color:var(--accent);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #a25900;outline-offset:4px}.skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;background:white;padding:1rem;z-index:20}header{border-bottom:1px solid var(--line);padding:1.1rem 5vw;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}header .brand{font-size:1.3rem;font-weight:750;letter-spacing:-.04em;text-decoration:none;color:var(--ink)}header nav{margin-left:auto;display:flex;gap:1.25rem;flex-wrap:wrap;font-size:.88rem}.edition{font:700 .72rem/1.5 "Segoe UI",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.wrap{max-width:1240px;margin:auto;padding:0 4vw}.hero{padding:5rem 0 3.2rem;max-width:950px}.hero h1{font-size:clamp(2.5rem,5vw,4.7rem);line-height:1.08;letter-spacing:-.045em;margin:1rem 0 1.5rem;font-weight:650}.hero .lead{font-size:1.26rem;max-width:780px;color:var(--muted)}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin:1.8rem 0}.button{display:inline-block;padding:.7rem 1.15rem;border:1px solid var(--accent);border-radius:4px;text-decoration:none;font-weight:650}.button.primary{background:var(--accent);color:#fff}.facts{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}.section{padding:3rem 0;border-top:1px solid var(--line)}h2{font-size:1.8rem;line-height:1.3;letter-spacing:-.025em;margin:2.5rem 0 1rem}h3{font-size:1.18rem;line-height:1.45;margin:1.8rem 0 .7rem}h4{font-size:1rem;margin:1.3rem 0 .6rem}p{margin:.85rem 0 1rem}ul,ol{padding-left:1.6rem}li{margin:.4rem 0}strong{font-weight:650}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.6rem}.product{border-top:3px solid var(--accent);padding:1.4rem 0}.product h3{font-size:1.65rem;margin:.4rem 0}.product p{color:var(--muted)}.number{font-size:.76rem;letter-spacing:.1em}.split{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.flow{width:100%;height:auto;display:block;margin:1.8rem 0}.caption{font-size:.85rem;color:var(--muted)}.reading{max-width:860px}.doclayout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:3rem;max-width:1320px;margin:auto;padding:2rem 4vw}.toc{font-size:.84rem;align-self:start;position:sticky;top:1rem;max-height:90vh;overflow:auto;padding-right:.8rem}.toc ul{list-style:none;padding:0}.toc li{margin:.5rem 0}.toc li li{padding-left:.8rem}.toc a{text-decoration:none}.docbody{min-width:0}.docbody h1{font-size:2.7rem;line-height:1.1;letter-spacing:-.04em}.docbody h2{border-top:1px solid var(--line);padding-top:1.8rem}.docbody img{max-width:100%;height:auto}.docmeta{color:var(--muted);font-size:.9rem}.docbody section{scroll-margin-top:1rem}table{width:100%;border-collapse:collapse;font-size:.87rem;line-height:1.5;margin:1.3rem 0;table-layout:auto}th{text-align:left;background:var(--wash);font-weight:650}th,td{padding:.65rem .7rem;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}thead{display:table-header-group}pre{background:#f2f5f6;padding:1rem;border:1px solid #dfe7e8;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:13px/1.6 Consolas,monospace}code{font: .85em/1.6 Consolas,monospace;overflow-wrap:anywhere}pre code{font-size:inherit}blockquote{border-left:3px solid var(--accent);padding-left:1rem;margin-left:0;color:var(--muted)}.search{padding:.65rem;border:1px solid #789399;border-radius:4px;width:100%;font:inherit}.search-status{font-size:.8rem;color:var(--muted)}footer{border-top:1px solid var(--line);padding:2rem 5vw;margin-top:3rem;font-size:.85rem;color:var(--muted);display:flex;gap:2rem;justify-content:space-between;flex-wrap:wrap}.small{font-size:.9rem;color:var(--muted)}.api-entry{padding:1.2rem 0;border-top:1px solid var(--line)}.api-entry h3{overflow-wrap:anywhere}.method{font-size:.76rem;font-weight:750;color:var(--accent)}details{margin:1rem 0}summary{cursor:pointer;font-weight:650}.index-columns{columns:2;column-gap:2rem}.index-columns li{break-inside:avoid}
 @media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}.doclayout{grid-template-columns:1fr;gap:1rem}.toc{position:static;max-height:none}.hero{padding-top:3rem}header nav{margin-left:0}.docbody h1{font-size:2.2rem}}
@@ -8,20 +8,29 @@
 main,.toc a,.hero h1{overflow-wrap:anywhere}
 @page{size:Letter;margin:.7in .65in .75in}
 @media print{html{scroll-behavior:auto}body{font:10.5pt/1.45 Arial,sans-serif;color:#172f39}header,footer,.search-area,.screen-only{display:none}.doclayout{display:block;padding:0;max-width:none}.toc{position:static;max-height:none;overflow:visible;font-size:10pt;break-after:page}.toc>h2{border:0}.toc ul{columns:2;column-gap:.3in}.toc li{break-inside:avoid}.docbody h1{font-size:30pt}.docbody h2{font-size:19pt;break-after:avoid;padding-top:.15in;margin-top:.35in}.docbody h3{font-size:12pt;break-after:avoid}.docbody h4{break-after:avoid}p{orphans:3;widows:3}pre{font-size:8.2pt;line-height:1.4;padding:.1in;break-inside:auto}table{font-size:8.4pt;line-height:1.35}th,td{padding:.06in .07in}tr{break-inside:avoid}.flow{max-height:6in;object-fit:contain;break-inside:avoid}a{color:#172f39;text-decoration:underline}.cover{break-after:page;padding-top:1in}.cover .edition{font-size:11pt}.cover h1{font-size:32pt}.cover .lead{font-size:14pt}.api-entry{break-inside:auto}.api-entry h3{break-after:avoid}.index-columns{columns:2}}
-header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:0}header .brand img{display:block;width:217px;max-width:100%;height:auto}</style><link rel="icon" href="../brand/favicon.svg" type="image/svg+xml"><link rel="icon" href="../brand/favicon.ico" sizes="16x16 32x32 48x48"><link rel="apple-touch-icon" href="../brand/png/townlight-hall-app-icon-180.png"><meta property="og:image" content="https://townlight.github.io/brand/png/townlight-hall-social-preview.png"><meta name="twitter:card" content="summary_large_image"></head>
+
+/* Townlight Open Hall documentation identity. Software adoption is separate. */
+header .brand{display:inline-flex;align-items:center;max-width:100%;flex-shrink:0}header .brand img{display:block;width:217px;max-width:100%;height:auto}
+</style></head>
 <body><a class="skip" href="#main">Skip to content</a>
-<header><a class="brand" href="../index.html"><img src="../brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a>
+<header><a class="brand" href="../index.html">Townlight</a>
 <nav aria-label="Main"><a href="../manuals/suite.html">Suite manual</a>
-<a href="../versions.html">Versions and Windows release</a>
+<a href="../index.html#connector-candidate">Candidate status</a>
 <a href="../terms.html">Terms and license</a></nav></header>
-<main id="main" class="reading wrap"><p class="edition">Windows x64 Beta 1 · MSI 1.8.1.1</p>
-<p>Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module. <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Acceptance and limits</a>.</p>
+<main id="main" class="reading wrap"><p class="edition">QuorumRelay dev8 integration - Townlight 1.8.5 source candidate</p>
+<p>Prepared source-candidate documentation; this page does not establish a built, signed or installed package.</p>
 
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#townlight-suite-manual"
 id="toc-townlight-suite-manual">Townlight Suite Manual</a>
 <ul>
+<li><a href="#prepared-connector-source-candidate-townlight-1.8.5"
+id="toc-prepared-connector-source-candidate-townlight-1.8.5">Prepared
+connector source candidate · Townlight 1.8.5</a></li>
+<li><a href="#shared-meeting-imports-windows-1.8.1.1"
+id="toc-shared-meeting-imports-windows-1.8.1.1">Shared meeting imports ·
+Windows 1.8.1.1</a></li>
 <li><a href="#using-this-manual" id="toc-using-this-manual">Using this
 manual</a></li>
 <li><a href="#beta-identity" id="toc-beta-identity">Beta
@@ -73,9 +82,224 @@ id="toc-delivery-subject-index">Delivery subject index</a></li>
 </ul></li>
 </ul>
 </nav>
+<p>Windows x64 Beta 1 · MSI 1.8.1.1</p>
+<p>Windows 1.8.1.1 adds shared meeting imports for 31 source families,
+with 34 supported source/format pairs. Installed Windows Sandbox checks
+exercised preview, save and durable readback using public captures and
+fixtures, plus the documented Townlight handoffs. These checks do not
+establish automatic discovery on every live portal or a complete retest
+of every module.</p>
+<ul>
+<li><a href="https://townlight.github.io/manuals/suite.html#connector-candidate" id="toc-connector-candidate">Prepared
+connector source candidate · Townlight 1.8.5</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#townlight-suite-manual" id="toc-townlight-suite-manual">Townlight
+Suite Manual</a>
+<ul>
+<li><a href="https://townlight.github.io/manuals/suite.html#using-this-manual" id="toc-using-this-manual">Using
+this manual</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#beta-identity" id="toc-beta-identity">Beta
+identity</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#first-run" id="toc-first-run">First
+run</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#daily-workflow" id="toc-daily-workflow">Daily
+workflow</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#connected-workflows" id="toc-connected-workflows">Connected
+workflows</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#architecture" id="toc-architecture">Architecture</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#existing-product-operating-guides" id="toc-existing-product-operating-guides">Existing
+product operating guides</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#technical-specifications" id="toc-technical-specifications">Technical
+specifications</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#configuration-and-administration" id="toc-configuration-and-administration">Configuration
+and administration</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#api-and-integration-examples" id="toc-api-and-integration-examples">API
+and integration examples</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#mcp-and-automation-boundary" id="toc-mcp-and-automation-boundary">MCP
+and automation boundary</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#security-and-permissions" id="toc-security-and-permissions">Security
+and permissions</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance" id="toc-backup-recovery-and-maintenance">Backup
+recovery and maintenance</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#troubleshooting" id="toc-troubleshooting">Troubleshooting</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#verified-workflows-and-limits" id="toc-verified-workflows-and-limits">Verified
+workflows and limits</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#terms-of-service-and-license" id="toc-terms-of-service-and-license">Terms
+of service and license</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#glossary" id="toc-glossary">Glossary</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#alphabetical-subject-index" id="toc-alphabetical-subject-index">Alphabetical
+subject index</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#source-and-document-control" id="toc-source-and-document-control">Source
+and document control</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#station-live-and-recorded-delivery" id="toc-station-live-and-recorded-delivery">Station
+live and recorded delivery</a></li>
+<li><a href="https://townlight.github.io/manuals/suite.html#delivery-subject-index" id="toc-delivery-subject-index">Delivery
+subject index</a></li>
+</ul></li>
+</ul>
 <h1 id="townlight-suite-manual">Townlight Suite Manual</h1>
+<p><a id="connector-candidate"></a></p>
+<h2 id="prepared-connector-source-candidate-townlight-1.8.5">Prepared
+connector source candidate · Townlight 1.8.5</h2>
+<p>This Townlight 1.8.5 source candidate (Windows product version
+1.8.5.0) pins QuorumRelay <code>0.1.0.dev8</code> in Townlight Runtime.
+The vendored wheel SHA-256 is
+<code>bcfe691b4d1eb0de162f5f94985d0242a97b5d3d89bd5eeb9306d1ef28caf692</code>;
+QuorumRelay source commit
+<code>3862e5f4ad7064aee722e09bb438899c3566477f</code> is pinned by the
+candidate connector lock. The shared connector source retains all 31
+provider families and 34 baseline input-format paths, while per-provider
+live discovery, schemas and supported operations have different evidence
+and completion levels.</p>
+<p>This is candidate-source guidance only. It does not identify a
+released or installed 1.8.5 Windows package. Use the currently released
+Windows 1.8.1.1 installer and acceptance links below for the public
+release. In this candidate, the Meetings workspace includes an
+<strong>External meeting evidence</strong> panel backed by the
+authenticated Townlight runtime. Provider actions require an exact
+server-owned source grant and local administrator role; provider
+credentials are configured server-side where required. Live provider
+acceptance remains NOT_RUN because no authorized provider test tenant or
+credentials were supplied. The dev8 core adds bounded public-source
+discovery and search paths with provider-specific limits; these do not
+establish complete provider coverage. A separate installed 1.8.4
+candidate passed a captured MP4 Station-to-Records handoff and restart
+readback; this 1.8.5 candidate requires its own affected acceptance. The
+connector guide describes evidence limits and file-preparation details.
+See the <a
+href="https://townlight.github.io/manuals/meeting-imports.html#quorumrelay-source-candidate">provider
+and format guide</a> for interface details, panel steps, limits and
+remaining acceptance.</p>
+<h3
+id="external-meeting-evidence-townlight-1.8.5-source-candidate">External
+meeting evidence · Townlight 1.8.5 source candidate</h3>
+<p>This panel is prepared in source; its presence here does not
+establish that it is installed in the released 1.8.1.1 package.</p>
+<ol type="1">
+<li>In the Meetings workspace, open <strong>External meeting
+evidence</strong>. Use <strong>Identify URL</strong> and <strong>Inspect
+provider capabilities</strong> to inspect a source. Select its
+provider/format, enter the original URL and optional body, then choose
+<strong>Save validated source</strong>. Keep provider options to
+documented fields. Never enter passwords or tokens in the panel.</li>
+<li>For an existing source, use the configured namespace. A source
+identity transition requires a local administrator to provide the
+original URL, namespace and evidence-backed ID mappings. Mark
+<strong>new source</strong> only when it is a genuinely separate
+source.</li>
+<li>Choose an inclusive date range and <strong>Discover / read saved
+response</strong>. You may attach a saved capture up to 16 MiB. For a
+namespace-bound account read, open <strong>Authorized account
+fetch</strong>; credentials must already be configured by the service
+administrator, and the panel accepts only documented provider request
+fields.</li>
+<li>Review result status and coverage. A <code>partial</code> result has
+missing or incomplete coverage. Use <strong>Reopen result</strong> to
+inspect saved output, <strong>Save searchable evidence</strong> before
+searching, or enter exact terms/phrases for local search. Use
+<strong>Preview canonical import</strong>, select the meeting and choose
+<strong>Save selected canonical meeting</strong> only after review. Use
+<strong>Export evidence</strong> for ZIP, JSON, JSONL, meeting/item CSV
+or iCalendar output.</li>
+<li><strong>Explicit provider action</strong> is disabled unless an
+exact server-owned source grant and local administrator role enable it.
+Review the displayed plan and hash, then explicitly approve that exact
+plan before commit. Provider credentials are required where the provider
+requires them and are configured on the server; the panel never accepts
+credential values. These controls do not establish live write
+acceptance.</li>
+</ol>
+<h4 id="service-admin-connector-configuration">Service-admin connector
+configuration</h4>
+<p>The candidate reads optional policy from
+<code>config/secrets/connectors.json</code> under the selected Townlight
+profile. Each top-level key is the local actor UUID. An entry includes a
+nonempty exact <code>namespaces</code> array; optional
+<code>credentials</code> maps provider IDs to provider-specific
+credential objects; optional <code>write_sources</code> maps a
+configured source ID to the exact full source object
+(<code>provider</code>, <code>url</code>, <code>namespace</code>,
+<code>body</code>, <code>input_format</code> and <code>options</code>).
+The saved source and namespace must match exactly for a write plan. No
+secret is entered in the Meetings panel or sent in browser requests. The
+policy file is limited to 1 MiB. A missing file disables account
+credentials and write authorization; malformed content fails closed.</p>
+<p><strong>Find the native actor UUID.</strong> Townlight Settings →
+Local Users shows the account email but not its UUID. Use the bundled
+runtime’s <code>townlight_runtime.records_import.stable_id</code> helper
+with the resolved Townlight profile root and the lowercase email from
+the existing native account configuration
+(<code>config/first-admin.json</code> or
+<code>config/staff-users.json</code>). Resolve the profile root using
+the same precedence as the runtime: absolute
+<code>TOWNLIGHT_PROFILE_ROOT</code> when set; otherwise the parent of
+<code>TOWNLIGHT_DATA_DIR</code> when set; otherwise
+<code>%LOCALAPPDATA%\CivicSuite</code> (or
+<code>%USERPROFILE%\AppData\Local\CivicSuite</code> when
+<code>LOCALAPPDATA</code> is unset). Resolve that path before
+calculating the UUID:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> townlight_runtime.records_import <span class="im">import</span> stable_id</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>profile_root <span class="op">=</span> Path(<span class="vs">r&quot;&lt;resolved Townlight profile root&gt;&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>native_email <span class="op">=</span> <span class="st">&quot;&lt;email from Settings → Local Users&gt;&quot;</span>.strip().lower()</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(stable_id(profile_root, <span class="st">&quot;native-user&quot;</span>, native_email))</span></code></pre></div>
+<p>For Essential and TelVue account credentials, bind each SDK
+credential object to its exact authorized <code>origin</code> and
+<code>namespace</code>; set <code>tenant</code> to the SHA-256 hex
+digest of the UTF-8 string form of the resolved profile root. Use
+provider-documented credential fields. Do not guess token names or
+production origins. Account-read and live-write acceptance remains
+NOT_RUN until an authorized provider test tenant and credentials are
+available.</p>
+<p>If an operation reports that its outcome could not be confirmed,
+reopen saved results before retrying. Incomplete provider coverage,
+missing text or unavailable media does not complete a transcription or
+publication workflow. The <a
+href="https://townlight.github.io/api/candidate-1.8.5/suite.html">candidate
+native API reference</a> describes source routes and validation
+contracts, not installed endpoint acceptance.</p>
+<h2 id="shared-meeting-imports-windows-1.8.1.1">Shared meeting imports ·
+Windows 1.8.1.1</h2>
+<p>Windows 1.8.1.1 adds shared meeting imports for 31 source families,
+with 34 supported source/format pairs. Installed Windows Sandbox checks
+exercised preview, save and durable readback using public captures and
+fixtures, plus the documented Townlight handoffs. These checks do not
+establish automatic discovery on every live portal or a complete retest
+of every module.</p>
+<p><a
+href="https://townlight.github.io/manuals/meeting-imports.html">All 31
+sources, formats and handoffs</a> · <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Installed
+acceptance</a>.</p>
+<p>Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to
+1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested
+upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an
+existing-city evaluation, back up city data and settings, close
+Townlight, keep the existing %LOCALAPPDATA%profile, and use the same
+Windows account. Keep the prior installer and a restore path. Station
+continues to use its separately configured service.</p>
+<p>The accepted MSI contains Townlight Runtime 0.3.1 and Meetings 1.0.6
+distributions. Its health version strings still report Runtime 0.3.0 and
+Meetings 1.0.5. Default-branch source corrects those display strings;
+the signed MSI and its exact build source remain unchanged.</p>
 <blockquote>
-<p>Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module. <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Acceptance and limits</a>.</p>
+<p><strong>Windows 1.8.1.1 acceptance.</strong> Windows 1.8.1.1 adds
+Boards &amp; Commissions, Contracts, and Procurement to the full Windows
+profile. The signed Windows Sandbox checks cover a fresh installation,
+the three staff workflows, role boundaries, record persistence, and
+upgrade from 1.7.2.1 with retained city data and settings. Station
+continues to use its separately configured local service. <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Acceptance
+and limits</a>.</p>
+</blockquote>
+<blockquote>
+<p>The signed <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1">Windows
+x64 beta 1.8.1.1</a> adds the three staff workspaces and automatically
+refreshes the bundled runtime when upgrading from 1.7.2.1. The <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Windows
+acceptance summary</a> applies to this exact MSI.</p>
 </blockquote>
 <h2 id="using-this-manual">Using this manual</h2>
 <p>Townlight connects municipal workflows around retained sources, named
@@ -115,7 +339,11 @@ identified by its receipt.</p>
 </tr>
 <tr>
 <td>Released artifact identity</td>
-<td><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/SHA256SUMS-Windows-1.8.1.1.txt">SHA-256 checksums</a> and <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Windows acceptance summary</a></td>
+<td><a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/SHA256SUMS-Windows-1.8.1.1.txt">SHA-256
+checksums</a> and <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Windows
+acceptance summary</a></td>
 </tr>
 <tr>
 <td>Corresponding source</td>
@@ -127,11 +355,15 @@ identified by its receipt.</p>
 </tr>
 <tr>
 <td>Supported acceptance profile</td>
-<td>Windows 1.8.1.1: fresh-install acceptance; upgrade to this version unverified. Select the full profile. Station uses separate configuration.</td>
+<td>Windows x64 fresh install and upgrade from 1.7.2.1; full profile;
+separate Station configuration</td>
 </tr>
 </tbody>
 </table>
-
+<p>Start a new installation with an empty database and fresh Windows
+profile. For an upgrade from Windows 1.7.2.1, keep the existing profile.
+The approved profile path is <code>%LOCALAPPDATA%\CivicSuite</code>.
+Keep existing profiles and backups.</p>
 <h3 id="component-versions">Component versions</h3>
 <table>
 <thead>
@@ -197,24 +429,53 @@ identified by its receipt.</p>
 <td>townlight-notice</td>
 <td>0.3.0</td>
 </tr>
-<tr><td>Boards &amp; Commissions</td><td>townlight-boards</td><td>0.2.0</td></tr>
-<tr><td>Contracts</td><td>townlight-contracts</td><td>0.2.0</td></tr>
-<tr><td>Procurement</td><td>townlight-procurement</td><td>0.3.0</td></tr>
-<tr><td>Local runtime</td><td>townlight-runtime</td><td>0.3.1</td></tr>
+<tr>
+<td>Boards &amp; Commissions</td>
+<td>townlight-boards</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>Contracts</td>
+<td>townlight-contracts</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>Procurement</td>
+<td>townlight-procurement</td>
+<td>0.3.0</td>
+</tr>
+<tr>
+<td>Local runtime</td>
+<td>townlight-runtime</td>
+<td>0.3.1</td>
+</tr>
 </tbody>
 </table>
 <h2 id="first-run">First run</h2>
-<p>Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to 1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an existing-city evaluation, back up city data and settings, close Townlight, keep the existing %LOCALAPPDATA%\CivicSuite profile, and use the same Windows account. Keep the prior installer and a restore path. Station continues to use its separately configured service.</p>
-<h3>Fresh installation</h3>
-<p>Run the signed Windows 1.8.1.1 MSI and use an empty database and a new Townlight profile for first run.</p>
+<p>Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to
+1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested
+upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an
+existing-city evaluation, back up city data and settings, close
+Townlight, keep the existing %LOCALAPPDATA%profile, and use the same
+Windows account. Keep the prior installer and a restore path. Station
+continues to use its separately configured service.</p>
+<h3 id="fresh-installation">Fresh installation</h3>
+<p>Run the signed Windows 1.8.1.1 MSI and use an empty database and a
+new Townlight profile for first run.</p>
 <ol type="1">
-<li>Download the signed MSI, matching source and checksums from the <a href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1">Windows x64 beta 1.8.1.1</a> release.</li>
-<li>Verify the MSI hash and Authenticode publisher before installation. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Windows acceptance summary</a> for the tested setup.</li>
+<li>Download the signed MSI, matching source and checksums from the <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1">Windows
+x64 beta 1.8.1.1</a> release.</li>
+<li>Verify the MSI hash and Authenticode publisher before installation.
+See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Windows
+acceptance summary</a> for the tested setup.</li>
 <li>Launch Townlight under the intended named Windows account. Choose
 the storage folders. Select <strong>Townlight Inspections
 candidate</strong> (<code>inspections-preview</code>) for the bounded
-desktop composition, including Access, Notice, Boards &amp; Commissions, Contracts, and Procurement. A narrower selection
-will not expose all workspaces.</li>
+desktop composition, including Access, Notice, Boards &amp; Commissions,
+Contracts, and Procurement. The full profile includes Boards &amp;
+Commissions, Contracts, and Procurement.</li>
 <li>Enter the city profile, time zone and contacts. Create the first
 named local administrator, sign in and choose protected backup storage.
 <strong>Continue without local AI</strong> is valid for the
@@ -231,7 +492,11 @@ Selecting the desktop composition does not start or configure Station.
 Configure vision explicitly only if automatic photo drafting is
 selected.</li>
 </ol>
-<h2 id="daily-workflow">Daily workflow</h2><p><a href="../manuals/windows-staff-workflows.html">Windows staff workflow guide</a> covers Boards &amp; Commissions, Contracts and Procurement.</p>
+<h2 id="daily-workflow">Daily workflow</h2>
+<p><a
+href="https://townlight.github.io/manuals/windows-staff-workflows.html">Windows
+staff workflow guide</a> covers Boards &amp; Commissions, Contracts,
+Procurement, staff roles and linked records.</p>
 <p>Sign in with your own named account. Confirm the selected workspace,
 open a saved record and check its source/version before editing. Save
 the work, record the intended review and inspect its audience. Use an
@@ -371,7 +636,7 @@ href="https://townlight.github.io/manuals/station.html">Station</a></td>
 </tbody>
 </table>
 <h2 id="architecture">Architecture</h2>
-<p><img class="flow" src="https://townlight.github.io/assets/suite-architecture.svg" alt="Townlight Suite architecture and evidence flow"></p>
+<p><img src="https://townlight.github.io/assets/suite-architecture.svg" class="flow" alt="Townlight Suite architecture and evidence flow" /></p>
 <p>The drawing shows the principal staff/evidence path. Native commands
 carry trusted identity to Python business services; PostgreSQL and
 retained original files hold durable state. A downstream copy does not
@@ -418,17 +683,19 @@ operating procedure</a>.</li>
 </ul>
 <h2 id="technical-specifications">Technical specifications</h2>
 <h3 id="runtime-and-storage">Runtime and storage</h3>
-<p>The Windows 1.8.1.1 package has fresh-install acceptance; an in-place upgrade to this version was not exercised. Its native shell uses <strong>Rust 2021, Tauri 2
-and Microsoft WebView2</strong>; browser assets are JavaScript built
-with <strong>Vite 8.1.6</strong>. This describes the native desktop
-frontend; Station has a separate React operator, specified below or in
-its product manual. Canonical business workflows use bundled
-<strong>CPython 3.13.5, FastAPI, Pydantic, SQLAlchemy and
-Alembic</strong>, with <strong>PostgreSQL 17 / PostGIS</strong> and
-managed original files. The installed runtime tested here contains
-FastAPI 0.162.0. Package minimum Python requirements can differ from the
-bundled executable; the metadata reference preserves both. No stack
-rewrite is implied by the beta label.</p>
+<p>The Windows 1.8.1.1 package has fresh-install acceptance; an in-place
+upgrade to this version was not exercised. Its native shell uses
+<strong>Rust 2021, Tauri 2 and Microsoft WebView2</strong>; browser
+assets are JavaScript built with <strong>Vite 8.1.6</strong>. This
+describes the native desktop frontend; Station has a separate React
+operator, specified below or in its product manual. Canonical business
+workflows use bundled <strong>CPython 3.13.5, FastAPI, Pydantic,
+SQLAlchemy and Alembic</strong>, with <strong>PostgreSQL 17 /
+PostGIS</strong> and managed original files. The installed runtime
+tested here contains FastAPI 0.162.0. Package minimum Python
+requirements can differ from the bundled executable; the metadata
+reference preserves both. No stack rewrite is implied by the beta
+label.</p>
 <p>The native transport is fixed to loopback
 <code>127.0.0.1:15480</code>; PostgreSQL uses the configured local
 runtime port (default <code>15432</code>). Optional local model service
@@ -460,7 +727,8 @@ statements</h3>
 <p>This beta has synthetic single-profile workflow evidence. It does not
 have a published benchmark for concurrent staff capacity, minimum
 RAM/CPU, large-source limits or a field SLA. Do not turn a developer
-machine’s specification into a supported minimum. The signed MSI is 2,081,316,864 bytes; allow additional disk for extracted runtime,
+machine’s specification into a supported minimum. The signed MSI is
+2,081,316,864 bytes; allow additional disk for extracted runtime,
 database, originals, exports, media and backups. Select
 equipment/storage after sizing those actual workloads.</p>
 <p>The exact <a
@@ -495,9 +763,10 @@ configuration</h3>
 <p>Use Setup, Settings and System Health for supported staff operation.
 Administrators provision folders, backup storage, named accounts and the
 city profile. Select <code>inspections-preview</code> for the bounded
-desktop composition, including Access, Notice, Boards &amp; Commissions, Contracts, and Procurement. Station remains a
-separate service boundary. Do not use a standalone product’s demo server
-as a substitute for the installed workspace.</p>
+desktop composition, including Access, Notice, Boards &amp; Commissions,
+Contracts, and Procurement. Station remains a separate service boundary.
+Do not use a standalone product’s demo server as a substitute for the
+installed workspace.</p>
 <p>Technical deployments use <code>TOWNLIGHT_PRODUCT_PROFILE</code>,
 <code>TOWNLIGHT_PROFILE_ROOT</code>, <code>DATABASE_URL</code>,
 <code>TOWNLIGHT_RUNTIME_PORT</code>, <code>PORTAL_MODE</code> and the
@@ -518,10 +787,10 @@ frontend/development environment with <code>invoke</code> imported from
 <code>@tauri-apps/api/core</code>. It is not a command for an arbitrary
 web page or an instruction for nontechnical staff. IDs must come from
 records created in an isolated synthetic exercise.</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { invoke } <span class="im">from</span> <span class="st">&#39;@tauri-apps/api/core&#39;</span><span class="op">;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> <span class="fu">invoke</span>(<span class="st">&#39;meetings_domain_request&#39;</span><span class="op">,</span> {<span class="dt">request</span><span class="op">:</span> {<span class="dt">operation</span><span class="op">:</span> <span class="st">&#39;get-proceedings&#39;</span><span class="op">,</span> <span class="dt">id</span><span class="op">:</span> meetingId}})<span class="op">;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(result)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { invoke } <span class="im">from</span> <span class="st">&#39;@tauri-apps/api/core&#39;</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> <span class="fu">invoke</span>(<span class="st">&#39;meetings_domain_request&#39;</span><span class="op">,</span> {<span class="dt">request</span><span class="op">:</span> {<span class="dt">operation</span><span class="op">:</span> <span class="st">&#39;get-proceedings&#39;</span><span class="op">,</span> <span class="dt">id</span><span class="op">:</span> meetingId}})<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(result)<span class="op">;</span></span></code></pre></div>
 <h3 id="trusted-local-http-example">Trusted local HTTP example</h3>
 <p>An administrator/developer can inspect an already-configured isolated
 runtime from a trusted local process. This PowerShell example reads the
@@ -529,13 +798,13 @@ signed-in synthetic profile’s existing proof into memory; it does not
 create a user, seed a session, reveal the proof in output or bypass a
 permission check. Do not use real city data in development examples. A
 read response does not prove approval or publication.</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">$profilePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$env</span><span class="op">:</span><span class="va">LOCALAPPDATA</span> <span class="st">&#39;CivicSuite&#39;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">$sessionPath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$profilePath</span> <span class="st">&#39;config\local-session.json&#39;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">$session</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$sessionPath</span> <span class="op">-</span>Raw <span class="op">|</span> <span class="fu">ConvertFrom-Json</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">$headers</span> <span class="op">=</span> @<span class="op">{</span> <span class="st">&#39;X-Townlight-Session&#39;</span> <span class="op">=</span> <span class="va">$session</span><span class="op">.</span><span class="fu">session_hash</span> <span class="op">}</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/station/catalog&#39;</span> <span class="op">-</span>Headers <span class="va">$headers</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Remove-Variable</span> session<span class="op">,</span> headers</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$profilePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$env</span><span class="op">:</span><span class="va">LOCALAPPDATA</span> <span class="st">&#39;CivicSuite&#39;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">$sessionPath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$profilePath</span> <span class="st">&#39;config\local-session.json&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="va">$session</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$sessionPath</span> <span class="op">-</span>Raw <span class="op">|</span> <span class="fu">ConvertFrom-Json</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="va">$headers</span> <span class="op">=</span> @<span class="op">{</span> <span class="st">&#39;X-Townlight-Session&#39;</span> <span class="op">=</span> <span class="va">$session</span><span class="op">.</span><span class="fu">session_hash</span> <span class="op">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/station/catalog&#39;</span> <span class="op">-</span>Headers <span class="va">$headers</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Remove-Variable</span> session<span class="op">,</span> headers</span></code></pre></div>
 <h3 id="a-synthetic-write-with-subsequent-readback">A synthetic write
 with subsequent readback</h3>
 <p>This example demonstrates the existing Meetings HTTP contract in an
@@ -543,24 +812,24 @@ isolated exercise. It is intentionally fictional. It does not start a
 service. Its authentication setup is included so it can be run
 independently under the signed-in synthetic account. If a write times
 out, inspect current records before repeating it.</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$profilePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$env</span><span class="op">:</span><span class="va">LOCALAPPDATA</span> <span class="st">&#39;CivicSuite&#39;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">$sessionPath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$profilePath</span> <span class="st">&#39;config/local-session.json&#39;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="va">$session</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$sessionPath</span> <span class="op">-</span>Raw <span class="op">|</span> <span class="fu">ConvertFrom-Json</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="va">$headers</span> <span class="op">=</span> @<span class="op">{</span> <span class="st">&#39;X-Townlight-Session&#39;</span> <span class="op">=</span> <span class="va">$session</span><span class="op">.</span><span class="fu">session_hash</span> <span class="op">}</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="va">$body</span> <span class="op">=</span> @<span class="op">{</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  title <span class="op">=</span> <span class="st">&#39;Synthetic documentation exercise&#39;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  scheduled_start <span class="op">=</span> <span class="st">&#39;2026-11-05T18:00:00-07:00&#39;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  location <span class="op">=</span> <span class="st">&#39;Synthetic room&#39;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  meeting_type <span class="op">=</span> <span class="st">&#39;regular&#39;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span> <span class="fu">ConvertTo-Json</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">$meeting</span> <span class="op">=</span> <span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Method Post `</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Uri <span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/meetings&#39;</span> `</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Headers <span class="va">$headers</span> <span class="op">-</span>ContentType <span class="st">&#39;application/json&#39;</span> <span class="op">-</span>Body <span class="va">$body</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> `</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Uri <span class="op">(</span><span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/meetings/&#39;</span> <span class="op">+</span> <span class="va">$meeting</span><span class="op">.</span><span class="fu">id</span><span class="op">)</span> `</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Headers <span class="va">$headers</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">Remove-Variable</span> session<span class="op">,</span> headers</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">$profilePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$env</span><span class="op">:</span><span class="va">LOCALAPPDATA</span> <span class="st">&#39;CivicSuite&#39;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">$sessionPath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="va">$profilePath</span> <span class="st">&#39;config/local-session.json&#39;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">$session</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$sessionPath</span> <span class="op">-</span>Raw <span class="op">|</span> <span class="fu">ConvertFrom-Json</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="va">$headers</span> <span class="op">=</span> @<span class="op">{</span> <span class="st">&#39;X-Townlight-Session&#39;</span> <span class="op">=</span> <span class="va">$session</span><span class="op">.</span><span class="fu">session_hash</span> <span class="op">}</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="va">$body</span> <span class="op">=</span> @<span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  title <span class="op">=</span> <span class="st">&#39;Synthetic documentation exercise&#39;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  scheduled_start <span class="op">=</span> <span class="st">&#39;2026-11-05T18:00:00-07:00&#39;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  location <span class="op">=</span> <span class="st">&#39;Synthetic room&#39;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  meeting_type <span class="op">=</span> <span class="st">&#39;regular&#39;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span> <span class="fu">ConvertTo-Json</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="va">$meeting</span> <span class="op">=</span> <span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Method Post `</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Uri <span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/meetings&#39;</span> `</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Headers <span class="va">$headers</span> <span class="op">-</span>ContentType <span class="st">&#39;application/json&#39;</span> <span class="op">-</span>Body <span class="va">$body</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> `</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Uri <span class="op">(</span><span class="st">&#39;http://127.0.0.1:15480/desktop/v1/meetings/meetings/&#39;</span> <span class="op">+</span> <span class="va">$meeting</span><span class="op">.</span><span class="fu">id</span><span class="op">)</span> `</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span>Headers <span class="va">$headers</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">Remove-Variable</span> session<span class="op">,</span> headers</span></code></pre></div>
 <p>This write requires Meetings to be enabled and the signed-in staff
 role to permit it. It is a cross-suite integration example; for this
 product’s request models, use the complete technical reference
@@ -594,8 +863,8 @@ authenticated as Townlight staff or accepted as a Townlight product MCP
 deployment. This documentation does not add such a service.</p>
 <p>For a transcription client already provisioned separately, an
 illustrative tool call is:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;name&quot;</span><span class="fu">:</span><span class="st">&quot;get_job_status&quot;</span><span class="fu">,</span><span class="dt">&quot;arguments&quot;</span><span class="fu">:{</span><span class="dt">&quot;job_id&quot;</span><span class="fu">:</span><span class="st">&quot;synthetic-existing-job-id&quot;</span><span class="fu">}}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;name&quot;</span><span class="fu">:</span><span class="st">&quot;get_job_status&quot;</span><span class="fu">,</span><span class="dt">&quot;arguments&quot;</span><span class="fu">:{</span><span class="dt">&quot;job_id&quot;</span><span class="fu">:</span><span class="st">&quot;synthetic-existing-job-id&quot;</span><span class="fu">}}</span></span></code></pre></div>
 <p>Use a job ID returned by that transcription service. This example
 does not create a Townlight record or bypass its review/Records handoff.
 The exact optional adapter tool signatures are supplied in the <a
@@ -642,7 +911,9 @@ backup.</p>
 controls. If the result says <strong>Restore needs service
 start</strong>, use <strong>Start</strong>, then <strong>Check</strong>,
 and reopen a known record. Do not repeat restore merely because services
-need to start. The <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1">Windows 1.6.0.1 Beta 1 fresh-install acceptance</a> verified that a fulfilled
+need to start. The <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1">Windows
+1.6.0.1 Beta 1 fresh-install acceptance</a> verified that a fulfilled
 request survived restore and a post-backup marker did not.</p>
 <p>Keep Station’s dedicated database and media evidence together in its
 own backup. Core’s native-profile backup must not be assumed to include
@@ -723,7 +994,14 @@ repeat restore.</td>
 </table>
 <h2 id="verified-workflows-and-limits">Verified workflows and
 limits</h2>
-<p>The table records selected synthetic workflows from the original <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1">Windows 1.6.0.1 Beta 1</a> Sandbox run. Station’s later delivery has <a href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery">separate Windows 1.6.0.1 acceptance</a>. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">Windows 1.8.0.1 acceptance summary</a> for the workflows and upgrade path exercised on the previous 1.8.0.1 MSI.</p>
+<p>The table records selected synthetic workflows from the original <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1">Windows
+1.6.0.1 Beta 1</a> Sandbox run. Station’s later delivery has <a
+href="https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery">separate
+Windows 1.6.0.1 acceptance</a>. See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">Windows
+1.8.0.1 acceptance summary</a> for the workflows and upgrade path
+exercised on the previous 1.8.0.1 MSI.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -803,8 +1081,12 @@ private Records readback, idempotent locked original and logout.</td>
 </tr>
 </tbody>
 </table>
-
-<p>The Windows 1.8.0.1 acceptance covers the tested installation paths and selected synthetic workflows, including Boards &amp; Commissions, Contracts, and Procurement. Earlier results apply to their original builds. City field acceptance, physical equipment and network commissioning, Station automatic provisioning, and comprehensive UI and role coverage remain outside the 1.8.0.1 checks.</p>
+<p>The Windows 1.8.0.1 acceptance covers the tested installation paths
+and selected synthetic workflows, including Boards &amp; Commissions,
+Contracts, and Procurement. Earlier results apply to their original
+builds. City field acceptance, physical equipment and network
+commissioning, Station automatic provisioning, and comprehensive UI and
+role coverage remain outside the 1.8.0.1 checks.</p>
 <h2 id="terms-of-service-and-license">Terms of service and license</h2>
 <h3 id="scope-and-status">Scope and status</h3>
 <p>These terms describe the Townlight Beta 1 software and this
@@ -863,7 +1145,13 @@ enforcement notice or records-release decision. Official permit fee
 authority remains with the adopted source and responsible organization;
 imported amounts do not become a new authoritative calculation.</p>
 <h3 id="beta-operation-and-recovery">Beta operation and recovery</h3>
-<p>Windows 1.8.0.1 was tested for fresh installation and in-place upgrade from 1.7.2.1. Upgrade paths from versions older than 1.7.2.1 are unverified. Station uses its separately configured service. Keep backups and original evidence. Test your physical equipment and network and service configuration before relying on them. See the <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">acceptance summary</a> for the tested paths.</p>
+<p>Windows 1.8.0.1 was tested for fresh installation and in-place
+upgrade from 1.7.2.1. Upgrade paths from versions older than 1.7.2.1 are
+unverified. Station uses its separately configured service. Keep backups
+and original evidence. Test your physical equipment and network and
+service configuration before relying on them. See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md">acceptance
+summary</a> for the tested paths.</p>
 <h3 id="warranty-and-liability">Warranty and liability</h3>
 <p>The covered software’s warranty and liability conditions are those in
 sections 15–17 of the supplied AGPL and any applicable separate written
@@ -976,60 +1264,68 @@ engine; standalone CivicCast remains separate.</td>
 <h2 id="alphabetical-subject-index">Alphabetical subject index</h2>
 <ul>
 <li><strong>Accounts and authentication</strong> — <a
-href="#security-and-permissions">Security and permissions</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#security-and-permissions">Security
+and permissions</a>.</li>
 <li><strong>AGPL and source</strong> — <a
-href="#terms-of-service-and-license">Terms of service and
-license</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#terms-of-service-and-license">Terms
+of service and license</a>.</li>
 <li><strong>API contracts</strong> — <a
-href="#api-and-integration-examples">API and integration
-examples</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#api-and-integration-examples">API
+and integration examples</a>.</li>
 <li><strong>Architecture</strong> — <a
-href="#architecture">Architecture</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#architecture">Architecture</a>.</li>
 <li><strong>Backup</strong> — <a
-href="#backup-recovery-and-maintenance">Backup recovery and
-maintenance</a>.</li>
-<li><strong>Beta version</strong> — <a href="#beta-identity">Beta
+href="https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance">Backup
+recovery and maintenance</a>.</li>
+<li><strong>Beta version</strong> — <a
+href="https://townlight.github.io/manuals/suite.html#beta-identity">Beta
 identity</a>.</li>
 <li><strong>Configuration</strong> — <a
-href="#configuration-and-administration">Configuration and
-administration</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#configuration-and-administration">Configuration
+and administration</a>.</li>
 <li><strong>Evidence and acceptance</strong> — <a
-href="#verified-workflows-and-limits">Verified workflows and
-limits</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#verified-workflows-and-limits">Verified
+workflows and limits</a>.</li>
 <li><strong>Fees and official decisions</strong> — <a
-href="#terms-of-service-and-license">Terms of service and
-license</a>.</li>
-<li><strong>First run</strong> — <a href="#first-run">First
+href="https://townlight.github.io/manuals/suite.html#terms-of-service-and-license">Terms
+of service and license</a>.</li>
+<li><strong>First run</strong> — <a
+href="https://townlight.github.io/manuals/suite.html#first-run">First
 run</a>.</li>
 <li><strong>Handoffs and audience</strong> — <a
-href="#connected-workflows">Connected workflows</a>.</li>
-<li><strong>MCP</strong> — <a href="#mcp-and-automation-boundary">MCP
+href="https://townlight.github.io/manuals/suite.html#connected-workflows">Connected
+workflows</a>.</li>
+<li><strong>MCP</strong> — <a
+href="https://townlight.github.io/manuals/suite.html#mcp-and-automation-boundary">MCP
 and automation boundary</a>.</li>
 <li><strong>Originals and provenance</strong> — <a
-href="#security-and-permissions">Security and permissions</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#security-and-permissions">Security
+and permissions</a>.</li>
 <li><strong>Recovery</strong> — <a
-href="#backup-recovery-and-maintenance">Backup recovery and
-maintenance</a>.</li>
-<li><strong>Staff procedures</strong> — <a href="#daily-workflow">Daily
+href="https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance">Backup
+recovery and maintenance</a>.</li>
+<li><strong>Staff procedures</strong> — <a
+href="https://townlight.github.io/manuals/suite.html#daily-workflow">Daily
 workflow</a>.</li>
 <li><strong>Station configuration</strong> — <a
-href="#configuration-and-administration">Configuration and
-administration</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#configuration-and-administration">Configuration
+and administration</a>.</li>
 <li><strong>Technical stack</strong> — <a
-href="#technical-specifications">Technical specifications</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#technical-specifications">Technical
+specifications</a>.</li>
 <li><strong>Troubleshooting</strong> — <a
-href="#troubleshooting">Troubleshooting</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#troubleshooting">Troubleshooting</a>.</li>
 </ul>
 <h3 id="operating-subject-links">Operating subject links</h3>
 <ul>
 <li><strong>Existing product operating guides</strong> — <a
-href="#existing-product-operating-guides">Existing product operating
-guides</a>.</li>
+href="https://townlight.github.io/manuals/suite.html#existing-product-operating-guides">Existing
+product operating guides</a>.</li>
 </ul>
 <h2 id="source-and-document-control">Source and document control</h2>
 <p>This edition is authored from the immutable corresponding-source
 companion, the generated installed-domain schema and the retained
-workflow receipts. Component version numbers are retained. The private
+workflow receipts. Component version numbers are retained. The published
 MSI has its own new hash and signing receipt. Historical release tags
 and their artifacts remain unchanged.</p>
 <ul>
@@ -1057,7 +1353,7 @@ cable take-to-air. After completion, staff may approve an upload copy to
 the Station-configured YouTube account, select its title and visibility,
 and inspect the durable receipt. The private canonical recording and
 existing Meetings → Station → Records handoff remain independent.</p>
-<p><img class="flow" src="https://townlight.github.io/assets/station-delivery-architecture.svg" alt="Station live delivery and completed video uploads"></p>
+<p><img src="https://townlight.github.io/assets/station-delivery-architecture.svg" class="flow" alt="Station live delivery and completed video uploads" /></p>
 <p>These paths reuse the pinned CivicCast media and YouTube client code.
 A separate sender isolates network backpressure from capture, and a
 separate upload worker prevents long uploads from blocking recording.
@@ -1084,252 +1380,9 @@ live feed</a></li>
 and reconciliation.</li>
 <li>Schema4: durable upload intent; existing evidence retained.</li>
 </ul>
-<section aria-label="Resident portal"><p>The resident portal is deployed separately. See the <a href="../manuals/portal.html">Townlight Portal Guide</a> for its workflow and acceptance limits.</p></section><section id="meeting-imports"><h2>Shared meeting imports · Windows 1.8.1.1</h2><p>Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.</p><p><a href="https://townlight.github.io/manuals/meeting-imports.html">All 31 sources, formats, operator steps and integration contracts</a> · <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Installed acceptance and limits</a>.</p><p>Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to 1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an existing-city evaluation, back up city data and settings, close Townlight, keep the existing %LOCALAPPDATA%\CivicSuite profile, and use the same Windows account. Keep the prior installer and a restore path. Station continues to use its separately configured service.</p><p>The accepted MSI contains Townlight Runtime 0.3.1 and Meetings 1.0.6 distributions. Its health version strings still report Runtime 0.3.0 and Meetings 1.0.5. Default-branch source corrects those display strings; the signed MSI and its exact build source remain unchanged.</p></section><section id="import-source-matrix"><h2 id="shared-meeting-imports">Shared meeting imports</h2>
-<p>Use <strong>Meetings → Import meeting records</strong> in Windows
-1.8.1.1. Select a source and format, enter the original public URL, then
-choose <strong>Preview import</strong>. For a saved response, select the
-file before previewing. Choose a meeting and use <strong>Save selected
-meeting</strong>. Townlight records the source URL, format, stable
-source ID and capture hash with the canonical meeting. Reopening the
-same capture returns the existing meeting. A changed capture for that
-identity is reported for staff review.</p>
-<p>The source and format selector lists the supported reader pairs
-below. A public URL must serve the chosen format directly. Use a saved
-public response for POST-only listings, portals that require a browser
-session and sources whose page does not return the required response.
-The importer reads what a municipality publishes in that response.
-Fields and attachments vary by municipality and by meeting.</p>
-<table>
-<thead>
-<tr>
-<th>Source</th>
-<th>Input to preview</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Legistar</td>
-<td>Core-format JSON export</td>
-</tr>
-<tr>
-<td>PrimeGov</td>
-<td>Core-format JSON export or public portal meeting list JSON</td>
-</tr>
-<tr>
-<td>Granicus</td>
-<td>Core-format JSON export or public ViewPublisher HTML</td>
-</tr>
-<tr>
-<td>NovusAGENDA</td>
-<td>Core-format JSON export</td>
-</tr>
-<tr>
-<td>CivicPlus Agenda and Meeting Management Select</td>
-<td>Public Events JSON</td>
-</tr>
-<tr>
-<td>CivicPlus Agenda Center</td>
-<td>Public listing HTML</td>
-</tr>
-<tr>
-<td>Municode Meetings</td>
-<td>Public meetings HTML</td>
-</tr>
-<tr>
-<td>BoardBook</td>
-<td>Public organization HTML</td>
-</tr>
-<tr>
-<td>eSCRIBE</td>
-<td>Public calendar JSON</td>
-</tr>
-<tr>
-<td>Simbli</td>
-<td>Public meeting listing HTML</td>
-</tr>
-<tr>
-<td>iCompass CivicWeb</td>
-<td>Public meeting-type listing HTML</td>
-</tr>
-<tr>
-<td>iQM2</td>
-<td>Public meeting list HTML</td>
-</tr>
-<tr>
-<td>Granicus Swagit</td>
-<td>Public video archive HTML</td>
-</tr>
-<tr>
-<td>SuiteOne Media</td>
-<td>Public meeting archive HTML</td>
-</tr>
-<tr>
-<td>Granicus Peak</td>
-<td>Public agenda center ViewPublisher HTML</td>
-</tr>
-<tr>
-<td>Utah Public Notice Website</td>
-<td>Public notice detail HTML</td>
-</tr>
-<tr>
-<td>Destiny AgendaQuick</td>
-<td>Public meeting list HTML</td>
-</tr>
-<tr>
-<td>Town Hall Streams</td>
-<td>Public archive HTML</td>
-</tr>
-<tr>
-<td>TelVue</td>
-<td>Public playlist HTML</td>
-</tr>
-<tr>
-<td>CHAMP</td>
-<td>Public event JSON</td>
-</tr>
-<tr>
-<td>Hyland OnBase</td>
-<td>Public Agenda Online HTML</td>
-</tr>
-<tr>
-<td>Laserfiche WebLink</td>
-<td>Saved public dated document folder HTML</td>
-</tr>
-<tr>
-<td>TownCloud</td>
-<td>Saved public agenda table JSON or public agenda detail HTML</td>
-</tr>
-<tr>
-<td>Digital Towpath</td>
-<td>Public meeting detail HTML</td>
-</tr>
-<tr>
-<td>ClerkBase</td>
-<td>Public meeting document HTML</td>
-</tr>
-<tr>
-<td>Municipality-published calendar</td>
-<td>Public iCalendar feed</td>
-</tr>
-<tr>
-<td>Wistia</td>
-<td>Public media JSON</td>
-</tr>
-<tr>
-<td>Boardable</td>
-<td>Public Site meeting detail HTML</td>
-</tr>
-<tr>
-<td>gWorks FrontDesk</td>
-<td>Public city meetings JSON</td>
-</tr>
-<tr>
-<td>Diligent BoardDocs</td>
-<td>Unencrypted printed agenda PDF with numbered items</td>
-</tr>
-<tr>
-<td>Tyler Meeting Manager</td>
-<td>Saved public calendar JSON. Meeting information and item titles when
-present.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="staff-handoffs">Staff handoffs</h2>
-<ul>
-<li><strong>Core and Meetings.</strong> Core's existing vendor formats
-share the same preview and save path as the public readers. The saved
-meeting and any structured agenda items open in the regular Meetings
-workflow.</li>
-<li><strong>Records.</strong> In Meetings, load imported documents by
-meeting ID, choose a PDF and enter the destination Records request ID.
-The attachment retains the citation and file hash. An HTML viewer or a
-dead document link may need staff to obtain the PDF separately.</li>
-<li><strong>Notice and Access.</strong> Use <strong>Review imported
-text</strong> to start a Notice draft or accessibility review with the
-source citation. Use each workspace's normal review and save
-actions.</li>
-<li><strong>Station.</strong> In the configured Station operator page,
-select the saved meeting and stage a direct MP4. Use the private capture
-workflow to queue processing. Player-only references are visible without
-a staging action.</li>
-<li><strong>Code.</strong> Use the existing ordinance proposal and
-adoption workflow with the canonical imported meeting and agenda
-IDs.</li>
-<li><strong>Boards, Contracts, Procurement, Zoning, Planning, Permitting
-and Inspections.</strong> In the destination workspace use
-<strong>Imported meeting evidence</strong>. Select an existing staff
-record and the saved meeting, then save the citation. The destination's
-existing role and workflow apply.</li>
-</ul>
-<h2 id="shared-interface">Shared interface</h2>
-<p>The installed Townlight Python runtime exposes a read-only CLI.
-CivicCast and other local clients can consume its normalized JSON and
-apply their own access and persistence rules.</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>python <span class="op">-</span>m townlight_runtime<span class="op">.</span><span class="fu">meeting_imports</span> champ PUBLIC_EVENT_URL saved-event<span class="op">.</span><span class="fu">json</span> <span class="op">--</span>format champ-event-json</span></code></pre></div>
-<p>Use <code>--fetch</code> in place of the saved file to read a
-supported public response.</p>
-<h2 id="interfaces-and-other-products">Interfaces and other
-products</h2>
-<p>The version-1 normalized JSON contract is shared by the Python
-function
-<code>townlight_runtime.meeting_imports.preview_export(connector, source_url, content, input_format=...)</code>
-and the CLI above. A saved response can also be read from stdin using
-<code>-</code>. Inputs are limited to 16 MiB. Preview is read-only; the
-consuming application owns persistence, staff authorization and its own
-data.</p>
-<p>The installed native HTTP bridge exposes
-<code>GET /desktop/v1/meetings/imports/sources</code>,
-<code>POST /desktop/v1/meetings/imports/preview</code>,
-<code>POST /desktop/v1/meetings/imports/fetch</code>,
-<code>POST /desktop/v1/meetings/imports/commit</code>, and
-meeting/link/document handoff operations in the <a
-href="https://townlight.github.io/api/suite-openapi.json">native API
-schema</a>. Use the existing <code>X-Townlight-Session</code>
-authentication, mapped staff roles and configured local PostgreSQL
-service. This is a native application interface; there is no independent
-anonymous importer HTTP service or importer MCP server.</p>
-<p><strong>CivicCast:</strong> opt in through its Townlight shared
-importer source setting and <code>TOWNLIGHT_IMPORT_PYTHON</code> (the
-absolute Python executable), <code>TOWNLIGHT_IMPORT_CONNECTOR</code>,
-<code>TOWNLIGHT_IMPORT_FORMAT</code>, <code>TOWNLIGHT_IMPORT_URL</code>
-and optional <code>TOWNLIGHT_IMPORT_CAPTURE</code>. The adapter saves
-normalized items through the existing AgendaStore. Structured agenda
-availability depends on the source response; a video listing can contain
-meeting metadata without agenda items. Existing sources remain the
-default.</p>
-<p><strong>CivicCast Brief:</strong> its existing PrimeGov and Granicus
-discovery routes can opt into the shared reader using
-<code>TOWNLIGHT_IMPORT_PYTHON</code>. Brief does not expose all 31
-sources as a new selection menu. Its existing caption/media workflow
-remains the consuming path. See each project's shared-import client
-documentation.</p>
-<p><strong>TownReporter, Describer Workbench and Textflowkit:</strong>
-no shared-import adapter was added to these products. TownReporter
-retains its own PrimeGov path. Describer Workbench and Textflowkit
-expose their existing transcription APIs/MCP interfaces, which do not
-constitute meeting-import integration. The shared engine ships inside
-Townlight Runtime; a standalone library is outside this release.</p>
-<h2 id="windows-acceptance-and-limits">Windows acceptance and
-limits</h2>
-<p>Windows 1.8.1.1 adds shared meeting imports for 31 source families,
-with 34 supported source/format pairs. Installed Windows Sandbox checks
-exercised preview, save and durable readback using public captures and
-fixtures, plus the documented Townlight handoffs. These checks do not
-establish automatic discovery on every live portal or a complete retest
-of every module.</p>
-<p>Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to
-1.8.1.1 was not exercised. The previous Windows 1.8.0.1 release tested
-upgrade from 1.7.2.1; that result applies to 1.8.0.1. Before an
-existing-city evaluation, back up city data and settings, close
-Townlight, keep the existing %LOCALAPPDATA%\CivicSuite profile, and use
-the same Windows account. Keep the prior installer and a restore path.
-Station continues to use its separately configured service.</p>
-<p>The accepted MSI contains Townlight Runtime 0.3.1 and Meetings 1.0.6
-distributions. Its health version strings still report Runtime 0.3.0 and
-Meetings 1.0.5. Default-branch source corrects those display strings;
-the signed MSI and its exact build source remain unchanged.</p>
-<p><a
-href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md">Exact
-Windows 1.8.1.1 acceptance and limits</a>.</p>
-</section></main><footer>Townlight · AGPL-3.0-only · Candidate evidence applies only to its identified artifacts.<span><a href="../brand/">Brand package</a></span><span><a href="../announcement.html">Announcement</a> · <a href="../support.html">Support and feedback</a></span></footer></body></html>
+<section aria-label="Resident portal">
+<p>The resident portal is deployed separately. See the <a
+href="https://townlight.github.io/manuals/portal.html">Townlight Portal
+Guide</a> for its workflow and acceptance limits.</p>
+</section>
+</main><footer>Townlight · AGPL-3.0-only · Candidate evidence applies only to its identified artifacts.</footer></body></html>
