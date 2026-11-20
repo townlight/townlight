@@ -1,211 +1,108 @@
-name: windows-readonly-smoke-probe
+name: Temporary Windows Recorder Diagnostics
+
 on:
   workflow_dispatch:
+
 permissions:
+  actions: read
   contents: read
+
 jobs:
-  probe:
+  recorder-diagnostics:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
-      - name: Read-only disk and tool-cache probe
+      - name: Checkout exact townlight ref
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          path: townlight
+
+      - name: Download unsigned MSI artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: townlight-windows-local-msi-UNSIGNED
+          run-id: 44820394451
+          github-token: ${{ github.token }}
+          path: msi-artifact
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install desktop dependencies
+        working-directory: townlight/desktop
+        run: npm ci
+
+      - name: Run unsigned recorder maintenance test
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Continue'
-          $ProgressPreference = 'SilentlyContinue'
+          $ErrorActionPreference = 'Stop'
+          $msis = @(Get-ChildItem -LiteralPath 'msi-artifact' -Recurse -File -Filter '*.msi')
+          if ($msis.Count -ne 1) { throw "Expected exactly one MSI, found $($msis.Count)." }
+          $msi = $msis[0]
+          $sha = (Get-FileHash -LiteralPath $msi.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          $evidence = Join-Path $env:RUNNER_TEMP 'recorder-evidence'
+          New-Item -ItemType Directory -Force -Path $evidence | Out-Null
+          & 'townlight/desktop/scripts/test-installed-maintenance.ps1' `
+            -SourceCommit '34f292c189ab1ac606aa61eb756806a3c076c6f9' `
+            -Mode recorder `
+            -UnsignedRecorderCandidate `
+            -ExpectedMsiSha256 $sha `
+            -MsiPath $msi.FullName `
+            -EvidenceRoot $evidence
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-          function Format-Bytes {
-            param([Nullable[long]]$Bytes)
-            if ($null -eq $Bytes) { return 'n/a' }
-            $b = [long]$Bytes
-            if ($b -ge 1TB) { return ('{0:N2} TiB' -f ($b / 1TB)) }
-            if ($b -ge 1GB) { return ('{0:N2} GiB' -f ($b / 1GB)) }
-            if ($b -ge 1MB) { return ('{0:N2} MiB' -f ($b / 1MB)) }
-            if ($b -ge 1KB) { return ('{0:N2} KiB' -f ($b / 1KB)) }
-            return "$b B"
+      - name: Collect redacted logs and scheduled task state
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $evidence = Join-Path $env:RUNNER_TEMP 'recorder-evidence'
+          $diag = Join-Path $evidence 'diagnostics'
+          New-Item -ItemType Directory -Force -Path $diag | Out-Null
+
+          function Redact([string]$text) {
+            $text = $text -replace '(?i)\b(?:postgres(?:ql)?(?:\+[a-z0-9_]+)?|mysql|mssql|mongodb(?:\+srv)?|redis)://[^\s''"]+', '[REDACTED_DB_URI]'
+            $text = $text -replace '(?i)(\b(?:password|passwd|pwd)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
+            $text = $text -replace '(?i)(\b(?:db_?uri|database_?url|postgres_?url|pgurl)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
+            return $text
           }
 
-          function Measure-LogicalBytes {
-            param([string]$Path)
-
-            if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
-            try {
-              if (-not [System.IO.Directory]::Exists($Path)) { return $null }
-              $rootFull = [System.IO.Path]::GetFullPath($Path)
-              $rootAttrs = [System.IO.File]::GetAttributes($rootFull)
-              if (($rootAttrs -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { return [long]0 }
-            } catch {
-              return $null
-            }
-
-            $sum = [long]0
-            $stack = [System.Collections.Generic.Stack[string]]::new()
-            $stack.Push($rootFull)
-
-            while ($stack.Count -gt 0) {
-              $dir = $stack.Pop()
-              try {
-                foreach ($entry in [System.IO.Directory]::EnumerateFileSystemEntries($dir)) {
-                  try {
-                    $attrs = [System.IO.File]::GetAttributes($entry)
-                    if (($attrs -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
-                    if (($attrs -band [System.IO.FileAttributes]::Directory) -ne 0) {
-                      $stack.Push($entry)
-                    } else {
-                      $sum += ([System.IO.FileInfo]::new($entry)).Length
-                    }
-                  } catch {
-                    # Skip inaccessible entries.
-                  }
-                }
-              } catch {
-                # Skip inaccessible directories.
-              }
-            }
-            return $sum
+          $locationsFile = Join-Path (Join-Path (Join-Path $env:LOCALAPPDATA "CivicSuite") "config") "locations.json"
+          $dataRoot = Join-Path (Join-Path $env:LOCALAPPDATA "CivicSuite") "Data"
+          if (Test-Path $locationsFile) {
+            $loc = Get-Content $locationsFile -Raw | ConvertFrom-Json
+            if ($loc.data_root) { $dataRoot = $loc.data_root }
           }
-
-          function Measure-RootSummary {
-            param(
-              [string]$Path,
-              [switch]$Children
-            )
-
-            $result = [pscustomobject]@{
-              Exists   = $false
-              Bytes    = [long]0
-              Children = @()
-            }
-
-            if ([string]::IsNullOrWhiteSpace($Path)) { return $result }
-            try {
-              if (-not [System.IO.Directory]::Exists($Path)) { return $result }
-              $rootFull = [System.IO.Path]::GetFullPath($Path)
-              $rootAttrs = [System.IO.File]::GetAttributes($rootFull)
-              if (($rootAttrs -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                $result.Exists = $true
-                return $result
-              }
-            } catch {
-              return $result
-            }
-
-            $result.Exists = $true
-            $total = [long]0
-            $childList = [System.Collections.Generic.List[object]]::new()
-
-            try {
-              foreach ($entry in [System.IO.Directory]::EnumerateFileSystemEntries($rootFull)) {
-                try {
-                  $attrs = [System.IO.File]::GetAttributes($entry)
-                  if (($attrs -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
-                  if (($attrs -band [System.IO.FileAttributes]::Directory) -ne 0) {
-                    $childBytes = Measure-LogicalBytes -Path $entry
-                    if ($null -eq $childBytes) { $childBytes = [long]0 }
-                    $total += $childBytes
-                    if ($Children) {
-                      $childList.Add([pscustomobject]@{
-                        Name  = [System.IO.Path]::GetFileName($entry)
-                        Path  = $entry
-                        Bytes = [long]$childBytes
-                      })
-                    }
-                  } else {
-                    $total += ([System.IO.FileInfo]::new($entry)).Length
-                  }
-                } catch {
-                  # Skip inaccessible entries.
-                }
-              }
-            } catch {
-              # Skip inaccessible root enumeration.
-            }
-
-            $result.Bytes = $total
-            if ($Children) {
-              $result.Children = @($childList | Sort-Object Name)
-            }
-            return $result
-          }
-
-          function Write-Root {
-            param(
-              [string]$Label,
-              [string]$Path,
-              [switch]$Children
-            )
-
-            if ([string]::IsNullOrWhiteSpace($Path)) {
-              Write-Output "ROOT $Label path=<undefined> exists=false"
-              return
-            }
-
-            $summary = Measure-RootSummary -Path $Path -Children:$Children
-            if (-not $summary.Exists) {
-              Write-Output "ROOT $Label path=$Path exists=false"
-              return
-            }
-
-            Write-Output "ROOT $Label path=$Path bytes=$($summary.Bytes) ($(Format-Bytes -Bytes $summary.Bytes))"
-            if ($Children) {
-              foreach ($child in $summary.Children) {
-                Write-Output "  SUB $Label/$($child.Name) bytes=$($child.Bytes) ($(Format-Bytes -Bytes $child.Bytes))"
-              }
+          $station = Join-Path $dataRoot "station"
+          foreach ($name in 'background.log','postgres-start.log','postgres.log','serve.log','worker.log') {
+            $src = Join-Path $station $name
+            if (Test-Path -LiteralPath $src) {
+              Get-Content -LiteralPath $src -Tail 50 -ErrorAction Stop |
+                ForEach-Object { Redact $_ } |
+                Set-Content -LiteralPath (Join-Path $diag $name) -Encoding utf8
             }
           }
 
-          $logicalDisks = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction SilentlyContinue
-          foreach ($letter in @('C:', 'D:')) {
-            $d = $logicalDisks | Where-Object { $_.DeviceID -eq $letter } | Select-Object -First 1
-            if (-not $d) {
-              Write-Output "DISK $letter free=<missing>"
-            } elseif ($d.DriveType -ne 3) {
-              Write-Output "DISK $letter free=<not-fixed type=$($d.DriveType)>"
-            } else {
-              Write-Output "DISK $letter free=$($d.FreeSpace) bytes ($(Format-Bytes -Bytes ([long]$d.FreeSpace)))"
+          $tasks = @(Get-ScheduledTask | Where-Object { $_.TaskName -like '*Townlight*Station*' -or $_.TaskPath -like '*Townlight*Station*' })
+          $taskInfo = foreach ($task in $tasks) {
+            $info = Get-ScheduledTaskInfo -TaskName $task.TaskName -TaskPath $task.TaskPath
+            [pscustomobject]@{
+              TaskName = $task.TaskName
+              TaskPath = $task.TaskPath
+              State = $task.State.ToString()
+              LastTaskResult = $info.LastTaskResult
             }
           }
+          $taskInfo | Format-List | Out-String | Set-Content -LiteralPath (Join-Path $diag 'townlight-station-task-info.txt') -Encoding utf8
 
-          $localAppDataValue = if ($env:LOCALAPPDATA) { $env:LOCALAPPDATA } else { '<undefined>' }
-          $laDrive = '<undefined>'
-          if ($env:LOCALAPPDATA) {
-            try { $laDrive = [System.IO.Path]::GetPathRoot($env:LOCALAPPDATA).TrimEnd('\') } catch { $laDrive = '<invalid>' }
-          }
-          $laFree = '<unknown>'
-          if ($laDrive -match '^[A-Za-z]:$') {
-            $laDisk = $logicalDisks | Where-Object { $_.DeviceID -eq $laDrive } | Select-Object -First 1
-            if (-not $laDisk) { $laFree = '<missing>' }
-            elseif ($laDisk.DriveType -ne 3) { $laFree = "<not-fixed type=$($laDisk.DriveType)>" }
-            else { $laFree = "$($laDisk.FreeSpace) bytes ($(Format-Bytes -Bytes ([long]$laDisk.FreeSpace)))" }
-          }
-          Write-Output "LOCALAPPDATA=$localAppDataValue drive=$laDrive free=$laFree"
-
-          $rtcValue = if ($env:RUNNER_TOOL_CACHE) { $env:RUNNER_TOOL_CACHE } else { '<undefined>' }
-          $androidHomeValue = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { '<undefined>' }
-          Write-Output "RUNNER_TOOL_CACHE=$rtcValue"
-          Write-Output "ANDROID_HOME=$androidHomeValue"
-
-          Write-Output "MEASURE begin"
-          Write-Root -Label 'ANDROID_HOME' -Path $env:ANDROID_HOME
-
-          if ($env:RUNNER_TOOL_CACHE) {
-            foreach ($lang in @('Java', 'Python', 'Ruby', 'Go')) {
-              $p = Join-Path -Path $env:RUNNER_TOOL_CACHE -ChildPath $lang
-              Write-Root -Label "RTC\$lang" -Path $p -Children
-            }
-          } else {
-            foreach ($lang in @('Java', 'Python', 'Ruby', 'Go')) {
-              Write-Root -Label "RTC\$lang" -Path $null
-            }
-          }
-
-          Write-Root -Label 'PFx86Android' -Path 'C:\Program Files (x86)\Android'
-          Write-Root -Label 'CAndroid' -Path 'C:\Android'
-          Write-Root -Label 'hostedtoolcache' -Path 'C:\hostedtoolcache' -Children
-          Write-Root -Label 'MSVS' -Path 'C:\Program Files\Microsoft Visual Studio' -Children
-          Write-Output "MEASURE end"
-
-          Write-Output "PREP date=$((Get-Date).ToUniversalTime().ToString('o')) host=$env:COMPUTERNAME user=$env:USERNAME"
-          Write-Output "PREP pwsh=$($PSVersionTable.PSVersion) os=$([System.Environment]::OSVersion.VersionString) runner_os=$env:RUNNER_OS runner_arch=$env:RUNNER_ARCH"
-          Write-Output "PREP cwd=$PWD temp=$env:TEMP"
-          Write-Output "PREP complete"
+      - name: Upload recorder evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recorder-evidence
+          path: ${{ runner.temp }}/recorder-evidence
+          if-no-files-found: warn
