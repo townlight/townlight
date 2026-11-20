@@ -15,10 +15,10 @@ Generated from `installer/modules.json`.
 
 | Module | Version | Role | Dependencies | Source commit | Installer status |
 |---|---:|---|---|---|---|
-| Townlight Core | 1.3.0.dev2 | shared platform | none | `3021821bf9a9` | `naming_candidate_acceptance_pending` |
-| Townlight Records | 1.8.0.dev2 | records workflow | `townlight_core` | `e1b712091c38` | `naming_candidate_acceptance_pending` |
-| Townlight Notice | 0.3.0 | public notice workflow | `townlight_core` | `4edf01296b0a` | `naming_candidate_acceptance_pending` |
-| Townlight Access | 0.5.0 | accessibility + records-ready export | `townlight_core` | `f377a9a6e2a1` | `naming_candidate_acceptance_pending` |
+| Townlight Core | 1.3.0.dev2 | shared platform | none | `2f6ba9be4a95` | `naming_candidate_acceptance_pending` |
+| Townlight Records | 1.8.0.dev3 | records workflow | `townlight_core` | `f63fe0e30a92` | `naming_candidate_acceptance_pending` |
+| Townlight Notice | 0.3.0 | public notice workflow | `townlight_core` | `b93bd4c907b5` | `naming_candidate_acceptance_pending` |
+| Townlight Access | 0.5.0 | accessibility + records-ready export | `townlight_core` | `6c4f2aefb587` | `naming_candidate_acceptance_pending` |
 
 Disabled profiles:
 - `land-use` (Land Use): queued - depends on Tier 2 module work after city-core ships

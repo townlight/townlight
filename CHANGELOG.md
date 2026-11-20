@@ -7,17 +7,17 @@
 - The MSI contains Runtime 0.3.1 and Meetings 1.0.6; health display strings still say 0.3.0 and 1.0.5. Later source corrections do not change that released artifact.
 - [Release and immutable acceptance assets](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1).
 
-## Windows 1.7.2.1 public beta — historical release summary
-
-- Publish the Windows candidate preceding 1.8.0.1. Its exact source, changes and acceptance remain in the [original release record](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.7.2.1).
-- Windows 1.8.0.1 subsequently exercised upgrade from 1.7.2.1 with retained city data and settings. That result is not an upgrade test of 1.8.1.1.
-
 ## Windows 1.8.0.1 public beta
 
 - Add Boards & Commissions, Contracts and Procurement to the full Windows profile using existing staff roles.
 - Link board attendance to Meetings and link a recorded Procurement award to one Contracts draft. Retain signed agreements and searchable renewals.
 - Refresh the per-user bundled Python runtime on normal upgrade from Windows 1.7.2.1 while retaining city profile and data.
 - Update the Windows install guide, staff manual, package reference and release evidence. [Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1)
+
+## Windows 1.7.2.1 public beta — historical release summary
+
+- Publish the Windows candidate preceding 1.8.0.1. Its exact source, changes and acceptance remain in the [original release record](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.7.2.1).
+- Windows 1.8.0.1 subsequently exercised upgrade from 1.7.2.1 with retained city data and settings. That result is not an upgrade test of 1.8.1.1.
 
 ## Windows 1.7.1.1 public beta - 2026-11-05
 

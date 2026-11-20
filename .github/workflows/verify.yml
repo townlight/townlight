@@ -119,7 +119,22 @@ jobs:
       - name: Verify suite state against GitHub releases
         env:
           GH_TOKEN: ${{ secrets.TOWNLIGHT_GITHUB_TOKEN || secrets.TOWNLIGHT_GH_TOKEN || secrets.GH_TOKEN || github.token }}
-        run: python scripts/verify-suite-state.py --remote-only
+        run: |
+          # Bind an unpublished candidate to this actual Actions checkout in an
+          # external receipt. Published source identities remain unchanged.
+          python - <<'PY'
+          import json, os, pathlib, subprocess
+          state = json.loads(pathlib.Path("config/suite-state.json").read_text())
+          release = state["desktop_release"]
+          if release["commit"] is None:
+              assert release["channel"] == "candidate" and release["published_at"] is None
+              head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+              assert head == os.environ["GITHUB_SHA"]
+              release["commit"] = head
+          target = pathlib.Path(os.environ["RUNNER_TEMP"]) / "suite-state-source-check.json"
+          target.write_text(json.dumps(state), encoding="utf-8")
+          PY
+          python scripts/verify-suite-state.py --remote-only --state "$RUNNER_TEMP/suite-state-source-check.json"
 
       - name: Verify public module status blocks
         run: python scripts/docs/render_public_status.py --check

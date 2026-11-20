@@ -230,7 +230,7 @@
         "task_queue_worker"
       ],
       "current_version": "1.3.0.dev2",
-      "source_commit": "3021821bf9a92c790a399ad12aed821d65b09105",
+      "source_commit": "2f6ba9be4a95e3772dc47a3682ac780c5283b626",
       "routes": [
         {
           "id": "system-health",
@@ -319,8 +319,8 @@
         "backup",
         "restore"
       ],
-      "current_version": "1.8.0.dev2",
-      "source_commit": "e1b712091c38fadeb00c19233d7f2bf1280fc248",
+      "current_version": "1.8.0.dev3",
+      "source_commit": "f63fe0e30a92eee2141ecc16bdbed6b2ad901f0e",
       "routes": [
         {
           "id": "records-requests",
@@ -404,7 +404,7 @@
         "restore"
       ],
       "current_version": "1.0.6",
-      "source_commit": "77ae8781f4a414f6f85c35a7e4394e29b0e0f21d",
+      "source_commit": "93fea47d9528e283c5835a1ef568f3f0cfa1fd56",
       "routes": [
         {
           "id": "meetings-notices",
@@ -491,7 +491,7 @@
         "release_attestation"
       ],
       "current_version": "1.0.9",
-      "source_commit": "22d00f560cc45088a5b24a3f997787ee9c7a5e31",
+      "source_commit": "296c13ac9075ed2849098952dcb1fddfbf4e8cd4",
       "routes": [
         {
           "id": "code-ordinances",
@@ -567,7 +567,7 @@
       ],
       "default_port": 8030,
       "installer_status": "naming_candidate_acceptance_pending",
-      "source_commit": "fb352955720db2e6e21caca816a8eb609a49f768",
+      "source_commit": "25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4",
       "current_version": "0.2.3",
       "routes": [
         {
@@ -687,7 +687,7 @@
         "disable": "allowed-after-backup",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "7de514f1afd720f93bd70a4866c3389ef621dc49"
+      "source_commit": "9782f6941d55ed4156f412c04200b79c2070b416"
     },
     {
       "id": "townlight_permitting",
@@ -754,7 +754,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "224116d9c714f613646f2b6ce2cbb687cb5e0040"
+      "source_commit": "5a3e63694f2eeaa695f4da85ffc0d8308c5827b6"
     },
     {
       "id": "townlight_access",
@@ -783,7 +783,7 @@
         "export_correctness"
       ],
       "current_version": "0.5.0",
-      "source_commit": "f377a9a6e2a14d890333a20eab9277d644a9aaeb",
+      "source_commit": "6c4f2aefb587eba57f5daa3cff4779530e57a61d",
       "routes": [
         {
           "id": "accessibility-staff",
@@ -907,7 +907,7 @@
         "Data/postgres",
         "Data/exports/inspections"
       ],
-      "source_commit": "a6861f262328e7645557ad2a2600db4a12a5046c"
+      "source_commit": "cd36cae97cba32ac7681d5e9abef378c17241a77"
     },
     {
       "id": "townlight_notice",
@@ -934,7 +934,7 @@
         "release_artifacts"
       ],
       "current_version": "0.3.0",
-      "source_commit": "4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48",
+      "source_commit": "b93bd4c907b5cf59e12afc5332ed177ac3e12bfd",
       "routes": [
         {
           "id": "notice-workbench",
@@ -1063,7 +1063,7 @@
       "selectable": true,
       "required": false,
       "townlight_core_requirement": "1.3.0.dev2",
-      "current_version": "0.2.0",
+      "current_version": "0.2.1",
       "installer_status": "windows_candidate_acceptance_pending",
       "dependencies": [
         "townlight_core",
@@ -1105,7 +1105,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "d14340b713c880908cc27e383a59271ed0471ac0",
+      "source_commit": "06df86606fe8249c49b1450ff13a40a5ab0aa1e5",
       "proof_required": [
         "windows_installed_staff_workflow",
         "existing_staff_roles",
@@ -1121,7 +1121,7 @@
       "selectable": true,
       "required": false,
       "townlight_core_requirement": "1.3.0.dev2",
-      "current_version": "0.2.0",
+      "current_version": "0.2.1",
       "installer_status": "windows_candidate_acceptance_pending",
       "dependencies": [
         "townlight_core"
@@ -1162,7 +1162,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "873de5bbff0f596b2c7cf20da4c68e94c3c3934c",
+      "source_commit": "216625f1020a7c25bfaec97d5f51ac4381b1fd75",
       "proof_required": [
         "windows_installed_staff_workflow",
         "existing_staff_roles",
@@ -1178,7 +1178,7 @@
       "selectable": true,
       "required": false,
       "townlight_core_requirement": "1.3.0.dev2",
-      "current_version": "0.3.0",
+      "current_version": "0.3.1",
       "installer_status": "windows_candidate_acceptance_pending",
       "dependencies": [
         "townlight_core",
@@ -1221,7 +1221,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "f10cd99f65f5f867d331af3bd6e60742bca61268",
+      "source_commit": "a787a6eff3c0940681eadb70778ea3ac05df64d4",
       "proof_required": [
         "windows_installed_staff_workflow",
         "existing_staff_roles",

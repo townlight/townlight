@@ -19,9 +19,8 @@ on:
 
 permissions:
   contents: read
-  # The proven signing path currently uses a client secret passed directly to
-  # azure/artifact-signing-action. A future OIDC migration must first verify that
-  # the action supports an ambient workload-identity credential.
+  # Existing client-secret Azure signing is retained for this Windows release.
+  # An authentication migration is outside this maintenance scope.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -155,7 +154,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: 3021821bf9a92c790a399ad12aed821d65b09105
+          ref: 2f6ba9be4a95e3772dc47a3682ac780c5283b626
           path: townlight_core
 
       - name: Check out Townlight Records runtime source
@@ -193,35 +192,35 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: c988c1a86e47836d48f189b2c4cc9e8fd622004a
+          ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: 22d00f560cc45088a5b24a3f997787ee9c7a5e31
+          ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: fb352955720db2e6e21caca816a8eb609a49f768
+          ref: 25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4
           path: zone
 
       - name: Check out Townlight Notice runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48
+          ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: townlight_notice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: f377a9a6e2a14d890333a20eab9277d644a9aaeb
+          ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
           path: townlight_access
 
       - name: Check out exact Station Beta 1 source
@@ -679,7 +678,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/core
-          ref: 3021821bf9a92c790a399ad12aed821d65b09105
+          ref: 2f6ba9be4a95e3772dc47a3682ac780c5283b626
           path: townlight_core
 
       - name: Check out Townlight Records runtime source
@@ -693,21 +692,21 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/meetings
-          ref: c988c1a86e47836d48f189b2c4cc9e8fd622004a
+          ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/ordinances
-          ref: 22d00f560cc45088a5b24a3f997787ee9c7a5e31
+          ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/zone
-          ref: fb352955720db2e6e21caca816a8eb609a49f768
+          ref: 25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4
           path: zone
 
       - name: Check out Townlight Planning development source
@@ -737,14 +736,14 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: townlight/notice
-          ref: 4edf01296b0ad56a331e7fdd9b7c2d19c20b8e48
+          ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: townlight_notice
 
       - name: Check out Townlight Access runtime source
         uses: actions/checkout@v5
         with:
           repository: townlight/access
-          ref: f377a9a6e2a14d890333a20eab9277d644a9aaeb
+          ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
           path: townlight_access
 
       - name: Check out exact Station Beta 1 source
@@ -1145,4 +1144,46 @@ jobs:
         with:
           name: windows-msi-lifecycle-logs
           path: ${{ runner.temp }}\townlight-msi-*.log
+          retention-days: 7
+
+  signed-installed-maintenance:
+    name: Signed installed maintenance (${{ matrix.mode }})
+    needs: windows-local-msi
+    if: github.event_name == 'workflow_dispatch' && inputs.sign_for_publication
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [fresh, upgrade]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: townlight
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.windows-local-msi.outputs.artifact_name }}
+          path: msi-artifact
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+      - name: Install existing desktop test tools
+        working-directory: townlight/desktop
+        run: npm ci
+      - name: Verify installed workflows and exact signed candidate
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $msis=@(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
+          if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode '${{ matrix.mode }}' -EvidenceRoot "$env:RUNNER_TEMP/installed-evidence"
+      - name: Preserve installed acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-installed-${{ matrix.mode }}
+          path: ${{ runner.temp }}/installed-evidence
           retention-days: 7

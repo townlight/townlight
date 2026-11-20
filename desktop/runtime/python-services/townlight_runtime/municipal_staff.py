@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from townlight_boards.board_registry import register_board_stub as build_board_registration
+from townlight_boards.board_registry import build_board_registration
 from townlight_boards.persistence import board_roster_records
 from townlight_boards.staff_workflow import AttendanceInput, BoardInput, SeatInput, attendance, seat_status, seats
 from townlight_contracts.staff_workflow import SignedAgreement, agreements
