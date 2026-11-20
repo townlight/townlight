@@ -10,20 +10,20 @@ permissions:
 jobs:
   recorder-diagnostics:
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - name: Checkout exact townlight ref
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}
-          ref: 6b298f37d3cca5d3250bc7ab4cf0d4f23eaaa1ec
+          ref: ${{ github.sha }}
           path: townlight
 
       - name: Download unsigned MSI artifact
         uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-UNSIGNED
-          run-id: 44807689486
+          run-id: 44820394451
           github-token: ${{ github.token }}
           path: msi-artifact
 
@@ -64,14 +64,14 @@ jobs:
           New-Item -ItemType Directory -Force -Path $diag | Out-Null
 
           function Redact([string]$text) {
-            $text = $text -replace '(?i)\b(?:postgres(?:ql)?|mysql|mssql|mongodb(?:\+srv)?|redis)://[^\s''"]+', '[REDACTED_DB_URI]'
+            $text = $text -replace '(?i)\b(?:postgres(?:ql)?(?:\+[a-z0-9_]+)?|mysql|mssql|mongodb(?:\+srv)?|redis)://[^\s''"]+', '[REDACTED_DB_URI]'
             $text = $text -replace '(?i)(\b(?:password|passwd|pwd)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
             $text = $text -replace '(?i)(\b(?:db_?uri|database_?url|postgres_?url|pgurl)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
             return $text
           }
 
           $station = Join-Path $env:LOCALAPPDATA 'CivicSuite/Data/station'
-          foreach ($name in 'background.log','postgres.log','serve.log','worker.log') {
+          foreach ($name in 'background.log','postgres-start.log','postgres.log','serve.log','worker.log') {
             $src = Join-Path $station $name
             if (Test-Path -LiteralPath $src) {
               Get-Content -LiteralPath $src -Tail 50 -ErrorAction Stop |
