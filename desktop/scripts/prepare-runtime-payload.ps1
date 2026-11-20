@@ -956,6 +956,20 @@ function Install-PythonServicePackages {
     ) + $ServicePackages
     if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
+    if ($ProductProfile -eq 'inspections-preview') {
+        # Service wheels are intentionally installed with --no-deps. Station's
+        # Windows ACL, DPAPI and private-pipe support must therefore be explicit.
+        $StationContract = Read-JsonFile -Path (Join-Path $RepoRoot 'config/station-media-input.json')
+        $Dependency = $StationContract.control_python_dependency
+        $DependencyPath = Join-Path $CacheRoot $Dependency.filename
+        Invoke-TownlightDownload -Url $Dependency.url -Destination $DependencyPath -ExpectedSha256 $Dependency.sha256 | Out-Null
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
+            '-m', 'pip', 'install', '--no-index', '--no-deps', '--no-warn-script-location', $DependencyPath
+        )
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
+            '-I', '-B', '-c', 'import win32api, win32security, win32crypt, win32pipe, pywintypes; from pathlib import Path; import sys; root=Path(sys.executable).parent.resolve(); assert all(Path(m.__file__).resolve().is_relative_to(root) for m in (win32api, win32security, win32crypt, win32pipe, pywintypes))'
+        )
+    }
     Copy-TownlightRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
