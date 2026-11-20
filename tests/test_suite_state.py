@@ -44,12 +44,17 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     assert records["modules"] == ["core", "records", "notice", "access"]
     assert records["status"] == "candidate"
     assert records["public_website_status"] == "prepared; unpublished candidate"
-    assert state["desktop_release"]["version"] == "1.8.1-1"
-    commit = state["desktop_release"]["commit"]
-    acceptance = ROOT / "release" / "ACCEPTANCE-Windows-1.8.1.1.md"
-    assert commit and f"Application source `{commit}`" in acceptance.read_text(encoding="utf-8")
-    assert state["desktop_release"]["channel"] == "public-beta"
-    assert state["desktop_release"]["published_at"] == "2026-11-11"
+    release = state["desktop_release"]
+    assert release["version"] == "1.8.2-1"
+    assert release["tag"] == "townlight-windows-v1.8.2.1"
+    if release["channel"] == "candidate":
+        assert release["commit"] is None
+        assert release["published_at"] is None
+    else:
+        assert release["channel"] == "public-beta"
+        assert release["published_at"]
+        acceptance = ROOT / "release" / "ACCEPTANCE-Windows-1.8.2.1.md"
+        assert release["commit"] and f"Application source `{release['commit']}`" in acceptance.read_text(encoding="utf-8")
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 
