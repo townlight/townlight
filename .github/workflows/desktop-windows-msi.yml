@@ -1190,7 +1190,13 @@ jobs:
             return $text
           }
 
-          $station = Join-Path $env:LOCALAPPDATA 'CivicSuite/Data/station'
+          $locationsFile = Join-Path (Join-Path (Join-Path $env:LOCALAPPDATA "CivicSuite") "config") "locations.json"
+          $dataRoot = Join-Path (Join-Path $env:LOCALAPPDATA "CivicSuite") "Data"
+          if (Test-Path $locationsFile) {
+            $loc = Get-Content $locationsFile -Raw | ConvertFrom-Json
+            if ($loc.data_root) { $dataRoot = $loc.data_root }
+          }
+          $station = Join-Path $dataRoot "station"
           foreach ($name in 'background.log','postgres-start.log','postgres.log','serve.log','worker.log') {
             $src = Join-Path $station $name
             if (Test-Path -LiteralPath $src) {

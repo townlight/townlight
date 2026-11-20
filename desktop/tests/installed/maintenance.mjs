@@ -45,6 +45,18 @@ try {
     assert.equal(state.first_run.finished,true,'Upgrade lost completed setup');
     await save('upgrade-app-state',state);
   } else {
+    if (mode === "recorder") {
+      const workspace = path.resolve(process.env.GITHUB_WORKSPACE);
+      assert(path.isAbsolute(workspace), `GITHUB_WORKSPACE not absolute: ${workspace}`);
+      const { statfs } = await import('node:fs/promises');
+      const st = await statfs(workspace);
+      const freeBytes = BigInt(st.bavail) * BigInt(st.bsize);
+      assert(freeBytes >= 35n * 1024n ** 3n, `Insufficient free space at ${workspace}: ${freeBytes} < 35GiB`);
+      const fixtureRoot = path.join(workspace, "townlight-recorder-fixture");
+      const dataRoot = path.join(fixtureRoot, "data");
+      const backupRoot = path.join(fixtureRoot, "backup");
+      await page.evaluate((r) => { window.__auditRecorderLocations = r; }, { dataRoot, backupRoot });
+    }
     const setup=await run('setup.js');
     assert(setup.final.first_run.finished, 'Installed first-run incomplete');
     await save(mode+'-setup',setup);

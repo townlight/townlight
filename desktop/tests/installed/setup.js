@@ -10,7 +10,7 @@
    rows.push(row);if(!row.pass)throw Error(id+' did not pass: '+row.error);
  };
  await a.nav('home');
- if((await get()).first_run.current_step_id==='locations')await step('locations','choose-location');
+ if ((await get()).first_run.current_step_id === "locations") await step("locations", "choose-location", window.__auditRecorderLocations ?? {});
  await a.click('[data-module-profile-id="inspections-preview"]',{confirm:false});
  await step('modules','select-modules');
  await step('city-profile','create-city-profile',{cityName:'Installed Audit Fictional City',state:'CO',timeZone:'America/Denver',recordsContact:'records@example.invalid',clerkContact:'clerk@example.invalid'});
