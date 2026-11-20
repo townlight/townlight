@@ -49,9 +49,9 @@ Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to 1.8.1.1 was
 The accepted MSI contains Townlight Runtime 0.3.1 and Meetings 1.0.6 distributions. Its health version strings still report Runtime 0.3.0 and Meetings 1.0.5. Default-branch source corrects those display strings; the signed MSI and its exact build source remain unchanged.
 
 
-> **Windows 1.8.1.1 acceptance.** Windows 1.8.1.1 adds Boards & Commissions, Contracts, and Procurement to the full Windows profile. The signed Windows Sandbox checks cover a fresh installation, the three staff workflows, role boundaries, record persistence, and upgrade from 1.7.2.1 with retained city data and settings. Station continues to use its separately configured local service. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
+> **Windows 1.8.1.1 acceptance.** Shared meeting imports cover 31 source families and 34 source/format pairs using public captures and fixtures. Windows 1.8.1.1 has fresh-install acceptance; an in-place upgrade to 1.8.1.1 was not exercised. The tested upgrade from 1.7.2.1 applies to Windows 1.8.0.1 only. Station uses its separately configured service. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
 
-> The signed [Windows x64 beta 1.8.1.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1) adds the three staff workspaces and automatically refreshes the bundled runtime when upgrading from 1.7.2.1. The [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) applies to this exact MSI.
+> Boards & Commissions, Contracts and Procurement were added in Windows 1.8.0.1. Its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) identifies the staff workflows, role boundaries, persistence and upgrade exercised on that build. Those results are not a new 1.8.1.1 upgrade test.
 
 ## Using this manual
 
@@ -69,9 +69,9 @@ Staff should start with First run and Connected workflows. Administrators should
 | Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/SHA256SUMS-Windows-1.8.1.1.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) |
 | Corresponding source | Released Windows x64 beta |
 | Current owned software license | AGPL-3.0-only |
-| Supported acceptance profile | Windows x64 fresh install and upgrade from 1.7.2.1; full profile; separate Station configuration |
+| Supported acceptance profile | Windows 1.8.1.1 fresh install; 1.7.2.1 → 1.8.0.1 upgrade only; full profile; separate Station configuration |
 
-Start a new installation with an empty database and fresh Windows profile. For an upgrade from Windows 1.7.2.1, keep the existing profile. The approved profile path is `%LOCALAPPDATA%\CivicSuite`. Keep existing profiles and backups.
+Start a new installation with an empty database and fresh Windows profile. The tested upgrade from Windows 1.7.2.1 was to 1.8.0.1, not 1.8.1.1. For existing-city evaluation, preserve the profile, city data, settings and a restore path. The approved profile path is `%LOCALAPPDATA%\CivicSuite`. Keep existing profiles and backups.
 
 ### Component versions
 
