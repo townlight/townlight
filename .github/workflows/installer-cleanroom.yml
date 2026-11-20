@@ -50,9 +50,29 @@ jobs:
           if ($before -ge 42GB) { Write-Host 'Already sufficient'; exit 0 }
           $p = $target
           while ($p) { $i = Get-Item -LiteralPath $p -Force; if (($i.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Reparse point: $p" }; $p = Split-Path -Parent $p }
-          $desc = @(Get-ChildItem -LiteralPath $target -Recurse -Force -ErrorAction Stop)
-          if ($desc | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 }) { throw 'Reparse descendant' }
-          Remove-Item -LiteralPath $target -Recurse -Force -ErrorAction Stop
+          $removed=0; $skipped=0
+          $stack=[Collections.Generic.Stack[string]]::new()
+          $stack.Push($target)
+          while($stack.Count -gt 0 -and [double](& $free) -lt 42GB){
+            $dir=$stack.Pop()
+            try{
+              $a=[IO.File]::GetAttributes($dir)
+              if(($a -band [IO.FileAttributes]::ReparsePoint) -or -not ($a -band [IO.FileAttributes]::Directory)){$skipped++;continue}
+            }catch{$skipped++;continue}
+            try{
+              foreach($p in [IO.Directory]::EnumerateFileSystemEntries($dir)){
+                try{
+                  $e=[IO.File]::GetAttributes($p)
+                  if($e -band [IO.FileAttributes]::ReparsePoint){$skipped++;continue}
+                  if($e -band [IO.FileAttributes]::Directory){$stack.Push($p)}
+                  else{
+                    try{[IO.File]::Delete($p);$removed++}catch{$skipped++}
+                  }
+                }catch{$skipped++}
+              }
+            }catch{$skipped++}
+          }
+          Write-Host "removed=$removed skipped=$skipped freeBytes=$([double](& $free))"
           $after = & $free
           Write-Host "C: available after: $after bytes"
           if ($after -lt 42GB) { throw "Insufficient C: available: $after bytes" }
