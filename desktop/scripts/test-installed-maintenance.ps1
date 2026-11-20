@@ -2,11 +2,17 @@ param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
   [ValidateSet('fresh','upgrade','recorder')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
-  [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA
+  [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA,
+  [switch]$UnsignedRecorderCandidate,
+  [ValidatePattern('^[0-9a-f]{64}$')][string]$ExpectedMsiSha256
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
+if ($UnsignedRecorderCandidate) {
+  if ($Mode -ne 'recorder' -or -not $ExpectedMsiSha256) { throw 'Unsigned acceptance is limited to a hash-bound unpublished recorder candidate.' }
+  if ((Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedMsiSha256) { throw 'Candidate artifact hash differs.' }
+}
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $candidateVersion = (Get-Content (Join-Path $repo 'config/inspections-msi-candidate.json') -Raw | ConvertFrom-Json).windows_product_version
 $EvidenceRoot = [IO.Path]::GetFullPath($EvidenceRoot)
@@ -21,11 +27,12 @@ $hadPolicy = $priorKey -and $priorKey.GetValueNames() -contains $appName
 if ($hadPolicy) { $priorValue=$priorKey.GetValue($appName); $priorKind=$priorKey.GetValueKind($appName) }
 $script:ownedApp = $null
 function Install-Candidate([string]$Path, [string]$Label) {
-  & (Join-Path $PSScriptRoot 'verify-publication-signature.ps1') -Path $Path
+  if (-not $UnsignedRecorderCandidate) { & (Join-Path $PSScriptRoot 'verify-publication-signature.ps1') -Path $Path }
+  elseif ((Get-AuthenticodeSignature -LiteralPath $Path).Status -ne 'NotSigned') { throw 'Expected the unchanged unsigned PR build, not an invalid signature.' }
   $log = Join-Path $EvidenceRoot "$Label-msiexec.log"
   $p = Start-Process msiexec.exe -ArgumentList @('/i',('"'+$Path+'"'),'/qn','/norestart','/l*v',('"'+$log+'"')) -WindowStyle Hidden -Wait -PassThru
   if ($p.ExitCode -notin @(0,3010)) { throw "$Label MSI installation failed: $($p.ExitCode)" }
-  & (Join-Path $PSScriptRoot 'verify-publication-signature.ps1') -Path $exe
+  if (-not $UnsignedRecorderCandidate) { & (Join-Path $PSScriptRoot 'verify-publication-signature.ps1') -Path $exe }
 }
 function Run-Installed([string]$Phase) {
   if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) { throw 'Installed acceptance debug port is already occupied.' }
@@ -94,7 +101,7 @@ try {
   foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
     if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }
-  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
+  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
   elseif (Test-Path -LiteralPath $debugPolicy) { Remove-ItemProperty -LiteralPath $debugPolicy -Name $appName -ErrorAction SilentlyContinue }

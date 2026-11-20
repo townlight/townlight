@@ -1146,6 +1146,41 @@ jobs:
           path: ${{ runner.temp }}\townlight-msi-*.log
           retention-days: 7
 
+  candidate-installed-recorder:
+    name: Installed recorder candidate
+    needs: windows-local-msi
+    if: github.event_name == 'pull_request' && github.head_ref == 'station/integrated-recorder'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: townlight
+      - uses: actions/download-artifact@v4
+        with:
+          name: townlight-windows-local-msi-UNSIGNED
+          path: msi-artifact
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+      - run: npm ci
+        working-directory: townlight/desktop
+      - name: Install exact PR artifact and verify recording-to-Records workflow
+        shell: pwsh
+        run: |
+          $msis=@(Get-ChildItem msi-artifact -Filter '*.msi' -Recurse -File)
+          if ($msis.Count -ne 1) { throw 'Expected exactly one PR candidate MSI.' }
+          $sha=(Get-FileHash $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode recorder -UnsignedRecorderCandidate -ExpectedMsiSha256 $sha -EvidenceRoot "$env:RUNNER_TEMP/recorder-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: installed-recorder-candidate
+          path: ${{ runner.temp }}/recorder-evidence
+          retention-days: 7
+
   signed-installed-maintenance:
     name: Signed installed maintenance (${{ matrix.mode }})
     needs: windows-local-msi
