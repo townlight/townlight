@@ -75,3 +75,5 @@ The two retained PRs are separate existing work, not new release requirements in
 Historical Suite release closeout #298 and inner-executable signing #253 are closed as resolved by their existing release evidence. Records transfer #27 and obsolete footer #88 are closed against current repository/source readback. OIDC #249 is closed as not planned by explicit owner decision. Records #98 remains an explicitly nonblocking runtime-guidance backlog item; this cleanup does not turn it into a release requirement.
 
 The current hosted Windows image exposed an archive-module/.NET overload incompatibility under Windows PowerShell 5.1. Runtime ZIP staging now uses compatible entry-level extraction, preserving overlay files and path-escape protection. Four real-shell regression checks passed locally across Windows PowerShell 5.1 and PowerShell 7; required Windows CI reruns against the corrected source. This packaging fix does not replace the published MSI.
+
+OSGeo moved the pinned PostGIS 3.6.2 ZIP into its `pg17/archive/` directory. The source URL now follows that location; the full downloaded ZIP matches the existing SHA-256. Version and dependency bytes are unchanged.
