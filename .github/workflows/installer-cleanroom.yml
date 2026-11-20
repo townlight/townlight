@@ -1,195 +1,101 @@
-name: installer-cleanroom
+name: Temporary Windows Recorder Diagnostics
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - ".github/workflows/installer-cleanroom.yml"
-      - "docs/installer/**"
-      - "installer/**"
-      - "scripts/plan-installer.py"
-      - "scripts/reclaim-installer-cleanroom-space.py"
-      - "scripts/run-clerk-core-installer.py"
-      - "scripts/run-installer-package-cleanroom.py"
-      - "scripts/verify-installer-plan.py"
-
-env:
-  TOWNLIGHT_PYTHON_VERSION: "3.12"
 
 permissions:
+  actions: read
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  package-readiness-plan:
-    name: ${{ matrix.platform }} archive readiness and plan
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
-    env:
-      TOWNLIGHT_CLEANROOM_HOST_CLEANUP_APPROVED: "1"
-      TOWNLIGHT_CLEANROOM_MIN_FREE_GB: "40"
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: windows
-            profile: clerk-core
-            # workflow-cost: windows-pr-justification -- validates the double-click installer wrapper plan on the only host family that can exercise it.
-            os: windows-latest
-            archive: installer/dist/Townlight-clerk-core-windows-0.1.0.zip
-            installer_version: 0.1.0
-          - platform: windows
-            profile: city-core
-            # workflow-cost: windows-pr-justification -- city-core release criteria require Windows one-click wrapper readiness evidence.
-            os: windows-latest
-            archive: installer/dist/Townlight-city-core-windows-0.1.0.zip
-            installer_version: 0.1.0
+  recorder-diagnostics:
+    runs-on: windows-latest
+    timeout-minutes: 35
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
-
-      - name: Check out Townlight Records bundle source
-        uses: actions/checkout@v5
+      - name: Checkout exact townlight ref
+        uses: actions/checkout@v4
         with:
-          repository: townlight/sunshine
-          ref: d46547976f69760461de89a1a6d086cd41c701dc
-          path: modules/townlight_records
+          repository: ${{ github.repository }}
+          ref: 6b298f37d3cca5d3250bc7ab4cf0d4f23eaaa1ec
+          path: townlight
 
-      - name: Check out TownlightMeetings bundle source
-        uses: actions/checkout@v5
+      - name: Download unsigned MSI artifact
+        uses: actions/download-artifact@v4
         with:
-          repository: townlight/meetings
-          ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
-          path: modules/townlight_meetings
+          name: townlight-windows-local-msi-UNSIGNED
+          run-id: 44807689486
+          github-token: ${{ github.token }}
+          path: msi-artifact
 
-      - name: Check out TownlightCode bundle source
-        uses: actions/checkout@v5
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
         with:
-          repository: townlight/ordinances
-          ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
-          path: modules/townlight_code
+          node-version: '22'
 
-      - name: Check out Townlight Notice bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/notice
-          ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
-          path: modules/townlight_notice
+      - name: Install desktop dependencies
+        working-directory: townlight/desktop
+        run: npm ci
 
-      - name: Check out Townlight Access bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/access
-          ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
-          path: modules/townlight_access
+      - name: Run unsigned recorder maintenance test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msis = @(Get-ChildItem -LiteralPath 'msi-artifact' -Recurse -File -Filter '*.msi')
+          if ($msis.Count -ne 1) { throw "Expected exactly one MSI, found $($msis.Count)." }
+          $msi = $msis[0]
+          $sha = (Get-FileHash -LiteralPath $msi.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          $evidence = Join-Path $env:RUNNER_TEMP 'recorder-evidence'
+          New-Item -ItemType Directory -Force -Path $evidence | Out-Null
+          & 'townlight/desktop/scripts/test-installed-maintenance.ps1' `
+            -Mode recorder `
+            -UnsignedRecorderCandidate `
+            -ExpectedMsiSha256 $sha `
+            -MsiPath $msi.FullName `
+            -EvidenceRoot $evidence
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.TOWNLIGHT_PYTHON_VERSION }}
-          cache: pip
+      - name: Collect redacted logs and scheduled task state
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $evidence = Join-Path $env:RUNNER_TEMP 'recorder-evidence'
+          $diag = Join-Path $evidence 'diagnostics'
+          New-Item -ItemType Directory -Force -Path $diag | Out-Null
 
-      - name: Generate release artifacts
-        run: python scripts/plan-installer.py --profile "${{ matrix.profile }}" --generate-release-artifacts --installer-version "${{ matrix.installer_version }}"
+          function Redact([string]$text) {
+            $text = $text -replace '(?i)\b(?:postgres(?:ql)?|mysql|mssql|mongodb(?:\+srv)?|redis)://[^\s''"]+', '[REDACTED_DB_URI]'
+            $text = $text -replace '(?i)(\b(?:password|passwd|pwd)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
+            $text = $text -replace '(?i)(\b(?:db_?uri|database_?url|postgres_?url|pgurl)\s*[=:]\s*)[^\s;,''"]+', '$1[REDACTED]'
+            return $text
+          }
 
-      - name: Reclaim hosted-runner workspace before package plan
-        if: runner.os == 'Linux'
-        run: python scripts/reclaim-installer-cleanroom-space.py --run-id "ci-${{ matrix.profile }}-${{ matrix.platform }}-package-plan" --approved
+          $station = Join-Path $env:LOCALAPPDATA 'CivicSuite/Data/station'
+          foreach ($name in 'background.log','postgres.log','serve.log','worker.log') {
+            $src = Join-Path $station $name
+            if (Test-Path -LiteralPath $src) {
+              Get-Content -LiteralPath $src -Tail 50 -ErrorAction Stop |
+                ForEach-Object { Redact $_ } |
+                Set-Content -LiteralPath (Join-Path $diag $name) -Encoding utf8
+            }
+          }
 
-      - name: Run extracted package readiness and plan
-        run: python scripts/run-installer-package-cleanroom.py --archive "${{ matrix.archive }}" --platform "${{ matrix.platform }}" --skip-install --run-id "ci-${{ matrix.profile }}-${{ matrix.platform }}-package-plan"
+          $tasks = @(Get-ScheduledTask | Where-Object { $_.TaskName -like '*Townlight*Station*' -or $_.TaskPath -like '*Townlight*Station*' })
+          $taskInfo = foreach ($task in $tasks) {
+            $info = Get-ScheduledTaskInfo -TaskName $task.TaskName -TaskPath $task.TaskPath
+            [pscustomobject]@{
+              TaskName = $task.TaskName
+              TaskPath = $task.TaskPath
+              State = $task.State.ToString()
+              LastTaskResult = $info.LastTaskResult
+            }
+          }
+          $taskInfo | Format-List | Out-String | Set-Content -LiteralPath (Join-Path $diag 'townlight-station-task-info.txt') -Encoding utf8
 
-      - name: Upload readiness and plan evidence
+      - name: Upload recorder evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: installer-${{ matrix.profile }}-${{ matrix.platform }}-package-plan
-          path: installer/reports/ci-${{ matrix.profile }}-${{ matrix.platform }}-package-plan/
-          retention-days: 7
-
-  linux-package-lifecycle:
-    # Excluded from the Windows release closeout. Preserve implementation for later.
-    if: ${{ false }}
-    name: linux archive full lifecycle
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      TOWNLIGHT_CLEANROOM_HOST_CLEANUP_APPROVED: "1"
-      TOWNLIGHT_CLEANROOM_MIN_FREE_GB: "40"
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        include:
-          - profile: clerk-core
-            archive: installer/dist/Townlight-clerk-core-linux-0.1.0.tar.gz
-            run_id: ci-linux-package-lifecycle
-            installer_version: 0.1.0
-          - profile: city-core
-            archive: installer/dist/Townlight-city-core-linux-0.1.2.tar.gz
-            run_id: ci-city-core-linux-package-lifecycle
-            installer_version: 0.1.2
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
-
-      - name: Check out Townlight Records bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/sunshine
-          ref: d46547976f69760461de89a1a6d086cd41c701dc
-          path: modules/townlight_records
-
-      - name: Check out TownlightMeetings bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/meetings
-          ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
-          path: modules/townlight_meetings
-
-      - name: Check out TownlightCode bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/ordinances
-          ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
-          path: modules/townlight_code
-
-      - name: Check out Townlight Notice bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/notice
-          ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
-          path: modules/townlight_notice
-
-      - name: Check out Townlight Access bundle source
-        uses: actions/checkout@v5
-        with:
-          repository: townlight/access
-          ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
-          path: modules/townlight_access
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.TOWNLIGHT_PYTHON_VERSION }}
-          cache: pip
-
-      - name: Generate release artifacts
-        run: python scripts/plan-installer.py --profile "${{ matrix.profile }}" --generate-release-artifacts --installer-version "${{ matrix.installer_version }}"
-
-      - name: Reclaim hosted-runner workspace before lifecycle
-        run: python scripts/reclaim-installer-cleanroom-space.py --run-id "${{ matrix.run_id }}" --approved
-
-      - name: Run extracted Linux package install, repair, verify, workflow proof, backup, restore, and uninstall
-        run: python scripts/run-installer-package-cleanroom.py --archive "${{ matrix.archive }}" --platform linux --run-id "${{ matrix.run_id }}" --staff-mode bearer --workflow-proof
-
-      - name: Upload Linux lifecycle evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: installer-${{ matrix.profile }}-linux-package-lifecycle
-          path: installer/reports/${{ matrix.run_id }}/
-          retention-days: 7
+          name: recorder-evidence
+          path: ${{ runner.temp }}/recorder-evidence
+          if-no-files-found: warn
