@@ -11,7 +11,7 @@ concurrency:
 jobs:
   detect-verify-relevant-changes:
     name: detect verify-relevant changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       relevant: ${{ steps.diff.outputs.relevant }}
     steps:
@@ -47,7 +47,7 @@ jobs:
   verify:
     needs: detect-verify-relevant-changes
     if: needs.detect-verify-relevant-changes.outputs.relevant == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
