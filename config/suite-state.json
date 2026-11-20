@@ -14,9 +14,9 @@
   "desktop_release": {
     "version": "1.8.2-1",
     "tag": "townlight-windows-v1.8.2.1",
-    "commit": null,
-    "channel": "candidate",
-    "published_at": null,
+    "commit": "993d47567799cd8f676fb514daea7edb3636eb0b",
+    "channel": "public-beta",
+    "published_at": "2026-11-20",
     "asset_policy": "windows-msi",
     "runtime_version": "0.3.2"
   },

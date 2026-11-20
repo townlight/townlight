@@ -1,5 +1,13 @@
 # Changelog
 
+## Windows 1.8.2.1 public beta — published 2026-11-20 UTC
+
+- Package corrected staff authorization, explicit database credential configuration, license documentation and component pins.
+- Update Records to 1.8.0.dev3, Boards and Contracts to 0.2.1, Procurement to 0.3.1, and Runtime to 0.3.2; correct displayed health versions.
+- Publish exact signed application source `993d47567799cd8f676fb514daea7edb3636eb0b` with fresh-install, 1.8.1.1 upgrade, staff handoff, backup/restore and uninstall-retention acceptance.
+- Expand Windows component CI and preserve earlier import/module evidence under its original identities. Station's separate Rust CI does not change the pinned Python service shipped in the MSI.
+- [Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/ACCEPTANCE-Windows-1.8.2.1.md).
+
 ## Windows 1.8.1.1 public beta — published 2026-11-11 UTC
 
 - Add shared meeting imports for 31 source families and 34 source/format pairs.

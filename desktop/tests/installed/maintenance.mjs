@@ -29,6 +29,10 @@ const readback = async ids => {
   await save(mode+'-readback',{passed:true,ids,boards,contracts,procurement});
 };
 try {
+  // WebView CDP becoming available precedes the app's first native state load.
+  // On upgrade that load refreshes the runtime under the profile lifecycle gate.
+  // Observe its rendered result before sending another native state request.
+  await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
   let ids;
   if (mode==='upgrade') {
@@ -51,10 +55,15 @@ try {
   }
   if (mode==='fresh') {
     accepted(await native('supervisor_action',{action:'backup',serviceId:null}));
-    const restore=accepted(await native('supervisor_action',{action:'restore',serviceId:null}));
-    await save('backup-restore',{passed:true,restore});
+    const restore=await native('supervisor_action',{action:'restore',serviceId:null});
+    // Restore intentionally leaves services stopped. It is not accepted as
+    // recovered until Start and independent saved-record readback succeed.
+    assert.equal(restore.action,'restore');
+    if (!restore.accepted) assert.equal(restore.status,'Restore needs service start',JSON.stringify(restore));
     accepted(await native('supervisor_action',{action:'start',serviceId:null}));
+    await admin();
     await readback(ids);
+    await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});

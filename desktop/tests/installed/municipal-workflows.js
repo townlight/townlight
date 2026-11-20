@@ -42,6 +42,14 @@
     catch (error) { return /denied|authoriz|permission|sign.in|not allowed/i.test(JSON.stringify(error)); }
     return false;
   };
+  // Full-profile first-run deliberately leaves legacy Records activation to
+  // this documented operator action before canonical Meetings staff work.
+  if ((await app()).domain_authority !== "python-records") {
+    await a.click('[data-surface="IT/Admin"]', {confirm:false});
+    await a.nav("health");
+    await a.click('[data-supervisor-action="activate-records"]', {timeout:600000});
+    await a.until(async () => (await app()).domain_authority === "python-records", 600000);
+  }
   await settings();
   for (const [role, user] of Object.entries(users)) {
     for (const [field, value] of Object.entries({
