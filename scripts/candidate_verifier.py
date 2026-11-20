@@ -38,6 +38,7 @@ def pinned_file(repository, commit, name, workspace, remote):
 def verify_pinned_metadata(state, read_file):
     """Inspect the committed provider itself; agreement between projections is insufficient."""
     errors = []
+    published_modules = None
     for key, module in state["modules"].items():
         repository = module["repository"]
         commit = module["installer"]["source_commit"]
@@ -46,9 +47,22 @@ def verify_pinned_metadata(state, read_file):
             expected = module["legacy"]["package_names"][0]
             if data["name"] != expected:
                 errors.append(f"{key}: pinned distribution {data['name']!r} differs from {expected!r}")
-            for field in ("development", "installer", "public_status"):
+            for field in ("development", "installer"):
                 if data["version"] != module["versions"][field]:
                     errors.append(f"{key}: pinned package version {data['version']} differs from {field} {module['versions'][field]}")
+            if module["versions"]["public_status"] != data["version"]:
+                # An unpublished installer can advance without changing what the
+                # existing public MSI shipped. Verify that claim at its own pin.
+                if published_modules is None:
+                    published_modules = json.loads(read_file(
+                        "townlight/townlight", state["desktop_release"]["commit"],
+                        "config/suite-state.json"))["modules"]
+                shipped = published_modules[key]
+                source = shipped["repository"]
+                public = tomllib.loads(read_file(source["name"], shipped["installer"]["source_commit"],
+                                                  source["manifest_path"]).decode("utf-8-sig"))["project"]
+                if public["name"] != expected or public["version"] != module["versions"]["public_status"]:
+                    errors.append(f"{key}: public_status differs from the published source pin")
         except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:
             errors.append(f"{key}: cannot inspect pinned source ({type(error).__name__})")
     desktop = state["desktop_release"]

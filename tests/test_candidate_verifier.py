@@ -61,6 +61,20 @@ def test_pinned_metadata_rejects_stale_state_and_ignores_new_branch_head(tmp_pat
                 "desktop/src-tauri/Cargo.toml": b'[package]\nversion="1.7.0-1"',
                 "desktop/runtime/python-services/pyproject.toml": b'[project]\nname="townlight-runtime"\nversion="0.2.0"'}[name]
     assert verify_pinned_metadata(state, read) == []
+    split = copy.deepcopy(state)
+    split["modules"]["core"]["versions"]["public_status"] = "1.2.0"
+    published = copy.deepcopy(split)
+    published["modules"]["core"]["installer"]["source_commit"] = "b" * 40
+    def read_published(repository, pin, name):
+        if name == "config/suite-state.json":
+            assert pin == state["desktop_release"]["commit"]
+            return json.dumps(published).encode()
+        if pin == "b" * 40:
+            return b'[project]\nname="townlight-core"\nversion="1.2.0"'
+        return read(repository, pin, name)
+    assert verify_pinned_metadata(split, read_published) == []
+    split["modules"]["core"]["versions"]["public_status"] = "9.0.0"
+    assert any("public_status differs" in error for error in verify_pinned_metadata(split, read_published))
     stale = copy.deepcopy(state)
     stale["modules"]["core"]["versions"]["installer"] = "9.0.0"
     assert any("pinned package version" in error for error in verify_pinned_metadata(stale, read))
