@@ -769,7 +769,7 @@
         "tier": 1,
         "role": "meeting media and proceedings handoff",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "99785365c3afa00faa7dc9d0fe9b9ec38c992f12"
+        "source_commit": "dfe88e5e2517980083d68ebc5242ae34c6b5eb6d"
       }
     },
     "boards": {

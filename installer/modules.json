@@ -1016,7 +1016,7 @@
         "release_artifacts"
       ],
       "current_version": "0.4.0",
-      "source_commit": "99785365c3afa00faa7dc9d0fe9b9ec38c992f12",
+      "source_commit": "dfe88e5e2517980083d68ebc5242ae34c6b5eb6d",
       "routes": [
         {
           "id": "station-operator",

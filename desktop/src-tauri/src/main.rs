@@ -619,11 +619,20 @@ async fn supervisor_action(
 }
 
 #[tauri::command]
-async fn station_action(action: String, selected_directory: Option<String>) -> Result<Value, String> {
-    if matches!(action.as_str(), "setup" | "backup" | "restore" | "stop") { auth::require_admin_session()?; }
-    else { auth::require_signed_in_session()?; }
-    tauri::async_runtime::spawn_blocking(move || supervisor::station_action(&action, selected_directory.as_deref()))
-        .await.map_err(|e| format!("Recorder action could not complete: {e}"))?
+async fn station_action(
+    action: String,
+    selected_directory: Option<String>,
+) -> Result<Value, String> {
+    if matches!(action.as_str(), "setup" | "backup" | "restore" | "stop") {
+        auth::require_admin_session()?;
+    } else {
+        auth::require_signed_in_session()?;
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        supervisor::station_action(&action, selected_directory.as_deref())
+    })
+    .await
+    .map_err(|e| format!("Recorder action could not complete: {e}"))?
 }
 
 fn picked_file_path_for_desktop() -> Result<Option<String>, String> {

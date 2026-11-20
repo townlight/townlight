@@ -830,8 +830,15 @@ pub fn first_run_action(
     }
     if action == "open-app" {
         let selected = module_registry::module_selection_state()?;
-        if selected.enabled_module_ids.iter().any(|id| id == "townlight_meetings")
-            && selected.enabled_module_ids.iter().any(|id| id == "townlight_records") {
+        if selected
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_meetings")
+            && selected
+                .enabled_module_ids
+                .iter()
+                .any(|id| id == "townlight_records")
+        {
             supervisor::station_action("setup", None)?;
         }
         action_completion = Some((

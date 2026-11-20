@@ -461,9 +461,15 @@ fn local_database_url(driver: &str) -> Result<String, String> {
 }
 
 /// Recorder actions use the installed Python entry point, never shell-built commands.
-pub fn station_action(action: &str, selected_directory: Option<&str>) -> Result<serde_json::Value, String> {
-    let python = runtime_payload_roots().into_iter().map(|root| root.join("python/python.exe"))
-        .find(|path| path.is_file()).unwrap_or_else(|| runtime_root().join("runtime/python/python.exe"));
+pub fn station_action(
+    action: &str,
+    selected_directory: Option<&str>,
+) -> Result<serde_json::Value, String> {
+    let python = runtime_payload_roots()
+        .into_iter()
+        .map(|root| root.join("python/python.exe"))
+        .find(|path| path.is_file())
+        .unwrap_or_else(|| runtime_root().join("runtime/python/python.exe"));
     if !python.is_file() {
         return Err("Install the Townlight runtime before setting up meeting recording.".into());
     }
@@ -477,46 +483,106 @@ pub fn station_action(action: &str, selected_directory: Option<&str>) -> Result<
                     && p.join("station/media-source/civiccast/egress/gst/worker.py").is_file())
                 .ok_or("Station media runtime is missing. Repair this Townlight candidate before setup.")?;
             let station_data = data_root().join("station");
-            command.arg("setup").arg("--payload-root").arg(&payload)
-                .arg("--data-root").arg(&station_data);
-            let result = command_output_with_timeout(&mut command, "Meeting recorder setup", MIGRATION_COMMAND_TIMEOUT)?;
+            command
+                .arg("setup")
+                .arg("--payload-root")
+                .arg(&payload)
+                .arg("--data-root")
+                .arg(&station_data);
+            let result = command_output_with_timeout(
+                &mut command,
+                "Meeting recorder setup",
+                MIGRATION_COMMAND_TIMEOUT,
+            )?;
             let value: serde_json::Value = serde_json::from_str(result.trim())
                 .map_err(|_| "Recorder setup returned an invalid result".to_string())?;
-            crate::atomic_io::atomic_write_bytes(&pairing_path,
-                serde_json::to_vec(&value).map_err(|e| e.to_string())?.as_slice())?;
+            crate::atomic_io::atomic_write_bytes(
+                &pairing_path,
+                serde_json::to_vec(&value)
+                    .map_err(|e| e.to_string())?
+                    .as_slice(),
+            )?;
             Ok(value)
         }
         "open" => {
             if !pairing_path.is_file() {
                 return Err("Set up meeting recording from Townlight first.".into());
             }
-            command.arg("operator").arg("--profile-root").arg(townlight_root());
-            command_output_with_timeout(&mut command, "Open meeting recorder", SERVICE_COMMAND_TIMEOUT)?;
-            Ok(serde_json::json!({"opened":true,"message":"Station opened using your current staff authority. An existing recording continues while you reconnect."}))
+            command
+                .arg("operator")
+                .arg("--profile-root")
+                .arg(townlight_root());
+            command_output_with_timeout(
+                &mut command,
+                "Open meeting recorder",
+                SERVICE_COMMAND_TIMEOUT,
+            )?;
+            Ok(
+                serde_json::json!({"opened":true,"message":"Station opened using your current staff authority. An existing recording continues while you reconnect."}),
+            )
         }
         "stop" => {
-            let pairing: serde_json::Value = serde_json::from_slice(&fs::read(&pairing_path)
-                .map_err(|_| "Recorder is not configured")?).map_err(|_| "Recorder pairing is invalid")?;
-            let data = PathBuf::from(pairing["data_directory"].as_str().ok_or("Recorder directory missing")?);
-            command.arg("stop").arg("--config").arg(data.join("settings.json"));
-            let result = command_output_with_timeout(&mut command, "Stop meeting recorder", Duration::from_secs(210))?;
+            let pairing: serde_json::Value = serde_json::from_slice(
+                &fs::read(&pairing_path).map_err(|_| "Recorder is not configured")?,
+            )
+            .map_err(|_| "Recorder pairing is invalid")?;
+            let data = PathBuf::from(
+                pairing["data_directory"]
+                    .as_str()
+                    .ok_or("Recorder directory missing")?,
+            );
+            command
+                .arg("stop")
+                .arg("--config")
+                .arg(data.join("settings.json"));
+            let result = command_output_with_timeout(
+                &mut command,
+                "Stop meeting recorder",
+                Duration::from_secs(210),
+            )?;
             serde_json::from_str(result.trim()).map_err(|_| "Invalid recorder stop result".into())
         }
         "backup" | "restore" => {
-            let pairing: serde_json::Value = serde_json::from_slice(&fs::read(&pairing_path)
-                .map_err(|_| "Set up the recorder before backup or restore")?)
-                .map_err(|_| "Recorder pairing is invalid")?;
-            let data = PathBuf::from(pairing["data_directory"].as_str().ok_or("Recorder data directory missing")?);
+            let pairing: serde_json::Value = serde_json::from_slice(
+                &fs::read(&pairing_path)
+                    .map_err(|_| "Set up the recorder before backup or restore")?,
+            )
+            .map_err(|_| "Recorder pairing is invalid")?;
+            let data = PathBuf::from(
+                pairing["data_directory"]
+                    .as_str()
+                    .ok_or("Recorder data directory missing")?,
+            );
             let destination = if action == "backup" {
-                selected_directory.map(PathBuf::from).unwrap_or_else(|| backup_root().join(format!("station-{}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs())))
+                selected_directory.map(PathBuf::from).unwrap_or_else(|| {
+                    backup_root().join(format!(
+                        "station-{}",
+                        SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap_or_default()
+                            .as_secs()
+                    ))
+                })
             } else {
-                let selected = PathBuf::from(selected_directory.ok_or("Select the Station backup directory to restore")?);
-                if !selected.is_absolute() { return Err("Backup directory must be absolute".into()); }
+                let selected = PathBuf::from(
+                    selected_directory.ok_or("Select the Station backup directory to restore")?,
+                );
+                if !selected.is_absolute() {
+                    return Err("Backup directory must be absolute".into());
+                }
                 selected
             };
-            command.arg(action).arg("--config").arg(data.join("settings.json"))
-                .arg("--destination").arg(destination);
-            let result = command_output_with_timeout(&mut command, "Station backup/restore", Duration::from_secs(1800))?;
+            command
+                .arg(action)
+                .arg("--config")
+                .arg(data.join("settings.json"))
+                .arg("--destination")
+                .arg(destination);
+            let result = command_output_with_timeout(
+                &mut command,
+                "Station backup/restore",
+                Duration::from_secs(1800),
+            )?;
             serde_json::from_str(result.trim()).map_err(|_| "Invalid Station backup result".into())
         }
         "status" => Ok(serde_json::json!({"configured":pairing_path.is_file(),
@@ -750,8 +816,10 @@ fn backup_relative_path_is_model_cache(prefix: &str, source_root: &Path, current
 /// live secrets folder rather than relying on the backup to carry it.
 fn backup_relative_path_is_secret(prefix: &str, source_root: &Path, current: &Path) -> bool {
     let relative_path = backup_relative_copy_path(prefix, source_root, current);
-    relative_path == "config/secrets" || relative_path.starts_with("config/secrets/")
-        || relative_path == "Data/station" || relative_path.starts_with("Data/station/")
+    relative_path == "config/secrets"
+        || relative_path.starts_with("config/secrets/")
+        || relative_path == "Data/station"
+        || relative_path.starts_with("Data/station/")
 }
 
 fn push_backup_copy_skip(
@@ -1490,8 +1558,12 @@ fn replace_profile_dir_from_backup_with_options(
     if stage.exists() {
         remove_profile_dir(&stage)?;
     }
-    (if source.exists() { copy_path_recursive_for_restore(source, &stage, options) }
-     else { fs::create_dir_all(&stage).map_err(|error| error.to_string()) }).map_err(|error| {
+    (if source.exists() {
+        copy_path_recursive_for_restore(source, &stage, options)
+    } else {
+        fs::create_dir_all(&stage).map_err(|error| error.to_string())
+    })
+    .map_err(|error| {
         let _ = remove_profile_dir(&stage);
         error
     })?;
@@ -1691,7 +1763,10 @@ fn create_backup_with_options(kind: &str, options: BackupOptions) -> Result<Path
     )
     .map_err(|error| format!("Could not write backup README: {error}"))?;
     if config_dir().join("station.json").is_file() {
-        station_action("backup", Some(destination.join("Station").to_string_lossy().as_ref()))?;
+        station_action(
+            "backup",
+            Some(destination.join("Station").to_string_lossy().as_ref()),
+        )?;
     }
     let (files, mut hash_skipped_files) = collect_backup_files_with_skips(&destination)?;
     skipped_files.append(&mut hash_skipped_files);
@@ -1706,7 +1781,8 @@ fn create_backup_with_options(kind: &str, options: BackupOptions) -> Result<Path
             let path = entry.path.replace('\\', "/");
             !(path == "config/secrets"
                 || path.starts_with("config/secrets/")
-                || path == "Data/station" || path.starts_with("Data/station/")
+                || path == "Data/station"
+                || path.starts_with("Data/station/")
                 || (!options.include_model_cache
                     && (path == "Data/models" || path.starts_with("Data/models/"))))
         })
@@ -3824,7 +3900,10 @@ fn restore_action(services: &[&ServiceDefinition]) -> Result<SupervisorActionRes
     if source.join("Station/manifest.json").is_file() {
         // Pairing paths belong to this installation, never to the backup's machine.
         station_action("setup", None)?;
-        station_action("restore", Some(source.join("Station").to_string_lossy().as_ref()))?;
+        station_action(
+            "restore",
+            Some(source.join("Station").to_string_lossy().as_ref()),
+        )?;
     }
 
     rewrite_service_state_after_restore(services)?;
@@ -3868,7 +3947,9 @@ fn restore_action(services: &[&ServiceDefinition]) -> Result<SupervisorActionRes
 fn uninstall_action(services: &[&ServiceDefinition]) -> Result<SupervisorActionResult, String> {
     stop_data_writers_for_snapshot()?;
     let final_backup = create_backup("final-uninstall")?;
-    if config_dir().join("station.json").is_file() { station_action("stop", None)?; }
+    if config_dir().join("station.json").is_file() {
+        station_action("stop", None)?;
+    }
     let _ = stop_services(services)?;
     let removed_data = remove_profile_dir(&data_root())?;
     let removed_config = remove_profile_dir(&config_dir())?;
@@ -4098,7 +4179,10 @@ mod tests {
                 fs::read_to_string(destination.join("models/cache.bin")).unwrap(),
                 "keep-model"
             );
-            assert_eq!(fs::read_to_string(destination.join("station/postgres/PG_VERSION")).unwrap(), "17");
+            assert_eq!(
+                fs::read_to_string(destination.join("station/postgres/PG_VERSION")).unwrap(),
+                "17"
+            );
             drop(held);
         });
     }
