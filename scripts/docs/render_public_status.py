@@ -5,7 +5,7 @@ Source of truth: installer/modules.public-status.json — the verified public
 status for the kept modules (grades, dates, notes, badge labels). This script:
 
   1. CROSS-CHECKS the status file against installer/modules.json
-     (same module id set; current_version and townlight_core_requirement agree).
+     (same module id set and Core requirement; versions match their respective canonical entries).
      Note: the status file's `arch_tier` is ARCHITECTURE.md's public taxonomy;
      modules.json's `tier` is the installer's internal grouping — deliberately
      NOT compared.
@@ -51,6 +51,12 @@ def cross_check(status: dict, modules: dict) -> list[str]:
     mj_by_id = mj if isinstance(mj, dict) else {m["id"]: m for m in mj}
     st_by_id = {m["id"]: m for m in status["modules"]}
 
+    canonical = json.loads((ROOT / "config" / "suite-state.json").read_text(encoding="utf-8"))
+    canonical_by_id = {
+        m["legacy"]["technical_id"]: m["versions"]
+        for m in canonical["modules"].values()
+    }
+
     missing = set(mj_by_id) - set(st_by_id)
     extra = set(st_by_id) - set(mj_by_id)
     if missing:
@@ -59,10 +65,15 @@ def cross_check(status: dict, modules: dict) -> list[str]:
         errors.append(f"public-status modules not in modules.json: {sorted(extra)}")
 
     for mid in sorted(set(mj_by_id) & set(st_by_id)):
-        mv = mj_by_id[mid].get("current_version")
-        sv = st_by_id[mid].get("current_version")
-        if mv is not None and sv is not None and mv != sv:
-            errors.append(f"{mid}: current_version disagrees (modules.json={mv}, public-status={sv})")
+        if mid not in canonical_by_id:
+            errors.append(f"{mid}: missing from canonical suite-state")
+        else:
+            cv = canonical_by_id[mid]
+            mv = mj_by_id[mid].get("current_version")
+            sv = st_by_id[mid].get("current_version")
+            if cv['installer'] != mv or cv['public_status'] != sv:
+                errors.append(f"{mid}: current_version disagrees (modules.json={mv}, "
+                              f"public-status={sv}, canonical={cv})")
         mr = mj_by_id[mid].get("townlight_core_requirement")
         sr = st_by_id[mid].get("townlight_core_requirement")
         if mr != sr:
