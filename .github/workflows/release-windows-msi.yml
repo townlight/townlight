@@ -92,21 +92,26 @@ jobs:
           }
           if ($promotion -and $tagSha -ne $promotion.source_commit) { throw 'Promotion tag must target the accepted signed source.' }
 
-          $runs = gh run list --workflow desktop-windows-msi.yml --branch main --event workflow_dispatch --status success --limit 30 --json databaseId,headSha,createdAt,url | ConvertFrom-Json
-          $run = $null
-          foreach ($candidate in @($runs | Where-Object { $_.headSha -eq $tagSha })) {
-            if ($promotion -and $candidate.databaseId -ne $promotion.workflow_run) { continue }
-            $artifacts = gh api "repos/${{ github.repository }}/actions/runs/$($candidate.databaseId)/artifacts" | ConvertFrom-Json
-            if (@($artifacts.artifacts | Where-Object { $_.name -eq 'townlight-windows-local-msi-SIGNED' }).Count -eq 1) {
-              if ($promotion -and @($artifacts.artifacts | Where-Object { $_.name -eq 'townlight-windows-local-msi-SIGNED' -and $_.id -eq $promotion.artifact_id }).Count -ne 1) {
-                throw 'Promotion signed artifact identity mismatch.'
-              }
-              $run = $candidate
-              break
-            }
+          if ($tag -ne 'townlight-windows-v1.8.2.1') { throw 'This exact-artifact promotion is only for Windows 1.8.2.1.' }
+          $run = gh run view 44681169076 --json databaseId,headSha,headBranch,event,url,jobs | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or $run.headSha -ne $tagSha -or $run.headBranch -ne 'main' -or $run.event -ne 'workflow_dispatch') { throw 'Original main signing run identity differs.' }
+          foreach ($name in @('build Windows Local MSI','desktop<->TownlightCore real-runtime integration test','Windows MSI install/first-run/backup-restore/uninstall lifecycle')) {
+            if (@($run.jobs | Where-Object { $_.name -eq $name -and $_.conclusion -eq 'success' }).Count -ne 1) { throw "Original signing/build/lifecycle check did not pass: $name" }
           }
-          if (-not $run) {
-            throw "No successful manual main signing run for tag SHA $tagSha has exactly one SIGNED MSI artifact."
+          $installedReceipts=@()
+          $acceptance=@(
+            @{mode='fresh';run=44689480672;head='7b293cd02ef0ea7d8456f013fb5df8fa0918c072'},
+            @{mode='upgrade';run=44690151304;head='0115342792cceb79d2825129a8fa937c216a2424'}
+          )
+          foreach ($spec in $acceptance) {
+            $accepted=gh run view $spec.run --json headSha,event,jobs | ConvertFrom-Json
+            if ($LASTEXITCODE -ne 0 -or $accepted.headSha -ne $spec.head -or $accepted.event -ne 'workflow_dispatch' -or @($accepted.jobs | Where-Object { $_.name -eq "installed ($($spec.mode))" -and $_.conclusion -eq 'success' }).Count -ne 1) { throw 'Affected installed acceptance job has not passed.' }
+            $mode=$spec.mode
+            gh run download $spec.run -n "signed-installed-reuse-$mode" -D "accepted-$mode"
+            if ($LASTEXITCODE -ne 0) { throw 'Installed acceptance receipt unavailable.' }
+            $entry=Get-Content "accepted-$mode/installed-acceptance.json" -Raw | ConvertFrom-Json
+            if (-not $entry.passed -or $entry.mode -ne $mode -or $entry.version -ne '1.8.2.1' -or $entry.source_commit -ne $tagSha -or -not $entry.uninstall_preserved_profile -or $entry.harness_commit -ne $spec.head) { throw 'Exact candidate installed acceptance differs.' }
+            $installedReceipts += $entry
           }
           Write-Host "Using signed MSI run: $($run.databaseId) $($run.url)"
           gh run download $run.databaseId -n townlight-windows-local-msi-SIGNED -D ./msi-artifact
@@ -126,6 +131,8 @@ jobs:
           if ($evidenceFiles.Count -ne 1) { throw "Expected exactly one signed MSI evidence file; found $($evidenceFiles.Count)." }
           $evidence = (Get-Content -Raw -LiteralPath $evidenceFiles[0].FullName) -replace "`r`n?", "`n"
           $signedSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $msi.FullName).Hash.ToLowerInvariant()
+          foreach ($entry in $installedReceipts) { if ($entry.msi_sha256 -ne $signedSha) { throw 'Accepted MSI hash differs from promoted bytes.' } }
+
           if ($promotion -and $signedSha -ne $promotion.msi_sha256) { throw 'Promotion MSI differs from the accepted signed installer.' }
           if ($evidence -notmatch "(?m)^SHA256=$signedSha$") { throw "Signed MSI hash does not match its evidence file." }
           if ($evidence -notmatch '(?m)^SignatureState=Valid$') { throw "Evidence does not classify the MSI signature as Valid." }
