@@ -1,0 +1,72 @@
+[
+  {
+    "repo": "townlight/townlight",
+    "number": 311,
+    "url": "https://github.com/townlight/townlight/pull/311",
+    "disposition": "retained open",
+    "reason": "Preserve separate QuorumRelay integration work in flight; not merged or changed by this cleanup."
+  },
+  {
+    "repo": "townlight/core",
+    "number": 79,
+    "url": "https://github.com/townlight/core/pull/79",
+    "disposition": "retained open",
+    "reason": "Preserve the independent catalog-collation fix for its own validation; not part of documentation/maintenance delivery and absent from unchanged released MSI."
+  },
+  {
+    "repo": "townlight/ordinances",
+    "number": 79,
+    "url": "https://github.com/townlight/ordinances/pull/79",
+    "disposition": "closed without merging; source retained",
+    "reason": "Superseded dependency/release preparation for old CivicCore 1.2.1; current package uses Townlight Core 1.3.0.dev2."
+  },
+  {
+    "repo": "townlight/meetings",
+    "number": 179,
+    "url": "https://github.com/townlight/meetings/pull/179",
+    "disposition": "closed without merging; source retained",
+    "reason": "Superseded rename to CivicSunshine conflicts with current Townlight Records branding and current source pairing."
+  },
+  {
+    "repo": "townlight/sunshine",
+    "number": 103,
+    "url": "https://github.com/townlight/sunshine/pull/103",
+    "disposition": "closed without merging; source retained",
+    "reason": "Superseded SignPath proposal; current Windows releases use the documented Azure Scott Converse signing path."
+  },
+  {
+    "repo": "townlight/core",
+    "number": 63,
+    "url": "https://github.com/townlight/core/pull/63",
+    "disposition": "closed without merging; source retained",
+    "reason": "Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates."
+  },
+  {
+    "repo": "townlight/meetings",
+    "number": 170,
+    "url": "https://github.com/townlight/meetings/pull/170",
+    "disposition": "closed without merging; source retained",
+    "reason": "Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates."
+  },
+  {
+    "repo": "townlight/ordinances",
+    "number": 74,
+    "url": "https://github.com/townlight/ordinances/pull/74",
+    "disposition": "closed without merging; source retained",
+    "reason": "Unadopted legacy pipeline scaffolding; current owner bounded-completion contract does not authorize introducing these generic process gates."
+  },
+  {
+    "repo": "townlight/core",
+    "number": 59,
+    "url": "https://github.com/townlight/core/pull/59",
+    "disposition": "closed without merging; source retained",
+    "reason": "Historical proof-document clarification predating current naming and release documentation. Preserve this proposed patch in the closed PR; do not rewrite historical evidence during current cleanup."
+  },
+  {
+    "repo": "townlight/sunshine",
+    "number": 23,
+    "url": "https://github.com/townlight/sunshine/pull/23",
+    "disposition": "closed without merging; source retained",
+    "reason": "Historical Phase 1 extraction inventory draft predating the completed Core extraction and naming migration; retained as historical proposed documentation, not a current implementation obligation."
+  }
+]

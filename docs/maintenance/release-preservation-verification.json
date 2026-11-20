@@ -1,0 +1,87 @@
+{
+  "tag": "townlight-windows-v1.8.1.1",
+  "source_commit": "0afd59de52cb7ecb317188a89bcd1fec8c578a24",
+  "all_assets_unchanged": true,
+  "assets": {
+    "ACCEPTANCE-Windows-1.8.1.1.md": {
+      "id": 734466758,
+      "name": "ACCEPTANCE-Windows-1.8.1.1.md",
+      "size": 6124,
+      "digest": "sha256:ac9900b5d020e50eb2450d23725ae4dc453900974d5502d3084cc79d8ff8ba8b",
+      "created_at": "2026-11-11T06:46:49Z",
+      "updated_at": "2026-11-11T06:46:49Z"
+    },
+    "DELIVERY-Windows-1.8.1.1.json": {
+      "id": 734671345,
+      "name": "DELIVERY-Windows-1.8.1.1.json",
+      "size": 47897,
+      "digest": "sha256:fcd13431dbb05d4f01c95c7a07224f3d71f1d9004fee2fac43638472e7a99385",
+      "created_at": "2026-11-11T08:01:47Z",
+      "updated_at": "2026-11-11T08:01:47Z"
+    },
+    "HANDOFF-Windows-1.8.1.1.md": {
+      "id": 734671364,
+      "name": "HANDOFF-Windows-1.8.1.1.md",
+      "size": 3689,
+      "digest": "sha256:60d66ebd87508664e13d33fbcafda22836ebacbe3901590df9e828781cf59e1d",
+      "created_at": "2026-11-11T08:01:47Z",
+      "updated_at": "2026-11-11T08:01:47Z"
+    },
+    "Installed-Evidence-Windows-1.8.1.1.zip": {
+      "id": 734466755,
+      "name": "Installed-Evidence-Windows-1.8.1.1.zip",
+      "size": 8842,
+      "digest": "sha256:79699eae020624fe22102f15736779ae03a3bdcec3060037ad76730f2bea4d9d",
+      "created_at": "2026-11-11T06:46:49Z",
+      "updated_at": "2026-11-11T06:46:49Z"
+    },
+    "SHA256SUMS-Windows-1.8.1.1.txt": {
+      "id": 734671361,
+      "name": "SHA256SUMS-Windows-1.8.1.1.txt",
+      "size": 944,
+      "digest": "sha256:e1cfaf9779ff37ce6911f10325611bf05ec50f26fed8d2c0a163d6b469fcd54d",
+      "created_at": "2026-11-11T08:01:47Z",
+      "updated_at": "2026-11-11T08:01:47Z"
+    },
+    "Signing-Receipt-Windows-1.8.1.1.json": {
+      "id": 734466754,
+      "name": "Signing-Receipt-Windows-1.8.1.1.json",
+      "size": 1113,
+      "digest": "sha256:d8578fc4d3a90275770c2d07225b5f7fc426521ef14abad82b569923bcbcca01",
+      "created_at": "2026-11-11T06:46:49Z",
+      "updated_at": "2026-11-11T06:46:49Z"
+    },
+    "Townlight-Windows-1.8.1.1-Corresponding-Source.zip": {
+      "id": 734466770,
+      "name": "Townlight-Windows-1.8.1.1-Corresponding-Source.zip",
+      "size": 475065606,
+      "digest": "sha256:8a52c5560b9b632b45892a06f17a7fe83f49f330a55b4d64ab3a19ce29d1a633",
+      "created_at": "2026-11-11T06:46:49Z",
+      "updated_at": "2026-11-11T06:47:05Z"
+    },
+    "Townlight-Windows-Staff-Workflows-1.8.1.1.docx": {
+      "id": 734485457,
+      "name": "Townlight-Windows-Staff-Workflows-1.8.1.1.docx",
+      "size": 16647,
+      "digest": "sha256:d65a8a5df9afc0d4ca0092248a2ca1f917f97b5aa6230ce1c7aa6fb5d90cba70",
+      "created_at": "2026-11-11T06:53:46Z",
+      "updated_at": "2026-11-11T06:53:46Z"
+    },
+    "Townlight-Windows-Staff-Workflows-1.8.1.1.pdf": {
+      "id": 734485451,
+      "name": "Townlight-Windows-Staff-Workflows-1.8.1.1.pdf",
+      "size": 143176,
+      "digest": "sha256:d6bed96e9ea954577e1992bf8ee30fb0bb54b5ad149a17968bd74f817d0210a5",
+      "created_at": "2026-11-11T06:53:46Z",
+      "updated_at": "2026-11-11T06:53:46Z"
+    },
+    "Townlight-Windows-x64-1.8.1.1.msi": {
+      "id": 734466774,
+      "name": "Townlight-Windows-x64-1.8.1.1.msi",
+      "size": 2081554432,
+      "digest": "sha256:9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da",
+      "created_at": "2026-11-11T06:46:49Z",
+      "updated_at": "2026-11-11T06:48:25Z"
+    }
+  }
+}
