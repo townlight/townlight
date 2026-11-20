@@ -36,6 +36,27 @@ jobs:
         working-directory: townlight/desktop
         run: npm ci
 
+      - name: Free C drive for install-only test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or -not $env:ImageOS -or -not $env:GITHUB_REPOSITORY) { throw 'Unsafe host' }
+          $target = 'C:\Program Files\Microsoft Visual Studio\18'
+          $parent = 'C:\Program Files\Microsoft Visual Studio'
+          if ((Split-Path -Parent $target) -ne $parent) { throw 'Parent mismatch' }
+          $free = { ([IO.DriveInfo]::new('C:\')).AvailableFreeSpace }
+          $before = & $free
+          Write-Host "C: available before: $before bytes"
+          if ($before -ge 42GB) { Write-Host 'Already sufficient'; exit 0 }
+          $p = $target
+          while ($p) { $i = Get-Item -LiteralPath $p -Force; if (($i.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Reparse point: $p" }; $p = Split-Path -Parent $p }
+          $desc = @(Get-ChildItem -LiteralPath $target -Recurse -Force -ErrorAction Stop)
+          if ($desc | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 }) { throw 'Reparse descendant' }
+          Remove-Item -LiteralPath $target -Recurse -Force -ErrorAction Stop
+          $after = & $free
+          Write-Host "C: available after: $after bytes"
+          if ($after -lt 42GB) { throw "Insufficient C: available: $after bytes" }
+
       - name: Run unsigned recorder maintenance test
         shell: pwsh
         run: |
