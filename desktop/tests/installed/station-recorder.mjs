@@ -42,7 +42,7 @@ export async function stationRecorder({native, save, admin}) {
     await page.waitForFunction(()=>!document.querySelector('#find-devices').disabled);
     // Empty device inventory on a hosted runner is supported and actionable.
     await save('station-device-discovery',{message:await page.locator('#message').innerText(),devices:await request(station,'/operator/devices')});
-    sender=spawn(path.join(payload,'station/bin/ffmpeg.exe'),['-hide_banner','-loglevel','error','-re','-f','lavfi','-i','testsrc=size=640x360:rate=25','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
+    sender=spawn(path.join(payload,'station/bin/ffmpeg.exe'),['-hide_banner','-loglevel','error','-re','-f','lavfi','-i','testsrc=size=640x360:rate=25','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-c:v','libopenh264','-b:v','700k','-pix_fmt','yuv420p','-c:a','aac','-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
     let senderError='';sender.stderr.on('data',x=>{senderError+=x.toString();});
     await page.locator('#meeting-id').selectOption(meeting.id);
     await page.locator('#source').selectOption('installed-fixture');
