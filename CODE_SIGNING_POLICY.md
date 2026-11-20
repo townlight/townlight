@@ -22,6 +22,14 @@ and never stored locally.
 - The release workflow accepts only the signed artifact from a successful manual signing run whose head SHA equals the release tag; it independently repeats signature and evidence checks before upload
 - All checksums are generated after signing
 
+A test-harness correction does not invalidate unchanged signed bytes. An exact
+artifact may be promoted after the original manual main build/signature,
+real-runtime and MSI lifecycle jobs pass and corrected installed acceptance
+independently passes against that same MSI hash and source commit. Preserve the
+original failed attempt, corrected harness commit and successful fresh/upgrade
+receipts. All signature, signer, timestamp, source and installed-behavior checks
+still apply; a bookkeeping-only failure does not require another build or signing.
+
 ### Team roles
 
 - Author (commit access): <https://github.com/scottconverse>

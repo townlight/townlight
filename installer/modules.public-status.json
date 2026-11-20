@@ -1,6 +1,6 @@
 {
   "$schema_note": "Current bounded Windows beta catalog. Historical releases retain their original identities.",
-  "verified": "2026-11-09",
+  "verified": "2026-11-20",
   "grade_labels": {
     "platform": "Shared platform",
     "released": "Published beta capability",
@@ -53,8 +53,8 @@
         "grade": "platform",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -67,8 +67,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -81,8 +81,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -95,8 +95,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -109,8 +109,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -123,8 +123,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -137,8 +137,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -151,8 +151,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -165,8 +165,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -179,8 +179,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -193,8 +193,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -207,8 +207,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -221,8 +221,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     },
     {
@@ -235,8 +235,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1",
-        "note": "Available in the Windows 1.8.1.1 beta. See release acceptance and scope."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1",
+        "note": "Included in Windows 1.8.2.1. New maintenance acceptance and reused workflow evidence are distinguished in the release summary."
       }
     }
   ]

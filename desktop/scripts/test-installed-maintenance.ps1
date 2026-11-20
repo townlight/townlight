@@ -1,7 +1,8 @@
 param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
   [ValidateSet('fresh','upgrade')][string]$Mode,
-  [Parameter(Mandatory=$true)][string]$EvidenceRoot
+  [Parameter(Mandatory=$true)][string]$EvidenceRoot,
+  [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
@@ -92,7 +93,7 @@ try {
   foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
     if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }
-  [ordered]@{passed=$true;mode=$Mode;version='1.8.2.1';source_commit=$env:GITHUB_SHA;msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
+  [ordered]@{passed=$true;mode=$Mode;version='1.8.2.1';source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
   elseif (Test-Path -LiteralPath $debugPolicy) { Remove-ItemProperty -LiteralPath $debugPolicy -Name $appName -ErrorAction SilentlyContinue }

@@ -1,6 +1,14 @@
 # Windows staff workflows
 
-This guide applies to Windows x64 1.8.0.1. Existing 1.7.2.1 installations keep the same data folders and staff accounts. Townlight refreshes the local runtime on the first launch after upgrade.
+## Windows 1.8.2.1 maintenance release
+
+Windows 1.8.2.1 packages the staff authorization, explicit database configuration and component metadata corrections. Its exact signed installed checks cover setup, the 1.8.1.1 upgrade, saved staff records, procurement/Contracts handoffs, backup/restore and uninstall retention. Unchanged module and 31-source/34-format import evidence remains attributed to the earlier build that produced it; this is not a new exhaustive test of every module or live provider.
+
+Windows 1.8.2.1 has signed installed acceptance for fresh setup and an in-place upgrade from Windows 1.8.1.1. Before upgrading, back up city data and settings, close Townlight, run the signed MSI, and reopen it under the same Windows account with the existing `%LOCALAPPDATA%\CivicSuite` profile. Keep the prior installer and a restore path. Other upgrade paths are unverified. Station uses its separately configured service. The acceptance summary distinguishes new maintenance checks from reused workflow evidence.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/ACCEPTANCE-Windows-1.8.2.1.md).
+
+This guide applies to Windows x64 1.8.2.1. The tested upgrade from 1.8.1.1 keeps existing data folders, staff accounts and saved records. Townlight refreshes the local runtime on the first launch after upgrade.
 
 ## Staff access
 
@@ -43,4 +51,4 @@ remain city processes. The Windows workspaces record staff work and decisions.
 
 ## Release and support
 
-[Download Windows 1.8.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
+[Download Windows 1.8.2.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/ACCEPTANCE-Windows-1.8.2.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
