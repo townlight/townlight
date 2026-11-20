@@ -32,6 +32,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'expand-runtime-archive.ps1')
 . (Join-Path $PSScriptRoot 'planning-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'permitting-build-contract.ps1')
 . (Join-Path $PSScriptRoot 'inspections-build-contract.ps1')
@@ -84,7 +85,7 @@ function Install-PostgisPayload {
     $Hash = Test-TownlightDownloadHash -Path $zipPath -ExpectedSha256 $ExpectedSha256 -Url $Source.download_url
 
     $expandRoot = Join-Path $CacheRoot 'postgis-3.6.2'
-    Expand-Archive -Path $zipPath -DestinationPath $expandRoot -Force
+    Expand-TownlightRuntimeArchive -Archive $zipPath -Destination $expandRoot
 
     $bundleRoot = Join-Path $expandRoot 'postgis-bundle-pg17-3.6.2x64'
     $payloadPostgres = Join-Path $PayloadRoot 'postgres'
@@ -317,7 +318,7 @@ function Expand-TownlightZip {
         Remove-Item -LiteralPath $Destination -Recurse -Force
     }
     New-Item -ItemType Directory -Force -Path $Destination | Out-Null
-    Expand-Archive -LiteralPath $Archive -DestinationPath $Destination -Force
+    Expand-TownlightRuntimeArchive -Archive $Archive -Destination $Destination
 }
 
 function Expand-PostgresServerPayload {
@@ -1084,7 +1085,7 @@ function Install-InspectionVoicePayload {
     $Hash = Get-Sha256 -Path $Archive
     if ($Hash -ne $Source.download_sha256) { throw 'Inspection voice archive hash mismatch.' }
     # Add this small asset subtree without resetting the provisioned interpreter.
-    Expand-Archive -LiteralPath $Archive -DestinationPath $PythonRoot -Force
+    Expand-TownlightRuntimeArchive -Archive $Archive -Destination $PythonRoot
     foreach ($Entry in $Source.required_sha256.PSObject.Properties) {
         $File = Join-TownlightPath -Root $PythonRoot -RelativePath $Entry.Name
         if (-not (Test-Path -LiteralPath $File) -or (Get-Sha256 -Path $File) -ne $Entry.Value) {

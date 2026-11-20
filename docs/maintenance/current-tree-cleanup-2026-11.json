@@ -1,0 +1,28 @@
+{
+  "scope": "Current tree only; history and released artifacts preserved",
+  "removed": [
+    {
+      "path": "debug.log",
+      "bytes": 456,
+      "sha256": "f3a468bfc287242cb0b68a5abd77b604bc54e3ca77b855846df4e805d0edd3dd",
+      "preserved_commit": "48651092eeff778099512c556880369003682a4d",
+      "history_url": "https://github.com/townlight/townlight/blob/48651092eeff778099512c556880369003682a4d/debug.log"
+    },
+    {
+      "path": "installer/dist/CivicSuite-city-core-linux-0.1.1.tar.gz",
+      "bytes": 21596886,
+      "sha256": "09f7b0868230da205da1bdd6408501dfbda2fd8453e95df81b16a1adcde73e21",
+      "preserved_commit": "48651092eeff778099512c556880369003682a4d",
+      "history_url": "https://github.com/townlight/townlight/blob/48651092eeff778099512c556880369003682a4d/installer/dist/CivicSuite-city-core-linux-0.1.1.tar.gz"
+    },
+    {
+      "path": "docs/beta-1/brand/Townlight-Open-Hall-Brand.zip",
+      "bytes": 286421,
+      "sha256": "87ec0998c11af84e052feb1c6e4121abca78e21cca1b99e7e79d23662529bc5d",
+      "preserved_commit": "48651092eeff778099512c556880369003682a4d",
+      "history_url": "https://github.com/townlight/townlight/blob/48651092eeff778099512c556880369003682a4d/docs/beta-1/brand/Townlight-Open-Hall-Brand.zip"
+    }
+  ],
+  "pack_before_bytes": "2.05 GiB; immutable historical blobs retained",
+  "lfs": "Not used: moving current files to LFS would not shrink existing history; no current retained file warrants conversion for this bounded cleanup."
+}

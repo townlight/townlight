@@ -103,10 +103,11 @@ def _set_local_defaults() -> None:
     os.environ.setdefault("OLLAMA_BASE_URL", "http://127.0.0.1:15434")
     os.environ.setdefault("TOWNLIGHT_MEETINGS_OLLAMA_BASE_URL", "http://127.0.0.1:15434")
     os.environ.setdefault("TOWNLIGHT_CORE_LLM_PROVIDER", "ollama")
-    os.environ.setdefault(
-        "DATABASE_URL",
-        "postgresql+asyncpg://townlight:townlight@127.0.0.1:15432/townlight",
-    )
+    if not os.environ.get("DATABASE_URL", "").strip():
+        raise RuntimeError(
+            "DATABASE_URL must be configured. Start through the Townlight supervisor "
+            "or provide an explicit PostgreSQL connection URL."
+        )
     if _product_profile() in {"city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"}:
         if not os.environ["DATABASE_URL"].startswith("postgresql"):
             raise RuntimeError("DATABASE_URL must be a PostgreSQL URL")

@@ -337,6 +337,12 @@ jobs:
         working-directory: townlight/desktop
         run: npm audit --audit-level=moderate
 
+      - name: Check Windows PowerShell runtime archive compatibility
+        working-directory: townlight
+        run: |
+          python -m pip install "pytest>=8,<9"
+          python -m pytest tests/test_windows_runtime_archive.py -q
+
       - name: Run desktop static contract checks
         working-directory: townlight/desktop
         run: npm test

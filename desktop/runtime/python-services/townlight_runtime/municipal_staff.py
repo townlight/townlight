@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from townlight_boards.board_registry import register_board_stub
+from townlight_boards.board_registry import register_board_stub as build_board_registration
 from townlight_boards.persistence import board_roster_records
 from townlight_boards.staff_workflow import AttendanceInput, BoardInput, SeatInput, attendance, seat_status, seats
 from townlight_contracts.staff_workflow import SignedAgreement, agreements
@@ -98,7 +98,7 @@ async def list_boards(session: Db, actor: BoardActor):
 @router.post("/boards", status_code=201)
 async def create_board(data: BoardInput, session: Db, actor: BoardActor):
     identity = str(uuid4())
-    board = register_board_stub(board_id=identity, board_name=data.board_name, liaison=data.liaison)
+    board = build_board_registration(board_id=identity, board_name=data.board_name, liaison=data.liaison)
     now = datetime.now(UTC)
     await session.execute(board_roster_records.insert().values(
         board_id=identity, board_name=board.board_name, liaison=board.liaison,
