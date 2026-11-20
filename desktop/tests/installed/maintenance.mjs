@@ -2,7 +2,7 @@ import { chromium } from '@playwright/test';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import {stationRecorder} from './station-recorder.mjs';
+import {stationRecorder,stationLargeHandoff} from './station-recorder.mjs';
 if (process.env.GITHUB_ACTIONS !== 'true' || process.platform !== 'win32') throw Error('Disposable hosted Windows only');
 const [mode, output] = process.argv.slice(2);
 assert(['seed', 'fresh', 'upgrade', 'recorder'].includes(mode));
@@ -76,7 +76,10 @@ try {
     if(ids) await readback(ids);
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
   }
-  if(recording) assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
+  if(recording) {
+    await stationLargeHandoff(recording,save);
+    assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
+  }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
 } catch(error) {

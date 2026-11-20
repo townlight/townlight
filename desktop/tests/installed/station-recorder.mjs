@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {readFile, writeFile} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {spawn} from 'node:child_process';
+import {spawn,execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import path from 'node:path';
 import {chromium} from '@playwright/test';
 
@@ -17,7 +18,7 @@ export async function stationRecorder({native, save, admin}) {
   const payload=path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
   const proof=()=>readFile(path.join(profile,'config/local-session.json'),'utf8').then(x=>JSON.parse(x).session_hash);
   const request=async(origin,url,body)=>{
-    const response=await fetch(origin+url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Townlight-Session':await proof()},body:body===undefined?undefined:JSON.stringify(body)});
+    const response=await fetch(origin+url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Townlight-Session':await proof(),'Origin':origin,'X-Station-UI':'1'},body:body===undefined?undefined:JSON.stringify(body)});
     if(!response.ok)throw Error(url+' '+response.status+' '+await response.text());
     return response.json();
   };
@@ -35,7 +36,7 @@ export async function stationRecorder({native, save, admin}) {
     await page.locator('#meeting-id').waitFor({timeout:30000});
   };
   try {
-    headless=await chromium.launch({headless:true});
+    headless=await chromium.launch({headless:true,channel:'msedge'});
     await connect();
     await page.locator('#find-devices').click();
     await page.waitForFunction(()=>!document.querySelector('#find-devices').disabled);
@@ -87,4 +88,48 @@ export async function stationRecorder({native, save, admin}) {
     if(sender&&sender.exitCode===null){sender.kill();await new Promise(r=>sender.once('exit',r));}
     await headless?.close();
   }
+}
+
+// A separately labelled storage-boundary fixture, not claimed as a long capture.
+// Keep it after backup/restore so recovery tests do not duplicate GiB fixtures.
+export async function stationLargeHandoff(recording,save) {
+  assert.equal(process.env.GITHUB_ACTIONS,'true');
+  const payload=path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
+  const code=`
+import sys,json,uuid,hashlib,copy
+from pathlib import Path
+import sqlalchemy as sa
+from townlight_station.setup_windows import load_configuration
+from townlight_station.store import Store,recordings
+values=load_configuration(sys.argv[1]);store=Store(values['DATABASE_URL']);root=Path(values['DATA_ROOT'])
+with store.engine.begin() as conn:
+ row=dict(conn.execute(sa.select(recordings).where(recordings.c.id==sys.argv[2])).mappings().one())
+ assert row['status']=='complete'
+ identity=str(uuid.uuid4());folder=root/'recordings'/identity;folder.mkdir()
+ original=root/'recordings'/row['id']/row['details']['output_file'];target=folder/'synthetic-scale.ts'
+ # Original valid captured program plus MPEG-TS null packets beyond the old 2-GiB limit.
+ import shutil
+ shutil.copyfile(original,target)
+ packet=bytes([0x47,0x1f,0xff,0x10])+bytes([0xff])*184;chunk=packet*8192
+ with target.open('ab') as out:
+  while out.tell()<=2*1024**3:out.write(chunk)
+ with target.open('rb') as src:digest=hashlib.file_digest(src,'sha256').hexdigest()
+ details=copy.deepcopy(row['details']);details.update(output_file=target.name,size_bytes=target.stat().st_size,sha256=digest,capture_kind='synthetic-storage-boundary-fixture')
+ details['attempts'].append({'fixture':'Original short program with null padding; not long-meeting or endurance evidence'})
+ row.update(id=identity,idempotency_key=identity,request_hash=hashlib.sha256(identity.encode()).hexdigest(),details=details)
+ conn.execute(recordings.insert().values(**row))
+ print(json.dumps({'id':identity,'sha256':digest,'size_bytes':target.stat().st_size}))
+store.engine.dispose()
+`;
+  const result=await promisify(execFile)(path.join(payload,'python/python.exe'),['-I','-B','-c',code,path.join(recording.station_data,'settings.json'),recording.recording_id],{windowsHide:true,timeout:600000,maxBuffer:1048576});
+  const fixture=JSON.parse(result.stdout.trim());assert(fixture.size_bytes>2*1024**3);
+  const proof=JSON.parse(await readFile(path.join(process.env.LOCALAPPDATA,'CivicSuite/config/local-session.json'),'utf8')).session_hash;
+  const response=await fetch('http://127.0.0.1:8756/operator/handoff',{method:'POST',headers:{'Content-Type':'application/json','Origin':'http://127.0.0.1:8756','X-Station-UI':'1','X-Townlight-Session':proof},body:JSON.stringify({request_id:recording.request_id,recording_id:fixture.id,expected_sha256:fixture.sha256}),signal:AbortSignal.timeout(1800000)});
+  assert.equal(response.status,200,await response.clone().text());
+  const handoff=await response.json();
+  const document=handoff.request.documents.find(d=>d.sha256===fixture.sha256);
+  assert(document);assert.equal(document.size_bytes,fixture.size_bytes);
+  const hash=createHash('sha256');for await(const chunk of createReadStream(document.stored_path))hash.update(chunk);
+  assert.equal(hash.digest('hex'),fixture.sha256);
+  await save('station-large-handoff',{passed:true,fixture,document,fixture_kind:'Synthetic null-padded storage boundary fixture; actual >2-GiB HTTP stream and independent Records file hash verified; not an eight-hour recording'});
 }
