@@ -83,3 +83,15 @@ No Mac, Linux or signing-authentication migration is part of this release.
 
 Windows only. The 1.8.1.1 release and historical receipts remain intact. Station uses its existing separately configured Python service. No Mac, Linux, OIDC migration, new integrations or additional release requirements were introduced.
 For later changes, run affected checks first and reuse unaffected evidence. A documentation-only change does not invalidate an unchanged signed installer.
+
+## Public verification and documentation delivery
+
+The anonymous public MSI download matched SHA-256 `b14b8dff9164f216fa4785a55df38c8a47e829837c0619220807602946d58f4b`; Windows independently reported a valid Scott Converse Authenticode signature and Microsoft timestamp. GitHub Latest points to this release. The previous 1.8.1.1 release notes, identity and ten asset IDs/names/sizes/digests remain unchanged.
+
+The GitHub Pages deployment passed. All 68 checked live pages/files matched the prepared documentation, including fifteen HTML manuals and all thirty PDF/Word editions. Public PDFs match the locally checked tagged/text-verified exports. The organization profile links the current release. Installed distribution metadata and runtime lock were extracted from the verified public MSI, rather than inferred from source.
+
+Documentation delivery spans the maintained manuals, README/text/HTML and existing binary mirrors, announcement, support, Windows terms scope, API/source references, current catalog and organization profile. Repository landing-page acceptance paragraphs were corrected to distinguish the new 1.8.1.1 upgrade from older evidence. Browser/documentation check expectations were updated for the current published identities; new Meetings desktop/mobile landing captures preserve earlier evidence.
+
+Primary Suite documentation PR: https://github.com/townlight/townlight/pull/329. Public docs: https://github.com/townlight/townlight.github.io/pull/20. Organization profile: https://github.com/townlight/.github/pull/18. Repository PDF copies excluded by sparse checkout's initial staging are included in explicit binary-mirror follow-ups; their bytes match the already verified public editions.
+
+No local Sandbox, VM or application runtime was started during this maintenance release. Temporary administrative MSI extraction was removed after metadata capture (2,646,089,887 bytes); the signed public MSI, matching source archive and acceptance/signing evidence remain preserved.
