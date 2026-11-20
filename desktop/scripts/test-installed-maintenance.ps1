@@ -98,16 +98,9 @@ try {
   $uninstallLog=Join-Path $EvidenceRoot 'uninstall.log'
   $p=Start-Process msiexec.exe -ArgumentList @('/x',('"'+$MsiPath+'"'),'/qn','/norestart','/l*v',('"'+$uninstallLog+'"')) -WindowStyle Hidden -Wait -PassThru
   if ($p.ExitCode -notin @(0,3010) -or @(Product-Registration).Count -ne 0 -or (Test-Path -LiteralPath $exe)) { throw 'Uninstall did not remove program and Windows registration.' }
-  $cityProfile = Join-Path (Join-Path $profile "config") "city-profile.json"
-  if (-not (Test-Path $cityProfile)) { throw "Missing city profile: $cityProfile" }
-  $locationsFile = Join-Path (Join-Path $profile "config") "locations.json"
-  $dataRoot = Join-Path $profile "Data"
-  if (Test-Path $locationsFile) {
-    $loc = Get-Content $locationsFile -Raw | ConvertFrom-Json
-    if ($loc.data_root) { $dataRoot = $loc.data_root }
+  foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }
-  $pgVersion = Join-Path (Join-Path $dataRoot "postgres") "PG_VERSION"
-  if (-not (Test-Path $pgVersion)) { throw "Missing postgres/PG_VERSION under data root: $pgVersion" }
   [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
