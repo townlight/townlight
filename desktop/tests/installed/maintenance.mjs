@@ -29,6 +29,10 @@ const readback = async ids => {
   await save(mode+'-readback',{passed:true,ids,boards,contracts,procurement});
 };
 try {
+  // WebView CDP becoming available precedes the app's first native state load.
+  // On upgrade that load refreshes the runtime under the profile lifecycle gate.
+  // Observe its rendered result before sending another native state request.
+  await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
   let ids;
   if (mode==='upgrade') {

@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [fresh]
+        mode: [upgrade]
     steps:
       - uses: actions/checkout@v5
         with:
