@@ -1,4 +1,4 @@
-name: Verify signed Windows 1.9.1.1 without rebuilding
+name: Diagnose Station video lag on the signed Windows package
 on:
   push:
     branches: [test/signed-1911-fresh-readback]
@@ -9,54 +9,50 @@ concurrency:
   group: signed-1911-fresh-readback
   cancel-in-progress: true
 jobs:
-  fresh:
+  encoder-profiles:
     runs-on: windows-latest
-    timeout-minutes: 125
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v5
-        with:
-          path: townlight
-          ref: d22f017cf6c05aa2eba483fe92ee8af6b2c88272
-      - uses: actions/checkout@v5
-        with:
-          path: verification
-      - name: Use corrected acceptance selector
-        shell: pwsh
-        run: Copy-Item -LiteralPath verification/desktop/tests/installed/clerk-workflows.mjs -Destination townlight/desktop/tests/installed/clerk-workflows.mjs
       - uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-SIGNED
           github-token: ${{ github.token }}
-          run-id: 44870777465
+          run-id: 44881049857
           path: msi-artifact
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: townlight/desktop/package-lock.json
-      - name: Install existing desktop test tools
-        working-directory: townlight/desktop
-        run: npm ci
-      - name: Prepare hosted Windows test volume
-        shell: pwsh
-        run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
-      - name: Verify installed workflows against the original signed candidate
+      - name: Install exact signed candidate and compare encoder profiles
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $source = 'd22f017cf6c05aa2eba483fe92ee8af6b2c88272'
+          $evidence = Join-Path $env:RUNNER_TEMP station-encoder-evidence
+          New-Item -ItemType Directory -Path $evidence | Out-Null
+          $source = '1af9f3f22d361c2a466f8da323393eeafb3e70df'
           $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
           $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*signing-receipt.json' -Recurse -File)
-          if ($msis.Count -ne 1 -or $receipts.Count -ne 1) { throw 'Expected one signed candidate and its signing receipt' }
+          if ($msis.Count -ne 1 -or $receipts.Count -ne 1) { throw 'Expected one signed candidate and receipt' }
           $receipt = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
-          if ($receipt.source_commit -ne $source -or $receipt.workflow_run -ne '44870777465') { throw 'Unexpected candidate provenance' }
           $hash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($hash -ne ($receipt.files | Where-Object file -eq $msis[0].Name).signed_sha256) { throw 'The signed MSI differs from the signing receipt' }
-          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode fresh -SourceCommit $source -EvidenceRoot "$env:RUNNER_TEMP/installed-evidence"
-      - name: Preserve installed acceptance evidence
+          $signature = Get-AuthenticodeSignature -LiteralPath $msis[0].FullName
+          if ($receipt.source_commit -ne $source -or $receipt.workflow_run -ne '44881049857' -or
+              $hash -ne ($receipt.files | Where-Object file -eq $msis[0].Name).signed_sha256 -or
+              $signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'CN=Scott Converse' -or
+              -not $signature.TimeStamperCertificate) { throw 'Candidate identity or signature failure' }
+          $proc = Start-Process msiexec.exe -ArgumentList @('/i',('"' + $msis[0].FullName + '"'),'/qn','/norestart') -Wait -PassThru -WindowStyle Hidden
+          if ($proc.ExitCode -notin @(0,3010)) { throw "Installer failed: $($proc.ExitCode)" }
+          $payload = Join-Path $env:ProgramFiles 'Townlight/_up_/runtime/payload'
+          $adapters = @(Get-ChildItem -LiteralPath $payload -Filter media_job.py -File -Recurse | Where-Object { $_.Directory.Name -eq 'townlight_station' })
+          if ($adapters.Count -ne 1) { throw 'Expected exactly one installed Station adapter' }
+          Get-CimInstance Win32_Processor | Select-Object Name,NumberOfLogicalProcessors |
+            ConvertTo-Json | Set-Content (Join-Path $evidence hardware.json)
+          $station = Join-Path $payload station
+          python station-encoder-diagnostic.py $station $adapters[0].FullName $evidence
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve comparison without recording fixtures
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: signed-1911-fresh-readback
-          path: ${{ runner.temp }}/installed-evidence
+          name: station-encoder-comparison
+          path: |
+            ${{ runner.temp }}/station-encoder-evidence/**/*.json
+            ${{ runner.temp }}/station-encoder-evidence/**/*.log
           retention-days: 7
