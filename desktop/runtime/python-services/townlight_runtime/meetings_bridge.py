@@ -824,10 +824,10 @@ def clerk_catalog(payload: ClerkCatalogInput, actor_id: str = Depends(actor)):
             ), {"query": payload.query, "meeting_id": str(payload.meeting_id) if payload.meeting_id else None}).mappings()]
             agenda = [dict(r) for r in conn.execute(text(
                 "SELECT id,title,meeting_id FROM townlight_meetings.agenda_items "
-                "WHERE (meeting_id IS NULL AND strpos(lower(title),lower(:query)) > 0) "
+                "WHERE meeting_id IS NULL "
                 "OR meeting_id = CAST(:meeting_id AS uuid) "
-                "ORDER BY meeting_id NULLS LAST,title LIMIT 500"
-            ), {"query": payload.query, "meeting_id": str(payload.meeting_id) if payload.meeting_id else None}).mappings()]
+                "ORDER BY meeting_id NULLS LAST,title,id LIMIT 500"
+            ), {"meeting_id": str(payload.meeting_id) if payload.meeting_id else None}).mappings()]
         return {'meetings': meetings, 'agenda': agenda}
     finally:
         engine.dispose()
