@@ -1,4 +1,4 @@
-name: Windows 1.9.0.1 Signed Recorder Acceptance
+name: Windows 1.8.2.1 to 1.9.0.1 signed upgrade
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  recorder-diagnostics:
+  published-upgrade:
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -19,13 +19,13 @@ jobs:
           ref: 5c386c6eb95df980d0b117c9a49aacf65b23b23d
           path: townlight
 
-      - name: Download signed MSI artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: townlight-windows-local-msi-SIGNED
-          run-id: 44851746939
-          github-token: ${{ github.token }}
-          path: msi-artifact
+      - name: Download the exact published Windows 1.9.0.1 MSI
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download townlight-windows-v1.9.0.1 -R townlight/townlight --pattern Townlight-Windows-x64-1.9.0.1.msi --dir msi-artifact
+          if ($LASTEXITCODE) { throw 'Published target MSI download failed' }
 
       - name: Setup Node 22
         uses: actions/setup-node@v6
@@ -77,19 +77,17 @@ jobs:
           Write-Host "C: available after: $after bytes"
           if ($after -lt 42GB) { throw "Insufficient C: available: $after bytes" }
 
-      - name: Verify exact signed installer and run installed recorder acceptance
+      - name: Verify the signed published MSI and test the direct upgrade
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          $ErrorActionPreference = "Stop"
-          $d='msi-artifact'
-          $msi=@(Get-ChildItem $d -Recurse -File -Filter *.msi); $ev=@(Get-ChildItem $d -Recurse -File -Filter *evidence*.txt); if($msi.Count -ne 1 -or $ev.Count -ne 1){throw 'Expected exactly one MSI and one evidence file'}
-          $m=$msi[0]; $e=$ev[0]; $t=Get-Content -Raw $e.FullName
-          $h=(Get-FileHash $m.FullName -Algorithm SHA256).Hash; if($t -notmatch ('(?im)^\s*SHA256\s*[:=]\s*' + [regex]::Escape($h) + '\s*$')){throw 'SHA256 mismatch'}
-          if($t -notmatch '(?im)^\s*SourceCommit\s*[:=]\s*5c386c6eb95df980d0b117c9a49aacf65b23b23d\s*$'){throw 'SourceCommit mismatch'}
-          if($t -notmatch '(?im)^\s*SignatureState\s*[:=]\s*Valid\s*$'){throw 'SignatureState invalid'}
-          if($t -notmatch '(?im)^\s*InnerExecutableSignatureState\s*[:=]\s*Valid\s*$'){throw 'InnerExecutableSignatureState invalid'}
-          Write-Output "OK: $($m.FullName) $($e.FullName)"
-          & 'townlight/desktop/scripts/test-installed-maintenance.ps1' -SourceCommit '5c386c6eb95df980d0b117c9a49aacf65b23b23d' -Mode recorder -MsiPath $m.FullName -EvidenceRoot (Join-Path $env:RUNNER_TEMP 'recorder-evidence')
+          $ErrorActionPreference='Stop'
+          $msi=(Resolve-Path 'msi-artifact/Townlight-Windows-x64-1.9.0.1.msi').Path
+          $hash='fde5cfd9d167571792e2384f7a5066b1dbea3fdc8b2085cf43f670440210ff0c'
+          if ((Get-FileHash -LiteralPath $msi).Hash.ToLowerInvariant() -ne $hash) { throw 'Published target all-bytes hash mismatch' }
+          & ./upgrade-baseline/prepare-harness.ps1 -Checkout (Resolve-Path townlight).Path
+          & ./townlight/desktop/scripts/test-installed-maintenance.ps1 -Mode upgrade -SourceCommit '5c386c6eb95df980d0b117c9a49aacf65b23b23d' -MsiPath $msi -EvidenceRoot (Join-Path $env:RUNNER_TEMP 'recorder-evidence')
 
       - name: Collect redacted logs and scheduled task state
         if: always()
@@ -139,6 +137,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: recorder-evidence
+          name: upgrade-evidence
           path: ${{ runner.temp }}/recorder-evidence
           if-no-files-found: warn
