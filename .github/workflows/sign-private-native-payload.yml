@@ -99,7 +99,7 @@ jobs:
           [ordered]@{workflow_run=$env:RUN_ID;intake_sha256=$env:INTAKE_SHA256;publication_allowed=$false;files=$receipts}|ConvertTo-Json -Depth 8|Set-Content sign-input/signing-receipt.json -Encoding utf8
           Compress-Archive sign-input/* signed-native-payload.zip -CompressionLevel Fastest
       - name: Return private signing artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: signed-native-payload
           path: signed-native-payload.zip
