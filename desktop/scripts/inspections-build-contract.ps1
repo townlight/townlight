@@ -21,7 +21,7 @@ function Get-InspectionsBuildContract {
         $Contract.zoning_package_version -ne '0.2.3' -or $Contract.access_package_version -ne '0.5.0' -or
         $Contract.notice_package_version -ne '0.3.0' -or $Contract.runtime_package_version -ne '0.3.3' -or
         $Contract.boards_package_version -ne '0.2.1' -or $Contract.contracts_package_version -ne '0.2.1' -or
-        $Contract.procurement_package_version -ne '0.3.1' -or $Contract.station_package_version -ne '0.4.1' -or $Contract.fresh_profile_only -ne $false -or
+        $Contract.procurement_package_version -ne '0.3.1' -or $Contract.station_package_version -ne '0.4.2' -or $Contract.fresh_profile_only -ne $false -or
         $Contract.legacy_upgrade_supported -ne $false) { throw 'Inspections release identity mismatch.' }
     $Repositories = @('townlight/core', 'townlight/sunshine', 'townlight/meetings', 'townlight/ordinances', 'townlight/zone', 'townlight/plan', 'townlight/notice', 'townlight/access', 'townlight/permit', 'townlight/inspect', 'townlight/station', 'townlight/boards', 'townlight/contracts', 'townlight/procure')
     if (@(Compare-Object $Repositories @($Pins.sources.PSObject.Properties.Name)).Count) { throw 'Coordinated candidate requires exactly fourteen component source pins.' }

@@ -1,11 +1,12 @@
 // Exact installed candidate. Synthetic network chamber feed; no camera is assumed on CI.
 import assert from 'node:assert/strict';
-import {readFile, writeFile} from 'node:fs/promises';
+import {mkdtemp, readFile, rmdir, unlink, writeFile} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {spawn,execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import path from 'node:path';
+import {tmpdir} from 'node:os';
 import {chromium} from '@playwright/test';
 
 export async function stationRecorder({native, save, admin, longCapture = false}) {
@@ -28,7 +29,10 @@ export async function stationRecorder({native, save, admin, longCapture = false}
   await writeFile(path.join(data,'live-sources.json'),JSON.stringify([{id:'installed-fixture',label:'Synthetic installed chamber',kind:'udp-mpegts',address:'127.0.0.1',port:18760}]));
   const meeting=await request(suite,'/desktop/v1/meetings/meetings',{title:'Synthetic installed recorder acceptance',scheduled_start:'2026-11-20T18:00:00-07:00',location:'Synthetic chamber',meeting_type:'regular'});
   const req=await request(suite,'/desktop/v1/requests',{requester:'Synthetic acceptance',summary:'Private recording handoff',deadline:'2026-12-20',deadlineBasis:'Staff reviewed fixture'});
-  let sender,headless,context,page,rid;
+  const ffmpeg=path.join(payload,'station/bin/ffmpeg.exe');
+  const senderOptions={windowsHide:true,stdio:['ignore','ignore','pipe']};
+  let sender,headless,context,page,rid,fixtureDirectory,fixture,latest;
+  let senderError='';
   const connect=async()=>{
     const address=await native('station_action',{action:'open',selectedDirectory:null,meetingId:meeting.id});
     context=await headless.newContext(); page=await context.newPage();
@@ -43,22 +47,33 @@ export async function stationRecorder({native, save, admin, longCapture = false}
     await page.waitForFunction(()=>!document.querySelector('#find-devices').disabled);
     // Empty device inventory on a hosted runner is supported and actionable.
     await save('station-device-discovery',{message:await page.locator('#message').innerText(),devices:await request(station,'/operator/devices')});
-    const testVideo=longCapture ? 'testsrc2=size=960x540:rate=30,noise=alls=28:allf=t+u' : 'testsrc=size=640x360:rate=25';
-    const ffmpeg=path.join(payload,'station/bin/ffmpeg.exe');
-    sender=spawn(ffmpeg,['-hide_banner','-loglevel','error','-re','-f','lavfi','-i',testVideo,'-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-c:v','libopenh264','-g','30','-b:v',longCapture?'6500k':'700k','-pix_fmt','yuv420p','-c:a','aac','-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
-    let senderError='';sender.stderr.on('data',x=>{senderError+=x.toString();});
+    const testVideo=longCapture ? 'testsrc2=size=960x540:rate=30,noise=alls=20:allf=t+u' : 'testsrc=size=640x360:rate=25';
+    const generate=['-f','lavfi','-i',testVideo,'-f','lavfi','-i','sine=frequency=440:sample_rate=48000'];
+    const encode=['-c:v','libopenh264','-g','30','-b:v',longCapture?'6500k':'700k','-pix_fmt','yuv420p','-c:a','aac'];
+    let input=['-re',...generate,...encode];
+    if(longCapture){
+      // Avoid competing for CPU with the installed recorder during sustained capture.
+      fixtureDirectory=await mkdtemp(path.join(tmpdir(),'townlight-station-feed-'));
+      fixture=path.join(fixtureDirectory,'chamber.ts');
+      await promisify(execFile)(ffmpeg,['-hide_banner','-loglevel','error',...generate,'-t','18',...encode,'-f','mpegts',fixture],{windowsHide:true,timeout:180000});
+      input=['-re','-stream_loop','-1','-i',fixture,'-c','copy'];
+    }
+    sender=spawn(ffmpeg,['-hide_banner','-loglevel','error',...input,'-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],senderOptions);
+    sender.stderr.on('data',x=>{senderError=(senderError+x.toString()).slice(-12000);});
+    sender.on('error',error=>{senderError=String(error);});
     await page.locator('#source').selectOption('installed-fixture');
     await page.locator('#start').click();
     const deadline=Date.now()+120000;
     while(Date.now()<deadline){
       const rows=await request(station,'/v1/recordings');
       const row=rows.find(r=>r.meeting_id===meeting.id);
+      if(row){rid=row.id;latest=row;}
       if(row?.status==='failed')throw Error(JSON.stringify(row));
-      if(row?.status==='running'&&row.live_progress?.bytes_written>0){rid=row.id;break;}
+      if(row?.status==='running'&&row.live_progress?.bytes_written>0)break;
       if(sender.exitCode!==null)throw Error('Synthetic sender exited '+senderError);
       await new Promise(r=>setTimeout(r,1000));
     }
-    assert(rid,'Installed worker did not emit recording bytes');
+    assert(latest?.status==='running'&&latest.live_progress?.bytes_written>0,'Installed worker did not emit recording bytes');
     const renewal=await page.evaluate(async()=>{const r=await fetch('/operator/renew',{method:'POST',headers:{'Content-Type':'application/json','X-Station-UI':'1'},body:'{}'});return {status:r.status,body:await r.json()};});
     assert.equal(renewal.status,200);assert.equal(renewal.body.expires_in,900);
     await context.close(); // Recorder must outlive its browser, not restart it.
@@ -71,6 +86,7 @@ export async function stationRecorder({native, save, admin, longCapture = false}
       let measured=0;
       while(Date.now()<captureDeadline) {
         const current=await request(station,'/v1/recordings/'+rid);
+        latest=current;
         assert.equal(current.status,'running','Live capture stopped before crossing 2 GiB');
         measured=current.live_progress?.bytes_written||0;
         if(measured>boundary)break;
@@ -91,8 +107,16 @@ export async function stationRecorder({native, save, admin, longCapture = false}
     assert.equal(record.status,'complete',JSON.stringify(record));
     assert.equal(record.details.attempts.at(-1).end_reason,'operator-stop');
     if (longCapture) assert(record.details.size_bytes>2*1024**3);
-    const handoff=await request(station,'/operator/handoff',{request_id:req.id,recording_id:rid,expected_sha256:record.details.sha256});
+    await article.getByRole('combobox',{name:'Records request',exact:true}).selectOption({label:req.summary||'Private recording handoff'});
+    const [handoffResponse]=await Promise.all([
+      page.waitForResponse(response=>response.url()===station+'/operator/handoff'&&response.request().method()==='POST',{timeout:15*60*1000}),
+      article.getByRole('button',{name:'Attach privately to Records',exact:true}).click(),
+    ]);
+    assert.equal(handoffResponse.status(),200,await handoffResponse.text());
+    const handoff=await handoffResponse.json();
+    assert.equal(handoffResponse.request().postDataJSON().request_id,req.id);
     assert.equal(handoff.request.documents.length,1);
+    await page.getByText('Attached privately to Private recording handoff.',{exact:false}).waitFor();
     const managed=handoff.request.documents[0];
     // The receipt plus independent file read proves durable copy, not just metadata.
     const source=path.join(data,'recordings',rid,record.details.output_file);
@@ -111,9 +135,26 @@ export async function stationRecorder({native, save, admin, longCapture = false}
     assert([401,403].includes(revoked),'Signed-out authority renewed');
     await admin();
     return {recording_id:rid,request_id:req.id,sha256:record.details.sha256,document:managed,station_data:data};
+  } catch(error) {
+    try {
+      if(rid) latest=await request(station,'/v1/recordings/'+rid).catch(()=>latest);
+      const attempt=latest?.details?.attempts?.at(-1)?.id;
+      let workerLog;
+      if(/^[a-f0-9-]{36}$/i.test(rid)&&/^[a-f0-9-]{36}$/i.test(attempt)){
+        workerLog=await readFile(path.join(data,'recordings',rid,attempt+'.log'),'utf8').then(log=>log.slice(-12000),()=>undefined);
+      }
+      await save('station-recording-failure',{error:String(error),latest,workerLog,senderError,senderExitCode:sender?.exitCode});
+    } catch(diagnosticError) {
+      console.error('Station failure evidence could not be saved:',diagnosticError);
+    }
+    throw error;
   } finally {
-    if(sender&&sender.exitCode===null){sender.kill();await new Promise(r=>sender.once('exit',r));}
+    if(sender?.pid&&sender.exitCode===null&&sender.signalCode===null){
+      await new Promise(resolve=>{sender.once('exit',resolve);if(!sender.kill())resolve();});
+    }
     await headless?.close();
+    if(fixture) await unlink(fixture).catch(error=>{if(error.code!=='ENOENT')console.error(error);});
+    if(fixtureDirectory) await rmdir(fixtureDirectory).catch(console.error);
   }
 }
 
