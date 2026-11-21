@@ -1,0 +1,63 @@
+{
+  "source": "scottconverse/civiccast",
+  "tag": "v1.0.0-rc.7",
+  "asset": "native-app-payload.ccpack",
+  "download_url": "https://github.com/scottconverse/civiccast/releases/download/v1.0.0-rc.7/native-app-payload.ccpack",
+  "sha256": "6e228097723a47efb8ac07cbec602416f1ab4102bd24e5eafa82bceafe3ebbf9",
+  "use": "Pinned native Python dependencies and GStreamer closure only. Station retains its own media-lock CivicCast implementation; no CivicCast application/service/configuration is started.",
+  "windows_audio_plugin": {
+    "url": "https://files.pythonhosted.org/packages/a3/5d/19b265c00cab34e78fc2c0ef0b8d719644d56df86a77257100da4f1d9ac4/gstreamer_plugins-1.28.5-cp39-abi3-win_amd64.whl",
+    "project": "gstreamer-plugins",
+    "version": "1.28.5",
+    "filename": "gstreamer_plugins-1.28.5-cp39-abi3-win_amd64.whl",
+    "sha256": "37be04432945a5ff3db0d0a17eacf7dcac9ba343a55b854779f5e8dd07e3bb02",
+    "member": "gstreamer_plugins-1.28.5.data/purelib/gstreamer_plugins/lib/gstreamer-1.0/gstwasapi2.dll",
+    "member_sha256": "37e8e3db6b039db03aa043a739c3c91ee3fb89e810f1fe4e191bd5fc0d710df8"
+  },
+  "ffmpeg": {
+    "url": "https://github.com/scottconverse/civiccast/releases/download/v1.0.0-rc.7/native-ffmpeg-runtime.ccpack",
+    "filename": "native-ffmpeg-runtime.ccpack",
+    "sha256": "0a00f8688bc53c2398edbd8538b1cd3150e958e2b963256a4c693eb82f81a421"
+  },
+  "python_packages": [
+    "_distutils_hack",
+    "alembic",
+    "annotated_doc",
+    "annotated_types",
+    "anyio",
+    "fastapi",
+    "greenlet",
+    "jaraco",
+    "keyring",
+    "mako",
+    "markupsafe",
+    "more_itertools",
+    "psutil",
+    "pydantic",
+    "pydantic_core",
+    "pygments",
+    "python_multipart",
+    "sqlalchemy",
+    "starlette",
+    "typing_extensions.py",
+    "typing_inspection",
+    "win32",
+    "win32com",
+    "pywin32_system32",
+    "pythonwin",
+    "_win32sysloader.py",
+    "pywin32_bootstrap.py",
+    "six.py",
+    "importlib_metadata",
+    "zipp",
+    "platformdirs",
+    "packaging",
+    "backports",
+    "gi"
+  ],
+  "control_python_dependency": {
+    "filename": "pywin32-311-cp313-cp313-win_amd64.whl",
+    "url": "https://files.pythonhosted.org/packages/e3/28/e0a1909523c6890208295a29e05c2adb2126364e289826c0a8bc7297bd5c/pywin32-311-cp313-cp313-win_amd64.whl",
+    "sha256": "718a38f7e5b058e76aee1c56ddd06908116d35147e133427e59a3983f703a20d"
+  }
+}

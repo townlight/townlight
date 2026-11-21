@@ -956,6 +956,20 @@ function Install-PythonServicePackages {
     ) + $ServicePackages
     if ($ReuseInstalledServiceDependencies) { $ServicePackageInstallArguments += "--no-index" }
     Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments $ServicePackageInstallArguments
+    if ($ProductProfile -eq 'inspections-preview') {
+        # Service wheels are intentionally installed with --no-deps. Station's
+        # Windows ACL, DPAPI and private-pipe support must therefore be explicit.
+        $StationContract = Read-JsonFile -Path (Join-Path $RepoRoot 'config/station-media-input.json')
+        $Dependency = $StationContract.control_python_dependency
+        $DependencyPath = Join-Path $CacheRoot $Dependency.filename
+        Invoke-TownlightDownload -Url $Dependency.url -Destination $DependencyPath -ExpectedSha256 $Dependency.sha256 | Out-Null
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
+            '-m', 'pip', 'install', '--no-index', '--no-deps', '--no-warn-script-location', $DependencyPath
+        )
+        Invoke-PythonPayloadCommand -PythonRoot $PythonRoot -Arguments @(
+            '-I', '-B', '-c', 'import win32api, win32security, win32crypt, win32pipe, pywintypes; from pathlib import Path; import sys; root=Path(sys.executable).parent.resolve(); assert all(Path(m.__file__).resolve().is_relative_to(root) for m in (win32api, win32security, win32crypt, win32pipe, pywintypes))'
+        )
+    }
     Copy-TownlightRecordsMigrations -PythonRoot $PythonRoot -RepoRoot $RepoRoot
     Test-PythonServiceImports -PythonRoot $PythonRoot -ProductProfile $ProductProfile
     if ($ProductProfile -in @('permitting-preview', 'inspections-preview')) {
@@ -1162,6 +1176,17 @@ $Report.python_vcruntime = Copy-PythonVcRuntime -PythonRoot (Join-Path $PayloadR
 if ($ProductProfile -eq 'inspections-preview') {
     $Report.inspection_voice = Install-InspectionVoicePayload -Source $Manifest.sources.inspection_voice -CacheRoot $CacheRoot -PythonRoot (Join-Path $PayloadRoot 'python')
 }
+if ($ProductProfile -eq 'inspections-preview') {
+    $StationMediaArchive = Join-Path $CacheRoot 'station-native-media.ccpack'
+    $StationContract = Read-JsonFile -Path (Join-Path $RepoRoot 'config/station-media-input.json')
+    $StationAudio = $StationContract.windows_audio_plugin
+    if ($SkipDownloads -and (-not (Test-Path -LiteralPath $StationMediaArchive) -or -not (Test-Path -LiteralPath (Join-Path $CacheRoot $StationAudio.filename)) -or -not (Test-Path -LiteralPath (Join-Path $CacheRoot $StationContract.ffmpeg.filename)))) {
+        throw 'Pinned Station native media inputs are not cached.'
+    }
+    & (Join-Path $PayloadRoot 'python/python.exe') -B (Join-Path $PSScriptRoot 'stage-station-media.py') --payload $PayloadRoot --station $StationRoot --archive $StationMediaArchive
+    if ($LASTEXITCODE -ne 0) { throw 'Station native media staging failed.' }
+    $Report.station_media = Read-JsonFile -Path (Join-Path $PayloadRoot 'station/media-input-receipt.json')
+}
 # Python imports generate __pycache__ paths that can exceed the WiX linker limit.
 # They are regenerable bytecode and must not be shipped; remove only those directories before hashing.
 $PythonRoot = Join-Path $PayloadRoot "python"
@@ -1177,6 +1202,15 @@ Get-ChildItem -LiteralPath $PythonRoot -Directory -Recurse -Filter __pycache__ |
         Remove-Item -LiteralPath $CachePath -Recurse -Force
     }
 $PayloadLock = New-RuntimePayloadLock -PayloadManifest $PayloadManifest -PayloadRoot $PayloadRoot -ProductProfile $ProductProfile
+if ($ProductProfile -eq 'inspections-preview') {
+    $StationFiles = @()
+    foreach ($Entry in $Report.station_media.files.PSObject.Properties) {
+        $File = Join-TownlightPath -Root (Join-Path $PayloadRoot 'station') -RelativePath $Entry.Name
+        if ((Get-Sha256 -Path $File) -ne $Entry.Value) { throw "Staged Station media changed: $($Entry.Name)" }
+        $StationFiles += [ordered]@{ path=$Entry.Name; size_bytes=(Get-Item -LiteralPath $File).Length; sha256=$Entry.Value }
+    }
+    $PayloadLock.payloads += [ordered]@{id='station-media';label='Townlight Station recorder media';source_dir='station';status='present';required_files=$StationFiles}
+}
 $Report.payloads = $PayloadLock.payloads
 
 Write-JsonFile -Path (Join-Path $PayloadRoot "runtime-payload-lock.json") -Value $Report

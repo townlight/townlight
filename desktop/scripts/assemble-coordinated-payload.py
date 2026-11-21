@@ -126,7 +126,8 @@ def make_lock(output, payload_manifest):
                        'status': 'present', 'required_files': entries})
     # The paired Station service/media must be present in the actual payload.
     entries = []
-    for name in ('bin/ffmpeg.exe', 'bin/ffprobe.exe', 'bin/FFMPEG-LICENSE.txt'):
+    media_receipt = read_json(output/'station/media-input-receipt.json')
+    for name in sorted(media_receipt['files']):
         path = child(output, 'station/' + name)
         entries.append({'path': name, 'size_bytes': path.stat().st_size, 'sha256': digest(path)})
     result.append({'id': 'station-media', 'label': 'Townlight Station media tools', 'source_dir': 'station',
@@ -151,6 +152,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for key in ('state', 'wheels', 'accepted-msi', 'base-root', 'base-inventory', 'base-exclusions', 'receipt'):
         parser.add_argument('--' + key, type=Path, required=True)
+    parser.add_argument('--station-source', type=Path, required=True, help='Pinned Station beta-1 source matching the wheel lock')
     args = parser.parse_args()
     manifest = read_json(args.state)
     commit = manifest['desktop_release']['commit']
@@ -215,6 +217,17 @@ def main():
         child(output, station_launcher).write_bytes(station_bytes)
         subprocess.run([str(child(output, station_launcher)), '--help'], cwd=cwd,
                        env=env, check=True, stdout=subprocess.DEVNULL)
+        import urllib.request
+        native_contract = read_json(ROOT/'config/station-media-input.json')
+        dependency = native_contract['control_python_dependency']
+        dependency_cache = ROOT/'.runtime-cache/windows-local-1.0'
+        dependency_cache.mkdir(parents=True, exist_ok=True)
+        dependency_path = dependency_cache/dependency['filename']
+        if not dependency_path.exists():
+            urllib.request.urlretrieve(dependency['url'], dependency_path)
+        if digest(dependency_path) != dependency['sha256']:
+            raise ValueError('Recorder control Python dependency hash differs')
+        print(invoke('-m', 'pip', 'install', '--no-index', '--no-deps', '--no-compile', str(dependency_path.resolve())), flush=True)
         print(invoke('-m', 'pip', 'check'), flush=True)
         probe = ('import importlib, importlib.metadata as metadata, json, pathlib\n'
                  'expected = json.loads(__import__("sys").argv[1])\n'
@@ -241,6 +254,24 @@ def main():
     for name, expected in reused_native.items():
         if digest(child(output, name)) != expected:
             raise ValueError(f'Wheel installation altered reused signed native bytes: {name}')
+    from importlib.machinery import SourceFileLoader
+    media = SourceFileLoader('station_media_stage', str(ROOT/'desktop/scripts/stage-station-media.py')).load_module()
+    media_contract = read_json(ROOT/'config/station-media-input.json')
+    media_cache = ROOT/'.runtime-cache/windows-local-1.0'
+    media_cache.mkdir(parents=True, exist_ok=True)
+    import urllib.request
+    archive = media_cache/'station-native-media.ccpack'
+    audio = media_contract['windows_audio_plugin']
+    wheel = media_cache/audio['filename']
+    ffmpeg_archive = media_cache/media_contract['ffmpeg']['filename']
+    for target, url in ((archive, media_contract['download_url']), (wheel, audio['url']), (ffmpeg_archive, media_contract['ffmpeg']['url'])):
+        if not target.exists():
+            urllib.request.urlretrieve(url, target)
+    # The Station wheel carries only the lock; reuse exactly the source tree bound by that lock.
+    station_source = args.station_source.resolve()
+    media.stage(output, station_source, archive, media_contract, wheel, ffmpeg_archive)
+    # FFmpeg is replaced by the newly pinned shared runtime, never claimed as reused.
+    reused_native = {name: sha for name, sha in reused_native.items() if not name.startswith("station/bin/")}
     added_native = sorted(path.relative_to(output).as_posix() for path in output.rglob('*')
                           if path.is_file() and path.suffix.lower() in NATIVE
                           and path.relative_to(output).as_posix() not in reused_native)
@@ -257,10 +288,10 @@ def main():
     write_json(output / 'runtime-payload-lock.json', lock)
     write_json(args.receipt, {**provenance, 'accepted_msi_sha256': contract['accepted_msi_sha256'],
                              'copied_files': copied, 'reused_signed_native_files': reused_native,
-                             'new_native_files_requiring_signing': added_native,
+                             'new_native_files_from_pinned_inputs': added_native,
                              'status': 'prepared payload; signing and installed acceptance pending'})
     print(f'Prepared {len(installed)} installed wheels and {len(reused_native)} reused signed native files; '
-          f'{len(added_native)} new native files require signing.', flush=True)
+          f'{len(added_native)} native files come from the new hash-pinned inputs. Desktop EXE/MSI signing remains required.', flush=True)
 
 
 if __name__ == '__main__':

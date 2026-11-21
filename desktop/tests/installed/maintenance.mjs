@@ -2,9 +2,10 @@ import { chromium } from '@playwright/test';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import {stationRecorder,stationLargeHandoff} from './station-recorder.mjs';
 if (process.env.GITHUB_ACTIONS !== 'true' || process.platform !== 'win32') throw Error('Disposable hosted Windows only');
 const [mode, output] = process.argv.slice(2);
-assert(['seed', 'fresh', 'upgrade'].includes(mode));
+assert(['seed', 'fresh', 'upgrade', 'recorder'].includes(mode));
 await mkdir(output, {recursive:true});
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:60000});
 const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
@@ -47,13 +48,33 @@ try {
     const setup=await run('setup.js');
     assert(setup.final.first_run.finished, 'Installed first-run incomplete');
     await save(mode+'-setup',setup);
-    ids=await run('municipal-workflows.js');
-    assert(ids.passed,'Installed municipal workflows failed');
-    await save(mode+'-workflows',ids);
-    await admin();
-    await readback(ids);
+    if(mode!=='recorder') {
+      ids=await run('municipal-workflows.js');
+      assert(ids.passed,'Installed municipal workflows failed');
+      await save(mode+'-workflows',ids);
+      await admin();
+      await readback(ids);
+    }
   }
-  if (mode==='fresh') {
+  if (mode === "recorder") {
+    await page.evaluate(async () => {
+      const a = window.audit;
+      if ((await a.native("get_app_state")).domain_authority !== "python-records") {
+        await a.click('[data-surface="IT/Admin"]', { confirm: false });
+        await a.nav("health");
+        await a.click('[data-supervisor-action="activate-records"]', { timeout: 600000 });
+        await a.until(async () => (await a.native("get_app_state")).domain_authority === "python-records", 600000);
+      }
+    });
+    const domainAuthority = (await native("get_app_state")).domain_authority;
+    await save("domain_authority", domainAuthority);
+    if (domainAuthority !== "python-records") {
+      throw new Error(`expected domain_authority python-records, got ${domainAuthority}`);
+    }
+  }
+  let recording;
+  if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin});
+  if (mode==='fresh'||mode==='recorder') {
     accepted(await native('supervisor_action',{action:'backup',serviceId:null}));
     const restore=await native('supervisor_action',{action:'restore',serviceId:null});
     // Restore intentionally leaves services stopped. It is not accepted as
@@ -62,8 +83,18 @@ try {
     if (!restore.accepted) assert.equal(restore.status,'Restore needs service start',JSON.stringify(restore));
     accepted(await native('supervisor_action',{action:'start',serviceId:null}));
     await admin();
-    await readback(ids);
+    if(recording) {
+      const proof=JSON.parse(await readFile(path.join(process.env.LOCALAPPDATA,'CivicSuite/config/local-session.json'),'utf8')).session_hash;
+      const response=await fetch('http://127.0.0.1:8756/v1/recordings/'+recording.recording_id,{headers:{'X-Townlight-Session':proof}});
+      assert.equal(response.status,200);assert.equal((await response.json()).details.sha256,recording.sha256);
+      await save('station-after-restore',{passed:true,recording});
+    }
+    if(ids) await readback(ids);
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
+  }
+  if(recording) {
+    await stationLargeHandoff(recording,save);
+    assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});

@@ -1176,7 +1176,7 @@ function visibleNavigationItems() {
 }
 
 function moduleStatusLabel(module) {
-  if (module.id === "townlight-station") return "Bundled separate service";
+  if (module.id === "townlight-station") return "Bundled meeting recorder";
   if (module.required) return "Required";
   if (module.installed && module.enabled === false) return "Disabled";
   if (module.installed) return "Enabled";
@@ -1439,11 +1439,11 @@ function renderModuleSelectionControls() {
           const checked = customMode ? selectedIds.has(module.id) : profileModuleIds.includes(module.id);
           const disabled = !customMode || !ready;
           const separateStation = module.id === "townlight-station";
-          const status = separateStation ? "Bundled separate service" : ready ? "Available in this Windows installation" : "Unavailable for this selection";
+          const status = separateStation ? "Bundled meeting recorder" : ready ? "Available in this Windows installation" : "Unavailable for this selection";
           // Clerk-facing plain reason; the raw technical contract string (e.g.
           // "must target Townlight Core 1.2.0") is kept only as a hover tooltip for support.
           const plainReason = separateStation
-            ? " - configure Station separately; desktop module selection does not provision it"
+            ? " - recorder setup runs with Meetings and Records at the end of first-run setup"
             : !ready ? " - choose a matching profile or resolve the module requirements" : "";
           const rawTitle = !ready && module.blocked_reason ? ` title="${escapeHtml(module.blocked_reason)}"` : "";
           return `
@@ -1465,7 +1465,7 @@ function renderModuleSelectionControls() {
       <p class="empty-note">
         ${customMode
           ? `Custom selection will install Townlight Core plus ${readySelectedCount} selected product module${readySelectedCount === 1 ? "" : "s"}.`
-          : "The selected profile installs its listed products with Townlight Core. Station is configured separately."}
+          : "The selected profile installs its listed products with Townlight Core. Station setup runs at the end when Meetings and Records are enabled."}
       </p>
     </div>
   `;
@@ -3219,6 +3219,7 @@ function renderMeetingsWorkflow() {
       <p class="eyebrow">${state.activeSurface}</p>
       <h2>Meetings & Notices</h2>
       <p>Create meetings, agenda items, notices, minutes, votes, and action records in the local city profile.</p>
+      <button type="button" data-station-action="open">Open / reconnect to meeting recorder</button>
     </section>
     ${renderGuidedWorkReview()}
     <section class="workflow-editor">
@@ -4580,7 +4581,7 @@ function renderModuleRow(module, { actions = false } = {}) {
         <span class="${moduleStatusClass(module)}">${moduleStatusLabel(module)}</span>
         <small>${escapeHtml(module.version || "No release yet")}${proofCount ? ` - ${proofCount} proof checks` : ""}</small>
         ${backupHooks.length ? `<small><strong>${separateStation ? "Separate Station backup:" : "Backup includes:"}</strong> ${backupHooks.map((hook) => escapeHtml(backupHookLabel(hook))).join(", ")}</small>` : ""}
-        ${separateStation ? `<p>Station is a bundled separate local service. See <a href="https://townlight.github.io/manuals/station.html" target="_blank" rel="noopener noreferrer">Station manual: Configuration and administration</a>. Configure its dedicated database and media directory, pair it with the suite process using named staff authority, and set TOWNLIGHT_STATION_URL. Back up Station database and media separately; the desktop profile backup does not include them.</p>` : ""}
+        ${separateStation ? `<p>Set up meeting recording here using the installed runtime. Station keeps a dedicated private database and recording directory and runs in your Windows sign-in session. Keep Windows signed in during recording. Use your existing staff account to open or reconnect to the recorder.</p><div class="module-actions"><button type="button" data-station-action="setup">Set up meeting recording</button><button type="button" data-station-action="open">Open / reconnect to Station</button><button type="button" data-station-action="status">Check recorder readiness</button><button type="button" data-station-action="backup">Back up Station</button><button type="button" data-station-action="restore">Restore Station backup</button></div>` : ""}
         ${disabled ? `<small>Data remains installed. Re-enable this module to show its work area.</small>` : ""}
         ${lifecycle.map((item) => `<small><strong>${item.label}:</strong> ${escapeHtml(item.value)}</small>`).join("")}
         ${actionButtons.length ? `
@@ -5449,6 +5450,28 @@ function bindEvents() {
   document.querySelectorAll("[data-supervisor-action]").forEach((button) => {
     button.addEventListener("click", async () => {
       await handleSupervisorAction(button.dataset.supervisorAction, button.dataset.serviceId);
+    });
+  });
+  document.querySelectorAll("[data-station-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const action = button.dataset.stationAction;
+      button.disabled = true;
+      try {
+        let selectedDirectory = null;
+        if (action === "restore") {
+          selectedDirectory = await invoke("choose_folder_path");
+          if (!selectedDirectory) { button.disabled = false; return; }
+          if (!window.confirm("Restore this Station backup? A recovery backup of current Station data will be retained first. Finish all recording jobs before continuing.")) { button.disabled = false; return; }
+        }
+        const result = await invoke("station_action", {action, selectedDirectory});
+        state.actionResult = {accepted: true, status: "Meeting recorder",
+          message: result.message || (result.ready ? "Recorder is ready." : "Recorder is not ready. Complete setup or check its private logs."),
+          next_action: "Open Station to select inputs and record a meeting."};
+      } catch (error) {
+        state.actionResult = {accepted: false, status: "Recorder needs attention", message: String(error),
+          next_action: "Use the Townlight admin account for setup; sign in with a permitted staff role to record."};
+      }
+      render();
     });
   });
   document.querySelectorAll("[data-file-path-field]").forEach((button) => {

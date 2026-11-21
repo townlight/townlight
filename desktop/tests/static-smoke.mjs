@@ -140,7 +140,7 @@ const requiredUiPhrases = [
   "Choose Product Modules",
   "Custom selection will install Townlight Core plus",
   "Unavailable for this selection",
-  "Bundled separate service",
+  "Bundled meeting recorder",
   "Separate Station backup:",
   "Apply Module Selection",
   "Save Local Folders",
