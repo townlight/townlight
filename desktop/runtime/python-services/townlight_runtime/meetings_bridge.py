@@ -801,3 +801,33 @@ def station_catalog(actor_id: str = Depends(actor)):
         return {'meetings': meetings, 'agenda': agenda}
     finally:
         engine.dispose()
+
+
+class ClerkCatalogInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: str = Field(default="", max_length=255)
+    meeting_id: UUID | None = None
+
+
+@router.post("/clerk/catalog")
+def clerk_catalog(payload: ClerkCatalogInput, actor_id: str = Depends(actor)):
+    engine = create_engine(database_url(), pool_pre_ping=True)
+    try:
+        with engine.connect() as conn:
+            meetings = [dict(r) for r in conn.execute(text(
+                "SELECT m.id,m.title,m.scheduled_start "
+                "FROM townlight_meetings.meetings m "
+                "WHERE strpos(lower(m.title),lower(:query)) > 0 "
+                "OR strpos(lower(COALESCE(CAST(m.scheduled_start AS text),'')),lower(:query)) > 0 "
+                "OR m.id = CAST(:meeting_id AS uuid) "
+                "ORDER BY (m.id = CAST(:meeting_id AS uuid)) DESC NULLS LAST, m.scheduled_start DESC NULLS LAST,m.id LIMIT 100"
+            ), {"query": payload.query, "meeting_id": str(payload.meeting_id) if payload.meeting_id else None}).mappings()]
+            agenda = [dict(r) for r in conn.execute(text(
+                "SELECT id,title,meeting_id FROM townlight_meetings.agenda_items "
+                "WHERE (meeting_id IS NULL AND strpos(lower(title),lower(:query)) > 0) "
+                "OR meeting_id = CAST(:meeting_id AS uuid) "
+                "ORDER BY meeting_id NULLS LAST,title LIMIT 500"
+            ), {"query": payload.query, "meeting_id": str(payload.meeting_id) if payload.meeting_id else None}).mappings()]
+        return {'meetings': meetings, 'agenda': agenda}
+    finally:
+        engine.dispose()

@@ -465,6 +465,14 @@ pub fn station_action(
     action: &str,
     selected_directory: Option<&str>,
 ) -> Result<serde_json::Value, String> {
+    station_action_with_context(action, selected_directory, None)
+}
+
+pub fn station_action_with_context(
+    action: &str,
+    selected_directory: Option<&str>,
+    meeting_id: Option<uuid::Uuid>,
+) -> Result<serde_json::Value, String> {
     let python = runtime_payload_roots()
         .into_iter()
         .map(|root| root.join("python/python.exe"))
@@ -512,11 +520,18 @@ pub fn station_action(
                 .arg("operator")
                 .arg("--profile-root")
                 .arg(townlight_root());
-            command_output_with_timeout(
+            if let Some(id) = meeting_id {
+                command.arg("--meeting-id").arg(id.to_string());
+            }
+            let launch = command_output_with_timeout(
                 &mut command,
                 "Open meeting recorder",
                 SERVICE_COMMAND_TIMEOUT,
             )?;
+            if env::var("TOWNLIGHT_SUPPRESS_OPEN_BROWSER").as_deref() == Ok("1") {
+                return serde_json::from_str(launch.trim())
+                    .map_err(|_| "Recorder did not return the installed test launch.".into());
+            }
             Ok(
                 serde_json::json!({"opened":true,"message":"Station opened using your current staff authority. An existing recording continues while you reconnect."}),
             )
@@ -3768,8 +3783,8 @@ fn activate_records_action() -> Result<SupervisorActionResult, String> {
         false,
     )?;
     Ok(SupervisorActionResult { accepted:true, action:"activate-records".to_string(), service_id:None,
-        status:"Records migration complete", message:"Records now uses Python and PostgreSQL. Historical JSON and its verified backup are retained, not used as a fallback.".to_string(),
-        next_action:"Refresh Records and verify the saved work. Meetings and Code remain unavailable in this candidate.".to_string() })
+        status:"Records is ready", message:"Saved Records work is available for staff. Townlight kept the previous data and verified recovery backup.".to_string(),
+        next_action:"Open Records to verify your saved work and review files attached from Townlight modules.".to_string() })
 }
 
 fn load_records_demo_action() -> Result<SupervisorActionResult, String> {

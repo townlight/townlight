@@ -8,7 +8,7 @@ import {promisify} from 'node:util';
 import path from 'node:path';
 import {chromium} from '@playwright/test';
 
-export async function stationRecorder({native, save, admin}) {
+export async function stationRecorder({native, save, admin, longCapture = false}) {
   assert.equal(process.env.GITHUB_ACTIONS,'true');
   const profile=path.join(process.env.LOCALAPPDATA,'CivicSuite');
   const pairing=JSON.parse(await readFile(path.join(profile,'config/station.json'),'utf8'));
@@ -30,10 +30,11 @@ export async function stationRecorder({native, save, admin}) {
   const req=await request(suite,'/desktop/v1/requests',{requester:'Synthetic acceptance',summary:'Private recording handoff',deadline:'2026-12-20',deadlineBasis:'Staff reviewed fixture'});
   let sender,headless,context,page,rid;
   const connect=async()=>{
-    const ticket=await request(station,'/v1/operator-ticket',{});
+    const address=await native('station_action',{action:'open',selectedDirectory:null,meetingId:meeting.id});
     context=await headless.newContext(); page=await context.newPage();
-    await page.goto(station+'/#ticket='+ticket.ticket);
+    await page.goto(address.operator_url);
     await page.locator('#meeting-id').waitFor({timeout:30000});
+    assert.equal(await page.locator('#meeting-id').inputValue(),meeting.id);
   };
   try {
     headless=await chromium.launch({headless:true,channel:'msedge'});
@@ -42,9 +43,10 @@ export async function stationRecorder({native, save, admin}) {
     await page.waitForFunction(()=>!document.querySelector('#find-devices').disabled);
     // Empty device inventory on a hosted runner is supported and actionable.
     await save('station-device-discovery',{message:await page.locator('#message').innerText(),devices:await request(station,'/operator/devices')});
-    sender=spawn(path.join(payload,'station/bin/ffmpeg.exe'),['-hide_banner','-loglevel','error','-re','-f','lavfi','-i','testsrc=size=640x360:rate=25','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-c:v','libopenh264','-g','25','-b:v','700k','-pix_fmt','yuv420p','-c:a','aac','-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
+    const testVideo=longCapture ? 'testsrc2=size=960x540:rate=30,noise=alls=28:allf=t+u' : 'testsrc=size=640x360:rate=25';
+    const ffmpeg=path.join(payload,'station/bin/ffmpeg.exe');
+    sender=spawn(ffmpeg,['-hide_banner','-loglevel','error','-re','-f','lavfi','-i',testVideo,'-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-c:v','libopenh264','-g','30','-b:v',longCapture?'6500k':'700k','-pix_fmt','yuv420p','-c:a','aac','-f','mpegts','udp://127.0.0.1:18760?pkt_size=1316'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
     let senderError='';sender.stderr.on('data',x=>{senderError+=x.toString();});
-    await page.locator('#meeting-id').selectOption(meeting.id);
     await page.locator('#source').selectOption('installed-fixture');
     await page.locator('#start').click();
     const deadline=Date.now()+120000;
@@ -62,6 +64,25 @@ export async function stationRecorder({native, save, admin}) {
     await context.close(); // Recorder must outlive its browser, not restart it.
     assert.equal((await request(station,'/v1/recordings/'+rid)).status,'running');
     await connect();
+    if (longCapture) {
+      const captureDeadline=Date.now()+85*60*1000;
+      const boundary=2*1024**3;
+      let nextReport=0;
+      let measured=0;
+      while(Date.now()<captureDeadline) {
+        const current=await request(station,'/v1/recordings/'+rid);
+        assert.equal(current.status,'running','Live capture stopped before crossing 2 GiB');
+        measured=current.live_progress?.bytes_written||0;
+        if(measured>boundary)break;
+        if(sender.exitCode!==null)throw Error('Synthetic sender exited: '+senderError);
+        if(Date.now()>=nextReport){
+          console.log('Station live capture:',measured,'bytes');
+          nextReport=Date.now()+5*60*1000;
+        }
+        await new Promise(r=>setTimeout(r,5000));
+      }
+      assert(measured>boundary,'Live recording never crossed 2 GiB');
+    }
     const article=page.locator('[data-id="'+rid+'"]');
     await article.getByRole('button',{name:'Stop recording',exact:true}).click();
     let record;
@@ -69,6 +90,7 @@ export async function stationRecorder({native, save, admin}) {
     while(Date.now()<finish){record=await request(station,'/v1/recordings/'+rid);if(['complete','failed','interrupted'].includes(record.status))break;await new Promise(r=>setTimeout(r,1000));}
     assert.equal(record.status,'complete',JSON.stringify(record));
     assert.equal(record.details.attempts.at(-1).end_reason,'operator-stop');
+    if (longCapture) assert(record.details.size_bytes>2*1024**3);
     const handoff=await request(station,'/operator/handoff',{request_id:req.id,recording_id:rid,expected_sha256:record.details.sha256});
     assert.equal(handoff.request.documents.length,1);
     const managed=handoff.request.documents[0];
@@ -78,7 +100,12 @@ export async function stationRecorder({native, save, admin}) {
     assert.equal(await digest(source),record.details.sha256);
     assert.notEqual(path.resolve(managed.stored_path),path.resolve(source));
     assert.equal(await digest(managed.stored_path),record.details.sha256);
-    await save('station-recording-handoff',{passed:true,record,handoff,source_hash_verified:true,renewal,reconnected_same_recording:true,configured_limits:capacity,fixture:'Synthetic UDP video and audio; not an eight-hour endurance test'});
+    await promisify(execFile)(ffmpeg,['-hide_banner','-v','error','-xerror','-ss',
+      String(Math.max(0,record.details.duration_seconds-8)),'-i',managed.stored_path,
+      '-map','0:v:0','-map','0:a:0','-t','4','-f','null','-'],{windowsHide:true,timeout:90000});
+    await save('station-recording-handoff',{passed:true,record,handoff,source_hash_verified:true,
+      playback_decoded_near_end:true,renewal,reconnected_same_recording:true,configured_limits:capacity,
+      actual_capture_over_2_gib:longCapture,fixture:'Paced synthetic UDP video and audio'});
     await native('auth_action',{action:'sign-out',payload:null});
     const revoked=await page.evaluate(async()=>{const r=await fetch('/operator/renew',{method:'POST',headers:{'X-Station-UI':'1'}});return r.status;});
     assert([401,403].includes(revoked),'Signed-out authority renewed');

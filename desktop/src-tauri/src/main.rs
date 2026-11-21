@@ -622,6 +622,7 @@ async fn supervisor_action(
 async fn station_action(
     action: String,
     selected_directory: Option<String>,
+    meeting_id: Option<uuid::Uuid>,
 ) -> Result<Value, String> {
     if matches!(action.as_str(), "setup" | "backup" | "restore" | "stop") {
         auth::require_admin_session()?;
@@ -629,7 +630,7 @@ async fn station_action(
         auth::require_signed_in_session()?;
     }
     tauri::async_runtime::spawn_blocking(move || {
-        supervisor::station_action(&action, selected_directory.as_deref())
+        supervisor::station_action_with_context(&action, selected_directory.as_deref(), meeting_id)
     })
     .await
     .map_err(|e| format!("Recorder action could not complete: {e}"))?

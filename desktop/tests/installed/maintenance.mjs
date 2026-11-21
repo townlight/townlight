@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { clerkWorkflows } from './clerk-workflows.mjs';
 import { chromium } from '@playwright/test';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -72,8 +75,9 @@ try {
       throw new Error(`expected domain_authority python-records, got ${domainAuthority}`);
     }
   }
+  if (mode === 'fresh') await clerkWorkflows({ page, native, save, meetingId: ids.meeting_id });
   let recording;
-  if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin});
+  if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin,longCapture:mode==='fresh'});
   if (mode==='fresh'||mode==='recorder') {
     accepted(await native('supervisor_action',{action:'backup',serviceId:null}));
     const restore=await native('supervisor_action',{action:'restore',serviceId:null});
@@ -87,13 +91,16 @@ try {
       const proof=JSON.parse(await readFile(path.join(process.env.LOCALAPPDATA,'CivicSuite/config/local-session.json'),'utf8')).session_hash;
       const response=await fetch('http://127.0.0.1:8756/v1/recordings/'+recording.recording_id,{headers:{'X-Townlight-Session':proof}});
       assert.equal(response.status,200);assert.equal((await response.json()).details.sha256,recording.sha256);
-      await save('station-after-restore',{passed:true,recording});
+      const hash = createHash('sha256');
+      for await (const bytes of createReadStream(recording.document.stored_path)) hash.update(bytes);
+      assert.equal(hash.digest('hex'), recording.sha256);
+      await save('station-after-restore',{passed:true,recording,restored_file_hash_verified:true});
     }
     if(ids) await readback(ids);
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
   }
   if(recording) {
-    await stationLargeHandoff(recording,save);
+    if (mode === 'recorder') await stationLargeHandoff(recording,save);
     assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));

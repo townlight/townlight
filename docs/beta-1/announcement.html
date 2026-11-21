@@ -62,7 +62,7 @@ and acceptance.</li>
 manuals are AGPL-3.0-only; retained historical grants and third-party
 notices still apply.</p>
 <h2 id="what-was-verified">What was verified</h2>
-<p><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md">Windows 1.9.0.1 installed acceptance</a> covers fresh setup, Station recording, the Records handoff, and recovery. The release notes link the passed upgrade from 1.8.1.1. The direct upgrade from 1.8.2.1 has no published result yet.</p>
+<p><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md">Windows 1.9.0.1 installed acceptance</a> covers fresh setup, Station recording, the Records handoff, and recovery. The release notes link the passed upgrade from 1.8.1.1. The signed upgrade from Windows 1.8.2.1 to 1.9.0.1 preserved the existing profile, administrator sign-in, a saved meeting and a Records request and attachment. Backup and restore recovered the saved meeting and the verified Records attachment. <a href="https://github.com/townlight/townlight/actions/runs/44863028775">View the direct upgrade and recovery test</a>.</p>
 <p>Windows 1.8.1.1 adds shared meeting imports for 31 source families,
 with 34 supported source/format pairs. Installed Windows Sandbox checks
 exercised preview, save and durable readback using public captures and
@@ -94,6 +94,7 @@ the signed Windows 1.9.0.1 MSI, then follow first-run setup with an
 empty database and a new Townlight profile. Follow the <a
 href="https://townlight.github.io/manuals/suite.html#first-run">first-run
 guide</a> and evaluate with synthetic data first.</p>
+<p><strong>Upgrade from Windows 1.8.2.1.</strong> Back up your city data and settings in Townlight, close the app, then run the signed Windows 1.9.0.1 MSI. Reopen Townlight under the same Windows account with your existing profile. If Station shows as unconfigured, open Settings → Modules → Townlight Station and select <strong>Set up meeting recording</strong>. After restoring a backup, start the services before checking your records. See the <a href="https://github.com/townlight/townlight/actions/runs/44863028775">signed upgrade and recovery test</a>.</p>
 <p>Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.</p>
 <h2 id="portal-and-branding">Portal and branding</h2>
 <p>The resident portal is a separately deployed beta with its own <a

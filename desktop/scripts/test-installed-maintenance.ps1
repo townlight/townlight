@@ -38,7 +38,9 @@ function Run-Installed([string]$Phase) {
   if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) { throw 'Installed acceptance debug port is already occupied.' }
   New-Item -Path $debugPolicy -Force | Out-Null
   New-ItemProperty -LiteralPath $debugPolicy -Name $appName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
-  $script:ownedApp = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru
+  $env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER = '1'
+  try { $script:ownedApp = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru }
+  finally { Remove-Item Env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER }
   try {
     $ready=$false; $deadline=(Get-Date).AddSeconds(120)
     while ((Get-Date) -lt $deadline) {
@@ -74,11 +76,11 @@ try {
   if ($Mode -eq 'upgrade') {
     $previous=Join-Path $env:RUNNER_TEMP 'townlight-previous-release'
     New-Item -ItemType Directory -Path $previous | Out-Null
-    gh release download townlight-windows-v1.8.1.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
+    gh release download townlight-windows-v1.9.0.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
     if ($LASTEXITCODE -ne 0) { throw 'Previous public MSI download failed.' }
     $old=@(Get-ChildItem -LiteralPath $previous -Filter '*.msi' -File)
-    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da') { throw 'Previous release identity mismatch.' }
-    Install-Candidate $old[0].FullName 'baseline-1.8.1.1'
+    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'fde5cfd9d167571792e2384f7a5066b1dbea3fdc8b2085cf43f670440210ff0c') { throw 'Previous release identity mismatch.' }
+    Install-Candidate $old[0].FullName 'baseline-1.9.0.1'
     Run-Installed 'seed'
     $marker=Join-Path $profile 'Data\maintenance-retention.txt'
     [IO.File]::WriteAllText($marker,'Synthetic Windows maintenance retention marker')
