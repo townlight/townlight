@@ -24,6 +24,9 @@ pub enum MeetingsRequest {
         id: Uuid,
         payload: MeetingStage,
     },
+    ClerkCatalog {
+        payload: MeetingCatalogInput,
+    },
     CapturePacket {
         id: Uuid,
         payload: PacketInput,
@@ -355,6 +358,14 @@ pub struct AgendaIntake {
     department_name: String,
 }
 
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MeetingCatalogInput {
+    #[serde(default)]
+    query: String,
+    meeting_id: Option<Uuid>,
+}
+
 pub async fn execute_meetings(
     request: MeetingsRequest,
     proof: String,
@@ -372,6 +383,11 @@ pub async fn execute_meetings(
                 crate::code_client::encode_segment(&id)?
             ),
             None,
+        ),
+        MeetingsRequest::ClerkCatalog { payload } => (
+            Method::POST,
+            "/desktop/v1/meetings/clerk/catalog".to_string(),
+            Some(serde_json::json!({"query": payload.query, "meeting_id": payload.meeting_id})),
         ),
         MeetingsRequest::RecordCodeDecision { id, payload } => (
             Method::POST,

@@ -16,6 +16,20 @@ interface ImportSource {
 interface ImportReceipt {
   payload: {documents?: Array<{kind: string; title?: string; url: string}>};
 }
+export interface MeetingCatalogItem {
+  id: string;
+  title: string;
+  scheduled_start: string | null;
+}
+export interface AgendaCatalogItem {
+  id: string;
+  title: string;
+  meeting_id: string | null;
+}
+export interface MeetingCatalog {
+  meetings: MeetingCatalogItem[];
+  agenda: AgendaCatalogItem[];
+}
 
 export async function readImportFile(source: ImportSource, data: {source_url: string; export_file: File}): Promise<ImportPayload> {
   const file = data.export_file;
@@ -39,6 +53,9 @@ export function createMeetingsClient(invoke: Invoke) {
     },
     previewImport(payload: ImportPayload): Promise<ImportPreview> {
       return invoke("meetings_domain_request", {request: {operation: "preview-import", payload}});
+    },
+    catalog(query: string, meeting_id: string | null): Promise<MeetingCatalog> {
+      return invoke("meetings_domain_request", {request: {operation: "clerk-catalog", payload: {query, meeting_id}}});
     },
     fetchImport(source: ImportSource, source_url: string): Promise<{payload: ImportPayload; preview: ImportPreview}> {
       const {connector, input_format} = source;

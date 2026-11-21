@@ -18,6 +18,7 @@ import { bindCodeSources } from "./records/code-sources.ts";
 import { bindZoningSources } from "./records/zoning-sources.ts";
 
 const municipalAreas = ["boards", "contracts", "procurement"];
+const openHallIcon = new URL("../src-tauri/icons/icon.ico", import.meta.url).href;
 const municipalView = createMunicipalView(invoke, escapeHtml, openMunicipalLink);
 let municipalRecord = null;
 
@@ -65,11 +66,7 @@ function openConnectedWork(area, id) {
   if (state.activeArea === 'planning' && !planningView.canLeave()) return;
   state.activeArea = area;
   render();
-  const target = document.querySelector(area === 'code' ? '[data-code-action="connection"]' : '[data-meetings-action="codeConnection"]');
-  if (!target || !target.elements) return;
-  const idField = target.elements.namedItem('id');
-  if (idField) idField.value = id;
-  target.requestSubmit();
+  void (area === "code" ? codeView : meetingsView).openConnection(id);
 }
 
 function openImportDraft(area, {title, text, date, source, meetingId}) {
@@ -1221,8 +1218,8 @@ function renderTopbar() {
   const access = accessState();
   return `
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Windows Local 1.0</p>
+      <div class="townlight-brand">
+        <img src="${openHallIcon}" width="40" height="40" alt="">
         <h1>Townlight</h1>
       </div>
       <div class="topbar-actions" aria-label="Application actions">
@@ -1965,6 +1962,7 @@ const GUIDED_WORK_ACTIONS = new Set([
 ]);
 
 const GUIDED_SUPERVISOR_ACTIONS = new Set([
+  "activate-records",
   "backup",
   "restore",
   "uninstall",
@@ -4874,6 +4872,18 @@ function guidedSupervisorReviewForAction(action, serviceId) {
       audit: "Creates a support-manifest.json with SHA-256 hashes for the bundle files.",
       retry: "If the support bundle folder cannot be written, the desktop app reports the error and leaves city data unchanged."
     },
+    "activate-records": {
+      title: "Prepare Records for staff",
+      confirmLabel: "Prepare Records",
+      module: "Townlight Records",
+      subject: "The current city profile",
+      status: "Records needs administrator setup for linked work.",
+      changes: "Townlight verifies its recovery backup and prepares saved Records work for use with Meetings and Station.",
+      visibility: "Townlight admin only. The work stays private in this city profile.",
+      sources: ["Saved city data and the profile’s backup location."],
+      audit: "Townlight reports whether setup completed.",
+      retry: "If setup is interrupted, reopen Records and use this action again."
+    },
     "repair": {
       title: `Review Before Repairing ${serviceLabel}`,
       confirmLabel: "Repair",
@@ -5089,11 +5099,11 @@ function renderHealth() {
       <div class="section-title">
         <p class="eyebrow">Local profile lifecycle</p>
         <h3>Backup, Restore, Uninstall</h3>
-        <p>These actions work on the local Townlight city profile. Uninstall creates a final backup before removing local data and setup state.</p>
+        <p>Windows uninstall removes the program and leaves the saved city profile. Use Backup Now to make a recovery copy.</p>
       </div>
       <div class="health-actions lifecycle-actions">
         <button type="button" class="secondary-action" data-supervisor-action="backup" ${adminDisabled}>Backup Now</button>
-        ${state.app.domain_authority !== "python-records" ? `<button type="button" class="secondary-action" data-supervisor-action="activate-records" ${adminDisabled}>Finish Records Migration</button><p>Records migration preserves the existing data and switches to Python/PostgreSQL. If interrupted, use this action again; the old writer remains blocked.</p>` : ""}
+        ${state.app.domain_authority !== "python-records" ? `<button type="button" class="secondary-action" data-supervisor-action="activate-records" ${adminDisabled}>Prepare Records</button>` : ""}
         <button type="button" class="secondary-action" data-supervisor-action="open-backup-folder" ${adminDisabled}>Open Backup Folder</button>
         <button type="button" class="secondary-action" data-supervisor-action="support-bundle" ${adminDisabled}>Create Support Bundle</button>
         <button type="button" class="secondary-action" data-supervisor-action="restore" ${adminDisabled}>Restore Latest Backup</button>
@@ -5170,7 +5180,19 @@ function renderActiveArea() {
         return meetingsView.render();
       return renderMeetingsWorkflow();
     case "records":
-      return renderRecordsWorkflow();
+      if (isPublicSurface()) return renderRecordsWorkflow();
+      return `${state.app.domain_authority !== "python-records" ? `
+        <section class="section-band" aria-labelledby="records-readiness">
+          <h3 id="records-readiness">Prepare Records for linked work</h3>
+          <p>Records must be ready before staff can attach a meeting recording or other material from Townlight modules.</p>
+          ${access.signed_in && access.role === "local-admin"
+            ? '<button type="button" class="secondary-action" data-supervisor-action="activate-records">Prepare Records</button>'
+            : '<p>Ask a Townlight administrator to open Records and complete setup.</p>'}
+        </section>
+        ${renderGuidedSupervisorReview()}` : ""}
+        ${state.supervisorActionResult?.action === "activate-records" || state.supervisorActionResult?.status === "Working"
+          ? renderSupervisorActionResult() : ""}
+        ${renderRecordsWorkflow()}`;
     case "code":
       if (isPublicSurface() && state.app?.domain_authority === 'python-records') return publicCodeView.render();
       if (
@@ -5341,7 +5363,11 @@ function bindEvents() {
       if (state.activeArea === 'permitting' && button.dataset.area !== 'permitting' && !permittingView.canLeave()) return;
       if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
-      if (state.activeArea === 'inspections' && button.dataset.area === 'records') await loadAppState();
+      if (button.dataset.area === 'records' &&
+          (state.activeArea === 'inspections' ||
+           (state.activeArea !== 'records' && state.app.domain_authority === 'python-records'))) {
+        await loadAppState();
+      }
       municipalRecord = null;
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
@@ -5787,6 +5813,7 @@ async function handleSupervisorAction(action, serviceId, { confirmed = false } =
   state.pendingSupervisorReviewServiceId = null;
   state.supervisorActionResult = {
     accepted: true,
+    action,
     status: "Working",
     message: `Running ${supervisorActionLabel(action)} from the desktop app.`,
     next_action: "Keep Townlight open while the local action completes."
@@ -5795,6 +5822,7 @@ async function handleSupervisorAction(action, serviceId, { confirmed = false } =
   if (!hasTauriBridge()) {
     state.supervisorActionResult = {
       accepted: false,
+      action,
       status: "Desktop app required",
       message: "Runtime service changes are saved by the Windows desktop app, not the browser preview.",
       next_action: desktopAppRequiredNextAction("manage local runtime services")
@@ -5812,6 +5840,7 @@ async function handleSupervisorAction(action, serviceId, { confirmed = false } =
   } catch (error) {
     state.supervisorActionResult = {
       accepted: false,
+      action,
       status: "Needs attention",
       message: String(error),
       next_action: "Review System Health and try the action again."
@@ -5822,6 +5851,7 @@ async function handleSupervisorAction(action, serviceId, { confirmed = false } =
 
 function supervisorActionLabel(action) {
   const labels = {
+    "activate-records": "Prepare Records",
     backup: "Backup Now",
     "support-bundle": "Create Support Bundle",
     restore: "Restore Latest Backup",

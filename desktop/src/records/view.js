@@ -175,7 +175,7 @@ function renderRecordsExemptionDecisions(request) {
 
 function renderRecordsWorkflow() {
   if (state.app.domain_authority === "records-migration-pending") {
-    return `<section role="status"><h2>Records migration is unfinished</h2><p>No legacy data is being displayed or changed. Use Finish Records Migration in System Health to resume.</p></section>`;
+    return `<section role="status"><h2>Records setup is in progress</h2><p>Saved requests will be available when the Townlight administrator completes setup.</p></section>`;
   }
   if (isPublicSurface()) return renderPublicRecordsWorkflow();
   const work = cityWork();

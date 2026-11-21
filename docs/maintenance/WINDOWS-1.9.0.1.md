@@ -22,8 +22,14 @@ The signed package was built from the same source tree and component pins as the
 | Storage and recovery | The eight-hour and 64 GiB configuration and storage admission checks passed. Station survived a Suite backup and restore with recording readback. |
 | Uninstall | Windows removed application files and registration and retained city configuration and database data. |
 
-The hosted runner exercised device discovery without physical cameras. Test your camera and microphone before a meeting. The storage-boundary test used synthetic data and did not run an eight-hour recording. Earlier installed feature and import evidence stays associated with the builds that produced it. An upgrade from Windows 1.8.2.1 was not exercised for this release.
+The hosted runner exercised device discovery without physical cameras. Test your camera and microphone before a meeting. The storage-boundary test used synthetic data and did not run an eight-hour recording. Earlier installed feature and import evidence stays associated with the builds that produced it.
 
 Station 0.4.0 is included with Records 1.8.0.dev4. Select the full Windows profile or a custom profile with Meetings and Records to set up Station during first run. On an existing installation, open Settings → Modules → Townlight Station → **Set up meeting recording**. Read the [Station operating guide](https://townlight.github.io/manuals/station.html).
 
 The standard signed Windows installer lifecycle also passed install, first run, backup and restore, repair, and uninstall. The separate broad fresh-maintenance job stopped at Station storage admission on its runner. The dedicated signed recorder run met the storage requirement and passed the recorder and Records workflow listed above.
+
+## Upgrade from 1.8.2.1
+
+The signed upgrade from Windows 1.8.2.1 to 1.9.0.1 preserved the existing profile, administrator sign-in, a saved meeting and a Records request and attachment. Backup and restore recovered the saved meeting and the verified Records attachment. [Signed upgrade and recovery run](https://github.com/townlight/townlight/actions/runs/44863028775).
+
+Back up your city data and settings in Townlight, close the app, run the signed 1.9.0.1 MSI, and reopen it under the same Windows account with the existing profile. On the tested profile, Station required **Set up meeting recording** in Settings → Modules → Townlight Station before it reported ready. After restoring a backup, select **Start** before checking your records.

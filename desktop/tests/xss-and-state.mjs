@@ -121,6 +121,10 @@ let rewritten = mainSrc.replace(/^﻿/, "");
 // import against the original main.js, including newly connected product views.
 const mainUrl = pathToFileURL(join(root, "src", "main.js"));
 rewritten = rewritten.replace(
+  /(new URL\(\s*["'][^"']+["']\s*,\s*)import\.meta\.url/g,
+  (_match, prefix) => prefix + JSON.stringify(mainUrl.href)
+);
+rewritten = rewritten.replace(
   /(\bfrom\s*)(["'])(\.{1,2}\/[^"']+)\2/g,
   (_match, prefix, _quote, specifier) => prefix + JSON.stringify(new URL(specifier, mainUrl).href)
 );

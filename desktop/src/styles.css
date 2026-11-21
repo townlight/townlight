@@ -38,6 +38,12 @@ main:focus-visible {
   padding: 12px 24px;
 }
 
+.townlight-brand {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
 .topbar h1,
 .page-heading h2,
 .section-title h2,

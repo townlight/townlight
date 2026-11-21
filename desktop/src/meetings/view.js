@@ -1,4 +1,6 @@
 import { createMeetingsClient, readImportFile } from "./client.ts";
+import { bindClerkWorkspace, clerkWorkspaceMarkup } from "./clerk-workspace.js";
+import { setOptions } from "../code/connection-pickers.js";
 
 function bindImport(form, client, output) {
   if (!form) return;
@@ -153,11 +155,13 @@ function bindTextHandoffs(form, client, output, openImportDraft) {
 
 /** Integrated controls only; later workflow steps remain explicitly unavailable. */
 export function createMeetingsView(invoke, navigate = () => {}, openImportDraft = () => {}) {
+  let openConnection = async () => {};
   const client = createMeetingsClient(invoke);
   return {
     render() {
       return `<section class="section-band"><h2>Townlight Meetings — integration candidate</h2>
         <p>Local integration candidate. Saved work uses Python/PostgreSQL. Packet delivery creates local staff files; notice checks are advisory. The local archive exposes only records you explicitly mark public. No external website upload.</p>
+        ${clerkWorkspaceMarkup()}
         <form data-meetings-import><h3>Import meeting records</h3>
           <label>Source <select name="source" required></select></label>
           <span role="status" data-import-source-status>Loading import formats…</span>
@@ -199,6 +203,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           <label>Agenda item ID <input name="id" required></label>
           <label>Completed stage <select name="to_status"><option>DRAFTED</option><option>SUBMITTED</option><option>DEPT_APPROVED</option><option>LEGAL_REVIEWED</option><option>CLERK_ACCEPTED</option><option>ON_AGENDA</option><option>IN_PACKET</option><option>POSTED</option><option>HEARD</option><option>DISPOSED</option><option>ARCHIVED</option></select></label>
           <button type="submit">Record completed stage</button></form>
+        <details><summary>Advanced agenda and packet references</summary>
         <form data-meetings-action="assignAgendaMeeting"><h3>Place or move item on agenda</h3>
           <label>Agenda item ID <input name="id" required></label>
           <label>Meeting ID <input name="meeting_id" required></label>
@@ -213,6 +218,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           <label>Packet ID from saved version <input name="id" required></label>
           <p>Creates a new staff-only folder with agenda, copied sources, manifest and checksums. Earlier exports remain intact.</p>
           <button type="submit">Create local packet bundle</button></form>
+        </details>
         <form data-meetings-action="openExports"><button type="submit">Open Meetings export folder</button></form>
         <form data-meetings-action="checkNotice"><h3>Check notice timing</h3>
           <p>Advisory calculation using the notice interval you supply; not a legal sufficiency decision. Warnings do not prevent recording your posting proof.</p>
@@ -302,26 +308,90 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           <button type="submit">Read from database</button></form>
         <h3>Code proposals and recorded decisions</h3>
         <p>Your explicit decision is recorded without requiring a motion, minutes, or a suggested meeting stage. Optional supporting references are human-supplied, not independently verified. Nothing here codifies or publishes law.</p>
-        <form data-meetings-action="codeConnections"><button type="submit">List Code proposals</button></form>
-        <form data-meetings-action="codeConnection"><label>Connection ID <input name="id" required></label><button type="submit">Read Code connection</button></form>
+        <form data-meetings-action="codeConnections"><button type="submit">Refresh Code proposals</button></form>
+        <form data-meetings-action="codeConnection"><label>Saved proposal <select name="id" required></select></label><button type="submit">Read proposal and decisions</button></form>
         <form data-meetings-action="recordCodeDecision">
-          <label>Connection ID <input name="id" required></label>
-          <label>Stable decision key <input name="decision_id" required></label>
+          <label>Proposal for this decision <select name="id" required></select></label>
           <label>Outcome <select name="outcome"><option value="adopted">Adopted</option><option value="not_adopted">Not adopted</option><option value="deferred">Deferred</option><option value="withdrawn">Withdrawn</option></select></label>
           <label>Decision date/time (optional; include time zone) <input name="decided_at" placeholder="2026-10-20T18:30:00-06:00"></label>
           <label>Decision text <textarea name="decision_text" required></textarea></label>
           <label>Supporting references (optional; one per line) <textarea name="supporting_references"></textarea></label>
-          <label>Supersedes decision ID (optional) <input name="supersedes_decision_id"></label>
+          <label>Correct the latest recorded decision (optional) <select name="supersedes_decision_id"></select></label>
           <label>Reconciliation note <textarea name="reconciliation_note"></textarea></label>
           <button type="submit">Record Code decision</button>
         </form>
         <div data-meetings-links></div>
-        <pre data-meetings-result role="status" aria-live="polite">No operation requested.</pre>
+        <p data-meetings-status role="status" aria-live="polite"></p>
+        <details><summary>Technical result</summary><pre data-meetings-result></pre></details>
       </section>`;
     },
     bind(root = document) {
-      const output = root.querySelector("[data-meetings-result]");
-      if (!output) return;
+      const output = root.querySelector("[data-meetings-status]");
+      if (!output) {
+        openConnection = async () => {};
+        return;
+      }
+      const detail = root.querySelector("[data-meetings-result]");
+      const workspace = bindClerkWorkspace(root, client, meetingId =>
+        invoke("station_action", {action:"open", selectedDirectory:null, meetingId}));
+      const findProposal = root.querySelector('[data-meetings-action="codeConnection"] select[name="id"]');
+      const decisionForm = root.querySelector('[data-meetings-action="recordCodeDecision"]');
+      const chooseProposal = decisionForm.elements.namedItem("id");
+      const correct = decisionForm.elements.namedItem("supersedes_decision_id");
+      let proposals = [];
+      let selectedMeeting = null;
+      const label = row => row.proposal.title;
+      const setCorrection = () => {
+        const proposal = proposals.find(row => row.id === chooseProposal.value);
+        const current = proposal?.decisions?.find(row => row.input.id === proposal.current_decision_id)?.input;
+        setOptions(correct, current ? [current] : [], row => row.decision_text, "Choose a decision to correct");
+      };
+      const fillProposals = () => {
+        const rows = proposals.filter(row => !selectedMeeting || row.proposal.meeting_id === selectedMeeting);
+        setOptions(findProposal, rows, label, "Choose a saved proposal");
+        setOptions(chooseProposal, rows, label, "Choose a saved proposal");
+        setCorrection();
+      };
+      const showProposal = result => {
+        const current = result.decisions?.find(row => row.input.id === result.current_decision_id)?.input;
+        output.textContent = `${result.proposal.title} · ${current
+          ? `Decision: ${current.outcome.replaceAll("_", " ")}. ${current.decision_text}` : "Awaiting a recorded decision."}`;
+        detail.textContent = JSON.stringify(result, null, 2);
+        const links = root.querySelector('[data-meetings-links]');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = "Open this proposal in Code";
+        button.addEventListener('click', () => navigate('code', result.id));
+        links.replaceChildren(button);
+      };
+      chooseProposal.addEventListener("change", setCorrection);
+      root.querySelector("[data-clerk-workspace]").addEventListener("clerk-meeting-change", event => {
+        selectedMeeting = event.detail;
+        fillProposals();
+      });
+      const loaded = client.codeConnections().then(rows => {
+        proposals = rows;
+        fillProposals();
+      }).catch(() => {
+        setOptions(chooseProposal, [], label, "Code proposals unavailable");
+        setOptions(findProposal, [], label, "Code proposals unavailable");
+      });
+      openConnection = async id => {
+        try {
+          await loaded;
+          const result = await client.codeConnection(id);
+          await workspace?.selectMeeting(result.proposal.meeting_id);
+          if (!proposals.some(row => row.id === result.id)) proposals.push(result);
+          fillProposals();
+          findProposal.value = chooseProposal.value = result.id;
+          setCorrection();
+          showProposal(result);
+          output.setAttribute("tabindex", "-1");
+          output.focus();
+        } catch (error) {
+          output.textContent = error?.message || String(error);
+        }
+      };
       bindImport(root.querySelector("[data-meetings-import]"), client, output);
       bindTextHandoffs(root.querySelector("[data-meetings-import-text]"), client, output, openImportDraft);
       const recordsHandoff = root.querySelector("[data-meetings-import-records]");
@@ -337,7 +407,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           try {
             const result = form.dataset.meetingsAction === 'recordCodeDecision'
               ? await client.recordCodeDecision(data.id, {
-                  id: data.decision_id, outcome: data.outcome, decided_at: data.decided_at || null,
+                  id: form.dataset.draftKey ||= crypto.randomUUID(), outcome: data.outcome, decided_at: data.decided_at || null,
                   decision_text: data.decision_text,
                   supporting_references: (data.supporting_references || '').split('\n').map(s => s.trim()).filter(Boolean),
                   supersedes_decision_id: data.supersedes_decision_id || null,
@@ -349,15 +419,23 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
               ? await client.read(data.kind, data.id)
               : form.dataset.meetingsCreate === "meeting"
                 ? await client.createMeeting(data) : await client.createAgendaItem(data);
-            output.textContent = JSON.stringify(result, null, 2);
-            const links = root.querySelector('[data-meetings-links]');
-            links?.replaceChildren();
-            if (links && result && result.id && result.proposal) {
-              const btn = document.createElement('button');
-              btn.type = 'button';
-              btn.textContent = 'Open this connection in Code';
-              btn.addEventListener('click', () => navigate('code', result.id));
-              links.appendChild(btn);
+            const action = form.dataset.meetingsAction;
+            detail.textContent = JSON.stringify(result, null, 2);
+            output.textContent = result?.title ? `Saved work: ${result.title}` : "Local Meetings service returned a result.";
+            if (form.dataset.meetingsCreate) await workspace?.refresh();
+            if (action === "codeConnections") {
+              proposals = result;
+              fillProposals();
+              output.textContent = result.length ? `${result.length} saved Code proposals.` : "No saved Code proposals.";
+            }
+            if (result?.proposal) {
+              proposals = [...proposals.filter(row => row.id !== result.id), result];
+              fillProposals();
+              showProposal(result);
+            }
+            if (action === "recordCodeDecision") {
+              delete form.dataset.draftKey;
+              form.elements.namedItem("decision_text").value = "";
             }
             if (form.dataset.meetingsAction === "getNoticeTemplate") {
               const target=root.querySelector('[data-meetings-action="deliverNotice"]');
@@ -371,5 +449,6 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
         });
       }
     },
+    openConnection: id => openConnection(id),
   };
 }
