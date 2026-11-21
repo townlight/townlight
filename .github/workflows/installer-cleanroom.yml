@@ -87,7 +87,7 @@ jobs:
           path: modules/townlight_access
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.TOWNLIGHT_PYTHON_VERSION }}
           cache: pip
@@ -172,7 +172,7 @@ jobs:
           path: modules/townlight_access
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.TOWNLIGHT_PYTHON_VERSION }}
           cache: pip

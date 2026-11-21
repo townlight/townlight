@@ -817,7 +817,7 @@ jobs:
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           # These checks import the prepared CPython 3.13 payload's native wheels.
           python-version: "3.13"
