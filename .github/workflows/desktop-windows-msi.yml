@@ -224,11 +224,11 @@ jobs:
           path: townlight_access
 
       - name: Check out exact Station Beta 1 source
-        if: steps.candidate.outputs.inspections_ref != ''
+        if: steps.candidate.outputs.station_ref != ''
         uses: actions/checkout@v5
         with:
           repository: townlight/station
-          ref: 49274095fe0d9c7c61f66d4b354a3cc2edda2e24
+          ref: ${{ steps.candidate.outputs.station_ref }}
           path: station
 
       - name: Check out pinned Townlight Boards source
@@ -747,11 +747,11 @@ jobs:
           path: townlight_access
 
       - name: Check out exact Station Beta 1 source
-        if: steps.candidate.outputs.inspections_ref != ''
+        if: steps.candidate.outputs.station_ref != ''
         uses: actions/checkout@v5
         with:
           repository: townlight/station
-          ref: 49274095fe0d9c7c61f66d4b354a3cc2edda2e24
+          ref: ${{ steps.candidate.outputs.station_ref }}
           path: station
 
       - name: Check out pinned Townlight Boards source
