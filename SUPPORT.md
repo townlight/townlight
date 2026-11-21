@@ -1,12 +1,12 @@
 # Townlight Windows beta support
 
-## Windows 1.8.2.1 maintenance release
+## Windows 1.9.0.1 Station recorder release
 
-Windows 1.8.2.1 packages the staff authorization, explicit database configuration and component metadata corrections. Its exact signed installed checks cover setup, the 1.8.1.1 upgrade, saved staff records, procurement/Contracts handoffs, backup/restore and uninstall retention. Unchanged module and 31-source/34-format import evidence remains attributed to the earlier build that produced it; this is not a new exhaustive test of every module or live provider.
+Windows 1.9.0.1 integrates Station setup, camera and microphone selection, renewable operator sessions and verified large-recording transfers to Records.
 
-Windows 1.8.2.1 has signed installed acceptance for fresh setup and an in-place upgrade from Windows 1.8.1.1. Before upgrading, back up city data and settings, close Townlight, run the signed MSI, and reopen it under the same Windows account with the existing `%LOCALAPPDATA%\CivicSuite` profile. Keep the prior installer and a restore path. Other upgrade paths are unverified. Station uses its separately configured service. The acceptance summary distinguishes new maintenance checks from reused workflow evidence.
+Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/ACCEPTANCE-Windows-1.8.2.1.md).
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
 
 ## Shared meeting imports · Windows 1.8.1.1
 
@@ -14,29 +14,29 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 [All 31 sources, formats and handoffs](https://townlight.github.io/manuals/meeting-imports.html) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
 
-Windows 1.8.2.1 has signed installed acceptance for fresh setup and an in-place upgrade from Windows 1.8.1.1. Before upgrading, back up city data and settings, close Townlight, run the signed MSI, and reopen it under the same Windows account with the existing `%LOCALAPPDATA%\CivicSuite` profile. Keep the prior installer and a restore path. Other upgrade paths are unverified. Station uses its separately configured service. The acceptance summary distinguishes new maintenance checks from reused workflow evidence.
+Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
 
-Windows 1.8.2.1 contains Townlight Runtime 0.3.2 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
+Windows 1.9.0.1 contains Station 0.4.0, Records 1.8.0.dev4, Townlight Runtime 0.3.2 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
 
 
 These instructions cover the signed **Windows x64 public beta 1.8.1.1**.
 
-[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/Townlight-Windows-x64-1.8.2.1.msi) ·
+[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/Townlight-Windows-x64-1.9.0.1.msi) ·
 [Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1) ·
 [Suite manual](https://townlight.github.io/manuals/suite.html) ·
 [Public beta announcement](https://townlight.github.io/announcement.html)
 
 ## Installation and recovery
 
-**Fresh installation.** For a fresh installation, run the signed Windows 1.8.2.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
+**Fresh installation.** For a fresh installation, run the signed Windows 1.9.0.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
 
-Windows 1.8.2.1 has signed installed acceptance for fresh setup and an in-place upgrade from Windows 1.8.1.1. Before upgrading, back up city data and settings, close Townlight, run the signed MSI, and reopen it under the same Windows account with the existing `%LOCALAPPDATA%\CivicSuite` profile. Keep the prior installer and a restore path. Other upgrade paths are unverified. Station uses its separately configured service. The acceptance summary distinguishes new maintenance checks from reused workflow evidence.
+Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
 
 Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
 Preserve existing data and backups. Do not rename or delete the compatibility
 profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
-Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.2.1/SHA256SUMS-Windows-1.8.2.1.txt) and check
+Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/SHA256SUMS-Windows-1.9.0.1.txt) and check
 its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact
 release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) describes the installed checks
 and their limits. Earlier local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
@@ -71,7 +71,7 @@ For questions and evaluation feedback, use
 
 ## What to include
 
-- Installed version (**1.8.2.1**) and Windows version.
+- Installed version (**1.9.0.1**) and Windows version.
 - The selected products/profile and whether this was a fresh installation.
 - Steps to reproduce, what you expected and what happened.
 - Redacted error messages, logs or screenshots, using synthetic data where possible.
