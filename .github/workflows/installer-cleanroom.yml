@@ -1,4 +1,4 @@
-name: Temporary Windows Recorder Diagnostics
+name: Windows 1.9.0.1 Signed Recorder Acceptance
 
 on:
   workflow_dispatch:
@@ -16,14 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
+          ref: 5c386c6eb95df980d0b117c9a49aacf65b23b23d
           path: townlight
 
-      - name: Download unsigned MSI artifact
+      - name: Download signed MSI artifact
         uses: actions/download-artifact@v4
         with:
-          name: townlight-windows-local-msi-UNSIGNED
-          run-id: 44820394451
+          name: townlight-windows-local-msi-SIGNED
+          run-id: 44851746939
           github-token: ${{ github.token }}
           path: msi-artifact
 
@@ -77,24 +77,19 @@ jobs:
           Write-Host "C: available after: $after bytes"
           if ($after -lt 42GB) { throw "Insufficient C: available: $after bytes" }
 
-      - name: Run unsigned recorder maintenance test
+      - name: Verify exact signed installer and run installed recorder acceptance
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-          $msis = @(Get-ChildItem -LiteralPath 'msi-artifact' -Recurse -File -Filter '*.msi')
-          if ($msis.Count -ne 1) { throw "Expected exactly one MSI, found $($msis.Count)." }
-          $msi = $msis[0]
-          $sha = (Get-FileHash -LiteralPath $msi.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          $evidence = Join-Path $env:RUNNER_TEMP 'recorder-evidence'
-          New-Item -ItemType Directory -Force -Path $evidence | Out-Null
-          & 'townlight/desktop/scripts/test-installed-maintenance.ps1' `
-            -SourceCommit '34f292c189ab1ac606aa61eb756806a3c076c6f9' `
-            -Mode recorder `
-            -UnsignedRecorderCandidate `
-            -ExpectedMsiSha256 $sha `
-            -MsiPath $msi.FullName `
-            -EvidenceRoot $evidence
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $ErrorActionPreference = "Stop"
+          $d='msi-artifact'
+          $msi=@(Get-ChildItem $d -Recurse -File -Filter *.msi); $ev=@(Get-ChildItem $d -Recurse -File -Filter *evidence*.txt); if($msi.Count -ne 1 -or $ev.Count -ne 1){throw 'Expected exactly one MSI and one evidence file'}
+          $m=$msi[0]; $e=$ev[0]; $t=Get-Content -Raw $e.FullName
+          $h=(Get-FileHash $m.FullName -Algorithm SHA256).Hash; if($t -notmatch ('(?im)^\s*SHA256\s*[:=]\s*' + [regex]::Escape($h) + '\s*$')){throw 'SHA256 mismatch'}
+          if($t -notmatch '(?im)^\s*SourceCommit\s*[:=]\s*5c386c6eb95df980d0b117c9a49aacf65b23b23d\s*$'){throw 'SourceCommit mismatch'}
+          if($t -notmatch '(?im)^\s*SignatureState\s*[:=]\s*Valid\s*$'){throw 'SignatureState invalid'}
+          if($t -notmatch '(?im)^\s*InnerExecutableSignatureState\s*[:=]\s*Valid\s*$'){throw 'InnerExecutableSignatureState invalid'}
+          Write-Output "OK: $($m.FullName) $($e.FullName)"
+          & 'townlight/desktop/scripts/test-installed-maintenance.ps1' -SourceCommit '5c386c6eb95df980d0b117c9a49aacf65b23b23d' -Mode recorder -MsiPath $m.FullName -EvidenceRoot (Join-Path $env:RUNNER_TEMP 'recorder-evidence')
 
       - name: Collect redacted logs and scheduled task state
         if: always()
