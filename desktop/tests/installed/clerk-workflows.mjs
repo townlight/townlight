@@ -62,7 +62,7 @@ export async function clerkWorkflows({ page, native, save, meetingId }) {
   const proposal = page.locator('[data-code-action="sendProposal"]');
   const section = proposal.getByLabel('Current code section');
   await section.selectOption({ label: '6.12.040 · Backyard chickens · Synthetic base version' });
-  const codeMeetingChoice = proposal.getByLabel('Meeting', { exact: true });
+  const codeMeetingChoice = proposal.locator('select[name="meeting_id"]');
   await codeMeetingChoice.locator('option', { hasText: meetingTitle }).waitFor({ state: 'attached' });
   await codeMeetingChoice.selectOption({ label: await codeMeetingChoice.locator('option', { hasText: meetingTitle }).textContent() });
   await proposal.getByLabel('Title', { exact: true }).fill(title);
