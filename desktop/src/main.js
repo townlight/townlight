@@ -5363,7 +5363,11 @@ function bindEvents() {
       if (state.activeArea === 'permitting' && button.dataset.area !== 'permitting' && !permittingView.canLeave()) return;
       if (state.activeArea === 'inspections' && button.dataset.area !== 'inspections' && !inspectionsView.canLeave()) return;
       if (state.activeArea === 'planning' && button.dataset.area !== 'planning' && !planningView.canLeave()) return;
-      if (state.activeArea !== 'records' && button.dataset.area === 'records') await loadAppState();
+      if (button.dataset.area === 'records' &&
+          (state.activeArea === 'inspections' ||
+           (state.activeArea !== 'records' && state.app.domain_authority === 'python-records'))) {
+        await loadAppState();
+      }
       municipalRecord = null;
       state.activeArea = button.dataset.area;
       state.pendingWorkReviewAction = null;
