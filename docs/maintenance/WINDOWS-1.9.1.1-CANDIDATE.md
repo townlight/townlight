@@ -1,6 +1,6 @@
-# Townlight Windows 1.9.1.1 candidate operator notes
+# Townlight Windows 1.9.1.1 operator notes
 
-These instructions cover the unpublished Windows candidate. Current public downloads and support continue to describe 1.9.0.1.
+These instructions cover the [published Windows 1.9.1.1 beta](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1). See the [maintenance handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/HANDOFF-Windows-1.9.1.1.md) for the signed installer identity, verified workflows and evidence limits.
 
 ## Meeting and packet
 

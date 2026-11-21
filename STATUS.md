@@ -1,8 +1,12 @@
 # Townlight Windows beta status
 
-## Windows 1.9.0.1 · Station recorder
+## Windows 1.9.1.1 · Clerk workflows and Station preview
 
-The current Windows MSI includes integrated recorder setup, camera and microphone selection, renewable operator sessions, and verified handoff of large recordings to Records. [Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
+The current Windows MSI includes Open Hall branding, Records setup checks and Station 0.4.4. [Download and release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
+
+## Windows 1.9.0.1 · Station recorder history
+
+The Windows 1.9.0.1 MSI introduced integrated recorder setup, camera and microphone selection, renewable operator sessions, and verified handoff of large recordings to Records. [Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
 
 ## Shared meeting imports · Windows 1.8.1.1
 
@@ -34,20 +38,20 @@ Status labels below are the suite's shared status set, generated from
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
-| Townlight Core | 1.3.0.dev2 | Shared platform | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Records | 1.8.0.dev4 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Meetings | 1.0.6 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Code | 1.0.9 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Access | 0.5.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Zoning | 0.2.3 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Planning | 0.4.0.dev2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Permitting | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Inspections | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Notice | 0.3.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Station | 0.4.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Boards & Commissions | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Contracts | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
-| Townlight Procurement | 0.3.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence. |
+| Townlight Core | 1.3.0.dev2 | Shared platform | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Records | 1.8.0.dev4 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Meetings | 1.0.6 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Code | 1.0.9 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Access | 0.5.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Zoning | 0.2.3 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Planning | 0.4.0.dev2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Permitting | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Inspections | 0.3.0+dev.2 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Notice | 0.3.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Station | 0.4.4 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Boards & Commissions | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Contracts | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
+| Townlight Procurement | 0.3.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.1.1. See the release for current checks and earlier evidence. |
 
 <!-- END GENERATED MODULE STATUS -->
 

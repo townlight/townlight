@@ -1,5 +1,12 @@
 # Changelog
 
+## Windows 1.9.1.1 public beta — published 2026-11-21 UTC
+
+- Added the Open Hall Windows installer and app artwork.
+- Improved meeting and packet preparation, ordinance proposal and decision handoffs, Records readiness and linked clerk work.
+- Shipped Station 0.4.4 with a verified ten-second camera and microphone preview before recording.
+- See the [signed Windows release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) and [acceptance and evidence](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
+
 ## Windows 1.9.0.1 public beta — published 2026-11-21 UTC
 
 - Set up bundled Station during Townlight first run. Choose and preview a camera and microphone, or use a configured UDP feed.

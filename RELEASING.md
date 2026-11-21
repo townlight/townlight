@@ -1,6 +1,6 @@
 # Current Windows release
 
-Windows 1.9.0.1 is published at https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1. The signed build used application source `5c386c6eb95df980d0b117c9a49aacf65b23b23d`. Read `release/ACCEPTANCE-Windows-1.9.0.1.md` and `docs/maintenance/WINDOWS-1.9.0.1.md` for the installed checks and their limits.
+[Windows 1.9.1.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) is the published Windows beta. Application source `2334a42a6dca632b96dcae119c98d1182231c113`. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) and [maintenance handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/HANDOFF-Windows-1.9.1.1.md) for the exact installer and evidence. [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) remains available.
 
 ## Historical release procedure records
 

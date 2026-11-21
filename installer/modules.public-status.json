@@ -53,8 +53,8 @@
         "grade": "platform",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -67,8 +67,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -81,8 +81,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -95,8 +95,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -109,8 +109,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -123,8 +123,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -137,8 +137,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -151,8 +151,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -165,8 +165,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -179,22 +179,22 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
       "id": "townlight-station",
       "name": "Townlight Station",
       "arch_tier": 3,
-      "current_version": "0.4.0",
+      "current_version": "0.4.4",
       "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -207,8 +207,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -221,8 +221,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     },
     {
@@ -235,8 +235,8 @@
         "grade": "released",
         "released_date": "2026-11-09",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1",
-        "note": "Included in Windows 1.9.0.1. Read the release summary for current installed checks and earlier evidence."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1",
+        "note": "Included in Windows 1.9.1.1. See the release for current checks and earlier evidence."
       }
     }
   ]
