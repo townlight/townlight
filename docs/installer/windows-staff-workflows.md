@@ -1,12 +1,12 @@
 # Windows staff workflows
 
-## Windows 1.9.0.1 Station recorder release
+## Windows 1.9.1.1 Station recorder release
 
-Windows 1.9.0.1 integrates Station setup, camera and microphone selection, renewable operator sessions and verified large-recording transfers to Records.
+Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
 
-Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
+Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
 
 Use these workflows with the full Windows profile. The separate Windows 1.8.2.1 acceptance records the earlier 1.8.1.1 upgrade and staff record checks.
 
@@ -51,4 +51,4 @@ remain city processes. The Windows workspaces record staff work and decisions.
 
 ## Release and support
 
-[Download Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
+[Download Windows 1.9.1.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.

@@ -1,13 +1,13 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Installation help, recovery guidance and product issue routes for Townlight Windows beta 1.9.0.1."><title>Townlight Windows beta support | Townlight</title><link rel="stylesheet" href="./assets/site.css"><link rel="icon" href="./brand/favicon.svg" type="image/svg+xml"><link rel="icon" href="./brand/favicon.ico" sizes="16x16 32x32 48x48"><link rel="apple-touch-icon" href="./brand/png/townlight-hall-app-icon-180.png"><meta property="og:image" content="https://townlight.github.io/brand/png/townlight-hall-social-preview.png"><meta name="twitter:card" content="summary_large_image"></head><body><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="./index.html"><img src="./brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a><span class="edition">Townlight Beta 1</span><nav aria-label="Main"><a href="./index.html#products">Products</a><a href="./manuals/suite.html">Suite manual</a><a href="./reference/index.html">Technical reference</a><a href="./terms.html">Terms and license</a></nav></header><main id="main" class="reading wrap"><article class="docbody"><h1 id="townlight-windows-beta-support">Townlight Windows beta
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Installation help, recovery guidance and product issue routes for Townlight Windows beta 1.9.1.1."><title>Townlight Windows beta support | Townlight</title><link rel="stylesheet" href="./assets/site.css"><link rel="icon" href="./brand/favicon.svg" type="image/svg+xml"><link rel="icon" href="./brand/favicon.ico" sizes="16x16 32x32 48x48"><link rel="apple-touch-icon" href="./brand/png/townlight-hall-app-icon-180.png"><meta property="og:image" content="https://townlight.github.io/brand/png/townlight-hall-social-preview.png"><meta name="twitter:card" content="summary_large_image"></head><body><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="./index.html"><img src="./brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a><span class="edition">Townlight Beta 1</span><nav aria-label="Main"><a href="./index.html#products">Products</a><a href="./manuals/suite.html">Suite manual</a><a href="./reference/index.html">Technical reference</a><a href="./terms.html">Terms and license</a></nav></header><main id="main" class="reading wrap"><article class="docbody"><h1 id="townlight-windows-beta-support">Townlight Windows beta
 support</h1>
 <h2 id="installation-and-recovery">Installation and recovery</h2>
 <p><strong>Fresh installation.</strong> For a fresh installation, run
-the signed Windows 1.9.0.1 MSI, then follow first-run setup with an
+the signed Windows 1.9.1.1 MSI, then follow first-run setup with an
 empty database and a new Townlight profile. Follow the <a
 href="https://townlight.github.io/manuals/suite.html#first-run">first-run
 instructions</a>.</p>
-<p>Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. </p>
-<p><strong>Upgrade from Windows 1.8.2.1.</strong> Back up your city data and settings in Townlight, close the app, then run the signed Windows 1.9.0.1 MSI. Reopen Townlight under the same Windows account with your existing profile. If Station shows as unconfigured, open Settings → Modules → Townlight Station and select <strong>Set up meeting recording</strong>. After restoring a backup, start the services before checking your records. See the <a href="https://github.com/townlight/townlight/actions/runs/44863028775">signed upgrade and recovery test</a>.</p>
+<p>Windows 1.9.1.1 is a signed public beta. See the acceptance summary for the verified workflows and artifact identities. Set up Station during Townlight first run. </p>
+<p><strong>Upgrade from an existing Windows installation.</strong> Back up your city data and settings in Townlight and close the app before running the signed MSI. Reopen Townlight under the same Windows account with your existing profile. If Station shows as unconfigured, open Settings → Modules → Townlight Station and select <strong>Set up meeting recording</strong>. After restoring a backup, start the services before checking your records. The <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md">acceptance summary</a> identifies the 1.9.0.1 upgrade run on the earlier signed candidate. The <a href="https://github.com/townlight/townlight/actions/runs/44863028775">separate verified 1.8.2.1 upgrade</a> ended at 1.9.0.1.</p>
 <p>Follow the <a
 href="https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance">backup,
 recovery and maintenance guidance</a>. Preserve existing data and
@@ -15,12 +15,12 @@ backups. Do not rename or delete the compatibility profile directory
 <code>%LOCALAPPDATA%\CivicSuite</code> to work around a setup
 problem.</p>
 <p>Verify the downloaded MSI against the <a
-href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/SHA256SUMS-Windows-1.9.0.1.txt">release
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/SHA256SUMS-Windows-1.9.1.1.txt">release
 checksums</a> and check its Authenticode signature is
 <code>Valid</code>, with signer Scott Converse. Use the exact release
 link here; GitHub’s Latest download now resolves to this public beta.
 The <a
-href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md">acceptance
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md">acceptance
 summary</a> describes the installed checks and their limits. Earlier
 local-model acceptance used a 16 GiB Sandbox; an 8 GiB run timed out
 without saving a draft.</p>
@@ -108,7 +108,7 @@ href="https://github.com/townlight/townlight/discussions">Townlight
 Discussions</a>.</p>
 <h2 id="what-to-include">What to include</h2>
 <ul>
-<li>Installed version (<strong>1.9.0.1</strong>) and Windows
+<li>Installed version (<strong>1.9.1.1</strong>) and Windows
 version.</li>
 <li>The selected products/profile and whether this was a fresh
 installation.</li>
@@ -130,4 +130,4 @@ provision a public website. Standalone CivicCast remains a separate
 product. The current Windows acceptance uses synthetic data and does not
 establish a live city deployment or physical broadcast acceptance.
 Follow each product guide for its supported workflow.</p>
-</article></main><aside class="release-note" aria-label="Current release"><p><strong>Current release:</strong> Townlight for Windows 1.9.0.1, a signed public beta. Installed checks cover fresh setup, Station recording, Records handoff and recovery. <a href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1">Downloads</a> · <a href="/announcement.html">Release notes and installation</a> · <a href="/versions.html">Versions and limits</a></p></aside><footer><span>Townlight Beta 1 · Townlight Beta 1 documentation · AGPL-3.0-only</span><span><a href="./versions.html">Exact versions and candidate</a> · CivicCast remains separate</span><span><a href="./brand/">Brand package</a></span><span><a href="./announcement.html">Announcement</a> · <a href="./support.html">Support and feedback</a></span></footer></body></html>
+</article></main><aside class="release-note" aria-label="Current release"><p><strong>Current release:</strong> Townlight for Windows 1.9.1.1, a signed public beta. See acceptance for the hardware test and earlier installed evidence. <a href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1">Downloads</a> · <a href="/announcement.html">Release notes and installation</a> · <a href="/versions.html">Versions and limits</a></p></aside><footer><span>Townlight Beta 1 · Townlight Beta 1 documentation · AGPL-3.0-only</span><span><a href="./versions.html">Exact versions and candidate</a> · CivicCast remains separate</span><span><a href="./brand/">Brand package</a></span><span><a href="./announcement.html">Announcement</a> · <a href="./support.html">Support and feedback</a></span></footer></body></html>

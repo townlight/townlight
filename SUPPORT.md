@@ -1,12 +1,12 @@
 # Townlight Windows beta support
 
-## Windows 1.9.0.1 Station recorder release
+## Windows 1.9.1.1 Station recorder release
 
-Windows 1.9.0.1 integrates Station setup, camera and microphone selection, renewable operator sessions and verified large-recording transfers to Records.
+Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
 
-Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
+Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
 
 ## Shared meeting imports · Windows 1.8.1.1
 
@@ -14,31 +14,31 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 [All 31 sources, formats and handoffs](https://townlight.github.io/manuals/meeting-imports.html) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
 
-Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
+Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
 
-Windows 1.9.0.1 contains Station 0.4.0, Records 1.8.0.dev4, Townlight Runtime 0.3.2 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
+Windows 1.9.1.1 contains Station 0.4.4, Records 1.8.0.dev4, Townlight Runtime 0.3.3 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
 
 
-These instructions cover the signed **Windows x64 public beta 1.8.1.1**.
+These instructions cover the signed **Windows x64 public beta 1.9.1.1**.
 
-[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/Townlight-Windows-x64-1.9.0.1.msi) ·
-[Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1) ·
+[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/Townlight-Windows-x64-1.9.1.1.msi) ·
+[Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) ·
 [Suite manual](https://townlight.github.io/manuals/suite.html) ·
 [Public beta announcement](https://townlight.github.io/announcement.html)
 
 ## Installation and recovery
 
-**Fresh installation.** For a fresh installation, run the signed Windows 1.9.0.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
+**Fresh installation.** For a fresh installation, run the signed Windows 1.9.1.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
 
-Windows 1.9.0.1 has signed fresh-install acceptance, including Station recording, Records handoff and recovery. Set up Station during Townlight first run. Read the acceptance summary before upgrading.
+**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The upgrade from Windows 1.9.0.1 was exercised on the signed 1.9.1.1 predecessor candidate. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) identifies the separate checks on the shipped MSI. The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
 
 Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
 Preserve existing data and backups. Do not rename or delete the compatibility
 profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
-Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/SHA256SUMS-Windows-1.9.0.1.txt) and check
+Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/SHA256SUMS-Windows-1.9.1.1.txt) and check
 its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact
-release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) describes the installed checks
+release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) describes the installed checks
 and their limits. Earlier local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
 timed out without saving a draft.
 
@@ -71,7 +71,7 @@ For questions and evaluation feedback, use
 
 ## What to include
 
-- Installed version (**1.9.0.1**) and Windows version.
+- Installed version (**1.9.1.1**) and Windows version.
 - The selected products/profile and whether this was a fresh installation.
 - Steps to reproduce, what you expected and what happened.
 - Redacted error messages, logs or screenshots, using synthetic data where possible.

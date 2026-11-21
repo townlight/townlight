@@ -14,7 +14,7 @@ These versions are bundled with [Windows x64 beta 1.8.0.1](https://github.com/to
 | `townlight-inspections` | [townlight/inspect](https://github.com/townlight/inspect) | 0.3.0+dev.2 |
 | `townlight-access` | [townlight/access](https://github.com/townlight/access) | 0.5.0 |
 | `townlight-notice` | [townlight/notice](https://github.com/townlight/notice) | 0.3.0 |
-| `townlight-station` | [townlight/station](https://github.com/townlight/station) | 0.4.0 |
+| `townlight-station` | [townlight/station](https://github.com/townlight/station) | 0.4.4 |
 | `townlight-boards` | [townlight/boards](https://github.com/townlight/boards) | 0.2.0 |
 | `townlight-contracts` | [townlight/contracts](https://github.com/townlight/contracts) | 0.2.0 |
 | `townlight-procurement` | [townlight/procure](https://github.com/townlight/procure) | 0.3.0 |

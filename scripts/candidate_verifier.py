@@ -61,6 +61,16 @@ def verify_pinned_metadata(state, read_file):
                 source = shipped["repository"]
                 public = tomllib.loads(read_file(source["name"], shipped["installer"]["source_commit"],
                                                   source["manifest_path"]).decode("utf-8-sig"))["project"]
+                if (public["version"] != module["versions"]["public_status"] and
+                        state["desktop_release"].get("channel") == "public-beta"):
+                    # The combined Windows MSI overrides the generic installer pins.
+                    profile = json.loads(read_file(
+                        "townlight/townlight", state["desktop_release"]["commit"],
+                        "config/inspections-preview-sources.json"))
+                    pin = profile["sources"].get(source["name"])
+                    if pin:
+                        public = tomllib.loads(read_file(
+                            source["name"], pin, source["manifest_path"]).decode("utf-8-sig"))["project"]
                 if public["name"] != expected or public["version"] != module["versions"]["public_status"]:
                     errors.append(f"{key}: public_status differs from the published source pin")
         except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:
@@ -158,12 +168,13 @@ class TableRows(HTMLParser):
 def verify_documentation(state, read_file):
     """Read actual built current tables, including the Meetings manual."""
     errors = []
-    all_packages = [(module["legacy"]["package_names"][0], module["versions"]["installer"])
+    version_field = "public_status" if state["desktop_release"].get("channel") == "public-beta" else "installer"
+    all_packages = [(module["legacy"]["package_names"][0], module["versions"][version_field])
                     for module in state["modules"].values()]
     all_packages.append(("townlight-runtime", state["desktop_release"]["runtime_version"]))
     meetings = state["modules"]["meetings"]
     for name, expected in [("versions.html", all_packages), ("manuals/suite.html", all_packages),
-                           ("manuals/meetings.html", [(meetings["legacy"]["package_names"][0], meetings["versions"]["installer"])])]:
+                           ("manuals/meetings.html", [(meetings["legacy"]["package_names"][0], meetings["versions"][version_field])])]:
         try:
             parser = TableRows()
             parser.feed(read_file(name).decode("utf-8-sig"))

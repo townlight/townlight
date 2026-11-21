@@ -75,6 +75,16 @@ def test_pinned_metadata_rejects_stale_state_and_ignores_new_branch_head(tmp_pat
     assert verify_pinned_metadata(split, read_published) == []
     split["modules"]["core"]["versions"]["public_status"] = "9.0.0"
     assert any("public_status differs" in error for error in verify_pinned_metadata(split, read_published))
+    split["desktop_release"]["channel"] = "public-beta"
+    split["modules"]["core"]["versions"]["public_status"] = "1.3.1"
+    def read_profile(repository, pin, name):
+        if name == "config/inspections-preview-sources.json":
+            assert pin == state["desktop_release"]["commit"]
+            return json.dumps({"sources": {"townlight/core": "c" * 40}}).encode()
+        if pin == "c" * 40:
+            return b'[project]\nname="townlight-core"\nversion="1.3.1"'
+        return read_published(repository, pin, name)
+    assert verify_pinned_metadata(split, read_profile) == []
     stale = copy.deepcopy(state)
     stale["modules"]["core"]["versions"]["installer"] = "9.0.0"
     assert any("pinned package version" in error for error in verify_pinned_metadata(stale, read))
@@ -85,7 +95,7 @@ def test_pinned_metadata_rejects_stale_state_and_ignores_new_branch_head(tmp_pat
 
 def test_built_documentation_rejects_old_meetings_table():
     state = json.loads((Path(__file__).resolve().parents[1] / "config/suite-state.json").read_text())
-    rows = ''.join(f'<tr><td>{m["legacy"]["package_names"][0]}</td><td>{m["versions"]["installer"]}</td></tr>'
+    rows = ''.join(f'<tr><td>{m["legacy"]["package_names"][0]}</td><td>{m["versions"]["public_status"]}</td></tr>'
                    for m in state["modules"].values())
     rows += f'<tr><td>townlight-runtime</td><td>{state["desktop_release"]["runtime_version"]}</td></tr>'
     assert verify_documentation(state, lambda name: rows.encode()) == []
