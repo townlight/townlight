@@ -1,0 +1,62 @@
+name: Verify signed Windows 1.9.1.1 without rebuilding
+on:
+  push:
+    branches: [test/signed-1911-fresh-readback]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: signed-1911-fresh-readback
+  cancel-in-progress: true
+jobs:
+  fresh:
+    runs-on: windows-latest
+    timeout-minutes: 125
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: townlight
+          ref: d22f017cf6c05aa2eba483fe92ee8af6b2c88272
+      - uses: actions/checkout@v5
+        with:
+          path: verification
+      - name: Use corrected acceptance selector
+        shell: pwsh
+        run: Copy-Item -LiteralPath verification/desktop/tests/installed/clerk-workflows.mjs -Destination townlight/desktop/tests/installed/clerk-workflows.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: townlight-windows-local-msi-SIGNED
+          github-token: ${{ github.token }}
+          run-id: 44870777465
+          path: msi-artifact
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+      - name: Install existing desktop test tools
+        working-directory: townlight/desktop
+        run: npm ci
+      - name: Prepare hosted Windows test volume
+        shell: pwsh
+        run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
+      - name: Verify installed workflows against the original signed candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = 'd22f017cf6c05aa2eba483fe92ee8af6b2c88272'
+          $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
+          $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*signing-receipt.json' -Recurse -File)
+          if ($msis.Count -ne 1 -or $receipts.Count -ne 1) { throw 'Expected one signed candidate and its signing receipt' }
+          $receipt = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
+          if ($receipt.source_commit -ne $source -or $receipt.workflow_run -ne '44870777465') { throw 'Unexpected candidate provenance' }
+          $hash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne ($receipt.files | Where-Object file -eq $msis[0].Name).signed_sha256) { throw 'The signed MSI differs from the signing receipt' }
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode fresh -SourceCommit $source -EvidenceRoot "$env:RUNNER_TEMP/installed-evidence"
+      - name: Preserve installed acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-1911-fresh-readback
+          path: ${{ runner.temp }}/installed-evidence
+          retention-days: 7
