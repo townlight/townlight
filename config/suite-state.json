@@ -12,11 +12,11 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.8.2-1",
-    "tag": "townlight-windows-v1.8.2.1",
-    "commit": "993d47567799cd8f676fb514daea7edb3636eb0b",
+    "version": "1.9.0-1",
+    "tag": "townlight-windows-v1.9.0.1",
+    "commit": "5c386c6eb95df980d0b117c9a49aacf65b23b23d",
     "channel": "public-beta",
-    "published_at": "2026-11-20",
+    "published_at": "2026-11-21",
     "asset_policy": "windows-msi",
     "runtime_version": "0.3.2"
   },
@@ -274,7 +274,7 @@
         "development": "1.8.0.dev4",
         "released": null,
         "installer": "1.8.0.dev4",
-        "public_status": "1.8.0.dev3"
+        "public_status": "1.8.0.dev4"
       },
       "release": {
         "tag": null,
@@ -741,7 +741,7 @@
         "development": "0.4.0",
         "released": null,
         "installer": "0.4.0",
-        "public_status": "0.3.1"
+        "public_status": "0.4.0"
       },
       "release": {
         "tag": null,

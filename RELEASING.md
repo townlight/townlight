@@ -1,6 +1,6 @@
 # Current Windows release
 
-Windows 1.8.2.1 is published at https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.2.1. The exact signed build is `993d47567799cd8f676fb514daea7edb3636eb0b`; later documentation and test-harness corrections do not replace those bytes. Read `release/ACCEPTANCE-Windows-1.8.2.1.md` and `docs/maintenance/WINDOWS-1.8.2.1.md` for new and reused evidence. The original signing job passed; corrected installed-harness receipts identify the same MSI hash. The earlier 1.8.1.1 release remains intact.
+Windows 1.9.0.1 is published at https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1. The signed build used application source `5c386c6eb95df980d0b117c9a49aacf65b23b23d`. Read `release/ACCEPTANCE-Windows-1.9.0.1.md` and `docs/maintenance/WINDOWS-1.9.0.1.md` for the installed checks and their limits.
 
 ## Historical release procedure records
 

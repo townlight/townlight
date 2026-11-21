@@ -1,5 +1,12 @@
 # Changelog
 
+## Windows 1.9.0.1 public beta — published 2026-11-21 UTC
+
+- Set up bundled Station during Townlight first run. Choose and preview a camera and microphone, or use a configured UDP feed.
+- Record with eight-hour and 64 GiB limits and storage safeguards. Renew operator sessions and reconnect to the same recording.
+- Verify large recording transfers into Records. Station is 0.4.0 and Records is 1.8.0.dev4.
+- See the [signed Windows release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) and [installed evidence and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md).
+
 ## Windows 1.8.2.1 public beta — published 2026-11-20 UTC
 
 - Package corrected staff authorization, explicit database credential configuration, license documentation and component pins.

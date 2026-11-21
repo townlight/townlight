@@ -1,7 +1,7 @@
 {
-  "source_companion_sha256": "bac6706de89549c9016c8c6e581538a629adbb28bc71e8659ea1e23e1209bc99",
+  "source_companion_sha256": "41725a4e2e2f844ed27474d8348563b03456a30166507f46e228c963a2ff7b5c",
   "source_companion_pending": false,
-  "basis": "Exact Windows 1.8.2.1 corresponding-source archives. Declarations are source references. The release acceptance records installed behavior.",
+  "basis": "Exact Windows 1.9.0.1 corresponding-source archives. Declarations are source references. The release acceptance records installed behavior.",
   "products": {
     "core": {
       "repository": "townlight/core",
@@ -5941,7 +5941,7 @@
     },
     "records": {
       "repository": "townlight/sunshine",
-      "repository_head": "f63fe0e30a92eee2141ecc16bdbed6b2ad901f0e",
+      "repository_head": "7cbdab22a8d8939a6e022022bacb7de51ac4f6ca",
       "working_tree_modified": false,
       "principal_import": "townlight_records",
       "source": [
@@ -7335,8 +7335,8 @@
         },
         {
           "source": "backend/townlight_records/desktop_bridge/schemas.py",
-          "sha256": "f200aa93d3ee20fe866ccae7c2827500b2dfc24b6f1763994a4feefa430b9194",
-          "bytes": 13013,
+          "sha256": "f4febdec6047b0d9c28dacdbfabb96ec5d2fbef1c9961b901782d0e39e8f0f21",
+          "bytes": 13015,
           "routes": [],
           "models": [
             {
@@ -9053,20 +9053,20 @@
         },
         {
           "source": "backend/townlight_records/desktop_bridge/station.py",
-          "sha256": "b623472558d71bad1d09770a0aec3e193189afc00834db7c2f5132166966160b",
-          "bytes": 9420,
+          "sha256": "c677c58371edc79b6e76738da3a177b97f18c2d64c69aa54faae163c3c13c045",
+          "bytes": 10324,
           "routes": [
             {
               "method": "GET",
               "declared_path": "/station/context",
               "function": "context",
-              "line": 43
+              "line": 57
             },
             {
               "method": "POST",
               "declared_path": "/requests/{request_id}/station-recordings",
               "function": "attach",
-              "line": 79
+              "line": 93
             }
           ],
           "models": [
@@ -9079,21 +9079,25 @@
                 {
                   "name": "recording_id",
                   "type": "UUID",
-                  "line": 63
+                  "line": 77
                 },
                 {
                   "name": "expected_sha256",
                   "type": "str",
-                  "line": 64
+                  "line": 78
                 }
               ],
-              "line": 61
+              "line": 75
             }
           ],
           "configuration": [
             {
+              "environment": "TOWNLIGHT_PROFILE_ROOT",
+              "line": 36
+            },
+            {
               "environment": "TOWNLIGHT_STATION_URL",
-              "line": 33
+              "line": 34
             }
           ]
         },
@@ -9787,8 +9791,8 @@
         },
         {
           "source": "backend/townlight_records/models/document.py",
-          "sha256": "49d34006fc4f30fc665813fc9fddde6f36dfe6ff4f283652f9abe4f0c429c795",
-          "bytes": 7841,
+          "sha256": "2de4f97bc87609deabf2f213262b1204f82f7b10dc2264bbd9c45f7f2c9e711e",
+          "bytes": 7856,
           "routes": [],
           "models": [
             {
@@ -31266,13 +31270,13 @@
     },
     "station": {
       "repository": "townlight/station",
-      "repository_head": "5e65aa40795933ce2f39b195f869dacb9d4aa6a8",
+      "repository_head": "49274095fe0d9c7c61f66d4b354a3cc2edda2e24",
       "working_tree_modified": false,
       "principal_import": "townlight_station",
       "source": [
         {
           "source": "beta-1/townlight_station/__init__.py",
-          "sha256": "0e4ae6948a7b82358592fa123efcb0f2f19edd0322d93e8077da9db1dcde1ccc",
+          "sha256": "e84cbde81ace1c93b242a09dbfd4f48ff77b84311a75793900270a910bbaac29",
           "bytes": 132,
           "routes": [],
           "models": [],
@@ -31296,8 +31300,8 @@
         },
         {
           "source": "beta-1/townlight_station/api.py",
-          "sha256": "8df6352adb3b94d717fb024c1ce120faf2bcd478405bdaa518e8a7ff5b0c6c39",
-          "bytes": 14612,
+          "sha256": "9526fdb3374bffc72f0f2c078bcb1577eddff42b956884addc941c31cc5422a1",
+          "bytes": 15597,
           "routes": [
             {
               "method": "GET",
@@ -31309,49 +31313,49 @@
               "method": "GET",
               "declared_path": "/v1/identity",
               "function": "identity",
-              "line": 86
+              "line": 95
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings",
               "function": "capture",
-              "line": 91
+              "line": 100
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings/{identity}",
               "function": "get_record",
-              "line": 196
+              "line": 212
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings/{identity}/content",
               "function": "content",
-              "line": 200
+              "line": 216
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings/{identity}/retry",
               "function": "retry",
-              "line": 211
+              "line": 227
             },
             {
               "method": "GET",
               "declared_path": "/v1/live-sources",
               "function": "live_sources",
-              "line": 224
+              "line": 240
             },
             {
               "method": "GET",
               "declared_path": "/v1/recordings",
               "function": "list_records",
-              "line": 229
+              "line": 245
             },
             {
               "method": "POST",
               "declared_path": "/v1/recordings/{identity}/stop",
               "function": "stop_live",
-              "line": 235
+              "line": 251
             }
           ],
           "models": [
@@ -31403,9 +31407,17 @@
           "configuration": []
         },
         {
+          "source": "beta-1/townlight_station/backup.py",
+          "sha256": "0e168cee75eb9f6d7ee1978e05f85ec4b13f1bf4c5cb28f268e857a831ffcd22",
+          "bytes": 7182,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
           "source": "beta-1/townlight_station/boundary.py",
-          "sha256": "700a35e89a4e0292a5e10e53957cda336fdfd1419ade5041982c653cc6af81a3",
-          "bytes": 7458,
+          "sha256": "7d94143e5b8607df287294a4e60d385835a49bd752c2c821c3a18aeef5f687da",
+          "bytes": 7823,
           "routes": [],
           "models": [
             {
@@ -31476,6 +31488,11 @@
                   "name": "bitrate_kbps",
                   "type": "int",
                   "line": 58
+                },
+                {
+                  "name": "reserve_bytes",
+                  "type": "int",
+                  "line": 59
                 }
               ],
               "line": 45
@@ -31485,11 +31502,16 @@
         },
         {
           "source": "beta-1/townlight_station/cli.py",
-          "sha256": "b67d712170f08a90e3477d2c12b04ecef0581e6844f6ad79c661bf0e8f86b722",
-          "bytes": 2362,
+          "sha256": "181485a49b4e1b2421037d1f40dbb275cc53373557e261b3a0f332a4b616b27d",
+          "bytes": 4845,
           "routes": [],
           "models": [],
-          "configuration": []
+          "configuration": [
+            {
+              "environment": "TOWNLIGHT_SUPPRESS_OPEN_BROWSER",
+              "line": 97
+            }
+          ]
         },
         {
           "source": "beta-1/townlight_station/delivery.py",
@@ -31555,6 +31577,22 @@
           "configuration": []
         },
         {
+          "source": "beta-1/townlight_station/device_probe.py",
+          "sha256": "3d50ef66276842cfe55df183bd182db916a4ad37aea9179e74c2466490d9d666",
+          "bytes": 2940,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "beta-1/townlight_station/devices.py",
+          "sha256": "449e25391d03c10c85beb114b7d8b697ccb3d5209708e3f1224f393e3af208c3",
+          "bytes": 1232,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
           "source": "beta-1/townlight_station/feed_job.py",
           "sha256": "a2e08fa43b4fb5b7f036de8fdef256cff1a6c39f2b4adabc08b09aa3fedb21f1",
           "bytes": 4086,
@@ -31571,9 +31609,17 @@
           "configuration": []
         },
         {
+          "source": "beta-1/townlight_station/input_test.py",
+          "sha256": "e7b988f13477b2497d1ad03f79f66c665fba0b646fb06baf052d4e789ecde92e",
+          "bytes": 2098,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
           "source": "beta-1/townlight_station/live.py",
-          "sha256": "5f32afd8d2b5e74296a083436b367fec3940da6ae33123fc17842bf0c6c05cce",
-          "bytes": 1251,
+          "sha256": "48189f940ad1630aab1eab0ae97963be7a8549fcbd8088ad13b82776e8b1a180",
+          "bytes": 1833,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31588,8 +31634,8 @@
         },
         {
           "source": "beta-1/townlight_station/media_job.py",
-          "sha256": "15237eaa872c9772c548aaf57dced25ec51a343489b894a462d95de19507e59b",
-          "bytes": 4024,
+          "sha256": "7ef10d35ba2ba18f2969a0fa08722510b754b20f2f39a740a277028dcd002193",
+          "bytes": 5303,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31791,74 +31837,110 @@
         },
         {
           "source": "beta-1/townlight_station/operator.py",
-          "sha256": "9b88822016886adc86c6a4ec30620d4312b05871a4d5757379365e656053ac67",
-          "bytes": 7912,
+          "sha256": "e1ae056d30d18c4aa340882437111e0ec272c6fe70b2f1ecf6dbe7132d4629a2",
+          "bytes": 12769,
           "routes": [
             {
               "method": "POST",
               "declared_path": "/v1/operator-ticket",
               "function": "issue",
-              "line": 57
+              "line": 60
             },
             {
               "method": "POST",
               "declared_path": "/operator/session",
               "function": "exchange",
-              "line": 66
+              "line": 69
             },
             {
               "method": "POST",
               "declared_path": "/operator/logout",
               "function": "logout",
-              "line": 81
+              "line": 84
+            },
+            {
+              "method": "POST",
+              "declared_path": "/operator/renew",
+              "function": "renew",
+              "line": 91
+            },
+            {
+              "method": "GET",
+              "declared_path": "/operator/devices",
+              "function": "device_list",
+              "line": 112
+            },
+            {
+              "method": "POST",
+              "declared_path": "/operator/devices",
+              "function": "select_devices",
+              "line": 126
+            },
+            {
+              "method": "POST",
+              "declared_path": "/operator/input-test",
+              "function": "test_inputs",
+              "line": 135
+            },
+            {
+              "method": "GET",
+              "declared_path": "/operator/input-test/content",
+              "function": "input_preview",
+              "line": 160
+            },
+            {
+              "method": "GET",
+              "declared_path": "/operator/storage",
+              "function": "capacity",
+              "line": 169
             },
             {
               "method": "GET",
               "declared_path": "/operator/catalog",
               "function": "catalog",
-              "line": 88
+              "line": 175
             },
             {
               "method": "GET",
               "declared_path": "/operator/meeting/{identity}",
               "function": "meeting",
-              "line": 108
+              "line": 195
             },
             {
               "method": "GET",
               "declared_path": "/operator/meeting/{identity}/imported-recordings",
               "function": "imported_recordings",
-              "line": 112
+              "line": 199
             },
             {
               "method": "POST",
               "declared_path": "/operator/meeting/{identity}/imported-recordings",
               "function": "stage_imported_recording",
-              "line": 121
+              "line": 208
             },
             {
               "method": "POST",
               "declared_path": "/operator/handoff",
               "function": "handoff",
-              "line": 129
+              "line": 216
             },
             {
               "method": "GET",
               "declared_path": "/",
               "function": "page",
-              "line": 147
+              "line": 236
             },
             {
               "method": "GET",
               "declared_path": "/operator.js",
               "function": "script",
-              "line": 151
+              "line": 240
             },
             {
               "method": "GET",
               "declared_path": "/operator.css",
               "function": "style",
-              "line": 155
+              "line": 244
             }
           ],
           "models": [
@@ -31871,10 +31953,10 @@
                 {
                   "name": "ticket",
                   "type": "str",
-                  "line": 16
+                  "line": 17
                 }
               ],
-              "line": 14
+              "line": 15
             },
             {
               "name": "Handoff",
@@ -31885,20 +31967,20 @@
                 {
                   "name": "request_id",
                   "type": "UUID",
-                  "line": 21
+                  "line": 22
                 },
                 {
                   "name": "recording_id",
                   "type": "UUID",
-                  "line": 22
+                  "line": 23
                 },
                 {
                   "name": "expected_sha256",
                   "type": "str",
-                  "line": 23
+                  "line": 24
                 }
               ],
-              "line": 19
+              "line": 20
             },
             {
               "name": "ImportedRecording",
@@ -31909,10 +31991,29 @@
                 {
                   "name": "index",
                   "type": "int",
-                  "line": 28
+                  "line": 29
                 }
               ],
-              "line": 26
+              "line": 27
+            },
+            {
+              "name": "DeviceSelection",
+              "bases": [
+                "BaseModel"
+              ],
+              "fields": [
+                {
+                  "name": "video_id",
+                  "type": "str",
+                  "line": 122
+                },
+                {
+                  "name": "audio_id",
+                  "type": "str",
+                  "line": 123
+                }
+              ],
+              "line": 120
             }
           ],
           "configuration": []
@@ -31921,6 +32022,22 @@
           "source": "beta-1/townlight_station/packaging.py",
           "sha256": "e53a0b87870b728f6ee5015672e08f9ca05eab0e3c33f5d4c8ecb08b88d92158",
           "bytes": 3726,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "beta-1/townlight_station/setup_windows.py",
+          "sha256": "1164724e48f52d709835eb929cd30d3fa5c4a2ea21d7fa64e145e45d000bf170",
+          "bytes": 22503,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "beta-1/townlight_station/storage_policy.py",
+          "sha256": "80e246371dfb8a8b2a7a7bcaaae87284eeeeccb4dcfc4a02494874ed322e9077",
+          "bytes": 1283,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31943,16 +32060,16 @@
         },
         {
           "source": "beta-1/townlight_station/ui/operator.css",
-          "sha256": "689079902c8b58f4737a47bdc8a4352f9845c21d0d6bbc017660bf1c21015ec9",
-          "bytes": 1723,
+          "sha256": "1883a00ba2cf0b5a0923c062d2ec97ad6c177fd00da45eed45b009fb7fce9583",
+          "bytes": 1848,
           "routes": [],
           "models": [],
           "configuration": []
         },
         {
           "source": "beta-1/townlight_station/ui/operator.js",
-          "sha256": "06d6c6265783512f1819046708c69cba1d76df0ecec3f2a4a8a3b5ffdc77fe61",
-          "bytes": 203991,
+          "sha256": "ca2a257728d6a578a1c2e13e9ceb3a494e00025796d19dae12c5a26ca1852197",
+          "bytes": 207605,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31961,6 +32078,14 @@
           "source": "beta-1/townlight_station/vod_job.py",
           "sha256": "d55a20bdf377142d6acd857aaca86d17468837ee638311dd3ac0fb76b571821d",
           "bytes": 4583,
+          "routes": [],
+          "models": [],
+          "configuration": []
+        },
+        {
+          "source": "beta-1/townlight_station/windows_cluster.py",
+          "sha256": "2cf76eda1ea4680364bd1ea44d0359a0a3c4baacf78ed543ac04904a2d9bbbd3",
+          "bytes": 2369,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31975,8 +32100,8 @@
         },
         {
           "source": "beta-1/townlight_station/worker.py",
-          "sha256": "dd69aaf49e1af7a887a104b1aee7c5a0f459dc95d6a3d520bacb88ad82748e32",
-          "bytes": 21320,
+          "sha256": "3b7aef95f16e403f386f1a9d2053133760765d295d2ce32d2769a135aa255001",
+          "bytes": 21697,
           "routes": [],
           "models": [],
           "configuration": []
@@ -31985,7 +32110,7 @@
     },
     "runtime": {
       "repository": "townlight/townlight",
-      "repository_head": "993d47567799cd8f676fb514daea7edb3636eb0b",
+      "repository_head": "5c386c6eb95df980d0b117c9a49aacf65b23b23d",
       "working_tree_modified": false,
       "principal_import": "townlight_runtime",
       "source": [
@@ -35593,8 +35718,8 @@
         },
         {
           "source": "desktop/src-tauri/src/first_run.rs",
-          "sha256": "406848985ec243c49c9d23d5572ffbcdb69dfa531f6dd44f814b3bb364a96d0e",
-          "bytes": 55973,
+          "sha256": "2754ed6efab49f03fe0170bd516f544c6993ccbf474bb8622de79b0e6ec68da6",
+          "bytes": 56387,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35625,8 +35750,8 @@
         },
         {
           "source": "desktop/src-tauri/src/main.rs",
-          "sha256": "43be9346f7f64f40a2fa9bfb18fc7d15f9bdf3d437e1d80c542665e2b1d70b03",
-          "bytes": 84133,
+          "sha256": "0f3f56ab1321263a94ddddba126219831ad8df61144355e9da10ceaba298a2af",
+          "bytes": 84707,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35713,8 +35838,8 @@
         },
         {
           "source": "desktop/src-tauri/src/supervisor.rs",
-          "sha256": "ef449704cb76a44de1eee2e26b8cfc840d1c286f7b109a75ebe8812085ea3fc6",
-          "bytes": 224477,
+          "sha256": "4cc89c635032736beee0860205d53ba3254955c07bf64715fb36d41c3dfc883f",
+          "bytes": 231469,
           "routes": [],
           "models": [],
           "configuration": []
@@ -35761,8 +35886,8 @@
         },
         {
           "source": "desktop/src/main.js",
-          "sha256": "11f4f61bf9bef7ec0249d15acdc5a9e9d494fc1eab1afc00d1f4ce314ad7dbf5",
-          "bytes": 362150,
+          "sha256": "fa2adf41d4042132936eef1318e5245ed87144ca0ff4ac7c1a7fa430d3d7178b",
+          "bytes": 363904,
           "routes": [],
           "models": [],
           "configuration": []
