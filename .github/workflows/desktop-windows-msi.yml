@@ -319,7 +319,7 @@ jobs:
           }
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -779,7 +779,7 @@ jobs:
           path: procurement
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -1066,7 +1066,7 @@ jobs:
       # installed wizard or prove the complete installed Records journey.
       # Exact-byte clean-machine acceptance remains a separate release gate.
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -1160,7 +1160,7 @@ jobs:
         with:
           name: townlight-windows-local-msi-UNSIGNED
           path: msi-artifact
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -1241,7 +1241,7 @@ jobs:
         with:
           name: ${{ needs.windows-local-msi.outputs.artifact_name }}
           path: msi-artifact
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
