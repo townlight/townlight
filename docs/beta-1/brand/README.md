@@ -2,4 +2,4 @@
 
 ![Townlight](svg/townlight-hall-lockup.svg)
 
-[Brand guide](BRAND.md) · [Download the package](../../brand/Townlight-Open-Hall-Brand.zip)
+[Brand guide](BRAND.md) · [Download the package](Townlight-Open-Hall-Brand.zip)
