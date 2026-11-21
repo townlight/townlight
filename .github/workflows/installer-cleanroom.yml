@@ -12,6 +12,11 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
+      - name: Checkout the diagnostic harness
+        uses: actions/checkout@v4
+        with:
+          path: diagnostic-harness
+
       - name: Checkout exact townlight ref
         uses: actions/checkout@v4
         with:
@@ -86,7 +91,7 @@ jobs:
           $msi=(Resolve-Path 'msi-artifact/Townlight-Windows-x64-1.9.0.1.msi').Path
           $hash='fde5cfd9d167571792e2384f7a5066b1dbea3fdc8b2085cf43f670440210ff0c'
           if ((Get-FileHash -LiteralPath $msi).Hash.ToLowerInvariant() -ne $hash) { throw 'Published target all-bytes hash mismatch' }
-          & ./upgrade-baseline/prepare-harness.ps1 -Checkout (Resolve-Path townlight).Path
+          & ./diagnostic-harness/upgrade-baseline/prepare-harness.ps1 -Checkout (Resolve-Path townlight).Path
           & ./townlight/desktop/scripts/test-installed-maintenance.ps1 -Mode upgrade -SourceCommit '5c386c6eb95df980d0b117c9a49aacf65b23b23d' -MsiPath $msi -EvidenceRoot (Join-Path $env:RUNNER_TEMP 'recorder-evidence')
 
       - name: Collect redacted logs and scheduled task state
