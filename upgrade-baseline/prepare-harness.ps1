@@ -15,6 +15,7 @@ $backup=@"
     await save('seed-backup',{passed:true,before_upgrade:true});
   }
 "@
-[IO.File]::WriteAllText($test,$text.Replace($needle,$backup+"`n"+$needle))
+$installedReadback=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'installed-readback.mjs'))
+[IO.File]::WriteAllText($test,$text.Replace($needle,$installedReadback+"`n"+$backup+"`n"+$needle))
 node --check $test
 if($LASTEXITCODE){throw 'Patched acceptance harness has invalid syntax'}
