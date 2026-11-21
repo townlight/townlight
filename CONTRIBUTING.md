@@ -2,9 +2,9 @@
 
 # Contributing to Townlight
 
-The townlight umbrella repo holds suite-wide documentation, design principles,
-cross-module ADRs, the roadmap, governance, and the Townlight Core <-> module
-compatibility matrix. It does not hold code.
+This repository contains the Windows desktop app, installer, local runtime integration,
+and suite-wide documentation. Component repositories are listed in the
+[product source directory](https://github.com/townlight#townlight).
 
 ## Where to file your bug
 
@@ -19,8 +19,7 @@ the most common contributor friction.
   exemption dashboard, public request portal) -> file at
   `townlight/sunshine` (the records repo now lives in the Townlight org; the canonical home is `townlight/sunshine`).
 - **Townlight Meetings / Townlight Code / Townlight Zoning bug** -> file at the matching module
-  repo. If the module repo doesn't exist yet, file in this umbrella with the
-  `module:<name>` label.
+  repo: [Meetings](https://github.com/townlight/meetings), [Code](https://github.com/townlight/ordinances), or [Zoning](https://github.com/townlight/zone).
 - **Cross-module strategy or roadmap question, docs typo, ADR proposal, suite
   governance question** -> file here.
 - **Security vulnerability in any repo** -> open a private GitHub Security
@@ -45,9 +44,7 @@ the most common contributor friction.
 
 ## Attribution
 
-Documentation in this repo is licensed under CC BY 4.0. If you adapt or
-republish any of it, attribute "Townlight contributors" and link back to
-this repository.
+Current first-party documentation is licensed under [AGPL-3.0-only](LICENSE-DOCS). Historical grants and third-party notices continue to apply to their respective materials.
 
 ## Code of conduct
 

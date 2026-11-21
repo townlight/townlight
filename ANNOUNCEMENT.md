@@ -51,6 +51,8 @@ AGPL-3.0-only; retained historical grants and third-party notices still apply.
 
 ## What was verified
 
+[Windows 1.9.0.1 installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/ACCEPTANCE-Windows-1.9.0.1.md) covers fresh setup, Station recording, the Records handoff, and recovery. The release notes link the passed upgrade from 1.8.1.1. The direct upgrade from 1.8.2.1 has no published result yet.
+
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
 The MSI and desktop executable have valid timestamped Authenticode signatures. Read the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md) and [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html).
@@ -61,7 +63,7 @@ The MSI and desktop executable have valid timestamped Authenticode signatures. R
    [published checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.0.1/SHA256SUMS-Windows-1.9.0.1.txt) from this exact release.
 2. In PowerShell, run `Get-FileHash .\Townlight-Windows-x64-1.9.0.1.msi -Algorithm SHA256`.
    The MSI SHA-256 must be
-   `9e9363ec5119a2ee4c0d69b4dd40b21a535571a11eb3750d57b8a24d4472a5da`.
+   `fde5cfd9d167571792e2384f7a5066b1dbea3fdc8b2085cf43f670440210ff0c`.
 3. Check the installer signature with
    `Get-AuthenticodeSignature .\Townlight-Windows-x64-1.9.0.1.msi`.
    It must report `Valid`; confirm the signer matches the publisher named on the release page before installing.
@@ -77,9 +79,7 @@ The resident portal is a separately deployed beta with its own
 and [deployment guide](https://townlight.github.io/manuals/portal.html). Installing
 this Windows MSI does not deploy a public website.
 
-The website and documentation now use the selected
-[Open Hall identity](https://townlight.github.io/brand/). Application and installer
-icons will adopt it in the next software update. This release includes a rebuilt Windows desktop and updated local runtime. The previous Windows release and its evidence remain intact.
+Townlight uses the [Open Hall visual identity](https://townlight.github.io/brand/) on the website and in the documentation. The signed 1.9.0.1 installer and desktop app retain their earlier icons.
 
 ## Try it and tell us what happened
 

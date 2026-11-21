@@ -64,8 +64,6 @@ favicon alone was repaired: its missing color classes and dark-mode rules
 were restored, and the superseded content-credential metadata was omitted.
 Other supplied logo artwork is unchanged.
 
-The November 2026 adoption updates documentation only. The released Windows
-MSI, its source companion, historical documentation and acceptance receipts
-retain their original bytes and identity. Desktop, installer and runtime
-branding will be integrated in the next software update. The supplied square
-artwork is ready for that work; it is not evidence of a changed installer.
+Open Hall is the visual identity for Townlight’s website and documentation.
+The signed Windows 1.9.0.1 desktop app and installer retain their earlier icons.
+The square artwork in this package is available for use in the Windows app.
