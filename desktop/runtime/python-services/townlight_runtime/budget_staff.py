@@ -10,8 +10,8 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field, StrictBool
 from sqlalchemy import select
 
-from civicbudget.adoption import budget_revisions, revision_content
-from civicbudget.budget_import import parse_budget_csv
+from townlight_budget.adoption import budget_revisions, revision_content
+from townlight_budget.budget_import import parse_budget_csv
 from townlight_records.auth.native_identity import mapped_native_actor
 from townlight_records.models.user import User
 

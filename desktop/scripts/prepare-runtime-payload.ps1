@@ -26,6 +26,7 @@ param(
     [string]$ContractsRoot = "",
     [string]$ProcurementRoot = "",
     [string]$DataRoot = '',
+    [string]$BudgetRoot = '',
     [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
@@ -883,6 +884,7 @@ function Install-PythonServicePackages {
                 'townlight/contracts' = $ContractsRoot
                 'townlight/procure' = $ProcurementRoot
                 'townlight/data' = $DataRoot
+                'townlight/budget' = $BudgetRoot
             }
             foreach ($Repository in $MunicipalRoots.Keys) {
                 if (-not $MunicipalRoots[$Repository]) { throw "Explicit pinned source required: $Repository" }
@@ -989,7 +991,7 @@ function Install-PythonServicePackages {
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_planning") }
     if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_permitting") }
-    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("townlight_meetings")
     }

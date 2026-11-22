@@ -354,6 +354,8 @@ pub struct AgendaAssignment {
 pub struct MotionInput {
     text: String,
     seconded_by: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    agenda_item_id: Option<Uuid>,
 }
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

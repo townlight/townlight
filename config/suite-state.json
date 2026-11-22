@@ -66,7 +66,8 @@
         "boards",
         "contracts",
         "procurement",
-        "data"
+        "data",
+        "budget"
       ],
       "disabled": false,
       "development_only": false
@@ -202,7 +203,8 @@
     "boards",
     "contracts",
     "procurement",
-    "data"
+    "data",
+    "budget"
   ],
   "modules": {
     "core": {
@@ -979,6 +981,59 @@
         "role": "Signed-contract dataset selection, review, publication and withdrawal",
         "status": "windows_candidate_acceptance_pending",
         "source_commit": "a959f5ea2f9fed3b42eaab312a68b4de65f0dfb0"
+      }
+    },
+    "budget": {
+      "public_name": "Townlight Budget",
+      "public_slug": "budget",
+      "legacy": {
+        "technical_id": "townlight_budget",
+        "product_names": [
+          "Townlight Budget"
+        ],
+        "package_names": [
+          "townlight-budget"
+        ]
+      },
+      "repository": {
+        "name": "townlight/budget",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": null
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "meetings",
+        "data"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "candidate",
+        "public_status_released_at": null
+      },
+      "installer": {
+        "tier": 3,
+        "role": "Budget review, adoption and publication",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "180fa171f1ec511936fd5c7368d2c15988522b13"
       }
     }
   }

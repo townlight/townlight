@@ -28,5 +28,6 @@
   "boards_package_version": "0.2.1",
   "contracts_package_version": "0.2.1",
   "procurement_package_version": "0.3.1",
-  "data_package_version": "0.2.0"
+  "data_package_version": "0.2.0",
+  "budget_package_version": "0.2.0"
 }
