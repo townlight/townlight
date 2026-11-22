@@ -52,7 +52,10 @@ async def _readback(session: Db, revision_id: UUID) -> dict[str, Any]:
     row = (await session.execute(statement)).mappings().one_or_none()
     if row is None:
         raise HTTPException(status_code=404, detail="revision not found")
-    return dict(row)
+    item = dict(row)
+    item["prior_year_total_cents_exact"] = str(item["prior_year_total_cents"])
+    item["proposed_total_cents_exact"] = str(item["proposed_total_cents"])
+    return item
 
 
 async def budget_reader(

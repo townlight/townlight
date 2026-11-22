@@ -9,6 +9,8 @@ type Revision = {
   adopted_at: string | null;
   prior_year_total_cents: number;
   proposed_total_cents: number;
+  prior_year_total_cents_exact?: string;
+  proposed_total_cents_exact?: string;
   lines?: Array<{
     department: string; account_code: string; description: string;
     prior_year_cents: number; proposed_cents: number;
@@ -17,6 +19,11 @@ type Revision = {
 
 export function createBudgetView(invoke: Invoke) {
   const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+  function exactCents(value: string | number) {
+    const cents = BigInt(value);
+    const abs = cents < 0n ? -cents : cents;
+    return `${cents < 0n ? "-" : ""}$${(abs / 100n).toLocaleString("en-US")}.${(abs % 100n).toString().padStart(2, "0")}`;
+  }
   const action = (operation: string, args = {}) =>
     invoke("municipal_staff_request", { request: { operation, ...args } });
 
@@ -76,7 +83,7 @@ export function createBudgetView(invoke: Invoke) {
       reviewForm.reset();
       publishForm.reset();
       root.querySelector<HTMLElement>("[data-budget-totals]")!.textContent = current
-        ? `Prior year ${money.format(current.prior_year_total_cents / 100)} · Proposed ${money.format(current.proposed_total_cents / 100)}`
+        ? `Prior year ${exactCents(current.prior_year_total_cents_exact ?? current.prior_year_total_cents)} · Proposed ${exactCents(current.proposed_total_cents_exact ?? current.proposed_total_cents)}`
         : "Select a saved budget revision.";
       const table = root.querySelector("[data-budget-lines]")!;
       table.replaceChildren();
