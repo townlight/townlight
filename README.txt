@@ -1,24 +1,18 @@
-Windows 1.9.1.1 Station recorder release
+Windows 1.9.2.1 public Windows beta
 
-Station recorder in Windows 1.9.1.1
+Windows 1.9.2.1 adds shared Meetings and Records use from a Windows workstation through the city host, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal.
 
-Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording. Acceptance and limits.
+Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
 
-Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
+Release and downloads · Signed Windows MSI · Acceptance and limits · Maintainer handoff
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+Windows staff workflow guide · Shared staff source guide · Portal guide
 
-Release and downloads · Acceptance and limits.
+Download Windows beta 1.9.2.1 · Public announcement · Support and feedback · Maintainer handoff
 
-Windows 1.9.2.1 signed candidate — not publicly released
+See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
 
-The signed, merged candidate adds shared Windows host/workstation workflows for Meetings and Records, council packet revisions, and unattended delivery of explicitly approved packets and recording copies to a separately deployed portal. The public installer remains 1.9.1.1; 1.9.2.1 has no public tag or release. See the candidate guide, candidate handoff and acceptance limits, and the shared staff and Portal source guides.
-
-Download Windows beta 1.9.1.1 · Public announcement · Support and feedback · Maintainer handoff
-
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
-
-Windows x64 Beta 1 · MSI 1.9.1.1
+Windows x64 Beta 1 · MSI 1.9.2.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
@@ -53,11 +47,11 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 All 31 sources, formats and handoffs · Installed acceptance.
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
 
-Windows 1.9.1.1 contains Station 0.4.4, Records 1.8.0.dev4, Townlight Runtime 0.3.3 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
+The release acceptance summary and corresponding-source archive identify the exact packaged component sources, artifact hashes and installed evidence for Windows 1.9.2.1.
 
-  Windows 1.9.1.1 acceptance. Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope. Acceptance and limits.
+  Windows 1.9.2.1 acceptance. See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits. Acceptance and limits.
 
   Boards & Commissions, Contracts and Procurement were added in Windows 1.8.0.1. Its acceptance summary identifies the staff workflows, role boundaries, persistence and upgrade exercised on that build. Those results are not a new 1.8.1.1 upgrade test.
 
@@ -69,14 +63,14 @@ Staff should start with First run and Connected workflows. Administrators should
 
 Beta identity
 
-  -----------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
   Identity                            Value
-  ----------------------------------- -----------------------------------------------------------------------
+  ----------------------------------- ------------------------------------------------------------------------------------------------------------------
   Public documentation identity       Townlight Beta 1
 
-  Windows MSI version                 1.9.1.1
+  Windows MSI version                 1.9.2.1
 
-  Native desktop source version       1.9.1-1
+  Native desktop source version       1.9.2-1
 
   Released artifact identity          SHA-256 checksums and Windows acceptance summary
 
@@ -84,10 +78,10 @@ Beta identity
 
   Current owned software license      AGPL-3.0-only
 
-  Supported acceptance profile        Windows 1.9.1.1 signed MSI with C920 preview and recording acceptance
-  -----------------------------------------------------------------------------------------------------------
+  Supported acceptance profile        Windows 1.9.2.1 signed MSI with synthetic shared workflow and same-machine cold-recovery acceptance; see limits.
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
 
 Component versions
 
@@ -107,17 +101,17 @@ Component versions
   Boards & Commissions   townlight-boards        0.2.1
   Contracts              townlight-contracts     0.2.1
   Procurement            townlight-procurement   0.3.1
-  Local runtime          townlight-runtime       0.3.3
+  Local runtime          townlight-runtime       0.3.4
 
 First run
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
 
 Fresh installation
 
-Run the signed Windows 1.9.1.1 MSI and use an empty database and a new Townlight profile for first run.
+Run the signed Windows 1.9.2.1 MSI and use an empty database and a new Townlight profile for first run.
 
-1.  Download the signed MSI, matching source and checksums from the Windows x64 beta 1.9.1.1 release.
+1.  Download the signed MSI, matching source and checksums from the Windows x64 beta 1.9.2.1 release.
 2.  Verify the MSI hash and Authenticode publisher before installation. See the Windows acceptance summary for the tested setup.
 3.  Launch Townlight under the intended named Windows account. Choose the storage folders. Select Townlight Inspections candidate (inspections-preview) for the bounded desktop composition, including Access, Notice, Boards & Commissions, Contracts, and Procurement. The full profile includes Boards & Commissions, Contracts, and Procurement.
 4.  Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. Continue without local AI is valid for the deterministic workflows.
@@ -127,7 +121,7 @@ Run the signed Windows 1.9.1.1 MSI and use an empty database and a new Townlight
 
 Existing installation
 
-Upgrading an existing installation. Back up your city data and settings, then close Townlight and keep the existing Windows profile. The upgrade from Windows 1.9.0.1 was exercised on the signed 1.9.1.1 predecessor candidate. The acceptance summary identifies the separate checks on the shipped MSI. The earlier direct 1.8.2.1 upgrade was to Windows 1.9.0.1.
+Upgrading an existing installation. Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier 1.9.1.1 acceptance remains attached to that historical release; see the current acceptance summary. The earlier direct 1.8.2.1 upgrade was to Windows 1.9.0.1.
 
 Daily workflow
 
@@ -211,7 +205,7 @@ Technical specifications
 
 Runtime and storage
 
-The signed Windows 1.9.1.1 package has physical Station camera and microphone acceptance. Its native shell uses Rust 2021, Tauri 2 and Microsoft WebView2; browser assets are JavaScript built with Vite 8.1.6. This describes the native desktop frontend; Station has a separate React operator, specified below or in its product manual. Canonical business workflows use bundled CPython 3.13.5, FastAPI, Pydantic, SQLAlchemy and Alembic, with PostgreSQL 17 / PostGIS and managed original files. Bundled dependency versions are recorded with the release evidence. Package minimum Python requirements can differ from the bundled executable; the metadata reference preserves both. No stack rewrite is implied by the beta label.
+The 1.9.1.1 camera and microphone test remains evidence for that historical release. Windows 1.9.2.1 acceptance covers the shared staff workflows and same-machine cold recovery listed in its release summary. Its native shell uses Rust 2021, Tauri 2 and Microsoft WebView2; browser assets are JavaScript built with Vite 8.1.6. This describes the native desktop frontend; Station has a separate React operator, specified below or in its product manual. Canonical business workflows use bundled CPython 3.13.5, FastAPI, Pydantic, SQLAlchemy and Alembic, with PostgreSQL 17 / PostGIS and managed original files. Bundled dependency versions are recorded with the release evidence. Package minimum Python requirements can differ from the bundled executable; the metadata reference preserves both. No stack rewrite is implied by the beta label.
 
 The native transport is fixed to loopback 127.0.0.1:15480; PostgreSQL uses the configured local runtime port (default 15432). Optional local model service defaults to 127.0.0.1:15434. Those are deployment defaults, not internet endpoints. The runtime has health, module and readiness endpoints; readiness is stronger than process existence. The task queue is the existing local Core task infrastructure, not an assertion that a separate Redis service is required for this desktop composition.
 

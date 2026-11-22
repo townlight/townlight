@@ -45,16 +45,14 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     assert records["status"] == "candidate"
     assert records["public_website_status"] == "prepared; unpublished candidate"
     release = state["desktop_release"]
-    assert release["version"] == "1.9.1-1"
-    assert release["tag"] == "townlight-windows-v1.9.1.1"
-    if release["channel"] == "candidate":
-        assert release["commit"] is None
-        assert release["published_at"] is None
-    else:
-        assert release["channel"] == "public-beta"
-        assert release["published_at"]
-        acceptance = ROOT / "release" / "ACCEPTANCE-Windows-1.9.1.1.md"
-        assert release["commit"] and f"Published source commit: `{release['commit']}`" in acceptance.read_text(encoding="utf-8")
+    assert release["version"] == "1.9.2-1"
+    assert release["tag"] == "townlight-windows-v1.9.2.1"
+    assert release["channel"] == "public-beta"
+    assert release["published_at"] == "2026-11-22"
+    assert release["runtime_version"] == "0.3.4"
+    assert release["commit"] == "1bc45be5a14aa969e53b87b1cef1f278dadc79a4"
+    handoff = ROOT / "release" / "CANDIDATE-Windows-1.9.2.1.md"
+    assert f"Suite commit `{release['commit']}`" in handoff.read_text(encoding="utf-8")
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 

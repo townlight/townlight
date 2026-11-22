@@ -1,52 +1,28 @@
 # Townlight Windows beta support
 
-## Windows 1.9.1.1 Station recorder release
+## Windows 1.9.2.1 shared staff release
 
-Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
+The current signed MSI supports shared Meetings and Records use from Windows workstations, reviewed council packet revisions, and queued delivery of separately approved material to a separately deployed portal. Review the [release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1), [signed MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi), and [acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
-
-## Shared meeting imports · Windows 1.8.1.1
-
-Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
-
-[All 31 sources, formats and handoffs](https://townlight.github.io/manuals/meeting-imports.html) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
-
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
-
-Windows 1.9.1.1 contains Station 0.4.4, Records 1.8.0.dev4, Townlight Runtime 0.3.3 and Meetings 1.0.6. Its current component sources and installed evidence are identified in the maintenance acceptance summary.
-
-
-These instructions cover the signed **Windows x64 public beta 1.9.1.1**.
-
-[Download the current Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/Townlight-Windows-x64-1.9.1.1.msi) ·
-[Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) ·
-[Suite manual](https://townlight.github.io/manuals/suite.html) ·
-[Public beta announcement](https://townlight.github.io/announcement.html)
+For install and recovery issues, back up city data and settings before changing an existing profile. The 1.9.2.1 acceptance does not cover direct MSI upgrades from earlier versions. The Townlight Portal server is not installed by the MSI.
 
 ## Installation and recovery
 
-**Fresh installation.** For a fresh installation, run the signed Windows 1.9.1.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
+**Fresh installation.** Run the signed Windows 1.9.2.1 MSI, then follow first-run setup with an empty database and a new Townlight profile. Follow the [first-run instructions](https://townlight.github.io/manuals/suite.html#first-run).
 
-**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The upgrade from Windows 1.9.0.1 was exercised on the signed 1.9.1.1 predecessor candidate. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) identifies the separate checks on the shipped MSI. The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
+**Upgrading an existing installation.** Back up city data and settings before changing an existing profile. Windows 1.9.2.1 acceptance does not cover direct MSI upgrades from earlier versions. Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance). Preserve existing data and backups. Do not rename or delete the compatibility profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
-Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance).
-Preserve existing data and backups. Do not rename or delete the compatibility
-profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
+Verify the downloaded MSI against the [Windows 1.9.2.1 release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt) and check its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact current [release link](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1); GitHub's Latest download resolves to this public beta. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) for the installed checks and limits.
 
-Verify the downloaded MSI against the [release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/SHA256SUMS-Windows-1.9.1.1.txt) and check
-its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact
-release link here; GitHub's Latest download now resolves to this public beta. The [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) describes the installed checks
-and their limits. Earlier local-model acceptance used a 16 GiB Sandbox; an 8 GiB run
-timed out without saving a draft.
+For setup problems, consult [troubleshooting](https://townlight.github.io/manuals/suite.html#troubleshooting) before filing an installer issue. Do not remove a database or existing profile as a troubleshooting shortcut. See the [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html) for roles and cross-module staff workflows.
 
-For setup problems, consult [troubleshooting](https://townlight.github.io/manuals/suite.html#troubleshooting)
-before filing an installer issue. Do not remove a database or existing profile
-as a troubleshooting shortcut.
+### Earlier release context
 
-See the [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html) for roles and cross-module staff workflows.
+Windows 1.9.1.1 added Open Hall branding, clerk workflow improvements, Records setup checks and Station 0.4.4. Its C920 camera and microphone result applies only to that release; it does not establish the 1.9.2.1 hardware limits stated above. The [1.9.1.1 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) and [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) retain their original identities.
+
+Windows 1.8.1.1 added shared meeting imports for 31 source families, with 34 supported source/format pairs. Its installed checks used public captures and fixtures; they do not establish automatic discovery on every live portal or a complete retest of every module. See [all 31 sources and formats](https://townlight.github.io/manuals/meeting-imports.html) and the [1.8.1.1 acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
 
 ## Where to report a problem
 
@@ -71,7 +47,7 @@ For questions and evaluation feedback, use
 
 ## What to include
 
-- Installed version (**1.9.1.1**) and Windows version.
+- Installed version (**1.9.2.1**) and Windows version.
 - The selected products/profile and whether this was a fresh installation.
 - Steps to reproduce, what you expected and what happened.
 - Redacted error messages, logs or screenshots, using synthetic data where possible.

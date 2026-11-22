@@ -1,10 +1,11 @@
 # Changelog
 
-## Windows 1.9.2.1 signed candidate — not publicly released
+## Windows 1.9.2.1 public beta — published 2026-11-22 UTC
 
-- Add shared Windows host/workstation use of Meetings and Records with existing staff roles, council packet correction, and queued delivery of explicitly approved portal content.
-- Verify the signed MSI and installed workflows on a Windows host and a clean Windows Sandbox guest, including recovery from a verified backup. The guest ran on the same physical PC; production portal operation and two physically separate PCs were not tested.
-- The public Windows download and GitHub Latest remain 1.9.1.1. See the [candidate handoff and acceptance limits](release/CANDIDATE-Windows-1.9.2.1.md); no 1.9.2.1 release is available.
+- Add shared Windows host/workstation use of Meetings and Records with existing staff roles, reviewed council packet revisions, and queued delivery of explicitly approved portal content.
+- Publish the accepted signed MSI from Suite source `1bc45be5a14aa969e53b87b1cef1f278dadc79a4`, with the Records source pin `3d1291a9bdc382b2fc09666a25ce82de6939c55d`; MSI SHA-256 is `3242792ad6c825a5057d96c5e1d9d45fb5726ccbfba7ab24a2b428a54e63b0bf`.
+- Installed acceptance covers synthetic shared staff workflows and same-machine cold recovery using the physical Windows host and a clean Sandbox guest. Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
+- See the [signed release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1), [Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi), [acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md), and [checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt).
 
 ## Windows 1.9.1.1 public beta — published 2026-11-21 UTC
 
