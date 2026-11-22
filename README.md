@@ -11,6 +11,10 @@ Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow impro
 
 [Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
 
+## Windows 1.9.2.1 signed candidate — not publicly released
+
+The signed, merged candidate adds shared Windows host/workstation workflows for Meetings and Records, council packet revisions, and unattended delivery of explicitly approved packets and recording copies to a separately deployed portal. The public installer remains 1.9.1.1; 1.9.2.1 has no public tag or release. See the [candidate guide](https://townlight.github.io/manuals/windows-1.9.2.1-candidate.html), [candidate handoff and acceptance limits](release/CANDIDATE-Windows-1.9.2.1.md), and the [shared staff](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md) and [Portal](https://github.com/townlight/townlight/blob/a35afc2bd7702a8ddbfabbd0ec3dbc75a3d581de/docs/portal/guide.md) source guides.
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/brand/svg/townlight-hall-lockup-tagline-reversed.svg">
