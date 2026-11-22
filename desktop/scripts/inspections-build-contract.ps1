@@ -10,7 +10,7 @@ function Get-InspectionsBuildContract {
         $Contract.publication_requires_signed_acceptance -ne $true -or
         $null -ne $Contract.release_tag -or
         $Pins.profile -ne 'inspections-preview' -or $Pins.development_only -ne $false -or
-        $Contract.desktop_version -ne '1.9.1-1' -or $Contract.windows_product_version -ne '1.9.1.1' -or
+        $Contract.desktop_version -ne '1.9.2-1' -or $Contract.windows_product_version -ne '1.9.2.1' -or
         $Overlay.version -ne $Contract.desktop_version -or $Overlay.identifier -ne 'org.townlight.windows.fixes.candidate' -or
         $Overlay.productName -ne 'Townlight' -or
         $Overlay.bundle.windows.wix.upgradeCode -ne '0b97efae-2a2e-4e88-a81c-3aad1a52c2cc' -or
@@ -19,7 +19,7 @@ function Get-InspectionsBuildContract {
         $Contract.planning_package_version -ne '0.4.0.dev2' -or
         $Contract.meetings_package_version -ne '1.0.6' -or $Contract.code_package_version -ne '1.0.9' -or
         $Contract.zoning_package_version -ne '0.2.3' -or $Contract.access_package_version -ne '0.5.0' -or
-        $Contract.notice_package_version -ne '0.3.0' -or $Contract.runtime_package_version -ne '0.3.3' -or
+        $Contract.notice_package_version -ne '0.3.0' -or $Contract.runtime_package_version -ne '0.3.4' -or
         $Contract.boards_package_version -ne '0.2.1' -or $Contract.contracts_package_version -ne '0.2.1' -or
         $Contract.procurement_package_version -ne '0.3.1' -or $Contract.station_package_version -ne '0.4.4' -or $Contract.fresh_profile_only -ne $false -or
         $Contract.legacy_upgrade_supported -ne $false) { throw 'Inspections release identity mismatch.' }

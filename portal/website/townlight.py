@@ -37,13 +37,22 @@ def release_root():
     return root
 
 
-def release_file(item):
-    if not re.fullmatch(r'[0-9a-f]{64}\.bin', item.release_path or ''):
+def stored_public_file(name, extension):
+    if not re.fullmatch(r'[0-9a-f]{64}\.' + extension, name or ''):
         raise ValueError('Invalid release path')
-    path = (release_root() / item.release_path).resolve(strict=True)
-    if path.parent != release_root() or not path.is_file():
+    root = release_root()
+    path = (root / name).resolve(strict=True)
+    if path.parent != root or not path.is_file():
         raise ValueError('Invalid release path')
     return path
+
+
+def release_file(item):
+    return stored_public_file(item.release_path, "bin")
+
+
+def packet_file(item):
+    return stored_public_file(item.packet_path, "pdf")
 
 
 def native_origin():

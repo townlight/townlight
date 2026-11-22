@@ -12,7 +12,7 @@ import tempfile
 from uuid import UUID
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, AwareDatetime
 from sqlalchemy import create_engine, text
@@ -36,7 +36,7 @@ from townlight_runtime.meeting_imports import (
     ImportInputError, MAX_INPUT_BYTES, preview_export, source_formats,
 )
 from townlight_runtime.meeting_import_fetch import fetch_meeting_document, fetch_public
-from townlight_runtime import meeting_import_links
+from townlight_runtime import council_packet, meeting_import_links
 from pathlib import Path
 
 router = APIRouter(prefix="/desktop/v1/meetings", tags=["native-meetings"])
@@ -523,10 +523,20 @@ def record_notice_proof(notice_id: UUID, data: NoticeProofInput, actor_id: str =
         raise HTTPException(422,str(error)) from None
 
 
+class UploadedCouncilSource(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    upload_id: UUID
+    packet_access: Literal["staff_only", "public_candidate"] = "staff_only"
+
+
 class PacketInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    agenda_item_ids: list[UUID]
-    source_files: list["ManagedSource"] = Field(default_factory=list)
+    agenda_item_ids: list[UUID] = Field(min_length=1, max_length=500)
+    public_agenda_ids: list[UUID] = Field(default_factory=list, max_length=500)
+    source_files: list["ManagedSource"] = Field(default_factory=list, max_length=100)
+    uploaded_sources: list[UploadedCouncilSource] = Field(default_factory=list, max_length=100)
+    prior_packet_id: UUID | None = None
+    retained_source_indexes: list[int] = Field(default_factory=list, max_length=100)
 
 
 class TranscriptInput(BaseModel):
@@ -578,14 +588,25 @@ def capture_action_item(meeting_id: UUID,data: ActionItemInput,actor_id: str = D
 @router.post("/meetings/{meeting_id}/archive",status_code=201)
 def archive_meeting(meeting_id: UUID,data: ArchiveInput,actor_id: str = Depends(actor)):
     meeting=operate("meeting",lambda store:store.get(str(meeting_id)))
+    if data.visibility == "public" and meeting["meeting_type"] in {"closed_session", "executive"}:
+        raise HTTPException(422, "A closed or executive meeting cannot be archived publicly.")
     agenda_text=packet_text=minutes_text=""
     adopted_at=signed_by=None
     if data.packet_id:
         packet=legal_record(PacketAssemblyRepository,lambda store:store.get(str(data.packet_id)))
         if packet["meeting_id"] != str(meeting_id):
             raise HTTPException(422,"Packet belongs to another meeting.")
-        agenda_text="\n".join(f"{i+1}. {item['title']}" for i,item in enumerate(packet["snapshot_content"]))
-        packet_text=f"{packet['title']} — Packet version {packet['packet_version']}\n\n{agenda_text}"
+        if data.visibility == "public":
+            try:
+                manifest, _ = legal_record(PacketAssemblyRepository, lambda store: council_packet.approved_public_packet(
+                    profile_root(), store.get(str(data.packet_id))))
+                agenda_text = manifest["agenda"]
+                packet_text = f"{manifest['title']} — Approved public packet version {manifest['packet_version']}\n\n{agenda_text}"
+            except (OSError, ValueError) as error:
+                raise HTTPException(422, str(error)) from None
+        else:
+            agenda_text="\n".join(f"{i+1}. {item['title']}" for i,item in enumerate(packet["snapshot_content"]))
+            packet_text=f"{packet['title']} — Packet version {packet['packet_version']}\n\n{agenda_text}"
     if data.minutes_id:
         minutes=legal_record(MinutesDraftRepository,lambda store:store.get_draft(str(data.minutes_id)))
         if minutes["meeting_id"] != str(meeting_id):
@@ -662,6 +683,7 @@ class ManagedSource(BaseModel):
     file_name: str
     sha256: str = Field(pattern="^[0-9a-f]{64}$")
     size_bytes: int = Field(ge=0)
+    packet_access: Literal["staff_only", "public_candidate"] = "staff_only"
 
 
 def profile_root() -> Path:
@@ -671,16 +693,58 @@ def profile_root() -> Path:
     return Path(root).resolve()
 
 
+MAX_COUNCIL_UPLOAD = 8 * 1024 * 1024
+
+
+class CouncilSourceInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    file_name: str = Field(min_length=1, max_length=230)
+    content_base64: str = Field(min_length=1, max_length=4 * ((MAX_COUNCIL_UPLOAD + 2) // 3))
+
+
+@router.post("/meetings/{meeting_id}/council-source", status_code=201)
+def upload_council_source(meeting_id: UUID, data: CouncilSourceInput, actor_id: str = Depends(actor)):
+    operate("meeting", lambda store: store.get(str(meeting_id)))
+    try:
+        content = base64.b64decode(data.content_base64, validate=True)
+        return council_packet.upload_source(profile_root(), str(meeting_id), actor_id, data.file_name, content, MAX_COUNCIL_UPLOAD)
+    except (OSError, ValueError) as error:
+        raise HTTPException(422, str(error)) from None
+
+
 @router.post("/meetings/{meeting_id}/packet-snapshots", status_code=201)
 def capture_packet(meeting_id: UUID, data: PacketInput, actor_id: str = Depends(actor)):
     meeting = operate("meeting", lambda store: store.get(str(meeting_id)))
+    if len(set(data.agenda_item_ids)) != len(data.agenda_item_ids) or not set(data.public_agenda_ids) <= set(data.agenda_item_ids):
+        raise HTTPException(422, "Public agenda choices must be unique items from this saved packet.")
+    if data.public_agenda_ids and meeting["meeting_type"] in {"closed_session", "executive"}:
+        raise HTTPException(422, "A closed or executive meeting cannot designate public packet items.")
     agenda = []
     for item_id in data.agenda_item_ids:
-        agenda.append(operate("agenda",lambda store: store.get(str(item_id))))
-    files = [file.model_dump() for file in data.source_files]
+        item = operate("agenda", lambda store: store.get(str(item_id)))
+        if str(item.get("meeting_id")) != str(meeting_id):
+            raise HTTPException(422, "Assign each agenda item to this meeting before saving the packet.")
+        agenda.append({**item, "packet_access": "public_candidate" if item_id in data.public_agenda_ids else "staff_only"})
+    files = []
     try:
+        if data.retained_source_indexes:
+            if data.prior_packet_id is None:
+                raise ValueError("Select a saved packet revision before keeping its attachments.")
+            prior = legal_record(PacketAssemblyRepository, lambda store: store.get(str(data.prior_packet_id)))
+            if str(prior["meeting_id"]) != str(meeting_id) or len(set(data.retained_source_indexes)) != len(data.retained_source_indexes) or any(
+                index < 0 or index >= len(prior["source_references"]) for index in data.retained_source_indexes
+            ):
+                raise ValueError("Keep only attachments from a saved packet for this meeting.")
+            files.extend(prior["source_references"][index] for index in sorted(data.retained_source_indexes))
+        files.extend(file.model_dump() for file in data.source_files)
+        for source in data.uploaded_sources:
+            files.append(council_packet.read_upload(profile_root(), str(meeting_id), actor_id,
+                                                   str(source.upload_id), source.packet_access))
         for file in files:
             verify_source(profile_root(),file)
+        if len(files) > 100 or (meeting["meeting_type"] in {"closed_session", "executive"} and
+                                any(file.get("packet_access") == "public_candidate" for file in files)):
+            raise ValueError("A packet allows 100 attachments. A closed meeting cannot designate public copies.")
     except (OSError,ValueError) as error:
         raise HTTPException(422,str(error)) from None
     snapshot = legal_record(PacketStore,lambda store: store.create_snapshot(
@@ -703,6 +767,58 @@ def export_packet(packet_id: UUID, actor_id: str = Depends(actor)):
         raise HTTPException(422,str(error)) from None
     except SQLAlchemyError:
         raise HTTPException(503,"Packet delivery not confirmed. Inspect saved work before retrying.") from None
+
+
+class CouncilPreview(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    audience: Literal["staff", "public"]
+    agenda_item_ids: list[UUID] = Field(default_factory=list, max_length=500)
+    source_indexes: list[int] = Field(default_factory=list, max_length=100)
+
+
+class CouncilApproval(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    preview_id: UUID
+    manifest_sha256: str = Field(pattern="^[0-9a-f]{64}$")
+    public_confirmed: bool = False
+
+
+def with_council_packet(packet_id, callback):
+    store = PacketAssemblyRepository(db_url=database_url())
+    try:
+        packet = store.get(str(packet_id))
+        if packet is None:
+            raise HTTPException(404, "Packet not found.")
+        meeting = operate("meeting", lambda meetings: meetings.get(str(packet.meeting_id)))
+        return callback(store, packet, meeting)
+    except (OSError, ValueError) as error:
+        raise HTTPException(422, str(error)) from None
+    except SQLAlchemyError:
+        raise HTTPException(503, "Packet operation not confirmed. Reopen the saved packet before retrying.") from None
+    finally:
+        store.engine.dispose()
+
+
+@router.post("/packets/{packet_id}/council-preview", status_code=201)
+def council_preview(packet_id: UUID, data: CouncilPreview, actor_id: str = Depends(actor)):
+    return with_council_packet(packet_id, lambda _, packet, meeting: council_packet.preview(
+        profile_root(), packet, meeting, actor_id, data.audience,
+        [str(item_id) for item_id in data.agenda_item_ids], data.source_indexes))
+
+
+@router.post("/packets/{packet_id}/council-approval", status_code=201)
+def council_approval(packet_id: UUID, data: CouncilApproval, actor_id: str = Depends(actor)):
+    return with_council_packet(packet_id, lambda store, packet, meeting: council_packet.approve(
+        store, profile_root(), packet, meeting, actor_id, str(data.preview_id), data.manifest_sha256,
+        data.public_confirmed))
+
+
+@router.get("/packets/{packet_id}/council-file/{artifact_id}/{filename}")
+def council_file(packet_id: UUID, artifact_id: UUID, filename: Literal["agenda.html", "packet.pdf"],
+                 manifest_sha256: str = Query(pattern="^[0-9a-f]{64}$"), offset: int = Query(ge=0),
+                 approved: bool = False, actor_id: str = Depends(actor)):
+    return with_council_packet(packet_id, lambda _, packet, __: council_packet.download_chunk(
+        profile_root(), packet, actor_id, str(artifact_id), manifest_sha256, filename, offset, approved))
 
 
 @router.post("/minutes/{draft_id}/decisions")

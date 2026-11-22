@@ -15,8 +15,11 @@ def main():
     from portal.wsgi import application
     from waitress import serve
     options = {}
+    if os.environ.get('TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE'):
+        from website.townlight import max_release
+        options['max_request_body_size'] = max(64 * 1024**2, max_release()) + 2 * 1024**2
     if os.environ.get('TOWNLIGHT_TRUST_TLS_PROXY') == '1':
-        options = {'trusted_proxy': '127.0.0.1', 'trusted_proxy_headers': {'x-forwarded-proto'}}
+        options.update(trusted_proxy='127.0.0.1', trusted_proxy_headers={'x-forwarded-proto'})
     serve(application, host='127.0.0.1', port=args.port, threads=8, **options)
 
 

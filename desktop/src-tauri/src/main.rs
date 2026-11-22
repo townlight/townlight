@@ -18,6 +18,7 @@ mod profile_gate;
 mod profile_identity;
 mod published_client;
 mod records_authority;
+mod shared_staff;
 mod supervisor;
 mod workflows;
 mod zoning_client;
@@ -47,6 +48,7 @@ struct AppState {
     product_name: &'static str,
     status_label: &'static str,
     local_only: bool,
+    shared_staff: bool,
     navigation: Vec<NavigationItem>,
     modules: Vec<ModuleSummary>,
     module_profiles: Vec<ModuleProfileSummary>,
@@ -475,6 +477,7 @@ fn app_state() -> Result<AppState, String> {
         product_name: "Townlight",
         status_label: "Windows Local 1.0 desktop",
         local_only: true,
+        shared_staff: false,
         navigation: navigation(),
         modules: module_summaries()?,
         module_profiles: module_registry::module_profiles()?,
@@ -490,8 +493,67 @@ fn app_state() -> Result<AppState, String> {
     })
 }
 
+async fn shared_app_state() -> Result<AppState, String> {
+    let access = shared_staff::access_state().await;
+    let modules = ["townlight_core", "townlight_meetings", "townlight_records"]
+        .into_iter()
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    let module_selection = ModuleSelectionState {
+        profile_id: "shared-staff".into(),
+        profile_label: "City host".into(),
+        installed_module_ids: modules.clone(),
+        enabled_module_ids: modules,
+        disabled_module_ids: Vec::new(),
+        last_updated_unix_seconds: 0,
+    };
+    let catalog = module_registry::module_summaries_for(&module_selection)?
+        .into_iter()
+        .filter(|module| module.enabled)
+        .collect();
+    Ok(AppState {
+        domain_authority: "python-records",
+        product_name: "Townlight",
+        status_label: "Windows shared staff",
+        local_only: false,
+        shared_staff: true,
+        navigation: navigation()
+            .into_iter()
+            .filter(|item| matches!(item.id, "home" | "meetings" | "records"))
+            .collect(),
+        modules: catalog,
+        module_profiles: Vec::new(),
+        module_selection,
+        installer_steps: Vec::new(),
+        first_run: FirstRunState {
+            profile: "shared-staff".into(),
+            profile_label: "City host".into(),
+            local_only: false,
+            finished: true,
+            status: "Connect to the city host",
+            current_step_id: None,
+            locations: first_run::FirstRunLocations {
+                install_root: String::new(),
+                data_root: String::new(),
+                backup_root: String::new(),
+            },
+            available_actions: Vec::new(),
+            steps: Vec::new(),
+        },
+        city_profile: None,
+        users: Vec::new(),
+        access,
+        model: public_model_state(model::model_state()?),
+        health: Vec::new(),
+        city_work: CityWorkState::default(),
+    })
+}
+
 #[tauri::command]
 async fn get_app_state() -> Result<AppState, String> {
+    if shared_staff::configured() {
+        return shared_app_state().await;
+    }
     tauri::async_runtime::spawn_blocking(move || {
         catch_unwind(AssertUnwindSafe(|| {
             #[cfg(windows)]
@@ -586,7 +648,10 @@ async fn first_run_action(
 }
 
 #[tauri::command]
-fn auth_action(action: String, payload: Option<Value>) -> Result<AuthActionResult, String> {
+async fn auth_action(action: String, payload: Option<Value>) -> Result<AuthActionResult, String> {
+    if shared_staff::configured() {
+        return shared_staff::auth_action(action, payload).await;
+    }
     auth::auth_action(&action, payload.as_ref())
 }
 
@@ -686,7 +751,11 @@ fn picked_folder_path_for_desktop() -> Result<Option<String>, String> {
 
 #[tauri::command]
 fn choose_file_path() -> Result<Option<String>, String> {
-    auth::require_signed_in_session()?;
+    if shared_staff::configured() {
+        shared_staff::proof()?;
+    } else {
+        auth::require_signed_in_session()?;
+    }
     picked_file_path_for_desktop()
 }
 
@@ -852,6 +921,10 @@ fn get_city_work_state() -> Result<CityWorkState, String> {
 async fn records_domain_request(
     request: domain_client::RecordsRequest,
 ) -> Result<Value, domain_client::DomainError> {
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| domain_client::DomainError::denied())?;
+        return domain_client::execute(request, proof).await;
+    }
     let _operation =
         profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let access =
@@ -934,6 +1007,10 @@ async fn suite_domain_request(
 async fn meetings_domain_request(
     request: domain_client::MeetingsRequest,
 ) -> Result<Value, domain_client::DomainError> {
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| domain_client::DomainError::denied())?;
+        return domain_client::execute_meetings(request, proof).await;
+    }
     let _operation =
         profile_gate::operation().map_err(|_| domain_client::DomainError::maintenance())?;
     let profile_id = module_registry::module_selection_state()
@@ -991,6 +1068,25 @@ async fn code_domain_request(
 
 #[tauri::command]
 async fn open_domain_exports(request: domain_files::OpenExports) -> Result<Value, String> {
+    if shared_staff::configured() {
+        let access = shared_staff::access_state().await;
+        if request.folder.name() != "meetings"
+            || !matches!(
+                access.role.as_deref(),
+                Some("local-admin" | "city-staff" | "clerk")
+            )
+        {
+            return Err(
+                "Sign in with a Meetings role to open files downloaded on this workstation.".into(),
+            );
+        }
+        let message = tauri::async_runtime::spawn_blocking(move || {
+            domain_files::open_exports(request.folder)
+        })
+        .await
+        .map_err(|_| "Could not open the local Meetings exports folder.")??;
+        return Ok(serde_json::json!({"message":message}));
+    }
     let access = auth::require_signed_in_session()?;
     let payload = serde_json::json!({"folder":request.folder.name()});
     require_role_for_city_work(&access, "open-exports-folder", Some(&payload))?;
@@ -1299,15 +1395,48 @@ async fn city_work_action(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let handler: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
+        get_app_state,
+        get_model_state,
+        model_action,
+        preview_first_run_state,
+        first_run_action,
+        auth_action,
+        supervisor_action,
+        station_action,
+        choose_file_path,
+        choose_folder_path,
+        module_action,
+        get_city_work_state,
+        records_domain_request,
+        records_public_request,
+        access_domain_request,
+        notice_domain_request,
+        suite_domain_request,
+        meetings_domain_request,
+        code_domain_request,
+        zoning_domain_request,
+        zoning_public_request,
+        published_domain_request,
+        planning_domain_request,
+        permitting_domain_request,
+        inspections_domain_request,
+        municipal_staff_request,
+        permitting_pick_bundle,
+        planning_public_request,
+        planning_pick_bundle,
+        open_domain_exports,
+        city_work_action
+    ];
     tauri::Builder::default()
         .setup(|_| {
-            profile_identity::prepare().map_err(std::io::Error::other)?;
+            if !shared_staff::configured() {
+                profile_identity::prepare().map_err(std::io::Error::other)?;
+            }
             Ok(())
         })
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            // A second launch was attempted. Do NOT start a second process that
-            // would concurrently read-modify-write the system-of-record files.
-            // Focus the already-running instance's window instead.
+            // A second launch was attempted. Keep local data under one writer.
             use tauri::Manager;
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
@@ -1316,48 +1445,41 @@ pub fn run() {
             }
         }))
         .on_window_event(|_window, event| {
-            if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
+            if !shared_staff::configured()
+                && !shared_staff::hosting()
+                && matches!(event, tauri::WindowEvent::CloseRequested { .. })
+            {
                 let _ = supervisor::supervisor_action("stop", None);
             }
         })
-        .invoke_handler(tauri::generate_handler![
-            get_app_state,
-            get_model_state,
-            model_action,
-            preview_first_run_state,
-            first_run_action,
-            auth_action,
-            supervisor_action,
-            station_action,
-            choose_file_path,
-            choose_folder_path,
-            module_action,
-            get_city_work_state,
-            records_domain_request,
-            records_public_request,
-            access_domain_request,
-            notice_domain_request,
-            suite_domain_request,
-            meetings_domain_request,
-            code_domain_request,
-            zoning_domain_request,
-            zoning_public_request,
-            published_domain_request,
-            planning_domain_request,
-            permitting_domain_request,
-            inspections_domain_request,
-            municipal_staff_request,
-            permitting_pick_bundle,
-            planning_public_request,
-            planning_pick_bundle,
-            open_domain_exports,
-            city_work_action
-        ])
+        .invoke_handler(move |invoke| {
+            if shared_staff::configured()
+                && !matches!(
+                    invoke.message.command(),
+                    "get_app_state"
+                        | "auth_action"
+                        | "choose_file_path"
+                        | "records_domain_request"
+                        | "meetings_domain_request"
+                        | "open_domain_exports"
+                )
+            {
+                invoke
+                    .resolver
+                    .reject("Use the city host for this operation.");
+                return true;
+            }
+            handler(invoke)
+        })
         .run(tauri::generate_context!())
         .expect("failed to run Townlight desktop");
 }
 
 fn main() {
+    #[cfg(windows)]
+    if let Some(code) = shared_staff::run_host_cli().or_else(shared_staff::run_client_cli) {
+        std::process::exit(code);
+    }
     run();
 }
 

@@ -46,7 +46,7 @@ function openMunicipalLink(area, id) {
 
 const recordsController = createRecordsController(invoke);
 const noticeView = createNoticeView(invoke);
-const meetingsView = createMeetingsView(invoke, openConnectedWork, openImportDraft);
+const meetingsView = createMeetingsView(invoke, openConnectedWork, openImportDraft, () => Boolean(state.app?.shared_staff));
 const codeView = createCodeView(invoke, openConnectedWork);
 const publicMeetingsView = createPublishedView(invoke, 'meetings');
 const publicCodeView = createPublishedView(invoke, 'code');
@@ -852,6 +852,8 @@ const state = {
     requestMessageBody: "",
     documentTitle: "",
     documentSourcePath: "",
+    stationRecordingId: "",
+    stationRecordingSha256: "",
     documentCitation: "",
     sourceNote: "",
     recordsSearchQuery: "",
@@ -1040,9 +1042,11 @@ async function loadAppState() {
     // The native activation receipt will supply this authority only after
     // import/recovery validation. Never merge old JSON into a canonical read.
     state.domainLoadError = null;
-    if (state.app.domain_authority === "python-records") {
+    const canReadSharedRecords = state.app.access?.signed_in
+      && ["local-admin", "city-staff", "records-staff"].includes(state.app.access?.role);
+    if (state.app.domain_authority === "python-records" && (!state.app.shared_staff || canReadSharedRecords)) {
       try {
-        state.app.city_work = await recordsController.refresh(!state.app.access?.signed_in);
+        state.app.city_work = await recordsController.refresh(!state.app.access?.signed_in, state.app.shared_staff);
       } catch (error) {
         // The shell/config loaded successfully. Keep recovery controls usable
         // when a backup, restore or outage leaves the domain service stopped.
@@ -1943,6 +1947,7 @@ const GUIDED_WORK_ACTIONS = new Set([
   "mark-notification-sent",
   "add-records-message",
   "add-records-release-copy",
+  "attach-station-recording",
   "add-records-exemption-decision",
   "add-records-fee-line",
   "waive-records-fee",
@@ -6354,6 +6359,11 @@ function workPayloadForAction(action) {
       documentSourcePath: draft.documentSourcePath,
       documentCitation: draft.documentCitation
     },
+    "attach-station-recording": {
+      ...selected,
+      stationRecordingId: draft.stationRecordingId,
+      stationRecordingSha256: draft.stationRecordingSha256
+    },
     "add-records-release-copy": {
       ...selected,
       releaseDocumentId: draft.releaseDocumentId,
@@ -6682,7 +6692,7 @@ async function handleCityWorkAction(action, { confirmed = false, overridePayload
     const builtPayload = workPayloadForAction(action);
     const payload = overridePayload ? { ...builtPayload, ...overridePayload } : builtPayload;
     const result = state.app.domain_authority === "python-records"
-      ? await recordsController.action(action, payload, previousWork)
+      ? await recordsController.action(action, payload, previousWork, state.app.shared_staff)
       : await invoke("city_work_action", { action, payload });
     if (expectedGeneration !== workGeneration) return;
     state.workActionResult = result;

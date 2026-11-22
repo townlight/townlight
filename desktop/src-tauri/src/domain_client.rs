@@ -3,11 +3,89 @@
 use reqwest::{Client, Method, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
+use std::sync::{LazyLock, Mutex};
 use std::time::Duration;
 use uuid::Uuid;
 
+#[path = "council_packet_client.rs"]
+mod council_packet_client;
+
 const DOMAIN_ORIGIN: &str = "http://127.0.0.1:15480";
 const MAX_RESPONSE_BYTES: usize = 16 * 1024 * 1024;
+static SHARED_WRITES_PENDING: LazyLock<Mutex<HashMap<String, Uuid>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+fn allocation_route(path: &str) -> bool {
+    let parts: Vec<_> = path.split('/').collect();
+    matches!(
+        parts.as_slice(),
+        ["", "desktop", "v1", "meetings", "meetings" | "agenda-items"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "meetings",
+                "meetings",
+                _,
+                "packet-snapshots" | "council-source"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "meetings",
+                "agenda-items",
+                _,
+                "reviews"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "meetings",
+                "packets",
+                _,
+                "council-preview" | "council-approval"
+            ]
+            | ["", "desktop", "v1", "requests"]
+            | ["", "desktop", "v1", "requests", _, "actions"]
+    )
+}
+
+fn shared_operation(path: &str, body: Option<&Value>) -> Result<(String, Uuid), DomainError> {
+    use sha2::{Digest, Sha256};
+
+    let mut hash = Sha256::new();
+    hash.update(path.as_bytes());
+    hash.update([0]);
+    if let Some(body) = body {
+        hash.update(serde_json::to_vec(body).map_err(|_| DomainError::transport(false))?);
+    }
+    let fingerprint = format!("{:x}", hash.finalize());
+    let mut pending = SHARED_WRITES_PENDING
+        .lock()
+        .map_err(|_| DomainError::transport(false))?;
+    if !pending.contains_key(&fingerprint) && pending.len() >= 256 {
+        return Err(DomainError::new(
+            "operation-outcome-unknown",
+            "Resolve the previous city-host writes before submitting more.",
+            false,
+        ));
+    }
+    let id = *pending
+        .entry(fingerprint.clone())
+        .or_insert_with(Uuid::new_v4);
+    Ok((fingerprint, id))
+}
+
+fn clear_shared_operation(operation: Option<&(String, Uuid)>) {
+    if let (Some((fingerprint, id)), Ok(mut pending)) = (operation, SHARED_WRITES_PENDING.lock()) {
+        if pending.get(fingerprint) == Some(id) {
+            pending.remove(fingerprint);
+        }
+    }
+}
 
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
@@ -34,6 +112,18 @@ pub enum MeetingsRequest {
     DeliverPacket {
         id: Uuid,
     },
+    PreviewCouncilPacket {
+        id: Uuid,
+        payload: CouncilPreview,
+    },
+    ApproveCouncilPacket {
+        id: Uuid,
+        payload: CouncilApproval,
+    },
+    SaveCouncilFiles {
+        id: Uuid,
+        payload: council_packet_client::CouncilDownload,
+    },
     GetNoticeTemplate {
         id: Uuid,
     },
@@ -52,6 +142,22 @@ pub enum MeetingsRequest {
     ArchiveMeeting {
         id: Uuid,
         payload: ArchiveInput,
+    },
+    PublisherStatus {
+        id: Uuid,
+    },
+    PublisherRecordingChoices {
+        request_id: Uuid,
+    },
+    PublisherPacket {
+        payload: Value,
+    },
+    PublisherRecording {
+        payload: Value,
+    },
+    PublisherWithdrawal {
+        id: Uuid,
+        kind: PublicationKind,
     },
     CheckNotice {
         id: Uuid,
@@ -140,6 +246,22 @@ pub enum MeetingsRequest {
     },
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum PublicationKind {
+    Packet,
+    Recording,
+}
+
+impl PublicationKind {
+    fn path(&self) -> &'static str {
+        match self {
+            Self::Packet => "packet",
+            Self::Recording => "recording",
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct MinutesDecision {
@@ -152,7 +274,38 @@ pub struct MinutesDecision {
 pub struct PacketInput {
     agenda_item_ids: Vec<Uuid>,
     #[serde(default)]
+    public_agenda_ids: Vec<Uuid>,
+    #[serde(default)]
+    prior_packet_id: Option<Uuid>,
+    #[serde(default)]
+    retained_source_indexes: Vec<usize>,
+    #[serde(default)]
     source_paths: Vec<String>,
+    #[serde(default)]
+    council_sources: Vec<council_packet_client::SelectedSource>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PacketAudience {
+    Staff,
+    Public,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CouncilPreview {
+    audience: PacketAudience,
+    agenda_item_ids: Vec<Uuid>,
+    source_indexes: Vec<usize>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CouncilApproval {
+    preview_id: Uuid,
+    manifest_sha256: String,
+    public_confirmed: bool,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -422,6 +575,34 @@ pub async fn execute_meetings(
             format!("/desktop/v1/meetings/meetings/{id}/archive"),
             Some(serde_json::json!(payload)),
         ),
+        MeetingsRequest::PublisherStatus { id } => (
+            Method::GET,
+            format!("/desktop/v1/portal/publications/{id}"),
+            None,
+        ),
+        MeetingsRequest::PublisherRecordingChoices { request_id } => (
+            Method::GET,
+            format!("/desktop/v1/portal/selections?request_id={request_id}"),
+            None,
+        ),
+        MeetingsRequest::PublisherPacket { payload } => (
+            Method::POST,
+            "/desktop/v1/portal/publications/packet".to_string(),
+            Some(payload),
+        ),
+        MeetingsRequest::PublisherRecording { payload } => (
+            Method::POST,
+            "/desktop/v1/portal/publications/recording".to_string(),
+            Some(payload),
+        ),
+        MeetingsRequest::PublisherWithdrawal { id, kind } => (
+            Method::POST,
+            format!(
+                "/desktop/v1/portal/publications/{id}/{}/withdraw",
+                kind.path()
+            ),
+            Some(serde_json::json!({"confirm": true})),
+        ),
         MeetingsRequest::CheckNotice { id, payload } => (
             Method::POST,
             format!("/desktop/v1/meetings/meetings/{id}/notice-checks"),
@@ -438,22 +619,11 @@ pub async fn execute_meetings(
             Some(serde_json::json!(payload)),
         ),
         MeetingsRequest::CapturePacket { id, payload } => {
-            let mut files = Vec::new();
-            for path in payload.source_paths {
-                files.push(crate::domain_files::stage_meetings(&path).map_err(|_| {
-                    DomainError::new(
-                        "file-unavailable",
-                        "The selected source file could not be staged; no packet was submitted.",
-                        false,
-                    )
-                })?);
-            }
+            let body = council_packet_client::snapshot_payload(id, payload, &proof).await?;
             (
                 Method::POST,
                 format!("/desktop/v1/meetings/meetings/{id}/packet-snapshots"),
-                Some(
-                    serde_json::json!({"agenda_item_ids":payload.agenda_item_ids,"source_files":files}),
-                ),
+                Some(body),
             )
         }
         MeetingsRequest::DeliverPacket { id } => (
@@ -461,6 +631,19 @@ pub async fn execute_meetings(
             format!("/desktop/v1/meetings/packets/{id}/deliver"),
             None,
         ),
+        MeetingsRequest::PreviewCouncilPacket { id, payload } => (
+            Method::POST,
+            format!("/desktop/v1/meetings/packets/{id}/council-preview"),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::ApproveCouncilPacket { id, payload } => (
+            Method::POST,
+            format!("/desktop/v1/meetings/packets/{id}/council-approval"),
+            Some(serde_json::json!(payload)),
+        ),
+        MeetingsRequest::SaveCouncilFiles { id, payload } => {
+            return council_packet_client::save_files(id, payload, &proof).await;
+        }
         MeetingsRequest::RecordMinutesDecision { id, payload } => (
             Method::POST,
             format!("/desktop/v1/meetings/minutes/{id}/decisions"),
@@ -938,6 +1121,11 @@ pub enum RecordsRequest {
         #[serde(default)]
         added_by: String,
     },
+    AttachStationRecording {
+        request_id: Uuid,
+        recording_id: Uuid,
+        expected_sha256: String,
+    },
     Create {
         payload: Intake,
     },
@@ -1002,6 +1190,10 @@ pub struct DomainError {
     pub code: &'static str,
     pub message: &'static str,
     pub outcome_unknown: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_revision: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_response_sha256: Option<String>,
 }
 
 impl DomainError {
@@ -1013,6 +1205,8 @@ impl DomainError {
             code,
             message,
             outcome_unknown,
+            current_revision: None,
+            current_response_sha256: None,
         }
     }
 
@@ -1117,11 +1311,16 @@ impl RecordsRequest {
                 source_path,
                 citation,
             } => {
-                let file = stage(&source_path, &title, &citation)?;
+                let body = if crate::shared_staff::configured() {
+                    serde_json::json!({"title":title, "citation":citation, "upload":records_upload(&source_path)?})
+                } else {
+                    let file = stage(&source_path, &title, &citation)?;
+                    serde_json::json!({"title":title, "citation":citation, "file":file})
+                };
                 (
                     Method::POST,
                     format!("/desktop/v1/requests/{request_id}/documents"),
-                    Some(serde_json::json!({"title":title, "citation":citation, "file":file})),
+                    Some(body),
                 )
             }
             Self::AttachReleaseCopy {
@@ -1132,21 +1331,35 @@ impl RecordsRequest {
                 note,
                 added_by,
             } => {
-                let file = stage(&source_path, "Records release copy", &note)?;
+                let body = if crate::shared_staff::configured() {
+                    serde_json::json!({"status":status, "note":note, "upload":records_upload(&source_path)?})
+                } else {
+                    let file = stage(&source_path, "Records release copy", &note)?;
+                    serde_json::json!({"status":status, "note":note, "added_by":added_by, "file":file})
+                };
                 (
                     Method::POST,
                     format!(
                         "/desktop/v1/requests/{request_id}/documents/{attachment_id}/release-copy"
                     ),
-                    Some(
-                        serde_json::json!({"status":status, "note":note, "added_by":added_by, "file":file}),
-                    ),
+                    Some(body),
                 )
             }
             Self::View { request_id } => (
                 Method::GET,
                 format!("/desktop/v1/requests/{request_id}/view"),
                 None,
+            ),
+            Self::AttachStationRecording {
+                request_id,
+                recording_id,
+                expected_sha256,
+            } => (
+                Method::POST,
+                format!("/desktop/v1/requests/{request_id}/station-recordings"),
+                Some(
+                    serde_json::json!({"recording_id":recording_id,"expected_sha256":expected_sha256}),
+                ),
             ),
             Self::Create { payload } => (
                 Method::POST,
@@ -1177,7 +1390,52 @@ fn status_error(status: StatusCode, writing: bool) -> DomainError {
     }
 }
 
+fn records_upload(source: &str) -> Result<Value, DomainError> {
+    use base64::Engine;
+    use sha2::{Digest, Sha256};
+    use std::io::Read;
+    use std::path::Path;
+
+    const MAX_FILE: u64 = 16 * 1024 * 1024;
+    let unavailable = || {
+        DomainError::new(
+            "file-unavailable",
+            "Choose a readable Records file up to 16 MiB.",
+            false,
+        )
+    };
+    let path = Path::new(source);
+    let file_name = path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(unavailable)?;
+    let file = std::fs::File::open(path).map_err(|_| unavailable())?;
+    let mut bytes = Vec::new();
+    file.take(MAX_FILE + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| unavailable())?;
+    if bytes.is_empty() || bytes.len() as u64 > MAX_FILE {
+        return Err(unavailable());
+    }
+    Ok(
+        serde_json::json!({"file_name":file_name,"sha256":format!("{:x}",Sha256::digest(&bytes)),
+        "content_base64":base64::engine::general_purpose::STANDARD.encode(bytes)}),
+    )
+}
+
 pub async fn execute(request: RecordsRequest, proof: String) -> Result<Value, DomainError> {
+    if crate::shared_staff::configured()
+        && matches!(
+            request,
+            RecordsRequest::Suggest { .. } | RecordsRequest::Export { .. }
+        )
+    {
+        return Err(DomainError::new(
+            "host-only",
+            "Use the city host for this Records operation.",
+            false,
+        ));
+    }
     let request = match request {
         RecordsRequest::Suggest { request_id } => {
             #[derive(Deserialize)]
@@ -1254,18 +1512,44 @@ async fn send_with_header(
     } else {
         MAX_RESPONSE_BYTES
     };
+    let request_timeout = if path == "/desktop/v1/portal/publications/recording" {
+        // The host verifies and seals the already-approved managed recording
+        // before acknowledging that it is safe to retry after a restart.
+        300
+    } else {
+        60
+    };
     // Do not forward the proof through a system proxy or a server redirect.
     let client = Client::builder()
         .no_proxy()
         .redirect(reqwest::redirect::Policy::none())
         .retry(reqwest::retry::never())
         .connect_timeout(Duration::from_secs(3))
-        .timeout(Duration::from_secs(60))
+        .timeout(Duration::from_secs(request_timeout))
         .build()
         .map_err(|_| DomainError::transport(false))?;
+    let shared = crate::shared_staff::configured();
+    let operation = if shared && writing && allocation_route(&path) {
+        Some(shared_operation(&path, body.as_ref())?)
+    } else {
+        None
+    };
+    let destination = if shared {
+        if proof_header != "X-Townlight-Session" {
+            return Err(DomainError::denied());
+        }
+        crate::shared_staff::url(&format!("/staff/v1/api{path}"))
+            .map_err(|_| DomainError::transport(false))?
+    } else {
+        reqwest::Url::parse(&format!("{DOMAIN_ORIGIN}{path}"))
+            .map_err(|_| DomainError::transport(false))?
+    };
     let mut outgoing = client
-        .request(method, format!("{DOMAIN_ORIGIN}{path}"))
+        .request(method, destination)
         .header(proof_header, proof);
+    if let Some((_, id)) = &operation {
+        outgoing = outgoing.header("X-Townlight-Operation", id.to_string());
+    }
     if let Some(body) = body {
         outgoing = outgoing.json(&body);
     }
@@ -1274,7 +1558,34 @@ async fn send_with_header(
         .await
         .map_err(|_| DomainError::transport(writing))?;
     if !response.status().is_success() {
-        return Err(status_error(response.status(), writing));
+        let status = response.status();
+        let mut error = status_error(status, writing);
+        if status == StatusCode::CONFLICT && shared {
+            if let Ok(Some(bytes)) = response.chunk().await {
+                if bytes.len() <= 4096 {
+                    if let Ok(body) = serde_json::from_slice::<Value>(&bytes) {
+                        if body.get("code").and_then(Value::as_str)
+                            == Some("operation-outcome-unknown")
+                        {
+                            return Err(DomainError::new("operation-outcome-unknown", "The city host did not confirm the previous write. Check the authoritative records before submitting again.", true));
+                        }
+                        error.current_revision =
+                            body.get("current_revision").and_then(Value::as_u64);
+                        error.current_response_sha256 = body
+                            .get("current_response_sha256")
+                            .and_then(Value::as_str)
+                            .map(str::to_string);
+                    }
+                }
+            }
+        }
+        if status.is_client_error()
+            && status != StatusCode::UNAUTHORIZED
+            && status != StatusCode::TOO_MANY_REQUESTS
+        {
+            clear_shared_operation(operation.as_ref());
+        }
+        return Err(error);
     }
     // Error bodies are deliberately not echoed: framework errors can contain
     // internal details. Successful responses must be bounded JSON.
@@ -1289,13 +1600,15 @@ async fn send_with_header(
         }
         bytes.extend_from_slice(&chunk);
     }
-    serde_json::from_slice(&bytes).map_err(|_| {
+    let result = serde_json::from_slice(&bytes).map_err(|_| {
         DomainError::new(
             "invalid-response",
             "Records returned an unreadable result. Refresh before repeating a change.",
             writing,
         )
-    })
+    })?;
+    clear_shared_operation(operation.as_ref());
+    Ok(result)
 }
 
 #[cfg(test)]

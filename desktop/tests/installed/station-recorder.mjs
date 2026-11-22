@@ -9,14 +9,15 @@ import path from 'node:path';
 import {tmpdir} from 'node:os';
 import {chromium} from '@playwright/test';
 
-export async function stationRecorder({native, save, admin, longCapture = false}) {
-  assert.equal(process.env.GITHUB_ACTIONS,'true');
-  const profile=path.join(process.env.LOCALAPPDATA,'CivicSuite');
+export async function stationRecorder({native, save, admin, longCapture = false, meetingId = null,
+  disposableFixture = false, profileRoot = null, payloadRoot = null}) {
+  assert(process.env.GITHUB_ACTIONS === 'true' || (disposableFixture && process.env.TOWNLIGHT_DISPOSABLE_INSTALLED_TEST === '1'));
+  const profile=profileRoot || path.join(process.env.LOCALAPPDATA,'CivicSuite');
   const pairing=JSON.parse(await readFile(path.join(profile,'config/station.json'),'utf8'));
   assert.equal(pairing.configured,true,'Normal first-run did not configure Station');
   assert.equal((await native('station_action',{action:'status',selectedDirectory:null})).ready,true);
   const data=pairing.data_directory;
-  const payload=path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
+  const payload=payloadRoot || path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
   const proof=()=>readFile(path.join(profile,'config/local-session.json'),'utf8').then(x=>JSON.parse(x).session_hash);
   const request=async(origin,url,body)=>{
     const response=await fetch(origin+url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Townlight-Session':await proof(),'Origin':origin,'X-Station-UI':'1'},body:body===undefined?undefined:JSON.stringify(body)});
@@ -27,7 +28,8 @@ export async function stationRecorder({native, save, admin, longCapture = false}
   const capacity=await request(station,'/operator/storage');
   assert.equal(capacity.max_seconds,28800); assert.equal(capacity.max_bytes,64*1024**3); assert(capacity.ready);
   await writeFile(path.join(data,'live-sources.json'),JSON.stringify([{id:'installed-fixture',label:'Synthetic installed chamber',kind:'udp-mpegts',address:'127.0.0.1',port:18760}]));
-  const meeting=await request(suite,'/desktop/v1/meetings/meetings',{title:'Synthetic installed recorder acceptance',scheduled_start:'2026-11-20T18:00:00-07:00',location:'Synthetic chamber',meeting_type:'regular'});
+  const meeting=meetingId ? await request(suite,`/desktop/v1/meetings/meetings/${meetingId}`) :
+    await request(suite,'/desktop/v1/meetings/meetings',{title:'Synthetic installed recorder acceptance',scheduled_start:'2026-11-20T18:00:00-07:00',location:'Synthetic chamber',meeting_type:'regular'});
   const req=await request(suite,'/desktop/v1/requests',{requester:'Synthetic acceptance',summary:'Private recording handoff',deadline:'2026-12-20',deadlineBasis:'Staff reviewed fixture'});
   const ffmpeg=path.join(payload,'station/bin/ffmpeg.exe');
   const senderOptions={windowsHide:true,stdio:['ignore','ignore','pipe']};

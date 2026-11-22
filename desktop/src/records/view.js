@@ -178,6 +178,7 @@ function renderRecordsWorkflow() {
     return `<section role="status"><h2>Records setup is in progress</h2><p>Saved requests will be available when the Townlight administrator completes setup.</p></section>`;
   }
   if (isPublicSurface()) return renderPublicRecordsWorkflow();
+  const sharedStaff = state.app.shared_staff === true;
   const work = cityWork();
   const selectedRequest = currentRecordsRequest(work);
   const selectedReleaseDocumentId = selectedRequest?.documents?.some((document) => document.id === state.workDraft.releaseDocumentId)
@@ -206,7 +207,7 @@ function renderRecordsWorkflow() {
       <p>Track intake, deadline, review draft, citations, exports, and audit evidence locally.</p>
     </section>
     ${renderDemoTownBanner(work)}
-    ${accessState().role === "local-admin" && !work.demo_fixture ? `
+    ${!sharedStaff && accessState().role === "local-admin" && !work.demo_fixture ? `
       <section class="workflow-form" aria-label="Load fictional demonstration town">
         <h3>Fictional demo town</h3>
         <p>Load Core's canonical Redstone Valley fixture to exercise the complete Records workflow. Loading is never automatic, requires an empty local profile, and creates a verified backup before replacing state.</p>
@@ -234,6 +235,7 @@ function renderRecordsWorkflow() {
         <label>Request summary <textarea data-work-field="recordsSummary">${escapeHtml(state.workDraft.recordsSummary)}</textarea></label>
         <button type="button" class="primary-action" data-work-action="create-records-request">Create Request</button>
       </div>
+      ${sharedStaff ? "" : `
       <div class="workflow-form">
         <h3>Scope & Search</h3>
         ${state.app.module_selection?.enabled_module_ids?.includes("townlight_meetings") ? renderMeetingsSources(selectedRequest?.request_id || "") : ""}
@@ -289,13 +291,19 @@ function renderRecordsWorkflow() {
         <label>Message to requester <textarea data-work-field="requestMessageBody">${escapeHtml(state.workDraft.requestMessageBody)}</textarea></label>
         <button type="button" class="secondary-action" data-work-action="add-records-message">Add Request Message</button>
       </div>
+      `}
       <div class="workflow-form">
         <h3>Request Documents</h3>
-        <p class="form-help">Attach a local source file or typed records reference. Readable files are copied and hashed; unreadable typed references are preserved as hashed local marker files.</p>
+        <p class="form-help">${sharedStaff ? "Choose a file up to 16 MiB. The city host verifies and stores the bytes." : "Attach a local source file or typed records reference. Readable files are copied and hashed; unreadable typed references are preserved as hashed local marker files."}</p>
         <label>Document title <input type="text" data-work-field="documentTitle" value="${escapeHtml(state.workDraft.documentTitle)}" /></label>
         ${renderFilePathField("Source file path or reference", "documentSourcePath", state.workDraft.documentSourcePath, "C:/City/Records/responsive-email.pdf")}
         <label>Document citation <input type="text" data-work-field="documentCitation" value="${escapeHtml(state.workDraft.documentCitation)}" /></label>
         <button type="button" class="secondary-action" data-work-action="add-records-document">Attach Document</button>
+        ${sharedStaff ? `
+          <label>Completed Station recording ID <input data-work-field="stationRecordingId" value="${escapeHtml(state.workDraft.stationRecordingId)}" /></label>
+          <label>Recording SHA-256 <input data-work-field="stationRecordingSha256" value="${escapeHtml(state.workDraft.stationRecordingSha256)}" /></label>
+          <button type="button" class="secondary-action" data-work-action="attach-station-recording" ${selectedRequest ? "" : "disabled"}>Attach Private Recording</button>
+        ` : ""}
         <label>Release document
           ${selectedRequest?.documents?.length ? `<select aria-label="Release document" data-work-field="releaseDocumentId">
             ${(selectedRequest.documents || []).map((document) => `<option value="${escapeHtml(document.id)}" ${selectedReleaseDocumentId === document.id ? "selected" : ""}>${escapeHtml(document.title)}</option>`).join("")}
@@ -308,7 +316,7 @@ function renderRecordsWorkflow() {
           </select>
         </label>
         <label>Release copy note <textarea data-work-field="releaseCopyNote">${escapeHtml(state.workDraft.releaseCopyNote)}</textarea></label>
-        <label>Release copy reviewed by <input type="text" data-work-field="releaseCopyAddedBy" value="${escapeHtml(state.workDraft.releaseCopyAddedBy)}" placeholder="Records Officer" /></label>
+        ${sharedStaff ? "" : `<label>Release copy reviewed by <input type="text" data-work-field="releaseCopyAddedBy" value="${escapeHtml(state.workDraft.releaseCopyAddedBy)}" placeholder="Records Officer" /></label>`}
         <button type="button" class="secondary-action" data-work-action="add-records-release-copy">Attach Release Copy</button>
       </div>
       <div class="workflow-form">
@@ -316,19 +324,21 @@ function renderRecordsWorkflow() {
         <label>Response draft <textarea data-work-field="responseDraft">${escapeHtml(state.workDraft.responseDraft)}</textarea></label>
         <label>Approval note <input type="text" data-work-field="approvalNote" value="${escapeHtml(state.workDraft.approvalNote)}" /></label>
         <div class="workflow-actions">
-          <button type="button" class="secondary-action" data-work-action="suggest-records-response">Generate Local AI Draft</button>
+          ${sharedStaff ? "" : `<button type="button" class="secondary-action" data-work-action="suggest-records-response">Generate Local AI Draft</button>`}
           <button type="button" class="secondary-action" data-work-action="draft-records-response">Save Draft</button>
           <button type="button" class="secondary-action" data-work-action="approve-records-response">Approve Response</button>
-          <button type="button" class="secondary-action" data-work-action="build-records-release-package">Build Release Package</button>
-          <button type="button" class="secondary-action" data-work-action="export-records-response">Export Response</button>
+          ${sharedStaff ? `<p class="form-help">Complete prepared release exports on the city host.</p>` : `
+            <button type="button" class="secondary-action" data-work-action="build-records-release-package">Build Release Package</button>
+            <button type="button" class="secondary-action" data-work-action="export-records-response">Export Response</button>
+          `}
           <button type="button" class="secondary-action" data-work-action="fulfill-records-request">Mark Fulfilled</button>
-          <button type="button" class="secondary-action" data-work-action="close-records-request">Close Request</button>
-          <button type="button" class="secondary-action" data-work-action="open-exports-folder">Open Exports Folder</button>
+          ${sharedStaff ? "" : `<button type="button" class="secondary-action" data-work-action="close-records-request">Close Request</button>
+          <button type="button" class="secondary-action" data-work-action="open-exports-folder">Open Exports Folder</button>`}
         </div>
       </div>
     </section>
     ${renderWorkActionResult()}
-    ${renderRecordsNotificationOutbox(work)}
+    ${sharedStaff ? "" : renderRecordsNotificationOutbox(work)}
     <section class="workflow-list">
       ${work.records_requests.length === 0 ? workflowEmpty("No local records requests have been created yet.") : work.records_requests.map((request) => `
         <article class="workflow-record">

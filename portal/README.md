@@ -1,6 +1,6 @@
 # Townlight Portal
 
-Wagtail provides public city pages and a meeting archive. The optional Townlight bridge pulls explicitly approved releases from the private desktop runtime; the synthetic PrimeGov fixture remains available for demonstrations and never contacts a real tenant.
+Wagtail provides public city pages and a meeting archive. A configured shared Windows host sends approved packets and recordings to the website. The synthetic PrimeGov fixture remains available for demonstrations and never contacts a real tenant.
 
 Townlight Beta 1 now includes the approved resident-facing design: a city-branded home and task finder, editable service guidance, searchable/filtered public meetings, recording playback, approved meeting document pages and optional provenance details. Pages are server-rendered and responsive; navigation and filters work without JavaScript. Existing component versions are retained.
 
@@ -10,7 +10,7 @@ Edit the home in Wagtail for the city name/prefix, logo and hero image, heading/
 
 `setup_demo` creates fictional Juniper Falls content only when no Townlight home is configured, and preserves existing content on subsequent runs. Its service links use `.example` domains and are explicitly illustrative. Upgrade a separate existing portal by backing up its database, media and private releases, running `migrate` and `collectstatic`, then editing its presentation fields; no page text is automatically replaced. City-approved contact, privacy and accessibility content is configured by the adopting city.
 
-Residents use `/meetings/?period=upcoming|past|all` with `q`, `series` and `page` filters. Series uses actual public titles because the existing contract has no separate board taxonomy. `/search/?q=records` searches published page/meeting titles only. Native agenda, packet and minutes open at `/meetings/<pk>/documents/<agenda|packet|minutes>/`; they expose approved text, not imaginary PDF files. Withdrawal removes these document routes, playback, search results and the home feature together. Synthetic PrimeGov links retain their illustrative labels.
+Residents use `/meetings/?period=upcoming|past|all` with `q`, `series` and `page` filters. Series uses actual public titles. `/search/?q=records` searches published page and meeting titles. Public agenda, packet and minutes pages open at `/meetings/<pk>/documents/<agenda|packet|minutes>/` where available. An approved council packet provides a public HTML index and the exact PDF. Withdrawing the recording removes its playback and download while leaving a published packet available. Withdrawing the last published item hides the meeting. Synthetic PrimeGov links retain their illustrative labels.
 
 The public presentation adds no resident accounts, transactions, fee calculator, new vendor connector or live-stream host. See the [portal guide](../docs/portal/guide.md) for complete field specifications, examples and existing publication controls.
 
@@ -27,6 +27,23 @@ Use `runserver` only for local demonstration. Set `TOWNLIGHT_DEBUG=0`, a unique 
 Use a same-host TLS reverse proxy; enable `TOWNLIGHT_TRUST_TLS_PROXY=1` only when it strips client forwarded headers, supplies its own HTTPS scheme and sets the canonical Host. Serve collected static assets only and proxy all other routes. Do not expose the native desktop port or private release directory. For a minimal Nginx example and detailed operational guidance see [the portal guide](../docs/portal/guide.md).
 
 ## Publication
+
+On a configured shared Windows host, staff publish from **Meetings → City website publication**. Send an exact approved public council packet or select an eligible recording from a fulfilled Records request. A queued or retrying status means the website has not yet confirmed the action. The local Windows host continues delivering queued copies and withdrawals after staff sign out. It retries the same bytes after an outage or restart. Refresh the status in the meeting before treating a copy or withdrawal as live.
+
+For unattended delivery, configure these values under the named Windows host account and the separately supervised website service.
+
+| Where | Setting |
+| --- | --- |
+| Windows host | `TOWNLIGHT_SHARED_STAFF_HOST=1`, `TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN` set to the canonical website HTTPS origin, and `TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE` pointing to an absolute file containing a random 32-byte base64url token without padding. |
+| Website | `TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE` pointing to an absolute file containing the lowercase SHA-256 of the token text without its line terminator. Run the existing `migrate` step before enabling delivery. |
+
+Restrict both credential files to their service accounts. Serve `/townlight/v1/publications/` over the website's canonical HTTPS origin and preserve its Authorization and Content-Length headers. For a city-issued certificate, install the issuing CA in the Windows trust store available to the publisher's service identity and make sure the certificate covers the configured hostname. Allow upload bodies of the configured recording limit plus 2 MiB on this route and provision the private disk accordingly. The worker and receiver read their credential files on each request. Rotate the matching files to replace the token, or remove the digest file to revoke delivery. Existing public pages stay visible until an authorized withdrawal reaches the website.
+
+The approved packet PDF and public agenda are available together on the resident meeting page. A corrected packet or recording replaces its own copy. Withdraw either independently. The same request can be retried safely and older requests cannot overwrite a newer correction or withdrawal. No Windows share, Station service, profile file or staff session proof is exposed publicly. Preserve the host profile's `publisher` directory alongside the city backup, and the website's database and private release directory together. If restoring to an earlier host queue, reconcile its state against the website before sending further revisions.
+
+### Historical manual bridge
+
+The existing Wagtail superuser workflow continues to serve the legacy manual archive. If a meeting was already published through that workflow, withdraw the old projection before switching that meeting to unattended delivery.
 
 Configure `TOWNLIGHT_NATIVE_ORIGIN` to the trusted private native runtime origin (HTTPS or loopback HTTP), `TOWNLIGHT_NATIVE_PROOF_FILE` to an absolute server-only file containing the native session proof, and optionally `TOWNLIGHT_DISPLAY_TIMEZONE` to an IANA zone (default `UTC`). Restrict the proof file to the portal service account. A native principal needs both Meetings and Records permissions. The proof is not sent to the browser.
 

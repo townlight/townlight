@@ -27,12 +27,12 @@ const fields = {
 
 export type LifecycleAction = keyof typeof fields;
 export type RecordsAction = LifecycleAction | "create-records-request" | "add-records-document" |
-  "add-records-release-copy" | "build-records-release-package" | "export-records-response" | "suggest-records-response" | "mark-notification-sent";
+  "add-records-release-copy" | "attach-station-recording" | "build-records-release-package" | "export-records-response" | "suggest-records-response" | "mark-notification-sent";
 export type PublicAction = "submit-public-records-request" | "lookup-public-records-request" | "add-public-records-message";
 
 export function isRecordsAction(action: string): action is RecordsAction {
   return Object.hasOwn(fields, action) || ["create-records-request", "add-records-document", "add-records-release-copy",
-    "build-records-release-package", "export-records-response", "suggest-records-response", "mark-notification-sent"].includes(action);
+    "attach-station-recording", "build-records-release-package", "export-records-response", "suggest-records-response", "mark-notification-sent"].includes(action);
 }
 export function isPublicRecordsAction(action: string): action is PublicAction {
   return ["submit-public-records-request", "lookup-public-records-request", "add-public-records-message"].includes(action);
@@ -53,7 +53,7 @@ export function createRecordsClient(invoke: Invoke) {
         operation === "lookup" ? ["trackingNumber", "requesterContact"] : ["trackingNumber", "requesterContact", "publicRequestMessage"];
       return invoke("records_public_request", {request: {operation, payload: pick(payload, keys)}});
     },
-    async action(action: RecordsAction, payload: Record<string, string>, current: RecordsState): Promise<OperationResult | Record<string, unknown>> {
+    async action(action: RecordsAction, payload: Record<string, string>, current: RecordsState, sharedStaff = false): Promise<OperationResult | Record<string, unknown>> {
       if (action === "mark-notification-sent") {
         const notification = current.notification_events?.find(item => item.id === payload.notificationId);
         if (!notification) throw new Error("Refresh Records and select the notification again.");
@@ -67,6 +67,10 @@ export function createRecordsClient(invoke: Invoke) {
       const selected = current.records_requests.find(item => item.id === payload.recordsRequestId);
       if (!selected?.request_id) throw new Error("Refresh Records and select the request again.");
       const request_id = selected.request_id;
+      if (action === "attach-station-recording") {
+        return invoke("records_domain_request", {request: {operation: action, request_id,
+          recording_id: payload.stationRecordingId, expected_sha256: payload.stationRecordingSha256}});
+      }
       if (action === "suggest-records-response") {
         return invoke("records_domain_request", {request: {operation: "suggest", request_id}});
       }
@@ -85,7 +89,12 @@ export function createRecordsClient(invoke: Invoke) {
           kind: action === "export-records-response" ? "response" : "release-package"}});
       }
       if (!Object.hasOwn(fields, action)) throw new Error("This Records action is not connected yet.");
-      return invoke("records_domain_request", {request: {operation: "apply", request_id, action, payload: pick(payload, fields[action])}});
+      const values = pick(payload, fields[action]);
+      if (sharedStaff && (action === "draft-records-response" || action === "approve-records-response")) {
+        if (typeof selected.response_draft_sha256 !== "string") throw new Error("Refresh this request first.");
+        values.expectedResponseSha256 = selected.response_draft_sha256;
+      }
+      return invoke("records_domain_request", {request: {operation: "apply", request_id, action, payload: values}});
     },
   };
 }
