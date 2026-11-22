@@ -70,7 +70,21 @@ export async function prepareBudget({ native }) {
     'review must set finance_reviewed_at: ' + JSON.stringify(reviewed));
   assert.equal(reviewed.content_sha256, imported.content_sha256);
 
-  // 5. Produce the hearing attachment for the reviewed revision.
+  // 5. Verify the reviewed revision via get-budget before attaching.
+  const fetched = await call('get-budget', { id: imported.id });
+  assert.equal(fetched.content_sha256, reviewed.content_sha256);
+  for (const title of [
+    'Budget Narrative',
+    'Hearing Packet Checklist',
+    'Resident Summary',
+  ]) {
+    assert.ok(
+      fetched.advisory_workpaper.includes(title),
+      `advisory_workpaper must include ${title}`,
+    );
+  }
+
+  // 6. Produce the hearing attachment for the reviewed revision.
   const attachment = await call('budget-attachment', { id: imported.id });
 
   assert.equal(typeof attachment?.text, 'string');
