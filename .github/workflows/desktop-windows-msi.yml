@@ -1,132 +1,285 @@
-name: Windows MSI diagnostic (throwaway)
-
+name: Windows MSI diagnostic after startup
 on:
   workflow_dispatch:
-
 permissions:
-  actions: read
   contents: read
-
+  actions: read
 jobs:
-  msi-diagnostic:
+  windows-msi-lifecycle:
+    name: Windows MSI install/first-run/backup-restore/uninstall lifecycle
     runs-on: windows-latest
-    timeout-minutes: 30
+    # Consume the exact MSI artifact this workflow built, not a rebuild and not
+    # the legacy 0.1.x archive the Linux package lifecycle exercises.
+    # Coverage and the documented gaps (GUI walkthrough, ~6.97 GB model) are in
+    # docs/installer/windows-msi-ci-lifecycle-coverage-v0.1.md.
+    timeout-minutes: 60
     steps:
-      - name: Download exact MSI from run 45066607396
+      - name: Check out Townlight
+        uses: actions/checkout@v5
+        with:
+          path: townlight
+
+      - name: Download built Windows Local MSI
         uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-UNSIGNED
           run-id: 45066607396
-          repository: townlight/townlight
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}\msi
+          github-token: ${{ github.token }}
+          path: msi-artifact
 
-      - name: Verify unique MSI sha and evidence (short)
+      - name: Verify MSI artifact classification before install
         shell: pwsh
+        env:
+          EXPECTED_SIGNATURE_STATE: UNSIGNED
         run: |
-          $ErrorActionPreference = 'Stop'
-          $msis = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\msi" -Filter '*.msi' -Recurse -File)
-          if ($msis.Count -ne 1) { throw "Expected exactly one MSI; found $($msis.Count)" }
+          $msis = @(Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -File -Recurse)
+          if ($msis.Count -ne 1) { throw "Expected exactly one MSI; found $($msis.Count)." }
+          $evidenceFiles = @(Get-ChildItem -LiteralPath "msi-artifact" -Filter "*evidence*.txt" -File -Recurse)
+          if ($evidenceFiles.Count -ne 1) { throw "Expected exactly one MSI evidence file; found $($evidenceFiles.Count)." }
           $msi = $msis[0]
-          $sha = (Get-FileHash -Algorithm SHA256 -LiteralPath $msi.FullName).Hash
-          Write-Host "MSI: $($msi.FullName)"
-          Write-Host "Size: $($msi.Length) bytes"
-          Write-Host "SHA256: $sha"
+          $evidence = (Get-Content -Raw -LiteralPath $evidenceFiles[0].FullName) -replace "`r`n?", "`n"
+          $signature = Get-AuthenticodeSignature -LiteralPath $msi.FullName
 
-          $evidence = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\msi" -File -Recurse -ErrorAction SilentlyContinue |
-            Where-Object { $_.Extension -ne '.msi' -and $_.Name -match '(?i)manifest|sha|checksum|evidence' })
-          if ($evidence.Count -eq 0) {
-            Write-Host 'No manifest/evidence file; sha check skipped'
-            return
+          if ($env:EXPECTED_SIGNATURE_STATE -eq "UNSIGNED") {
+            if ($msi.Name -notmatch '-UNSIGNED\.msi$') { throw "Unsigned CI MSI filename is not visibly marked UNSIGNED." }
+            if ($signature.Status -ne "NotSigned") { throw "Unsigned CI lane requires Authenticode state NotSigned; received $($signature.Status)." }
+            if ($evidence -notmatch '(?m)^SignatureState=UNSIGNED$') { throw "Evidence does not classify the MSI as UNSIGNED." }
+            if ($evidence -notmatch '(?m)^PublicationAllowed=false$') { throw "Unsigned evidence does not forbid publication." }
+            exit 0
           }
 
-          $pattern = "(?i)(?<![0-9a-f])$([regex]::Escape($sha))(?![0-9a-f])"
-          $match = $null
-          foreach ($e in $evidence) {
-            $text = Get-Content -LiteralPath $e.FullName -Raw
-            if ($text -match $pattern) { $match = $e.Name; break }
+          if ($env:EXPECTED_SIGNATURE_STATE -ne "Valid") { throw "Unknown expected signature state." }
+          if ($signature.Status -ne "Valid") { throw "Signed lifecycle lane received an invalid signature." }
+          if ($signature.SignerCertificate.Subject -notmatch '(^|,\s*)CN=Scott Converse(,|$)') {
+            throw "Signed lifecycle lane received an unexpected signer."
           }
-          if ($match) { Write-Host "OK: SHA256 found exactly in $match" }
-          else { Write-Warning 'WARN: SHA256 not found in evidence files' }
+          if ($evidence -notmatch '(?m)^SignatureState=Valid$') { throw "Evidence does not classify the MSI as Valid." }
+          if ($evidence -notmatch '(?m)^PublicationAllowed=true$') { throw "Signed evidence does not permit publication." }
 
-      - name: Fresh headless install /i
-        timeout-minutes: 15
+      # ---- INSTALL ------------------------------------------------------------
+      # Per-machine MSI; GitHub-hosted windows-latest runs elevated, so a silent
+      # msiexec install needs no interactive UAC. We log to a file and surface the
+      # exit code explicitly because msiexec returns non-zero codes (1603/1638/...)
+      # that PowerShell would otherwise swallow.
+      - name: Install the MSI silently
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-          $msis = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\msi" -Filter '*.msi' -Recurse -File)
-          if ($msis.Count -ne 1) { throw "Expected exactly one MSI; found $($msis.Count)" }
-          $msi = $msis[0]
-          $log = Join-Path $env:RUNNER_TEMP 'townlight-msi-install.log'
-          $out = Join-Path $env:RUNNER_TEMP 'townlight-msi-install.stdout.log'
-          $err = Join-Path $env:RUNNER_TEMP 'townlight-msi-install.stderr.log'
+          $ErrorActionPreference = "Stop"
+          $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msi) { throw "No MSI found in the downloaded artifact." }
+          Write-Host "Installing $($msi.FullName)"
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-install.log"
+          $p = Start-Process msiexec.exe -ArgumentList @("/i", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -Wait -PassThru
+          Write-Host "msiexec install exit code: $($p.ExitCode)"
+          if (Test-Path $log) { Get-Content $log -Tail 40 }
+          if ($p.ExitCode -ne 0) { throw "MSI install failed with exit code $($p.ExitCode)." }
 
-          Write-Host "BEFORE install: msiexec /i $($msi.FullName)"
-          $p = Start-Process msiexec.exe -ArgumentList @('/i', "`"$($msi.FullName)`"", '/quiet', '/norestart', '/l*v', "`"$log`"") -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err -PassThru
-          Write-Host "Started msiexec /i PID $($p.Id)"
-
-          if (-not $p.WaitForExit(600000)) {
-            Write-Host "msiexec /i PID $($p.Id) timeout; killing"
-            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
-            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
-            throw 'Install timeout'
-          }
-
-          $code = $p.ExitCode
-          Write-Host "AFTER install: PID $($p.Id) exit=$code"
-          if (Test-Path -LiteralPath $log) { Write-Host 'Log tail:'; Get-Content -LiteralPath $log -Tail 30 }
-          if ($code -ne 0 -and $code -ne 3010) { throw "Install exit $code" }
-
-      - name: Direct repair /fa
-        timeout-minutes: 10
+      # ---- VERIFY INSTALL -----------------------------------------------------
+      # Confirm the product registered an ARP/uninstall entry and the main binary
+      # landed. The runtime payload (Postgres/Python) is downloaded at first run on
+      # real machines; CI builds do not prepare it, so we do not check for it here.
+      - name: Verify installed product and binary
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-          $msis = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP\msi" -Filter '*.msi' -Recurse -File)
-          if ($msis.Count -ne 1) { throw "Expected exactly one MSI; found $($msis.Count)" }
-          $msi = $msis[0]
-          $log = Join-Path $env:RUNNER_TEMP 'townlight-msi-repair.log'
-          $out = Join-Path $env:RUNNER_TEMP 'townlight-msi-repair.stdout.log'
-          $err = Join-Path $env:RUNNER_TEMP 'townlight-msi-repair.stderr.log'
-          $eventsLog = Join-Path $env:RUNNER_TEMP 'townlight-msi-repair.events.log'
-
-          function Save-MsiInstallerEvents([string]$reason) {
-            Write-Host "Capturing recent MsiInstaller events: $reason"
-            try {
-              Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='MsiInstaller'; StartTime=(Get-Date).AddMinutes(-15)} -MaxEvents 40 |
-                Format-Table -AutoSize | Out-String -Width 4096 |
-                Set-Content -LiteralPath $eventsLog
-              Write-Host "Events written: $eventsLog"
-            } catch {
-              "Event query failed: $_" | Set-Content -LiteralPath $eventsLog
+          $ErrorActionPreference = "Stop"
+          # Read the ARP/uninstall registry entries directly (faster and more
+          # reliable than Win32_Product, which can trigger MSI self-repair).
+          $arpRoots = @(
+            "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+          )
+          $entry = Get-ItemProperty -Path $arpRoots -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -like "*Townlight*" } | Select-Object -First 1
+          if (-not $entry) { throw "No Townlight ARP/uninstall entry registered after install." }
+          Write-Host "Installed ARP entry: $($entry.DisplayName) $($entry.DisplayVersion)"
+          # Resolve install dir: prefer InstallLocation, then extract from DisplayIcon
+          # (Tauri WiX sets DisplayIcon to "C:\...\binary.exe,0"), then fall back.
+          $installDir = $entry.InstallLocation
+          if (-not $installDir -or -not (Test-Path $installDir)) {
+            if ($entry.DisplayIcon) {
+              $iconExe = ($entry.DisplayIcon -split ',')[0].Trim('"')
+              $installDir = Split-Path -Parent $iconExe
             }
           }
+          if (-not $installDir -or -not (Test-Path $installDir)) {
+            $installDir = Join-Path ${env:ProgramFiles} "Townlight"
+          }
+          if (-not (Test-Path $installDir)) { throw "Install directory $installDir does not exist after install." }
+          Write-Host "Install directory: $installDir"
+          # Find the main exe -- Tauri WiX names it from the Cargo binary at build
+          # time (productName may differ from the on-disk filename); just confirm
+          # any non-uninstaller exe is present rather than hardcoding a name.
+          $exe = Get-ChildItem -LiteralPath $installDir -Filter "*.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notlike "unins*" } | Select-Object -First 1
+          if (-not $exe) { throw "No application exe found under $installDir after install." }
+          Write-Host "Main binary: $($exe.FullName) ($([math]::Round($exe.Length/1KB)) KB)"
+          "TOWNLIGHT_INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "TOWNLIGHT_EXE=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
-          Write-Host "BEFORE repair: msiexec /fa $($msi.FullName)"
-          $p = Start-Process msiexec.exe -ArgumentList @('/fa', "`"$($msi.FullName)`"", '/quiet', '/norestart', '/l*v', "`"$log`"") -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err -PassThru
-          Write-Host "Started msiexec /fa PID $($p.Id)"
+      - name: Verify installed executable trust and exact bytes
+        shell: pwsh
+        env:
+          EXPECTED_SIGNATURE_STATE: UNSIGNED
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $evidenceFile = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*evidence*.txt' -Recurse -File)
+          if ($evidenceFile.Count -ne 1) { throw 'Expected exactly one MSI evidence file.' }
+          $evidence = Get-Content -LiteralPath $evidenceFile[0].FullName -Raw
+          $hash = (Get-FileHash -LiteralPath $env:TOWNLIGHT_EXE -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($evidence -notmatch "(?m)^InnerExecutableSHA256=$hash\r?$") { throw 'Installed executable hash differs from packaged evidence.' }
+          if ($env:EXPECTED_SIGNATURE_STATE -eq 'Valid') {
+            & ./townlight/desktop/scripts/verify-publication-signature.ps1 -Path $env:TOWNLIGHT_EXE
+          } elseif ((Get-AuthenticodeSignature -LiteralPath $env:TOWNLIGHT_EXE).Status -ne 'NotSigned') {
+            throw 'Routine CI installed executable is unexpectedly signed.'
+          }
 
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+
+
+      - name: Install desktop dependencies
+        working-directory: townlight/desktop
+        run: npm ci
+
+      - name: Prepare isolated Data resident portal
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install fixture portal dependencies
+        shell: pwsh
+        run: |
+          $dependencies = @(python -c "import tomllib; print(*tomllib.load(open('townlight/portal/pyproject.toml', 'rb'))['project']['dependencies'], sep=chr(10))")
+          if ($LASTEXITCODE -or -not $dependencies) { throw 'Cannot read portal dependencies.' }
+          python -m pip install @dependencies
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+
+      - name: Launch the installed Townlight application
+        shell: pwsh
+        env:
+          DATA_CANDIDATE_PROFILE: inspections-preview
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not (Test-Path -LiteralPath $env:TOWNLIGHT_EXE -PathType Leaf)) {
+            throw "Installed Townlight executable is missing before launch: $env:TOWNLIGHT_EXE"
+          }
+          # A loader-error dialog also keeps a process alive. Require the real
+          # installed WebView page, not just process survival.
+          if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) {
+            throw 'Startup proof requires an unused debug port; an existing browser could give false evidence.'
+          }
+          $previousArguments = $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS
+          $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = '--remote-debugging-port=9222'
+          # WebView2 150+ ignores WEBVIEW2_* environment switches in elevated
+          # hosts. Use the supported HKLM policy only for this test executable
+          # on the disposable runner; preserve and restore any prior value.
+          $debugPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments'
+          $debugAppName = Split-Path -Leaf $env:TOWNLIGHT_EXE
+          $priorKey = Get-Item -LiteralPath $debugPolicy -ErrorAction SilentlyContinue
+          $hadDebugPolicy = $priorKey -and $priorKey.GetValueNames() -contains $debugAppName
+          if ($hadDebugPolicy) {
+            $priorDebugValue = $priorKey.GetValue($debugAppName)
+            $priorDebugKind = $priorKey.GetValueKind($debugAppName)
+          }
+          if ($env:DATA_CANDIDATE_PROFILE -eq 'inspections-preview') {
+            $env:TOWNLIGHT_SHARED_STAFF_HOST = '1'
+            $env:TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN = 'http://127.0.0.1:8871'
+            $root = Join-Path $env:RUNNER_TEMP ('townlight-portal-' + [guid]::NewGuid().ToString('N')); New-Item -ItemType Directory -Path $root -Force | Out-Null
+            $tokenFile = Join-Path $root 'publisher-token'; $shaFile = Join-Path $root 'publisher-token.sha256'; $db = Join-Path $root 'townlight.sqlite3'; $release = Join-Path $root 'release'
+            New-Item -ItemType Directory -Path $release -Force | Out-Null
+            $bytes = [Text.Encoding]::ASCII.GetBytes(('Z' * 43)); [IO.File]::WriteAllBytes($tokenFile, $bytes)
+            $sha = ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($bytes))).Replace('-','').ToLowerInvariant(); [IO.File]::WriteAllText($shaFile, $sha, [Text.Encoding]::ASCII)
+            $env:TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE = $tokenFile; $env:TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE = $shaFile; $env:TOWNLIGHT_DB = $db; $env:TOWNLIGHT_RELEASE_ROOT = $release
+            python ./townlight/portal/manage.py migrate
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          }
+          $process = $null
+          try {
+            New-Item -Path $debugPolicy -Force | Out-Null
+            New-ItemProperty -LiteralPath $debugPolicy -Name $debugAppName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
+            $process = Start-Process -FilePath $env:TOWNLIGHT_EXE -PassThru
+            $ready = $false
+            $deadline = (Get-Date).AddSeconds(60)
+            while ((Get-Date) -lt $deadline) {
+              $process.Refresh()
+              if ($process.HasExited) { throw "Installed Townlight exited during startup with code $($process.ExitCode)." }
+              try {
+                $pages = Invoke-RestMethod 'http://127.0.0.1:9222/json/list' -TimeoutSec 2
+                $ready = @($pages | Where-Object { $_.type -eq 'page' -and $_.title -eq 'Townlight' -and $_.webSocketDebuggerUrl }).Count -gt 0
+              } catch { $ready = $false }
+              if ($ready) { break }
+              Start-Sleep -Seconds 1
+            }
+            if (-not $ready) {
+              $process.Refresh()
+              Write-Host "Startup diagnostic: PID=$($process.Id) Window=$($process.MainWindowTitle) Responding=$($process.Responding)"
+              Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table
+              Get-CimInstance Win32_Process -Filter "name = 'msedgewebview2.exe'" | Select-Object ProcessId,ParentProcessId,ExecutablePath | Format-Table
+              throw 'Installed Townlight did not open its WebView page within 60 seconds.'
+            }
+            Write-Host 'Installed Townlight WebView page opened. This is startup proof, not full Records acceptance.'
+            if ($env:DATA_CANDIDATE_PROFILE -eq 'inspections-preview') {
+              node ./townlight/desktop/tests/installed/data-smoke.mjs; if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            }
+          } finally {
+            if ($process -and -not $process.HasExited) { Stop-Process -Id $process.Id -Force; $process.WaitForExit() }
+            if ($hadDebugPolicy) {
+              (Get-Item -LiteralPath $debugPolicy).SetValue($debugAppName, $priorDebugValue, $priorDebugKind)
+            } else {
+              Remove-ItemProperty -LiteralPath $debugPolicy -Name $debugAppName -ErrorAction SilentlyContinue
+            }
+            $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = $previousArguments
+          }
+
+      - name: Repair the installed Townlight MSI
+        timeout-minutes: 8
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msi) { throw "No MSI found for repair." }
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.log"
+          $stdoutLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stdout.log"
+          $stderrLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stderr.log"
+          Write-Host "Launching msiexec.exe repair. MSI file: $($msi.Name)"
+          Write-Host "Launching msiexec.exe repair. MSI path: $($msi.FullName)"
+          Write-Host "Repair log: $log"
+          Write-Host "Child stdout log: $stdoutLog"
+          Write-Host "Child stderr log: $stderrLog"
+          $p = Start-Process msiexec.exe -ArgumentList @("/fa", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -NoNewWindow -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru
+          Write-Host "Started msiexec.exe repair with PID $($p.Id)."
           if (-not $p.WaitForExit(300000)) {
-            Write-Host "msiexec /fa PID $($p.Id) timeout; killing"
-            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+            Write-Host "msiexec.exe repair PID $($p.Id) did not exit within five minutes."
             if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
-            Save-MsiInstallerEvents "timeout (PID $($p.Id))"
-            throw 'Repair timeout'
+            if (Test-Path -LiteralPath $stdoutLog) { Get-Content -LiteralPath $stdoutLog -Tail 40 }
+            if (Test-Path -LiteralPath $stderrLog) { Get-Content -LiteralPath $stderrLog -Tail 40 }
+            if (-not $p.HasExited) { $p.Kill() }
+            throw "MSI repair did not exit within five minutes."
+          }
+          Write-Host "msiexec repair exit code: $($p.ExitCode)"
+          if (Test-Path $log) { Get-Content $log -Tail 40 }
+          if (Test-Path $stdoutLog) { Get-Content $stdoutLog -Tail 20 }
+          if (Test-Path $stderrLog) { Get-Content $stderrLog -Tail 20 }
+          if ($p.ExitCode -notin @(0, 3010)) { throw "MSI repair failed with exit code $($p.ExitCode)." }
+          if (-not (Test-Path -LiteralPath $env:TOWNLIGHT_EXE -PathType Leaf)) {
+            throw "Townlight executable is missing after MSI repair."
           }
 
-          $code = $p.ExitCode
-          Write-Host "AFTER repair: PID $($p.Id) exit=$code"
-          if (Test-Path -LiteralPath $log) { Write-Host 'Log tail:'; Get-Content -LiteralPath $log -Tail 30 }
-          if ($code -ne 0 -and $code -ne 3010) {
-            Save-MsiInstallerEvents "exit $code (PID $($p.Id))"
-            throw "Repair exit $code"
-          }
-
-      - name: Upload diagnostic logs (always)
+      # ---- FIRST-RUN + BACKUP/RESTORE (verifiable subset) ---------------------
+      # Startup above checks the installed WebView. Tests below compile source
+      # and exercise lifecycle logic with isolated state; they do NOT drive the
+      # installed wizard or prove the complete installed Records journey.
+      # Exact-byte clean-machine acceptance remains a separate release gate.
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Upload diagnostic logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: windows-msi-diagnostic-logs
-          path: ${{ runner.temp }}\townlight-*.log
-          if-no-files-found: warn
-          retention-days: 14
+          name: windows-msi-after-startup-logs
+          path: ${{ runner.temp }}/townlight-msi-*.log
