@@ -68,7 +68,13 @@ try {
   if (contractsError) throw contractsError;
   console.log(JSON.stringify(await installedData({page, native, startPortal, publicOrigin})));
 } finally {
-  await native('supervisor_action', {action: 'stop', serviceId: null}).catch(() => {});
-  if (receiver?.exitCode === null) receiver.kill();
-  await browser.close();
+  try {
+    console.log(JSON.stringify(await native('supervisor_action', {action: 'stop', serviceId: null})));
+  } finally {
+    try {
+      if (receiver?.exitCode === null) receiver.kill();
+    } finally {
+      await browser.close();
+    }
+  }
 }
