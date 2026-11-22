@@ -236,6 +236,25 @@ jobs:
             $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = $previousArguments
           }
 
+      - name: Capture pre-repair evidence
+        shell: pwsh
+        timeout-minutes: 2
+        run: |
+          $d = Join-Path $env:RUNNER_TEMP 'townlight-pre-repair'; New-Item -ItemType Directory -Force -Path $d | Out-Null
+          $names = 'Townlight','townlight-desktop','postgres','pg_ctl','python','pythonw','msiexec','msedgewebview2','ollama'
+          Get-CimInstance Win32_Process | Where-Object { $names -contains ($_.Name -replace '\.exe$','') } |
+            Select-Object Name,ProcessId,ParentProcessId,ExecutablePath | Format-Table -AutoSize | Out-File (Join-Path $d 'processes.txt')
+          Get-WinEvent -FilterHashtable @{LogName='Application';ProviderName='MsiInstaller'} -MaxEvents 50 -ErrorAction SilentlyContinue |
+            Select-Object Id,TimeCreated | Format-Table -AutoSize | Out-File (Join-Path $d 'msi-events.txt')
+          $r = [bool]((Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') -or (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired') -or (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager' -Name PendingFileRenameOperations -ErrorAction SilentlyContinue).PendingFileRenameOperations)
+          "RebootPending: $r" | Out-File (Join-Path $d 'state.txt')
+          'FileHandleLockApproximation: skipped (no safely accessible target specified)' | Out-File (Join-Path $d 'locks.txt')
+      - name: Upload pre-repair evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: townlight-pre-repair-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/townlight-pre-repair/*.txt
+
       - name: Repair the installed Townlight MSI
         timeout-minutes: 8
         shell: pwsh
