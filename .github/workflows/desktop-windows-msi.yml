@@ -256,3 +256,98 @@ jobs:
           name: townlight-pre-repair-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/townlight-pre-repair/*
 
+      - name: Stop Townlight maintenance CLI and verify runtime processes exited
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $exe = $env:TOWNLIGHT_EXE
+          if (-not $exe) { throw 'TOWNLIGHT_EXE is not set' }
+          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "TOWNLIGHT_EXE not found: $exe" }
+          $installRoot = Split-Path -Parent $exe
+          if (-not $installRoot) { throw "Cannot determine install root from TOWNLIGHT_EXE: $exe" }
+
+          $env:TOWNLIGHT_SHARED_STAFF_HOST = '1'
+
+          Write-Host "Invoking maintenance stop: $exe --townlight-staff-host stop (installRoot=$installRoot)"
+          $timeoutMs = 150000
+          $proc = Start-Process -FilePath $exe `
+                                -ArgumentList @('--townlight-staff-host', 'stop') `
+                                -PassThru -NoNewWindow
+          if (-not $proc.WaitForExit($timeoutMs)) {
+              throw "townlight-staff-host stop did not exit within $($timeoutMs / 1000)s (pid $($proc.Id))"
+          }
+          if ($proc.ExitCode -ne 0) {
+              throw "townlight-staff-host stop exited with code $($proc.ExitCode) (pid $($proc.Id))"
+          }
+          Write-Host "townlight-staff-host stop exited with code 0"
+
+          $names = @('postgres.exe', 'python.exe', 'pythonw.exe')
+          $deadline = (Get-Date).AddSeconds(15)
+          $remaining = @()
+          while ($true) {
+              $remaining = @(
+                  Get-CimInstance Win32_Process |
+                      Where-Object {
+                          $names -contains $_.Name -and
+                          $_.ExecutablePath -and
+                          $_.ExecutablePath.StartsWith(($installRoot + [IO.Path]::DirectorySeparatorChar), [System.StringComparison]::OrdinalIgnoreCase)
+                      }
+              )
+              if ($remaining.Count -eq 0) { break }
+              if ((Get-Date) -ge $deadline) { break }
+              Start-Sleep -Milliseconds 500
+          }
+
+          if ($remaining.Count -gt 0) {
+              Write-Host "Runtime processes still running under $installRoot after 15s:"
+              $remaining |
+                  Select-Object ProcessId, ParentProcessId, Name, ExecutablePath |
+                  Format-Table -AutoSize -Wrap |
+                  Out-String |
+                  Write-Host
+              throw "Runtime processes still running under $installRoot after grace period"
+          }
+
+          Write-Host "No postgres.exe/python.exe/pythonw.exe under $installRoot; runtime fully stopped"
+
+      - name: Repair the installed Townlight MSI
+        timeout-minutes: 8
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msi) { throw "No MSI found for repair." }
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.log"
+          $stdoutLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stdout.log"
+          $stderrLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stderr.log"
+          Write-Host "Launching msiexec.exe repair. MSI file: $($msi.Name)"
+          Write-Host "Launching msiexec.exe repair. MSI path: $($msi.FullName)"
+          Write-Host "Repair log: $log"
+          Write-Host "Child stdout log: $stdoutLog"
+          Write-Host "Child stderr log: $stderrLog"
+          $p = Start-Process msiexec.exe -ArgumentList @("/fa", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -NoNewWindow -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru
+          Write-Host "Started msiexec.exe repair with PID $($p.Id)."
+          if (-not $p.WaitForExit(300000)) {
+            Write-Host "msiexec.exe repair PID $($p.Id) did not exit within five minutes."
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
+            if (Test-Path -LiteralPath $stdoutLog) { Get-Content -LiteralPath $stdoutLog -Tail 40 }
+            if (Test-Path -LiteralPath $stderrLog) { Get-Content -LiteralPath $stderrLog -Tail 40 }
+            if (-not $p.HasExited) { $p.Kill() }
+            throw "MSI repair did not exit within five minutes."
+          }
+          Write-Host "msiexec repair exit code: $($p.ExitCode)"
+          if (Test-Path $log) { Get-Content $log -Tail 40 }
+          if (Test-Path $stdoutLog) { Get-Content $stdoutLog -Tail 20 }
+          if (Test-Path $stderrLog) { Get-Content $stderrLog -Tail 20 }
+          if ($p.ExitCode -notin @(0, 3010)) { throw "MSI repair failed with exit code $($p.ExitCode)." }
+          if (-not (Test-Path -LiteralPath $env:TOWNLIGHT_EXE -PathType Leaf)) {
+            throw "Townlight executable is missing after MSI repair."
+          }
+
+      # ---- FIRST-RUN + BACKUP/RESTORE (verifiable subset) ---------------------
+      # Startup above checks the installed WebView. Tests below compile source
+      # and exercise lifecycle logic with isolated state; they do NOT drive the
+      # installed wizard or prove the complete installed Records journey.
+      # Exact-byte clean-machine acceptance remains a separate release gate.
