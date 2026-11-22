@@ -52,6 +52,7 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
         imports.extend((name, f"{name}.staff_workflow") for name in (
             "townlight_boards", "townlight_contracts", "townlight_procurement",
         ))
+        imports.append(("townlight_data", "townlight_data.public_dataset"))
     return imports
 
 
@@ -431,6 +432,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.include_router(inspections_router)
         from townlight_runtime.municipal_staff import router as municipal_staff_router
         domain_app.include_router(municipal_staff_router)
+        from townlight_runtime.data_staff import router as data_staff_router
+        domain_app.include_router(data_staff_router)
     async def demo_marker(session):
         from sqlalchemy import select
         from townlight_runtime.records_import_store import imports

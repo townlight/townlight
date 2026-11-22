@@ -20,6 +20,11 @@ pub enum StaffRequest {
     SaveProposal { id: Uuid, payload: Value },
     RecordAward { id: Uuid, payload: Value },
     CreateDraftContract { id: Uuid },
+    Data {},
+    PreviewData { payload: Value },
+    ReviewData { id: Uuid },
+    PublishData { payload: Value },
+    WithdrawData { payload: Value },
 }
 
 impl StaffRequest {
@@ -42,6 +47,16 @@ impl StaffRequest {
             Self::CreateDraftContract { .. } => (
                 &["townlight_procurement", "townlight_contracts"],
                 "townlight_procurement",
+                true,
+            ),
+            Self::Data {} | Self::PreviewData { .. } | Self::ReviewData { .. } => (
+                &["townlight_data", "townlight_contracts"],
+                "townlight_contracts",
+                false,
+            ),
+            Self::PublishData { .. } | Self::WithdrawData { .. } => (
+                &["townlight_data", "townlight_contracts"],
+                "townlight_contracts",
                 true,
             ),
             Self::RecordAward { .. } => (&["townlight_procurement"], "townlight_procurement", true),
@@ -82,6 +97,11 @@ impl StaffRequest {
             Self::CreateDraftContract { id } => {
                 (Method::POST, format!("procurement/{id}/contract"), None)
             }
+            Self::Data {} => (Method::GET, "data".into(), None),
+            Self::ReviewData { id } => (Method::GET, format!("data/revisions/{id}"), None),
+            Self::PreviewData { payload } => (Method::POST, "data/preview".into(), Some(payload)),
+            Self::PublishData { payload } => (Method::POST, "data/publish".into(), Some(payload)),
+            Self::WithdrawData { payload } => (Method::POST, "data/withdraw".into(), Some(payload)),
         };
         domain_client::send(
             method,

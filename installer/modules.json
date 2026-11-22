@@ -57,7 +57,8 @@
         "townlight_inspections",
         "townlight_boards",
         "townlight_contracts",
-        "townlight_procurement"
+        "townlight_procurement",
+        "townlight_data"
       ],
       "disabled": false,
       "development_only": false
@@ -1226,6 +1227,64 @@
         "windows_installed_staff_workflow",
         "existing_staff_roles",
         "restart_readback"
+      ]
+    },
+    {
+      "id": "townlight_data",
+      "display_name": "Townlight Data",
+      "repo": "townlight/data",
+      "tier": 3,
+      "role": "Signed-contract dataset selection, review, publication and withdrawal",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_contracts"
+      ],
+      "routes": [
+        {
+          "id": "data",
+          "label": "Data",
+          "path": "/data",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "contracts.read",
+        "contracts.manage"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [
+        "townlight_data_0001"
+      ],
+      "tasks": [
+        "select-signed-contracts",
+        "review-dataset",
+        "publish-dataset",
+        "withdraw-dataset"
+      ],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/postgres"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "a959f5ea2f9fed3b42eaab312a68b4de65f0dfb0",
+      "proof_required": [
+        "installed_data_workflow"
       ]
     }
   ]

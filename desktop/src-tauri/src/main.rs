@@ -142,6 +142,11 @@ fn navigation() -> Vec<NavigationItem> {
             description: "RFP drafts, proposal review and recorded awards",
         },
         NavigationItem {
+            id: "data",
+            label: "Data",
+            description: "Open data, exports and municipal datasets",
+        },
+        NavigationItem {
             id: "search",
             label: "Search City Knowledge",
             description: "Cross-module local search with citations",
@@ -1605,7 +1610,7 @@ mod tests {
     fn navigation_matches_frontend_fallback_state() {
         // The offline preview has no staff session or municipal runtime.
         // Keep the shared tabs in parity and require these tabs only in native navigation.
-        let native_staff_ids = ["boards", "contracts", "procurement"];
+        let native_staff_ids = ["boards", "contracts", "procurement", "data"];
         let main_js = include_str!("../../src/main.js");
         let start = main_js
             .find("navigation: [")

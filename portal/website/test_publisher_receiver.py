@@ -94,3 +94,40 @@ class PublisherReceiverTests(TestCase):
         self.assertEqual(self.post(self.bundle("packet"), "packet", 2).status_code, 200)
         self.assertEqual(self.post(self.bundle("packet", self.packet), "packet", 1).status_code, 409)
         self.assertFalse(Meeting.objects.get().published)
+
+
+    def test_dataset_lifecycle(self):
+        def bundle(csv_content=None):
+            manifest = {
+                "version": 2, "action": "withdraw" if csv_content is None else "publish",
+                "kind": "dataset", "meeting_id": self.meeting,
+            }
+            if csv_content is not None:
+                inner = io.BytesIO()
+                with zipfile.ZipFile(inner, "w") as archive:
+                    archive.writestr("dataset.csv", csv_content)
+                    archive.writestr("dataset.json", "[]")
+                    archive.writestr("data-dictionary.json", "[]")
+                artifact = inner.getvalue()
+                manifest.update(title="Contracts", artifact_size=len(artifact),
+                                artifact_sha256=hashlib.sha256(artifact).hexdigest())
+            outer = io.BytesIO()
+            with zipfile.ZipFile(outer, "w") as archive:
+                archive.writestr("manifest.json", json.dumps(manifest))
+                if csv_content is not None:
+                    archive.writestr("release.bin", artifact)
+            return outer.getvalue()
+
+        path = f"/datasets/{self.meeting}/dataset.csv"
+        initial = bundle(b"id,value\n1,first\n")
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.assertEqual(self.post(initial, "dataset", 1).json()["status"], "applied")
+        self.assertEqual(self.post(initial, "dataset", 1).json()["status"], "unchanged")
+        self.assertEqual(self.client.get(path).content, b"id,value\n1,first\n")
+        corrected = bundle(b"id,value\n1,corrected\n")
+        self.assertEqual(self.post(corrected, "dataset", 2).json()["status"], "applied")
+        self.assertEqual(self.client.get(path).content, b"id,value\n1,corrected\n")
+        self.assertEqual(self.post(initial, "dataset", 1).status_code, 409)
+        self.assertEqual(self.post(bundle(), "dataset", 3).json()["status"], "applied")
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.assertFalse(Meeting.objects.exists())

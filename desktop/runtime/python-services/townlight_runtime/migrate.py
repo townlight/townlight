@@ -124,9 +124,11 @@ def upgrade_all() -> None:
 
     if profile == "inspections-preview":
         from townlight_runtime.municipal_staff import ensure_schema
+        from townlight_runtime.data_staff import ensure_data_schema
         staff_engine = create_engine(sync_url)
         try:
             ensure_schema(staff_engine)
+            ensure_data_schema(staff_engine)
         finally:
             staff_engine.dispose()
         from townlight_inspections.migrations import source_engine, upgrade

@@ -66,6 +66,7 @@ REQUIRED_MODULES = {
     "townlight_boards",
     "townlight_contracts",
     "townlight_procurement",
+    "townlight_data",
     "townlight_core", "townlight_records", "townlight_meetings", "townlight_code",
     "townlight_zoning", "townlight_access", "townlight_planning",
     "townlight_permitting", "townlight_inspections", "townlight_notice",

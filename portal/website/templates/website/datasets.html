@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>Datasets</title>
+</head>
+<body>
+<main>
+<h1>Datasets</h1>
+{% for dataset in datasets %}
+<section>
+<h2>{{ dataset.title }}</h2>
+<ul>
+{% for name in expected_names %}
+<li><a href='{% url 'dataset-download' dataset.id name %}'>{{ name }}</a></li>
+{% endfor %}
+</ul>
+</section>
+{% empty %}
+<p>No datasets.</p>
+{% endfor %}
+</main>
+</body>
+</html>

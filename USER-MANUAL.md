@@ -497,3 +497,15 @@ See [the Station manual delivery section](https://townlight.github.io/manuals/st
 The resident portal is deployed separately. See the [Townlight Portal Guide](https://townlight.github.io/manuals/portal.html) for its workflow and acceptance limits.
 
 </div>
+
+## Townlight Data (Windows candidate)
+
+1. Open Staff > Data with Contracts grant.
+2. Select signed agreements; preview contract ID, title, vendor name, start and expiration. Staff notes, renewal fields and signed attachments are excluded.
+3. Local admin reviews and checks confirmation, then Publish to queue.
+4. Refresh to see acknowledged/delivered status.
+5. The app retries while the configured portal is unavailable.
+6. Visit `/datasets/` at the configured portal for CSV, JSON and dictionary.
+7. To correct, prepare and publish a new revision. To take offline, confirm Withdraw and wait for delivery.
+
+Applies to the candidate; 1.9.2.1 does not include it.

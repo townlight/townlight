@@ -26,6 +26,7 @@ $StationRef = ''
 $BoardsRef = ''
 $ContractsRef = ''
 $ProcurementRef = ''
+$DataRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -74,12 +75,13 @@ if ($Selected -eq 'inspections-preview') {
     $BoardsRef = $Build.Pins.sources.'townlight/boards'
     $ContractsRef = $Build.Pins.sources.'townlight/contracts'
     $ProcurementRef = $Build.Pins.sources.'townlight/procure'
+    $DataRef = $Build.Pins.sources.'townlight/data'
     $RuntimeProfile = 'inspections-preview'
     $PlanningContract = $Build.ContractPath
     $DesktopVersion = $Build.Contract.desktop_version
     $TauriArgs = '--config src-tauri/tauri.inspections-candidate.conf.json'
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }
