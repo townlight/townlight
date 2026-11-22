@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium } from '@playwright/test';
 import { installedData } from './data-workflow.mjs';
+import { installedBudget } from './budget-workflow.mjs';
 
 assert.equal(process.platform, 'win32');
 assert.equal(process.env.GITHUB_ACTIONS, 'true');
@@ -67,6 +68,7 @@ try {
   }
   if (contractsError) throw contractsError;
   console.log(JSON.stringify(await installedData({page, native, startPortal, publicOrigin})));
+  console.log(JSON.stringify({scenario: 'budget', ...(await installedBudget({native, publicOrigin}))}));
 } finally {
   await native('supervisor_action', {action: 'stop', serviceId: null}).catch(() => {});
   if (receiver?.exitCode === null) receiver.kill();
