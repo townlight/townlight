@@ -1,3 +1,5 @@
+> Historical prepublication candidate handoff. Windows 1.9.2.1 was published on 2026-11-22 UTC; current release identity and accepted limits are in the [signed release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) and [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The candidate notes below preserve the prepublication state and are not the current public release record.
+
 # Townlight Windows 1.9.2.1 candidate handoff and acceptance limits
 
 ## Candidate identity

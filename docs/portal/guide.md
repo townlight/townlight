@@ -1,20 +1,14 @@
 # Townlight Portal guide
 
-## Windows 1.9.1.1 Station recorder release
+## Windows 1.9.2.1 published shared-host workflow
 
-Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
+Windows 1.9.2.1 includes the shared-host publisher and its integration with the separately deployed Townlight Portal. The MSI installs the Windows desktop only; the Wagtail portal server remains a separate deployment.
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
+Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
+[Windows release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Windows acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) · [Shared staff guide at the signed source commit](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md)
 
-Townlight Beta 1 · separately deployed portal beta
-
-The portal is a separately deployed suite capability for city pages and public meeting archives. It brings together a public Meetings archive, a completed Station recording and a Records release copy selected for publication. It does not add a tenth product. The existing signed Beta 1 installer and prior Sandbox evidence predate this local portal integration; they do not demonstrate that it is installed or publicly deployed. CivicCast remains separate.
-
-## Windows shared-host candidate publication
-
-This section describes the unreleased Windows 1.9.2.1 candidate. The public Windows 1.9.1.1 installer does not include or deploy the portal; deployments paired with that release use the separately deployed manual Wagtail publication workflow below.
+## Windows shared-host publication
 
 In the shared Meetings workspace, review the public council packet and approve the exact revision for publication. When publishing a recording, select the approved Records release copy and explicitly approve it for publication. The host sends the queued items even after staff sign out. Check the status in Meetings. During an outage, previously published material remains available while delivery retries. To correct a packet, approve and send a new revision. To remove a recording, withdraw that recording and confirm it is gone from the public meeting page. The approved packet remains available unless separately withdrawn.
 
@@ -76,9 +70,11 @@ Refresh the protected proof after session expiry, sign-out, account change or cr
 
 These IDs and hash are placeholders. Run `python manage.py sync_townlight selection.json`. For withdrawal change `action` to `withdraw`, retain the selection fields and explicit approval, and verify removal. Restrict the selection file because it contains internal identifiers.
 
-## Prepare the candidate native runtime
+## Development runtime for earlier installers
 
-The existing signed installer predates the portal bridge and does not include its native endpoints. Prepare a separate matching native runtime with the compatible Records, Meetings, Core, Access and Notice dependencies, normal activation, profile and database contracts. Do not patch the installed host runtime. From the suite source root, build the candidate wheel into a chosen output directory:
+The Windows 1.9.2.1 MSI includes the native bridge endpoints; the Portal server remains a separate deployment. The release acceptance covers a test portal with synthetic data on the physical Windows host and a clean Windows Sandbox guest on the same PC. It does not establish production portal or city network operation. The procedure below is for a separately prepared development runtime used with earlier installers; it does not update the signed host runtime or establish acceptance for a published MSI.
+
+Prepare a separate matching native runtime with the compatible Records, Meetings, Core, Access and Notice dependencies, normal activation, profile and database contracts. Do not patch the installed host runtime. From the suite source root, build the candidate wheel into a chosen output directory:
 
 ```powershell
 python -m pip wheel --no-deps --wheel-dir '<wheel-output>' desktop/runtime/python-services

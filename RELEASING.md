@@ -1,7 +1,10 @@
 # Current Windows release
 
-[Windows 1.9.1.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) is the published Windows beta. Application source `2334a42a6dca632b96dcae119c98d1182231c113`. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) and [maintenance handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/HANDOFF-Windows-1.9.1.1.md) for the exact installer and evidence. [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1) remains available.
+Windows 1.9.2.1 is the current published Windows beta. Its release tag targets the exact accepted Suite source `1bc45be5a14aa969e53b87b1cef1f278dadc79a4`; the package includes Records source `3d1291a9bdc382b2fc09666a25ce82de6939c55d`. The signed MSI SHA-256 is `3242792ad6c825a5057d96c5e1d9d45fb5726ccbfba7ab24a2b428a54e63b0bf`.
 
+[Release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Signed MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/HANDOFF-Windows-1.9.2.1.md). The prior [Windows 1.9.1.1 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) and its acceptance remain available under their original identities.
+
+## Historical release procedure records
 ## Historical release procedure records
 
 # Releasing the Townlight Records Windows MSI
