@@ -147,6 +147,11 @@ fn navigation() -> Vec<NavigationItem> {
             description: "Open data, exports and municipal datasets",
         },
         NavigationItem {
+            id: "budget",
+            label: "Budget",
+            description: "Budget proposals, council adoption and public summaries",
+        },
+        NavigationItem {
             id: "search",
             label: "Search City Knowledge",
             description: "Cross-module local search with citations",

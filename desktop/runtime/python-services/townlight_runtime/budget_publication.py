@@ -8,7 +8,7 @@ from starlette.concurrency import run_in_threadpool
 
 from .budget_export import budget_artifact
 from .budget_hearing import canonical_budget_text
-from .budget_staff import ActorDep, _readback, router
+from .budget_staff import ActorDep, BudgetReader, _readback, router
 from .data_staff import enqueue_dataset
 from .municipal_staff import Db, audit
 from .publisher_api import envelope, queue, require_configured
@@ -22,7 +22,7 @@ class PublishBudget(BaseModel):
 
 
 @router.get("/{revision_id}/attachment")
-async def read_attachment(revision_id: UUID, session: Db, actor: ActorDep):
+async def read_attachment(revision_id: UUID, session: Db, actor: BudgetReader):
     row = await _readback(session, revision_id)
     if row["finance_reviewed_at"] is None:
         raise HTTPException(409, "Review the revision before preparing the hearing attachment.")

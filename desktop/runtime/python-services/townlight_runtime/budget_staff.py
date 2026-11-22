@@ -55,8 +55,21 @@ async def _readback(session: Db, revision_id: UUID) -> dict[str, Any]:
     return dict(row)
 
 
+async def budget_reader(
+    request: Request,
+    session: Db,
+    proof: str | None = Header(default=None, alias="X-Townlight-Session"),
+) -> User:
+    if "townlight_budget" not in request.app.state.desktop_enabled_modules:
+        raise HTTPException(status_code=403, detail="Townlight budget module is not enabled")
+    return await mapped_native_actor(request, session, proof, "townlight_meetings")
+
+
+BudgetReader = Annotated[User, Depends(budget_reader)]
+
+
 @router.get("")
-async def list_revisions(session: Db, actor: ActorDep):
+async def list_revisions(session: Db, actor: BudgetReader):
     statement = (
         select(*budget_revisions.c)
         .order_by(budget_revisions.c.imported_at.desc())
@@ -69,7 +82,7 @@ async def list_revisions(session: Db, actor: ActorDep):
 
 
 @router.get("/{revision_id}")
-async def get_revision(revision_id: UUID, session: Db, actor: ActorDep):
+async def get_revision(revision_id: UUID, session: Db, actor: BudgetReader):
     return await _readback(session, revision_id)
 
 
@@ -77,10 +90,7 @@ async def get_revision(revision_id: UUID, session: Db, actor: ActorDep):
 async def import_revision(payload: ImportPayload, session: Db, actor: ActorDep):
     parsed = parse_budget_csv(payload.csv_text)
     if parsed.errors or not parsed.lines:
-        raise HTTPException(
-            status_code=422,
-            detail={"errors": [asdict(error) for error in parsed.errors]},
-        )
+        return {"errors": [asdict(error) for error in parsed.errors]}
 
     canonical, digest = revision_content(payload.fiscal_year, parsed)
     revision_id = uuid4()

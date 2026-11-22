@@ -25,6 +25,13 @@ pub enum StaffRequest {
     ReviewData { id: Uuid },
     PublishData { payload: Value },
     WithdrawData { payload: Value },
+    Budget {},
+    GetBudget { id: Uuid },
+    ImportBudget { payload: Value },
+    ReviewBudget { id: Uuid, payload: Value },
+    BudgetAttachment { id: Uuid },
+    AdoptBudget { id: Uuid, payload: Value },
+    PublishBudget { id: Uuid, payload: Value },
 }
 
 impl StaffRequest {
@@ -60,6 +67,22 @@ impl StaffRequest {
                 true,
             ),
             Self::RecordAward { .. } => (&["townlight_procurement"], "townlight_procurement", true),
+            Self::Budget {}
+            | Self::GetBudget { .. }
+            | Self::BudgetAttachment { .. }
+            | Self::AdoptBudget { .. } => (
+                &["townlight_budget", "townlight_meetings"],
+                "townlight_meetings",
+                false,
+            ),
+            Self::ImportBudget { .. } | Self::ReviewBudget { .. } => {
+                (&["townlight_budget"], "townlight_budget", false)
+            }
+            Self::PublishBudget { .. } => (
+                &["townlight_budget", "townlight_data"],
+                "townlight_budget",
+                true,
+            ),
             _ => (&["townlight_procurement"], "townlight_procurement", false),
         }
     }
@@ -102,6 +125,19 @@ impl StaffRequest {
             Self::PreviewData { payload } => (Method::POST, "data/preview".into(), Some(payload)),
             Self::PublishData { payload } => (Method::POST, "data/publish".into(), Some(payload)),
             Self::WithdrawData { payload } => (Method::POST, "data/withdraw".into(), Some(payload)),
+            Self::Budget {} => (Method::GET, "budget".into(), None),
+            Self::GetBudget { id } => (Method::GET, format!("budget/{id}"), None),
+            Self::ImportBudget { payload } => (Method::POST, "budget/import".into(), Some(payload)),
+            Self::ReviewBudget { id, payload } => {
+                (Method::POST, format!("budget/{id}/review"), Some(payload))
+            }
+            Self::BudgetAttachment { id } => (Method::GET, format!("budget/{id}/attachment"), None),
+            Self::AdoptBudget { id, payload } => {
+                (Method::POST, format!("budget/{id}/adopt"), Some(payload))
+            }
+            Self::PublishBudget { id, payload } => {
+                (Method::POST, format!("budget/{id}/publish"), Some(payload))
+            }
         };
         domain_client::send(
             method,
