@@ -11,6 +11,7 @@ type Revision = {
   proposed_total_cents: number;
   prior_year_total_cents_exact?: string;
   proposed_total_cents_exact?: string;
+  advisory_workpaper?: string[];
   lines?: Array<{
     department: string; account_code: string; description: string;
     prior_year_cents: number; proposed_cents: number;
@@ -37,6 +38,7 @@ export function createBudgetView(invoke: Invoke) {
       </form>
       <label>Budget revision <select data-budget-select></select></label>
       <p data-budget-totals></p>
+      <details data-budget-workpaper hidden><summary>Budget review workpaper</summary><pre></pre></details>
       <table><caption>Budget line items</caption><thead><tr>
         <th>Department</th><th>Account</th><th>Description</th><th>Prior year</th><th>Proposed</th>
       </tr></thead><tbody data-budget-lines></tbody></table>
@@ -85,6 +87,12 @@ export function createBudgetView(invoke: Invoke) {
       root.querySelector<HTMLElement>("[data-budget-totals]")!.textContent = current
         ? `Prior year ${exactCents(current.prior_year_total_cents_exact ?? current.prior_year_total_cents)} · Proposed ${exactCents(current.proposed_total_cents_exact ?? current.proposed_total_cents)}`
         : "Select a saved budget revision.";
+      const workpaper = root.querySelector<HTMLDetailsElement>("[data-budget-workpaper]");
+      if (workpaper) {
+        workpaper.hidden = !current?.advisory_workpaper?.length;
+        const workpaperPre = workpaper.querySelector("pre");
+        if (workpaperPre) workpaperPre.textContent = current?.advisory_workpaper?.join("\n\n") ?? "";
+      }
       const table = root.querySelector("[data-budget-lines]")!;
       table.replaceChildren();
       for (const line of current?.lines || []) {

@@ -12,6 +12,9 @@ from sqlalchemy import select
 
 from townlight_budget.adoption import budget_revisions, revision_content
 from townlight_budget.budget_import import parse_budget_csv
+from townlight_budget.hearing_packet import build_hearing_packet_checklist
+from townlight_budget.narrative import draft_budget_narrative
+from townlight_budget.resident_summary import draft_resident_summary
 from townlight_records.auth.native_identity import mapped_native_actor
 from townlight_records.models.user import User
 
@@ -86,7 +89,39 @@ async def list_revisions(session: Db, actor: BudgetReader):
 
 @router.get("/{revision_id}")
 async def get_revision(revision_id: UUID, session: Db, actor: BudgetReader):
-    return await _readback(session, revision_id)
+    revision = await _readback(session, revision_id)
+    items = [
+        {
+            "account": line["account_code"],
+            "prior_amount": line["prior_year_cents"] / 100,
+            "current_amount": line["proposed_cents"] / 100,
+        }
+        for line in revision["lines"]
+    ]
+    narrative = draft_budget_narrative("All departments", [], items)
+    finance_review_count = sum(
+        1 for variance in narrative.variances
+        if variance.review_note.startswith("Finance review required")
+    )
+    title = f"Fiscal year {revision['fiscal_year']} budget"
+    required_items = ["Include the finance-reviewed budget revision."]
+    packet = build_hearing_packet_checklist(title, required_items)
+    facts = [
+        f"Fiscal year: {revision['fiscal_year']}",
+        f"Line items: {len(revision['lines'])}",
+    ]
+    summary = draft_resident_summary(title, facts)
+    variance_sentence = f"Finance review required for {finance_review_count} variance(s)."
+    advisory = ["Budget Narrative"]
+    advisory.extend(narrative.sections)
+    advisory.append("Variances")
+    advisory.append(variance_sentence)
+    advisory.append("Hearing Packet Checklist")
+    advisory.extend(packet.checklist)
+    advisory.append("Resident Summary")
+    advisory.extend(summary.bullets)
+    revision["advisory_workpaper"] = advisory
+    return revision
 
 
 @router.post("/import")
