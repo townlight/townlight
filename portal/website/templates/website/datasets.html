@@ -7,7 +7,7 @@
 <body>
 <main>
 <h1>Datasets</h1>
-{% for dataset in datasets %}
+{% for dataset, expected_names in dataset_items %}
 <section>
 <h2>{{ dataset.title }}</h2>
 <ul>

@@ -434,6 +434,9 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.include_router(municipal_staff_router)
         from townlight_runtime.data_staff import router as data_staff_router
         domain_app.include_router(data_staff_router)
+        from townlight_runtime.budget_council import router as budget_router
+        from townlight_runtime import budget_publication  # noqa: F401
+        domain_app.include_router(budget_router)
     async def demo_marker(session):
         from sqlalchemy import select
         from townlight_runtime.records_import_store import imports

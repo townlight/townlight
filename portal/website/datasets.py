@@ -1,20 +1,34 @@
 import hashlib
 import os
+import re
 import stat
 import zipfile
+
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import Http404, HttpResponse
+from django.shortcuts import render
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_safe
+
 from .models import DatasetPublication
 from .townlight import release_root
 
 EXPECTED = {"dataset.csv", "dataset.json", "data-dictionary.json"}
+OPTIONAL = {"summary.txt"}
+ALLOWED = EXPECTED | OPTIONAL
 LIMIT = 16 * 1024 * 1024
+
+_SHA256_RE = re.compile(r'^[0-9a-f]{64}$')
+
 
 def _validate_zip(path):
     with zipfile.ZipFile(path) as zf:
         names = zf.namelist()
         if len(names) != len(set(names)):
             raise ValueError("duplicate zip entry")
-        if set(names) != EXPECTED:
+        name_set = set(names)
+        if not (EXPECTED <= name_set <= ALLOWED):
             raise ValueError("unexpected zip contents")
         total = 0
         for info in zf.infolist():
@@ -28,12 +42,29 @@ def _validate_zip(path):
         if zf.testzip() is not None:
             raise ValueError("bad zip CRC")
 
+
 def _sha256(path):
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _download_names(sha):
+    if not isinstance(sha, str) or not _SHA256_RE.fullmatch(sha):
+        return sorted(EXPECTED)
+    path = release_root() / f"{sha}.zip"
+    try:
+        with zipfile.ZipFile(path) as zf:
+            names = zf.namelist()
+    except (OSError, zipfile.BadZipFile, RuntimeError, ValueError):
+        return sorted(EXPECTED)
+    result = sorted(EXPECTED)
+    if "summary.txt" in set(names):
+        result.append("summary.txt")
+    return result
+
 
 def project_dataset(dataset_id, sequence, digest, data, staged_artifact):
     with transaction.atomic():
@@ -63,30 +94,20 @@ def project_dataset(dataset_id, sequence, digest, data, staged_artifact):
         return "applied"
 
 
-import re
-import zipfile
-
-from django.core.exceptions import ValidationError
-from django.http import Http404, HttpResponse
-from django.shortcuts import render
-from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_safe
-
-from .models import DatasetPublication
-from .townlight import release_root
-
-_SHA256_RE = re.compile(r'^[0-9a-f]{64}$')
-
 @require_safe
 @never_cache
 def datasets(request):
     dataset_rows = DatasetPublication.objects.exclude(artifact_sha256='').order_by('title', 'id')
-    return render(request, 'website/datasets.html', {'datasets': dataset_rows, 'expected_names': sorted(EXPECTED)})
+    dataset_items = [(ds, _download_names(ds.artifact_sha256)) for ds in dataset_rows]
+    return render(request, 'website/datasets.html', {
+        'dataset_items': dataset_items,
+    })
+
 
 @require_safe
 @never_cache
 def download_dataset(request, dataset_id, name):
-    if name not in EXPECTED:
+    if name not in ALLOWED:
         raise Http404
     try:
         ds = DatasetPublication.objects.exclude(artifact_sha256='').get(pk=dataset_id)
@@ -105,7 +126,9 @@ def download_dataset(request, dataset_id, name):
         raise Http404
     if len(data) > LIMIT:
         raise Http404
-    if name.endswith('.csv'):
+    if name == 'summary.txt':
+        content_type = 'text/plain; charset=utf-8'
+    elif name.endswith('.csv'):
         content_type = 'text/csv; charset=utf-8'
     elif name.endswith('.json'):
         content_type = 'application/json'
