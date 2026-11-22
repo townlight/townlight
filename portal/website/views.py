@@ -6,14 +6,14 @@ import json
 import re
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, StreamingHttpResponse
+from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from django.core.paginator import Paginator
 from wagtail.models import Site
 
 from .models import Meeting, ServicePage
-from .townlight import release_file
+from .townlight import packet_file, release_file
 
 
 SOURCE_FILES = (
@@ -81,11 +81,31 @@ def meeting_document(request, pk, kind):
     if kind not in labels:
         raise Http404()
     native = json.loads(item.source_body)
+    if kind == "packet" and item.packet_path:
+        return render(request, "website/meeting_document.html", {
+            "meeting": item, "document_title": labels[kind], "packet_index": native.get("packet_index", []),
+            "has_packet_pdf": True,
+        })
     if not native.get(kind):
         raise Http404()
     return render(request, "website/meeting_document.html", {
         "meeting": item, "document_title": labels[kind], "document_body": native[kind],
     })
+
+
+def packet_pdf(request, pk):
+    item = get_object_or_404(Meeting, pk=pk, published=True, vendor="townlight", cancelled=False)
+    try:
+        path = packet_file(item)
+        stream = path.open("rb")
+    except (OSError, ValueError):
+        raise Http404("Packet unavailable") from None
+    if hashlib.file_digest(stream, "sha256").hexdigest() != path.stem:
+        stream.close()
+        raise Http404("Packet unavailable")
+    stream.seek(0)
+    return FileResponse(stream, content_type="application/pdf", as_attachment=True, filename="meeting-packet.pdf",
+                        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "no-store"})
 
 
 def search(request):
@@ -166,6 +186,7 @@ def release(request, pk):
     response['Accept-Ranges'] = 'bytes'
     response['Content-Length'] = str(end - start + 1)
     response['X-Content-Type-Options'] = 'nosniff'
+    response['Cache-Control'] = 'no-store'
     if status == 206:
         response['Content-Range'] = f'bytes {start}-{end}/{size}'
     return response

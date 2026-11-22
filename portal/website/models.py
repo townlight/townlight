@@ -89,6 +89,7 @@ class Meeting(models.Model):
     imported_at = models.DateTimeField(auto_now=True)
     release_path = models.CharField(max_length=80, blank=True, editable=False)
     release_media_type = models.CharField(max_length=80, blank=True)
+    packet_path = models.CharField(max_length=80, blank=True, editable=False)
 
     @property
     def local_start(self):
@@ -112,3 +113,13 @@ class Meeting(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["vendor", "tenant", "external_id"], name="unique_vendor_tenant_meeting")]
         ordering = ["scheduled_start", "pk"]
+
+
+class PublicationCursor(models.Model):
+    meeting_id = models.UUIDField()
+    kind = models.CharField(max_length=9)
+    sequence = models.PositiveBigIntegerField()
+    digest = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=("meeting_id", "kind"), name="unique_publication_stream")]

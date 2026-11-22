@@ -1,13 +1,27 @@
 # Townlight Windows Operator Walkthrough
 
-## Current Windows beta 1.8.0.1
+## Current public Windows beta 1.9.1.1
 
-1. Download the [signed Townlight Windows x64 MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/Townlight-Windows-x64-1.8.0.1.msi) from the [Windows beta 1.8.0.1 release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.0.1). Verify the published SHA-256 and timestamped Authenticode signature. Use a Windows x64 machine with Microsoft WebView2.
-2. For an upgrade from 1.7.2.1, back up the city profile and data, close Townlight, install the new MSI and reopen under the same Windows account. Keep `%LOCALAPPDATA%\CivicSuite`. On first launch, let Townlight finish refreshing the bundled Python runtime.
-3. For a new setup, choose the local storage and **Townlight Inspections candidate** full profile. Create the city profile and named administrator, choose backup storage and complete health verification. Finish the Records migration step when offered. Local AI setup can be deferred.
-4. Open the staff workspace using the role listed in the [Windows staff guide](https://townlight.github.io/manuals/windows-staff-workflows.html). Configure Station using its [separate local service guide](https://townlight.github.io/manuals/station.html).
+1. Download the [signed Windows x64 MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/Townlight-Windows-x64-1.9.1.1.msi) and verify its published SHA-256 and timestamped Authenticode signature. Use a Windows x64 machine with Microsoft WebView2.
+2. For an upgrade from 1.9.0.1, back up city data and settings, close Townlight, and run the MSI under the same Windows account with the existing profile. Keep `%LOCALAPPDATA%\CivicSuite`. The [release acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) identifies the build used for each check. Direct upgrades from 1.8.2.1 and older were untested for 1.9.1.1.
+3. On a new machine, create the city profile and named administrator, choose backup storage, and complete health verification. Finish the Records setup if prompted. Local AI setup can be deferred.
+4. For recording, enable the bundled Station service in setup, then choose and preview your camera and microphone. See the [Station manual](https://townlight.github.io/manuals/station.html) and [Windows staff guide](https://townlight.github.io/manuals/windows-staff-workflows.html).
 
-See the [installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the tested Windows configuration.
+## Windows 1.9.2.1 candidate shared staff setup
+
+Use a dedicated Windows account on a city-managed host. Initialize the full Townlight profile under that account and create named Townlight staff accounts with their normal roles. Keep the city data and backups in protected local folders. Station setup and recording input configuration stay on the host.
+
+Set `TOWNLIGHT_SHARED_STAFF_HOST=1` in the host process environment and run the installed `townlight-desktop.exe --townlight-staff-host start` under the dedicated account. Use the same account and environment for `health` and `stop`. Configure Windows startup to run the host independently of staff sign-in. Keep the Townlight and Station runtime ports private. Configure the city’s HTTPS reverse proxy to forward only `/staff/v1/*` to `127.0.0.1:15480`. The proxy certificate must match the private DNS name and be trusted by the client PCs. Do not expose PostgreSQL or proxy other routes.
+
+On each Windows staff PC, install the same candidate and set `TOWNLIGHT_SHARED_ORIGIN` to the city’s private HTTPS origin before starting Townlight. Sign in with a named Townlight account. Meetings and Records share the city host’s data. Station controls and other modules remain on the host for this workflow. A disconnected client must reconnect to the host before staff can commit changes.
+
+In Meetings, save a packet snapshot, choose the staff or public edition, then preview and approve that edition. When saving a public version, explicitly select eligible agenda items and attachments. Only those selected public materials appear in its PDF and agenda index. Keep the prior approved revision when preparing a correction. If the city operates its own resident site, follow the [portal guide](../portal/guide.md) for separate packet and recording publication approval.
+
+### Back up or replace a shared host
+
+Use Townlight’s normal backup to produce a verified cold backup. Export a separate recovery envelope with `desktop/scripts/Protect-TownlightRecovery.ps1` and the city’s document-encryption certificate. Keep the encrypted envelope apart from the backup. Keep the recovery certificate’s private key with the city’s recovery operators. The ordinary backup does not contain the database password or document encryption key.
+
+On a replacement host, install the candidate, initialize the same Windows profile and data paths, and restore the normal backup while the host service is stopped. Before starting PostgreSQL, import the matching envelope with `Protect-TownlightRecovery.ps1 -Action Import`. The script verifies the restored database against the backup before installing those keys. Recreate the city’s Windows startup task and proxy settings. Verify named staff, meeting snapshots, approved packet downloads, Records attachments and Station media before restoring staff access. Reapply site or device credentials from the city’s protected credential store when needed.
 
 ## Historical Records + Meetings + Code + Zoning 1.4.0-beta.1 public beta
 

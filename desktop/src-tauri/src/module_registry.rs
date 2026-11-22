@@ -1078,6 +1078,12 @@ pub fn module_profiles() -> Result<Vec<ModuleProfileSummary>, String> {
 }
 
 pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
+    module_summaries_for(&module_selection_state()?)
+}
+
+pub(crate) fn module_summaries_for(
+    selection: &ModuleSelectionState,
+) -> Result<Vec<ModuleSummary>, String> {
     let registry = parse_registry(MODULES_JSON)?;
     validate_profile(&registry, DEFAULT_PROFILE_ID)?;
     let core_version = registry_core_version(&registry)?;
@@ -1102,7 +1108,6 @@ pub fn module_summaries() -> Result<Vec<ModuleSummary>, String> {
             ));
         }
     }
-    let selection = module_selection_state()?;
     let installed_ids: HashSet<&str> = selection
         .installed_module_ids
         .iter()

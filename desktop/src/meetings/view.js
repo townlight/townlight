@@ -1,5 +1,6 @@
 import { createMeetingsClient, readImportFile } from "./client.ts";
 import { bindClerkWorkspace, clerkWorkspaceMarkup } from "./clerk-workspace.js";
+import { bindPublisher, publisherMarkup } from "./publisher.js";
 import { setOptions } from "../code/connection-pickers.js";
 
 function bindImport(form, client, output) {
@@ -154,14 +155,15 @@ function bindTextHandoffs(form, client, output, openImportDraft) {
 }
 
 /** Integrated controls only; later workflow steps remain explicitly unavailable. */
-export function createMeetingsView(invoke, navigate = () => {}, openImportDraft = () => {}) {
+export function createMeetingsView(invoke, navigate = () => {}, openImportDraft = () => {}, isSharedStaff = () => false) {
   let openConnection = async () => {};
   const client = createMeetingsClient(invoke);
   return {
     render() {
       return `<section class="section-band"><h2>Townlight Meetings — integration candidate</h2>
-        <p>Local integration candidate. Saved work uses Python/PostgreSQL. Packet delivery creates local staff files; notice checks are advisory. The local archive exposes only records you explicitly mark public. No external website upload.</p>
-        ${clerkWorkspaceMarkup()}
+        <p>Packet delivery creates local staff files. City website publication requires an approved public copy and a configured shared Windows host.</p>
+        ${clerkWorkspaceMarkup(isSharedStaff())}
+        ${publisherMarkup()}
         <form data-meetings-import><h3>Import meeting records</h3>
           <label>Source <select name="source" required></select></label>
           <span role="status" data-import-source-status>Loading import formats…</span>
@@ -332,6 +334,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
         return;
       }
       const detail = root.querySelector("[data-meetings-result]");
+      bindPublisher(root, invoke, client);
       const workspace = bindClerkWorkspace(root, client, meetingId =>
         invoke("station_action", {action:"open", selectedDirectory:null, meetingId}));
       const findProposal = root.querySelector('[data-meetings-action="codeConnection"] select[name="id"]');

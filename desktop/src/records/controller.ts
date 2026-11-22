@@ -18,11 +18,11 @@ export function canonicalWork(snapshot: State) {
 export function createRecordsController(invoke: Invoke) {
   const records = createRecordsClient(invoke);
   const access = createAccessClient(invoke);
-  const refresh = async (publicOnly: boolean) => canonicalWork(publicOnly ? await records.refresh(true) :
+  const refresh = async (publicOnly: boolean, sharedStaff = false) => canonicalWork(publicOnly || sharedStaff ? await records.refresh(publicOnly) :
     await invoke<State>("suite_domain_request", {request:{operation:"state"}}));
   return {
     refresh,
-    async action(action: string, payload: Record<string, string>, current: RecordsState) {
+    async action(action: string, payload: Record<string, string>, current: RecordsState, sharedStaff = false) {
       let result: Result;
       let publicOnly = false;
       if (action === "load-demo-town") {
@@ -31,7 +31,7 @@ export function createRecordsController(invoke: Invoke) {
         publicOnly = true;
         result = await records.publicAction(action, payload);
       } else if (isRecordsAction(action)) {
-        result = await records.action(action, payload, current) as Result;
+        result = await records.action(action, payload, current, sharedStaff) as Result;
       } else if (action === "accessibility-review" || action.startsWith("townlight_access-")) {
         result = await access.action(action, payload, current.access as AccessState | undefined) as Result;
       } else if (action === "search-city-knowledge") {
@@ -45,7 +45,7 @@ export function createRecordsController(invoke: Invoke) {
       }
       // Public lookup's contact-authorized thread belongs to this returned view;
       // an anonymous refresh would incorrectly discard it.
-      const state = result.state ? canonicalWork(result.state) : await refresh(publicOnly);
+      const state = result.state ? canonicalWork(result.state) : await refresh(publicOnly, sharedStaff);
       return {accepted: result.accepted ?? true, action, status: result.accepted === false ? "Needs attention" : "Saved", message: result.message ?? "Records work saved.",
         next_action: "Review the current saved work.", next_steps: result.next_steps ?? [], disclaimer: result.disclaimer ?? "",
         search_results: result.search_results ?? [], state};

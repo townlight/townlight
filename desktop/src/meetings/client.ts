@@ -31,6 +31,11 @@ export interface MeetingCatalog {
   agenda: AgendaCatalogItem[];
 }
 
+type PacketAudience = 'staff' | 'public';
+interface CouncilSource {path: string; packet_access: 'staff_only' | 'public_candidate'}
+interface CouncilSelection {audience: PacketAudience; agenda_item_ids: string[]; source_indexes: number[]}
+interface CouncilFileReceipt {audience: PacketAudience; folder: string; manifest_sha256: string}
+
 export async function readImportFile(source: ImportSource, data: {source_url: string; export_file: File}): Promise<ImportPayload> {
   const file = data.export_file;
   if (!file?.size || file.size > 16 * 1024 * 1024) {
@@ -119,11 +124,31 @@ export function createMeetingsClient(invoke: Invoke) {
     deliverPacket(id: string) {
       return invoke("meetings_domain_request", {request:{operation:"deliver-packet",id}});
     },
-    capturePacket(id: string, data: {agenda_item_ids: string; source_paths?: string}) {
+    capturePacket(id: string, data: {agenda_item_ids: string; source_paths?: string; public_agenda_ids?: string[];
+      council_sources?: CouncilSource[]; prior_packet_id?: string; retained_source_indexes?: number[]}) {
       return invoke("meetings_domain_request", {request: {operation: "capture-packet", id, payload: {
         agenda_item_ids: data.agenda_item_ids.split(/[\s,]+/).filter(Boolean),
         source_paths: (data.source_paths || "").split(/\r?\n/).map(s=>s.trim()).filter(Boolean),
+        public_agenda_ids: data.public_agenda_ids || [],
+        council_sources: data.council_sources || [],
+        prior_packet_id: data.prior_packet_id || null,
+        retained_source_indexes: data.retained_source_indexes || [],
       }}});
+    },
+    chooseCouncilSource() {
+      return invoke<string | null>('choose_file_path', {request: {}});
+    },
+    previewCouncilPacket(id: string, payload: CouncilSelection) {
+      return invoke<CouncilFileReceipt & {preview_id: string}>('meetings_domain_request',
+        {request: {operation: 'preview-council-packet', id, payload}});
+    },
+    approveCouncilPacket(id: string, payload: {preview_id: string; manifest_sha256: string; public_confirmed: boolean}) {
+      return invoke<CouncilFileReceipt & {approval_id: string}>('meetings_domain_request',
+        {request: {operation: 'approve-council-packet', id, payload}});
+    },
+    saveCouncilFiles(id: string, payload: {artifact_id: string; manifest_sha256: string; approved: boolean}) {
+      return invoke<{folder: string}>('meetings_domain_request',
+        {request: {operation: 'save-council-files', id, payload}});
     },
     recordMinutesDecision(id: string, data: {action: string; note?: string}) {
       return invoke("meetings_domain_request", {request: {operation: "record-minutes-decision", id, payload: {action: data.action, note: data.note || ""}}});

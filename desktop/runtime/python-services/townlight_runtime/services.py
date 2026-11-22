@@ -379,6 +379,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.include_router(meetings_public_router)
         from townlight_runtime.portal_publication import router as portal_publication_router
         domain_app.include_router(portal_publication_router)
+        from townlight_runtime.publisher_api import router as publisher_router
+        domain_app.include_router(publisher_router)
         from townlight_meetings.records_sources import public_documents
         from townlight_runtime.meetings_bridge import database_url, readiness
         def meetings_sources(query="", source_id=None):
@@ -441,8 +443,21 @@ def create_runtime_app(*, domain_enabled: bool = False):
 
     @asynccontextmanager
     async def runtime_lifespan(app):
-        yield
-        await domain_engine.dispose()
+        from threading import Event, Thread
+
+        stop = Event()
+        worker = None
+        if ("townlight_meetings" in modules and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"
+                and os.getenv("TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN")):
+            from townlight_runtime.publisher_queue import PublisherQueue
+            worker = Thread(target=PublisherQueue(_profile_root()).run, args=(stop,),
+                            name="townlight-publisher", daemon=True)
+            worker.start()
+        try:
+            yield
+        finally:
+            stop.set()
+            await domain_engine.dispose()
 
     app = FastAPI(title='Townlight local runtime', lifespan=runtime_lifespan)
 
@@ -483,6 +498,10 @@ def create_runtime_app(*, domain_enabled: bool = False):
             status_code=200 if database["ok"] else 503,
         )
 
+    if os.environ.get("TOWNLIGHT_SHARED_STAFF_HOST") == "1":
+        from townlight_runtime.shared_staff import install_shared_staff
+
+        install_shared_staff(app, domain_app, _profile_root())
     app.mount("/", domain_app)
     return app
 

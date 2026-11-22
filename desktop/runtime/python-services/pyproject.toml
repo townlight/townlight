@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "townlight-runtime"
-version = "0.3.3"
+version = "0.3.4"
 description = "Local Windows runtime bridge for Townlight Records desktop services."
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"
 license-files = ["LICENSE"]
-dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0", "pdfplumber>=0.11.10,<1"]
+dependencies = ["sqlalchemy>=2.0", "fastapi>=0.135.0", "uvicorn>=0.44.0", "pdfplumber>=0.11.10,<1", "argon2-cffi>=23.1,<26"]
 
 [tool.setuptools.packages.find]
 where = ["."]

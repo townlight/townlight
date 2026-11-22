@@ -1,4 +1,6 @@
-export function clerkWorkspaceMarkup() {
+import {bindCouncilPacket, councilPacketMarkup} from './council-packet.js';
+
+export function clerkWorkspaceMarkup(isSharedStaff = false) {
   return `
 <section data-clerk-workspace>
   <h3>Work on a saved meeting</h3>
@@ -14,7 +16,8 @@ export function clerkWorkspaceMarkup() {
   <button type="button" data-move-down>Move down</button>
   <button type="button" data-save-packet>Save packet</button>
   <button type="button" data-deliver-packet>Deliver saved packet files</button>
-  <button type="button" data-open-station>Open Station</button>
+  <button type="button" data-open-station ${isSharedStaff ? 'hidden title="Open Station on the city Windows host"' : ''}>Open Station</button>
+  ${councilPacketMarkup()}
   <p data-status role="status" aria-live="polite"></p>
   <p data-summary></p>
 </section>`;
@@ -38,6 +41,7 @@ export function bindClerkWorkspace(root, client, openStation) {
   const openBtn = $('[data-open-station]');
   const statusEl = $('[data-status]');
   const summaryEl = $('[data-summary]');
+  const council = bindCouncilPacket(section, client);
   let packetIds = [];
   let savedPacketId = '';
   let packetMeetingId = '';
@@ -67,6 +71,7 @@ export function bindClerkWorkspace(root, client, openStation) {
       saveBtn.disabled = !hasMeeting || packetIds.length === 0;
       deliverBtn.disabled = !hasMeeting || !savedPacketId;
       upBtn.disabled = downBtn.disabled = packetIds.length < 2;
+      council.sync();
       if (active?.isConnected && !active.disabled && doc.activeElement === doc.body) active.focus();
     }
   }
@@ -75,12 +80,14 @@ export function bindClerkWorkspace(root, client, openStation) {
     if (!meetingId) {
       summaryEl.textContent = 'No saved meeting selected.';
       savedPacketId = '';
+      council.load(null);
       return null;
     }
     try {
       const saved = await client.read('proceedings', meetingId);
       const latestPacket = saved.packets.at(-1) || null;
       savedPacketId = latestPacket?.id || '';
+      council.load(latestPacket, saved.packets);
       summaryEl.textContent = [
         saved.meeting.title,
         `${saved.motions.length} motions`,
@@ -91,6 +98,7 @@ export function bindClerkWorkspace(root, client, openStation) {
       return latestPacket;
     } catch (err) {
       savedPacketId = '';
+      council.load(null);
       summaryEl.textContent = `Saved proceedings unavailable: ${err?.message || err}`;
       return null;
     }
@@ -110,6 +118,7 @@ export function bindClerkWorkspace(root, client, openStation) {
     packetSelect.replaceChildren(
       ...packetIds.map(id => new Option(assigned.get(id).title, id))
     );
+    council.order([...packetSelect.options].map(option => [option.value, option.text]));
     if (packetIds.includes(activeItem)) packetSelect.value = activeItem;
   }
 
@@ -156,6 +165,7 @@ export function bindClerkWorkspace(root, client, openStation) {
     else packetSelect.insertBefore(other, selected);
     packetSelect.selectedIndex = next;
     packetIds = [...packetSelect.options].map((o) => o.value);
+    council.order([...packetSelect.options].map(option => [option.value, option.text]));
     setStatus(`Moved ${selected.textContent} to position ${next + 1}.`);
   }
 
@@ -192,7 +202,7 @@ export function bindClerkWorkspace(root, client, openStation) {
       const meetingId = meetingSelect.value;
       if (!meetingId) throw new Error('Select a saved meeting first.');
       if (!packetIds.length) throw new Error('Packet order is empty.');
-      await client.capturePacket(meetingId, { agenda_item_ids: packetIds.map(String).join(',') });
+      await client.capturePacket(meetingId, { agenda_item_ids: packetIds.map(String).join(','), ...council.capture() });
       await loadSummary(meetingId);
       setStatus(`Saved packet with ${packetIds.length} agenda items.`);
     }).catch((err) => setStatus(err?.message || String(err), true));
