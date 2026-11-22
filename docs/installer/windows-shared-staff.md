@@ -46,7 +46,7 @@ The ordinary backup omits the secrets needed to read the copied PostgreSQL clust
   -EscrowFile E:\Recovery\townlight-EXAMPLE.cms -Recipient C:\CityTLS\recovery-public.cer
 ```
 
-On the replacement, reproduce the same absolute profile and data paths so stored references remain valid. Install the matching MSI, initialize Townlight under the replacement Windows host account, and set up the same locations. Restore the verified normal backup from System Health. Keep the local Suite database stopped after restore. Import the escrow before starting Suite services, using the imported city recovery certificate in the recovery account. The script compares the backed-up PostgreSQL control file, the exact original backup manifest, and the control file already restored on the target. A mismatch stops the operation.
+On the replacement, reproduce the same absolute profile and data paths so stored references remain valid. Install the matching MSI, initialize Townlight under the replacement Windows host account, and set up the same locations. System Health selects the newest eligible backup. Preserve automatically created setup backups separately and place only the verified city backup in the configured backup folder before selecting Restore. Keep the local Suite database stopped after restore. Import the escrow before starting Suite services, using the imported city recovery certificate in the recovery account. The script compares the backed-up PostgreSQL control file, the exact original backup manifest, and the control file already restored on the target. A mismatch stops the operation.
 
 ```powershell
 .\Protect-TownlightRecovery.ps1 -Action Import `
