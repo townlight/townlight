@@ -16,7 +16,16 @@ const page = browser.contexts().flatMap(context => context.pages())
   .find(candidate => !candidate.url().startsWith('devtools:'));
 assert(page, 'The installed Townlight WebView is absent');
 const native = (command, args = {}) =>
-  page.evaluate(({command, args}) => window.__TAURI_INTERNALS__.invoke(command, args), {command, args});
+  page.evaluate(async ({command, args}) => {
+    try {
+      return await window.__TAURI_INTERNALS__.invoke(command, args);
+    } catch (error) {
+      const detail = error && typeof error === 'object'
+        ? [error.code, error.message].filter(value => value !== undefined && value !== null && value !== '').join(': ')
+        : String(error);
+      throw new Error(`${command}${detail ? `: ${detail}` : ''}`);
+    }
+  }, {command, args});
 
 async function startPortal() {
   receiver = spawn('python', ['manage.py', 'runserver', '127.0.0.1:8871', '--noreload'], {
@@ -44,6 +53,19 @@ try {
     const activation = await native('supervisor_action', {action: 'activate-records', serviceId: null});
     assert.equal(activation.accepted, true, activation.message);
   }
+  const contractsDeadline = Date.now() + 30_000;
+  let contractsError;
+  while (Date.now() < contractsDeadline) {
+    try {
+      await native('municipal_staff_request', {request: {operation: 'contracts'}});
+      contractsError = undefined;
+      break;
+    } catch (error) {
+      contractsError = error;
+      await delay(500);
+    }
+  }
+  if (contractsError) throw contractsError;
   console.log(JSON.stringify(await installedData({page, native, startPortal, publicOrigin})));
 } finally {
   await native('supervisor_action', {action: 'stop', serviceId: null}).catch(() => {});
