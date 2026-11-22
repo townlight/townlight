@@ -57,6 +57,13 @@ def gateway(tmp_path):
     def state(request: Request):
         return {"identity": require(request, "townlight_records").email}
 
+    @domain.get("/desktop/v1/meetings/packets/{packet_id}/council-file/{artifact_id}/{filename}")
+    def council_file(request: Request, packet_id: str, artifact_id: str, filename: str,
+                     manifest_sha256: str, offset: int, approved: bool):
+        require(request, "townlight_meetings")
+        return {"manifest_sha256": manifest_sha256, "offset": offset, "approved": approved,
+                "filename": filename, "content_base64": "ZmlsZQ=="}
+
     @domain.post("/desktop/v1/requests/{request_id}/documents/{attachment_id}/release-copy")
     def release_copy(request: Request, request_id: str, attachment_id: str, payload: dict):
         require(request, "townlight_records")
@@ -81,6 +88,26 @@ def login(client, name):
 
 def operation(session, operation_id=None):
     return {**session, "X-Townlight-Operation": operation_id or str(uuid4())}
+
+
+def test_council_preview_and_approved_download_queries(gateway):
+    client, _, _, _, _ = gateway
+    clerk = login(client, "clerk")
+    path = f"{API}/meetings/packets/{MEETING}/council-file/{RECORD}/packet.pdf"
+    digest = "c" * 64
+    preview_query = f"manifest_sha256={digest}&offset=0&approved=false"
+    approved_query = f"approved=true&offset=2097152&manifest_sha256={digest}"
+    for query, approved, offset in ((preview_query, False, 0), (approved_query, True, 2097152)):
+        response = client.get(f"{path}?{query}", headers=clerk)
+        assert response.status_code == 200
+        assert response.json() == {"manifest_sha256": digest, "offset": offset, "approved": approved,
+                                   "filename": "packet.pdf", "content_base64": "ZmlsZQ=="}
+    for query in ("", "offset=0", f"{preview_query}&offset=1", f"{preview_query}&extra=1",
+                  preview_query.replace(digest, "wrong"), preview_query.replace("offset=0", "offset=-1"),
+                  preview_query.replace("approved=false", "approved=1")):
+        assert client.get(f"{path}?{query}", headers=clerk).status_code == 404
+    records = login(client, "records")
+    assert client.get(f"{path}?{preview_query}", headers=records).status_code == 403
 
 
 def test_concurrent_roles_station_callback_and_account_changes(gateway):

@@ -239,10 +239,18 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         council_file = request.method == "GET" and COUNCIL_FILE.fullmatch(path) is not None
         records_upload = request.method == "POST" and RECORDS_FILE.fullmatch(path) is not None
         query = request.url.query
-        allowed_query = (council_file and re.fullmatch(r"offset=[0-9]{1,16}", query)
-                         or path == "/desktop/v1/portal/selections" and re.fullmatch(rf"request_id={UUID}", query))
+        if council_file:
+            pairs = request.query_params.multi_items()
+            parameters = dict(pairs)
+            allowed_query = (len(pairs) == 3
+                             and re.fullmatch(r"[0-9a-f]{64}", parameters.get("manifest_sha256", ""))
+                             and re.fullmatch(r"[0-9]{1,16}", parameters.get("offset", ""))
+                             and parameters.get("approved") in {"true", "false"})
+        else:
+            allowed_query = (not query or path == "/desktop/v1/portal/selections"
+                             and re.fullmatch(rf"request_id={UUID}", query))
         if (allowed.fullmatch(path) is None and not council_file and not records_upload
-                or query and not allowed_query):
+                or not allowed_query):
             return json_response({"detail": "This operation is only available on the city host."}, status=404)
         proof = request.headers.get("x-townlight-session")
         principal = staff.resolve(proof)
