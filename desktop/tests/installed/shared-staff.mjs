@@ -327,8 +327,9 @@ try {
   const recording = await stationRecorder({native: host.native, save, admin, meetingId: meeting.id,
     disposableFixture: true, profileRoot: fixture.host.profile, payloadRoot: fixture.host.runtime_payload});
   await guest.signIn(fixture.guest.records_only);
+  const deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const request = await guest.records({operation: 'create', payload: {requester: 'Private fixture requester',
-    summary: `Shared Station ${key}`, deadline: '', deadlineBasis: 'Fixture staff review'}});
+    summary: `Shared Station ${key}`, deadline, deadlineBasis: 'Fixture staff review'}});
   const requestId = request.request_id || request.id;
   assert(requestId, 'The shared Records desk did not return the saved request identifier.');
   await guest.records({operation: 'attach-station-recording', request_id: requestId,
@@ -439,7 +440,7 @@ try {
   await save('shared-windows-acceptance', {passed: true, candidate_sha256: fixture.candidate_sha256,
     host: fixture.host.machine, guest: fixture.guest.machine, checks});
 } catch (error) {
-  await save('shared-windows-acceptance-failure', {passed: false, checks, error: String(error?.message || error)});
+  await save('shared-windows-acceptance-failure', {passed: false, checks, error: String(error?.message || error), stack: error?.stack});
   throw error;
 } finally {
   await guest?.signOut().catch(() => {});
