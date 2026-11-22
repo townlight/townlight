@@ -176,6 +176,12 @@ Planning imports adopted policy revisions, including neighborhood applicability,
 
 Core provides shared contracts, named account/session support, ingestion/task helpers and coherent recovery. Supporting Notice and Access are included where selected. These relationships do not establish all 56 directed product pairs, universal vendor integration or unrestricted federation.
 
+### Shared Windows staff and approved portal publication — 1.9.2.1 candidate
+
+The signed Windows 1.9.2.1 candidate adds a city-hosted shared mode: named Windows workstations use Meetings and Records through the city's private HTTPS endpoint, while the host owns the database, managed files and Station capture. Townlight Clerk and Records Staff remain separate named roles; existing City Staff and Local Admin retain only the actions their current permissions allow, and Code Staff gains no Meetings or Records authority. On a workstation, clerks can prepare council packets and send a reviewed correction; the host verifies copied files and records the operator. Station capture and administration remain on the host.
+
+Fulfilling a Records request does not publish its contents. Staff must separately review and approve the exact council packet revision or eligible Records release copy for the portal. The shared host queues approved actions, retries after sign-out, outage or restart, and reports the confirmed status in Meetings. A packet correction replaces that packet only; packet and recording withdrawals are separate. The public 1.9.1.1 installer does not include this shared-host workflow or unattended publisher. Read the [1.9.2.1 candidate guide](https://townlight.github.io/manuals/windows-1.9.2.1-candidate.html), [shared staff guide at the signed source commit](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md), and [Portal guide](https://github.com/townlight/townlight/blob/a35afc2bd7702a8ddbfabbd0ec3dbc75a3d581de/docs/portal/guide.md). Candidate acceptance used a host and Sandbox guest on the same physical PC and a synthetic portal.
+
 ### Product guide directory
 
 | Product | Purpose | Manual |

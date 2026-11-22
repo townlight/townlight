@@ -14,7 +14,7 @@ The portal is a separately deployed suite capability for city pages and public m
 
 ## Windows shared-host candidate publication
 
-This section describes the unreleased Windows 1.9.2.1 candidate. The public 1.9.1.1 installer still uses the manual publication workflow below.
+This section describes the unreleased Windows 1.9.2.1 candidate. The public Windows 1.9.1.1 installer does not include or deploy the portal; deployments paired with that release use the separately deployed manual Wagtail publication workflow below.
 
 In the shared Meetings workspace, review the public council packet and approve the exact revision for publication. When publishing a recording, select the approved Records release copy and explicitly approve it for publication. The host sends the queued items even after staff sign out. Check the status in Meetings. During an outage, previously published material remains available while delivery retries. To correct a packet, approve and send a new revision. To remove a recording, withdraw that recording and confirm it is gone from the public meeting page. The approved packet remains available unless separately withdrawn.
 

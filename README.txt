@@ -10,7 +10,11 @@ Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow impro
 
 Release and downloads · Acceptance and limits.
 
-Download Windows beta 1.9.1.1 · Public announcement · Support and feedback
+Windows 1.9.2.1 signed candidate — not publicly released
+
+The signed, merged candidate adds shared Windows host/workstation workflows for Meetings and Records, council packet revisions, and unattended delivery of explicitly approved packets and recording copies to a separately deployed portal. The public installer remains 1.9.1.1; 1.9.2.1 has no public tag or release. See the candidate guide, candidate handoff and acceptance limits, and the shared staff and Portal source guides.
+
+Download Windows beta 1.9.1.1 · Public announcement · Support and feedback · Maintainer handoff
 
 Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
 
@@ -65,9 +69,9 @@ Staff should start with First run and Connected workflows. Administrators should
 
 Beta identity
 
-  ----------------------------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------
   Identity                            Value
-  ----------------------------------- ----------------------------------------------------------------------------
+  ----------------------------------- -----------------------------------------------------------------------
   Public documentation identity       Townlight Beta 1
 
   Windows MSI version                 1.9.1.1
@@ -81,7 +85,7 @@ Beta identity
   Current owned software license      AGPL-3.0-only
 
   Supported acceptance profile        Windows 1.9.1.1 signed MSI with C920 preview and recording acceptance
-  ----------------------------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------
 
 Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
 
@@ -123,7 +127,7 @@ Run the signed Windows 1.9.1.1 MSI and use an empty database and a new Townlight
 
 Existing installation
 
-Back up city data and settings, close Townlight and preserve the existing profile. The Windows 1.9.0.1 upgrade ran on the signed predecessor candidate. See the Windows 1.9.1.1 release acceptance for checks on the distributed installer.
+Upgrading an existing installation. Back up your city data and settings, then close Townlight and keep the existing Windows profile. The upgrade from Windows 1.9.0.1 was exercised on the signed 1.9.1.1 predecessor candidate. The acceptance summary identifies the separate checks on the shipped MSI. The earlier direct 1.8.2.1 upgrade was to Windows 1.9.0.1.
 
 Daily workflow
 

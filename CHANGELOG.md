@@ -1,5 +1,11 @@
 # Changelog
 
+## Windows 1.9.2.1 signed candidate — not publicly released
+
+- Add shared Windows host/workstation use of Meetings and Records with existing staff roles, council packet correction, and queued delivery of explicitly approved portal content.
+- Verify the signed MSI and installed workflows on a Windows host and a clean Windows Sandbox guest, including recovery from a verified backup. The guest ran on the same physical PC; production portal operation and two physically separate PCs were not tested.
+- The public Windows download and GitHub Latest remain 1.9.1.1. See the [candidate handoff and acceptance limits](release/CANDIDATE-Windows-1.9.2.1.md); no 1.9.2.1 release is available.
+
 ## Windows 1.9.1.1 public beta — published 2026-11-21 UTC
 
 - Added the Open Hall Windows installer and app artwork.
