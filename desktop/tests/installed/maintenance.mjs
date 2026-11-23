@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {stationRecorder,stationLargeHandoff} from './station-recorder.mjs';
 if (process.env.GITHUB_ACTIONS !== 'true' || process.platform !== 'win32') throw Error('Disposable hosted Windows only');
 const [mode, output] = process.argv.slice(2);
-assert(['seed', 'fresh', 'upgrade', 'recorder'].includes(mode));
+assert(['seed', 'fresh', 'upgrade', 'recorder', 'station-long'].includes(mode));
 await mkdir(output, {recursive:true});
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:60000});
 const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
@@ -51,7 +51,7 @@ try {
     const setup=await run('setup.js');
     assert(setup.final.first_run.finished, 'Installed first-run incomplete');
     await save(mode+'-setup',setup);
-    if(mode!=='recorder') {
+    if(mode!=='recorder'&&mode!=='station-long') {
       ids=await run('municipal-workflows.js');
       assert(ids.passed,'Installed municipal workflows failed');
       await save(mode+'-workflows',ids);
@@ -59,7 +59,7 @@ try {
       await readback(ids);
     }
   }
-  if (mode === "recorder") {
+  if (mode === "recorder" || mode === "station-long") {
     await page.evaluate(async () => {
       const a = window.audit;
       if ((await a.native("get_app_state")).domain_authority !== "python-records") {
@@ -77,7 +77,8 @@ try {
   }
   if (mode === 'fresh') await clerkWorkflows({ page, native, save, meetingId: ids.meeting_id });
   let recording;
-  if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin,longCapture:mode==='fresh'});
+  if (mode === 'station-long') await admin();
+  if(mode==='recorder'||mode==='fresh'||mode==='station-long') recording=await stationRecorder({native,save,admin,longCapture:mode==='fresh'||mode==='station-long'});
   if (mode==='fresh'||mode==='recorder') {
     accepted(await native('supervisor_action',{action:'backup',serviceId:null}));
     const restore=await native('supervisor_action',{action:'restore',serviceId:null});
@@ -102,6 +103,13 @@ try {
   if(recording) {
     if (mode === 'recorder') await stationLargeHandoff(recording,save);
     assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
+  }
+  if (mode === 'seed' || mode === 'upgrade') {
+    const station = await native('station_action', {action:'status', selectedDirectory:null});
+    if (station.ready) {
+      const stopped = await native('station_action', {action:'stop', selectedDirectory:null});
+      assert.equal(stopped.stopped, true, 'Installed Station did not stop before maintenance');
+    }
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});

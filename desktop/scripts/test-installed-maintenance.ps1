@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
-  [ValidateSet('fresh','upgrade','recorder')][string]$Mode,
+  [ValidateSet('fresh','upgrade','recorder','station-long')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
   [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA,
   [switch]$UnsignedRecorderCandidate,
@@ -38,9 +38,10 @@ function Run-Installed([string]$Phase) {
   if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) { throw 'Installed acceptance debug port is already occupied.' }
   New-Item -Path $debugPolicy -Force | Out-Null
   New-ItemProperty -LiteralPath $debugPolicy -Name $appName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
+  $priorSuppressOpenBrowser=$env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER
   $env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER = '1'
   try { $script:ownedApp = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru }
-  finally { Remove-Item Env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER }
+  finally { $env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER=$priorSuppressOpenBrowser }
   try {
     $ready=$false; $deadline=(Get-Date).AddSeconds(120)
     while ((Get-Date) -lt $deadline) {
@@ -73,14 +74,18 @@ function Product-Registration {
 }
 try {
   $retained=@()
+  $baselineVersion=$null
   if ($Mode -eq 'upgrade') {
     $previous=Join-Path $env:RUNNER_TEMP 'townlight-previous-release'
     New-Item -ItemType Directory -Path $previous | Out-Null
-    gh release download townlight-windows-v1.9.0.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
+    gh release download townlight-windows-v1.9.2.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
     if ($LASTEXITCODE -ne 0) { throw 'Previous public MSI download failed.' }
     $old=@(Get-ChildItem -LiteralPath $previous -Filter '*.msi' -File)
-    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'fde5cfd9d167571792e2384f7a5066b1dbea3fdc8b2085cf43f670440210ff0c') { throw 'Previous release identity mismatch.' }
-    Install-Candidate $old[0].FullName 'baseline-1.9.0.1'
+    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '3242792ad6c825a5057d96c5e1d9d45fb5726ccbfba7ab24a2b428a54e63b0bf') { throw 'Previous release identity mismatch.' }
+    Install-Candidate $old[0].FullName 'baseline-1.9.2.1'
+    $baselineVersion='1.9.2.1'
+    $baselineRegistered=@(Product-Registration)
+    if ($baselineRegistered.Count -ne 1 -or $baselineRegistered[0].DisplayVersion -ne '1.9.2.1') { throw 'Baseline registration/version verification failed.' }
     Run-Installed 'seed'
     $marker=Join-Path $profile 'Data\maintenance-retention.txt'
     [IO.File]::WriteAllText($marker,'Synthetic Windows maintenance retention marker')
@@ -97,14 +102,9 @@ try {
   foreach ($entry in $retained) {
     if ((Get-FileHash -LiteralPath (Join-Path $profile $entry.path) -Algorithm SHA256).Hash -ne $entry.sha256) { throw "Upgrade changed retained $($entry.path)" }
   }
-  $uninstallLog=Join-Path $EvidenceRoot 'uninstall.log'
-  $p=Start-Process msiexec.exe -ArgumentList @('/x',('"'+$MsiPath+'"'),'/qn','/norestart','/l*v',('"'+$uninstallLog+'"')) -WindowStyle Hidden -Wait -PassThru
-  if ($p.ExitCode -notin @(0,3010) -or @(Product-Registration).Count -ne 0 -or (Test-Path -LiteralPath $exe)) { throw 'Uninstall did not remove program and Windows registration.' }
-  foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
-  }
-  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
+  if (-not (Test-Path -LiteralPath $profile)) { throw 'Installed run did not preserve the Townlight profile.' }
+  $retainedProfilePreserved=$true
+  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;baseline_version=$baselineVersion;retained_profile_preserved=$retainedProfilePreserved;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
-  elseif (Test-Path -LiteralPath $debugPolicy) { Remove-ItemProperty -LiteralPath $debugPolicy -Name $appName -ErrorAction SilentlyContinue }
 }

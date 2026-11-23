@@ -1,6 +1,6 @@
 // Exact installed candidate. Synthetic network chamber feed; no camera is assumed on CI.
 import assert from 'node:assert/strict';
-import {mkdtemp, readFile, rmdir, unlink, writeFile} from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {spawn,execFile} from 'node:child_process';
@@ -155,8 +155,6 @@ export async function stationRecorder({native, save, admin, longCapture = false,
       await new Promise(resolve=>{sender.once('exit',resolve);if(!sender.kill())resolve();});
     }
     await headless?.close();
-    if(fixture) await unlink(fixture).catch(error=>{if(error.code!=='ENOENT')console.error(error);});
-    if(fixtureDirectory) await rmdir(fixtureDirectory).catch(console.error);
   }
 }
 

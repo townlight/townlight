@@ -1,0 +1,102 @@
+name: Released Windows 1.9.3.1 installed checks
+
+on:
+  push:
+    branches:
+      - diagnostic/windows-1.9.3.1-installed
+    paths:
+      - .github/workflows/released-windows-1.9.3.1-installed.yml
+      - desktop/scripts/**
+
+permissions:
+  contents: read
+
+jobs:
+  installed:
+    name: Installed ${{ matrix.mode }}
+    runs-on: windows-latest
+    timeout-minutes: 130
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [upgrade, station-long]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          path: townlight
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: npm ci
+        working-directory: townlight/desktop
+        run: npm ci
+
+      - name: Report free space
+        shell: pwsh
+        run: |
+          $roots = @('C:\', $env:RUNNER_WORKSPACE, $env:RUNNER_TEMP) |
+            Where-Object { $_ } |
+            ForEach-Object { [System.IO.Path]::GetPathRoot($_) } |
+            Sort-Object -Unique
+          foreach ($root in $roots) {
+            $letter = $root.Substring(0, 1)
+            $drive = Get-PSDrive -Name $letter -ErrorAction Stop
+            $freeGb = [math]::Round($drive.Free / 1GB, 2)
+            Write-Host "Drive ${letter}: free ${freeGb} GB"
+          }
+
+      - name: Download and verify signed MSI
+        shell: pwsh
+        env:
+          TAG: townlight-windows-v1.9.3.1
+          ASSET: Townlight-Windows-x64-1.9.3.1.msi
+          EXPECTED_SHA: f2980b80f7cd059e2c4c500f50f23e59bceadf4c29043769180374f1e34f1ba4
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $folder = Join-Path $env:RUNNER_TEMP 'townlight-1.9.3.1-installed'
+          New-Item -ItemType Directory -Path $folder -Force | Out-Null
+          $msi = Join-Path $folder $env:ASSET
+          $url = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:TAG/$env:ASSET"
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile $msi -UseBasicParsing
+          $hash = (Get-FileHash -Algorithm SHA256 -Path $msi).Hash.ToLowerInvariant()
+          Write-Host "SHA256: $hash"
+          if ($hash -ne $env:EXPECTED_SHA) { throw "SHA256 mismatch for $msi" }
+          $sig = Get-AuthenticodeSignature -FilePath $msi
+          Write-Host "Authenticode status: $($sig.Status)"
+          Write-Host "Authenticode signer: $($sig.SignerCertificate.Subject)"
+          if ($sig.Status -ne 'Valid') { throw "Authenticode signature is not valid for $msi" }
+          "MSI_PATH=$msi" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Run installed maintenance harness
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ matrix.mode }}
+          SOURCE_COMMIT: b6cb182eb72bafe0e9bdbcacf96ce756082e6b6c
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Get-Variable PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
+            $PSNativeCommandUseErrorActionPreference = $true
+          }
+          $evidence = Join-Path $env:RUNNER_TEMP 'release-acceptance'
+          New-Item -ItemType Directory -Path $evidence -Force | Out-Null
+          $script = Join-Path $env:GITHUB_WORKSPACE 'townlight/desktop/scripts/test-installed-maintenance.ps1'
+          $global:LASTEXITCODE = 0
+          & $script -MsiPath $env:MSI_PATH -Mode $env:MODE -EvidenceRoot $evidence -SourceCommit $env:SOURCE_COMMIT
+          $code = $LASTEXITCODE
+          if ($code -ne 0) { throw "Maintenance harness failed with exit code $code" }
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-1.9.3.1-installed-${{ matrix.mode }}
+          path: |
+            ${{ runner.temp }}/release-acceptance/**/*.json
+            ${{ runner.temp }}/release-acceptance/**/*.log
+          if-no-files-found: warn
+          retention-days: 30
