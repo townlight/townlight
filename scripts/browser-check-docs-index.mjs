@@ -1,10 +1,13 @@
 import { chromium } from "playwright";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const target = `file://${path.join(root, "docs", "index.html").replaceAll("\\", "/")}`;
+const { desktop_release: release } = JSON.parse(readFileSync(path.join(root, "config", "suite-state.json"), "utf8"));
+const windowsVersion = release.tag.replace(/^townlight-windows-v/, "");
+const expectedDownloadUrl = `https://github.com/townlight/townlight/releases/download/${release.tag}/Townlight-Windows-x64-${windowsVersion}.msi`;
 const outputDir = path.join(root, "docs", "audit-browser-qa");
 mkdirSync(outputDir, { recursive: true });
 
@@ -66,8 +69,8 @@ try {
       .map((slug) => `/products/${slug}/index.html`);
     const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
       expectedProductLinks.every((link, index) => productLinks[index].endsWith(link));
-    const currentDownloadLinked = await page.locator('a[href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/Townlight-Windows-x64-1.9.1.1.msi"]').first()
-      .getAttribute("href") === "https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/Townlight-Windows-x64-1.9.1.1.msi";
+    const currentDownloadLinked = await page.locator(`a.button.primary[href="${expectedDownloadUrl}"]`).first()
+      .isVisible();
     const overallManualVisible = await page.locator('a[href$="manuals/suite.html"]').first().isVisible();
     const horizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
