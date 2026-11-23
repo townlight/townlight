@@ -102,7 +102,47 @@ export async function stationRecorder({native, save, admin, longCapture = false,
       assert(measured>boundary,'Live recording never crossed 2 GiB');
     }
     const article=page.locator('[data-id="'+rid+'"]');
-    await article.getByRole('button',{name:'Stop recording',exact:true}).click();
+    const stop=article.getByRole('button',{name:'Stop recording',exact:true});
+    const stopUrl=station+'/v1/recordings/'+rid+'/stop';
+    const isStop=request=>request.method()==='POST'&&request.url()===stopUrl;
+    const stopEvidence={recording_id:rid,network:[]};
+    const note=(event,details={})=>stopEvidence.network.push({event,at:new Date().toISOString(),...details});
+    const requestStarted=request=>{if(isStop(request))note('request');};
+    const requestFailed=request=>{if(isStop(request))note('request-failed',{error:request.failure()?.errorText});};
+    const readStopState=async()=>{
+      const count=await stop.count();
+      const cookie=(await context.cookies(station)).find(item=>item.name==='station_operator');
+      return {
+        count,
+        visible:count===1&&await stop.isVisible(),
+        enabled:count===1&&await stop.isEnabled({timeout:1000}).catch(()=>false),
+        cookie_seconds_remaining:cookie ? Math.round(cookie.expires-Date.now()/1000) : null,
+      };
+    };
+    page.on('request',requestStarted);
+    page.on('requestfailed',requestFailed);
+    try {
+      stopEvidence.before=await readStopState();
+      const response=page.waitForResponse(result=>isStop(result.request()),{timeout:40000})
+        .then(result=>{note('response',{status:result.status()});return result;},error=>{
+          stopEvidence.response_error=error.message.split('\n')[0];
+          return null;
+        });
+      try {
+        await stop.click({timeout:10000});
+        stopEvidence.click_completed=true;
+      } catch(error) {
+        stopEvidence.click_error=error.message.split('\n')[0];
+        throw error;
+      }
+      const reply=await response;
+      assert(reply?.ok(),reply ? `Station Stop returned HTTP ${reply.status()}` : stopEvidence.response_error);
+    } finally {
+      page.off('request',requestStarted);
+      page.off('requestfailed',requestFailed);
+      stopEvidence.after=await readStopState().catch(error=>({read_error:error.message.split('\n')[0]}));
+      await save('station-operator-stop',stopEvidence);
+    }
     let record;
     const finish=Date.now()+120000;
     while(Date.now()<finish){record=await request(station,'/v1/recordings/'+rid);if(['complete','failed','interrupted'].includes(record.status))break;await new Promise(r=>setTimeout(r,1000));}
