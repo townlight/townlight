@@ -55,7 +55,8 @@ async function prepareHearing({ native, attachment }) {
     const approval = proceedings.packets.find(p => p.id === packet.packet_id)
       .delivery_history.find(a => a.kind === 'council-packet-approval');
     assert.ok(approval, 'Persisted approval required'); assert.equal(approval.audience, 'public', 'Persisted approval is not public');
-    assert.equal(approval.manifest_sha256, preview.manifest_sha256, 'approval manifest SHA mismatch');
+    assert.equal(approval.preview_sha256, preview.manifest_sha256, 'approval preview SHA mismatch');
+    assert.notEqual(approval.manifest_sha256, approval.preview_sha256, 'approval manifest SHA must differ from preview SHA');
     return { meeting, agenda, approval, packet, motion, vote };
   } finally {
     await unlink(absoluteFilePath).catch(() => {});
