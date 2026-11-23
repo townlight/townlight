@@ -32,6 +32,16 @@ pub enum StaffRequest {
     BudgetAttachment { id: Uuid },
     AdoptBudget { id: Uuid, payload: Value },
     PublishBudget { id: Uuid, payload: Value },
+    GrantAssignees {},
+    Grants {},
+    GetGrant { id: Uuid },
+    ArchiveGrant { id: Uuid },
+    CreateGrant { payload: Value },
+    AssignGrant { id: Uuid, payload: Value },
+    ReviewGrant { id: Uuid, payload: Value },
+    AwardGrant { id: Uuid, payload: Value },
+    ReportGrant { id: Uuid, payload: Value },
+    CloseoutGrant { id: Uuid, payload: Value },
 }
 
 impl StaffRequest {
@@ -83,6 +93,16 @@ impl StaffRequest {
                 "townlight_budget",
                 true,
             ),
+            Self::GrantAssignees {}
+            | Self::Grants {}
+            | Self::GetGrant { .. }
+            | Self::ArchiveGrant { .. }
+            | Self::CreateGrant { .. }
+            | Self::AssignGrant { .. }
+            | Self::ReviewGrant { .. }
+            | Self::AwardGrant { .. }
+            | Self::ReportGrant { .. }
+            | Self::CloseoutGrant { .. } => (&["townlight_grants"], "townlight_grants", false),
             _ => (&["townlight_procurement"], "townlight_procurement", false),
         }
     }
@@ -137,6 +157,26 @@ impl StaffRequest {
             }
             Self::PublishBudget { id, payload } => {
                 (Method::POST, format!("budget/{id}/publish"), Some(payload))
+            }
+            Self::GrantAssignees {} => (Method::GET, "grants/assignees".into(), None),
+            Self::Grants {} => (Method::GET, "grants".into(), None),
+            Self::GetGrant { id } => (Method::GET, format!("grants/{id}"), None),
+            Self::ArchiveGrant { id } => (Method::GET, format!("grants/{id}/archive"), None),
+            Self::CreateGrant { payload } => (Method::POST, "grants".into(), Some(payload)),
+            Self::AssignGrant { id, payload } => {
+                (Method::POST, format!("grants/{id}/assign"), Some(payload))
+            }
+            Self::ReviewGrant { id, payload } => {
+                (Method::POST, format!("grants/{id}/review"), Some(payload))
+            }
+            Self::AwardGrant { id, payload } => {
+                (Method::POST, format!("grants/{id}/award"), Some(payload))
+            }
+            Self::ReportGrant { id, payload } => {
+                (Method::POST, format!("grants/{id}/report"), Some(payload))
+            }
+            Self::CloseoutGrant { id, payload } => {
+                (Method::POST, format!("grants/{id}/closeout"), Some(payload))
             }
         };
         domain_client::send(

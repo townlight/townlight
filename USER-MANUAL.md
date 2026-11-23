@@ -520,3 +520,13 @@ Applies to the candidate; 1.9.2.1 does not include it.
 6. With a configured publisher, a local administrator selects **Queue adopted budget for publication** and checks the public Portal Datasets view for the CSV and summary.
 
 Budget is available in the Windows candidate. The public download is version 1.9.2.1.
+
+
+## Townlight Grants (Windows candidate)
+
+1. In Staff > Grants, enter the opportunity title, funding area, deadline, project name and city need. Select the adopted Budget revision, signed Contract and saved Records request from the lists. Confirm all three before creating the case.
+2. Open the case and save an assignment to an active named city staff member or local administrator. Read the triage, eligibility factors and application outline as staff workpapers.
+3. Record the review note. After the city confirms the award, record the award reference, amount in cents, report due date and reporting frequency. Check the generated calendar against the signed award.
+4. Save the report completion note, close the case and select **Download verified archive**. Reopen the case to retrieve the same SHA-256-verified JSON and check the three source references.
+
+Grants records staff decisions and timestamps. Funder applications, awards and reporting submissions take place outside Townlight. Grants is in the Windows candidate. The published download remains 1.9.2.1.

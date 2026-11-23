@@ -271,6 +271,14 @@ jobs:
           ref: ${{ steps.candidate.outputs.budget_ref }}
           path: budget-module
           persist-credentials: false
+      - name: Check out pinned Townlight Grants source
+        if: steps.candidate.outputs.grants_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/grants
+          ref: ${{ steps.candidate.outputs.grants_ref }}
+          path: grants-module
+          persist-credentials: false
 
       - name: Validate publication-signing context
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
@@ -390,7 +398,7 @@ jobs:
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module") }
             npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta @sourceRoots
@@ -810,6 +818,14 @@ jobs:
           ref: ${{ steps.candidate.outputs.budget_ref }}
           path: budget-module
           persist-credentials: false
+      - name: Check out pinned Townlight Grants source
+        if: steps.candidate.outputs.grants_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/grants
+          ref: ${{ steps.candidate.outputs.grants_ref }}
+          path: grants-module
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -846,7 +862,7 @@ jobs:
           )
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks

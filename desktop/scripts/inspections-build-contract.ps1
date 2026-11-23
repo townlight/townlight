@@ -21,10 +21,10 @@ function Get-InspectionsBuildContract {
         $Contract.zoning_package_version -ne '0.2.3' -or $Contract.access_package_version -ne '0.5.0' -or
         $Contract.notice_package_version -ne '0.3.0' -or $Contract.runtime_package_version -ne '0.3.4' -or
         $Contract.boards_package_version -ne '0.2.1' -or $Contract.contracts_package_version -ne '0.2.1' -or
-        $Contract.procurement_package_version -ne '0.3.1' -or $Contract.data_package_version -ne '0.2.0' -or $Contract.budget_package_version -ne '0.2.0' -or $Contract.station_package_version -ne '0.4.4' -or $Contract.fresh_profile_only -ne $false -or
+        $Contract.procurement_package_version -ne '0.3.1' -or $Contract.data_package_version -ne '0.2.0' -or $Contract.budget_package_version -ne '0.2.0' -or $Contract.grants_package_version -ne '0.3.0' -or $Contract.station_package_version -ne '0.4.4' -or $Contract.fresh_profile_only -ne $false -or
         $Contract.legacy_upgrade_supported -ne $false) { throw 'Inspections release identity mismatch.' }
-    $Repositories = @('townlight/core', 'townlight/sunshine', 'townlight/meetings', 'townlight/ordinances', 'townlight/zone', 'townlight/plan', 'townlight/notice', 'townlight/access', 'townlight/permit', 'townlight/inspect', 'townlight/station', 'townlight/boards', 'townlight/contracts', 'townlight/procure', 'townlight/data', 'townlight/budget')
-    if (@(Compare-Object $Repositories @($Pins.sources.PSObject.Properties.Name)).Count) { throw 'Coordinated candidate requires exactly sixteen component source pins.' }
+    $Repositories = @('townlight/core', 'townlight/sunshine', 'townlight/meetings', 'townlight/ordinances', 'townlight/zone', 'townlight/plan', 'townlight/notice', 'townlight/access', 'townlight/permit', 'townlight/inspect', 'townlight/station', 'townlight/boards', 'townlight/contracts', 'townlight/procure', 'townlight/data', 'townlight/budget', 'townlight/grants')
+    if (@(Compare-Object $Repositories @($Pins.sources.PSObject.Properties.Name)).Count) { throw 'Coordinated candidate requires exactly seventeen component source pins.' }
     foreach ($Pin in $Pins.sources.PSObject.Properties) {
         if ($Pin.Value -notmatch '^[0-9a-f]{40}$') { throw "Invalid Inspections source pin: $($Pin.Name)" }
     }

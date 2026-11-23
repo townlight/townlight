@@ -286,6 +286,10 @@ This write requires Meetings to be enabled and the signed-in staff role to permi
 
 Read the [Suite API reference](https://townlight.github.io/api/suite.html) for every documented operation, request field, constraint, response declaration and source supplement. Download the [OpenAPI JSON](https://townlight.github.io/api/suite-openapi.json) for tools. For Station this is the suite-side schema only; its separate service contract is documented in the API supplement. The [reference directory](https://townlight.github.io/reference/index.html) includes configuration/source inventories, dependency declarations, native command contracts, MCP signatures and candidate evidence.
 
+### Windows candidate workflows
+
+The next Windows candidate adds staff-reviewed Data publication, Budget review and council adoption, and Grants case management with verified closeout archives. See the [operator manual](USER-MANUAL.md) for the workflows. The published Windows download remains 1.9.2.1.
+
 ## MCP and automation boundary
 
 No direct product MCP server is exposed by the accepted Townlight desktop or Station boundary. Do not configure an invented `townlight mcp` command or assume an AI client has staff permissions. The integration surfaces for this beta are native IPC, the documented HTTP APIs, source bundle imports, exact exports and the existing Station CLI.

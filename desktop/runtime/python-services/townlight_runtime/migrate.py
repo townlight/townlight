@@ -126,11 +126,13 @@ def upgrade_all() -> None:
         from townlight_runtime.municipal_staff import ensure_schema
         from townlight_runtime.data_staff import ensure_data_schema
         from townlight_budget.adoption import ensure_budget_schema
+        from townlight_grants.grant_cases import ensure_grants_schema
         staff_engine = create_engine(sync_url)
         try:
             ensure_schema(staff_engine)
             ensure_data_schema(staff_engine)
             ensure_budget_schema(staff_engine)
+            ensure_grants_schema(staff_engine)
         finally:
             staff_engine.dispose()
         from townlight_inspections.migrations import source_engine, upgrade

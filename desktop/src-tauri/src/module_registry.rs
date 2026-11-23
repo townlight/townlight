@@ -19,6 +19,7 @@ const MUNICIPAL_MODULES: &[&str] = &[
     "townlight_procurement",
     "townlight_data",
     "townlight_budget",
+    "townlight_grants",
 ];
 
 #[derive(Deserialize)]
@@ -1249,13 +1250,13 @@ mod tests {
     fn migration_adds_data_and_budget_disabled_while_preserving_prior_disables() {
         with_temp_state_dir(|_| {
             let mut prior = persist_profile_selection("inspections-preview").unwrap();
-            // Rewind to a state that predates Data and Budget.
-            prior
-                .installed_module_ids
-                .retain(|id| id != "townlight_data" && id != "townlight_budget");
-            prior
-                .enabled_module_ids
-                .retain(|id| id != "townlight_data" && id != "townlight_budget");
+            // Rewind to a state that predates Data, Budget, and Grants.
+            prior.installed_module_ids.retain(|id| {
+                id != "townlight_data" && id != "townlight_budget" && id != "townlight_grants"
+            });
+            prior.enabled_module_ids.retain(|id| {
+                id != "townlight_data" && id != "townlight_budget" && id != "townlight_grants"
+            });
             // Simulate deliberate disable of Contracts and dependent Procurement.
             prior
                 .enabled_module_ids
@@ -1270,7 +1271,7 @@ mod tests {
 
             let current = module_selection_state().unwrap();
 
-            for module in ["townlight_data", "townlight_budget"] {
+            for module in ["townlight_data", "townlight_budget", "townlight_grants"] {
                 assert!(
                     current.installed_module_ids.iter().any(|id| id == module),
                     "{module} should be installed after migration"

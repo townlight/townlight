@@ -67,7 +67,8 @@
         "contracts",
         "procurement",
         "data",
-        "budget"
+        "budget",
+        "grants"
       ],
       "disabled": false,
       "development_only": false
@@ -204,7 +205,8 @@
     "contracts",
     "procurement",
     "data",
-    "budget"
+    "budget",
+    "grants"
   ],
   "modules": {
     "core": {
@@ -1034,6 +1036,60 @@
         "role": "Budget review, adoption and publication",
         "status": "windows_candidate_acceptance_pending",
         "source_commit": "180fa171f1ec511936fd5c7368d2c15988522b13"
+      }
+    },
+    "grants": {
+      "public_name": "Townlight Grants",
+      "public_slug": "grants",
+      "legacy": {
+        "technical_id": "townlight_grants",
+        "product_names": [
+          "Townlight Grants"
+        ],
+        "package_names": [
+          "townlight-grants"
+        ]
+      },
+      "repository": {
+        "name": "townlight/grants",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.3.0",
+        "released": null,
+        "installer": "0.3.0",
+        "public_status": null
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "budget",
+        "contracts",
+        "records"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "candidate",
+        "public_status_released_at": null
+      },
+      "installer": {
+        "tier": 3,
+        "role": "Grants review, awards and closeout",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "790892f620767a2fcaf6b8f072ff45df15a963c1"
       }
     }
   }
