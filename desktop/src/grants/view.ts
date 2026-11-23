@@ -11,7 +11,7 @@ export function createGrantsView(invoke: Invoke) {
   const hex = async (s: string) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, "0")).join("");
 
   function render() {
-    return `<section class="workflow-editor grants-view" data-grants-view><h2>Municipal Grants</h2><form data-create-grant><fieldset><legend>Create grant</legend><label>Title <input name="title" required></label><label>Funding area <input name="funding_area" required></label><label>Deadline <input name="deadline" type="date" required></label><label>Project name <input name="project_name" required></label><label>City need <textarea name="city_need" required></textarea></label><label>Budget revision ID <input name="budget_revision_id" required></label><label>Contract ID <input name="contract_id" required></label><label>Records request ID <input name="records_request_id" required></label><button>Create grant</button></fieldset></form><p role="status" aria-live="polite" data-status></p><table><caption>Grants</caption><thead><tr><th>Title</th><th>Stage</th><th>Assigned to</th><th>Report completed</th><th>Archived</th><th>Action</th></tr></thead><tbody data-grants-list></tbody></table><section data-grant-detail aria-live="polite"></section></section>`;
+    return `<section class="workflow-editor grants-view" data-grants-view><h2>Municipal Grants</h2><form data-create-grant><fieldset><legend>Create grant</legend><label>Title <input name="title" required></label><label>Funding area <input name="funding_area" required></label><label>Deadline <input name="deadline" type="date" required></label><label>Project name <input name="project_name" required></label><label>City need <textarea name="city_need" required></textarea></label><label>Budget revision <select name="budget_revision_id" required><option value="">Choose adopted budget</option></select></label><label>Contract <select name="contract_id" required><option value="">Choose signed contract</option></select></label><label>Records request <select name="records_request_id" required><option value="">Choose Records request</option></select></label><button>Create grant</button></fieldset></form><p role="status" aria-live="polite" data-status></p><table><caption>Grants</caption><thead><tr><th>Title</th><th>Stage</th><th>Assigned to</th><th>Report completed</th><th>Archived</th><th>Action</th></tr></thead><tbody data-grants-list></tbody></table><section data-grant-detail aria-live="polite"></section></section>`;
   }
 
   async function bind() {
@@ -22,6 +22,28 @@ export function createGrantsView(invoke: Invoke) {
     const detail = root.querySelector<HTMLElement>("[data-grant-detail]")!;
     const createForm = root.querySelector<HTMLFormElement>("[data-create-grant]")!;
     const setStatus = (m: string, tone = "info") => { status.textContent = m; status.dataset.tone = tone; };
+    const budgetSel = createForm.elements.namedItem("budget_revision_id") as HTMLSelectElement;
+    const contractSel = createForm.elements.namedItem("contract_id") as HTMLSelectElement;
+    const recordsSel = createForm.elements.namedItem("records_request_id") as HTMLSelectElement;
+    try {
+      const budgets = (await call("budget")) as Array<{ id: string; adopted_at?: string | null; fiscal_year?: number | string | null }>;
+      for (const b of budgets) if (b.adopted_at) {
+        budgetSel.add(new Option(`FY ${b.fiscal_year ?? "FY?"} — ${String(b.id).slice(0, 8)}`, b.id));
+      }
+    } catch (e) { setStatus(err(e), "error"); }
+    try {
+      const contracts = (await call("contracts")) as Array<{ id: string; status?: string; title?: string; vendor_name?: string | null }>;
+      for (const c of contracts) if (c.status === "signed") {
+        contractSel.add(new Option(`${c.title ?? "Contract"}${c.vendor_name ? " — " + c.vendor_name : ""}`, c.id));
+      }
+    } catch (e) { setStatus(err(e), "error"); }
+    try {
+      const rv = await invoke("records_domain_request", { request: { operation: "state" } });
+      const rlist = ((rv && rv.records_requests) || []) as Array<{ request_id?: string; id?: string; public_tracking_number?: string | null }>;
+      for (const r of rlist) if (r.request_id) {
+        recordsSel.add(new Option(r.public_tracking_number || r.id || r.request_id, r.request_id));
+      }
+    } catch (e) { setStatus(err(e), "error"); }
     let assignees: Assignee[] = [];
     try { assignees = (await call("grant-assignees")) as Assignee[]; } catch { assignees = []; }
     const assigneeName = (id?: string | null) => id ? assignees.find(a => a.id === id)?.full_name ?? id : "Unassigned";

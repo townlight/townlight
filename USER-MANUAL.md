@@ -524,7 +524,7 @@ Budget is available in the Windows candidate. The public download is version 1.9
 
 ## Townlight Grants (Windows candidate)
 
-1. In Staff > Grants, enter the opportunity title, funding area, deadline, project name and city need. Use the IDs from the adopted Budget revision, signed Contract and saved Records request. Confirm all three before creating the case.
+1. In Staff > Grants, enter the opportunity title, funding area, deadline, project name and city need. Select the adopted Budget revision, signed Contract and saved Records request from the lists. Confirm all three before creating the case.
 2. Open the case and save an assignment to an active named city staff member or local administrator. Read the triage, eligibility factors and application outline as staff workpapers.
 3. Record the review note. After the city confirms the award, record the award reference, amount in cents, report due date and reporting frequency. Check the generated calendar against the signed award.
 4. Save the report completion note, close the case and select **Download verified archive**. Reopen the case to retrieve the same SHA-256-verified JSON and check the three source references.
