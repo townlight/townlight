@@ -17,6 +17,10 @@ export async function stationRecorder({native, save, admin, longCapture = false,
   assert.equal(pairing.configured,true,'Normal first-run did not configure Station');
   assert.equal((await native('station_action',{action:'status',selectedDirectory:null})).ready,true);
   const data=pairing.data_directory;
+  if (process.env.TOWNLIGHT_TEST_DATA_ROOT) {
+    const expected = path.resolve(process.env.TOWNLIGHT_TEST_DATA_ROOT, 'station');
+    assert.equal(path.resolve(data).toLowerCase(), expected.toLowerCase(), `data_directory ${data} != ${expected}`);
+  }
   const payload=payloadRoot || path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
   const proof=()=>readFile(path.join(profile,'config/local-session.json'),'utf8').then(x=>JSON.parse(x).session_hash);
   const request=async(origin,url,body)=>{
@@ -26,7 +30,11 @@ export async function stationRecorder({native, save, admin, longCapture = false,
   };
   const suite='http://127.0.0.1:15480',station='http://127.0.0.1:8756';
   const capacity=await request(station,'/operator/storage');
-  assert.equal(capacity.max_seconds,28800); assert.equal(capacity.max_bytes,64*1024**3); assert(capacity.ready);
+  await save('station-storage-capacity',capacity);
+  const capacitySnapshot=JSON.stringify(capacity);
+  assert.equal(capacity.max_seconds,28800,`max_seconds changed: ${capacitySnapshot}`);
+  assert.equal(capacity.max_bytes,64*1024**3,`max_bytes changed: ${capacitySnapshot}`);
+  assert(capacity.ready,`ready changed: ${capacitySnapshot}`);
   await writeFile(path.join(data,'live-sources.json'),JSON.stringify([{id:'installed-fixture',label:'Synthetic installed chamber',kind:'udp-mpegts',address:'127.0.0.1',port:18760}]));
   const meeting=meetingId ? await request(suite,`/desktop/v1/meetings/meetings/${meetingId}`) :
     await request(suite,'/desktop/v1/meetings/meetings',{title:'Synthetic installed recorder acceptance',scheduled_start:'2026-11-20T18:00:00-07:00',location:'Synthetic chamber',meeting_type:'regular'});
