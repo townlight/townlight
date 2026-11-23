@@ -17,6 +17,8 @@ const MUNICIPAL_MODULES: &[&str] = &[
     "townlight_boards",
     "townlight_contracts",
     "townlight_procurement",
+    "townlight_data",
+    "townlight_budget",
 ];
 
 #[derive(Deserialize)]
@@ -828,28 +830,36 @@ pub fn module_selection_state() -> Result<ModuleSelectionState, String> {
     };
     if selection.profile_id == "inspections-preview" {
         let profile = profile_by_id(&registry, &selection.profile_id)?;
-        let prior: HashSet<_> = profile
+        let prior_base: HashSet<_> = profile
             .modules
             .iter()
             .filter(|id| !MUNICIPAL_MODULES.contains(&id.as_str()))
             .collect();
-        let installed: HashSet<_> = selection.installed_module_ids.iter().collect();
-        if prior == installed {
+        let installed_base: HashSet<_> = selection
+            .installed_module_ids
+            .iter()
+            .filter(|id| !MUNICIPAL_MODULES.contains(&id.as_str()))
+            .collect();
+        if prior_base == installed_base {
             normalize_enabled_modules(&registry, &mut selection)?;
-            for id in MUNICIPAL_MODULES {
-                selection.installed_module_ids.push((*id).to_string());
-                selection
-                    .disabled_module_ids
-                    .retain(|disabled| disabled != id);
-                if *id != "townlight_boards"
-                    || selection
-                        .enabled_module_ids
-                        .iter()
-                        .any(|enabled| enabled == "townlight_meetings")
-                {
-                    selection.enabled_module_ids.push((*id).to_string());
+            let index = module_index(&registry);
+            for id in &profile.modules {
+                if !MUNICIPAL_MODULES.contains(&id.as_str()) {
+                    continue;
+                }
+                if selection.installed_module_ids.contains(id) {
+                    continue;
+                }
+                selection.installed_module_ids.push(id.clone());
+                selection.disabled_module_ids.retain(|d| d != id);
+                let deps_enabled = index[id.as_str()]
+                    .dependencies
+                    .iter()
+                    .all(|dep| selection.enabled_module_ids.iter().any(|e| e == dep));
+                if deps_enabled {
+                    selection.enabled_module_ids.push(id.clone());
                 } else {
-                    selection.disabled_module_ids.push((*id).to_string());
+                    selection.disabled_module_ids.push(id.clone());
                 }
             }
         }
@@ -1232,6 +1242,67 @@ mod tests {
                 .enabled_module_ids
                 .iter()
                 .any(|item| item == "townlight_meetings"));
+        });
+    }
+
+    #[test]
+    fn migration_adds_data_and_budget_disabled_while_preserving_prior_disables() {
+        with_temp_state_dir(|_| {
+            let mut prior = persist_profile_selection("inspections-preview").unwrap();
+            // Rewind to a state that predates Data and Budget.
+            prior
+                .installed_module_ids
+                .retain(|id| id != "townlight_data" && id != "townlight_budget");
+            prior
+                .enabled_module_ids
+                .retain(|id| id != "townlight_data" && id != "townlight_budget");
+            // Simulate deliberate disable of Contracts and dependent Procurement.
+            prior
+                .enabled_module_ids
+                .retain(|id| id != "townlight_contracts" && id != "townlight_procurement");
+            prior
+                .disabled_module_ids
+                .push("townlight_contracts".to_string());
+            prior
+                .disabled_module_ids
+                .push("townlight_procurement".to_string());
+            write_selection(&prior).unwrap();
+
+            let current = module_selection_state().unwrap();
+
+            for module in ["townlight_data", "townlight_budget"] {
+                assert!(
+                    current.installed_module_ids.iter().any(|id| id == module),
+                    "{module} should be installed after migration"
+                );
+                assert!(
+                    current.disabled_module_ids.iter().any(|id| id == module),
+                    "{module} should be disabled after migration"
+                );
+                assert!(
+                    !current.enabled_module_ids.iter().any(|id| id == module),
+                    "{module} should not be auto-enabled"
+                );
+            }
+
+            for module in ["townlight_contracts", "townlight_procurement"] {
+                assert!(
+                    current.disabled_module_ids.iter().any(|id| id == module),
+                    "prior-disabled {module} should remain disabled"
+                );
+                assert!(
+                    !current.enabled_module_ids.iter().any(|id| id == module),
+                    "prior-disabled {module} should not be re-enabled"
+                );
+            }
+
+            assert!(
+                current
+                    .enabled_module_ids
+                    .iter()
+                    .any(|id| id == "townlight_meetings"),
+                "Meetings should remain enabled"
+            );
         });
     }
 

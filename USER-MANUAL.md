@@ -497,3 +497,26 @@ See [the Station manual delivery section](https://townlight.github.io/manuals/st
 The resident portal is deployed separately. See the [Townlight Portal Guide](https://townlight.github.io/manuals/portal.html) for its workflow and acceptance limits.
 
 </div>
+
+## Townlight Data (Windows candidate)
+
+1. Open Staff > Data with Contracts grant.
+2. Select signed agreements; preview contract ID, title, vendor name, start and expiration. Staff notes, renewal fields and signed attachments are excluded.
+3. Local admin reviews and checks confirmation, then Publish to queue.
+4. Refresh to see acknowledged/delivered status.
+5. The app retries while the configured portal is unavailable.
+6. Visit `/datasets/` at the configured portal for CSV, JSON and dictionary.
+7. To correct, prepare and publish a new revision. To take offline, confirm Withdraw and wait for delivery.
+
+Applies to the candidate; 1.9.2.1 does not include it.
+
+## Townlight Budget (Windows candidate)
+
+1. In Staff > Budget, enter fiscal year and use **Import budget CSV** with header `department,account_code,description,prior_year_amount,proposed_amount` and dollar amounts such as `1234.56`. Correct any row errors and reimport. An invalid file creates no revision.
+2. Select the saved revision, verify totals, and **Save finance review** using a named staff account with Budget access.
+3. **Download hearing attachment** to create `budget-revision.txt`. In Meetings, open the saved hearing, assign the agenda item, include that exact attachment as a public candidate, preview, and approve the public packet.
+4. In **Capture a motion**, supply hearing meeting ID and agenda item ID. Record the council roll-call vote.
+5. As a clerk or local administrator, select the saved evidence in Budget and record the carried result and resident summary.
+6. With a configured publisher, a local administrator selects **Queue adopted budget for publication** and checks the public Portal Datasets view for the CSV and summary.
+
+Budget is available in the Windows candidate. The public download is version 1.9.2.1.

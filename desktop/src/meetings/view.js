@@ -251,6 +251,7 @@ export function createMeetingsView(invoke, navigate = () => {}, openImportDraft 
           <label>Meeting ID <input name="id" required></label>
           <label>Motion text <textarea name="text" required></textarea></label>
           <label>Seconded by <input name="seconded_by"></label>
+          <label>Agenda item ID (optional; blank leaves motion unlinked) <input name="agenda_item_id"></label>
           <button type="submit">Capture motion</button></form>
         <form data-meetings-action="captureVote"><h3>Capture a vote</h3>
           <label>Motion ID <input name="id" required></label>

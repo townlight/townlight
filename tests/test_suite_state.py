@@ -23,11 +23,15 @@ def test_committed_state_and_legacy_projections_pass() -> None:
     assert suite_state.validate_all() == []
 
 
-def test_catalog_has_14_kept_townlight_modules_with_unique_technical_ids() -> None:
+def test_catalog_has_16_kept_townlight_modules_with_unique_technical_ids() -> None:
     state = _load(suite_state.STATE_PATH)
     modules = state["modules"]
     assert isinstance(modules, dict)
-    assert len(modules) == 14
+    assert len(modules) == 16
+    assert modules["data"]["maturity"]["state"] == "candidate"
+    assert modules["data"]["versions"]["public_status"] is None
+    assert modules["budget"]["maturity"]["state"] == "candidate"
+    assert modules["budget"]["versions"]["public_status"] is None
     assert "station" in modules
     assert set(state["module_order"]) == set(modules)
     assert all(

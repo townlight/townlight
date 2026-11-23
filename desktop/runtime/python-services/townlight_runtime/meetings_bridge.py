@@ -402,6 +402,7 @@ class MotionInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     text: str = Field(min_length=1)
     seconded_by: str | None = Field(default=None, min_length=1)
+    agenda_item_id: UUID | None = None
 
 
 class MotionCorrection(BaseModel):
@@ -847,8 +848,13 @@ def legal_record(repository, operation):
 @router.post("/meetings/{meeting_id}/motions", status_code=201)
 def capture_motion(meeting_id: UUID, data: MotionInput, actor_id: str = Depends(actor)):
     operate("meeting", lambda store: store.get(str(meeting_id)))
+    if data.agenda_item_id is not None:
+        item = operate("agenda", lambda store: store.get(str(data.agenda_item_id)))
+        if str(item.get("meeting_id")) != str(meeting_id):
+            raise HTTPException(422, "Assign the agenda item to this meeting before capturing the motion.")
     return legal_record(MotionVoteRepository, lambda store: store.capture_motion(
-        meeting_id=str(meeting_id), text=data.text, seconded_by=data.seconded_by, actor=actor_id))
+        meeting_id=str(meeting_id), text=data.text, seconded_by=data.seconded_by, actor=actor_id,
+        agenda_item_id=str(data.agenda_item_id) if data.agenda_item_id else None))
 
 
 @router.post("/motions/{motion_id}/corrections", status_code=201)

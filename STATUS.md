@@ -36,7 +36,7 @@ Status labels below are the suite's shared status set, generated from
 - **Candidate — installed acceptance pending:** Prepared software; completion and publication require the recorded exact-candidate acceptance.
 - **Published beta capability:** Available in a published bounded Townlight desktop beta or recorded standalone release; select the documented profile and read its limits.
 
-## Module Status (14 kept modules)
+## Module Status (16 kept modules)
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
@@ -54,6 +54,8 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Boards & Commissions | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Contracts | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Procurement | 0.3.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
+| Townlight Data | — | Candidate — installed acceptance pending | — | Staff-reviewed signed Contracts datasets. Windows candidate, absent from the 1.9.2.1 MSI. |
+| Townlight Budget | — | Candidate — installed acceptance pending | — | Finance-reviewed budget revisions with hearing, adoption and resident publication. Windows candidate, absent from the 1.9.2.1 MSI. |
 
 <!-- END GENERATED MODULE STATUS -->
 

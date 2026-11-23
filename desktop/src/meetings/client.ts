@@ -167,8 +167,8 @@ export function createMeetingsClient(invoke: Invoke) {
       const {title, department_name} = data;
       return invoke("meetings_domain_request", {request: {operation: "create-agenda-item", payload: {title, department_name}}});
     },
-    captureMotion(id: string, data: {text: string; seconded_by?: string}) {
-      return invoke("meetings_domain_request", {request: {operation: "capture-motion", id, payload: {text: data.text, seconded_by: data.seconded_by || null}}});
+    captureMotion(id: string, data: {text: string; seconded_by?: string; agenda_item_id?: string}) {
+      return invoke("meetings_domain_request", {request: {operation: "capture-motion", id, payload: {text: data.text, seconded_by: data.seconded_by || null, agenda_item_id: data.agenda_item_id || null}}});
     },
     correctMotion(id: string, data: {text: string; reason: string}) {
       return invoke("meetings_domain_request", {request: {operation: "correct-motion", id, payload: {text: data.text, reason: data.reason}}});

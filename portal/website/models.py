@@ -123,3 +123,17 @@ class PublicationCursor(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=("meeting_id", "kind"), name="unique_publication_stream")]
+
+
+from django.db import models
+import uuid
+
+class DatasetPublication(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=400)
+    sequence = models.PositiveBigIntegerField(default=0)
+    digest = models.CharField(max_length=64)
+    artifact_sha256 = models.CharField(max_length=64, blank=True)
+
+    class Meta:
+        ordering = ("title", "id")

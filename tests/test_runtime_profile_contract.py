@@ -284,3 +284,11 @@ def test_public_code_missing_refusal(monkeypatch):
     result = p.public_citation("9.99")
     assert result["status"] == "refused"
     assert "RESTRICTED" not in str(result)
+
+
+def test_required_module_imports_runtime_enablement():
+    preview = dict(services._required_module_imports("inspections-preview"))
+    assert preview.get("townlight_budget") == "townlight_budget.adoption"
+
+    beta = dict(services._required_module_imports("records-beta"))
+    assert "townlight_budget" not in beta

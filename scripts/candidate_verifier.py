@@ -50,7 +50,7 @@ def verify_pinned_metadata(state, read_file):
             for field in ("development", "installer"):
                 if data["version"] != module["versions"][field]:
                     errors.append(f"{key}: pinned package version {data['version']} differs from {field} {module['versions'][field]}")
-            if module["versions"]["public_status"] != data["version"]:
+            if module["versions"]["public_status"] is not None and module["versions"]["public_status"] != data["version"]:
                 # An unpublished installer can advance without changing what the
                 # existing public MSI shipped. Verify that claim at its own pin.
                 if published_modules is None:
@@ -170,7 +170,7 @@ def verify_documentation(state, read_file):
     errors = []
     version_field = "public_status" if state["desktop_release"].get("channel") == "public-beta" else "installer"
     all_packages = [(module["legacy"]["package_names"][0], module["versions"][version_field])
-                    for module in state["modules"].values()]
+                    for module in state["modules"].values() if module["versions"][version_field] is not None]
     all_packages.append(("townlight-runtime", state["desktop_release"]["runtime_version"]))
     meetings = state["modules"]["meetings"]
     for name, expected in [("versions.html", all_packages), ("manuals/suite.html", all_packages),

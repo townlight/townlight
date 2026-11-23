@@ -188,14 +188,14 @@
       "items": {
         "$ref": "#/$defs/moduleId"
       },
-      "minItems": 14,
-      "maxItems": 14,
+      "minItems": 16,
+      "maxItems": 16,
       "uniqueItems": true
     },
     "modules": {
       "type": "object",
-      "minProperties": 14,
-      "maxProperties": 14,
+      "minProperties": 16,
+      "maxProperties": 16,
       "propertyNames": {
         "$ref": "#/$defs/moduleId"
       },

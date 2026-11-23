@@ -15,7 +15,7 @@ $CombinedContract = Get-Content (Join-Path $RepoRoot 'config/inspections-msi-can
 $Modules = Get-Content (Join-Path $RepoRoot 'installer/modules.json') -Raw | ConvertFrom-Json
 $Selected = $RequestedProfile
 if ($Selected -eq 'automatic') {
-    $Selected = if ($SourceBranch -eq $CombinedContract.source_branch -or $SourceBranch -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'main')) { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
+    $Selected = if ($SourceBranch -eq $CombinedContract.source_branch -or $SourceBranch -in @('inspections/connected-workflow', 'release/townlight-beta-1', 'windows/budget-adoption', 'main')) { 'inspections-preview' } elseif ($SourceBranch -in @('permitting/connected-workflow', 'release/permitting-1-6-0-signing')) { 'permitting-preview' } elseif ($SourceBranch -eq $BetaContract.source_branch) { 'planning-staff-beta' } elseif ($SourceBranch -eq $Contract.source_branch) { 'planning-preview' } else { 'zoning-beta' }
 }
 $RecordsRef = ($Modules.modules | Where-Object { $_.id -eq 'townlight_records' }).source_commit
 if ($RecordsRef -notmatch '^[0-9a-f]{40}$') { throw 'Default Records source requires an exact module-manifest pin.' }
@@ -26,6 +26,8 @@ $StationRef = ''
 $BoardsRef = ''
 $ContractsRef = ''
 $ProcurementRef = ''
+$DataRef = ''
+$BudgetRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -74,12 +76,14 @@ if ($Selected -eq 'inspections-preview') {
     $BoardsRef = $Build.Pins.sources.'townlight/boards'
     $ContractsRef = $Build.Pins.sources.'townlight/contracts'
     $ProcurementRef = $Build.Pins.sources.'townlight/procure'
+    $DataRef = $Build.Pins.sources.'townlight/data'
+    $BudgetRef = $Build.Pins.sources.'townlight/budget'
     $RuntimeProfile = 'inspections-preview'
     $PlanningContract = $Build.ContractPath
     $DesktopVersion = $Build.Contract.desktop_version
     $TauriArgs = '--config src-tauri/tauri.inspections-candidate.conf.json'
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; budget_ref=$BudgetRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }
