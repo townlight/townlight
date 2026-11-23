@@ -53,6 +53,7 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
             "townlight_boards", "townlight_contracts", "townlight_procurement",
         ))
         imports.append(("townlight_data", "townlight_data.public_dataset"))
+        imports.append(("townlight_budget", "townlight_budget.adoption"))
     return imports
 
 
