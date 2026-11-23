@@ -98,6 +98,49 @@ try {
   Install-Candidate $MsiPath ('candidate-'+$candidateVersion)
   $registered=@(Product-Registration)
   if ($registered.Count -ne 1 -or $registered[0].DisplayVersion -ne $candidateVersion) { throw 'Candidate registration/version or upgrade replacement failed.' }
+
+  if ($Mode -eq 'station-long' -and $env:TOWNLIGHT_TEST_DATA_ROOT) {
+    # Keep PostgreSQL on the default filesystem; only recorded media uses the larger drive.
+
+    $dataParent  = Join-Path $profile 'Data'
+    $stationLink = Join-Path $dataParent 'station'
+    if (Test-Path -LiteralPath $stationLink) {
+        throw "Refusing to touch existing station directory: $stationLink"
+    }
+
+    $target = $env:TOWNLIGHT_TEST_DATA_ROOT
+    New-Item -ItemType Directory -Path $target -Force     | Out-Null
+    New-Item -ItemType Directory -Path $dataParent -Force | Out-Null
+
+    New-Item -ItemType Junction -Path $stationLink -Target $target | Out-Null
+
+
+    $py = Join-Path $env:ProgramFiles 'Townlight\_up_\runtime\payload\python\python.exe'
+    if (-not (Test-Path -LiteralPath $py)) { throw "Bundled python missing: $py" }
+
+    $probe  = Join-Path $EvidenceRoot 'station-long-disk-probe.json'
+    $pyCode = @"
+import json, os, shutil
+target  = os.environ['TOWNLIGHT_TEST_DATA_ROOT']
+station = r'''$stationLink'''
+out = {
+    'target': target,
+    'target_disk_usage': shutil.disk_usage(target)._asdict(),
+    'junction_path': station,
+    'junction_disk_usage': shutil.disk_usage(station)._asdict(),
+}
+with open(r'''$probe''', 'w', encoding='utf-8') as f:
+    json.dump(out, f, indent=2)
+"@
+    & $py -c $pyCode
+    if ($LASTEXITCODE -ne 0) { throw "Python disk probe failed: $LASTEXITCODE" }
+
+    $data = Get-Content -LiteralPath $probe -Raw | ConvertFrom-Json
+    if ($data.junction_disk_usage.total -ne $data.target_disk_usage.total) {
+        throw "Station path does not report the recording volume capacity"
+    }
+}
+
   Run-Installed $Mode
   foreach ($entry in $retained) {
     if ((Get-FileHash -LiteralPath (Join-Path $profile $entry.path) -Algorithm SHA256).Hash -ne $entry.sha256) { throw "Upgrade changed retained $($entry.path)" }

@@ -48,10 +48,6 @@ try {
     assert.equal(state.first_run.finished,true,'Upgrade lost completed setup');
     await save('upgrade-app-state',state);
   } else {
-    if (mode === 'station-long') {
-      assert(process.env.TOWNLIGHT_TEST_DATA_ROOT, 'TOWNLIGHT_TEST_DATA_ROOT must be set in station-long mode');
-      await page.evaluate(root => { window.__auditDataRoot = root; }, process.env.TOWNLIGHT_TEST_DATA_ROOT);
-    }
     const setup=await run('setup.js');
     assert(setup.final.first_run.finished, 'Installed first-run incomplete');
     await save(mode+'-setup',setup);

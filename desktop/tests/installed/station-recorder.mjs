@@ -1,6 +1,6 @@
 // Exact installed candidate. Synthetic network chamber feed; no camera is assumed on CI.
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, realpath, writeFile } from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {spawn,execFile} from 'node:child_process';
@@ -18,8 +18,9 @@ export async function stationRecorder({native, save, admin, longCapture = false,
   assert.equal((await native('station_action',{action:'status',selectedDirectory:null})).ready,true);
   const data=pairing.data_directory;
   if (process.env.TOWNLIGHT_TEST_DATA_ROOT) {
-    const expected = path.resolve(process.env.TOWNLIGHT_TEST_DATA_ROOT, 'station');
-    assert.equal(path.resolve(data).toLowerCase(), expected.toLowerCase(), `data_directory ${data} != ${expected}`);
+    const expected = await realpath(process.env.TOWNLIGHT_TEST_DATA_ROOT);
+    assert.equal((await realpath(data)).toLowerCase(), expected.toLowerCase());
+    await save('station-recording-volume',{data_directory:data,resolved_directory:expected});
   }
   const payload=payloadRoot || path.join(process.env.ProgramFiles,'Townlight','_up_','runtime','payload');
   const proof=()=>readFile(path.join(profile,'config/local-session.json'),'utf8').then(x=>JSON.parse(x).session_hash);
