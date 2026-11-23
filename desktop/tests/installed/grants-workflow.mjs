@@ -20,7 +20,7 @@ export async function installedGrants({ page, native }) {
       }
     }
   });
-  const recordsRequestId = records.request_id;
+  const recordsRequestId = records.request_id || records.id;
   assert(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(recordsRequestId), 'records request_id');
 
   const title = `Grants fixture ${randomUUID()}`;
