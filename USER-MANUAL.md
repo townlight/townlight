@@ -1,3 +1,9 @@
+## Windows 1.9.3.1 current release
+
+Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+
 ## Windows 1.9.2.1 shared staff release
 
 Windows 1.9.2.1 adds shared Meetings and Records use from a Windows workstation through the city host, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal.
@@ -75,7 +81,7 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
 
-Earlier installed workflow evidence used Records 1.8.0.dev2; the current MSI includes Records 1.8.0.dev4. The release acceptance summary and corresponding-source archive identify the exact packaged component sources, artifact hashes and installed evidence for Windows 1.9.2.1.
+Earlier installed workflow evidence used Records 1.8.0.dev2; the previous MSI includes Records 1.8.0.dev4. The release acceptance summary and corresponding-source archive identify the exact packaged component sources, artifact hashes and installed evidence for Windows 1.9.2.1.
 
 
 > **Windows 1.9.2.1 acceptance.** See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
@@ -140,7 +146,7 @@ Run the signed Windows 1.9.2.1 MSI and use an empty database and a new Townlight
 
 ### Existing installation
 
-**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier [1.9.1.1 acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) remains attached to that historical release; see the [current acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
+**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier [1.9.1.1 acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) remains attached to that historical release; see the [previous acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
 
 ## Daily workflow
 
@@ -180,7 +186,7 @@ Core provides shared contracts, named account/session support, ingestion/task he
 
 ### Shared Windows staff and approved portal publication — Windows 1.9.2.1 release
 
-The signed Windows 1.9.2.1 release adds a city-hosted shared mode: named Windows workstations use Meetings and Records through the city's private HTTPS endpoint, while the host owns the database, managed files and Station capture. Townlight Clerk and Records Staff remain separate named roles; existing City Staff and Local Admin retain only the actions their current permissions allow, and Code Staff gains no Meetings or Records authority. On a workstation, clerks can prepare council packets and send a reviewed correction; the host verifies copied files and records the operator. Station capture and administration remain on the host.
+The signed Windows 1.9.2.1 release adds a city-hosted shared mode: named Windows workstations use Meetings and Records through the city's private HTTPS endpoint, while the host owns the database, managed files and Station capture. Townlight Clerk and Records Staff remain separate named roles; existing City Staff and Local Admin retain only the actions their previous permissions allow, and Code Staff gains no Meetings or Records authority. On a workstation, clerks can prepare council packets and send a reviewed correction; the host verifies copied files and records the operator. Station capture and administration remain on the host.
 
 Fulfilling a Records request does not publish its contents. Staff must separately review and approve the exact council packet revision or eligible Records release copy for the portal. The shared host queues approved actions, retries after sign-out, outage or restart, and reports the confirmed status in Meetings. A packet correction replaces that packet only; packet and recording withdrawals are separate. This shared-host workflow and unattended publisher are included in the public Windows 1.9.2.1 release. Read the [Windows 1.9.2.1 staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html), [shared staff guide at the signed source commit](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md), and [Portal guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/portal/guide.md). Acceptance used synthetic data and a test portal on the physical host with a clean Windows Sandbox guest on the same PC; it does not establish two physical PCs, a different computer or account, or a production portal or city network.
 

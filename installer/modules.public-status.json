@@ -243,42 +243,42 @@
       "id": "townlight_data",
       "name": "Townlight Data",
       "arch_tier": 3,
-      "current_version": null,
+      "current_version": "0.2.0",
       "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "candidate",
-        "released_date": null,
-        "release_url_state": "candidate",
-        "release_url": null,
-        "note": "Staff-reviewed signed Contracts datasets. Windows candidate, absent from the 1.9.2.1 MSI."
+        "grade": "released",
+        "released_date": "2026-11-23",
+        "release_url_state": "released",
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1",
+        "note": "Included in Windows beta with acceptance scope; no standalone artifact."
       }
     },
     {
       "id": "townlight_budget",
       "name": "Townlight Budget",
       "arch_tier": 3,
-      "current_version": null,
+      "current_version": "0.2.0",
       "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "candidate",
-        "released_date": null,
-        "release_url_state": "candidate",
-        "release_url": null,
-        "note": "Finance-reviewed budget revisions with hearing, adoption and resident publication. Windows candidate, absent from the 1.9.2.1 MSI."
+        "grade": "released",
+        "released_date": "2026-11-23",
+        "release_url_state": "released",
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1",
+        "note": "Included in Windows beta with acceptance scope; no standalone artifact."
       }
     },
     {
       "id": "townlight_grants",
       "name": "Townlight Grants",
       "arch_tier": 3,
-      "current_version": null,
+      "current_version": "0.3.0",
       "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
-        "grade": "candidate",
-        "released_date": null,
-        "release_url_state": "candidate",
-        "release_url": null,
-        "note": "Staff-reviewed Grants data with review and award handoff. Windows candidate, absent from the 1.9.2.1 MSI."
+        "grade": "released",
+        "released_date": "2026-11-23",
+        "release_url_state": "released",
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1",
+        "note": "Included in Windows beta with acceptance scope; no standalone artifact."
       }
     }
   ]

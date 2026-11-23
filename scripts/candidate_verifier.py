@@ -82,8 +82,25 @@ def verify_pinned_metadata(state, read_file):
         metadata = json.loads(read_file("townlight/townlight", desktop["commit"], "desktop/package.json"))
         native = tomllib.loads(read_file("townlight/townlight", desktop["commit"], "desktop/src-tauri/Cargo.toml").decode())
         runtime = tomllib.loads(read_file("townlight/townlight", desktop["commit"], "desktop/runtime/python-services/pyproject.toml").decode())["project"]
-        if metadata["version"] != desktop["version"] or native["package"]["version"] != desktop["version"]:
-            errors.append("desktop: pinned browser/native version differs from candidate")
+        base_version = metadata["version"]
+        if base_version != native["package"]["version"]:
+            errors.append("desktop: pinned browser/native versions disagree")
+        elif base_version != desktop["version"]:
+            if desktop.get("channel") != "public-beta" or desktop.get("asset_policy") != "windows-msi":
+                errors.append("desktop: pinned browser/native version differs from candidate")
+            else:
+                commit = desktop["commit"]
+                repository = "townlight/townlight"
+                contract = json.loads(read_file(repository, commit, "config/inspections-msi-candidate.json"))
+                overlay = json.loads(read_file(repository, commit, "desktop/" + contract["tauri_config"]))
+                version = desktop["version"]
+                msi_version = version.replace("-", ".")
+                if (contract["profile"] != "inspections-preview"
+                        or contract["desktop_version"] != version
+                        or overlay["version"] != version
+                        or contract["windows_product_version"] != msi_version
+                        or desktop["tag"] != "townlight-windows-v" + msi_version):
+                    errors.append("desktop: pinned Windows overlay differs from published release")
         if runtime["name"] != "townlight-runtime" or runtime["version"] != desktop["runtime_version"]:
             errors.append("runtime: pinned distribution/version differs from candidate")
     except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:

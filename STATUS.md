@@ -1,8 +1,14 @@
 # Townlight Windows beta status
 
+## Windows 1.9.3.1 current release
+
+Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+
 ## Windows 1.9.2.1 · Shared staff and approved portal publication
 
-The current signed MSI adds shared Windows host/workstation workflows for Meetings and Records, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal. [Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
+The previous signed MSI adds shared Windows host/workstation workflows for Meetings and Records, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal. [Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
 
 Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
 
@@ -54,9 +60,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Boards & Commissions | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Contracts | 0.2.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Procurement | 0.3.1 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
-| Townlight Data | — | Candidate — installed acceptance pending | — | Staff-reviewed signed Contracts datasets. Windows candidate, absent from the 1.9.2.1 MSI. |
-| Townlight Budget | — | Candidate — installed acceptance pending | — | Finance-reviewed budget revisions with hearing, adoption and resident publication. Windows candidate, absent from the 1.9.2.1 MSI. |
-| Townlight Grants | — | Candidate — installed acceptance pending | — | Staff-reviewed Grants data with review and award handoff. Windows candidate, absent from the 1.9.2.1 MSI. |
+| Townlight Data | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
+| Townlight Budget | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
+| Townlight Grants | 0.3.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
 
 <!-- END GENERATED MODULE STATUS -->
 

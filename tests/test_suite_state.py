@@ -29,11 +29,11 @@ def test_catalog_has_17_kept_townlight_modules_with_unique_technical_ids() -> No
     assert isinstance(modules, dict)
     assert len(modules) == 17
     assert modules["data"]["maturity"]["state"] == "candidate"
-    assert modules["data"]["versions"]["public_status"] is None
+    assert modules["data"]["versions"]["public_status"] == "0.2.0"
     assert modules["budget"]["maturity"]["state"] == "candidate"
-    assert modules["budget"]["versions"]["public_status"] is None
+    assert modules["budget"]["versions"]["public_status"] == "0.2.0"
     assert modules["grants"]["maturity"]["state"] == "candidate"
-    assert modules["grants"]["versions"]["public_status"] is None
+    assert modules["grants"]["versions"]["public_status"] == "0.3.0"
     assert "station" in modules
     assert set(state["module_order"]) == set(modules)
     assert all(
@@ -51,14 +51,17 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     assert records["status"] == "candidate"
     assert records["public_website_status"] == "prepared; unpublished candidate"
     release = state["desktop_release"]
-    assert release["version"] == "1.9.2-1"
-    assert release["tag"] == "townlight-windows-v1.9.2.1"
+    assert release["version"] == "1.9.3-1"
+    assert release["tag"] == "townlight-windows-v1.9.3.1"
     assert release["channel"] == "public-beta"
-    assert release["published_at"] == "2026-11-22"
+    assert release["published_at"] == "2026-11-23"
     assert release["runtime_version"] == "0.3.4"
-    assert release["commit"] == "1bc45be5a14aa969e53b87b1cef1f278dadc79a4"
-    handoff = ROOT / "release" / "CANDIDATE-Windows-1.9.2.1.md"
-    assert f"Suite commit `{release['commit']}`" in handoff.read_text(encoding="utf-8")
+    assert release["commit"] == "b6cb182eb72bafe0e9bdbcacf96ce756082e6b6c"
+    prior_handoff = ROOT / "release" / "CANDIDATE-Windows-1.9.2.1.md"
+    assert (
+        "Suite commit `1bc45be5a14aa969e53b87b1cef1f278dadc79a4`"
+        in prior_handoff.read_text(encoding="utf-8")
+    )
     assert state["profiles"]["records-beta"]["modules"] == records["modules"]
     assert state["modules"]["notice"]["dependencies"] == ["core"]
 

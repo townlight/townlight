@@ -88,14 +88,18 @@ def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> 
     contract = json.loads(_read(ROOT / "config/planning-msi-candidate.json"))
     overlay = json.loads(_read(ROOT / "desktop" / contract["tauri_config"]))
     base = json.loads(_read(ROOT / "desktop/src-tauri/tauri.conf.json"))
+    inspections_contract = json.loads(_read(ROOT / "config/inspections-msi-candidate.json"))
+    inspections_overlay = json.loads(
+        _read(ROOT / "desktop" / inspections_contract["tauri_config"])
+    )
     assert overlay == {"version": contract["desktop_version"]}
     assert tuple(map(int, contract["windows_product_version"].split("."))) > (1, 4, 0, 1)
     # The shared base composition used to be pinned to one frozen literal, so a
     # legitimate candidate metadata bump could only be satisfied by downgrading
     # the version or deleting the check. Pin the properties that actually have
-    # to hold instead: a WiX-compilable numeric version, one desktop identity
-    # across all four manifests, no regression below the published desktop
-    # release, and an overlay that states its own version.
+    # to hold instead: a WiX-compilable numeric version and one desktop identity
+    # across all four synchronized base manifests. The effective signed Windows
+    # version is supplied by the inspections-preview candidate overlay below.
     base_version = base["version"]
     assert re.fullmatch(r"\d+\.\d+\.\d+-\d+", base_version), (
         "Tauri base version must use the numeric MSI prerelease form X.Y.Z-N; "
@@ -118,9 +122,18 @@ def test_planning_msi_candidate_uses_the_same_overlay_for_build_and_bundle() -> 
     ), "Cargo.lock desktop package version drifted from tauri.conf.json"
     published = tuple(map(int, re.split(r"[.-]", json.loads(
         _read(ROOT / "config/suite-state.json"))["desktop_release"]["version"])))
-    base_product = tuple(map(int, base_version.replace("-", ".").split(".")))
-    assert base_product >= published, (
-        f"base desktop version {base_version} regresses the published desktop release identity"
+    assert inspections_overlay["version"] == inspections_contract["desktop_version"], (
+        "the published Windows inspections overlay must state the candidate desktop version"
+    )
+    inspections_effective = tuple(map(int, re.split(r"[.-]", inspections_contract["desktop_version"])))
+    assert inspections_effective >= published, (
+        f"effective Windows published version {inspections_contract['desktop_version']} "
+        "regresses the published desktop release identity"
+    )
+    assert tuple(
+        map(int, inspections_contract["windows_product_version"].split("."))
+    ) == inspections_effective, (
+        "Windows MSI ProductVersion must match the effective desktop version"
     )
     assert overlay["version"] != base_version, (
         "the Planning candidate overlay must state its own version, not inherit the base identity"
