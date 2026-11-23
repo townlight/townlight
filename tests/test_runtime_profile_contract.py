@@ -289,6 +289,8 @@ def test_public_code_missing_refusal(monkeypatch):
 def test_required_module_imports_runtime_enablement():
     preview = dict(services._required_module_imports("inspections-preview"))
     assert preview.get("townlight_budget") == "townlight_budget.adoption"
+    assert preview.get("townlight_grants") == "townlight_grants.grant_cases"
 
     beta = dict(services._required_module_imports("records-beta"))
     assert "townlight_budget" not in beta
+    assert "townlight_grants" not in beta

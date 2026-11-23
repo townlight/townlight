@@ -3,6 +3,7 @@ import "./styles.css";
 import { createMunicipalView } from "./municipal/view.js";
 import { createDataView } from "./data/view.ts";
 import { createBudgetView } from "./budget/view.ts";
+import { createGrantsView } from "./grants/view.ts";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
@@ -19,11 +20,12 @@ import { bindMeetingsSources } from "./records/meetings-sources.ts";
 import { bindCodeSources } from "./records/code-sources.ts";
 import { bindZoningSources } from "./records/zoning-sources.ts";
 
-const municipalAreas = ["boards", "contracts", "procurement", "data", "budget"];
+const municipalAreas = ["boards", "contracts", "procurement", "data", "budget", "grants"];
 const openHallIcon = new URL("../src-tauri/icons/icon.ico", import.meta.url).href;
 const municipalView = createMunicipalView(invoke, escapeHtml, openMunicipalLink);
 const dataView = createDataView(invoke, escapeHtml);
 const budgetView = createBudgetView(invoke);
+const grantsView = createGrantsView(invoke);
 let municipalRecord = null;
 
 function municipalAccess(area) {
@@ -100,7 +102,7 @@ const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
   "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning"],
   "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning"],
-  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget"],
+  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget", "townlight_grants"],
   "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting"]
 };
 const MODULE_AREA_BY_ID = {
@@ -116,6 +118,7 @@ const MODULE_AREA_BY_ID = {
   procurement: "townlight_procurement",
   data: "townlight_data",
   budget: "townlight_budget",
+  grants: "townlight_grants",
   notice: "townlight_notice",
   access: "townlight_access"
 };
@@ -5170,6 +5173,9 @@ function renderActiveArea() {
   } else if (state.activeArea === "budget") {
     return municipalAccess("budget") ? budgetView.render()
       : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
+  } else if (state.activeArea === "grants") {
+    return municipalAccess("grants") ? grantsView.render()
+      : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
   }
   if (municipalAreas.includes(state.activeArea)) {
     return municipalAccess(state.activeArea) ? municipalView.render(state.activeArea)
@@ -5352,6 +5358,8 @@ function bindEvents() {
     void dataView.bind(accessState().role === "local-admin");
   } else if (state.activeArea === "budget" && municipalAccess("budget")) {
     void budgetView.bind(accessState().role);
+  } else if (state.activeArea === "grants" && municipalAccess("grants")) {
+    void grantsView.bind(accessState().role);
   } else if (municipalAreas.includes(state.activeArea) && municipalAccess(state.activeArea)) {
     void municipalView.bind(state.activeArea, accessState().role === "local-admin", municipalRecord);
   }
