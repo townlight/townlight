@@ -7,7 +7,7 @@
      await a.click('[data-first-run-action="'+action+'"][data-step-id="'+id+'"]',{timeout:300000});
      await a.until(async()=>{const after=await get();return after.first_run.current_step_id!==id||after.first_run.finished;},300000);
    },async()=>{const after=await get();return after.first_run.current_step_id!==id||after.first_run.finished;});
-   rows.push(row);if(!row.pass)throw Error(id+' did not pass: '+row.error);
+   rows.push(row);if(!row.pass){const state=await get(),result=(document.querySelector(".action-result")?.innerText??'').slice(0,200);throw Error(id+' did not pass: '+row.error+'; step='+state.first_run.current_step_id+'; finished='+state.first_run.finished+'; result='+result);}
  };
  await a.nav('home');
  if((await get()).first_run.current_step_id==='locations')await step('locations','choose-location');
