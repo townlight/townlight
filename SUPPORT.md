@@ -1,8 +1,14 @@
 # Townlight Windows beta support
 
+## Windows 1.9.3.1 current release
+
+Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+
 ## Windows 1.9.2.1 shared staff release
 
-The current signed MSI supports shared Meetings and Records use from Windows workstations, reviewed council packet revisions, and queued delivery of separately approved material to a separately deployed portal. Review the [release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1), [signed MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi), and [acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
+The previous signed MSI supports shared Meetings and Records use from Windows workstations, reviewed council packet revisions, and queued delivery of separately approved material to a separately deployed portal. Review the [release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1), [signed MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi), and [acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
 
 Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
 
@@ -14,7 +20,7 @@ For install and recovery issues, back up city data and settings before changing 
 
 **Upgrading an existing installation.** Back up city data and settings before changing an existing profile. Windows 1.9.2.1 acceptance does not cover direct MSI upgrades from earlier versions. Follow the [backup, recovery and maintenance guidance](https://townlight.github.io/manuals/suite.html#backup-recovery-and-maintenance). Preserve existing data and backups. Do not rename or delete the compatibility profile directory `%LOCALAPPDATA%\CivicSuite` to work around a setup problem.
 
-Verify the downloaded MSI against the [Windows 1.9.2.1 release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt) and check its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact current [release link](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1); GitHub's Latest download resolves to this public beta. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) for the installed checks and limits.
+Verify the downloaded MSI against the [Windows 1.9.2.1 release checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt) and check its Authenticode signature is `Valid`, with signer Scott Converse. Use the exact previous [release link](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1); GitHub's Latest download resolves to this public beta. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) for the installed checks and limits.
 
 For setup problems, consult [troubleshooting](https://townlight.github.io/manuals/suite.html#troubleshooting) before filing an installer issue. Do not remove a database or existing profile as a troubleshooting shortcut. See the [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html) for roles and cross-module staff workflows.
 

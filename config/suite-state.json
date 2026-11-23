@@ -12,11 +12,11 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.9.2-1",
-    "tag": "townlight-windows-v1.9.2.1",
-    "commit": "1bc45be5a14aa969e53b87b1cef1f278dadc79a4",
+    "version": "1.9.3-1",
+    "tag": "townlight-windows-v1.9.3.1",
+    "commit": "b6cb182eb72bafe0e9bdbcacf96ce756082e6b6c",
     "channel": "public-beta",
-    "published_at": "2026-11-22",
+    "published_at": "2026-11-23",
     "asset_policy": "windows-msi",
     "runtime_version": "0.3.4"
   },
@@ -955,7 +955,7 @@
         "development": "0.2.0",
         "released": null,
         "installer": "0.2.0",
-        "public_status": null
+        "public_status": "0.2.0"
       },
       "release": {
         "tag": null,
@@ -975,8 +975,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-23"
       },
       "installer": {
         "tier": 3,
@@ -1007,7 +1007,7 @@
         "development": "0.2.0",
         "released": null,
         "installer": "0.2.0",
-        "public_status": null
+        "public_status": "0.2.0"
       },
       "release": {
         "tag": null,
@@ -1028,8 +1028,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-23"
       },
       "installer": {
         "tier": 3,
@@ -1060,7 +1060,7 @@
         "development": "0.3.0",
         "released": null,
         "installer": "0.3.0",
-        "public_status": null
+        "public_status": "0.3.0"
       },
       "release": {
         "tag": null,
@@ -1082,8 +1082,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-23"
       },
       "installer": {
         "tier": 3,

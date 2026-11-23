@@ -1,3 +1,9 @@
+## Windows 1.9.3.1 current release
+
+Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+
 ## Windows 1.9.2.1 public Windows beta
 
 Windows 1.9.2.1 adds shared Meetings and Records use from a Windows workstation through the city host, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal.
@@ -121,7 +127,7 @@ Run the signed Windows 1.9.2.1 MSI and use an empty database and a new Townlight
 
 ### Existing installation
 
-**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier [1.9.1.1 acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) remains attached to that historical release; see the [current acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
+**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier [1.9.1.1 acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) remains attached to that historical release; see the [previous acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
 
 ## Daily workflow
 
