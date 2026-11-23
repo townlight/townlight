@@ -256,33 +256,11 @@ jobs:
           name: townlight-pre-repair-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/townlight-pre-repair/*
 
-      - name: Stop Townlight maintenance CLI and verify runtime processes exited
-        if: runner.os == 'Windows'
+      - name: Verify installed services are stopped before repair
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-
-          $exe = $env:TOWNLIGHT_EXE
-          if (-not $exe) { throw 'TOWNLIGHT_EXE is not set' }
-          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "TOWNLIGHT_EXE not found: $exe" }
-          $installRoot = Split-Path -Parent $exe
-          if (-not $installRoot) { throw "Cannot determine install root from TOWNLIGHT_EXE: $exe" }
-
-          $env:TOWNLIGHT_SHARED_STAFF_HOST = '1'
-
-          Write-Host "Invoking maintenance stop: $exe --townlight-staff-host stop (installRoot=$installRoot)"
-          $timeoutMs = 150000
-          $proc = Start-Process -FilePath $exe `
-                                -ArgumentList @('--townlight-staff-host', 'stop') `
-                                -PassThru -NoNewWindow
-          if (-not $proc.WaitForExit($timeoutMs)) {
-              throw "townlight-staff-host stop did not exit within $($timeoutMs / 1000)s (pid $($proc.Id))"
-          }
-          if ($proc.ExitCode -ne 0) {
-              throw "townlight-staff-host stop exited with code $($proc.ExitCode) (pid $($proc.Id))"
-          }
-          Write-Host "townlight-staff-host stop exited with code 0"
-
+          $installRoot = Split-Path -Parent $env:TOWNLIGHT_EXE
           $names = @('postgres.exe', 'python.exe', 'pythonw.exe')
           $deadline = (Get-Date).AddSeconds(15)
           $remaining = @()
@@ -312,88 +290,42 @@ jobs:
 
           Write-Host "No postgres.exe/python.exe/pythonw.exe under $installRoot; runtime fully stopped"
 
-      - name: Diagnose leftover Townlight postgres/python on Windows
-        if: always()
+      - name: Repair the installed Townlight MSI
+        timeout-minutes: 8
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Continue'
-          $roots = @((Split-Path -Parent $env:TOWNLIGHT_EXE) + [IO.Path]::DirectorySeparatorChar)
-          function Test-UnderRoots([string]$p) {
-            if (-not $p) { return $false }
-            foreach ($r in $roots) {
-              if ($p.StartsWith($r, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
-            }
-            return $false
+          $ErrorActionPreference = "Stop"
+          $msi = Get-ChildItem -LiteralPath "msi-artifact" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msi) { throw "No MSI found for repair." }
+          $log = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.log"
+          $stdoutLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stdout.log"
+          $stderrLog = Join-Path $env:RUNNER_TEMP "townlight-msi-repair.stderr.log"
+          Write-Host "Launching msiexec.exe repair. MSI file: $($msi.Name)"
+          Write-Host "Launching msiexec.exe repair. MSI path: $($msi.FullName)"
+          Write-Host "Repair log: $log"
+          Write-Host "Child stdout log: $stdoutLog"
+          Write-Host "Child stderr log: $stderrLog"
+          $p = Start-Process msiexec.exe -ArgumentList @("/fa", "`"$($msi.FullName)`"", "/quiet", "/norestart", "/l*v", "`"$log`"") -NoNewWindow -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru
+          Write-Host "Started msiexec.exe repair with PID $($p.Id)."
+          if (-not $p.WaitForExit(300000)) {
+            Write-Host "msiexec.exe repair PID $($p.Id) did not exit within five minutes."
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
+            if (Test-Path -LiteralPath $stdoutLog) { Get-Content -LiteralPath $stdoutLog -Tail 40 }
+            if (Test-Path -LiteralPath $stderrLog) { Get-Content -LiteralPath $stderrLog -Tail 40 }
+            if (-not $p.HasExited) { $p.Kill() }
+            throw "MSI repair did not exit within five minutes."
+          }
+          Write-Host "msiexec repair exit code: $($p.ExitCode)"
+          if (Test-Path $log) { Get-Content $log -Tail 40 }
+          if (Test-Path $stdoutLog) { Get-Content $stdoutLog -Tail 20 }
+          if (Test-Path $stderrLog) { Get-Content $stderrLog -Tail 20 }
+          if ($p.ExitCode -notin @(0, 3010)) { throw "MSI repair failed with exit code $($p.ExitCode)." }
+          if (-not (Test-Path -LiteralPath $env:TOWNLIGHT_EXE -PathType Leaf)) {
+            throw "Townlight executable is missing after MSI repair."
           }
 
-          $procs = Get-CimInstance Win32_Process |
-            Where-Object {
-              $_.Name -in @('postgres.exe','python.exe','pythonw.exe') -and
-              (Test-UnderRoots $_.ExecutablePath)
-            } | Sort-Object ProcessId
-
-          "=== Traced Processes ==="
-          foreach ($p in $procs) {
-            $parent = $null
-            try {
-              if ($p.ParentProcessId -and $p.ParentProcessId -ne 0) {
-                $parent = Get-CimInstance Win32_Process -Filter "ProcessId=$($p.ParentProcessId)" -ErrorAction Stop
-              }
-            } catch {}
-
-            $created = if ($p.CreationDate) { $p.CreationDate.ToString('o') } else { '<unknown>' }
-            "PID=$($p.ProcessId) PPID=$($p.ParentProcessId) Created=$created Name=$($p.Name) Exe=$($p.ExecutablePath)"
-
-            if ($parent) {
-              "  Parent PID=$($parent.ProcessId) Name=$($parent.Name) Exe=$($parent.ExecutablePath)"
-            } else {
-              "  Parent PID=$($p.ParentProcessId) Name=<not present> Exe=<not present>"
-            }
-
-            $listens = Get-NetTCPConnection -OwningProcess $p.ProcessId -State Listen -ErrorAction SilentlyContinue
-            if ($listens) {
-              foreach ($l in $listens) { "  Listen=$($l.LocalAddress):$($l.LocalPort)" }
-            } else {
-              "  Listen=<none>"
-            }
-
-            $svcs = Get-CimInstance Win32_Service -Filter "ProcessId=$($p.ProcessId)" -ErrorAction SilentlyContinue
-            if ($svcs) {
-              foreach ($s in $svcs) { "  Service=$($s.Name) PID=$($s.ProcessId) State=$($s.State)" }
-            } else {
-              "  Service=<none>"
-            }
-
-            if ($p.Name -ieq 'postgres.exe' -and $p.CommandLine) {
-              $dd = $null
-              if ($p.CommandLine -match '(?i)(?:^|\s)-D\s+(?:"([^"]+)"|(\S+))') {
-                $dd = if ($matches[1]) { $matches[1] } else { $matches[2] }
-              }
-              if ($dd) {
-                "  PostgresDataDir=$dd"
-                $pmPath = Join-Path $dd 'postmaster.pid'
-                if (Test-Path -LiteralPath $pmPath) {
-                  $pm = @(Get-Content -LiteralPath $pmPath -ErrorAction SilentlyContinue)
-                  if ($pm.Count -ge 1) { "  PostmasterPid=$($pm[0])" }
-                  if ($pm.Count -ge 4) { "  PostmasterPort=$($pm[3])" }
-                } else {
-                  "  PostmasterPid=<postmaster.pid not found>"
-                }
-              } else {
-                "  PostgresDataDir=<not found>"
-              }
-            }
-
-            if ($p.Name -in @('python.exe','pythonw.exe') -and $p.CommandLine) {
-              $mods = @()
-              $re = [regex]'(?i)(?:^|\s)-m\s+([^\s"]+)'
-              foreach ($m in $re.Matches($p.CommandLine)) {
-                $mods += $m.Groups[1].Value.Trim('"', "'")
-              }
-              if ($mods) { "  PythonModules=$($mods -join ',')" } else { "  PythonModules=<none>" }
-            }
-
-            "---"
-          }
-          "=== End Traced Processes ==="
-          exit 0
+      # ---- FIRST-RUN + BACKUP/RESTORE (verifiable subset) ---------------------
+      # Startup above checks the installed WebView. Tests below compile source
+      # and exercise lifecycle logic with isolated state; they do NOT drive the
+      # installed wizard or prove the complete installed Records journey.
+      # Exact-byte clean-machine acceptance remains a separate release gate.
