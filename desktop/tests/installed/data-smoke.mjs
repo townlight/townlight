@@ -44,11 +44,13 @@ async function startPortal() {
   throw new Error('The disposable resident portal did not start');
 }
 
+let setupComplete = false;
 try {
   await page.locator('.sidebar [data-area="home"]').waitFor({timeout: 600_000});
   await page.evaluate(await readFile(new URL('observer.js', import.meta.url), 'utf8'));
   const setup = await page.evaluate(await readFile(new URL('setup.js', import.meta.url), 'utf8'));
   assert(setup.final.first_run.finished, 'Installed setup did not complete');
+  setupComplete = true;
   if ((await native('get_app_state')).domain_authority !== 'python-records') {
     const activation = await native('supervisor_action', {action: 'activate-records', serviceId: null});
     assert.equal(activation.accepted, true, activation.message);
@@ -69,12 +71,22 @@ try {
   console.log(JSON.stringify(await installedData({page, native, startPortal, publicOrigin})));
 } finally {
   try {
-    console.log(JSON.stringify(await native('supervisor_action', {action: 'stop', serviceId: null})));
+    if (setupComplete) {
+      const station = await native('station_action', {action: 'stop', selectedDirectory: null, meetingId: null});
+      assert.equal(station.stopped, true, station.message);
+    }
   } finally {
     try {
-      if (receiver?.exitCode === null) receiver.kill();
+      if (setupComplete) {
+        const runtime = await native('supervisor_action', {action: 'stop', serviceId: null});
+        assert.equal(runtime.accepted, true, runtime.message);
+      }
     } finally {
-      await browser.close();
+      try {
+        if (receiver?.exitCode === null) receiver.kill();
+      } finally {
+        await browser.close();
+      }
     }
   }
 }
