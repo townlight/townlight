@@ -1250,12 +1250,22 @@ mod tests {
         with_temp_state_dir(|_| {
             let mut prior = persist_profile_selection("inspections-preview").unwrap();
             // Rewind to a state that predates Data and Budget.
-            prior.installed_module_ids.retain(|id| id != "townlight_data" && id != "townlight_budget");
-            prior.enabled_module_ids.retain(|id| id != "townlight_data" && id != "townlight_budget");
+            prior
+                .installed_module_ids
+                .retain(|id| id != "townlight_data" && id != "townlight_budget");
+            prior
+                .enabled_module_ids
+                .retain(|id| id != "townlight_data" && id != "townlight_budget");
             // Simulate deliberate disable of Contracts and dependent Procurement.
-            prior.enabled_module_ids.retain(|id| id != "townlight_contracts" && id != "townlight_procurement");
-            prior.disabled_module_ids.push("townlight_contracts".to_string());
-            prior.disabled_module_ids.push("townlight_procurement".to_string());
+            prior
+                .enabled_module_ids
+                .retain(|id| id != "townlight_contracts" && id != "townlight_procurement");
+            prior
+                .disabled_module_ids
+                .push("townlight_contracts".to_string());
+            prior
+                .disabled_module_ids
+                .push("townlight_procurement".to_string());
             write_selection(&prior).unwrap();
 
             let current = module_selection_state().unwrap();
@@ -1287,7 +1297,10 @@ mod tests {
             }
 
             assert!(
-                current.enabled_module_ids.iter().any(|id| id == "townlight_meetings"),
+                current
+                    .enabled_module_ids
+                    .iter()
+                    .any(|id| id == "townlight_meetings"),
                 "Meetings should remain enabled"
             );
         });
