@@ -1,0 +1,60 @@
+name: Verify signed Windows 1.9.3.2 fresh installation without rebuilding
+on:
+  push:
+    branches: [test/signed-1932-fresh-readback]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: signed-1932-fresh-readback
+  cancel-in-progress: false
+jobs:
+  signed-fresh-readback:
+    name: Exact signed Windows 1.9.3.2 fresh readback
+    runs-on: windows-latest
+    timeout-minutes: 125
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 14890237005
+          github-token: ${{ github.token }}
+          run-id: 45321294952
+          path: msi-artifact
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - name: Install existing desktop test tools
+        working-directory: desktop
+        run: npm ci
+      - name: Prepare the existing fresh-install test volume
+        shell: pwsh
+        run: ./desktop/scripts/prepare-installer-test-volume.ps1
+      - name: Verify candidate identity and run the complete signed fresh acceptance
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = '67d56f24c12be4f2a409d1940ca4199a226adcfc'
+          $expectedHash = 'b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77'
+          $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
+          $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*signing-receipt.json' -Recurse -File)
+          if ($msis.Count -ne 1 -or $receipts.Count -ne 1) { throw 'Expected one signed candidate and receipt' }
+          $receipt = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
+          $hash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          $entries = @($receipt.files | Where-Object file -ceq $msis[0].Name)
+          if ($receipt.source_commit -cne $source -or [string]$receipt.workflow_run -cne '45321294952' -or
+              $receipt.desktop_version -cne '1.9.3-2' -or $receipt.product_profile -cne 'inspections-preview' -or
+              $entries.Count -ne 1 -or $entries[0].signed_sha256 -cne $hash -or $hash -cne $expectedHash) {
+            throw 'Signed candidate provenance mismatch'
+          }
+          Write-Host "Verified exact signed candidate SHA-256 $hash"
+          ./desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode fresh -SourceCommit $source -EvidenceRoot "$env:RUNNER_TEMP/installed-evidence"
+      - name: Preserve complete fresh acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-installed-fresh-readback
+          path: ${{ runner.temp }}/installed-evidence
+          retention-days: 7
