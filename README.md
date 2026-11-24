@@ -6,22 +6,6 @@ Signed MSI SHA-256 `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c9
 
 [Release notes](docs/installer/windows-1.9.3.2-candidate.md) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Release catalog](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) · [Acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md)
 
-## Windows 1.9.3.1 previous release
-
-Windows 1.9.3.1 includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows. Its original release identity and acceptance remain preserved.
-
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
-
-## Windows 1.9.2.1 public Windows beta
-
-Windows 1.9.2.1 adds shared Meetings and Records use from a Windows workstation through the city host, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal.
-
-Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
-
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/HANDOFF-Windows-1.9.2.1.md)
-
-[Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html) · [Shared staff source guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md) · [Portal guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/portal/guide.md)
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/brand/svg/townlight-hall-lockup-tagline-reversed.svg">
@@ -29,11 +13,11 @@ Acceptance used synthetic data and a test portal on the physical Windows host wi
   </picture>
 </p>
 
-[Download Windows beta 1.9.2.1](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/HANDOFF-Windows-1.9.2.1.md)
+[Download Windows beta 1.9.3.2](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/HANDOFF-Windows-1.9.3.2.md)
 
-See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
 
-Windows x64 Beta 1 · MSI 1.9.2.1
+Windows x64 Beta 1 · MSI 1.9.3.2
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
@@ -62,21 +46,6 @@ Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supp
 
 # Townlight Suite Manual
 
-## Shared meeting imports · Windows 1.8.1.1
-
-Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
-
-[All 31 sources, formats and handoffs](https://townlight.github.io/manuals/meeting-imports.html) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
-
-See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
-
-The release acceptance summary and corresponding-source archive identify the exact packaged component sources, artifact hashes and installed evidence for Windows 1.9.2.1.
-
-
-> **Windows 1.9.2.1 acceptance.** See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
-
-> Boards & Commissions, Contracts and Procurement were added in Windows 1.8.0.1. Its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) identifies the staff workflows, role boundaries, persistence and upgrade exercised on that build. Those results are not a new 1.8.1.1 upgrade test.
-
 ## Using this manual
 
 Townlight connects municipal workflows around retained sources, named staff and explicit human decisions. This suite manual explains setup, shared operating procedures and cross-product handoffs, including the bounded Access and Notice workflows. Set up Station during Townlight first run, or use Settings → Modules → Townlight Station on an existing installation. Standalone CivicCast remains a separate product.
@@ -88,14 +57,14 @@ Staff should start with First run and Connected workflows. Administrators should
 | Identity | Value |
 |----|----|
 | Public documentation identity | Townlight Beta 1 |
-| Windows MSI version | 1.9.2.1 |
-| Native desktop source version | 1.9.2-1 |
-| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/SHA256SUMS-Windows-1.9.2.1.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) |
+| Windows MSI version | 1.9.3.2 |
+| Native desktop source version | 1.9.3-2 |
+| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) |
 | Corresponding source | Released Windows x64 beta |
 | Current owned software license | AGPL-3.0-only |
-| Supported acceptance profile | Windows 1.9.2.1 signed MSI with synthetic shared workflow and same-machine cold-recovery acceptance; see limits. |
+| Supported acceptance profile | Signed 1.9.3.2 setup, backup/restore, uninstall, and adjacent upgrade verified. |
 
-See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
 
 ### Component versions
 
@@ -115,27 +84,30 @@ See the Windows 1.9.2.1 release acceptance for the exact installed checks, artif
 | Boards & Commissions | townlight-boards | 0.2.1 |
 | Contracts | townlight-contracts | 0.2.1 |
 | Procurement | townlight-procurement | 0.3.1 |
+| Data | townlight-data | 0.2.0 |
+| Budget | townlight-budget | 0.2.0 |
+| Grants | townlight-grants | 0.3.0 |
 | Local runtime | townlight-runtime | 0.3.4 |
 
 ## First run
 
-See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
 
 ### Fresh installation
 
-Run the signed Windows 1.9.2.1 MSI and use an empty database and a new Townlight profile for first run.
+Run the signed Windows 1.9.3.2 MSI and use an empty database and a new Townlight profile for first run.
 
-1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.9.2.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) release.
-2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) for the tested setup.
-3.  Launch Townlight under the intended named Windows account. Choose the storage folders. Select **Townlight Inspections candidate** (`inspections-preview`) for the bounded desktop composition, including Access, Notice, Boards & Commissions, Contracts, and Procurement. The full profile includes Boards & Commissions, Contracts, and Procurement.
+1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.9.3.2](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) release.
+2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) for the tested setup.
+3.  Launch Townlight under the intended Windows account and choose storage folders. On the setup screen, choose the full bundled profile labeled **Townlight Inspections candidate**; it includes Records, Meetings, Code, Access, Notice, Zoning, Planning, Permitting, Inspections, Boards & Commissions, Contracts, Procurement, Data, Budget, and Grants.
 4.  Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
-5.  Run Health Check and wait for readiness. Open Townlight. In System Health select **Finish Records Migration** to activate the canonical Python/PostgreSQL runtime. Do not fabricate migration receipts or seed accounts.
+5.  Select **Run Health Check**, then choose **Finish setup**; in System Health, if **Prepare Records** appears, choose it and follow its prompts, otherwise skip it.
 6.  Create named staff through Settings. Import authorized sources using each product’s source library. All examples in this package are synthetic; they are not municipal authority.
 7.  Set up Station during first run with the full profile or with Meetings and Records selected. On an existing installation, open Settings → Modules → Townlight Station → Set up meeting recording. Configure vision explicitly only if automatic photo drafting is selected.
 
 ### Existing installation
 
-**Upgrading an existing installation.** Back up your city data and settings, then close Townlight and keep the existing Windows profile. The Windows 1.9.2.1 acceptance does not cover a direct MSI upgrade from an earlier version. The earlier [1.9.1.1 acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md) remains attached to that historical release; see the [previous acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md). The earlier direct 1.8.2.1 upgrade was to [Windows 1.9.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.0.1).
+**Upgrading an existing installation.** For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.9.3.2 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.1; earlier paths have separate prior evidence.
 
 ## Daily workflow
 
@@ -160,6 +132,10 @@ Drafting, review, approval, attachment, export, fulfillment and publication are 
 3.  Stop and wait for completed validated media. Inspect the content and provenance. Partial/failed attempts stay separate.
 4.  Records-authorized staff explicitly attach the completed recording to an existing request. The receiver verifies bytes/hash and retains one locked private original, including on an identical retry.
 5.  Records separately prepares any release copy, records release/redact/exempt decisions, approves exact response text, exports the response/package and fulfills the request. Capture and handoff do not publish it.
+
+### Download a private Records attachment
+
+Authorized Records staff signed into the shared Windows workstation should open Records Requests and an existing saved request. Beside the private managed document, choose **Download private attachment**, then choose a new destination file or cancel. Townlight compares the byte count and SHA-256 before saving and reports the destination, count, and hash; protect the workstation copy as private Records evidence, with review and publication kept separate.
 
 ### Legislation to cited staff guidance
 
@@ -298,11 +274,11 @@ This write requires Meetings to be enabled and the signed-in staff role to permi
 
 ### Complete technical contract
 
-Read the [Suite API reference](https://townlight.github.io/api/suite.html) for every documented operation, request field, constraint, response declaration and source supplement. Download the [OpenAPI JSON](https://townlight.github.io/api/suite-openapi.json) for tools. For Station this is the suite-side schema only; its separate service contract is documented in the API supplement. The [reference directory](https://townlight.github.io/reference/index.html) includes configuration/source inventories, dependency declarations, native command contracts, MCP signatures and candidate evidence.
+The [Suite API catalogue](https://townlight.github.io/api/suite.html) and [Suite API JSON](https://townlight.github.io/api/suite-openapi.json) are the historical Windows 1.8.2.1 schema snapshot. For Windows 1.9.3.2, see the release [source](https://github.com/townlight/townlight/tree/67d56f24c12be4f2a409d1940ca4199a226adcfc), the signed [shared staff guide](https://github.com/townlight/townlight/blob/67d56f24c12be4f2a409d1940ca4199a226adcfc/docs/installer/windows-shared-staff.md), and the [reference directory](https://townlight.github.io/reference/index.html). Station has a separate service API documented in its [product manual](https://townlight.github.io/manuals/station.html).
 
-### Windows candidate workflows
+### Windows Suite workflows
 
-The next Windows candidate adds staff-reviewed Data publication, Budget review and council adoption, and Grants case management with verified closeout archives. See the [operator manual](USER-MANUAL.md) for the workflows. The published Windows download remains 1.9.2.1.
+Townlight Windows 1.9.3.2 is a signed Suite package; Data, Budget, and Grants were first bundled in Windows 1.9.3.1 and remain in the current signed 1.9.3.2 Windows beta. See the [operator manual](USER-MANUAL.md) for the workflows.
 
 ## MCP and automation boundary
 
@@ -346,7 +322,7 @@ On failure, record the time, selected composition, component/installer versions 
 
 | Symptom | Likely meaning | Next action |
 |----|----|----|
-| Workspace absent | Wrong product composition or unavailable canonical runtime. | Check selected composition; activate through Finish Records Migration; wait for readiness. |
+| Workspace absent | Wrong product composition or unavailable canonical runtime. | Check the selected composition. Use **Prepare Records** in System Health if the workspace still uses legacy data. Wait for readiness. |
 | Cannot sign in / 401 | Missing or expired named account session. | Sign in normally; reopen a Station launch ticket if applicable. |
 | Permission denied / 403 | Account, module, source or browser-origin permission. | Ask the authorized administrator to inspect the intended permission; do not invent role headers. |
 | Save conflict / 409 | The saved revision, expected source hash or lifecycle changed. | Keep edits, reopen current state and reconcile deliberately. |
@@ -356,6 +332,37 @@ On failure, record the time, selected composition, component/installer versions 
 | Restore needs service start | The snapshot was restored but services have not resumed. | Use Start, then Check and verify a saved record; do not blindly repeat restore. |
 
 ## Verified workflows and limits
+
+### Historical shared meeting imports · Windows 1.8.1.1
+
+Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
+
+[All 31 sources, formats and handoffs](https://townlight.github.io/manuals/meeting-imports.html) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/ACCEPTANCE-Windows-1.8.1.1.md).
+
+See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits.
+
+The release acceptance summary and corresponding-source archive identify the exact packaged component sources, artifact hashes and installed evidence for Windows 1.9.2.1.
+
+
+> **Windows 1.9.2.1 acceptance.** See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
+
+> Boards & Commissions, Contracts and Procurement were added in Windows 1.8.0.1. Its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) identifies the staff workflows, role boundaries, persistence and upgrade exercised on that build. Those results are not a new 1.8.1.1 upgrade test.
+
+### Windows 1.9.3.1 previous release
+
+Windows 1.9.3.1 includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows. Its original release identity and acceptance remain preserved.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+
+### Historical Windows 1.9.2.1 public Windows beta
+
+Windows 1.9.2.1 adds shared Meetings and Records use from a Windows workstation through the city host, reviewed council packet revisions, and queued delivery of separately approved packets and recording copies to the separately deployed portal.
+
+Acceptance used synthetic data and a test portal on the physical Windows host with a clean Windows Sandbox guest on the same PC. It does not establish two physical PCs, recovery on another computer or account, production portal or city network operation, direct MSI upgrade from an earlier version, new hardware or broadcast acceptance, or PDF/UA and full assistive-technology review.
+
+[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/Townlight-Windows-x64-1.9.2.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/HANDOFF-Windows-1.9.2.1.md)
+
+[Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html) · [Shared staff source guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/installer/windows-shared-staff.md) · [Portal guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/portal/guide.md)
 
 The table records selected synthetic workflows from the original [Windows 1.6.0.1 Beta 1](https://github.com/townlight/townlight/releases/tag/townlight-beta-1) Sandbox run. Station’s later delivery has [separate Windows 1.6.0.1 acceptance](https://github.com/townlight/townlight/releases/tag/townlight-beta-1-station-delivery). See the [Windows 1.8.0.1 acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) for the workflows and upgrade path exercised on the previous 1.8.0.1 MSI.
 

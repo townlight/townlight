@@ -306,7 +306,7 @@
         "tier": 1,
         "role": "records workflow",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "7cbdab22a8d8939a6e022022bacb7de51ac4f6ca"
+        "source_commit": "3d1291a9bdc382b2fc09666a25ce82de6939c55d"
       }
     },
     "meetings": {
@@ -775,7 +775,7 @@
         "tier": 1,
         "role": "meeting media and proceedings handoff",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "49274095fe0d9c7c61f66d4b354a3cc2edda2e24"
+        "source_commit": "f1b946b10ed72f2ffd93e0609d913c73566debe4"
       }
     },
     "boards": {
