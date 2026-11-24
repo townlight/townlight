@@ -1,6 +1,14 @@
-## Windows 1.9.3.1 current release
+## Windows 1.9.3.2 current release
 
-Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+Windows 1.9.3.2 adds private Records staff attachment downloads with byte-count and SHA-256 verification, plus a Station control fix during session renewal. Physical candidate component checks verified a 2,174,280,536-byte private attachment on R7 and a short Station run with four successful polls and HTTP 202 Stop. The signed MSI passed direct-upgrade, lifecycle, and fresh exact-artifact acceptance checks. Published 2026-11-24T05:50:39Z.
+
+Signed MSI SHA-256 `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77`; size 1,866,072,064 bytes. In [signing/build run 45321294952](https://github.com/townlight/townlight/actions/runs/45321294952), direct-upgrade and lifecycle jobs passed but initial fresh maintenance failed on fixture setup. A fixture-only correction without rebuilding the MSI was followed by passing exact-artifact [fresh run 45328280431](https://github.com/townlight/townlight/actions/runs/45328280431).
+
+[Release notes](docs/installer/windows-1.9.3.2-candidate.md) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Release catalog](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) · [Acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md)
+
+## Windows 1.9.3.1 previous release
+
+Windows 1.9.3.1 includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows. Its original release identity and acceptance remain preserved.
 
 [Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
 
