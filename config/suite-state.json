@@ -12,11 +12,11 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.9.3-1",
-    "tag": "townlight-windows-v1.9.3.1",
-    "commit": "b6cb182eb72bafe0e9bdbcacf96ce756082e6b6c",
+    "version": "1.9.3-2",
+    "tag": "townlight-windows-v1.9.3.2",
+    "commit": "67d56f24c12be4f2a409d1940ca4199a226adcfc",
     "channel": "public-beta",
-    "published_at": "2026-11-23",
+    "published_at": "2026-11-24",
     "asset_policy": "windows-msi",
     "runtime_version": "0.3.4"
   },
