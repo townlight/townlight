@@ -72,16 +72,35 @@ export async function clerkWorkflows({ page, native, save, meetingId }) {
   await proposal.getByRole('button', { name: 'Send proposal to Meetings' }).click();
   await page.locator('[data-code-output]').filter({ hasText: 'Awaiting a recorded decision.' }).waitFor();
   await page.getByRole('button', { name: 'Open this proposal in Meetings' }).click();
+  // The proposal list can populate before the handoff finishes opening the
+  // proposal and its meeting. Wait for the action rendered by that handoff.
+  const openInCode = page.locator('[data-meetings-links]').getByRole('button', { name: 'Open this proposal in Code' });
+  await openInCode.waitFor();
   const decision = page.locator('[data-meetings-action="recordCodeDecision"]');
   const decisionProposal = decision.getByLabel('Proposal for this decision');
-  await decisionProposal.locator('option', { hasText: title }).waitFor({ state: 'attached' });
-  await decisionProposal.selectOption({ label: await decisionProposal.locator('option', { hasText: title }).textContent() });
+  await decisionProposal.selectOption({ label: title });
+  const proposalId = await decisionProposal.inputValue();
   await decision.getByLabel('Outcome').selectOption({ label: 'Adopted' });
   const vote = 'Council adopted the ordinance.';
   await decision.getByLabel('Decision text').fill(vote);
-  await decision.getByRole('button', { name: 'Record Code decision' }).click();
-  await page.locator('[data-meetings-status]').filter({ hasText: 'Decision: adopted' }).waitFor();
-  await page.getByRole('button', { name: 'Open this proposal in Code' }).click();
+  const decisionStatus = page.locator('[data-meetings-status]');
+  try {
+    await decision.getByRole('button', { name: 'Record Code decision' }).click();
+    await decisionStatus.filter({ hasText: 'Decision: adopted' }).waitFor();
+  } catch (error) {
+    const savedDecision = await meetings({ operation: 'code-connection', id: proposalId })
+      .then(result => ({
+        current_decision_id: result.current_decision_id,
+        outcome: result.decisions.find(item => item.input.id === result.current_decision_id)?.input.outcome,
+      }))
+      .catch(cause => ({ read_error: String(cause) }));
+    await save('installed-clerk-decision-failure', {
+      error: String(error), proposalId, savedDecision,
+      status: await decisionStatus.textContent({ timeout: 1000 }).catch(() => null),
+    });
+    throw error;
+  }
+  await openInCode.click();
   const close = page.locator('[data-code-action="closeConnection"]');
   await close.getByLabel('Recorded adoption').selectOption({ label: vote });
   await close.getByLabel('Codification source').selectOption({ label: fixture.source.name });
