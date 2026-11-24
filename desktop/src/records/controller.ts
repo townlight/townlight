@@ -6,7 +6,7 @@ import type {AccessState} from "./access-client.ts";
 
 type State = RecordsState & {access?: object; demo_fixture?: object | null};
 type Result = {accepted?: boolean; message?: string; state?: State; search_results?: unknown[];
-  next_steps?: string[]; disclaimer?: string};
+  next_steps?: string[]; disclaimer?: string; path?: string; size_bytes?: number; sha256?: string};
 
 export function canonicalWork(snapshot: State) {
   // Explicit unavailable product collections, not data read from the retired writer.
@@ -32,6 +32,9 @@ export function createRecordsController(invoke: Invoke) {
         result = await records.publicAction(action, payload);
       } else if (isRecordsAction(action)) {
         result = await records.action(action, payload, current, sharedStaff) as Result;
+        if (action === "download-records-attachment" && typeof result.path === "string") {
+          result.message = `Private attachment saved to ${result.path} (${String(result.size_bytes)} bytes, SHA-256 ${String(result.sha256)}).`;
+        }
       } else if (action === "accessibility-review" || action.startsWith("townlight_access-")) {
         result = await access.action(action, payload, current.access as AccessState | undefined) as Result;
       } else if (action === "search-city-knowledge") {

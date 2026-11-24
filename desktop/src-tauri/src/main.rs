@@ -764,6 +764,50 @@ fn picked_folder_path_for_desktop() -> Result<Option<String>, String> {
     }
 }
 
+fn save_records_attachment_path(
+    attachment_id: uuid::Uuid,
+    suggested_file_name: &str,
+) -> Result<Option<String>, String> {
+    #[cfg(target_os = "windows")]
+    {
+        let name = std::path::Path::new(suggested_file_name)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .filter(|n| !n.is_empty() && *n != "." && *n != "..")
+            .map(str::to_string)
+            .unwrap_or_else(|| format!("records-attachment-{attachment_id}.bin"));
+        Ok(rfd::FileDialog::new()
+            .set_title("Save private Records attachment")
+            .set_file_name(name)
+            .save_file()
+            .map(|path| path.display().to_string()))
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        Err("Saving Records attachments is only available in the Windows desktop app.".to_string())
+    }
+}
+
+#[tauri::command]
+async fn download_records_attachment(
+    request_id: uuid::Uuid,
+    attachment_id: uuid::Uuid,
+    suggested_file_name: String,
+) -> Result<Value, String> {
+    if !shared_staff::configured() {
+        return Err(
+            "Private Records downloads require the signed-in city staff connection.".into(),
+        );
+    }
+    let proof = shared_staff::proof()?;
+    let Some(path) = save_records_attachment_path(attachment_id, &suggested_file_name)? else {
+        return Err("Download cancelled.".into());
+    };
+    domain_client::download_records_attachment(request_id, attachment_id, proof, path)
+        .await
+        .map_err(|error| error.message.to_string())
+}
+
 #[tauri::command]
 fn choose_file_path() -> Result<Option<String>, String> {
     if shared_staff::configured() {
@@ -1421,6 +1465,7 @@ pub fn run() {
         station_action,
         choose_file_path,
         choose_folder_path,
+        download_records_attachment,
         module_action,
         get_city_work_state,
         records_domain_request,
@@ -1475,6 +1520,7 @@ pub fn run() {
                         | "auth_action"
                         | "choose_file_path"
                         | "records_domain_request"
+                        | "download_records_attachment"
                         | "meetings_domain_request"
                         | "open_domain_exports"
                 )

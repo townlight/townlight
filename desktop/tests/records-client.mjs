@@ -3,6 +3,7 @@ import { createRecordsClient } from "../src/records/client.ts";
 import { createAccessClient } from "../src/records/access-client.ts";
 import { createRecordsController } from "../src/records/controller.ts";
 import { createMeetingsClient } from "../src/meetings/client.ts";
+import { createRecordsRenderer } from "../src/records/view.js";
 
 const calls = [];
 const client = createRecordsClient(async (command, args) => { calls.push({ command, ...args }); return {}; });
@@ -15,14 +16,48 @@ await assert.rejects(client.action("close-records-request", {recordsRequestId:"g
 assert.equal(calls.length, 1);
 await client.action("add-records-release-copy", {recordsRequestId:"legacy-1", releaseDocumentId:"legacy-doc", releaseCopyPath:"synthetic.txt", releaseCopyStatus:"redacted copy"}, current);
 assert.equal(calls[1].request.attachment_id, current.records_requests[0].documents[0].attachment_id);
+await client.action("download-records-attachment", {recordsRequestId:"legacy-1", attachmentId:current.records_requests[0].documents[0].attachment_id,
+  suggestedFileName:"station-recording.ts", targetPath:"must-not-be-web-supplied"}, current, true);
+assert.equal(calls[2].command, "download_records_attachment");
+assert.deepEqual({requestId:calls[2].requestId, attachmentId:calls[2].attachmentId, suggestedFileName:calls[2].suggestedFileName}, {
+  requestId:current.records_requests[0].request_id, attachmentId:current.records_requests[0].documents[0].attachment_id, suggestedFileName:"station-recording.ts"});
+assert.equal(Object.hasOwn(calls[2], "targetPath"), false);
 await client.publicAction("lookup-public-records-request", {trackingNumber:"REQ-0001", requesterContact:"synthetic", responseDraft:"must not pass"});
-assert.equal(calls[2].command, "records_public_request");
-assert.deepEqual(calls[2].request.payload, {trackingNumber:"REQ-0001", requesterContact:"synthetic"});
+assert.equal(calls[3].command, "records_public_request");
+assert.deepEqual(calls[3].request.payload, {trackingNumber:"REQ-0001", requesterContact:"synthetic"});
 let count = 0;
 const failed = createRecordsClient(async () => { count++; throw {code:"service-unavailable", outcome_unknown:true}; });
 await assert.rejects(failed.action("close-records-request", {recordsRequestId:"legacy-1"}, current));
 assert.equal(count, 1);
 console.log("PASS: Records client uses canonical IDs, strips unrelated fields, and never retries or falls back.");
+
+// Exercise the actual shared-staff Documents button payload through its
+// controller and native command adapter, including a cancelled save dialog.
+const requestWithFile = {id:"legacy-1", request_id:"a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78", documents:[{
+  id:"legacy-doc", attachment_id:"b7abf8da-7c0b-47a5-b4ab-4fc1b33aab78", title:"Station recording", file_name:"station-'&#39;.ts", sha256:"d".repeat(64), size_bytes:2174280536
+}]};
+const documentsHtml = createRecordsRenderer({escapeHtml:String}).renderRecordsDocuments(requestWithFile, true);
+const encodedButtonPayload = documentsHtml.match(/data-action-payload='([^']+)'/)[1];
+const buttonPayload = JSON.parse(encodedButtonPayload.replace(/&(?:amp|#39);/g, entity => entity === "&amp;" ? "&" : "'"));
+const nativeCalls = [];
+const downloadController = createRecordsController(async (command, args) => {
+  nativeCalls.push({command, ...args});
+  if (command === "download_records_attachment") return {path:"C:/Records/station.ts", size_bytes:2174280536, sha256:"d".repeat(64)};
+  if (command === "records_domain_request") return {records_requests:[requestWithFile]};
+  throw new Error(`Unexpected command ${command}`);
+});
+const downloaded = await downloadController.action("download-records-attachment", buttonPayload, {records_requests:[requestWithFile]}, true);
+assert.deepEqual(nativeCalls.filter(call => call.command === "download_records_attachment").map(({command, requestId, attachmentId, suggestedFileName}) => ({command, requestId, attachmentId, suggestedFileName})), [{
+  command:"download_records_attachment", requestId:requestWithFile.request_id,
+  attachmentId:requestWithFile.documents[0].attachment_id, suggestedFileName:requestWithFile.documents[0].file_name
+}]);
+assert.match(downloaded.message, /2174280536 bytes, SHA-256/);
+const cancelledController = createRecordsController(async (command) => {
+  if (command === "download_records_attachment") throw new Error("Download cancelled.");
+  return {records_requests:[requestWithFile]};
+});
+await assert.rejects(cancelledController.action("download-records-attachment", buttonPayload, {records_requests:[requestWithFile]}, true), /Download cancelled/);
+console.log("PASS: shared Records Documents button routes canonical attachment IDs and filename to the native verified downloader; cancellation is preserved.");
 const accessCalls = [];
 const access = createAccessClient(async (command, args) => {accessCalls.push({command, ...args}); return {};});
 await access.action("accessibility-review", {title:"Notice", body:"Public text", hasAltText:false, actor:"admin", ai_analysis:"forged"});
