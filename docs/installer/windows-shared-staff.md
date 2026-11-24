@@ -2,6 +2,8 @@
 
 Shared staff uses one Windows host as the system of record. It runs the same signed Townlight desktop and bundled runtime as the workstations. The host owns the PostgreSQL database, managed files, recording hardware and Station. The staff workstations open the existing Townlight desktop in shared mode. Their edits go to the city host, and downloaded files are copies. The normal stand-alone install does not enable this mode.
 
+Townlight for Windows 1.9.3.2 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md).
+
 ## Prepare the city host
 
 1. Install the Windows MSI on the host. Before first run, select a Windows account owned by the city for this host. Use one protected absolute Windows profile and data path that IT can reproduce on a replacement host. You can set `TOWNLIGHT_DESKTOP_STATE_DIR` to choose the profile path before setup. Keep the managed folders on a local Windows volume and grant access only to the host account and authorized IT administrators.
@@ -29,6 +31,10 @@ Shared staff uses one Windows host as the system of record. It runs the same sig
 Install the same Windows MSI and set `TOWNLIGHT_SHARED_ORIGIN=https://staff.city.example` for the workstation account. Close Townlight fully and reopen it after setting the variable. Keep `TOWNLIGHT_SHARED_STAFF_HOST` unset on the workstation. Sign in with your named city account. Passwords and short-lived staff proof travel over validated TLS and the proof stays in the native client. Signing out revokes that workstation's session when the host is reachable. Disabling an account or resetting its passcode on the host invalidates its active sessions. A host restart clears staff sessions.
 
 Clerks prepare council packets in Meetings. Source files selected on a workstation are copied and verified by the host. Downloaded council packet files are workstation copies. Records staff can work on a request, attach a completed private Station recording by its ID and verified SHA-256, download the original managed attachment through their signed-in staff client, prepare release copies, and draft and approve the reviewed Records response. The download uses the current request and attachment identity and verifies the saved file against the host’s byte count and SHA-256. Protect workstation copies as private Records evidence. The host records the real operator. A changed draft requires refreshing and reviewing the current version before approval. Records release export finalization and Station capture or administration stay on the host. The staff host endpoint is separate from any city website or public publishing endpoint.
+
+### Download a private Records attachment
+
+Authorized Records staff signed into the shared Windows workstation should open Records Requests and an existing saved request. Beside the private managed document, choose **Download private attachment**, then choose a new destination file or cancel. Townlight compares the byte count and SHA-256 before saving and reports the destination, count, and hash; protect the workstation copy as private Records evidence, with review and publication kept separate.
 
 An installed headless staff client can also use `--townlight-staff-client` under that workstation environment. Provide UTF-8 JSON lines over redirected standard input, one action per line. It replies with one JSON result envelope per action. It accepts the same `auth_action`, `get_app_state`, `meetings_domain_request`, and `records_domain_request` commands as the Windows UI. Use an isolated fixture account for troubleshooting. Never persist sign-in input to logs or shell history.
 

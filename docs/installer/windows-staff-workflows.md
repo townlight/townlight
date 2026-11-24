@@ -1,19 +1,14 @@
 # Windows staff workflows
 
-## Windows 1.9.1.1 Station recorder release
+## Windows 1.9.3.2
 
-Windows 1.9.1.1 includes bundled Station setup and a preview that verifies ten seconds of picture and sound before meeting recording.
+Townlight for Windows 1.9.3.2 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md).
 
-Windows 1.9.1.1 adds the Open Hall installer and app icons, clerk workflow improvements, Records setup checks and Station 0.4.4. The signed release passed a headless C920 camera and microphone test. See the acceptance summary for the checks and their scope.
-
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md).
-
-Use these workflows with the full Windows profile. The separate Windows 1.8.2.1 acceptance records the earlier 1.8.1.1 upgrade and staff record checks.
+For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.9.3.2 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.1; earlier paths have separate prior evidence.
 
 ## Staff access
 
-Select the full Windows profile, finish setup, then use **Finish Records
-Migration** in System Health if the workspace still uses legacy data. The
+Select the full Windows profile, finish setup, then use **Prepare Records** in System Health if the workspace still uses legacy data. The
 migration enables the local Meetings records used by the Boards attendance
 picker and link. Boards & Commissions is available to clerks,
 city staff and Townlight administrators. Contracts and Procurement are available
@@ -49,6 +44,10 @@ award and returns that draft on retry. Record the final PDF in Contracts.
 Public applications, vendor submissions, signing, payments and award decisions
 remain city processes. The Windows workspaces record staff work and decisions.
 
+## Private Records attachment downloads
+
+Authorized Records staff signed into the shared Windows workstation should open Records Requests and an existing saved request. Beside the private managed document, choose **Download private attachment**, then choose a new destination file or cancel. Townlight compares the byte count and SHA-256 before saving and reports the destination, count, and hash; protect the workstation copy as private Records evidence, with review and publication kept separate.
+
 ## Release and support
 
-[Download Windows 1.9.1.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.1.1/ACCEPTANCE-Windows-1.9.1.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
+[Download Windows 1.9.3.2](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.

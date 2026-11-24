@@ -5,9 +5,10 @@ import { mkdirSync, readFileSync } from "node:fs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const target = `file://${path.join(root, "docs", "index.html").replaceAll("\\", "/")}`;
-const { desktop_release: release } = JSON.parse(readFileSync(path.join(root, "config", "suite-state.json"), "utf8"));
+const { desktop_release: release, module_order: moduleOrder, modules } = JSON.parse(readFileSync(path.join(root, "config", "suite-state.json"), "utf8"));
 const windowsVersion = release.tag.replace(/^townlight-windows-v/, "");
 const expectedDownloadUrl = `https://github.com/townlight/townlight/releases/download/${release.tag}/Townlight-Windows-x64-${windowsVersion}.msi`;
+const expectedModuleNames = moduleOrder.map((slug) => modules[slug].public_name.replace(/^Townlight /, ""));
 const outputDir = path.join(root, "docs", "audit-browser-qa");
 mkdirSync(outputDir, { recursive: true });
 
@@ -57,15 +58,15 @@ try {
       .getByRole("heading", { name: "Municipal work with a clear record." })
       .isVisible();
     const candidateStatusVisible = await page
-      .locator('a[href="https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.1.1"]').first()
+      .locator(`a[href="https://github.com/townlight/townlight/releases/tag/${release.tag}"]`).first()
       .isVisible();
     const productModulesVisible = await Promise.all(
-      ["Core", "Records", "Meetings", "Code", "Access", "Notice", "Zoning", "Planning", "Permitting", "Inspections", "Station", "Boards & Commissions", "Contracts", "Procurement"].map((name) =>
+      expectedModuleNames.map((name) =>
         page.locator(".product h3").getByRole("link", { name, exact: true }).isVisible(),
       ),
     );
     const productLinks = await page.locator(".product h3 a").evaluateAll((nodes) => nodes.map((node) => node.href));
-    const expectedProductLinks = ["core", "records", "meetings", "code", "access", "notice", "zoning", "planning", "permitting", "inspections", "station", "boards", "contracts", "procurement"]
+    const expectedProductLinks = moduleOrder
       .map((slug) => `/products/${slug}/index.html`);
     const productLinksCorrect = productLinks.length === expectedProductLinks.length &&
       expectedProductLinks.every((link, index) => productLinks[index].endsWith(link));
