@@ -12,13 +12,14 @@ import os
 from pathlib import Path
 import re
 import secrets
+import stat
 import tempfile
 import time
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.concurrency import run_in_threadpool
 from starlette.responses import Response
@@ -33,6 +34,7 @@ COUNCIL_FILE = re.compile(rf"/desktop/v1/meetings/packets/{UUID}/council-file/{U
 READ = re.compile(rf"/desktop/v1/(?:records-state|requests/{UUID}(?:/view)?|meetings/meetings/{UUID}(?:/proceedings)?|meetings/agenda-items/{UUID}|portal/(?:publications/{UUID}|selections))")
 WRITE = re.compile(rf"/desktop/v1/(?:meetings/(?:clerk/catalog|meetings|agenda-items|agenda-items/{UUID}/(?:reviews|meeting)|meetings/{UUID}/(?:packet-snapshots|council-source)|packets/{UUID}/(?:deliver|council-preview|council-approval))|requests(?:/{UUID}/(?:actions|station-recordings))?|portal/publications/(?:(?:packet|recording)|{UUID}/(?:packet|recording)/withdraw))")
 RECORDS_FILE = re.compile(rf"/desktop/v1/requests/{UUID}/documents(?:/{UUID}/release-copy)?")
+RECORDS_DOWNLOAD = re.compile(rf"/desktop/v1/requests/(?P<request_id>{UUID})/documents/(?P<attachment_id>{UUID})/content")
 RECORDS_ACTIONS = {"draft-records-response", "approve-records-response", "fulfill-records-request"}
 MAX_BODY = 24 * 1024 * 1024
 MAX_FILE = 16 * 1024 * 1024
@@ -202,9 +204,142 @@ def safe_result(value):
     return value
 
 
+def opened_windows_path(file) -> Path:
+    """Resolve the opened handle, including a directory swapped after path validation."""
+    import ctypes
+    import msvcrt
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    final_path = kernel.GetFinalPathNameByHandleW
+    final_path.argtypes = [wintypes.HANDLE, wintypes.LPWSTR, wintypes.DWORD, wintypes.DWORD]
+    final_path.restype = wintypes.DWORD
+    handle = msvcrt.get_osfhandle(file.fileno())
+    length = final_path(handle, None, 0, 0)
+    if not length:
+        raise OSError("The managed file handle could not be verified.")
+    buffer = ctypes.create_unicode_buffer(length)
+    written = final_path(handle, buffer, length, 0)
+    if not 0 < written < length:
+        raise OSError("The managed file handle could not be verified.")
+    name = buffer.value
+    if name.startswith("\\\\?\\UNC\\"):
+        return Path("\\\\" + name[8:])
+    return Path(name.removeprefix("\\\\?\\"))
+
+
+def open_records_download(profile_root: Path, document: dict):
+    from townlight_records.requests.files import managed_records_root
+
+    stored_path = document.get("stored_path")
+    size = document.get("size_bytes")
+    digest = document.get("sha256")
+    if (not isinstance(stored_path, str) or type(size) is not int or size < 0
+            or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)):
+        raise ValueError("Invalid Records file metadata.")
+    root = managed_records_root(profile_root)
+    path = Path(stored_path)
+    relative = path.relative_to(root)
+    if not relative.parts or any(part == ".." or ":" in part for part in relative.parts):
+        raise ValueError("Invalid managed Records path.")
+    for component in (path, *path.parents[:len(relative.parts) - 1]):
+        entry = component.lstat()
+        if (stat.S_ISLNK(entry.st_mode) or
+                getattr(entry, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+            raise ValueError("The Records path contains a link.")
+    if path.resolve(strict=True) != path or not stat.S_ISREG(path.lstat().st_mode):
+        raise ValueError("Not a regular managed Records file.")
+    file = path.open("rb")
+    try:
+        opened = os.fstat(file.fileno())
+        if not stat.S_ISREG(opened.st_mode) or opened.st_size != size:
+            raise ValueError("The Records file no longer matches its metadata.")
+        if os.name == "nt":
+            if opened_windows_path(file) != path:
+                raise ValueError("The Records handle is outside its verified path.")
+        elif path.resolve(strict=True) != path or not os.path.samestat(opened, path.stat()):
+            raise ValueError("The Records handle is outside its verified path.")
+        if hashlib.file_digest(file, "sha256").hexdigest() != digest:
+            raise ValueError("The Records file no longer matches its metadata.")
+        file.seek(0)
+    except BaseException:
+        file.close()
+        raise
+    filename = re.sub(r"[^A-Za-z0-9._-]", "_", relative.name[-160:]).strip(".")
+    return file, filename or "attachment", size, digest
+
+
+class RecordsFileResponse(StreamingResponse):
+    def __init__(self, file, filename: str, size: int, digest: str):
+        self.file = file
+        super().__init__(
+            self.chunks(size),
+            media_type="application/octet-stream",
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+                     "Content-Length": str(size), "Content-Disposition": f'attachment; filename="{filename}"',
+                     "X-Content-SHA256": digest},
+        )
+
+    def chunks(self, remaining: int):
+        while remaining:
+            chunk = self.file.read(min(remaining, 1024 * 1024))
+            if not chunk:
+                raise OSError("The Records attachment changed during download.")
+            remaining -= len(chunk)
+            yield chunk
+
+    async def __call__(self, scope, receive, send):
+        try:
+            await super().__call__(scope, receive, send)
+        finally:
+            self.file.close()
+
+
 def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
     staff = SharedStaff(profile_root)
     operations = SharedOperations(profile_root)
+
+    async def dispatch(request, path, body, proof, principal):
+        # Dispatch the existing route in the same process and request context.
+        # HTTP never supplies the trusted actor or role.
+        async def receive():
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        response: dict = {}
+        output = bytearray()
+
+        async def send(message):
+            if message["type"] == "http.response.start":
+                response.update(message)
+            elif message["type"] == "http.response.body":
+                output.extend(message.get("body", b""))
+
+        scope = {**request.scope, "path": path, "raw_path": path.encode("ascii"), "root_path": "",
+                 "headers": [(b"content-type", b"application/json"), (b"x-townlight-session", proof.encode("ascii"))]}
+        with shared_staff_scope(profile_root, proof, principal):
+            await domain_app(scope, receive, send)
+        return response["status"], output
+
+    async def download_records_file(request, download, proof, principal):
+        if not principal.allows_module("townlight_records"):
+            return json_response({"detail": "This role cannot download Records evidence."}, status=403)
+        if "range" in request.headers:
+            return json_response({"detail": "Download the complete Records attachment."}, status=416)
+        path = f"/desktop/v1/requests/{download['request_id']}/view"
+        status, output = await dispatch(request, path, b"", proof, principal)
+        if status != 200:
+            return json_response({"detail": "This Records attachment could not be opened."}, status=status)
+        unavailable = {"detail": "This Records attachment is unavailable."}
+        try:
+            documents = json.loads(output)["documents"]
+            document = next(item for item in documents if item["attachment_id"] == download["attachment_id"])
+            file, filename, size, digest = await run_in_threadpool(open_records_download, profile_root, document)
+        except (OSError, ValueError, KeyError, TypeError, StopIteration):
+            return json_response(unavailable, status=404)
+        if staff.resolve(proof) != principal:
+            file.close()
+            return json_response({"detail": "Sign in with an authorized Townlight account."}, status=401)
+        return RecordsFileResponse(file, filename, size, digest)
 
     @app.post("/staff/v1/session", include_in_schema=False)
     async def sign_in(request: Request):
@@ -237,6 +372,7 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         path = f"/{target}"
         allowed = READ if request.method == "GET" else WRITE
         council_file = request.method == "GET" and COUNCIL_FILE.fullmatch(path) is not None
+        records_download = RECORDS_DOWNLOAD.fullmatch(path) if request.method == "GET" else None
         records_upload = request.method == "POST" and RECORDS_FILE.fullmatch(path) is not None
         query = request.url.query
         if council_file:
@@ -249,13 +385,15 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         else:
             allowed_query = (not query or path == "/desktop/v1/portal/selections"
                              and re.fullmatch(rf"request_id={UUID}", query))
-        if (allowed.fullmatch(path) is None and not council_file and not records_upload
+        if (allowed.fullmatch(path) is None and not council_file and not records_upload and not records_download
                 or not allowed_query):
             return json_response({"detail": "This operation is only available on the city host."}, status=404)
         proof = request.headers.get("x-townlight-session")
         principal = staff.resolve(proof)
         if principal is None:
             raise HTTPException(401, "Sign in with an authorized Townlight account.")
+        if records_download:
+            return await download_records_file(request, records_download, proof, principal)
         body = await bounded_body(request, MAX_BODY)
         if records_upload or path.endswith(("/actions", "/packet-snapshots")):
             try:
@@ -300,25 +438,7 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
                 return Response(replay.body, status_code=replay.status, media_type="application/json",
                                 headers={"Cache-Control": "no-store"})
 
-        # Dispatch the existing route in the same process and request context.
-        # HTTP never supplies the trusted actor or role.
-        async def receive():
-            return {"type": "http.request", "body": body, "more_body": False}
-
-        response: dict = {}
-        output = bytearray()
-
-        async def send(message):
-            if message["type"] == "http.response.start":
-                response.update(message)
-            elif message["type"] == "http.response.body":
-                output.extend(message.get("body", b""))
-
-        scope = {**request.scope, "path": path, "raw_path": path.encode("ascii"), "root_path": "",
-                 "headers": [(b"content-type", b"application/json"), (b"x-townlight-session", proof.encode("ascii"))]}
-        with shared_staff_scope(profile_root, proof, principal):
-            await domain_app(scope, receive, send)
-        status = response["status"]
+        status, output = await dispatch(request, path, body, proof, principal)
         if status >= 400:
             failure = {"detail": "The city host did not accept this operation."}
             if status == 409:

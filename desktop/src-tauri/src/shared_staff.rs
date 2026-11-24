@@ -118,6 +118,11 @@ pub(crate) fn run_client_cli() -> Option<i32> {
         RecordsDomainRequest {
             request: crate::domain_client::RecordsRequest,
         },
+        RecordsAttachmentDownload {
+            request_id: uuid::Uuid,
+            attachment_id: uuid::Uuid,
+            target_path: String,
+        },
         FirstRunAction {
             action: String,
             step_id: Option<String>,
@@ -166,6 +171,26 @@ pub(crate) fn run_client_cli() -> Option<i32> {
                         crate::records_domain_request(request)
                             .await
                             .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::RecordsAttachmentDownload {
+                        request_id,
+                        attachment_id,
+                        target_path,
+                    } => {
+                        let proof = proof()
+                            .map_err(|_| "Sign in with an authorized Records account.".to_string());
+                        match proof {
+                            Ok(proof) => crate::domain_client::download_records_attachment(
+                                request_id,
+                                attachment_id,
+                                proof,
+                                target_path,
+                            )
+                            .await
+                            .map_err(|error| error.message.to_string()),
+                            Err(error) => Err(error),
+                        }
+                        .map_err(Value::String)
                     }
                     Request::FirstRunAction {
                         action,

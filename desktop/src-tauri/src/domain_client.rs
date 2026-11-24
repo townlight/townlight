@@ -4,6 +4,8 @@ use reqwest::{Client, Method, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+use std::io::Write;
+use std::path::PathBuf;
 use std::sync::{LazyLock, Mutex};
 use std::time::Duration;
 use uuid::Uuid;
@@ -1489,6 +1491,112 @@ pub async fn execute(request: RecordsRequest, proof: String) -> Result<Value, Do
         .await
         .map_err(|_| DomainError::transport(false))??;
     send(method, path, body, &proof).await
+}
+
+pub async fn download_records_attachment(
+    request_id: Uuid,
+    attachment_id: Uuid,
+    proof: String,
+    target: String,
+) -> Result<Value, DomainError> {
+    use sha2::{Digest, Sha256};
+    let view = execute(RecordsRequest::View { request_id }, proof.clone()).await?;
+    let attachment_text = attachment_id.to_string();
+    let document = view
+        .get("documents")
+        .and_then(Value::as_array)
+        .and_then(|docs| {
+            docs.iter().find(|doc| {
+                doc.get("attachment_id").and_then(Value::as_str) == Some(attachment_text.as_str())
+            })
+        })
+        .ok_or_else(|| {
+            DomainError::new(
+                "attachment-unavailable",
+                "This Records attachment is not available on the selected request.",
+                false,
+            )
+        })?;
+    let expected_size = document
+        .get("size_bytes")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| {
+            DomainError::new(
+                "attachment-unavailable",
+                "The Records attachment has no valid size metadata.",
+                false,
+            )
+        })?;
+    let expected_hash = document
+        .get("sha256")
+        .and_then(Value::as_str)
+        .filter(|s| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        .ok_or_else(|| {
+            DomainError::new(
+                "attachment-unavailable",
+                "The Records attachment has no valid hash metadata.",
+                false,
+            )
+        })?
+        .to_ascii_lowercase();
+    let target = PathBuf::from(target);
+    if target.exists() {
+        return Err(DomainError::new(
+            "save-target-exists",
+            "Choose a new file name; Townlight will not replace an existing file.",
+            false,
+        ));
+    }
+    let name = target
+        .file_name()
+        .and_then(|n| n.to_str())
+        .filter(|n| !n.is_empty())
+        .ok_or_else(|| {
+            DomainError::new(
+                "save-target-invalid",
+                "Choose a valid destination file name.",
+                false,
+            )
+        })?;
+    let temp = target.with_file_name(format!(".{name}.{}.part", Uuid::new_v4()));
+    let result = async {
+        let destination = if crate::shared_staff::configured() {
+            crate::shared_staff::url(&format!("/staff/v1/api/desktop/v1/requests/{request_id}/documents/{attachment_id}/content"))
+                .map_err(|_| DomainError::transport(false))?
+        } else { return Err(DomainError::denied()); };
+        let client = Client::builder().no_proxy().redirect(reqwest::redirect::Policy::none()).retry(reqwest::retry::never())
+            .connect_timeout(Duration::from_secs(3)).timeout(Duration::from_secs(7200)).build().map_err(|_| DomainError::transport(false))?;
+        let mut response = client.get(destination).header("X-Townlight-Session", &proof).send().await.map_err(|_| DomainError::transport(false))?;
+        if !response.status().is_success() { return Err(DomainError::new("download-rejected", "The city host did not authorize this attachment download.", false)); }
+        if response.headers().get(reqwest::header::CONTENT_TYPE).and_then(|h| h.to_str().ok()) != Some("application/octet-stream")
+            || response.headers().get(reqwest::header::CONTENT_DISPOSITION).and_then(|h| h.to_str().ok()).is_none() {
+            return Err(DomainError::new("download-header-mismatch", "The city host returned an invalid attachment response.", false));
+        }
+        if response.content_length() != Some(expected_size)
+            || response.headers().get("X-Content-SHA256").and_then(|h| h.to_str().ok()).map(str::to_ascii_lowercase).as_deref() != Some(expected_hash.as_str()) {
+            return Err(DomainError::new("download-metadata-mismatch", "The attachment response did not match the current Records metadata.", false));
+        }
+        let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&temp).map_err(|_| DomainError::transport(false))?;
+        let mut hasher = Sha256::new(); let mut count = 0u64;
+        while let Some(chunk) = response.chunk().await.map_err(|_| DomainError::transport(false))? {
+            count = count.checked_add(chunk.len() as u64).ok_or_else(|| DomainError::transport(false))?;
+            if count > expected_size { return Err(DomainError::new("download-size-mismatch", "The attachment exceeded its verified size; the incomplete file was removed.", false)); }
+            file.write_all(&chunk).map_err(|_| DomainError::transport(false))?; hasher.update(&chunk);
+        }
+        file.sync_all().map_err(|_| DomainError::transport(false))?;
+        let actual = format!("{:x}", hasher.finalize());
+        if count != expected_size || actual != expected_hash { return Err(DomainError::new("download-integrity-failed", "The downloaded attachment failed its size or SHA-256 check; the incomplete file was removed.", false)); }
+        drop(file);
+        // A same-directory hard link publishes the verified bytes atomically
+        // and fails if another process created the chosen target meanwhile.
+        std::fs::hard_link(&temp, &target).map_err(|_| DomainError::new("save-target-unavailable", "The destination could not be created without replacing an existing file.", false))?;
+        let _ = std::fs::remove_file(&temp);
+        Ok(serde_json::json!({"path":target.display().to_string(),"size_bytes":count,"sha256":actual}))
+    }.await;
+    if result.is_err() {
+        let _ = std::fs::remove_file(&temp);
+    }
+    result
 }
 
 pub(crate) async fn send(

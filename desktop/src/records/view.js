@@ -91,7 +91,7 @@ function renderRecordsMessages(request) {
   `;
 }
 
-function renderRecordsDocuments(request) {
+function renderRecordsDocuments(request, sharedStaff = false) {
   const documents = request.documents || [];
   if (documents.length === 0) return "";
   return `
@@ -106,6 +106,7 @@ function renderRecordsDocuments(request) {
             <small>SHA-256 ${escapeHtml(document.sha256)}</small>
             ${document.release_sha256 ? `<small>Release artifact: ${escapeHtml(document.release_status || "release copy")} ${escapeHtml(document.release_file_name || "")}; SHA-256 ${escapeHtml(document.release_sha256)}; ${escapeHtml(String(document.release_size_bytes || 0))} bytes</small>` : ""}
             ${document.release_note ? `<small>Release note: ${escapeHtml(document.release_note)}</small>` : ""}
+            ${sharedStaff && document.attachment_id ? `<button type="button" class="secondary-action" data-work-action="download-records-attachment" data-action-payload='${JSON.stringify({recordsRequestId: request.id, attachmentId: document.attachment_id, suggestedFileName: document.file_name || document.title}).replace(/&/g, "&amp;").replace(/'/g, "&#39;")}'>Download private attachment</button>` : ""}
           </li>
         `).join("")}
       </ul>
@@ -356,7 +357,7 @@ function renderRecordsWorkflow() {
           ${request.approved_at_unix_seconds ? "<p><strong>Approval:</strong> human-approved</p>" : ""}
           ${request.fulfilled_at_unix_seconds ? "<p><strong>Fulfillment:</strong> released to requester</p>" : ""}
           ${renderRecordsMessages(request)}
-          ${renderRecordsDocuments(request)}
+          ${renderRecordsDocuments(request, sharedStaff)}
           ${renderRecordsSearchSessions(request)}
           ${renderRecordsExemptionDecisions(request)}
           ${renderRecordsReleasePackages(request)}

@@ -1,16 +1,20 @@
 """Shared staff gateway: isolated principals, bounded host paths and revocation."""
 
+import asyncio
 import hashlib
+import io
 import json
+import threading
 from uuid import uuid4
 
 from argon2 import PasswordHasher
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.testclient import TestClient
 import pytest
+from starlette.requests import ClientDisconnect
 
 from townlight_records.auth.desktop_session import validate_native_session
-from townlight_runtime.shared_staff import install_shared_staff
+from townlight_runtime.shared_staff import RecordsFileResponse, install_shared_staff
 from townlight_runtime.shared_operations import SharedOperations
 
 
@@ -36,6 +40,9 @@ def gateway(tmp_path):
     users = config / "staff-users.json"
     users.write_text(json.dumps([clerk, records]))
     domain = FastAPI()
+    download_file = tmp_path / "Data" / "files" / "records" / "recording.ts"
+    download_file.parent.mkdir(parents=True)
+    download_file.write_bytes(b"private" * 200_000)
 
     def require(request, module):
         try:
@@ -56,6 +63,17 @@ def gateway(tmp_path):
     @domain.get("/desktop/v1/records-state")
     def state(request: Request):
         return {"identity": require(request, "townlight_records").email}
+
+    @domain.get("/desktop/v1/requests/{request_id}/view")
+    def records_view(request: Request, request_id: str):
+        require(request, "townlight_records")
+        if request_id != RECORD:
+            raise HTTPException(404, "Request not found.")
+        return {"documents": [{
+            "attachment_id": MEETING, "stored_path": str(download_file),
+            "sha256": hashlib.sha256(b"private" * 200_000).hexdigest(),
+            "size_bytes": len(b"private") * 200_000,
+        }]}
 
     @domain.get("/desktop/v1/meetings/packets/{packet_id}/council-file/{artifact_id}/{filename}")
     def council_file(request: Request, packet_id: str, artifact_id: str, filename: str,
@@ -88,6 +106,72 @@ def login(client, name):
 
 def operation(session, operation_id=None):
     return {**session, "X-Townlight-Operation": operation_id or str(uuid4())}
+
+
+def test_private_records_download_authorization_integrity_and_exact_scope(gateway):
+    client, _, _, _, root = gateway
+    records = login(client, "records")
+    clerk = login(client, "clerk")
+    path = f"{API}/requests/{RECORD}/documents/{MEETING}/content"
+    assert client.get(path).status_code == 401
+    assert client.get(path, headers=clerk).status_code == 403
+    assert client.get(path.replace(RECORD, MEETING, 1), headers=records).status_code == 404
+    assert client.get(path.replace(MEETING, RECORD), headers=records).status_code == 404
+    assert client.get(f"{path}?location=C:/secret", headers=records).status_code == 404
+    assert client.get(path, headers={**records, "Range": "bytes=2-"}).status_code == 416
+    assert client.get(path.replace("/staff/v1/api", ""), headers=records).status_code == 404
+
+    response = client.get(path, headers=records)
+    data = b"private" * 200_000
+    assert response.status_code == 200
+    assert response.content == data
+    assert response.headers["content-length"] == str(len(data))
+    assert response.headers["content-type"] == "application/octet-stream"
+    assert response.headers["content-disposition"] == 'attachment; filename="recording.ts"'
+    assert response.headers["x-content-sha256"] == hashlib.sha256(data).hexdigest()
+    assert response.headers["cache-control"] == "no-store"
+
+    (root / "Data" / "files" / "records" / "recording.ts").write_bytes(b"changed" * 200_000)
+    failure = client.get(path, headers=records)
+    assert failure.status_code == 404 and str(root) not in failure.text
+    assert client.delete(SESSION, headers=records).status_code == 200
+    assert client.get(path, headers=records).status_code == 401
+
+
+def test_private_records_download_rejects_link_to_unmanaged_file(gateway):
+    client, _, _, _, root = gateway
+    records = login(client, "records")
+    path = f"{API}/requests/{RECORD}/documents/{MEETING}/content"
+    managed = root / "Data" / "files" / "records" / "recording.ts"
+    unmanaged = root / "unmanaged.ts"
+    managed.rename(unmanaged)
+    try:
+        managed.symlink_to(unmanaged)
+    except OSError:
+        pytest.skip("Creating file symlinks is unavailable")
+    response = client.get(path, headers=records)
+    assert response.status_code == 404 and str(unmanaged) not in response.text
+
+
+def test_private_records_stream_closes_after_failed_send():
+    loop_thread = threading.get_ident()
+
+    class ManagedFile(io.BytesIO):
+        def read(self, size):
+            assert threading.get_ident() != loop_thread
+            assert 0 < size <= 1024 * 1024
+            return super().read(size)
+
+    file = ManagedFile(b"private Recording")
+    response = RecordsFileResponse(file, "recording.ts", 17, "0" * 64)
+
+    async def send(message):
+        if message["type"] == "http.response.body":
+            raise OSError("Disconnected")
+
+    with pytest.raises(ClientDisconnect):
+        asyncio.run(response({"type": "http", "asgi": {"spec_version": "2.4"}}, None, send))
+    assert file.closed
 
 
 def test_council_preview_and_approved_download_queries(gateway):

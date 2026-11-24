@@ -1,5 +1,5 @@
 /** Records UI adapter. No HTTP, session proof, fallback state, or retry here. */
-export type Invoke = <T>(command: string, args: {request: object}) => Promise<T>;
+export type Invoke = <T>(command: string, args: Record<string, unknown>) => Promise<T>;
 export interface Attachment { id: string; attachment_id: string }
 export interface RecordView { id: string; request_id: string; documents: Attachment[]; [field: string]: unknown }
 export interface RecordsState { records_requests: RecordView[]; notification_events?: {id:string; notification_id:string}[]; [field: string]: unknown }
@@ -27,12 +27,12 @@ const fields = {
 
 export type LifecycleAction = keyof typeof fields;
 export type RecordsAction = LifecycleAction | "create-records-request" | "add-records-document" |
-  "add-records-release-copy" | "attach-station-recording" | "build-records-release-package" | "export-records-response" | "suggest-records-response" | "mark-notification-sent";
+  "add-records-release-copy" | "attach-station-recording" | "download-records-attachment" | "build-records-release-package" | "export-records-response" | "suggest-records-response" | "mark-notification-sent";
 export type PublicAction = "submit-public-records-request" | "lookup-public-records-request" | "add-public-records-message";
 
 export function isRecordsAction(action: string): action is RecordsAction {
   return Object.hasOwn(fields, action) || ["create-records-request", "add-records-document", "add-records-release-copy",
-    "attach-station-recording", "build-records-release-package", "export-records-response", "suggest-records-response", "mark-notification-sent"].includes(action);
+    "attach-station-recording", "download-records-attachment", "build-records-release-package", "export-records-response", "suggest-records-response", "mark-notification-sent"].includes(action);
 }
 export function isPublicRecordsAction(action: string): action is PublicAction {
   return ["submit-public-records-request", "lookup-public-records-request", "add-public-records-message"].includes(action);
@@ -67,6 +67,10 @@ export function createRecordsClient(invoke: Invoke) {
       const selected = current.records_requests.find(item => item.id === payload.recordsRequestId);
       if (!selected?.request_id) throw new Error("Refresh Records and select the request again.");
       const request_id = selected.request_id;
+      if (action === "download-records-attachment") {
+        if (!sharedStaff || !payload.attachmentId) throw new Error("Select a private attachment from the current Records request.");
+        return invoke("download_records_attachment", {requestId: request_id, attachmentId: payload.attachmentId, suggestedFileName: payload.suggestedFileName});
+      }
       if (action === "attach-station-recording") {
         return invoke("records_domain_request", {request: {operation: action, request_id,
           recording_id: payload.stationRecordingId, expected_sha256: payload.stationRecordingSha256}});
