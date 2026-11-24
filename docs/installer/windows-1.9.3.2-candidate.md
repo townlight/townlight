@@ -26,6 +26,9 @@ The signed 1.9.3.2 installer passed setup, backup and restore, uninstall, and up
 ## Verified signed artifact metadata
 
 - Suite source: `67d56f24c12be4f2a409d1940ca4199a226adcfc`
+- Records 1.8.0.dev4 source: `3d1291a9bdc382b2fc09666a25ce82de6939c55d`
+- Station 0.4.4 source: `f1b946b10ed72f2ffd93e0609d913c73566debe4`
+- [Released component source pins](https://townlight.github.io/reference/windows-1.9.3.2-source-pins.json)
 - Signing run: [45321294952](https://github.com/townlight/townlight/actions/runs/45321294952)
 - MSI SHA-256: `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77`
 - MSI size: 1,866,072,064 bytes
