@@ -25,6 +25,8 @@ The signed 1.9.3.2 installer passed setup, backup and restore, uninstall, and up
 
 ## Verified signed artifact metadata
 
+The legacy installer planner reads `config/suite-state.json` and its `installer/modules.json` projection, retaining source pins used by archived cleanroom tests. Windows 1.9.3.2 release source pins come from its published corresponding-source archive and listed release pin manifest.
+
 - Suite source: `67d56f24c12be4f2a409d1940ca4199a226adcfc`
 - Records 1.8.0.dev4 source: `3d1291a9bdc382b2fc09666a25ce82de6939c55d`
 - Station 0.4.4 source: `f1b946b10ed72f2ffd93e0609d913c73566debe4`
