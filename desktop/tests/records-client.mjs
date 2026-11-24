@@ -34,11 +34,11 @@ console.log("PASS: Records client uses canonical IDs, strips unrelated fields, a
 // Exercise the actual shared-staff Documents button payload through its
 // controller and native command adapter, including a cancelled save dialog.
 const requestWithFile = {id:"legacy-1", request_id:"a7abf8da-7c0b-47a5-b4ab-4fc1b33aab78", documents:[{
-  id:"legacy-doc", attachment_id:"b7abf8da-7c0b-47a5-b4ab-4fc1b33aab78", title:"Station recording", file_name:"station.ts", sha256:"d".repeat(64), size_bytes:2174280536
+  id:"legacy-doc", attachment_id:"b7abf8da-7c0b-47a5-b4ab-4fc1b33aab78", title:"Station recording", file_name:"station-'&#39;.ts", sha256:"d".repeat(64), size_bytes:2174280536
 }]};
 const documentsHtml = createRecordsRenderer({escapeHtml:String}).renderRecordsDocuments(requestWithFile, true);
-const encodedButtonPayload = documentsHtml.match(/data-action-payload='([^']+)'/)[1].replace(/&amp;/g, "&").replace(/&#39;/g, "'");
-const buttonPayload = JSON.parse(encodedButtonPayload);
+const encodedButtonPayload = documentsHtml.match(/data-action-payload='([^']+)'/)[1];
+const buttonPayload = JSON.parse(encodedButtonPayload.replace(/&(?:amp|#39);/g, entity => entity === "&amp;" ? "&" : "'"));
 const nativeCalls = [];
 const downloadController = createRecordsController(async (command, args) => {
   nativeCalls.push({command, ...args});
@@ -49,7 +49,7 @@ const downloadController = createRecordsController(async (command, args) => {
 const downloaded = await downloadController.action("download-records-attachment", buttonPayload, {records_requests:[requestWithFile]}, true);
 assert.deepEqual(nativeCalls.filter(call => call.command === "download_records_attachment").map(({command, requestId, attachmentId, suggestedFileName}) => ({command, requestId, attachmentId, suggestedFileName})), [{
   command:"download_records_attachment", requestId:requestWithFile.request_id,
-  attachmentId:requestWithFile.documents[0].attachment_id, suggestedFileName:"station.ts"
+  attachmentId:requestWithFile.documents[0].attachment_id, suggestedFileName:requestWithFile.documents[0].file_name
 }]);
 assert.match(downloaded.message, /2174280536 bytes, SHA-256/);
 const cancelledController = createRecordsController(async (command) => {
