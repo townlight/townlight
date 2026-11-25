@@ -49,6 +49,9 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
         imports.append(("townlight_permitting", "townlight_permitting.workflow_store"))
     if profile == "inspections-preview":
         imports.append(("townlight_inspections", "townlight_inspections.workflow_store"))
+        imports.append(("townlight_311", "townlight_311.workflow"))
+        imports.append(("townlight_comms", "townlight_comms.workflow"))
+        imports.append(("townlight_parks", "townlight_parks.workflow"))
         imports.extend((name, f"{name}.staff_workflow") for name in (
             "townlight_boards", "townlight_contracts", "townlight_procurement",
         ))
@@ -206,18 +209,30 @@ def health_payload() -> dict[str, Any]:
 
 def _domain_database_status() -> dict[str, Any]:
     """A domain schema probe, not merely process/import/TCP health."""
+    from sqlalchemy import select
     from townlight_records.models.audit import AuditLog
+    from townlight_records.models.document import DataSource, Document
     from townlight_records.models.fees import FeeLineItem, FeeWaiver
     from townlight_records.models.notifications import NotificationLog
-    from townlight_records.models.records_evidence import RequestEvidenceNote, RequestExemptionDecision
-    from townlight_records.models.records_files import RequestFileEvidence, RequestReleaseCopy
-    from townlight_records.models.records_artifacts import RequestArtifact, RequestPublication
-    from townlight_records.models.document import DataSource, Document
-    from townlight_records.models.request import RequestDocument
-    from townlight_records.models.request import RecordsRequest
-    from townlight_records.models.request_workflow import RequestMessage, RequestPublicStatus, RequestTimeline
+    from townlight_records.models.records_artifacts import (
+        RequestArtifact,
+        RequestPublication,
+    )
+    from townlight_records.models.records_evidence import (
+        RequestEvidenceNote,
+        RequestExemptionDecision,
+    )
+    from townlight_records.models.records_files import (
+        RequestFileEvidence,
+        RequestReleaseCopy,
+    )
+    from townlight_records.models.request import RecordsRequest, RequestDocument
+    from townlight_records.models.request_workflow import (
+        RequestMessage,
+        RequestPublicStatus,
+        RequestTimeline,
+    )
     from townlight_records.models.search import SearchQuery, SearchResult, SearchSession
-    from sqlalchemy import select
 
     database = create_engine(_sync_database_url(os.environ["DATABASE_URL"]), pool_pre_ping=True)
     try:
@@ -228,11 +243,19 @@ def _domain_database_status() -> dict[str, Any]:
                           DataSource, Document, RequestDocument, RequestFileEvidence, RequestReleaseCopy,
                           RequestArtifact, RequestPublication):
                 connection.execute(select(model).limit(0))
-            from townlight_access.access_review import accessibility_review_records, audit_events
-            from townlight_runtime.access_bridge import review_advice, review_exports, drafts
-            from townlight_notice.workflow import heads, events, proofs, archives
-            from townlight_runtime.records_import_store import imports, legacy_audit
+            from townlight_access.access_review import (
+                accessibility_review_records,
+                audit_events,
+            )
+            from townlight_notice.workflow import archives, events, heads, proofs
+
+            from townlight_runtime.access_bridge import (
+                drafts,
+                review_advice,
+                review_exports,
+            )
             from townlight_runtime.native_accounts import accounts
+            from townlight_runtime.records_import_store import imports, legacy_audit
             for table in (accessibility_review_records, audit_events, review_advice, review_exports,
                           drafts, heads, events, proofs, archives, imports, legacy_audit, accounts):
                 connection.execute(select(table).limit(0))
@@ -249,7 +272,7 @@ def _code_database_status() -> dict[str, Any]:
         database_url = os.environ.get("TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL", "")
         if not database_url.startswith("postgresql"):
             raise ValueError("Code requires PostgreSQL.")
-        from townlight_code.models import Base
+        from sqlalchemy import select
         from townlight_code import (
             import_connectors,
             operational_state,
@@ -260,7 +283,7 @@ def _code_database_status() -> dict[str, Any]:
             source_registry,
             staff_workbench,
         )
-        from sqlalchemy import select
+        from townlight_code.models import Base
 
         keyed_tables: dict[str, Any] = {}
         for table in Base.metadata.tables.values():
@@ -359,8 +382,9 @@ def create_runtime_app(*, domain_enabled: bool = False):
     from fastapi.responses import JSONResponse
 
     _set_local_defaults()
-    from townlight_records.main import create_app
     from townlight_records.database import engine as domain_engine
+    from townlight_records.main import create_app
+
     from townlight_runtime.records_cutover import verify_activation
     domain_enabled = domain_enabled or verify_activation(_profile_root(), os.environ["DATABASE_URL"])
 
@@ -378,13 +402,18 @@ def create_runtime_app(*, domain_enabled: bool = False):
     if _product_profile() in ("meetings-beta", "city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"):
         from townlight_runtime.meetings_bridge import router as meetings_router
         domain_app.include_router(meetings_router)
-        from townlight_runtime.meetings_bridge import public_router as meetings_public_router
+        from townlight_runtime.meetings_bridge import (
+            public_router as meetings_public_router,
+        )
         domain_app.include_router(meetings_public_router)
-        from townlight_runtime.portal_publication import router as portal_publication_router
+        from townlight_runtime.portal_publication import (
+            router as portal_publication_router,
+        )
         domain_app.include_router(portal_publication_router)
         from townlight_runtime.publisher_api import router as publisher_router
         domain_app.include_router(publisher_router)
         from townlight_meetings.records_sources import public_documents
+
         from townlight_runtime.meetings_bridge import database_url, readiness
         def meetings_sources(query="", source_id=None):
             if not readiness():
@@ -394,7 +423,12 @@ def create_runtime_app(*, domain_enabled: bool = False):
     if _product_profile() in ("city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"):
         from townlight_runtime.code_bridge import router as code_router
         domain_app.include_router(code_router)
-        from townlight_runtime.code_meetings_bridge import code_router as code_connections, meetings_router as meeting_connections
+        from townlight_runtime.code_meetings_bridge import (
+            code_router as code_connections,
+        )
+        from townlight_runtime.code_meetings_bridge import (
+            meetings_router as meeting_connections,
+        )
         domain_app.include_router(code_connections)
         domain_app.include_router(meeting_connections)
         from townlight_runtime.code_public import router as code_public_router
@@ -407,7 +441,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
                                   query=query, source_id=source_id, as_of=as_of)
         domain_app.state.desktop_code_sources = code_sources
     if _product_profile() in ("zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"):
-        from townlight_runtime.zoning_bridge import public_router, router as zoning_router
+        from townlight_runtime.zoning_bridge import public_router
+        from townlight_runtime.zoning_bridge import router as zoning_router
         domain_app.include_router(zoning_router)
         domain_app.include_router(public_router)
         from townlight_runtime import zoning_records
@@ -419,30 +454,105 @@ def create_runtime_app(*, domain_enabled: bool = False):
                 domain_app.state.desktop_meetings_sources, query=query, source_id=source_id)
         domain_app.state.desktop_zoning_sources = zoning_sources
     if _product_profile() in {"planning-preview", "permitting-preview", "inspections-preview"}:
-        from townlight_runtime.planning_bridge import router as planning_router, public_router as planning_public
+        from townlight_runtime.planning_bridge import public_router as planning_public
+        from townlight_runtime.planning_bridge import router as planning_router
         from townlight_runtime.planning_connections import configure
         configure(domain_app, domain_app, _sync_database_url(os.environ["DATABASE_URL"]))
         domain_app.include_router(planning_router)
         domain_app.include_router(planning_public)
     if _product_profile() in {"permitting-preview", "inspections-preview"}:
-        from townlight_runtime.permitting_bridge import router as permitting_router, configure
+        from townlight_runtime.permitting_bridge import configure
+        from townlight_runtime.permitting_bridge import router as permitting_router
         configure(domain_app)
         domain_app.include_router(permitting_router)
     if _product_profile() == "inspections-preview":
-        from townlight_runtime.inspections_bridge import router as inspections_router, configure
+        from townlight_runtime.inspections_bridge import configure
+        from townlight_runtime.inspections_bridge import router as inspections_router
         configure(domain_app)
         domain_app.include_router(inspections_router)
         from townlight_runtime.municipal_staff import router as municipal_staff_router
         domain_app.include_router(municipal_staff_router)
         from townlight_runtime.data_staff import router as data_staff_router
         domain_app.include_router(data_staff_router)
+        from townlight_runtime import budget_publication  # noqa: F401
         from townlight_runtime.budget_council import router as budget_router
         from townlight_runtime.grants_staff import router as grants_router
-        from townlight_runtime import budget_publication  # noqa: F401
         domain_app.include_router(budget_router)
         domain_app.include_router(grants_router)
+        from townlight_runtime import (
+            service_request_data,
+            service_request_interchange,
+            service_request_open311,
+            service_request_open311_create,
+            service_request_open311_read,
+            service_request_operations,
+            service_request_records,
+            service_requests,
+        )
+        domain_app.include_router(service_requests.router)
+        domain_app.include_router(service_request_data.router)
+        domain_app.include_router(service_request_operations.router)
+        domain_app.include_router(service_request_interchange.router)
+        domain_app.include_router(service_request_records.router)
+        domain_app.include_router(service_request_open311.router)
+        domain_app.include_router(service_request_open311_read.router)
+        domain_app.include_router(service_request_open311_create.router)
+        from townlight_runtime.communications_staff import (
+            router as communications_staff_router,
+        )
+        domain_app.include_router(communications_staff_router)
+        from townlight_runtime.communications_attachments import (
+            router as communications_attachments_router,
+        )
+        domain_app.include_router(communications_attachments_router)
+        from townlight_runtime.communications_records import (
+            router as communications_records_router,
+        )
+        domain_app.include_router(communications_records_router)
+        from townlight_runtime.parks_staff import router as parks_staff_router
+        domain_app.include_router(parks_staff_router)
+        from townlight_runtime.parks_data import router as parks_data_router
+        domain_app.include_router(parks_data_router)
+    if domain_enabled and _product_profile() == "inspections-preview":
+        from cryptography.fernet import Fernet
+        from sqlalchemy import create_engine
+        from townlight_311 import migrations as townlight_311_migrations
+        from townlight_311.workflow import ServiceRequestRepository
+
+        from townlight_runtime.email_settings import EmailSettingsStore
+        sync_engine = create_engine(_sync_database_url(os.environ["DATABASE_URL"]))
+        if not townlight_311_migrations.ready(sync_engine):
+            raise RuntimeError(
+                "Townlight 311 migrations are not applied; refusing to start service requests."
+            )
+        repo = ServiceRequestRepository(sync_engine, bootstrap=False)
+        key = _ensure_secret_file(
+            "resident-recovery.key", lambda: Fernet.generate_key().decode("ascii"),
+        ).read_bytes().strip()
+        repo.recovery_key = key
+        domain_app.state.desktop_service_requests = repo
+        domain_app.state.desktop_service_requests_engine = sync_engine
+        domain_app.state.desktop_notification_email = EmailSettingsStore(_profile_root(), key)
+        from townlight_comms import migrations as townlight_comms_migrations
+        from townlight_comms.workflow import CommunicationsRepository
+        if not townlight_comms_migrations.ready(sync_engine):
+            raise RuntimeError(
+                'Townlight communications migrations are not applied; refusing to start communications.'
+            )
+        domain_app.state.desktop_communications = CommunicationsRepository(sync_engine, bootstrap=False)
+        from townlight_parks import migrations as townlight_parks_migrations
+        from townlight_parks.workflow import ParksRepository
+        if not townlight_parks_migrations.ready(sync_engine):
+            raise RuntimeError(
+                "Townlight parks migrations are not applied; refusing to start parks."
+            )
+        domain_app.state.desktop_parks = ParksRepository(sync_engine)
+        domain_app.state.desktop_parks_key = key
+        from townlight_runtime.parks_payment_settings import ParksPaymentSettingsStore
+        domain_app.state.desktop_parks_payments = ParksPaymentSettingsStore(_profile_root(), lambda: key)
     async def demo_marker(session):
         from sqlalchemy import select
+
         from townlight_runtime.records_import_store import imports
         return await session.scalar(select(imports.c.demo_fixture).limit(1))
     domain_app.state.desktop_demo_marker = demo_marker
@@ -453,20 +563,116 @@ def create_runtime_app(*, domain_enabled: bool = False):
 
     @asynccontextmanager
     async def runtime_lifespan(app):
+        import asyncio
         from threading import Event, Thread
 
         stop = Event()
         worker = None
+        product_threads = []
         if ("townlight_meetings" in modules and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"
                 and os.getenv("TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN")):
             from townlight_runtime.publisher_queue import PublisherQueue
             worker = Thread(target=PublisherQueue(_profile_root()).run, args=(stop,),
                             name="townlight-publisher", daemon=True)
             worker.start()
+        repo = getattr(domain_app.state, "desktop_service_requests", None)
+        emailstore = getattr(domain_app.state, "desktop_notification_email", None)
+        if repo is not None and emailstore is not None and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1":
+            from townlight_runtime.service_request_delivery import (
+                ServiceRequestDelivery,
+            )
+            delivery = Thread(target=ServiceRequestDelivery(repo, emailstore).run, args=(stop,),
+                              name="townlight-service-request-delivery", daemon=True)
+            delivery.start()
+            product_threads.append(delivery)
+        if (repo is not None
+                and getattr(domain_app.state, "desktop_communications", None) is not None
+                and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"
+                and os.getenv("TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN")):
+            from townlight_runtime.resident_commands import ResidentCommandPump
+            from townlight_runtime.resident_dispatch import ResidentRepositoryDispatch
+            dispatch = ResidentRepositoryDispatch(
+                repo,
+                domain_app.state.desktop_communications,
+                repo.recovery_key,
+                os.getenv("TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN"),
+                parks=getattr(domain_app.state, "desktop_parks", None),
+            )
+            pump = Thread(target=ResidentCommandPump(dispatch).run, args=(stop,),
+                          name="townlight-resident-commands", daemon=True)
+            pump.start()
+            product_threads.append(pump)
+        if (getattr(domain_app.state, 'desktop_communications', None) is not None
+                and emailstore is not None
+                and os.getenv('TOWNLIGHT_SHARED_STAFF_HOST') == '1'
+                and os.getenv('TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN')):
+            from townlight_runtime.communications_host import CommunicationsHost
+            from townlight_runtime.publisher_queue import PublisherQueue
+            comms_repo = domain_app.state.desktop_communications
+            origin = os.environ['TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN']
+            comms_repo.recovery_key = domain_app.state.desktop_service_requests.recovery_key
+            comms_repo.public_origin = origin
+            communications = Thread(
+                target=CommunicationsHost(
+                    comms_repo, PublisherQueue(_profile_root()), emailstore, origin, _profile_root(),
+                    recovery_key=domain_app.state.desktop_service_requests.recovery_key,
+                ).run,
+                args=(stop,),
+                name='townlight-communications',
+                daemon=True,
+            )
+            communications.start()
+            product_threads.append(communications)
+        parks_repo = getattr(domain_app.state, "desktop_parks", None)
+        parks_settings = getattr(domain_app.state, "desktop_parks_payments", None)
+        if (parks_repo is not None
+                and parks_settings is not None
+                and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"):
+            from townlight_runtime.parks_payments import ParksPayments
+            payments = Thread(target=ParksPayments(parks_repo, parks_settings).run, args=(stop,),
+                              name="townlight-parks-payments", daemon=True)
+            payments.start()
+            product_threads.append(payments)
+        if (parks_repo is not None
+                and emailstore is not None
+                and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"
+                and os.getenv("TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN")):
+            from townlight_runtime.parks_email import ParksEmailDelivery
+            parks_delivery = Thread(
+                target=ParksEmailDelivery(
+                    parks_repo,
+                    emailstore,
+                    key=getattr(domain_app.state, "desktop_parks_key", None),
+                    public_origin=os.environ["TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN"],
+                ).run,
+                args=(stop,),
+                name="townlight-parks-email-delivery",
+                daemon=True,
+            )
+            parks_delivery.start()
+            product_threads.append(parks_delivery)
+        if (parks_repo is not None
+                and os.getenv("TOWNLIGHT_SHARED_STAFF_HOST") == "1"):
+            from townlight_runtime.parks_catalog_publish import ParksCatalogPublisher
+            parks_catalog = Thread(
+                target=ParksCatalogPublisher(parks_repo).run,
+                args=(stop,),
+                name="townlight-parks-catalog",
+                daemon=True,
+            )
+            parks_catalog.start()
+            product_threads.append(parks_catalog)
         try:
             yield
         finally:
             stop.set()
+            for thread in product_threads:
+                await asyncio.to_thread(thread.join, 35)
+            if any(thread.is_alive() for thread in product_threads):
+                raise RuntimeError("Townlight runtime worker did not stop cleanly.")
+            sync_engine = getattr(domain_app.state, "desktop_service_requests_engine", None)
+            if sync_engine is not None:
+                await asyncio.to_thread(sync_engine.dispose)
             await domain_engine.dispose()
 
     app = FastAPI(title='Townlight local runtime', lifespan=runtime_lifespan)

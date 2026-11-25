@@ -5,16 +5,16 @@ only /staff/v1/ and terminates TLS. Never proxy the native or Station ports.
 """
 
 import base64
-from dataclasses import dataclass
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
 import secrets
 import stat
 import tempfile
 import time
+from dataclasses import dataclass
+from pathlib import Path
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
@@ -23,16 +23,25 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.concurrency import run_in_threadpool
 from starlette.responses import Response
+from townlight_records.auth.desktop_session import (
+    NativeDesktopPrincipal,
+    shared_staff_scope,
+)
 
-from townlight_records.auth.desktop_session import NativeDesktopPrincipal, shared_staff_scope
 from townlight_runtime.native_accounts import ROLES
 from townlight_runtime.shared_operations import ALLOCATION, SharedOperations
-
 
 UUID = r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}"
 COUNCIL_FILE = re.compile(rf"/desktop/v1/meetings/packets/{UUID}/council-file/{UUID}/[A-Za-z0-9][A-Za-z0-9._-]*")
 READ = re.compile(rf"/desktop/v1/(?:records-state|requests/{UUID}(?:/view)?|meetings/meetings/{UUID}(?:/proceedings)?|meetings/agenda-items/{UUID}|portal/(?:publications/{UUID}|selections))")
 WRITE = re.compile(rf"/desktop/v1/(?:meetings/(?:clerk/catalog|meetings|agenda-items|agenda-items/{UUID}/(?:reviews|meeting)|meetings/{UUID}/(?:packet-snapshots|council-source)|packets/{UUID}/(?:deliver|council-preview|council-approval))|requests(?:/{UUID}/(?:actions|station-recordings))?|portal/publications/(?:(?:packet|recording)|{UUID}/(?:packet|recording)/withdraw))")
+SERVICE_REQUEST_READ = re.compile(rf"/desktop/v1/service-requests/(?:categories|assignees|email-settings|requests(?:/{UUID})?)")
+SERVICE_REQUEST_WRITE = re.compile(rf"/desktop/v1/service-requests/(?:categories|email-settings/(?:import-preview|import|export)|record-lookup|requests|requests/{UUID}/(?:transition|comments|attachments|links|records))")
+SERVICE_REQUEST_DATA_READ = re.compile(rf"/desktop/v1/municipal-staff/data/service-requests(?:/revisions/{UUID})?")
+SERVICE_REQUEST_DATA_WRITE = re.compile(r"/desktop/v1/municipal-staff/data/service-requests/(?:preview|publish)")
+COMMUNICATIONS_READ = re.compile(rf"/desktop/v1/communications/articles(?:/{UUID}(?:/attachments/{UUID})?)?")
+COMMUNICATIONS_WRITE = re.compile(rf"/desktop/v1/communications/(?:sources/lookup|access-review|articles(?:/{UUID}/(?:revisions|records|review|approval|schedule|attachments(?:/{UUID}/remove)?))?)")
+
 RECORDS_FILE = re.compile(rf"/desktop/v1/requests/{UUID}/documents(?:/{UUID}/release-copy)?")
 RECORDS_DOWNLOAD = re.compile(rf"/desktop/v1/requests/(?P<request_id>{UUID})/documents/(?P<attachment_id>{UUID})/content")
 RECORDS_ACTIONS = {"draft-records-response", "approve-records-response", "fulfill-records-request"}
@@ -367,31 +376,95 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
             staff.grants.pop(token_digest(proof), None)
         return json_response({"signed_out": True})
 
-    @app.api_route("/staff/v1/api/{target:path}", methods=["GET", "POST"], include_in_schema=False)
+    @app.api_route("/staff/v1/api/{target:path}", methods=["GET", "POST", "PUT", "DELETE"], include_in_schema=False)
     async def staff_api(target: str, request: Request):
         path = f"/{target}"
-        allowed = READ if request.method == "GET" else WRITE
+        allowed = (READ if request.method == "GET"
+                   else WRITE if request.method == "POST"
+                   else re.compile(r"(?!)"))
         council_file = request.method == "GET" and COUNCIL_FILE.fullmatch(path) is not None
         records_download = RECORDS_DOWNLOAD.fullmatch(path) if request.method == "GET" else None
         records_upload = request.method == "POST" and RECORDS_FILE.fullmatch(path) is not None
         query = request.url.query
-        if council_file:
+        from .parks_proxy import parks_data_route, parks_route
+        from .service_request_proxy import BINARY_DOWNLOAD, forward_binary
+        parks = parks_route(request.method, path, query)
+        parks_data = parks_data_route(request.method, path, query)
+        binary_download = request.method == "GET" and BINARY_DOWNLOAD.fullmatch(path) is not None
+        service_request_read = request.method == "GET" and (SERVICE_REQUEST_READ.fullmatch(path) is not None
+                                                               or SERVICE_REQUEST_DATA_READ.fullmatch(path) is not None)
+        service_request_write = request.method == "POST" and (SERVICE_REQUEST_WRITE.fullmatch(path) is not None
+                                                                or SERVICE_REQUEST_DATA_WRITE.fullmatch(path) is not None)
+        service_request = service_request_read or service_request_write
+        communications_read = request.method == "GET" and COMMUNICATIONS_READ.fullmatch(path) is not None
+        communications_write = request.method == "POST" and COMMUNICATIONS_WRITE.fullmatch(path) is not None
+        communications = communications_read or communications_write
+        if parks or parks_data:
+            allowed_query = True
+        elif council_file:
             pairs = request.query_params.multi_items()
             parameters = dict(pairs)
             allowed_query = (len(pairs) == 3
                              and re.fullmatch(r"[0-9a-f]{64}", parameters.get("manifest_sha256", ""))
                              and re.fullmatch(r"[0-9]{1,16}", parameters.get("offset", ""))
                              and parameters.get("approved") in {"true", "false"})
+        elif service_request:
+            pairs = request.query_params.multi_items()
+            keys = [key for key, _ in pairs]
+            if service_request_read and path == "/desktop/v1/service-requests/requests":
+                values = dict(pairs)
+                allowed_query = (len(keys) == len(set(keys))
+                                 and set(keys) <= {"department", "state", "offset", "limit"}
+                                 and all(re.fullmatch(r"[0-9]{1,9}", value) for key, value in pairs if key in {"offset", "limit"})
+                                 and all(1 <= len(value) <= (255 if key == "department" else 32) for key, value in pairs if key in {"department", "state"})
+                                 and 0 <= int(values.get("offset", "0")) <= 10**9
+                                 and 1 <= int(values.get("limit", "100")) <= 200)
+            elif service_request_read and path == "/desktop/v1/service-requests/categories":
+                allowed_query = (len(keys) == len(set(keys))
+                                 and set(keys) <= {"include_inactive"}
+                                 and dict(pairs).get("include_inactive") in {None, "true", "false"})
+            else:
+                allowed_query = not query
+        elif communications:
+            pairs = request.query_params.multi_items()
+            keys = [key for key, _ in pairs]
+            if communications_read and path == "/desktop/v1/communications/articles":
+                values = dict(pairs)
+                allowed_query = (len(keys) == len(set(keys))
+                                 and set(keys) <= {"state", "limit", "offset"}
+                                 and all(re.fullmatch(r"[A-Za-z0-9_-]{1,32}", value) for key, value in pairs if key == "state")
+                                 and all(re.fullmatch(r"[0-9]{1,9}", value) for key, value in pairs if key in {"offset", "limit"})
+                                 and 0 <= int(values.get("offset", "0")) <= 10**7
+                                 and 1 <= int(values.get("limit", "100")) <= 200)
+            elif communications_read and re.fullmatch(rf"/desktop/v1/communications/articles/{UUID}/attachments/{UUID}", path):
+                values = dict(pairs)
+                allowed_query = (len(keys) == len(set(keys))
+                                 and set(keys) <= {"revision"}
+                                 and all(re.fullmatch(r"[1-9][0-9]*", value) for key, value in pairs if key == "revision"))
+            else:
+                allowed_query = not query
         else:
             allowed_query = (not query or path == "/desktop/v1/portal/selections"
                              and re.fullmatch(rf"request_id={UUID}", query))
-        if (allowed.fullmatch(path) is None and not council_file and not records_upload and not records_download
+        if (allowed.fullmatch(path) is None and not council_file and not records_upload and not records_download and not service_request and not binary_download and not communications and not parks and not parks_data
                 or not allowed_query):
             return json_response({"detail": "This operation is only available on the city host."}, status=404)
         proof = request.headers.get("x-townlight-session")
         principal = staff.resolve(proof)
         if principal is None:
             raise HTTPException(401, "Sign in with an authorized Townlight account.")
+        if parks and not principal.allows_module("townlight_parks"):
+            raise HTTPException(403, "Townlight Parks is not available.")
+        if parks_data and not (principal.allows_module("townlight_parks") and principal.allows_module("townlight_data")):
+            raise HTTPException(403, "Townlight Data is not available.")
+        if binary_download:
+            return await forward_binary(
+                domain_app, request, path, proof, principal, profile_root, staff.resolve
+            )
+        if service_request and not principal.allows_module("townlight_311"):
+            raise HTTPException(403, "Townlight 311 is not available.")
+        if communications and not principal.allows_module("townlight_comms"):
+            raise HTTPException(403, "Townlight Communications is not available.")
         if records_download:
             return await download_records_file(request, records_download, proof, principal)
         body = await bounded_body(request, MAX_BODY)
@@ -399,7 +472,7 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
             try:
                 data = json.loads(body)
                 if not isinstance(data, dict):
-                    raise ValueError
+                    raise ValueError  # noqa: TRY004 - preserve the HTTP 422 validation boundary
             except ValueError:
                 raise HTTPException(422, "Invalid request.") from None
             if path.endswith("/actions") and (not isinstance(data.get("action"), str) or data["action"] not in RECORDS_ACTIONS):

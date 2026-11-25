@@ -52,6 +52,64 @@ fn allocation_route(path: &str) -> bool {
             ]
             | ["", "desktop", "v1", "requests"]
             | ["", "desktop", "v1", "requests", _, "actions"]
+            | ["", "desktop", "v1", "communications", "articles"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "communications",
+                "articles",
+                _,
+                "revisions" | "attachments" | "records"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "catalog",
+                "resource" | "program"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "households"
+                    | "participants"
+                    | "bookings"
+                    | "sessions"
+                    | "registrations"
+                    | "refunds"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "resources",
+                _,
+                "closures" | "maintenance"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "attachments",
+                "resource" | "program" | "booking" | "registration",
+                _
+            ]
+            | ["", "desktop", "v1", "parks", "archives", _, _, "records"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "municipal-staff",
+                "data",
+                "parks",
+                "preview"
+            ]
     )
 }
 
@@ -1204,7 +1262,7 @@ impl DomainError {
     pub fn maintenance() -> Self {
         Self::new("profile-maintenance", "Profile maintenance is in progress. No Records operation was started; retry after maintenance finishes.", false)
     }
-    fn new(code: &'static str, message: &'static str, outcome_unknown: bool) -> Self {
+    pub(crate) fn new(code: &'static str, message: &'static str, outcome_unknown: bool) -> Self {
         Self {
             code,
             message,
@@ -1615,7 +1673,7 @@ async fn send_with_header(
     proof: &str,
     proof_header: &'static str,
 ) -> Result<Value, DomainError> {
-    let writing = method == Method::POST;
+    let writing = method == Method::POST || method == Method::PUT || method == Method::DELETE;
     // Import fetch includes the bounded 16 MiB source encoded as base64.
     let response_limit = if path == "/desktop/v1/meetings/imports/fetch" {
         32 * 1024 * 1024

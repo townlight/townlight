@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Public communications{% endblock %}
+{% block description %}Approved public communications published by {{ site_brand }}.{% endblock %}
+{% block content %}
+<div class="container">
+  <nav aria-label="Breadcrumb"><a href="/">Home</a> / Public communications</nav>
+  <h1>Public communications</h1>
+  <p>Approved public articles published by the city.</p>
+  <p><a href="/communications/subscribe/">Subscribe to city updates</a></p>
+  <ul class="card-list">
+    {% for publication in publications %}
+    <li>
+      <a href="/communications/{{ publication.id }}/">{{ publication.title }}</a>
+      {% if publication.language %}<span class="muted" lang="{{ publication.language }}">{{ publication.language }}</span>{% endif %}
+    </li>
+    {% empty %}
+    <li>No communications have been published yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

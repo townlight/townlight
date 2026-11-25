@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
-  [ValidateSet('fresh','upgrade','recorder')][string]$Mode,
+  [ValidateSet('fresh','upgrade','recorder','community')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
   [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA,
   [switch]$UnsignedRecorderCandidate,
@@ -26,6 +26,108 @@ $priorKey = Get-Item -LiteralPath $debugPolicy -ErrorAction SilentlyContinue
 $hadPolicy = $priorKey -and $priorKey.GetValueNames() -contains $appName
 if ($hadPolicy) { $priorValue=$priorKey.GetValue($appName); $priorKind=$priorKey.GetValueKind($appName) }
 $script:ownedApp = $null
+$script:communityFixture = $null
+function Resolve-CommunityPython {
+  $requested = $env:TOWNLIGHT_TEST_PYTHON
+  if ($requested) {
+    $command = Get-Command -Name $requested -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($command) { return $command.Source }
+    if (Test-Path -LiteralPath $requested -PathType Leaf) { return (Resolve-Path -LiteralPath $requested).Path }
+    throw "TOWNLIGHT_TEST_PYTHON does not resolve to an executable: $requested"
+  }
+  $command = Get-Command -Name python -CommandType Application -ErrorAction Stop | Select-Object -First 1
+  if (-not $command) { throw 'Community acceptance requires python from PATH.' }
+  return $command.Source
+}
+function Assert-CommunityTestTools([string]$Python) {
+  $portalRoot = Join-Path $repo 'portal'
+  Push-Location $portalRoot
+  try {
+    & $Python -c "import aiosmtpd, django, portal, waitress, cryptography"
+    if ($LASTEXITCODE -ne 0) { throw 'Community acceptance requires aiosmtpd and the portal test tools installed for the selected Python.' }
+  } finally { Pop-Location }
+}
+function Start-CommunityFixture([string]$Python) {
+  $fixtureRoot = Join-Path $EvidenceRoot 'community-fixture'
+  New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
+  $portalRoot = Join-Path $repo 'portal'
+  $scriptPath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\tests\installed\community-services.py'))
+  if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) { throw "Community fixture script is absent: $scriptPath" }
+  if (-not (Test-Path -LiteralPath $portalRoot -PathType Container)) { throw "Portal root is absent: $portalRoot" }
+  $portalPort = 24680
+  $smtpPort = 24681
+  foreach ($port in @($portalPort, $smtpPort)) {
+    if (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue) { throw "Community fixture port $port is already occupied." }
+  }
+  $stdout = Join-Path $EvidenceRoot 'community-fixture.stdout.log'
+  $stderr = Join-Path $EvidenceRoot 'community-fixture.stderr.log'
+  $arguments = @('"'+$scriptPath+'"','--root','"'+$fixtureRoot+'"','--portal-root','"'+$portalRoot+'"','--portal-port',[string]$portalPort,'--smtp-port',[string]$smtpPort)
+  $process = Start-Process -FilePath $Python -ArgumentList $arguments -WorkingDirectory $repo -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+  return [pscustomobject]@{
+    Process = $process
+    Root = $fixtureRoot
+    PortalPort = $portalPort
+    SmtpPort = $smtpPort
+    StatePath = Join-Path $fixtureRoot 'fixture-state.json'
+  }
+}
+function Wait-CommunityFixture($Fixture) {
+  $deadline = (Get-Date).AddSeconds(180)
+  while ((Get-Date) -lt $deadline) {
+    $Fixture.Process.Refresh()
+    if ($Fixture.Process.HasExited) {
+      $stderrPath = Join-Path $EvidenceRoot 'community-fixture.stderr.log'
+      $tail = if (Test-Path -LiteralPath $stderrPath) { Get-Content -LiteralPath $stderrPath -Tail 40 | Out-String } else { '' }
+      throw "Community fixture exited before readiness: $($Fixture.Process.ExitCode)`n$tail"
+    }
+    if (Test-Path -LiteralPath $Fixture.StatePath) {
+      try { $state = Get-Content -LiteralPath $Fixture.StatePath -Raw | ConvertFrom-Json } catch { $state = $null }
+      if ($state -and [int]$state.pid -eq [int]$Fixture.Process.Id) {
+        $httpReady = $false
+        try {
+          $response = Invoke-WebRequest -Uri "http://127.0.0.1:$($Fixture.PortalPort)/" -UseBasicParsing -TimeoutSec 2
+          $httpReady = $null -ne $response.StatusCode
+        } catch { $httpReady = $null -ne $_.Exception.Response }
+        if ($httpReady) { return $state }
+      }
+    }
+    Start-Sleep -Milliseconds 500
+  }
+  throw 'Community fixture did not become ready (fixture-state plus HTTP) within 180 seconds.'
+}
+function Set-CommunityRuntimeEnvironment($Fixture, $State, $Restore) {
+  if (-not $State.runtime_environment) { throw 'Community fixture state did not expose runtime_environment.' }
+  $values = @{}
+  foreach ($property in $State.runtime_environment.PSObject.Properties) {
+    $values[$property.Name] = [string]$property.Value
+  }
+  $values['TOWNLIGHT_COMMUNITY_FIXTURE_ROOT'] = $Fixture.Root
+  $values['TOWNLIGHT_COMMUNITY_PORTAL_URL'] = "http://127.0.0.1:$($Fixture.PortalPort)"
+  foreach ($name in $values.Keys) {
+    $Restore[$name] = [pscustomobject]@{
+      present = Test-Path -LiteralPath ('Env:'+$name)
+      value = [Environment]::GetEnvironmentVariable($name, 'Process')
+    }
+    [Environment]::SetEnvironmentVariable($name, $values[$name], 'Process')
+  }
+}
+function Restore-ProcessEnvironment($Restore) {
+  foreach ($name in @($Restore.Keys)) {
+    $prior = $Restore[$name]
+    if ($prior.present) { [Environment]::SetEnvironmentVariable($name, $prior.value, 'Process') }
+    else { [Environment]::SetEnvironmentVariable($name, $null, 'Process') }
+  }
+}
+function Stop-CommunityFixture($Fixture) {
+  if (-not $Fixture) { return }
+  $process = $Fixture.Process
+  $process.Refresh()
+  if (-not $process.HasExited) {
+    # This is the exact Process object/PID started by Start-CommunityFixture.
+    Stop-Process -Id $process.Id -Force
+    $process.WaitForExit()
+  }
+}
 function Install-Candidate([string]$Path, [string]$Label) {
   if (-not $UnsignedRecorderCandidate) { & (Join-Path $PSScriptRoot 'verify-publication-signature.ps1') -Path $Path }
   elseif ((Get-AuthenticodeSignature -LiteralPath $Path).Status -ne 'NotSigned') { throw 'Expected the unchanged unsigned PR build, not an invalid signature.' }
@@ -36,35 +138,88 @@ function Install-Candidate([string]$Path, [string]$Label) {
 }
 function Run-Installed([string]$Phase) {
   if (Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue) { throw 'Installed acceptance debug port is already occupied.' }
+  $fixture = $null
+  $environmentRestore = @{}
   New-Item -Path $debugPolicy -Force | Out-Null
   New-ItemProperty -LiteralPath $debugPolicy -Name $appName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
-  $env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER = '1'
-  try { $script:ownedApp = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru }
-  finally { Remove-Item Env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER }
+  $communityReady = $false
   try {
-    $ready=$false; $deadline=(Get-Date).AddSeconds(120)
-    while ((Get-Date) -lt $deadline) {
-      $script:ownedApp.Refresh()
-      if ($script:ownedApp.HasExited) { throw "Installed app exited: $($script:ownedApp.ExitCode)" }
-      try {
-        $pages=Invoke-RestMethod 'http://127.0.0.1:9222/json/list' -TimeoutSec 2
-        $ready=@($pages | Where-Object { $_.type -eq 'page' -and $_.title -eq 'Townlight' -and $_.webSocketDebuggerUrl }).Count -gt 0
-      } catch { $ready=$false }
-      if ($ready) { break }; Start-Sleep -Seconds 1
+    if ($Phase -eq 'community') {
+      $python = Resolve-CommunityPython
+      Assert-CommunityTestTools $python
+      $fixture = Start-CommunityFixture $python
+      $fixtureState = Wait-CommunityFixture $fixture
+      Set-CommunityRuntimeEnvironment $fixture $fixtureState $environmentRestore
+      $script:communityFixture = [ordered]@{
+        role = 'actual headless acceptance fixture; not an acceptance result'
+        pid = $fixture.Process.Id
+        root = $fixture.Root
+        portal_port = $fixture.PortalPort
+        smtp_port = $fixture.SmtpPort
+        state = $fixture.StatePath
+        readiness = 'fixture-state PID matched the owned process and the portal answered HTTP'
+        fixture_is_acceptance = $false
+      }
     }
-    if (-not $ready) { throw 'Installed Townlight WebView did not become ready.' }
-    Push-Location (Join-Path $repo 'desktop')
+    $env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER = '1'
+    try { $script:ownedApp = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru }
+    finally { Remove-Item Env:TOWNLIGHT_SUPPRESS_OPEN_BROWSER }
     try {
-      node tests/installed/maintenance.mjs $Phase $EvidenceRoot
-      if ($LASTEXITCODE -ne 0) { throw "Installed $Phase acceptance failed." }
-    } finally { Pop-Location }
-  } finally {
-    if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
-      # This Process object is the exact executable launched by this function.
-      Stop-Process -Id $script:ownedApp.Id -Force
-      $script:ownedApp.WaitForExit()
+      $ready=$false; $deadline=(Get-Date).AddSeconds(120)
+      while ((Get-Date) -lt $deadline) {
+        $script:ownedApp.Refresh()
+        if ($script:ownedApp.HasExited) { throw "Installed app exited: $($script:ownedApp.ExitCode)" }
+        try {
+          $pages=Invoke-RestMethod 'http://127.0.0.1:9222/json/list' -TimeoutSec 2
+          $ready=@($pages | Where-Object { $_.type -eq 'page' -and $_.title -eq 'Townlight' -and $_.webSocketDebuggerUrl }).Count -gt 0
+        } catch { $ready=$false }
+        if ($ready) { break }; Start-Sleep -Seconds 1
+      }
+      if (-not $ready) { throw 'Installed Townlight WebView did not become ready.' }
+      Push-Location (Join-Path $repo 'desktop')
+      try {
+        node tests/installed/maintenance.mjs $Phase $EvidenceRoot
+        if ($LASTEXITCODE -ne 0) { throw "Installed $Phase acceptance failed." }
+        if ($Phase -eq 'community') { $communityReady = $true }
+      } finally { Pop-Location }
+    } finally {
+      if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
+        # This Process object is the exact executable launched by this function.
+        Stop-Process -Id $script:ownedApp.Id -Force
+        $script:ownedApp.WaitForExit()
+      }
+      if ($script:ownedApp) {
+        $script:ownedApp.Refresh()
+        [ordered]@{
+          pid = $script:ownedApp.Id
+          exited = $script:ownedApp.HasExited
+          at = [DateTime]::UtcNow.ToString('o')
+        } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'communications-app-stopped.json') -Encoding utf8
+      }
+      $script:ownedApp=$null
     }
-    $script:ownedApp=$null
+    if ($communityReady) {
+      $staffStdout = Join-Path $EvidenceRoot 'communications-staff-host.stdout.log'
+      $staffStderr = Join-Path $EvidenceRoot 'communications-staff-host.stderr.log'
+      $staff = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','start' -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $staffStdout -RedirectStandardError $staffStderr
+      if ($staff.ExitCode -ne 0) { throw "Townlight staff host start failed: $($staff.ExitCode)" }
+      try {
+        Push-Location (Join-Path $repo 'desktop')
+        try {
+          node tests/installed/communications-unattended.mjs verify $EvidenceRoot $env:TOWNLIGHT_COMMUNITY_PORTAL_URL $fixture.Root
+          if ($LASTEXITCODE -ne 0) { throw 'Installed community communications unattended verification failed.' }
+        } finally {
+          Pop-Location
+        }
+      } finally {
+        $staffStop = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','stop' -WindowStyle Hidden -Wait -PassThru
+        if ($staffStop.ExitCode -ne 0) { throw "Townlight staff host stop failed: $($staffStop.ExitCode)" }
+      }
+    }
+  } finally {
+    # The fixture must outlive the app, and only then may its exact owned PID stop.
+    Stop-CommunityFixture $fixture
+    if ($environmentRestore.Count -gt 0) { Restore-ProcessEnvironment $environmentRestore }
   }
 }
 function Product-Registration {
@@ -76,11 +231,11 @@ try {
   if ($Mode -eq 'upgrade') {
     $previous=Join-Path $env:RUNNER_TEMP 'townlight-previous-release'
     New-Item -ItemType Directory -Path $previous | Out-Null
-    gh release download townlight-windows-v1.9.3.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
+    gh release download townlight-windows-v1.9.3.2 --repo townlight/townlight --pattern '*.msi' --dir $previous
     if ($LASTEXITCODE -ne 0) { throw 'Previous public MSI download failed.' }
     $old=@(Get-ChildItem -LiteralPath $previous -Filter '*.msi' -File)
-    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'f2980b80f7cd059e2c4c500f50f23e59bceadf4c29043769180374f1e34f1ba4') { throw 'Previous release identity mismatch.' }
-    Install-Candidate $old[0].FullName 'baseline-1.9.3.1'
+    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77') { throw 'Previous release identity mismatch.' }
+    Install-Candidate $old[0].FullName 'baseline-1.9.3.2'
     Run-Installed 'seed'
     $marker=Join-Path $profile 'Data\maintenance-retention.txt'
     [IO.File]::WriteAllText($marker,'Synthetic Windows maintenance retention marker')
@@ -94,6 +249,11 @@ try {
   $registered=@(Product-Registration)
   if ($registered.Count -ne 1 -or $registered[0].DisplayVersion -ne $candidateVersion) { throw 'Candidate registration/version or upgrade replacement failed.' }
   Run-Installed $Mode
+  if ($Mode -eq 'community') {
+    foreach ($relative in @('community-setup.json','community-workflows.json','community-readback.json','community-outcome.json','backup-restore.json','community-fixture/fixture-state.json')) {
+      if (-not (Test-Path -LiteralPath (Join-Path $EvidenceRoot $relative))) { throw "Community acceptance evidence absent: $relative" }
+    }
+  }
   foreach ($entry in $retained) {
     if ((Get-FileHash -LiteralPath (Join-Path $profile $entry.path) -Algorithm SHA256).Hash -ne $entry.sha256) { throw "Upgrade changed retained $($entry.path)" }
   }
@@ -103,7 +263,21 @@ try {
   foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
     if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }
-  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
+  $communityFixtureEvidence = $null
+  $communityEvidence = $null
+  if ($Mode -eq 'community') {
+    $communityFixtureEvidence = $script:communityFixture
+    $communityEvidence = [ordered]@{
+      outcome = 'community-outcome.json'
+      workflows = 'community-workflows.json'
+      readback = 'community-readback.json'
+      backup_restore = 'backup-restore.json'
+      fixture_state = 'community-fixture/fixture-state.json'
+      fixture_is_acceptance = $false
+      note = 'Fixture serves synthetic local services only; candidate acceptance comes from the listed installed-app outcome, readback and backup-restore evidence.'
+    }
+  }
+  [ordered]@{passed=$true;mode=$Mode;version=$candidateVersion;source_commit=$SourceCommit;harness_commit=$env:GITHUB_SHA;signature_state=if($UnsignedRecorderCandidate){'unsigned internal PR candidate; not publication acceptance'}else{'verified signed'};msi_sha256=(Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant();retained=$retained;uninstall_preserved_profile=$true;community_fixture=$communityFixtureEvidence;community_evidence=$communityEvidence;at=[datetime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $EvidenceRoot 'installed-acceptance.json') -Encoding utf8
 } finally {
   if ($hadPolicy) { (Get-Item -LiteralPath $debugPolicy).SetValue($appName,$priorValue,$priorKind) }
   elseif (Test-Path -LiteralPath $debugPolicy) { Remove-ItemProperty -LiteralPath $debugPolicy -Name $appName -ErrorAction SilentlyContinue }

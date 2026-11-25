@@ -172,7 +172,12 @@
           "Lib/site-packages/textflowkit/core/whistle.py",
           "inspections/whistle/whistle.cact",
           "inspections/whistle/windows-x86_64/needle.exe",
-          "inspections/reuse-manifest.json"
+          "inspections/reuse-manifest.json",
+          "Lib/site-packages/townlight_311/__init__.py",
+          "Lib/site-packages/townlight_311/migrations.py",
+          "Lib/site-packages/townlight_runtime/service_requests.py",
+          "Lib/site-packages/townlight_runtime/service_request_records.py",
+          "Lib/site-packages/townlight_runtime/service_request_data.py"
         ]
       }
     },

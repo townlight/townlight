@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title|default:"Parks" }} · Townlight</title>
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.5; margin: 0; color: #111; }
+    header, main, footer { max-width: 46rem; margin: 0 auto; padding: 1rem; }
+    header { border-bottom: 1px solid #ccc; }
+    footer { border-top: 1px solid #ccc; margin-top: 2rem; }
+    nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+    h1, h2, h3 { line-height: 1.2; }
+    label { display: block; font-weight: 600; margin-top: .75rem; }
+    input[type="text"], input[type="email"], input[type="number"],
+    input[type="datetime-local"], textarea, select {
+      width: 100%;
+      max-width: 32rem;
+      padding: .4rem;
+      box-sizing: border-box;
+    }
+    textarea { min-height: 5rem; }
+    button { margin-top: 1rem; padding: .5rem .8rem; }
+    .errorlist { color: #8b0000; }
+    .error { color: #8b0000; font-weight: 600; }
+    .note { color: #444; }
+    .meta { color: #555; display: block; }
+    [role="status"] { border-left: .25rem solid #555; padding-left: .75rem; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem; }
+    dt { font-weight: 600; }
+    dd { margin: 0; overflow-wrap: anywhere; }
+    article { border: 1px solid #ccc; padding: 1rem; margin: 1rem 0; }
+    section { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Townlight sections">
+      <ul>
+        <li><a href="/parks/">Parks</a></li>
+        <li><a href="/service-requests/">Service requests</a></li>
+        <li><a href="/communications/">Communications</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h1>{{ title|default:"Parks and recreation" }}</h1>
+
+    {% if mode == "home" %}
+      {% if available %}
+        <p>Cached parks information{% if last_updated %} as of {{ last_updated }}{% elif updated_at %} as of {{ updated_at }}{% endif %}.</p>
+      {% else %}
+        <p role="status">Parks information is currently unavailable. Please try again.</p>
+      {% endif %}
+
+      <section aria-labelledby="resources-heading">
+        <h2 id="resources-heading">Resources</h2>
+        {% if resources %}
+          <ul>
+            {% for item in resources %}
+              <li>
+                {% if item.id %}
+                  <a href="/parks/resources/{{ item.id }}/">{{ item.name|default:"Resource" }}</a>
+                {% else %}
+                  {{ item.name|default:"Resource" }}
+                {% endif %}
+                {% if item.address %}<span class="meta">{{ item.address }}</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No resources are currently listed.</p>
+        {% endif %}
+      </section>
+
+      <section aria-labelledby="programs-heading">
+        <h2 id="programs-heading">Programs</h2>
+        {% if programs %}
+          <ul>
+            {% for item in programs %}
+              <li>
+                {% if item.id %}
+                  <a href="/parks/programs/{{ item.id }}/">{{ item.title|default:item.name|default:"Program" }}</a>
+                {% else %}
+                  {{ item.title|default:item.name|default:"Program" }}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No programs are currently listed.</p>
+        {% endif %}
+      </section>
+
+      <p>
+        <a href="{{ household_url|default:'/parks/household/' }}">Open household</a>
+        · <a href="/parks/household/new/">Create a household</a>
+      </p>
+
+    {% elif mode == "resource" %}
+      <h2>{{ resource.name|default:title|default:"Resource" }}</h2>
+      {% if resource.description %}<p>{{ resource.description }}</p>{% endif %}
+
+      <dl>
+        {% if resource.public_amenities %}
+          <dt>Public amenities</dt>
+          <dd>{{ resource.public_amenities }}</dd>
+        {% endif %}
+        {% if resource.address %}
+          <dt>Address</dt>
+          <dd>{{ resource.address }}</dd>
+        {% endif %}
+        {% if resource.hours %}
+          <dt>Hours</dt>
+          <dd>{{ resource.hours }}</dd>
+        {% endif %}
+        {% if resource.accessibility %}
+          <dt>Accessibility</dt>
+          <dd>{{ resource.accessibility }}</dd>
+        {% endif %}
+        <dt>Fee</dt>
+        <dd>
+          {% if resource.fee_cents != None and resource.fee_cents != "" %}
+            {{ resource.fee_cents }} cents USD
+          {% else %}
+            Not listed
+          {% endif %}
+        </dd>
+        <dt>Deposit</dt>
+        <dd>
+          {% if resource.deposit_cents != None and resource.deposit_cents != "" %}
+            {{ resource.deposit_cents }} cents USD
+          {% else %}
+            Not listed
+          {% endif %}
+        </dd>
+      </dl>
+
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+      <section aria-labelledby="availability-heading">
+        <h2 id="availability-heading">Check availability</h2>
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="availability">
+          {{ availability_form.as_p }}
+          <button type="submit">Check availability</button>
+        </form>
+      </section>
+
+      <section aria-labelledby="booking-heading">
+        <h2 id="booking-heading">Request a booking</h2>
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="booking">
+          {{ booking_form.as_p }}
+          <button type="submit">Request booking</button>
+        </form>
+        <p class="note">
+          Booking requests require a household.
+          <a href="{{ household_url|default:'/parks/household/' }}">Create or open a household</a>.
+        </p>
+      </section>
+
+    {% elif mode == "program" %}
+      <h2>{{ program.title|default:title|default:"Program" }}</h2>
+      {% if program.description %}<p>{{ program.description }}</p>{% endif %}
+      <p class="note">Cached program information. Session times are shown in UTC; each session also lists its published timezone.</p>
+
+      {% if program.advisory %}
+        <p class="note">Program advisory: {{ program.advisory }}</p>
+      {% endif %}
+
+      {% for session in sessions %}
+        <article>
+          <h3>Session</h3>
+          <dl>
+            <dt>Starts (UTC)</dt>
+            <dd>{{ session.starts_at|default:"Not listed" }}</dd>
+            <dt>Ends (UTC)</dt>
+            <dd>{{ session.ends_at|default:"Not listed" }}</dd>
+            <dt>Timezone</dt>
+            <dd>{{ session.timezone|default:program.timezone|default:"Not listed" }}</dd>
+            <dt>Capacity</dt>
+            <dd>
+              {% if session.capacity != None and session.capacity != "" %}
+                {{ session.capacity }}
+              {% else %}
+                Not listed
+              {% endif %}
+            </dd>
+            <dt>Available seats</dt>
+            <dd>
+              {% if session.available_seats != None and session.available_seats != "" %}
+                {{ session.available_seats }}
+              {% else %}
+                Not listed
+              {% endif %}
+            </dd>
+            {% if session.advisory %}
+              <dt>Advisory</dt>
+              <dd>{{ session.advisory }}</dd>
+            {% endif %}
+          </dl>
+          {% if session.id %}
+            <p>
+              <a href="/parks/household/?session={{ session.id|urlencode }}">Register for this session</a>
+            </p>
+          {% endif %}
+        </article>
+      {% empty %}
+        <p>No sessions are currently listed.</p>
+      {% endfor %}
+
+    {% elif mode == "form" %}
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post" action="">
+        {% csrf_token %}
+        {% if action %}<input type="hidden" name="action" value="{{ action }}">{% endif %}
+        {% if context_id %}<input type="hidden" name="context_id" value="{{ context_id }}">{% endif %}
+        {% if booking_id %}<input type="hidden" name="booking_id" value="{{ booking_id }}">{% endif %}
+        {% if registration_id %}<input type="hidden" name="registration_id" value="{{ registration_id }}">{% endif %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+      </form>
+
+    {% elif mode == "pending" %}
+      <p role="status">{{ message|default:"Your request is being processed." }}</p>
+      <p class="note">This request is queued and is not confirmed yet.</p>
+      {% if status_url %}
+        <p><a href="{{ status_url }}">Refresh status</a></p>
+      {% endif %}
+
+    {% elif mode == "created" %}
+      <p role="status">{{ message|default:"Your parks household is ready." }}</p>
+      {% if private_link %}
+        <p>Private household link:</p>
+        <p><a href="{{ private_link }}" rel="noreferrer noopener">{{ private_link }}</a></p>
+        <p class="note">Save this link. Anyone with it can access this household.</p>
+      {% endif %}
+
+    {% elif mode == "payment" %}
+      {% if payment %}
+        <dl>
+          <dt>Payment status</dt>
+          <dd>{{ payment.state|default:"Not listed" }}</dd>
+          <dt>Amount</dt>
+          <dd>
+            {% if payment.amount_cents != None and payment.amount_cents != "" %}
+              {{ payment.amount_cents }} cents
+            {% else %}
+              Not listed
+            {% endif %}
+          </dd>
+          <dt>Currency</dt>
+          <dd>{{ payment.currency|default:"Not listed" }}</dd>
+        </dl>
+        {% if checkout_url %}
+          <p><a href="{{ checkout_url }}" rel="noreferrer noopener">Continue to secure checkout</a></p>
+        {% else %}
+          <p>No validated checkout link is available.</p>
+        {% endif %}
+        <p class="note">Payment is not complete until the provider verifies it. A provider return is not proof of payment.</p>
+      {% else %}
+        <p>Payment details are unavailable.</p>
+      {% endif %}
+
+    {% elif mode == "availability" %}
+      {% if availability %}
+        <dl>
+          <dt>Availability</dt>
+          <dd>{% if availability.available %}Available{% else %}Unavailable{% endif %}</dd>
+          {% if availability.reason %}
+            <dt>Reason</dt>
+            <dd>{{ availability.reason }}</dd>
+          {% endif %}
+          {% if availability.starts_at %}
+            <dt>Window start</dt>
+            <dd>{{ availability.starts_at }}</dd>
+          {% endif %}
+          {% if availability.ends_at %}
+            <dt>Window end</dt>
+            <dd>{{ availability.ends_at }}</dd>
+          {% endif %}
+          {% if availability.time_window.starts_at %}
+            <dt>Window start</dt>
+            <dd>{{ availability.time_window.starts_at }}</dd>
+          {% endif %}
+          {% if availability.time_window.ends_at %}
+            <dt>Window end</dt>
+            <dd>{{ availability.time_window.ends_at }}</dd>
+          {% endif %}
+          {% if availability.time_window.start %}
+            <dt>Window start</dt>
+            <dd>{{ availability.time_window.start }}</dd>
+          {% endif %}
+          {% if availability.time_window.end %}
+            <dt>Window end</dt>
+            <dd>{{ availability.time_window.end }}</dd>
+          {% endif %}
+        </dl>
+      {% else %}
+        <p>No availability result is available.</p>
+      {% endif %}
+
+    {% elif mode == "household" %}
+      {% include "website/parks_household.html" %}
+
+    {% else %}
+      <p role="status">{{ message|default:"We could not complete that request. Please try again." }}</p>
+      <p><a href="{{ household_url|default:'/parks/household/' }}">Refresh household</a></p>
+    {% endif %}
+  </main>
+
+  <footer>
+    <nav aria-label="Townlight sections">
+      <ul>
+        <li><a href="/parks/">Parks</a></li>
+        <li><a href="/service-requests/">Service requests</a></li>
+        <li><a href="/communications/">Communications</a></li>
+      </ul>
+    </nav>
+  </footer>
+</body>
+</html>

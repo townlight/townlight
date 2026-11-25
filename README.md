@@ -6,6 +6,16 @@ Signed MSI SHA-256 `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c9
 
 [Release notes](docs/installer/windows-1.9.3.2-candidate.md) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Release catalog](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) · [Acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md)
 
+## Windows 1.10.0.1 source candidate (311, Communications, Parks)
+
+Windows 1.9.3.2 remains the current public download. Windows 1.10.0.1 is a source candidate: installed acceptance is pending, tags and software publication are held, and no new download link is provided. The candidate adds:
+
+- **311:** resident private inbox and request tracking.
+- **Communications:** subscription consent and outbound updates.
+- **Parks:** facility bookings and program registration.
+
+These flows require a separately configured resident portal, SMTP, and optional payment service; no automatic public website is implied. See the [Windows 1.10.0.1 source candidate guide](docs/windows-311-communications-parks.md).
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/brand/svg/townlight-hall-lockup-tagline-reversed.svg">

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block description %}Public communication published by {{ site_brand }}.{% endblock %}
+{% block content %}
+<article class="container">
+  <nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/communications/">Public communications</a></nav>
+  <h1>{{ article.title }}</h1>
+  {% if article.language %}<p class="muted">Language: <span lang="{{ article.language }}">{{ article.language }}</span></p>{% endif %}
+  <div class="article-body">{{ article.body|linebreaks }}</div>
+  {% if sources %}
+  <section aria-labelledby="sources-heading">
+    <h2 id="sources-heading">Sources</h2>
+    <ul>
+      {% for source in sources %}
+      <li><a href="/communications/{{ publication.id }}/sources/{{ source.index }}/">{{ source.title|default:"Source" }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% if attachments %}
+  <section aria-labelledby="attachments-heading">
+    <h2 id="attachments-heading">Attachments</h2>
+    <ul>
+      {% for attachment in attachments %}
+      <li><a href="/communications/{{ publication.id }}/attachments/{{ attachment.uuid }}/">{{ attachment.filename }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

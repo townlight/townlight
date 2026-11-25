@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Source {{ index|add:1 }} · {{ publication.title }}{% endblock %}
+{% block description %}Captured source for a public communication published by {{ site_brand }}.{% endblock %}
+{% block content %}
+<div class="container">
+  <nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/communications/">Public communications</a> / <a href="/communications/{{ publication.id }}/">{{ publication.title }}</a></nav>
+  <h1>{{ title|default:"Source" }}</h1>
+  <p>This source was captured from an approved public publication. It is shown as escaped plain text and is not embedded, interpreted or executed.</p>
+  {% if provenance %}<p class="muted">Provenance: {{ provenance }}</p>{% endif %}
+  {% if external_url %}<p>External source: <a href="{{ external_url }}" rel="noopener noreferrer nofollow" target="_blank">{{ external_url }}</a></p>{% endif %}
+  <pre class="source-content">{{ content }}</pre>
+  <p><a href="/communications/{{ publication.id }}/">Back to the publication</a></p>
+</div>
+{% endblock %}

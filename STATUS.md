@@ -39,10 +39,10 @@ Status labels below are the suite's shared status set, generated from
 [`installer/modules.public-status.json`](installer/modules.public-status.json) — the same source the [module explorer](docs/module-explorer.html) renders.
 
 - **Shared platform:** The shared platform every module depends on; always installed.
-- **Candidate — installed acceptance pending:** Prepared software; completion and publication require the recorded exact-candidate acceptance.
+- **Candidate â€” installed acceptance pending:** Prepared software; completion and publication require the recorded exact-candidate acceptance.
 - **Published beta capability:** Available in a published bounded Townlight desktop beta or recorded standalone release; select the documented profile and read its limits.
 
-## Module Status (17 kept modules)
+## Module Status (20 kept modules)
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
@@ -63,6 +63,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Data | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
 | Townlight Budget | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
 | Townlight Grants | 0.3.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
+| Townlight 311 | 0.2.0 | Candidate â€” installed acceptance pending | — | Source integrated; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
+| Townlight Communications | 0.2.0 | Candidate â€” installed acceptance pending | — | Source integrated; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
+| Townlight Parks | 0.2.0 | Candidate â€” installed acceptance pending | — | Source pin pending merge; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
 
 <!-- END GENERATED MODULE STATUS -->
 

@@ -279,6 +279,32 @@ jobs:
           ref: ${{ steps.candidate.outputs.grants_ref }}
           path: grants-module
           persist-credentials: false
+      - name: Check out pinned Townlight 311 source
+        if: steps.candidate.outputs.service_requests_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/311
+          ref: ${{ steps.candidate.outputs.service_requests_ref }}
+          path: service-requests-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Communications source
+        if: steps.candidate.outputs.communications_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/comms
+          ref: ${{ steps.candidate.outputs.communications_ref }}
+          path: communications-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Parks source
+        if: steps.candidate.outputs.parks_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/parks
+          ref: ${{ steps.candidate.outputs.parks_ref }}
+          path: parks-module
+          persist-credentials: false
 
       - name: Validate publication-signing context
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
@@ -398,7 +424,7 @@ jobs:
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module") }
             npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta @sourceRoots
@@ -826,6 +852,32 @@ jobs:
           ref: ${{ steps.candidate.outputs.grants_ref }}
           path: grants-module
           persist-credentials: false
+      - name: Check out pinned Townlight 311 source
+        if: steps.candidate.outputs.service_requests_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/311
+          ref: ${{ steps.candidate.outputs.service_requests_ref }}
+          path: service-requests-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Communications source
+        if: steps.candidate.outputs.communications_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/comms
+          ref: ${{ steps.candidate.outputs.communications_ref }}
+          path: communications-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Parks source
+        if: steps.candidate.outputs.parks_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/parks
+          ref: ${{ steps.candidate.outputs.parks_ref }}
+          path: parks-module
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -862,7 +914,7 @@ jobs:
           )
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
@@ -1330,11 +1382,11 @@ jobs:
     needs: windows-local-msi
     if: github.event_name == 'workflow_dispatch' && inputs.sign_for_publication
     runs-on: windows-latest
-    timeout-minutes: ${{ matrix.mode == 'fresh' && 125 || 60 }}
+    timeout-minutes: ${{ matrix.mode == 'community' && 180 || (matrix.mode == 'fresh' && 125 || 60) }}
     strategy:
       fail-fast: false
       matrix:
-        mode: [fresh, upgrade]
+        mode: [fresh, upgrade, community]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -1348,11 +1400,22 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: townlight/desktop/package-lock.json
+      - name: Set up community Python
+        if: matrix.mode == 'community'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
       - name: Install existing desktop test tools
         working-directory: townlight/desktop
         run: npm ci
+      - name: Install community portal and test fixture dependencies
+        if: matrix.mode == 'community'
+        working-directory: townlight/portal
+        run: |
+          python -m pip install --require-hashes -r requirements.lock
+          python -m pip install aiosmtpd==1.4.6
       - name: Free C drive for install-only test
-        if: matrix.mode == 'fresh'
+        if: matrix.mode == 'fresh' || matrix.mode == 'community'
         shell: pwsh
         run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
       - name: Verify installed workflows and exact signed candidate

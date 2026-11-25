@@ -227,6 +227,29 @@ try {
   assert.equal(hostState.first_run.finished, true);
   assert.equal(hostState.domain_authority, 'python-records');
   assert.equal(guestState.shared_staff, true, 'The second Windows desktop must use staff HTTPS, not its local profile.');
+  if (fixture.community_ids_file) {
+    const { readFile } = await import('node:fs/promises');
+    const { communityShared } = await import('./community-shared.mjs');
+    const summary = JSON.parse(await readFile(fixture.community_ids_file, 'utf8'));
+    const ids = summary.ids ?? summary;
+    await host.signIn(fixture.host.admin);
+    await guest.signIn(fixture.guest.clerk);
+    await communityShared({
+      hostNative: host.native,
+      guestNative: guest.native,
+      ids,
+      save,
+      hostMachine: fixture.host.machine,
+      guestMachine: fixture.guest.machine,
+      machineAcceptanceRef: fixtureFile,
+    });
+    await save('shared-windows-community-acceptance', {
+      passed: true,
+      candidate_sha256: fixture.candidate_sha256,
+      host: fixture.host.machine,
+      guest: fixture.guest.machine,
+    });
+  } else {
   await startWebsite();
   const key = randomUUID().slice(0, 8);
   const title = `Synthetic shared council ${key}`;
@@ -439,6 +462,7 @@ try {
   verify('Publication retry was idempotent. The correction reused the meeting identity, and both withdrawals removed only their respective files.');
   await save('shared-windows-acceptance', {passed: true, candidate_sha256: fixture.candidate_sha256,
     host: fixture.host.machine, guest: fixture.guest.machine, checks});
+  }
 } catch (error) {
   await save('shared-windows-acceptance-failure', {passed: false, checks, error: String(error?.message || error), stack: error?.stack});
   throw error;

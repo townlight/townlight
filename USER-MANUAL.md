@@ -39,6 +39,10 @@ Townlight connects municipal workflows around retained sources, named staff and 
 
 Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the API reference and per-product source contracts. Each acceptance result applies only to the artifact identified by its receipt.
 
+## Windows 1.10.0.1 source candidate
+
+Windows 1.9.3.2 remains the current public download. Windows 1.10.0.1 is a source candidate with installed acceptance pending; tags and software publication are held, and no new download link is provided. Candidate modules cover 311 resident private inbox/tracking, Communications subscription consent, and Parks bookings/registration. These flows require a separately configured resident portal, SMTP, and optional payment service; no automatic public website is implied. See the [Windows 1.10.0.1 source candidate guide](docs/windows-311-communications-parks.md).
+
 ## Beta identity
 
 | Identity | Value |
