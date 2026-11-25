@@ -12,13 +12,23 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
+      # Test-only fixture: checkout the actual townlight/comms producer at the pinned ref so the cross-repo publication test exercises real producer code.
+      - uses: actions/checkout@v5
+        with:
+          repository: townlight/comms
+          ref: 8ec0061daaddb55100f437f0f4b71627b88e2561
+          path: test-components/comms
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - run: python -m pip install --require-hashes -r requirements.lock
         working-directory: portal
+      # Test-only dependency for the actual townlight/comms producer import; production portal remains locked by requirements.lock.
+      - run: python -m pip install 'SQLAlchemy>=2.0,<3'
       - run: python manage.py test website
         working-directory: portal
+        env:
+          PYTHONPATH: ${{ github.workspace }}/test-components/comms
       - run: python manage.py makemigrations --check --dry-run
         working-directory: portal
       - run: python -m py_compile desktop/runtime/python-services/townlight_runtime/portal_publication.py
