@@ -528,10 +528,17 @@ fn app_state() -> Result<AppState, String> {
 
 async fn shared_app_state() -> Result<AppState, String> {
     let access = shared_staff::access_state().await;
-    let modules = ["townlight_core", "townlight_meetings", "townlight_records"]
-        .into_iter()
-        .map(str::to_string)
-        .collect::<Vec<_>>();
+    let modules = [
+        "townlight_core",
+        "townlight_meetings",
+        "townlight_records",
+        "townlight_311",
+        "townlight_comms",
+        "townlight_parks",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect::<Vec<_>>();
     let module_selection = ModuleSelectionState {
         profile_id: "shared-staff".into(),
         profile_label: "City host".into(),
@@ -552,7 +559,17 @@ async fn shared_app_state() -> Result<AppState, String> {
         shared_staff: true,
         navigation: navigation()
             .into_iter()
-            .filter(|item| matches!(item.id, "home" | "meetings" | "records"))
+            .filter(|item| {
+                matches!(
+                    item.id,
+                    "home"
+                        | "meetings"
+                        | "records"
+                        | "service-requests"
+                        | "communications"
+                        | "parks"
+                )
+            })
             .collect(),
         modules: catalog,
         module_profiles: Vec::new(),
