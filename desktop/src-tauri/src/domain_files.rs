@@ -149,6 +149,91 @@ fn write_planning_file_at(
     Ok(path.to_string_lossy().into_owned())
 }
 
+#[derive(Serialize)]
+pub struct ServiceRequestFileReceipt {
+    pub path: String,
+    pub sha256: String,
+    pub size_bytes: u64,
+}
+
+const MAX_SERVICE_REQUEST_BYTES: usize = 64 * 1024 * 1024;
+
+fn is_lower_sha256_hex(value: &str) -> bool {
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+}
+
+fn is_service_request_export_name(name: &str) -> bool {
+    if name.is_empty()
+        || name.len() > 255
+        || name.contains(['/', '\\', ':'])
+        || name.chars().any(char::is_control)
+        || Path::new(name).file_name().and_then(|part| part.to_str()) != Some(name)
+    {
+        return false;
+    }
+    let Some((stem, extension)) = name.rsplit_once('.') else {
+        return false;
+    };
+    match extension.to_ascii_lowercase().as_str() {
+        "zip" => stem
+            .strip_prefix("service-request-")
+            .and_then(|id| Uuid::parse_str(id).ok())
+            .is_some(),
+        "png" | "jpg" | "jpeg" | "pdf" | "txt" => stem
+            .strip_prefix("attachment-")
+            .and_then(|id| Uuid::parse_str(id).ok())
+            .is_some(),
+        _ => false,
+    }
+}
+
+pub fn write_service_request_file(
+    name: &str,
+    bytes: &[u8],
+    digest: &str,
+) -> Result<ServiceRequestFileReceipt, String> {
+    if !is_service_request_export_name(name)
+        || bytes.is_empty()
+        || bytes.len() > MAX_SERVICE_REQUEST_BYTES
+        || !is_lower_sha256_hex(digest)
+        || format!("{:x}", Sha256::digest(bytes)) != digest
+    {
+        return Err("Invalid service request export bytes or file name.".into());
+    }
+    let root = std::path::PathBuf::from(local_paths::effective_locations()?.data_root)
+        .join("exports")
+        .join("311")
+        .join(uuid::Uuid::new_v4().to_string());
+    fs::create_dir_all(&root)
+        .map_err(|_| "Could not create the service request export folder.")?;
+    let path = root.join(name);
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&path)
+        .map_err(|_| "Could not create a new service request export.")?;
+    file.write_all(bytes)
+        .and_then(|_| file.sync_all())
+        .map_err(|_| "Could not finish the service request export.")?;
+    let stored = fs::read(&path).map_err(|_| "Could not verify the service request export.")?;
+    let stored_digest = if stored.len() == bytes.len() {
+        format!("{:x}", Sha256::digest(&stored))
+    } else {
+        String::new()
+    };
+    if stored_digest != digest {
+        return Err("Service request export verification failed.".into());
+    }
+    Ok(ServiceRequestFileReceipt {
+        path: path.to_string_lossy().into_owned(),
+        sha256: stored_digest,
+        size_bytes: stored.len() as u64,
+    })
+}
+
 fn write_export_at(plan: ArtifactPlan, root: &Path) -> Result<String, String> {
     if Path::new(&plan.file_name)
         .file_name()
@@ -192,56 +277,6 @@ fn write_export_at(plan: ArtifactPlan, root: &Path) -> Result<String, String> {
         .and_then(|_| manifest_file.sync_all())
         .map_err(|_| "Could not finish the Records integrity manifest.")?;
     Ok(path.to_string_lossy().into())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn planning_export_checks_exact_bytes_paths_and_exclusive_creation() {
-        let root = std::env::temp_dir().join(format!("planning-export-{}", Uuid::new_v4()));
-        let content = b"{\"reviewed\":true}";
-        let digest = format!("{:x}", Sha256::digest(content));
-        assert!(write_planning_file_at(&root, "../outside.json", content, &digest).is_err());
-        assert!(write_planning_file_at(&root, "source.exe", content, &digest).is_err());
-        assert!(write_planning_file_at(&root, "source.json", b"changed", &digest).is_err());
-        let path = write_planning_file_at(&root, "source.json", content, &digest).unwrap();
-        assert_eq!(fs::read(path).unwrap(), content);
-        assert!(write_planning_file_at(&root, "source.json", content, &digest).is_err());
-        fs::remove_dir_all(root).unwrap();
-    }
-
-    #[test]
-    fn export_verifies_hash_confines_path_and_never_overwrites() {
-        let root = std::env::temp_dir().join(format!("townlight-export-test-{}", Uuid::new_v4()));
-        let make_plan = |name: &str| ArtifactPlan {
-            artifact_id: Uuid::new_v4(),
-            file_name: name.into(),
-            content: "Synthetic approved response".into(),
-            sha256: format!("{:x}", Sha256::digest(b"Synthetic approved response")),
-            created_at_unix_seconds: 1000,
-        };
-        assert!(write_export_at(make_plan("../outside.md"), &root).is_err());
-        let mut bad = make_plan("bad.md");
-        bad.sha256 = "0".repeat(64);
-        assert!(write_export_at(bad, &root).is_err());
-        let path = write_export_at(make_plan("response.md"), &root).unwrap();
-        assert_eq!(
-            fs::read_to_string(&path).unwrap(),
-            "Synthetic approved response"
-        );
-        assert!(write_export_at(make_plan("response.md"), &root).is_err());
-        let manifest: serde_json::Value = serde_json::from_str(
-            &fs::read_to_string(root.join("response.md.manifest.json")).unwrap(),
-        )
-        .unwrap();
-        assert_eq!(manifest["size_bytes"], 27);
-        assert_eq!(manifest["sha256"], make_plan("response.md").sha256);
-        fs::remove_file(root.join("response.md.manifest.json")).unwrap();
-        fs::remove_file(path).unwrap();
-        fs::remove_dir(root).unwrap();
-    }
 }
 
 pub fn stage(source: &str, title: &str, note: &str) -> Result<ManagedFileReceipt, String> {
@@ -340,4 +375,74 @@ fn stage_module(
         sha256: format!("{:x}", hash.finalize()),
         size_bytes: size,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn planning_export_checks_exact_bytes_paths_and_exclusive_creation() {
+        let root = std::env::temp_dir().join(format!("planning-export-{}", Uuid::new_v4()));
+        let content = b"{\"reviewed\":true}";
+        let digest = format!("{:x}", Sha256::digest(content));
+        assert!(write_planning_file_at(&root, "../outside.json", content, &digest).is_err());
+        assert!(write_planning_file_at(&root, "source.exe", content, &digest).is_err());
+        assert!(write_planning_file_at(&root, "source.json", b"changed", &digest).is_err());
+        let path = write_planning_file_at(&root, "source.json", content, &digest).unwrap();
+        assert_eq!(fs::read(path).unwrap(), content);
+        assert!(write_planning_file_at(&root, "source.json", content, &digest).is_err());
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn export_verifies_hash_confines_path_and_never_overwrites() {
+        let root = std::env::temp_dir().join(format!("townlight-export-test-{}", Uuid::new_v4()));
+        let make_plan = |name: &str| ArtifactPlan {
+            artifact_id: Uuid::new_v4(),
+            file_name: name.into(),
+            content: "Synthetic approved response".into(),
+            sha256: format!("{:x}", Sha256::digest(b"Synthetic approved response")),
+            created_at_unix_seconds: 1000,
+        };
+        assert!(write_export_at(make_plan("../outside.md"), &root).is_err());
+        let mut bad = make_plan("bad.md");
+        bad.sha256 = "0".repeat(64);
+        assert!(write_export_at(bad, &root).is_err());
+        let path = write_export_at(make_plan("response.md"), &root).unwrap();
+        assert_eq!(
+            fs::read_to_string(&path).unwrap(),
+            "Synthetic approved response"
+        );
+        assert!(write_export_at(make_plan("response.md"), &root).is_err());
+        let manifest: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(root.join("response.md.manifest.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(manifest["size_bytes"], 27);
+        assert_eq!(manifest["sha256"], make_plan("response.md").sha256);
+        fs::remove_file(root.join("response.md.manifest.json")).unwrap();
+        fs::remove_file(path).unwrap();
+        fs::remove_dir(root).unwrap();
+    }
+
+    #[test]
+    fn service_request_export_names_are_confined_and_exclusive() {
+        let request_id = Uuid::new_v4();
+        let attachment_id = Uuid::new_v4();
+        assert!(is_service_request_export_name(&format!(
+            "service-request-{request_id}.zip"
+        )));
+        assert!(is_service_request_export_name(&format!(
+            "attachment-{attachment_id}.pdf"
+        )));
+        assert!(!is_service_request_export_name("../service-request-x.zip"));
+        assert!(!is_service_request_export_name(&format!(
+            "service-request-{request_id}.exe"
+        )));
+        assert!(!is_service_request_export_name(&format!(
+            "attachment-not-a-uuid.png"
+        )));
+        assert!(!is_lower_sha256_hex(&"A".repeat(64)));
+    }
 }

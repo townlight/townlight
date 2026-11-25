@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} · Townlight</title>
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.5; margin: 0; }
+    header, main { max-width: 42rem; margin: 0 auto; padding: 1rem; }
+    label { display: block; font-weight: 600; margin-top: .75rem; }
+    input[type="email"], select { width: 100%; max-width: 28rem; padding: .4rem; }
+    ul { list-style: none; padding: 0; }
+    li label { display: inline; font-weight: 400; }
+    .button { display: inline-block; margin-top: 1rem; padding: .5rem .8rem; }
+    .errorlist { color: #8b0000; }
+    [role="status"] { border-left: .25rem solid #555; padding-left: .75rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/communications/subscribe/">Subscribe to city updates</a>
+  </header>
+  <main>
+    <h1>{{ title }}</h1>
+    {% if mode == "message" %}
+      <p role="status">{{ message }}</p>
+    {% elif mode == "pending" %}
+      <p role="status">{{ message }}</p>
+      <form method="get" action="{{ status_url }}">
+        <button type="submit">Refresh status</button>
+      </form>
+    {% else %}
+      <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+      </form>
+    {% endif %}
+    <p><a href="/communications/subscribe/">Subscription page</a></p>
+  </main>
+</body>
+</html>

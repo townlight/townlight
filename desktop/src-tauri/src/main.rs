@@ -22,6 +22,9 @@ mod shared_staff;
 mod supervisor;
 mod workflows;
 mod zoning_client;
+mod service_requests_client;
+mod parks_client;
+mod communications_client;
 
 use auth::{AccessState, AuthActionResult, LocalUserSummary};
 use first_run::{FirstRunActionResult, FirstRunState, SavedCityProfile};
@@ -155,6 +158,11 @@ fn navigation() -> Vec<NavigationItem> {
             id: "grants",
             label: "Grants",
             description: "Grant opportunities, staff review and award closeout",
+        },
+        NavigationItem {
+            id: "service-requests",
+            label: "311 Service Requests",
+            description: "Resident intake, department queues and resolution",
         },
         NavigationItem {
             id: "search",
@@ -1294,6 +1302,82 @@ fn inspections_capability() -> Result<String, domain_client::DomainError> {
 }
 
 #[tauri::command]
+async fn service_requests_request(
+    request: service_requests_client::ServiceRequestsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_311")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_311"))
+        || (matches!(
+            &request,
+            service_requests_client::ServiceRequestsRequest::SaveCategory { .. }
+        ) && !access_is_local_admin(&access))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    service_requests_client::execute(request, proof).await
+}
+
+#[tauri::command]
+async fn communications_request(
+    request: communications_client::CommunicationsRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_comms")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_comms"))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    communications_client::execute(request, proof).await
+}
+
+#[tauri::command]
+async fn parks_request(
+    request: parks_client::ParksRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_parks")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_parks"))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    parks_client::execute(request, proof).await
+}
+
+#[tauri::command]
 async fn municipal_staff_request(
     request: municipal_staff::StaffRequest,
 ) -> Result<Value, domain_client::DomainError> {
@@ -1482,6 +1566,9 @@ pub fn run() {
         permitting_domain_request,
         inspections_domain_request,
         municipal_staff_request,
+        service_requests_request,
+        communications_request,
+        parks_request,
         permitting_pick_bundle,
         planning_public_request,
         planning_pick_bundle,

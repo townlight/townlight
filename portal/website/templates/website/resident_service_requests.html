@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% comment %}SPDX-License-Identifier: AGPL-3.0-only{% endcomment %}
+{% block title %}{{ title }}{% endblock %}
+{% block description %}Submit, track, and manage a public city service request.{% endblock %}
+{% block content %}
+<section class="section"><div class="container narrow">
+<h1>{{ title }}</h1>
+
+{% if mode == "home" %}
+  <p>Use this form to report a non-emergency city issue. For emergencies, contact emergency services.</p>
+  {% if catalog_available %}
+    <form method="post" action="{% url 'resident-311' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="button" type="submit">Submit request</button>
+    </form>
+  {% else %}
+    <div class="notice" role="status">
+      <h2>New requests are temporarily unavailable</h2>
+      <p>The service catalogue cannot be reached right now. Existing requests can still be tracked.</p>
+    </div>
+  {% endif %}
+  <p><a href="{% url 'resident-311-lookup' %}">Track an existing request</a></p>
+  <p><a href="{% url 'resident-311-recover' %}">Recover access to a request</a></p>
+
+{% elif mode == "lookup" %}
+  <p>Enter the tracking number and private access token supplied with your request.</p>
+  <form method="post" action="{% url 'resident-311-lookup' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button" type="submit">Look up request</button>
+  </form>
+  <p><a href="{% url 'resident-311' %}">Start a new request</a></p>
+
+{% elif mode == "pending" %}
+  <div class="notice" role="status">
+    <p>{{ message }}</p>
+    <p>This page does not update automatically. Refresh when you are ready to check again.</p>
+    <p><a class="button outline" href="{{ status_url }}">Refresh request status</a></p>
+  </div>
+  <p><a href="{% url 'resident-311' %}">Return to 311 services</a></p>
+
+{% elif mode == "created" %}
+  <div class="notice" role="status">
+    <h2>Save these private details now</h2>
+    <p>Keep this access token private. Anyone with it can view and update your request.</p>
+    <dl>
+      <dt>Tracking number</dt><dd><code>{{ tracking }}</code></dd>
+      <dt>Access token</dt><dd><code>{{ access_token }}</code></dd>
+    </dl>
+    <p><a class="button" href="{{ detail_url }}">Open your request</a></p>
+  </div>
+  <p><a href="{% url 'resident-311-lookup' %}">Track a request</a></p>
+
+{% elif mode == "recovered" %}
+  <div class="notice" role="status">
+    <h2>Access restored</h2>
+    <p>Save this replacement access token now. The previous token is no longer shown here.</p>
+    <dl>
+      <dt>Tracking number</dt><dd><code>{{ tracking }}</code></dd>
+      <dt>New access token</dt><dd><code>{{ access_token }}</code></dd>
+    </dl>
+    <p><a class="button" href="{{ detail_url }}">Open your request</a></p>
+  </div>
+
+{% elif mode == "recovery" %}
+  <p>Start recovery with your tracking number and the email address used for the request.</p>
+  <form method="post" action="{% url 'resident-311-recover' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="action" value="start">
+    <button class="button" type="submit">Start recovery</button>
+  </form>
+  <p>If the details match, you will be asked for the recovery code sent to that email address.</p>
+  <p><a href="{% url 'resident-311-lookup' %}">Track a request instead</a></p>
+
+{% elif mode == "recovery_complete" %}
+  <p>Enter the six-digit recovery code that was sent to the email address on file.</p>
+  <form method="post" action="{% url 'resident-311-recover' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="action" value="complete">
+    <button class="button" type="submit">Complete recovery</button>
+  </form>
+
+{% elif mode == "detail" %}
+  <p><a href="{% url 'resident-311-lookup' %}">Track a different request</a></p>
+  <article class="card" aria-labelledby="request-heading">
+    <h2 id="request-heading">Request {{ request_record.tracking|default:request_id }}</h2>
+    <dl>
+      {% if request_record.state %}<dt>Status</dt><dd>{{ request_record.state }}</dd>{% endif %}
+      {% if request_record.category %}<dt>Category</dt><dd>{{ request_record.category }}</dd>{% endif %}
+      {% if request_record.location %}<dt>Location</dt><dd>{{ request_record.location }}</dd>{% endif %}
+      {% if request_record.description %}<dt>Description</dt><dd>{{ request_record.description|linebreaksbr }}</dd>{% endif %}
+      {% if request_record.revision %}<dt>Revision</dt><dd>{{ request_record.revision }}</dd>{% endif %}
+      {% if request_record.created_at %}<dt>Created</dt><dd>{{ request_record.created_at }}</dd>{% endif %}
+      {% if request_record.updated_at %}<dt>Updated</dt><dd>{{ request_record.updated_at }}</dd>{% endif %}
+    </dl>
+    <p><a class="button outline" href="{{ refresh_url }}">Refresh this request</a></p>
+  </article>
+
+  {% if request_record.events %}
+    <section aria-labelledby="messages-heading">
+      <h2 id="messages-heading">Updates</h2>
+      <ol class="request-updates">
+        {% for entry in request_record.events %}
+          <li>
+            <p>{{ entry.message|default:""|linebreaksbr }}</p>
+            {% if entry.created_at %}<p><small>{{ entry.created_at }}</small></p>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% endif %}
+
+  {% if request_record.attachments %}
+    <section aria-labelledby="attachments-heading">
+      <h2 id="attachments-heading">Attachments</h2>
+      <ul>
+        {% for attachment in request_record.attachments %}
+          <li>
+            {{ attachment.name|default:"Attachment" }}
+            <form method="post" action="{% url 'resident-311-detail' request_id %}">
+              {% csrf_token %}
+              {{ download_form.as_p }}
+              <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+              <input type="hidden" name="action" value="download">
+              <button class="button outline" type="submit">Download attachment</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section aria-labelledby="comment-heading">
+    <h2 id="comment-heading">Add a comment</h2>
+    <form method="post" action="{% url 'resident-311-detail' request_id %}">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <input type="hidden" name="action" value="comment">
+      <button class="button" type="submit">Send comment</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="reopen-heading">
+    <h2 id="reopen-heading">Ask to reopen this request</h2>
+    <form method="post" action="{% url 'resident-311-detail' request_id %}">
+      {% csrf_token %}
+      {{ reopen_form.as_p }}
+      <input type="hidden" name="action" value="reopen">
+      <button class="button outline" type="submit">Request reopening</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="upload-heading">
+    <h2 id="upload-heading">Add a photo or document</h2>
+    <p>Upload a PNG, JPEG, PDF, or plain-text file no larger than 10 MiB.</p>
+    <form method="post" action="{% url 'resident-311-detail' request_id %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ upload_form.as_p }}
+      <input type="hidden" name="action" value="upload">
+      <button class="button outline" type="submit">Upload attachment</button>
+    </form>
+  </section>
+
+{% elif mode == "committed" %}
+  <div class="notice" role="status">
+    <p>{{ message }}</p>
+    <p><a class="button" href="{{ detail_url }}">View the updated request</a></p>
+    <p><a href="{{ refresh_url }}">Refresh this confirmation</a></p>
+  </div>
+
+{% elif mode == "message" %}
+  <div class="notice" role="alert">
+    <p>{{ message }}</p>
+  </div>
+  <p><a href="{% url 'resident-311' %}">Return to 311 services</a></p>
+{% endif %}
+</div></section>
+{% endblock %}

@@ -61,8 +61,23 @@
       "additionalProperties": false,
       "allOf": [
         {
-          "if": {"properties": {"commit": {"type": "null"}}},
-          "then": {"properties": {"channel": {"const": "candidate"}, "published_at": {"type": "null"}}}
+          "if": {
+            "properties": {
+              "commit": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "channel": {
+                "const": "candidate"
+              },
+              "published_at": {
+                "type": "null"
+              }
+            }
+          }
         }
       ],
       "required": [
@@ -83,7 +98,14 @@
           "minLength": 1
         },
         "commit": {
-          "anyOf": [{"$ref": "#/$defs/sha1"}, {"type": "null"}]
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha1"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "channel": {
           "enum": [
@@ -188,14 +210,14 @@
       "items": {
         "$ref": "#/$defs/moduleId"
       },
-      "minItems": 17,
-      "maxItems": 17,
+      "minItems": 20,
+      "maxItems": 20,
       "uniqueItems": true
     },
     "modules": {
       "type": "object",
-      "minProperties": 17,
-      "maxProperties": 17,
+      "minProperties": 20,
+      "maxProperties": 20,
       "propertyNames": {
         "$ref": "#/$defs/moduleId"
       },

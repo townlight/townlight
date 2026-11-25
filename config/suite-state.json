@@ -68,7 +68,10 @@
         "procurement",
         "data",
         "budget",
-        "grants"
+        "grants",
+        "311",
+        "comms",
+        "parks"
       ],
       "disabled": false,
       "development_only": false
@@ -206,7 +209,10 @@
     "procurement",
     "data",
     "budget",
-    "grants"
+    "grants",
+    "311",
+    "comms",
+    "parks"
   ],
   "modules": {
     "core": {
@@ -1090,6 +1096,164 @@
         "role": "Grants review, awards and closeout",
         "status": "windows_candidate_acceptance_pending",
         "source_commit": "790892f620767a2fcaf6b8f072ff45df15a963c1"
+      }
+    },
+    "311": {
+      "public_name": "Townlight 311",
+      "public_slug": "311",
+      "legacy": {
+        "technical_id": "townlight_311",
+        "product_names": [
+          "Townlight 311"
+        ],
+        "package_names": [
+          "townlight-311"
+        ]
+      },
+      "repository": {
+        "name": "townlight/311",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": "0.2.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "records"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "candidate",
+        "public_status_released_at": null
+      },
+      "installer": {
+        "tier": 3,
+        "role": "Resident service requests and staff casework",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "630b9a31a24281a9ffce724c139f8aa39db60106"
+      }
+    },
+    "comms": {
+      "public_name": "Townlight Communications",
+      "public_slug": "comms",
+      "legacy": {
+        "technical_id": "townlight_comms",
+        "product_names": [
+          "Townlight Communications"
+        ],
+        "package_names": [
+          "townlight-comms"
+        ]
+      },
+      "repository": {
+        "name": "townlight/comms",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": "0.2.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "records"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "candidate",
+        "public_status_released_at": null
+      },
+      "installer": {
+        "tier": 3,
+        "role": "communications workflow",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "60513d0b4c2fcd7a53aa2c7da2752614720cf616"
+      }
+    },
+    "parks": {
+      "public_name": "Townlight Parks",
+      "public_slug": "parks",
+      "legacy": {
+        "technical_id": "townlight_parks",
+        "product_names": [
+          "Townlight Parks"
+        ],
+        "package_names": [
+          "townlight-parks"
+        ]
+      },
+      "repository": {
+        "name": "townlight/parks",
+        "aliases": [],
+        "default_branch": "main",
+        "manifest_path": "pyproject.toml"
+      },
+      "versions": {
+        "development": "0.2.0",
+        "released": null,
+        "installer": "0.2.0",
+        "public_status": "0.2.0"
+      },
+      "release": {
+        "tag": null,
+        "published_at": null,
+        "asset_policy": "python-package"
+      },
+      "compatibility": {
+        "development_core": "1.3.0.dev2",
+        "installer_core": "1.3.0.dev2",
+        "public_status_core": "1.3.0.dev2"
+      },
+      "dependencies": [
+        "core",
+        "records",
+        "311",
+        "comms"
+      ],
+      "maturity": {
+        "state": "candidate",
+        "availability": "runtime",
+        "arch_tier": 3,
+        "legacy_grade": "candidate",
+        "public_status_released_at": null
+      },
+      "installer": {
+        "tier": 3,
+        "role": "parks workflow",
+        "status": "windows_candidate_acceptance_pending",
+        "source_commit": "bd5f9964c544dc9923457b212dd00af56aa86948"
       }
     }
   }

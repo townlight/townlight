@@ -551,7 +551,14 @@ pub(crate) fn domain_public_proof() -> Result<String, String> {
 fn role_module_ids(role: &str) -> Option<&'static [&'static str]> {
     match role {
         "local-admin" | "city-staff" => None,
-        "clerk" => Some(&["townlight_meetings", "townlight_notice", "townlight_access"]),
+        "clerk" => Some(&[
+            "townlight_meetings",
+            "townlight_notice",
+            "townlight_access",
+            "townlight_comms",
+            "townlight_parks",
+            "townlight_311",
+        ]),
         "records-staff" => Some(&["townlight_records"]),
         "code-staff" => Some(&["townlight_code"]),
         _ => Some(&[]),
@@ -852,6 +859,15 @@ mod tests {
             first_run::first_run_action("create-admin", Some("first-admin"), Some(&admin_payload))
                 .expect("admin saved");
         assert!(result.accepted);
+    }
+
+    #[test]
+    fn clerk_role_is_granted_service_requests_module() {
+        assert!(role_allows_module("clerk", "townlight_meetings"));
+        assert!(role_allows_module("clerk", "townlight_notice"));
+        assert!(role_allows_module("clerk", "townlight_access"));
+        assert!(role_allows_module("clerk", "townlight_311"));
+        assert!(!role_allows_module("records-staff", "townlight_311"));
     }
 
     #[test]

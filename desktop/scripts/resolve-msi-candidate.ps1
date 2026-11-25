@@ -29,6 +29,9 @@ $ProcurementRef = ''
 $DataRef = ''
 $BudgetRef = ''
 $GrantsRef = ''
+$ServiceRequestsRef = ''
+$CommunicationsRef = ''
+$ParksRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -80,12 +83,15 @@ if ($Selected -eq 'inspections-preview') {
     $DataRef = $Build.Pins.sources.'townlight/data'
     $BudgetRef = $Build.Pins.sources.'townlight/budget'
     $GrantsRef = $Build.Pins.sources.'townlight/grants'
+    $ServiceRequestsRef = $Build.Pins.sources.'townlight/311'
+    $CommunicationsRef = $Build.Pins.sources.'townlight/comms'
+    $ParksRef = $Build.Pins.sources.'townlight/parks'
     $RuntimeProfile = 'inspections-preview'
     $PlanningContract = $Build.ContractPath
     $DesktopVersion = $Build.Contract.desktop_version
     $TauriArgs = '--config src-tauri/tauri.inspections-candidate.conf.json'
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; budget_ref=$BudgetRef; grants_ref=$GrantsRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; budget_ref=$BudgetRef; grants_ref=$GrantsRef; service_requests_ref=$ServiceRequestsRef; communications_ref=$CommunicationsRef; parks_ref=$ParksRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }

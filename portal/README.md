@@ -12,7 +12,7 @@ Edit the home in Wagtail for the city name/prefix, logo and hero image, heading/
 
 Residents use `/meetings/?period=upcoming|past|all` with `q`, `series` and `page` filters. Series uses actual public titles. `/search/?q=records` searches published page and meeting titles. Public agenda, packet and minutes pages open at `/meetings/<pk>/documents/<agenda|packet|minutes>/` where available. An approved council packet provides a public HTML index and the exact PDF. Withdrawing the recording removes its playback and download while leaving a published packet available. Withdrawing the last published item hides the meeting. Synthetic PrimeGov links retain their illustrative labels.
 
-The public presentation adds no resident accounts, transactions, fee calculator, new vendor connector or live-stream host. See the [portal guide](../docs/portal/guide.md) for complete field specifications, examples and existing publication controls.
+The historical scope of public 1.9.3.2 added no resident accounts, transactions, fee calculator, new vendor connector or live-stream host. The 1.10.0.1 source candidate adds resident 311 private inbox/tracking, Parks bookings/registration and Communications subscription consent; those flows require a separately configured resident portal, SMTP and optional payment service, and its local runtime is never exposed. See the [Windows 1.10.0.1 source candidate guide](../docs/windows-311-communications-parks.md). See the [portal guide](../docs/portal/guide.md) for complete field specifications, examples and existing publication controls.
 
 ## Local setup
 

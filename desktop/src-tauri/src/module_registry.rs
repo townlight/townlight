@@ -20,6 +20,9 @@ const MUNICIPAL_MODULES: &[&str] = &[
     "townlight_data",
     "townlight_budget",
     "townlight_grants",
+    "townlight_comms",
+    "townlight_parks",
+    "townlight_311",
 ];
 
 #[derive(Deserialize)]

@@ -5,6 +5,7 @@ separate unchanged service schema remains its own existing document.
 """
 from __future__ import annotations
 
+import argparse
 import copy
 import html
 import json
@@ -15,6 +16,8 @@ import shutil
 import socket
 import sys
 import tempfile
+from contextlib import ExitStack
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOS = ROOT.parent
@@ -32,14 +35,23 @@ PREFIXES = {
     'access': ('/desktop/v1/access',),
     'notice': ('/desktop/v1/notices', '/desktop/v1/notice'),
     'station': ('/desktop/v1/station', '/desktop/v1/meetings/station'),
+    '311': ('/desktop/v1/service-requests',),
+    'comms': ('/desktop/v1/communications',),
+    'parks': ('/desktop/v1/parks',),
+}
+
+MODULE_ALIASES = {
+    '311': ('311', 'service_requests', 'service-requests'),
+    'comms': ('comms', 'communications'),
+    'parks': ('parks',),
 }
 
 
-def reference(slug, schema, identity):
+def reference(slug, schema, identity, site=SITE):
     title = 'Townlight ' + slug.title() + ' API reference'
     esc = html.escape
     body = [f'<h1>{esc(title)}</h1>',
-            '<p>Prepared source candidate, November 2, 2026. New signed Windows installed acceptance and publication remain pending.</p>',
+            '<p>Prepared source candidate, November 2, 2026. Unpublished source schema; no installed acceptance is claimed.</p>',
             f'<p>{esc(identity)}. The HTTP host is {esc(schema["info"]["title"])} '
             f'{esc(schema["info"]["version"])}. Component package versions and the host API version are separate identities.</p>',
             '<p>Generated from the actual native inspections-preview composition without application lifespan, migrations or database/network access. It describes route and validation contracts; it does not establish endpoint behavior, individual authorization or installed acceptance. Standalone product applications have separate deployment boundaries.</p>',
@@ -62,7 +74,7 @@ def reference(slug, schema, identity):
                  'Station runs its own service and database. Its unchanged 0.3.0 service contract is available in '
                  '<a href="station-service-openapi.json">the separate Station service schema</a>. '
                  'Schema reuse does not establish the changed suite candidate’s installed handoff acceptance.</p>']
-    css = (SITE / 'assets/site.css').read_text(encoding='utf-8')
+    css = (site / 'assets/site.css').read_text(encoding='utf-8')
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{esc(title)}</title><style>{css}\npre{{white-space:pre-wrap;overflow-wrap:anywhere}}'
@@ -74,6 +86,10 @@ def reference(slug, schema, identity):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--site-root', type=Path, default=SITE,
+                        help='Documentation site root (default: existing townlight.github.io checkout)')
+    site = parser.parse_args().site_root
     sys.path[:0] = [str(path) for path in SOURCES]
     os.environ.update(TESTING='1', TOWNLIGHT_PRODUCT_PROFILE='inspections-preview',
                       DATABASE_URL='postgresql+asyncpg://schema_export@127.0.0.1:9/schema_export',
@@ -87,8 +103,20 @@ def main():
     original_connect = socket.socket.connect
     socket.socket.connect = refuse_connection
     try:
-        with tempfile.TemporaryDirectory(prefix='tl-schema-') as profile:
+        with tempfile.TemporaryDirectory(prefix='tl-schema-') as profile, ExitStack() as stack:
             os.environ['TOWNLIGHT_PROFILE_ROOT'] = profile
+            # Source documentation only: substitute the three startup migration-readiness
+            # DB probes while constructing the schema. This is not endpoint or installed
+            # acceptance; production startup still requires these unchanged readiness checks.
+            stack.enter_context(patch('townlight_311.migrations.ready', return_value=True))
+            stack.enter_context(patch('townlight_comms.migrations.ready', return_value=True))
+            stack.enter_context(patch('townlight_parks.migrations.ready', return_value=True))
+            # Schema-only docs app construction: substitute all three startup repository
+            # objects (Parks, Communications, Service Requests) solely for schema extraction.
+            # The objects are irrelevant to OpenAPI and are not app or acceptance evidence.
+            stack.enter_context(patch('townlight_parks.workflow.ParksRepository', MagicMock()))
+            stack.enter_context(patch('townlight_comms.workflow.CommunicationsRepository', MagicMock()))
+            stack.enter_context(patch('townlight_311.workflow.ServiceRequestRepository', MagicMock()))
             from townlight_runtime.services import create_runtime_app
             outer = create_runtime_app(domain_enabled=True)
             from starlette.routing import Mount
@@ -104,8 +132,18 @@ def main():
     # new product routes by prefix. Removed routes are never copied from history.
     membership = {}
     for slug in ('core', 'records'):
-        membership[slug] = set(json.loads((SITE / f'api/{slug}-openapi.json').read_text())['paths'])
+        path = site / f'api/{slug}-openapi.json'
+        if path.is_file():
+            membership[slug] = set(json.loads(path.read_text(encoding='utf-8'))['paths'])
     membership['station'] = {'/desktop/v1/requests/{request_id}/station-recordings'}
+    candidate_path = ROOT / 'config/inspections-msi-candidate.json'
+    candidate_version = '1.10.0.1'
+    if candidate_path.is_file():
+        candidate_version = json.loads(candidate_path.read_text(encoding='utf-8')).get(
+            'windows_product_version', candidate_version)
+    public_release = state.get('desktop_release', {})
+    public_version = public_release.get('version', '1.9.3.2')
+    runtime_version = public_release.get('runtime_version', '')
     for slug in ['suite', 'core', 'records', *PREFIXES]:
         document = copy.deepcopy(schema)
         if slug != 'suite':
@@ -115,16 +153,25 @@ def main():
         if not document['paths']:
             raise ValueError('No actual composed API routes for ' + slug)
         if slug == 'suite':
-            identity = 'Desktop source ' + state['desktop_release']['version'] + '; townlight-runtime ' + state['desktop_release']['runtime_version']
+            identity = (f'Desktop source candidate {candidate_version} (unpublished); '
+                        f'public desktop release {public_version} unchanged; '
+                        f'townlight-runtime {runtime_version}')
         else:
-            module = state['modules'][slug]
-            identity = module['public_name'] + ' ' + next(value for value in module['versions'].values() if isinstance(value, str))
+            modules = state.get('modules', {})
+            module = next((modules.get(key) for key in MODULE_ALIASES.get(slug, (slug,))
+                           if modules.get(key)), None)
+            if module:
+                version = next((value for value in module.get('versions', {}).values()
+                                if isinstance(value, str)), '')
+                identity = module.get('public_name', slug) + (' ' + version if version else '')
+            else:
+                identity = slug + ' source candidate (unpublished)'
         document['info']['description'] = 'Prepared source schema for the actual native composition; installed acceptance remains pending. Exported without lifespan, migrations or database/network access.'
         document['x-townlight-component'] = {'view': slug, 'identity': identity, 'evidence': 'source-schema-only'}
-        json_path = SITE / f'api/{slug}-openapi.json'
-        html_path = SITE / f'api/{slug}.html'
+        json_path = site / f'api/{slug}-openapi.json'
+        html_path = site / f'api/{slug}.html'
         json_path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-        html_path.write_text(reference(slug, document, identity), encoding='utf-8')
+        html_path.write_text(reference(slug, document, identity, site), encoding='utf-8')
         for owner in OWNERS:
             destination = REPOS / owner / 'docs/beta-1/api'
             if destination.is_dir():

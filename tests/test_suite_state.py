@@ -23,11 +23,11 @@ def test_committed_state_and_legacy_projections_pass() -> None:
     assert suite_state.validate_all() == []
 
 
-def test_catalog_has_17_kept_townlight_modules_with_unique_technical_ids() -> None:
+def test_catalog_has_20_kept_townlight_modules_with_unique_technical_ids() -> None:
     state = _load(suite_state.STATE_PATH)
     modules = state["modules"]
     assert isinstance(modules, dict)
-    assert len(modules) == 17
+    assert len(modules) == 20
     assert modules["data"]["maturity"]["state"] == "candidate"
     assert modules["data"]["versions"]["public_status"] == "0.2.0"
     assert modules["budget"]["maturity"]["state"] == "candidate"
@@ -40,6 +40,7 @@ def test_catalog_has_17_kept_townlight_modules_with_unique_technical_ids() -> No
         module["public_name"].startswith("Townlight") for module in modules.values()
     )
     technical_ids = [module["legacy"]["technical_id"] for module in modules.values()]
+    assert {"townlight_311", "townlight_comms", "townlight_parks"} <= set(technical_ids)
     assert len(technical_ids) == len(set(technical_ids))
 
 

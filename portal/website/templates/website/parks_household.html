@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title|default:"Household" }}</title>
+</head>
+<body>
+{% autoescape on %}
+<main>
+  <h1>{{ title|default:"Household" }}</h1>
+
+  <p>
+    Updates on this page are submitted to the host as commands. They take
+    effect only after the host confirms them; nothing here is saved
+    instantly into the household record.
+  </p>
+
+  <section aria-labelledby="household-contact-heading">
+    <h2 id="household-contact-heading">Household contact</h2>
+    <dl>
+      <dt>Contact name</dt>
+      <dd>{{ household.snapshot.contact_name|default:"Not provided" }}</dd>
+      <dt>Email</dt>
+      <dd>{{ household.snapshot.email|default:"Not provided" }}</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="refresh-heading">
+    <h2 id="refresh-heading">Refresh</h2>
+    <p>
+      Request a fresh read of your own household records from the host.
+      A refresh does not change any record.
+    </p>
+    <form method="post" action="/parks/household/">
+      {% csrf_token %}
+      <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+      <button type="submit" name="action" value="refresh">Refresh household</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="participants-heading">
+    <h2 id="participants-heading">Participants</h2>
+
+    {% for item in participants %}
+      <article>
+        <h3>{{ item.record.snapshot.name|default:"Participant" }}</h3>
+        <dl>
+          <dt>Participant ID</dt>
+          <dd>{{ item.record.id|default:"Not provided" }}</dd>
+          <dt>Date of birth</dt>
+          <dd>{{ item.record.snapshot.birth_date|default:"Not provided" }}</dd>
+          <dt>Accommodations</dt>
+          <dd>{{ item.record.snapshot.accommodations|default:"None provided" }}</dd>
+        </dl>
+
+        <h4>Update participant</h4>
+        <p>
+          This form submits an update command. The host must confirm the
+          change before it becomes part of your household record.
+        </p>
+        <form method="post" action="/parks/household/">
+          {% csrf_token %}
+          <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+          {{ item.edit_form.as_p }}
+          <button type="submit" name="action" value="update_participant">Update participant</button>
+        </form>
+      </article>
+    {% empty %}
+      <p>No participants are currently listed for your household.</p>
+    {% endfor %}
+
+    <h3>Add a participant</h3>
+    <p>
+      Submitting this form asks the host to add a participant. The addition
+      is not final until the host confirms the command.
+    </p>
+    <form method="post" action="/parks/household/">
+      {% csrf_token %}
+      <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+      {{ participant_form.as_p }}
+      <button type="submit" name="action" value="add_participant">Add participant</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="bookings-heading">
+    <h2 id="bookings-heading">Bookings</h2>
+
+    {% for item in bookings %}
+      <article>
+        <h3>Booking {{ item.record.id|default:"not provided" }}</h3>
+        <dl>
+          <dt>State</dt>
+          <dd>{{ item.record.state|default:"Not provided" }}</dd>
+          <dt>Starts at</dt>
+          <dd>{{ item.record.starts_at|default:"Not provided" }}</dd>
+          <dt>Ends at</dt>
+          <dd>{{ item.record.ends_at|default:"Not provided" }}</dd>
+          <dt>Purpose</dt>
+          <dd>{{ item.record.purpose|default:"Not provided" }}</dd>
+          <dt>Resource</dt>
+          <dd>
+            {{ item.record.resource_id|default:"Not provided" }}
+            {% for resource_id, resource_name in resource_names.items %}
+              {% if resource_id == item.record.resource_id %}
+                ({{ resource_name }})
+              {% endif %}
+            {% endfor %}
+          </dd>
+        </dl>
+
+        {% if item.record.state == "pending" or item.record.state == "requested" or item.record.state == "confirmed" or item.record.state == "active" or item.record.state == "rescheduled" %}
+          <h4>Cancel booking</h4>
+          <p>
+            Cancellation is a host command. It is shown as cancelled only
+            after the host confirms the operation.
+          </p>
+          <form method="post" action="/parks/household/">
+            {% csrf_token %}
+            <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+            <input type="hidden" name="booking_id" value="{{ item.record.id|default:'' }}">
+            {{ item.cancel_form.as_p }}
+            <button type="submit" name="action" value="cancel_booking">Cancel booking</button>
+          </form>
+
+          <h4>Reschedule booking</h4>
+          <p>
+            Rescheduling is a host command. The new times take effect only
+            after the host confirms them.
+          </p>
+          <form method="post" action="/parks/household/">
+            {% csrf_token %}
+            <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+            <input type="hidden" name="booking_id" value="{{ item.record.id|default:'' }}">
+            {{ item.reschedule_form.as_p }}
+            <button type="submit" name="action" value="reschedule_booking">Reschedule booking</button>
+          </form>
+        {% else %}
+          <p>This booking is not active, so cancellation and rescheduling are not offered.</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p>No bookings are currently listed for your household.</p>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="registrations-heading">
+    <h2 id="registrations-heading">Program registrations</h2>
+
+    {% for item in registrations %}
+      <article>
+        <h3>Registration {{ item.record.id|default:"not provided" }}</h3>
+        <dl>
+          <dt>State</dt>
+          <dd>{{ item.record.state|default:"Not provided" }}</dd>
+          <dt>Checked in at</dt>
+          <dd>{{ item.record.checked_in_at|default:"Not checked in" }}</dd>
+        </dl>
+
+        {% if item.record.state == "pending" or item.record.state == "registered" or item.record.state == "confirmed" or item.record.state == "active" or item.record.state == "waitlisted" %}
+          {% if not item.record.checked_in_at or item.record.state == "waitlisted" %}
+            <h4>Cancel registration</h4>
+            <p>
+              Cancellation is a host command. The registration remains
+              listed until the host confirms the cancellation.
+            </p>
+            <form method="post" action="/parks/household/">
+              {% csrf_token %}
+              <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+              <input type="hidden" name="registration_id" value="{{ item.record.id|default:'' }}">
+              {{ item.cancel_form.as_p }}
+              <button type="submit" name="action" value="cancel_registration">Cancel registration</button>
+            </form>
+          {% else %}
+            <p>This registration is checked in, so cancellation is not offered.</p>
+          {% endif %}
+        {% else %}
+          <p>This registration is not active, so cancellation is not offered.</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p>No program registrations are currently listed for your household.</p>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="registration-forms-heading">
+    <h2 id="registration-forms-heading">Register for a program</h2>
+
+    {% if catalog_unavailable %}
+      <p>
+        The program catalog is currently unavailable, so registration
+        choices cannot be shown. Your existing household records are still
+        listed on this page.
+      </p>
+    {% else %}
+      {% for item in registration_forms %}
+        <article>
+          <h3>{{ item.program_title|default:"Program" }}</h3>
+          <dl>
+            <dt>Session ID</dt>
+            <dd>{{ item.session.id|default:"Not provided" }}</dd>
+            <dt>Starts at</dt>
+            <dd>{{ item.session.starts_at|default:"Not provided" }}</dd>
+            <dt>Ends at</dt>
+            <dd>{{ item.session.ends_at|default:"Not provided" }}</dd>
+          </dl>
+          <p>
+            Registration is a host command. The participant is registered
+            only after the host confirms the operation.
+          </p>
+          <form method="post" action="/parks/household/">
+            {% csrf_token %}
+            <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+            {{ item.form.as_p }}
+            <button type="submit" name="action" value="register">Register for this session</button>
+          </form>
+        </article>
+      {% empty %}
+        <p>No open program sessions are available for registration right now.</p>
+      {% endfor %}
+    {% endif %}
+  </section>
+
+  <section aria-labelledby="obligations-heading">
+    <h2 id="obligations-heading">Amounts owed and ledger</h2>
+    <p>
+      Monetary amounts below are shown in integer cents together with their
+      currency code. They are not formatted into decimal currency values on
+      this page.
+    </p>
+
+    {% for item in obligations %}
+      <article>
+        <h3>Obligation {{ item.record.id|default:"not provided" }}</h3>
+        <dl>
+          {% if item.record.amount_cents or item.record.amount_cents == 0 %}
+            <dt>Amount</dt>
+            <dd>{{ item.record.amount_cents }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+          {% if item.record.deposit_cents or item.record.deposit_cents == 0 %}
+            <dt>Deposit</dt>
+            <dd>{{ item.record.deposit_cents }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+          {% if item.record.financial.paid or item.record.financial.paid == 0 %}
+            <dt>Paid</dt>
+            <dd>{{ item.record.financial.paid }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+          {% if item.record.financial.refunded or item.record.financial.refunded == 0 %}
+            <dt>Refunded</dt>
+            <dd>{{ item.record.financial.refunded }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+          {% if item.record.financial.net or item.record.financial.net == 0 %}
+            <dt>Net</dt>
+            <dd>{{ item.record.financial.net }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+          {% if item.record.financial.balance or item.record.financial.balance == 0 %}
+            <dt>Balance</dt>
+            <dd>{{ item.record.financial.balance }} cents {{ item.record.currency|default:"" }}</dd>
+          {% endif %}
+        </dl>
+
+        {% if item.record.financial.entries %}
+          <h4>Payment and refund ledger</h4>
+          <table>
+            <caption>Entries from your own obligation</caption>
+            <thead>
+              <tr>
+                <th scope="col">Operation</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Reference</th>
+                <th scope="col">Recorded at</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in item.record.financial.entries %}
+                <tr>
+                  <td>{{ entry.operation }}</td>
+                  <td>{{ entry.amount_cents }} cents</td>
+                  <td>{{ entry.reference }}</td>
+                  <td>{{ entry.created_at }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No payment or refund ledger entries are available for this obligation.</p>
+        {% endif %}
+
+        <h4>Prepare checkout</h4>
+        <p>
+          This submits a host command to prepare checkout for this
+          obligation. Completing a payment provider redirect does not by
+          itself mark the obligation as paid; refresh your household and
+          check the ledger after the host confirms the payment.
+        </p>
+        <form method="post" action="/parks/household/">
+          {% csrf_token %}
+          <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+          {{ item.payment_form.as_p }}
+          <button type="submit" name="action" value="prepare_checkout">Prepare checkout</button>
+        </form>
+      </article>
+    {% empty %}
+      <p>No financial obligations are currently listed for your household.</p>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="payment-intents-heading">
+    <h2 id="payment-intents-heading">Checkout attempts</h2>
+    <p>
+      These records show the host's current view of your own checkout
+      attempts. A returned checkout page does not itself confirm payment;
+      wait for the host to confirm and refresh the household before relying
+      on an updated balance.
+    </p>
+
+    {% for item in payment_intents %}
+      <article>
+        <h3>Checkout attempt {{ item.record.id|default:"not provided" }}</h3>
+        <dl>
+          <dt>State</dt>
+          <dd>{{ item.record.state|default:"Not provided" }}</dd>
+          <dt>Amount</dt>
+          <dd>{{ item.record.amount_cents|default:"" }} cents {{ item.record.currency|default:"" }}</dd>
+          {% if item.record.last_error %}
+            <dt>Last error</dt>
+            <dd>{{ item.record.last_error }}</dd>
+          {% endif %}
+        </dl>
+
+        <h4>Read checkout</h4>
+        <p>
+          This submits a host read command. The host may open a safe
+          checkout page when one is available. No payment is claimed merely
+          because a redirect or checkout page is returned.
+        </p>
+        <form method="post" action="/parks/household/">
+          {% csrf_token %}
+          <input type="hidden" name="context_id" value="{{ context_id|default:'' }}">
+          {{ item.read_form.as_p }}
+          <button type="submit" name="action" value="read_checkout">Read checkout</button>
+        </form>
+      </article>
+    {% empty %}
+      <p>No checkout attempts are currently listed for your household.</p>
+    {% endfor %}
+  </section>
+</main>
+{% endautoescape %}
+</body>
+</html>

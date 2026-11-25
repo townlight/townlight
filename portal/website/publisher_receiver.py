@@ -25,6 +25,7 @@ SHA256 = re.compile(r"[0-9a-f]{64}")
 TOKEN = re.compile(r"[A-Za-z0-9_-]{43,128}")
 MAX_PACKET = 64 * 1024**2
 MAX_DATASET = 16 * 1024**2
+MAX_ARTICLE = 32 * 1024**2
 MAX_MANIFEST = 1024**2
 CHUNK = 1024**2
 
@@ -56,6 +57,8 @@ def stage_bundle(bundle_path, directory, meeting_id, kind):
         file_name, size_limit = "packet.pdf", MAX_PACKET
     elif kind == "dataset":
         file_name, size_limit = "release.bin", MAX_DATASET
+    elif kind == "article":
+        file_name, size_limit = "release.bin", MAX_ARTICLE
     else:
         file_name, size_limit = "release.bin", max_release()
     with zipfile.ZipFile(bundle_path) as bundle:
@@ -76,16 +79,17 @@ def stage_bundle(bundle_path, directory, meeting_id, kind):
             if set(data) != base_keys or names != {"manifest.json"}:
                 raise ValueError("Invalid withdrawal")
             return data, None
-        if kind == "dataset":
+        if kind in ("dataset", "article"):
             fields = {"title", "artifact_sha256", "artifact_size"}
         else:
             fields = {"title", "scheduled_start", "artifact_sha256", "artifact_size"}
             fields |= {"agenda", "index"} if kind == "packet" else {"media_type"}
         if data.get("action") != "publish" or set(data) != base_keys | fields or names != {"manifest.json", file_name}:
             raise ValueError("Invalid publication fields")
-        if not isinstance(data["title"], str) or not data["title"].strip() or len(data["title"]) > 400:
+        title_limit = 512 if kind == "article" else 400
+        if not isinstance(data["title"], str) or not data["title"].strip() or len(data["title"]) > title_limit:
             raise ValueError("Invalid title")
-        if kind != "dataset":
+        if kind not in ("dataset", "article"):
             if not isinstance(data["scheduled_start"], str) or len(data["scheduled_start"]) > 50:
                 raise ValueError("Invalid meeting time")
             data["scheduled_start"] = datetime.fromisoformat(data["scheduled_start"])
@@ -199,9 +203,9 @@ def receive(request, meeting_id, kind, sequence):
     if not service_allowed(request):
         return JsonResponse({"detail": "Publisher authorization required"}, status=401)
     digest = request.headers.get("X-Townlight-SHA256", "")
-    if kind not in ("packet", "recording", "dataset") or not 0 < sequence < 2**63 or not SHA256.fullmatch(digest):
+    if kind not in ("packet", "recording", "dataset", "article") or not 0 < sequence < 2**63 or not SHA256.fullmatch(digest):
         return JsonResponse({"detail": "Invalid publication identity"}, status=400)
-    if kind != "dataset":
+    if kind not in ("dataset", "article"):
         cursor = PublicationCursor.objects.filter(meeting_id=meeting_id, kind=kind).first()
         known = revision_state(cursor, sequence, digest)
         if known:
@@ -209,6 +213,7 @@ def receive(request, meeting_id, kind, sequence):
     limit = (
         MAX_PACKET if kind == "packet" else
         MAX_DATASET if kind == "dataset" else
+        MAX_ARTICLE if kind == "article" else
         max_release()
     ) + 2 * MAX_MANIFEST
     length_text = request.headers.get("Content-Length", "")
@@ -234,6 +239,9 @@ def receive(request, meeting_id, kind, sequence):
             if kind == "dataset":
                 from .datasets import project_dataset
                 status = project_dataset(meeting_id, sequence, digest, data, artifact)
+            elif kind == "article":
+                from .communications_projection import project_article
+                status = project_article(meeting_id, sequence, digest, data, artifact)
             else:
                 status = project_revision(meeting_id, kind, sequence, digest, data, artifact)
     except (ValueError, UnicodeError, zipfile.BadZipFile, RuntimeError):

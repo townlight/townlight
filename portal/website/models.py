@@ -1,12 +1,15 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from zoneinfo import ZoneInfo
+import uuid
 from urllib.parse import urlsplit
-from wagtail.models import Page
+from zoneinfo import ZoneInfo
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils import timezone
+from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
-from wagtail import blocks
+from wagtail.models import Page
+
 
 class HomePage(Page):
     intro = models.TextField(blank=True)
@@ -20,8 +23,8 @@ class HomePage(Page):
     hero_image = models.ForeignKey("wagtailimages.Image", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     content_panels = Page.content_panels + [FieldPanel(name) for name in (
         "brand_name", "brand_prefix", "logo", "hero_image", "hero_title", "intro", "contact_address", "contact_hours", "synthetic_demo")]
-    subpage_types = ["website.ServicePage"]
-    parent_page_types = ["wagtailcore.Page"]
+    subpage_types = ["website.ServicePage"]  # noqa: RUF012
+    parent_page_types = ["wagtailcore.Page"]  # noqa: RUF012
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
@@ -48,8 +51,8 @@ class ServicePage(Page):
     ]))], blank=True, use_json_field=True)
     content_panels = Page.content_panels + [FieldPanel(name) for name in (
         "kind", "summary", "heading", "body", "steps", "destination_label", "destination_url", "department", "contact_details", "questions")]
-    parent_page_types = ["website.HomePage"]
-    subpage_types = []
+    parent_page_types = ["website.HomePage"]  # noqa: RUF012
+    subpage_types = []  # noqa: RUF012
 
     def clean(self):
         super().clean()
@@ -111,8 +114,8 @@ class Meeting(models.Model):
     def status_class(self):
         return "cancelled" if self.cancelled else "upcoming" if self.scheduled_start >= timezone.now() and not self.has_video else ""
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["vendor", "tenant", "external_id"], name="unique_vendor_tenant_meeting")]
-        ordering = ["scheduled_start", "pk"]
+        constraints = [models.UniqueConstraint(fields=["vendor", "tenant", "external_id"], name="unique_vendor_tenant_meeting")]  # noqa: RUF012
+        ordering = ["scheduled_start", "pk"]  # noqa: RUF012
 
 
 class PublicationCursor(models.Model):
@@ -122,11 +125,8 @@ class PublicationCursor(models.Model):
     digest = models.CharField(max_length=64)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=("meeting_id", "kind"), name="unique_publication_stream")]
+        constraints = [models.UniqueConstraint(fields=("meeting_id", "kind"), name="unique_publication_stream")]  # noqa: RUF012
 
-
-from django.db import models
-import uuid
 
 class DatasetPublication(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -137,3 +137,114 @@ class DatasetPublication(models.Model):
 
     class Meta:
         ordering = ("title", "id")
+
+
+class ResidentCommand(models.Model):
+    """An encrypted, owner-scoped unit of work for the resident 311 inbox."""
+    OPERATIONS = (
+        ("create_request", "Create request"),
+        ("read_request", "Read request"),
+        ("comment", "Comment"),
+        ("reopen", "Reopen"),
+        ("upload_attachment", "Upload attachment"),
+        ("begin_recovery", "Begin recovery"),
+        ("complete_recovery", "Complete recovery"),
+        ("download_attachment", "Download attachment"),
+        ("comms_subscribe", "Subscribe to communications"),
+        ("comms_confirm", "Confirm communications subscription"),
+        ("comms_preferences", "Update communications preferences"),
+        ("parks_create_household", "Create parks household"),
+        ("parks_read_household", "Read parks household"),
+        ("parks_add_participant", "Add parks participant"),
+        ("parks_update_participant", "Update parks participant"),
+        ("parks_create_booking", "Create parks booking"),
+        ("parks_cancel_booking", "Cancel parks booking"),
+        ("parks_reschedule_booking", "Reschedule parks booking"),
+        ("parks_register", "Register for parks program"),
+        ("parks_cancel_registration", "Cancel parks registration"),
+        ("parks_availability", "Check parks availability"),
+        ("parks_prepare_checkout", "Prepare parks checkout"),
+        ("parks_read_checkout", "Read parks checkout"),
+    )
+    STATES = (
+        ("queued", "Queued"),
+        ("claimed", "Claimed"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner_session_digest64 = models.CharField(max_length=64)
+    operation = models.CharField(max_length=32, choices=OPERATIONS)
+    encrypted_payload = models.TextField()
+    payload_sha256 = models.CharField(max_length=64)
+    state = models.CharField(max_length=9, choices=STATES, default="queued")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    lease_id = models.UUIDField(null=True, blank=True)
+    lease_until = models.DateTimeField(null=True, blank=True)
+    encrypted_result = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ("created_at", "id")
+        indexes = [  # noqa: RUF012
+            models.Index(fields=("owner_session_digest64", "state", "created_at"),
+                         name="resident_owner_state_idx"),
+        ]
+
+
+class ServiceRequestCatalog(models.Model):
+    """Singleton cache of the publisher-approved public 311 categories."""
+    id = models.PositiveSmallIntegerField(primary_key=True, default=311, editable=False)
+    categories = models.JSONField(default=list)
+    digest = models.CharField(max_length=64)
+    updated_at = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "service request catalog"
+        verbose_name_plural = "service request catalog"
+
+
+class ParksCatalog(models.Model):
+    """Singleton cache of the publisher-approved parks catalog."""
+    id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
+    catalog = models.JSONField(default=dict)
+    sha256 = models.CharField(max_length=64)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "parks catalog"
+        verbose_name_plural = "parks catalog"
+
+
+class ArticlePublication(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=512)
+    language = models.CharField(max_length=16)
+    sequence = models.PositiveBigIntegerField()
+    digest = models.CharField(max_length=64)
+    artifact_sha256 = models.CharField(max_length=64, blank=True)
+    withdrawn = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ArticlePublicationRevision(models.Model):
+    article = models.ForeignKey(
+        ArticlePublication,
+        on_delete=models.CASCADE,
+        related_name="publication_history",
+    )
+    sequence = models.PositiveBigIntegerField()
+    digest = models.CharField(max_length=64)
+    artifact_sha256 = models.CharField(max_length=64, blank=True)
+    action = models.CharField(max_length=16)
+    title = models.CharField(max_length=512)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=("article", "sequence"),
+                name="unique_article_publication_revision",
+            ),
+        ]

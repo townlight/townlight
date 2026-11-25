@@ -4,17 +4,22 @@ The data and files stay owned by the existing domain. A reservation survives
 host loss before a receipt is written and fences an uncertain operation.
 """
 
+import re
+import sqlite3
 from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
-import re
-import sqlite3
-
 
 ALLOCATION = re.compile(
     r"/desktop/v1/(?:meetings/(?:meetings(?:/[0-9a-f-]+/(?:packet-snapshots|council-source))?"
     r"|agenda-items(?:/[0-9a-f-]+/reviews)?|packets/[0-9a-f-]+/(?:council-preview|council-approval))"
-    r"|requests(?:/[0-9a-f-]+/actions)?)"
+    r"|requests(?:/[0-9a-f-]+/actions)?"
+    r"|communications/articles(?:/[0-9a-f-]+/(?:revisions|attachments|records))?"
+    r"|parks/(?:catalog/(?:resource|program)|households|participants|bookings|sessions|registrations|refunds"
+    r"|resources/[0-9a-f-]+/(?:closures|maintenance)"
+    r"|attachments/(?:resource|program|booking|registration)/[0-9a-f-]+"
+    r"|archives/[^/]+/[0-9a-f-]+/records)"
+    r"|municipal-staff/data/parks/preview)"
 )
 
 

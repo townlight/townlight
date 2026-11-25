@@ -61,6 +61,7 @@ def upgrade_all() -> None:
 
     sync_url = _sync_database_url(database_url)
     from sqlalchemy import create_engine
+
     from townlight_runtime.database_identity import establish
     identity_engine = create_engine(sync_url)
     try:
@@ -96,7 +97,9 @@ def upgrade_all() -> None:
         from townlight_runtime.native_accounts import metadata as account_metadata
         account_metadata.create_all(repository.engine)
         if profile in {"city-core", "zoning-beta", "planning-preview", "permitting-preview", "inspections-preview"}:
-            from townlight_runtime.code_meetings import ensure_schema as ensure_connections
+            from townlight_runtime.code_meetings import (
+                ensure_schema as ensure_connections,
+            )
             ensure_connections(repository.engine)
     finally:
         repository.engine.dispose()
@@ -123,16 +126,27 @@ def upgrade_all() -> None:
         print("Townlight Permitting: schema migrated (townlight_permitting_0001)")
 
     if profile == "inspections-preview":
-        from townlight_runtime.municipal_staff import ensure_schema
-        from townlight_runtime.data_staff import ensure_data_schema
+        from townlight_311.migrations import upgrade as upgrade_311
         from townlight_budget.adoption import ensure_budget_schema
         from townlight_grants.grant_cases import ensure_grants_schema
+
+        from townlight_runtime import (
+            parks_data_model,  # noqa: F401
+            service_request_data_model,  # noqa: F401
+        )
+        from townlight_runtime.data_staff import ensure_data_schema
+        from townlight_runtime.municipal_staff import ensure_schema
         staff_engine = create_engine(sync_url)
         try:
             ensure_schema(staff_engine)
             ensure_data_schema(staff_engine)
             ensure_budget_schema(staff_engine)
             ensure_grants_schema(staff_engine)
+            upgrade_311(staff_engine)
+            from townlight_comms.migrations import upgrade as upgrade_comms
+            upgrade_comms(staff_engine)
+            from townlight_parks.migrations import upgrade as upgrade_parks
+            upgrade_parks(staff_engine)
         finally:
             staff_engine.dispose()
         from townlight_inspections.migrations import source_engine, upgrade
