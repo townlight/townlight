@@ -14,6 +14,7 @@ import {installedCommunicationsDelivery} from './communications-delivery.mjs';
 import {installedParksReservations} from './parks-reservations.mjs';
 import {installedParksEnrollment} from './parks-enrollment.mjs';
 import {installedParksFinanceRecords} from './parks-finance-records.mjs';
+import {recoveryEvidence, verifyRecoveryEvidence} from './community-recovery.mjs';
 import {installedParksMaintenanceData} from './parks-maintenance-data.mjs';
 import {ensureResidentSubscriber} from './resident-communications.mjs';
 
@@ -211,6 +212,7 @@ export async function communityWorkflows({page, native, save, meetingId, output,
       parksFinanceAttachment: finance?.ids?.records_attachment ?? null,
       parksMaintenanceRequest: maintenance?.requestId ?? null,
     },
+    recovery: recoveryEvidence({resident,staff,delivery,enrollment,finance}),
     messageCounts: {
       residentUpdates: resident?.evidence?.addInfo?.message ? 1 : 0,
       residentPhotos: resident?.evidence?.photo ? 1 : 0,
@@ -228,7 +230,7 @@ export async function communityWorkflows({page, native, save, meetingId, output,
   return summary;
 }
 
-export async function communityReadback({native, ids, save}) {
+export async function communityReadback({native, ids, save, expected}) {
   assert.equal(typeof native, 'function', 'native required');
   assert.ok(ids && typeof ids === 'object', 'ids required');
   const call = async (command, request) => {
@@ -283,7 +285,12 @@ export async function communityReadback({native, ids, save}) {
     const r = await call('parks_request', {operation: 'obligation-get', id: ids.parksObligation});
     const obligation = r?.obligation ?? r;
     if (obligation?.id !== ids.parksObligation) throw new Error(`obligation-get returned ${obligation?.id}, expected ${ids.parksObligation}`);
-    return {id: obligation.id, totals: obligation?.totals ?? null};
+    return {
+      id: obligation.id,
+      paid_cents: obligation.paid_cents,
+      refunded_cents: obligation.refunded_cents,
+      balance_cents: obligation.balance_cents,
+    };
   });
 
   await run('resource', ids.parksResource, async () => {
@@ -304,6 +311,7 @@ export async function communityReadback({native, ids, save}) {
     return {id: req.id, state: req.state, revision: req.revision};
   });
 
+  findings.durable = await verifyRecoveryEvidence({native, ids, expected, downloadRecordsAttachment});
   if (typeof save === 'function') await save('community-readback', findings);
   return findings;
 }

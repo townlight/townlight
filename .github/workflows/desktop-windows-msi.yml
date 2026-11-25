@@ -1431,5 +1431,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: signed-installed-${{ matrix.mode }}
-          path: ${{ runner.temp }}/installed-evidence
+          path: |
+            ${{ runner.temp }}/installed-evidence/**
+            !${{ runner.temp }}/installed-evidence/community-fixture/publisher.token
+            !${{ runner.temp }}/installed-evidence/community-fixture/resident.key
+            !${{ runner.temp }}/installed-evidence/community-fixture/tls/localhost.key
           retention-days: 7
