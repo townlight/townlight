@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -154,7 +154,7 @@ test('communityReadback uses the real records downloader and rejects corrupt arc
   let deleteSessions = 0;
   let corruptArchive = false;
 
-  const sessionToken = 'test-session-token-no-credentials';
+  const sessionToken = randomUUID();
   const testProof = 'test-proof-no-credentials';
 
   const native = async (command, params = {}) => {

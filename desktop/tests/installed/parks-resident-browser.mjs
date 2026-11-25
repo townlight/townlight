@@ -51,7 +51,9 @@ export async function installedResidentParks({
   const root = new URL(portalBaseUrl);
   const browser = await chromium.launch({
     headless: true,
-    channel: process.env.TOWNLIGHT_BROWSER_CHANNEL || undefined,
+    channel:
+      process.env.TOWNLIGHT_BROWSER_CHANNEL ||
+      (process.platform === 'win32' ? 'msedge' : undefined),
   });
 
   try {
