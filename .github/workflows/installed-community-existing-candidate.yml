@@ -25,7 +25,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-SIGNED
-          run-id: 45548487216
+          run-id: 45686468496
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: msi-artifact
 
@@ -58,9 +58,9 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $expectedSha = 'f6bbeb52ec72600ad40704965a6751632bfa3fa9ebc8d1b8a8d61f1ccfc4a570'
-          $expectedSource = '6b0541a24deec43bf217b8c375cf5eec158615d0'
-          $expectedRun = '45548487216'
+          $expectedSha = 'c7a895c52c7dbe16b83cf15a473c79945f8222216875d9e5137f52ff0ed49ddb'
+          $expectedSource = '78f91310397b3a736ebbeba8c5d5f73eca4671a5'
+          $expectedRun = '45686468496'
           $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
           if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
           $msiHash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -75,7 +75,7 @@ jobs:
           $signedHash = "$($entries[0].signed_sha256)".ToLowerInvariant()
           if ($signedHash -ne $expectedSha) { throw "Unexpected signed MSI SHA256 in receipt: $signedHash" }
 
-          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode 'community' -EvidenceRoot "$env:RUNNER_TEMP/installed-community-evidence" -ExpectedMsiSha256 $expectedSha
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode 'community' -EvidenceRoot "$env:RUNNER_TEMP/installed-community-evidence" -ExpectedMsiSha256 $expectedSha -SourceCommit $expectedSource
 
       - name: Preserve installed community evidence
         if: always()
