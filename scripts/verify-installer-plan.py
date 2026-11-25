@@ -72,6 +72,7 @@ REQUIRED_MODULES = {
     "townlight_core", "townlight_records", "townlight_meetings", "townlight_code",
     "townlight_zoning", "townlight_access", "townlight_planning",
     "townlight_permitting", "townlight_inspections", "townlight_notice",
+    "townlight_311", "townlight_comms", "townlight_parks",
     "townlight-station",
 }
 EXTERNAL_NON_SELECTABLE_MODULES = {"townlight-station"}

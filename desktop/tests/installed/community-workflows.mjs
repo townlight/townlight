@@ -139,20 +139,23 @@ export async function communityWorkflows({page, native, save, meetingId, output,
   startsAt.setUTCDate(startsAt.getUTCDate() + 8);
   startsAt.setUTCHours(15, 0, 0, 0);
   const endsAt = new Date(startsAt.getTime() + 60 * 60 * 1000);
-  const residentSession = await native({
-    operation: 'parks_request',
-    action: 'sessions-create',
-    payload: {
-      program_id: enrollment.programId,
-      starts_at: startsAt.toISOString(),
-      ends_at: endsAt.toISOString(),
-      capacity: 2,
-      fee_cents: 0,
-      currency: 'USD',
+  const residentSessionResponse = await native('parks_request', {
+    request: {
+      operation: 'sessions-create',
+      payload: {
+        program_id: enrollment.programId,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        capacity: 2,
+        fee_cents: 0,
+        currency: 'USD',
+      },
     },
   });
+  const residentSession = residentSessionResponse?.result ?? residentSessionResponse;
   const residentParks = await installedResidentParks({
-    page, native, save,
+    native, save,
+    portalBaseUrl,
     resourceId: reservations.resource_id,
     sessionId: residentSession.session_id ?? residentSession.id,
   });
@@ -173,8 +176,8 @@ export async function communityWorkflows({page, native, save, meetingId, output,
       parksBooking: reservations?.original_booking_id ?? null,
       parksObligation: reservations?.original_obligation_id ?? null,
       parksProgram: enrollment?.programId ?? null,
-      parksResidentBooking: residentParks?.bookingId ?? residentParks?.booking_id ?? null,
-      parksResidentRegistration: residentParks?.registrationId ?? residentParks?.registration_id ?? null,
+      parksResidentBooking: residentParks?.actualIds?.bookingId ?? null,
+      parksResidentRegistration: residentParks?.actualIds?.registrationId ?? null,
       parksSession: enrollment?.sessionId ?? null,
       parksFinanceRecords: finance?.ids?.records_request ?? null,
       parksFinanceAttachment: finance?.ids?.records_attachment ?? null,
@@ -234,6 +237,18 @@ export async function communityReadback({native, ids, save}) {
     const b = await call('parks_request', {operation: 'bookings-get', booking_id: ids.parksBooking});
     const bk = b?.booking ?? b;
     return {id: bk.id, state: bk.state ?? bk.status, revision: bk.revision};
+  });
+
+  await run('residentBooking', ids.parksResidentBooking, async () => {
+    const b = await call('parks_request', {operation: 'bookings-get', booking_id: ids.parksResidentBooking});
+    const bk = b?.booking ?? b;
+    return {id: bk.id, state: bk.state ?? bk.status, revision: bk.revision};
+  });
+
+  await run('residentRegistration', ids.parksResidentRegistration, async () => {
+    const r = await call('parks_request', {operation: 'registrations-get', registration_id: ids.parksResidentRegistration});
+    const reg = r?.registration ?? r;
+    return {id: reg.id, state: reg.state ?? reg.status, revision: reg.revision};
   });
 
   await run('obligation', ids.parksObligation, async () => {
