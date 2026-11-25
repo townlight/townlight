@@ -28,12 +28,7 @@ async function readArticle(native, id) {
 }
 
 function historyPublications(article) {
-  const history = article && Array.isArray(article.history) ? article.history : [];
-  const publications = [];
-  for (const entry of history) {
-    if (entry && Array.isArray(entry.publications)) publications.push(...entry.publications);
-  }
-  return publications;
+  return article && Array.isArray(article.history) ? article.history : [];
 }
 
 function publicationMatches(publication, expected) {
@@ -124,26 +119,31 @@ async function schedule(page, { channels, action }) {
   await page.click('form[data-schedule] button[type="submit"]');
 }
 
-async function verifyRecordsArchive(native, requestId, displayedHash, downloadRecordsAttachment) {
+async function verifyRecordsArchive(native, requestId, displayedHash, downloadRecordsAttachment, expected) {
   if (typeof downloadRecordsAttachment !== "function") {
     throw new Error("downloadRecordsAttachment callback is required");
   }
+  assert.ok(expected && typeof expected === "object", "expected archive identity is required");
+  assert.ok(typeof expected.articleId === "string" && expected.articleId, "expected archive article id");
+  assert.ok(Number.isInteger(expected.revision) && expected.revision > 0, "expected archive revision");
+  assert.match(String(expected.contentSha256), SHA256, "expected archive content sha256");
 
   const viewed = unwrap(await native("records_domain_request", { request: { operation: "view", request_id: requestId } }));
   const documents = viewed && Array.isArray(viewed.documents) ? viewed.documents : [];
   assert.ok(documents.length > 0, "records view must return at least one document");
 
-  const normalizedDisplayed = displayedHash ? String(displayedHash).toLowerCase() : null;
-  const document = normalizedDisplayed
-    ? documents.find(item => item && String(item.sha256 ?? "").toLowerCase() === normalizedDisplayed && (item.attachment_id || item.id))
-    : documents.find(item => item && (item.attachment_id || item.id));
+  const normalizedDisplayed = String(displayedHash).toLowerCase();
+  assert.match(normalizedDisplayed, SHA256, "records displayed archive sha256");
+  const document = documents.find(item => item && String(item.sha256 ?? "").toLowerCase() === normalizedDisplayed && (item.attachment_id || item.id));
   assert.ok(document, "records archive document matching displayed hash");
 
   const attachmentId = document.attachment_id || document.id;
   assert.ok(attachmentId, "records archive attachment id");
   const expectedSha256 = String(document.sha256 ?? "").toLowerCase();
   assert.match(expectedSha256, SHA256, "records archive attachment sha256");
-  if (normalizedDisplayed) assert.equal(expectedSha256, normalizedDisplayed, "records archive attachment hash matches displayed hash");
+  assert.equal(expectedSha256, normalizedDisplayed, "records archive attachment hash matches displayed hash");
+  assert.equal(document.original_path, `townlight-comms-archive:${expected.articleId}:${expected.revision}:${expectedSha256}`, "records archive original_path");
+  assert.equal(document.citation, `Townlight communications article ${expected.articleId}; revision ${expected.revision}; archive sha256 ${expectedSha256}.`, "records archive citation");
   const expectedSize = Number(document.size_bytes);
   assert.ok(Number.isSafeInteger(expectedSize) && expectedSize > 0, "records archive attachment size");
 
@@ -163,6 +163,9 @@ async function verifyRecordsArchive(native, requestId, displayedHash, downloadRe
     attachmentId: String(attachmentId),
     sha256: expectedSha256,
     sizeBytes: actualBuffer.length,
+    articleId: expected.articleId,
+    revision: expected.revision,
+    contentSha256: expected.contentSha256,
   };
 }
 
@@ -189,6 +192,32 @@ export async function installedCommunicationsDelivery({
   const initial = await readArticle(native, article.id);
   assert.equal(Number(initial.current_revision), article.revision, "initial actual revision");
   assert.equal(initial.revision && initial.revision.sha256, article.sha256, "initial actual sha256");
+
+  const archiveCurrent = async (revision, contentSha256) => {
+    const actualArticle = await readArticle(native, article.id);
+    assert.equal(actualArticle && actualArticle.id, article.id, "actual archive article id");
+    assert.equal(Number(actualArticle && actualArticle.current_revision), Number(revision), "actual archive revision");
+    assert.equal(actualArticle && actualArticle.revision && actualArticle.revision.sha256, contentSha256, "actual archive content sha256");
+
+    await page.click("[data-archive-records]");
+    await waitForStatus(page, "Records request created");
+    await page.waitForFunction(
+      () => Boolean(document.querySelector("[data-records] [data-records-request-id]")?.dataset.recordsRequestId),
+      undefined,
+      { timeout: TIMEOUT_MS },
+    );
+    const recordsRequestId = await page
+      .locator("[data-records] [data-records-request-id]")
+      .getAttribute("data-records-request-id");
+    assert.ok(recordsRequestId, "actual UI records request id");
+    const recordsInfo = await page.locator("[data-records] p").first().textContent();
+    const displayedHash = /Hash:\s*([0-9a-f]{64})/i.exec(recordsInfo ?? "")?.[1];
+    return verifyRecordsArchive(native, recordsRequestId, displayedHash, downloadRecordsAttachment, {
+      articleId: article.id,
+      revision,
+      contentSha256,
+    });
+  };
 
   const channels = subscriberEmail ? ["website", "email"] : ["website"];
   await schedule(page, { channels, action: "publish" });
@@ -220,6 +249,7 @@ export async function installedCommunicationsDelivery({
     if (typeof captureMessage === "function") await captureMessage(email.publication);
   }
 
+  const originalArchive = await archiveCurrent(article.revision, article.sha256);
   const correctedBody = `${article.body} Corrected at ${new Date().toISOString()}.`;
   await page.fill('form[data-draft] [name="body"]', correctedBody);
   await page.check('form[data-draft] [name="access_reviewed"]');
@@ -260,6 +290,7 @@ export async function installedCommunicationsDelivery({
   );
   assert.ok(oldPublicationRetained, "actual history must retain the old published revision");
 
+  const archive = await archiveCurrent(correction.revision, correction.sha256);
   await schedule(page, { channels: ["website"], action: "withdraw" });
   const withdrawDelivery = await waitForPublication(native, article.id, {
     action: "withdraw",
@@ -268,20 +299,7 @@ export async function installedCommunicationsDelivery({
     state: "published",
   }, "website withdrawal");
   const removedRead = await waitForRemoval(page, correctedUrl, correctedBody, "website withdrawal removal");
-
-  await page.click("[data-archive-records]");
-  await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-records] [data-records-request-id]")?.dataset.recordsRequestId),
-    undefined,
-    { timeout: TIMEOUT_MS },
-  );
-  const recordsRequestId = await page
-    .locator("[data-records] [data-records-request-id]")
-    .getAttribute("data-records-request-id");
-  assert.ok(recordsRequestId, "actual UI records request id");
-  const recordsInfo = await page.locator("[data-records] p").first().textContent();
-  const displayedHash = /Hash:\s*([0-9a-f]{64})/i.exec(recordsInfo ?? "")?.[1];
-  const archive = await verifyRecordsArchive(native, recordsRequestId, displayedHash, downloadRecordsAttachment);
+  assert.notEqual(originalArchive.attachmentId, archive.attachmentId, "archive attachments must differ");
 
   const evidence = {
     id: article.id,
@@ -307,6 +325,7 @@ export async function installedCommunicationsDelivery({
       removed: true,
     },
     records: archive,
+    originalRecords: originalArchive,
   };
 
   if (typeof save === "function") await save("communications-delivery", evidence);
