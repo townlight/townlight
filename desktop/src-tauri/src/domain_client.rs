@@ -62,15 +62,35 @@ fn allocation_route(path: &str) -> bool {
                 _,
                 "revisions" | "attachments" | "records"
             ]
-            | ["", "desktop", "v1", "parks", "catalog", "resource" | "program"]
             | [
                 "",
                 "desktop",
                 "v1",
                 "parks",
-                "households" | "participants" | "bookings" | "sessions" | "registrations" | "refunds"
+                "catalog",
+                "resource" | "program"
             ]
-            | ["", "desktop", "v1", "parks", "resources", _, "closures" | "maintenance"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "households"
+                    | "participants"
+                    | "bookings"
+                    | "sessions"
+                    | "registrations"
+                    | "refunds"
+            ]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "parks",
+                "resources",
+                _,
+                "closures" | "maintenance"
+            ]
             | [
                 "",
                 "desktop",
@@ -81,7 +101,15 @@ fn allocation_route(path: &str) -> bool {
                 _
             ]
             | ["", "desktop", "v1", "parks", "archives", _, _, "records"]
-            | ["", "desktop", "v1", "municipal-staff", "data", "parks", "preview"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "municipal-staff",
+                "data",
+                "parks",
+                "preview"
+            ]
     )
 }
 

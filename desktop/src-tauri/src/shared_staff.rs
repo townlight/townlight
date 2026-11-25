@@ -191,11 +191,9 @@ pub(crate) fn run_client_cli() -> Option<i32> {
                             .await
                             .map_err(|value| serde_json::json!(value))
                     }
-                    Request::ParksRequest { request } => {
-                        crate::parks_request(request)
-                            .await
-                            .map_err(|value| serde_json::json!(value))
-                    }
+                    Request::ParksRequest { request } => crate::parks_request(request)
+                        .await
+                        .map_err(|value| serde_json::json!(value)),
                     Request::RecordsAttachmentDownload {
                         request_id,
                         attachment_id,

@@ -14,18 +14,51 @@ const BASE: &str = "/desktop/v1/communications";
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum CommunicationsRequest {
     Articles {},
-    Article { id: Uuid },
-    Source { payload: Value },
-    AccessReview { payload: Value },
-    Create { payload: Value },
-    Edit { id: Uuid, payload: Value },
-    Review { id: Uuid, payload: Value },
-    Approve { id: Uuid, payload: Value },
-    Schedule { id: Uuid, payload: Value },
-    Attach { id: Uuid, payload: Value },
-    Attachment { id: Uuid, attachment_id: Uuid },
-    RemoveAttachment { id: Uuid, attachment_id: Uuid, payload: Value },
-    ArchiveRecords { id: Uuid, payload: Value },
+    Article {
+        id: Uuid,
+    },
+    Source {
+        payload: Value,
+    },
+    AccessReview {
+        payload: Value,
+    },
+    Create {
+        payload: Value,
+    },
+    Edit {
+        id: Uuid,
+        payload: Value,
+    },
+    Review {
+        id: Uuid,
+        payload: Value,
+    },
+    Approve {
+        id: Uuid,
+        payload: Value,
+    },
+    Schedule {
+        id: Uuid,
+        payload: Value,
+    },
+    Attach {
+        id: Uuid,
+        payload: Value,
+    },
+    Attachment {
+        id: Uuid,
+        attachment_id: Uuid,
+    },
+    RemoveAttachment {
+        id: Uuid,
+        attachment_id: Uuid,
+        payload: Value,
+    },
+    ArchiveRecords {
+        id: Uuid,
+        payload: Value,
+    },
 }
 
 fn invalid_input() -> DomainError {
@@ -45,10 +78,7 @@ fn checked_body(body: Option<&Value>) -> Result<(), DomainError> {
     Ok(())
 }
 
-pub async fn execute(
-    request: CommunicationsRequest,
-    proof: String,
-) -> Result<Value, DomainError> {
+pub async fn execute(request: CommunicationsRequest, proof: String) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
         CommunicationsRequest::Articles {} => (Method::GET, format!("{BASE}/articles"), None),
         CommunicationsRequest::Article { id } => {
@@ -59,11 +89,9 @@ pub async fn execute(
             format!("{BASE}/sources/lookup"),
             Some(payload),
         ),
-        CommunicationsRequest::AccessReview { payload } => (
-            Method::POST,
-            format!("{BASE}/access-review"),
-            Some(payload),
-        ),
+        CommunicationsRequest::AccessReview { payload } => {
+            (Method::POST, format!("{BASE}/access-review"), Some(payload))
+        }
         CommunicationsRequest::Create { payload } => {
             (Method::POST, format!("{BASE}/articles"), Some(payload))
         }

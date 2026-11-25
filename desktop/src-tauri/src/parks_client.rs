@@ -1,9 +1,9 @@
 //! Fixed native Parks transport for catalog and household routes. Callers
 //! cannot select an arbitrary URL or path.
 use reqwest::Method;
+use reqwest::Url;
 use serde::Deserialize;
 use serde_json::Value;
-use reqwest::Url;
 use uuid::Uuid;
 
 use crate::domain_client::{send, DomainError};
@@ -319,11 +319,8 @@ fn encoded_path(path: String, pairs: &[(&str, String)]) -> Result<String, Domain
 pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, DomainError> {
     let (method, path, body) = match request {
         ParksRequest::DownloadAttachment { attachment_id } => {
-            return crate::service_requests_client::download_parks_attachment(
-                attachment_id,
-                proof,
-            )
-            .await;
+            return crate::service_requests_client::download_parks_attachment(attachment_id, proof)
+                .await;
         }
         ParksRequest::CatalogList {
             kind,
@@ -353,10 +350,7 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             public_only,
         } => {
             let pairs = vec![("public_only", public_only.to_string())];
-            let path = encoded_path(
-                format!("{BASE}/catalog/{}/{id}", kind.as_str()),
-                &pairs,
-            )?;
+            let path = encoded_path(format!("{BASE}/catalog/{}/{id}", kind.as_str()), &pairs)?;
             (Method::GET, path, None)
         }
         ParksRequest::CatalogUpdate { kind, id, payload } => (
@@ -414,11 +408,9 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             format!("{BASE}/households/{household_id}/participants"),
             None,
         ),
-        ParksRequest::CreateParticipant { payload } => (
-            Method::POST,
-            format!("{BASE}/participants"),
-            Some(payload),
-        ),
+        ParksRequest::CreateParticipant { payload } => {
+            (Method::POST, format!("{BASE}/participants"), Some(payload))
+        }
         ParksRequest::EditParticipant { id, payload } => (
             Method::PUT,
             format!("{BASE}/participants/{id}"),
@@ -447,16 +439,12 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             let path = encoded_path(format!("{BASE}/bookings"), &pairs)?;
             (Method::GET, path, None)
         }
-        ParksRequest::BookingsCreate { payload } => (
-            Method::POST,
-            format!("{BASE}/bookings"),
-            Some(payload),
-        ),
-        ParksRequest::BookingsGet { booking_id } => (
-            Method::GET,
-            format!("{BASE}/bookings/{booking_id}"),
-            None,
-        ),
+        ParksRequest::BookingsCreate { payload } => {
+            (Method::POST, format!("{BASE}/bookings"), Some(payload))
+        }
+        ParksRequest::BookingsGet { booking_id } => {
+            (Method::GET, format!("{BASE}/bookings/{booking_id}"), None)
+        }
         ParksRequest::BookingsTransition {
             booking_id,
             payload,
@@ -507,16 +495,12 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             let path = encoded_path(format!("{BASE}/sessions"), &pairs)?;
             (Method::GET, path, None)
         }
-        ParksRequest::SessionsCreate { payload } => (
-            Method::POST,
-            format!("{BASE}/sessions"),
-            Some(payload),
-        ),
-        ParksRequest::SessionsGet { session_id } => (
-            Method::GET,
-            format!("{BASE}/sessions/{session_id}"),
-            None,
-        ),
+        ParksRequest::SessionsCreate { payload } => {
+            (Method::POST, format!("{BASE}/sessions"), Some(payload))
+        }
+        ParksRequest::SessionsGet { session_id } => {
+            (Method::GET, format!("{BASE}/sessions/{session_id}"), None)
+        }
         ParksRequest::SessionsUpdate {
             session_id,
             payload,
@@ -530,11 +514,9 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             format!("{BASE}/sessions/{session_id}/roster"),
             None,
         ),
-        ParksRequest::RegistrationsCreate { payload } => (
-            Method::POST,
-            format!("{BASE}/registrations"),
-            Some(payload),
-        ),
+        ParksRequest::RegistrationsCreate { payload } => {
+            (Method::POST, format!("{BASE}/registrations"), Some(payload))
+        }
         ParksRequest::RegistrationsGet { registration_id } => (
             Method::GET,
             format!("{BASE}/registrations/{registration_id}"),
@@ -561,11 +543,9 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             format!("{BASE}/households/{household_id}/registrations"),
             None,
         ),
-        ParksRequest::ObligationGet { id } => (
-            Method::GET,
-            format!("{BASE}/obligations/{id}"),
-            None,
-        ),
+        ParksRequest::ObligationGet { id } => {
+            (Method::GET, format!("{BASE}/obligations/{id}"), None)
+        }
         ParksRequest::ObligationReceipt { id } => (
             Method::GET,
             format!("{BASE}/obligations/{id}/receipt"),
@@ -593,31 +573,19 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             let path = encoded_path(format!("{BASE}/reconciliation"), &pairs)?;
             (Method::GET, path, None)
         }
-        ParksRequest::RefundPrepare { payload } => (
-            Method::POST,
-            format!("{BASE}/refunds"),
-            Some(payload),
-        ),
-        ParksRequest::RefundGet { id } => (
-            Method::GET,
-            format!("{BASE}/refunds/{id}"),
-            None,
-        ),
-        ParksRequest::CheckoutGet { id } => (
-            Method::GET,
-            format!("{BASE}/checkouts/{id}"),
-            None,
-        ),
+        ParksRequest::RefundPrepare { payload } => {
+            (Method::POST, format!("{BASE}/refunds"), Some(payload))
+        }
+        ParksRequest::RefundGet { id } => (Method::GET, format!("{BASE}/refunds/{id}"), None),
+        ParksRequest::CheckoutGet { id } => (Method::GET, format!("{BASE}/checkouts/{id}"), None),
         ParksRequest::NotificationSummary { kind, id } => (
             Method::GET,
             format!("{BASE}/notifications/{}/{id}", kind.as_str()),
             None,
         ),
-        ParksRequest::PaymentSettingsGet => (
-            Method::GET,
-            format!("{BASE}/settings/payments"),
-            None,
-        ),
+        ParksRequest::PaymentSettingsGet => {
+            (Method::GET, format!("{BASE}/settings/payments"), None)
+        }
         ParksRequest::PaymentSettingsPut { payload } => (
             Method::PUT,
             format!("{BASE}/settings/payments"),
@@ -651,27 +619,17 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             format!("{BASE}/attachments/{}/{entity_id}", kind.as_str()),
             Some(payload),
         ),
-        ParksRequest::AggregateReport => (
-            Method::GET,
-            format!("{BASE}/reports/aggregate"),
-            None,
-        ),
+        ParksRequest::AggregateReport => (Method::GET, format!("{BASE}/reports/aggregate"), None),
         ParksRequest::DataStatus => (Method::GET, DATA_BASE.to_string(), None),
-        ParksRequest::DataPreview => (
-            Method::POST,
-            format!("{DATA_BASE}/preview"),
-            None,
-        ),
+        ParksRequest::DataPreview => (Method::POST, format!("{DATA_BASE}/preview"), None),
         ParksRequest::DataRevision { revision_id } => (
             Method::GET,
             format!("{DATA_BASE}/revisions/{revision_id}"),
             None,
         ),
-        ParksRequest::DataPublish { payload } => (
-            Method::POST,
-            format!("{DATA_BASE}/publish"),
-            Some(payload),
-        ),
+        ParksRequest::DataPublish { payload } => {
+            (Method::POST, format!("{DATA_BASE}/publish"), Some(payload))
+        }
         ParksRequest::MaintenanceCreate {
             resource_id,
             payload,
@@ -699,11 +657,9 @@ pub async fn execute(request: ParksRequest, proof: String) -> Result<Value, Doma
             )?;
             (Method::GET, path, None)
         }
-        ParksRequest::MaintenanceGet { link_id } => (
-            Method::GET,
-            format!("{BASE}/maintenance/{link_id}"),
-            None,
-        ),
+        ParksRequest::MaintenanceGet { link_id } => {
+            (Method::GET, format!("{BASE}/maintenance/{link_id}"), None)
+        }
     };
     checked_body(body.as_ref())?;
     send(method, path, body, &proof).await

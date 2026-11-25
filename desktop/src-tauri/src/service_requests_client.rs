@@ -100,8 +100,12 @@ pub enum ServiceRequestsRequest {
     },
     DataStatus {},
     DataPreview {},
-    DataRevision { id: Uuid },
-    DataPublish { payload: Value },
+    DataRevision {
+        id: Uuid,
+    },
+    DataPublish {
+        payload: Value,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -350,10 +354,7 @@ fn wire(request: ServiceRequestsRequest) -> Result<Wire, DomainError> {
     }
 }
 
-pub async fn execute(
-    request: ServiceRequestsRequest,
-    proof: String,
-) -> Result<Value, DomainError> {
+pub async fn execute(request: ServiceRequestsRequest, proof: String) -> Result<Value, DomainError> {
     let Wire {
         method,
         path,
@@ -402,14 +403,9 @@ fn content_type_extension(value: &str) -> Option<&'static str> {
     }
 }
 
-fn export_filename(
-    asset: BinaryAsset,
-    content_type: Option<&str>,
-) -> Result<String, DomainError> {
+fn export_filename(asset: BinaryAsset, content_type: Option<&str>) -> Result<String, DomainError> {
     match asset {
-        BinaryAsset::Archive { request_id } => {
-            Ok(format!("service-request-{request_id}.zip"))
-        }
+        BinaryAsset::Archive { request_id } => Ok(format!("service-request-{request_id}.zip")),
         BinaryAsset::Attachment { attachment_id } => {
             let extension = content_type
                 .and_then(content_type_extension)
@@ -486,9 +482,7 @@ async fn download_file(
             .len()
             .checked_add(chunk.len())
             .ok_or_else(download_rejected)?;
-        if next_length as u64 > content_length
-            || next_length as u64 > MAX_TRANSFER_BYTES
-        {
+        if next_length as u64 > content_length || next_length as u64 > MAX_TRANSFER_BYTES {
             return Err(download_rejected());
         }
         hash.update(&chunk[..]);
@@ -564,20 +558,25 @@ mod tests {
         assert_eq!(requests.method, Method::GET);
         assert_eq!(requests.path, "/desktop/v1/service-requests/requests");
 
-        let create = accepted(json!({"operation":"create-request","payload":{"summary":"Fixture"}}));
+        let create =
+            accepted(json!({"operation":"create-request","payload":{"summary":"Fixture"}}));
         assert_eq!(create.method, Method::POST);
         assert_eq!(create.path, "/desktop/v1/service-requests/requests");
 
         let request = accepted(json!({"operation":"request","id":id}));
         assert_eq!(request.method, Method::GET);
-        assert_eq!(request.path, format!("/desktop/v1/service-requests/requests/{id}"));
+        assert_eq!(
+            request.path,
+            format!("/desktop/v1/service-requests/requests/{id}")
+        );
 
         for (operation, suffix) in [
             ("transition", "transition"),
             ("comment", "comments"),
             ("attach", "attachments"),
         ] {
-            let wired = accepted(json!({"operation":operation,"id":id,"payload":{"note":"fixture"}}));
+            let wired =
+                accepted(json!({"operation":operation,"id":id,"payload":{"note":"fixture"}}));
             assert_eq!(wired.method, Method::POST);
             assert_eq!(
                 wired.path,
@@ -655,8 +654,7 @@ mod tests {
     #[test]
     fn filenames_and_hashes_are_derived_not_caller_supplied() {
         let request_id: Uuid = "3a2f8e8c-7f0d-4a9c-a47f-8dfb1d0d1b57".parse().unwrap();
-        let attachment_id: Uuid =
-            "f7b4fb04-9e02-4d7e-b3f2-3b0e7bd8f7fa".parse().unwrap();
+        let attachment_id: Uuid = "f7b4fb04-9e02-4d7e-b3f2-3b0e7bd8f7fa".parse().unwrap();
         assert_eq!(
             export_filename(BinaryAsset::Archive { request_id }, None).unwrap(),
             format!("service-request-{request_id}.zip")
@@ -669,10 +667,7 @@ mod tests {
             .unwrap(),
             format!("attachment-{attachment_id}.png")
         );
-        assert_eq!(
-            content_type_extension("application/pdf"),
-            Some("pdf")
-        );
+        assert_eq!(content_type_extension("application/pdf"), Some("pdf"));
         assert_eq!(content_type_extension("text/plain"), Some("txt"));
         assert_eq!(content_type_extension("application/zip"), None);
         assert!(export_filename(

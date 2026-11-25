@@ -207,8 +207,7 @@ pub fn write_service_request_file(
         .join("exports")
         .join("311")
         .join(uuid::Uuid::new_v4().to_string());
-    fs::create_dir_all(&root)
-        .map_err(|_| "Could not create the service request export folder.")?;
+    fs::create_dir_all(&root).map_err(|_| "Could not create the service request export folder.")?;
     let path = root.join(name);
     let mut file = OpenOptions::new()
         .write(true)
