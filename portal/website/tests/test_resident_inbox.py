@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import hashlib
 import json
+import secrets
 from datetime import timedelta
 from uuid import uuid4
 
@@ -28,8 +29,8 @@ pytestmark = pytest.mark.django_db
 
 TOKEN = "Z" * 43
 CONTACT = "resident@example.com"
-BROWSER_TOKEN = "browser-secret-do-not-store"
-OTHER_BROWSER = "other-browser-secret"
+BROWSER_TOKEN = "browser-" + secrets.token_urlsafe(24)
+OTHER_BROWSER = "other-" + secrets.token_urlsafe(24)
 
 
 @pytest.fixture(autouse=True)

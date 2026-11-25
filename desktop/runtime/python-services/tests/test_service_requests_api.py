@@ -104,7 +104,7 @@ def app_env(tmp_path):
         user = User(
             id=uuid4(),
             email=email,
-            hashed_password="not-used-by-these-tests",
+            hashed_password="fixture",
             full_name=email.split("@")[0],
             role=role,
             is_active=active,

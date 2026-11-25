@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import secrets
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,7 @@ from cryptography.fernet import Fernet
 from townlight_runtime.email_settings import EmailSettingsError, EmailSettingsStore
 
 KEY = Fernet.generate_key()
-PASSWORD = "sup3r-secret-password"
+PASSWORD = secrets.token_urlsafe(24)
 
 
 def payload(**overrides):

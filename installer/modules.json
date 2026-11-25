@@ -1465,7 +1465,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "630b9a31a24281a9ffce724c139f8aa39db60106",
+      "source_commit": "e97872e3bbba5bb512d3231f689dbc66f1104134",
       "proof_required": [
         "installed_service_requests_workflow"
       ]
@@ -1520,7 +1520,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "60513d0b4c2fcd7a53aa2c7da2752614720cf616",
+      "source_commit": "8ec0061daaddb55100f437f0f4b71627b88e2561",
       "proof_required": [
         "installed_communications_workflow"
       ]
@@ -1577,7 +1577,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "bd5f9964c544dc9923457b212dd00af56aa86948",
+      "source_commit": "f9617ce680a0c22cf15dce2022480ec7a0a11bf9",
       "proof_required": [
         "installed_parks_workflow"
       ]

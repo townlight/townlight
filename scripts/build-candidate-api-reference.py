@@ -12,10 +12,10 @@ import json
 import os
 import secrets
 from pathlib import Path
-import shutil
 import socket
 import sys
 import tempfile
+import tomllib
 from contextlib import ExitStack
 from unittest.mock import MagicMock, patch
 
@@ -24,7 +24,6 @@ REPOS = ROOT.parent
 SITE = REPOS / 'townlight.github.io'
 SOURCES = [REPOS / name for name in ('core', 'meetings', 'ordinances', 'zone', 'plan', 'permit', 'inspect', 'access', 'notice')]
 SOURCES += [REPOS / 'sunshine/backend', ROOT / 'desktop/runtime/python-services']
-OWNERS = ['townlight', 'core', 'sunshine', 'meetings', 'ordinances', 'zone', 'plan', 'permit', 'inspect', 'access', 'notice', 'station']
 PREFIXES = {
     'meetings': ('/desktop/v1/meetings', '/public/meetings'),
     'code': ('/desktop/v1/code', '/public/code'),
@@ -47,15 +46,25 @@ MODULE_ALIASES = {
 }
 
 
-def reference(slug, schema, identity, site=SITE):
+def read_runtime_version():
+    with (ROOT / 'desktop/runtime/python-services/pyproject.toml').open('rb') as handle:
+        version = tomllib.load(handle).get('project', {}).get('version')
+    if not isinstance(version, str) or not version:
+        raise ValueError('pyproject.toml project.version is required')
+    return version
+
+
+def reference(slug, schema, identity, site=SITE, candidate_version='1.10.0.1', runtime_version='0.4.0'):
     title = 'Townlight ' + slug.title() + ' API reference'
     esc = html.escape
+    manual_slug = 'communications' if slug == 'comms' else slug
+    schema_href = f'/api/candidate-1.10.0.1/{slug}-openapi.json'
     body = [f'<h1>{esc(title)}</h1>',
-            '<p>Prepared source candidate, November 2, 2026. Unpublished source schema; no installed acceptance is claimed.</p>',
+            f'<p>Prepared Windows {esc(candidate_version)} unpublished candidate, runtime {esc(runtime_version)}. Unpublished source schema; no installed acceptance is claimed.</p>',
             f'<p>{esc(identity)}. The HTTP host is {esc(schema["info"]["title"])} '
             f'{esc(schema["info"]["version"])}. Component package versions and the host API version are separate identities.</p>',
             '<p>Generated from the actual native inspections-preview composition without application lifespan, migrations or database/network access. It describes route and validation contracts; it does not establish endpoint behavior, individual authorization or installed acceptance. Standalone product applications have separate deployment boundaries.</p>',
-            f'<p><a href="{slug}-openapi.json">Machine-readable OpenAPI schema</a> · <a href="../manuals/{slug}.html">Operating manual and limits</a></p>',
+            f'<p><a href="{schema_href}">Machine-readable OpenAPI schema</a> · <a href="/manuals/{manual_slug}.html">Operating manual and limits</a></p>',
             '<h2 id="operations">HTTP operations</h2>']
     for path, item in sorted(schema['paths'].items()):
         for method, operation in item.items():
@@ -72,16 +81,16 @@ def reference(slug, schema, identity, site=SITE):
     if slug == 'station':
         body += ['<h2>Separate Station service</h2><p>The native operations above are the suite authority boundary. '
                  'Station runs its own service and database. Its unchanged 0.3.0 service contract is available in '
-                 '<a href="station-service-openapi.json">the separate Station service schema</a>. '
+                 '<a href="/api/station-service-openapi.json">the separate Station service schema</a>. '
                  'Schema reuse does not establish the changed suite candidate’s installed handoff acceptance.</p>']
     css = (site / 'assets/site.css').read_text(encoding='utf-8')
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{esc(title)}</title><style>{css}\npre{{white-space:pre-wrap;overflow-wrap:anywhere}}'
             'summary{cursor:pointer;padding:.6rem;font-weight:600}details{margin:.5rem 0}</style></head>'
-            '<body><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="../index.html">Townlight</a>'
-            '<nav aria-label="Main"><a href="../manuals/suite.html">Suite manual</a><a href="../versions.html">Versions and candidate</a>'
-            '<a href="../reference/index.html">Technical reference</a></nav></header><main class="reading wrap" id="main">'
+            '<body><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="/index.html">Townlight</a>'
+            '<nav aria-label="Main"><a href="/manuals/suite.html">Suite manual</a><a href="/versions.html">Versions and candidate</a>'
+            '<a href="/reference/index.html">Technical reference</a></nav></header><main class="reading wrap" id="main">'
             + '\n'.join(body) + '</main><footer>Townlight · AGPL-3.0-only · Source schema evidence only</footer></body></html>')
 
 
@@ -136,14 +145,10 @@ def main():
         if path.is_file():
             membership[slug] = set(json.loads(path.read_text(encoding='utf-8'))['paths'])
     membership['station'] = {'/desktop/v1/requests/{request_id}/station-recordings'}
-    candidate_path = ROOT / 'config/inspections-msi-candidate.json'
     candidate_version = '1.10.0.1'
-    if candidate_path.is_file():
-        candidate_version = json.loads(candidate_path.read_text(encoding='utf-8')).get(
-            'windows_product_version', candidate_version)
-    public_release = state.get('desktop_release', {})
-    public_version = public_release.get('version', '1.9.3.2')
-    runtime_version = public_release.get('runtime_version', '')
+    runtime_version = read_runtime_version()
+    output_dir = site / 'api' / 'candidate-1.10.0.1'
+    output_dir.mkdir(parents=True, exist_ok=True)
     for slug in ['suite', 'core', 'records', *PREFIXES]:
         document = copy.deepcopy(schema)
         if slug != 'suite':
@@ -153,8 +158,7 @@ def main():
         if not document['paths']:
             raise ValueError('No actual composed API routes for ' + slug)
         if slug == 'suite':
-            identity = (f'Desktop source candidate {candidate_version} (unpublished); '
-                        f'public desktop release {public_version} unchanged; '
+            identity = (f'Windows {candidate_version} unpublished candidate; '
                         f'townlight-runtime {runtime_version}')
         else:
             modules = state.get('modules', {})
@@ -168,15 +172,10 @@ def main():
                 identity = slug + ' source candidate (unpublished)'
         document['info']['description'] = 'Prepared source schema for the actual native composition; installed acceptance remains pending. Exported without lifespan, migrations or database/network access.'
         document['x-townlight-component'] = {'view': slug, 'identity': identity, 'evidence': 'source-schema-only'}
-        json_path = site / f'api/{slug}-openapi.json'
-        html_path = site / f'api/{slug}.html'
+        json_path = output_dir / f'{slug}-openapi.json'
+        html_path = output_dir / f'{slug}.html'
         json_path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-        html_path.write_text(reference(slug, document, identity, site), encoding='utf-8')
-        for owner in OWNERS:
-            destination = REPOS / owner / 'docs/beta-1/api'
-            if destination.is_dir():
-                shutil.copyfile(json_path, destination / json_path.name)
-                shutil.copyfile(html_path, destination / html_path.name)
+        html_path.write_text(reference(slug, document, identity, site, candidate_version, runtime_version), encoding='utf-8')
         print(slug, len(document['paths']), 'actual route paths')
     print('API reference prepared; network/database connections:', len(connections))
 

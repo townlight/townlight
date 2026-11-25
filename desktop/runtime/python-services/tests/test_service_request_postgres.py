@@ -96,7 +96,7 @@ def postgres_env(tmp_path, monkeypatch):
     admin = User(
         id=uuid4(),
         email=f"postgres-admin-{uuid4().hex}@example.test",
-        hashed_password="not-used-by-these-tests",
+        hashed_password="fixture",
         full_name="Postgres Admin",
         role=UserRole.ADMIN,
         is_active=True,

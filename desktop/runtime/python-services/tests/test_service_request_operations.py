@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import secrets
 
 import pytest
 from cryptography.fernet import Fernet
@@ -13,7 +14,7 @@ from townlight_runtime.service_request_operations import (
 pytest_plugins = ["test_service_requests_api"]
 
 BASE = "/desktop/v1/service-requests"
-PASSWORD = "actual-smtp-password"
+PASSWORD = secrets.token_urlsafe(24)
 
 
 @pytest.fixture

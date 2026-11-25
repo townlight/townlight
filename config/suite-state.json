@@ -1147,7 +1147,7 @@
         "tier": 3,
         "role": "Resident service requests and staff casework",
         "status": "windows_candidate_acceptance_pending",
-        "source_commit": "630b9a31a24281a9ffce724c139f8aa39db60106"
+        "source_commit": "e97872e3bbba5bb512d3231f689dbc66f1104134"
       }
     },
     "comms": {
@@ -1199,7 +1199,7 @@
         "tier": 3,
         "role": "communications workflow",
         "status": "windows_candidate_acceptance_pending",
-        "source_commit": "60513d0b4c2fcd7a53aa2c7da2752614720cf616"
+        "source_commit": "8ec0061daaddb55100f437f0f4b71627b88e2561"
       }
     },
     "parks": {
@@ -1253,7 +1253,7 @@
         "tier": 3,
         "role": "parks workflow",
         "status": "windows_candidate_acceptance_pending",
-        "source_commit": "bd5f9964c544dc9923457b212dd00af56aa86948"
+        "source_commit": "f9617ce680a0c22cf15dce2022480ec7a0a11bf9"
       }
     }
   }
