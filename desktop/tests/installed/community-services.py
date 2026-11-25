@@ -21,6 +21,8 @@ import tempfile
 import threading
 import time
 import uuid
+from socketserver import ThreadingMixIn
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 from datetime import datetime, timedelta, timezone
 from email import policy
 from email.parser import BytesParser
@@ -33,10 +35,30 @@ from cryptography import x509
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 
 HOST = "127.0.0.1"
 SYNTHETIC_TOKEN_BYTES = 32
+
+
+class _QuietWSGIRequestHandler(WSGIRequestHandler):
+    def log_message(self, format, *args):
+        return None
+
+
+class _TLSWSGIServer(ThreadingMixIn, WSGIServer):
+    daemon_threads = True
+    block_on_close = False
+
+    def setup_environ(self):
+        super().setup_environ()
+        self.base_environ["HTTPS"] = "on"
+
+    def run(self):
+        self.serve_forever()
+
+    def close(self):
+        self.server_close()
 
 
 def _atomic_write(path: Path, data: bytes, mode: int = 0o600) -> None:
@@ -92,6 +114,108 @@ def _make_certificate(tls_dir: Path) -> tuple[Path, Path]:
     _atomic_write(cert_path, certificate.public_bytes(serialization.Encoding.PEM))
     return cert_path, key_path
 
+def _make_https_certificate(tls_dir: Path) -> tuple[Path, Path, Path]:
+    ca_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    leaf_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    now = datetime.now(timezone.utc)
+    ca_name = x509.Name(
+        [x509.NameAttribute(NameOID.COMMON_NAME, "Townlight Fixture Local CA")]
+    )
+    ca_certificate = (
+        x509.CertificateBuilder()
+        .subject_name(ca_name)
+        .issuer_name(ca_name)
+        .public_key(ca_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(now - timedelta(minutes=1))
+        .not_valid_after(now + timedelta(days=1))
+        .add_extension(
+            x509.BasicConstraints(ca=True, path_length=0), critical=True
+        )
+        .add_extension(
+            x509.KeyUsage(
+                digital_signature=False,
+                content_commitment=False,
+                key_encipherment=False,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=True,
+                crl_sign=True,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(ca_key.public_key()),
+            critical=False,
+        )
+        .sign(ca_key, hashes.SHA256())
+    )
+    subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "localhost")])
+    certificate = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(ca_name)
+        .public_key(leaf_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(now - timedelta(minutes=1))
+        .not_valid_after(now + timedelta(days=1))
+        .add_extension(
+            x509.SubjectAlternativeName(
+                [
+                    x509.DNSName("localhost"),
+                    x509.IPAddress(ipaddress.ip_address("127.0.0.1")),
+                ]
+            ),
+            critical=False,
+        )
+        .add_extension(
+            x509.BasicConstraints(ca=False, path_length=None), critical=True
+        )
+        .add_extension(
+            x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH]),
+            critical=False,
+        )
+        .add_extension(
+            x509.KeyUsage(
+                digital_signature=True,
+                content_commitment=False,
+                key_encipherment=True,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=False,
+                crl_sign=False,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        )
+        .add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_key.public_key()),
+            critical=False,
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(leaf_key.public_key()),
+            critical=False,
+        )
+        .sign(ca_key, hashes.SHA256())
+    )
+    cert_path = tls_dir / "localhost.crt"
+    key_path = tls_dir / "localhost.key"
+    ca_path = tls_dir / "ca.crt"
+    _atomic_write(ca_path, ca_certificate.public_bytes(serialization.Encoding.PEM))
+    _atomic_write(
+        key_path,
+        leaf_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption(),
+        ),
+    )
+    _atomic_write(cert_path, certificate.public_bytes(serialization.Encoding.PEM))
+    return cert_path, key_path, ca_path
+
 
 class CaptureHandler:
     """Capture every local synthetic SMTP message without relaying it."""
@@ -141,34 +265,41 @@ def _configure_portal_env(
     token_sha_path: Path,
     resident_key_path: Path,
     db_path: Path,
+    ca_path: Path,
+    portal_scheme: str = "http",
 ) -> dict[str, str]:
     secret_key = secrets.token_urlsafe(64)
-    origins = f"http://127.0.0.1:{portal_port},http://localhost:{portal_port}"
+    origin = f"{portal_scheme}://127.0.0.1:{portal_port}"
+    origins = f"{origin},{portal_scheme}://localhost:{portal_port}"
+    debug = "0" if portal_scheme == "https" else "1"
     os.environ.update(
         {
             "DJANGO_SETTINGS_MODULE": "portal.settings",
             "TOWNLIGHT_SECRET_KEY": secret_key,
-            "TOWNLIGHT_DEBUG": "1",
+            "TOWNLIGHT_DEBUG": debug,
             "TOWNLIGHT_ALLOWED_HOSTS": "127.0.0.1,localhost",
             "TOWNLIGHT_CSRF_TRUSTED_ORIGINS": origins,
-            "TOWNLIGHT_BASE_URL": f"http://127.0.0.1:{portal_port}",
+            "TOWNLIGHT_BASE_URL": origin,
             "TOWNLIGHT_DB": str(db_path),
             "TOWNLIGHT_MEDIA_ROOT": str(root / "media"),
             "TOWNLIGHT_STATIC_ROOT": str(root / "static"),
             "TOWNLIGHT_PORTAL_RESIDENT_KEY_FILE": str(resident_key_path),
             "TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE": str(token_sha_path),
             "TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE": str(token_path),
-            "TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN": f"http://127.0.0.1:{portal_port}",
+            "TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN": origin,
             "TOWNLIGHT_SHARED_STAFF_HOST": "1",
-            "SSL_CERT_FILE": str(cert_path),
+            "SSL_CERT_FILE": str(ca_path),
+            "NODE_EXTRA_CA_CERTS": str(ca_path),
             "PYTHONDONTWRITEBYTECODE": "1",
         }
     )
     return {
-        "TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN": f"http://127.0.0.1:{portal_port}",
+        "TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN": origin,
         "TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE": str(token_path),
         "TOWNLIGHT_SHARED_STAFF_HOST": "1",
-        "SSL_CERT_FILE": str(cert_path),
+        "SSL_CERT_FILE": str(ca_path),
+        "NODE_EXTRA_CA_CERTS": str(ca_path),
+        "TOWNLIGHT_COMMUNITY_PORTAL_URL": origin,
     }
 
 
@@ -177,6 +308,7 @@ def main() -> int:
     parser.add_argument("--root", required=True, help="absolute owned temporary root")
     parser.add_argument("--portal-root", required=True, help="actual repository portal directory")
     parser.add_argument("--portal-port", type=int, default=24680)
+    parser.add_argument("--portal-scheme", choices=("http", "https"), default="http")
     parser.add_argument("--smtp-port", type=int, default=24681)
     args = parser.parse_args()
 
@@ -194,7 +326,11 @@ def main() -> int:
     mail_dir.mkdir(parents=True, exist_ok=True)
     tls_dir.mkdir(parents=True, exist_ok=True)
 
-    cert_path, key_path = _make_certificate(tls_dir)
+    if args.portal_scheme == "https":
+        cert_path, key_path, ca_path = _make_https_certificate(tls_dir)
+    else:
+        cert_path, key_path = _make_certificate(tls_dir)
+        ca_path = cert_path
     token = secrets.token_urlsafe(SYNTHETIC_TOKEN_BYTES)
     token_path = root / "publisher.token"
     token_sha_path = root / "publisher-token.sha256"
@@ -210,7 +346,7 @@ def main() -> int:
 
     runtime_environment = _configure_portal_env(
         root, args.portal_port, cert_path, token_path, token_sha_path,
-        resident_key_path, db_path,
+        resident_key_path, db_path, ca_path, args.portal_scheme,
     )
 
     sys.path.insert(0, str(portal_root))
@@ -263,9 +399,21 @@ def main() -> int:
         )
         smtp_controller.start()
 
-        waitress_server = create_server(
-            application, host=HOST, port=args.portal_port, threads=8
-        )
+        if args.portal_scheme == "https":
+            waitress_server = make_server(
+                HOST,
+                args.portal_port,
+                application,
+                server_class=_TLSWSGIServer,
+                handler_class=_QuietWSGIRequestHandler,
+            )
+            waitress_server.socket = server_context.wrap_socket(
+                waitress_server.socket, server_side=True
+            )
+        else:
+            waitress_server = create_server(
+                application, host=HOST, port=args.portal_port, threads=8
+            )
         state_path = root / "fixture-state.json"
         _write_json(
             state_path,
@@ -273,10 +421,13 @@ def main() -> int:
                 "pid": os.getpid(),
                 "root": str(root),
                 "ports": {"portal": args.portal_port, "smtp": args.smtp_port},
+                "portal_scheme": args.portal_scheme,
+                "portal_url": f"{args.portal_scheme}://127.0.0.1:{args.portal_port}",
                 "paths": {
                     "fixture_state": str(state_path),
                     "cert": str(cert_path),
                     "tls_key": str(key_path),
+                    "ca_cert": str(ca_path),
                     "mail": str(mail_dir),
                     "portal_db": str(db_path),
                     "publisher_token": str(token_path),
