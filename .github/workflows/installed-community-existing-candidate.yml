@@ -1,0 +1,86 @@
+name: Installed community existing signed candidate
+
+on:
+  push:
+    branches: [acceptance/windows-community-11001]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  installed-community-existing-candidate:
+    runs-on: windows-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: townlight
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: townlight-windows-local-msi-SIGNED
+          run-id: 45548487216
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: msi-artifact
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+
+      - name: Set up community Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install existing desktop test tools
+        working-directory: townlight/desktop
+        run: npm ci
+
+      - name: Install community portal and test fixture dependencies
+        working-directory: townlight/portal
+        run: |
+          python -m pip install --require-hashes -r requirements.lock
+          python -m pip install aiosmtpd==1.4.6
+
+      - name: Free C drive for install-only test
+        shell: pwsh
+        run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
+
+      - name: Verify existing signed candidate and run community maintenance test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $expectedSha = 'f6bbeb52ec72600ad40704965a6751632bfa3fa9ebc8d1b8a8d61f1ccfc4a570'
+          $expectedSource = '6b0541a24deec43bf217b8c375cf5eec158615d0'
+          $expectedRun = '45548487216'
+          $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
+          if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
+          $msiHash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($msiHash -ne $expectedSha) { throw "Unexpected signed candidate MSI SHA256: $msiHash" }
+          $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter 'Townlight-signing-receipt.json' -Recurse -File)
+          if ($receipts.Count -ne 1) { throw 'Expected exactly one Townlight-signing-receipt.json.' }
+          $doc = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
+          if ("$($doc.source_commit)" -cne $expectedSource) { throw 'Receipt source_commit does not match the existing signed candidate.' }
+          if ("$($doc.workflow_run)" -cne $expectedRun) { throw 'Receipt workflow_run does not match the existing signed candidate.' }
+          $entries = @($doc.files | Where-Object { $_.file -ceq $msis[0].Name })
+          if ($entries.Count -ne 1) { throw 'Expected exactly one receipt files entry for the MSI.' }
+          $signedHash = "$($entries[0].signed_sha256)".ToLowerInvariant()
+          if ($signedHash -ne $expectedSha) { throw "Unexpected signed MSI SHA256 in receipt: $signedHash" }
+
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode 'community' -EvidenceRoot "$env:RUNNER_TEMP/installed-community-evidence" -ExpectedMsiSha256 $expectedSha
+
+      - name: Preserve installed community evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installed-community-existing-signed-11001
+          path: ${{ runner.temp }}/installed-community-evidence
+          retention-days: 7

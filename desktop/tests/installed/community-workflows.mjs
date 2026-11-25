@@ -39,7 +39,6 @@ async function configureEmail(native, fixtureRoot) {
         port: state.ports.smtp,
         sender: 'fixture@example.test',
         username: '',
-        password: '',
         clear_password: true,
       },
     },

@@ -14,7 +14,27 @@ const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:
 const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
 assert(page, 'Installed WebView page is absent');
 const run = async name => page.evaluate(await readFile(new URL(name, import.meta.url), 'utf8'));
-const native = (command, args={}) => page.evaluate(({command,args}) => window.__TAURI_INTERNALS__.invoke(command,args), {command,args});
+const native = (command, args={}) => page.evaluate(async ({command,args}) => {
+  try {
+    return await window.__TAURI_INTERNALS__.invoke(command,args);
+  } catch (error) {
+    if (typeof error === 'string') throw new Error(error);
+    const safe = {};
+    if (error && typeof error === 'object') {
+      for (const key of ['code','message','retryable','status']) {
+        if (error[key] !== undefined) safe[key] = error[key];
+      }
+    }
+    const detail = typeof safe.message === 'string' ? safe.message
+      : safe.code !== undefined ? String(safe.code)
+      : 'Native command failed';
+    const wrapped = new Error(detail);
+    if (safe.code !== undefined) wrapped.code = safe.code;
+    if (safe.retryable !== undefined) wrapped.retryable = safe.retryable;
+    if (safe.status !== undefined) wrapped.status = safe.status;
+    throw wrapped;
+  }
+}, {command,args});
 const accepted = result => { assert.equal(result?.accepted, true, JSON.stringify(result)); return result; };
 const save = async (name, value) => writeFile(path.join(output,name+'.json'), JSON.stringify(value,null,2));
 const admin = async () => {
