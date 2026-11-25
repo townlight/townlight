@@ -196,6 +196,7 @@ export async function communityWorkflows({page, native, save, meetingId, output,
   });
 
   const summary = {
+    unattended: {articleId: article.id, sourceId: publicSource.publicRecordId, recipientSha256: createHash('sha256').update(subscriber.email.trim().toLowerCase()).digest('hex'), archives: {original: delivery.originalRecords, corrected: delivery.records}},
     ids: {
       serviceRequest: staff?.ids?.main_request ?? null,
       residentRequest: resident?.evidence?.requestId ?? null,
