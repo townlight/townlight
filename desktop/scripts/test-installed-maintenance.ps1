@@ -61,7 +61,7 @@ function Start-CommunityFixture([string]$Python) {
   }
   $stdout = Join-Path $EvidenceRoot 'community-fixture.stdout.log'
   $stderr = Join-Path $EvidenceRoot 'community-fixture.stderr.log'
-  $arguments = @('"'+$scriptPath+'"','--root','"'+$fixtureRoot+'"','--portal-root','"'+$portalRoot+'"','--portal-port',[string]$portalPort,'--smtp-port',[string]$smtpPort)
+  $arguments = @(('"'+$scriptPath+'"'),'--root',('"'+$fixtureRoot+'"'),'--portal-root',('"'+$portalRoot+'"'),'--portal-scheme','https','--portal-port',[string]$portalPort,'--smtp-port',[string]$smtpPort)
   $process = Start-Process -FilePath $Python -ArgumentList $arguments -WorkingDirectory $repo -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
   return [pscustomobject]@{
     Process = $process
@@ -69,6 +69,49 @@ function Start-CommunityFixture([string]$Python) {
     PortalPort = $portalPort
     SmtpPort = $smtpPort
     StatePath = Join-Path $fixtureRoot 'fixture-state.json'
+    OwnedCertificate = $null
+  }
+}
+function Add-CommunityFixtureTrust($Fixture, [string]$CaPath) {
+  if ($Fixture.OwnedCertificate) { return }
+  $cert = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Certificate2 -ArgumentList $CaPath
+  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  try {
+    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+    $existing = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $cert.Thumbprint, $false)
+    if ($existing.Count -gt 0) { throw "Fixture CA thumbprint $($cert.Thumbprint) is already trusted; refusing to alter preexisting trust." }
+    $Fixture.OwnedCertificate = $cert
+    $store.Add($cert)
+  } catch {
+    if (-not $Fixture.OwnedCertificate) { $cert.Dispose() }
+    throw
+  } finally {
+    $store.Close()
+    $store.Dispose()
+  }
+}
+function Remove-CommunityFixtureTrust($Fixture) {
+  if (-not $Fixture -or -not $Fixture.OwnedCertificate) { return }
+  $cert = $Fixture.OwnedCertificate
+  $thumbprint = $cert.Thumbprint
+  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  try {
+    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+    $store.Remove($cert)
+  } finally {
+    $store.Close()
+    $store.Dispose()
+    $Fixture.OwnedCertificate = $null
+    $cert.Dispose()
+  }
+  $verify = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  try {
+    $verify.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
+    $remaining = $verify.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $thumbprint, $false)
+    if ($remaining.Count -gt 0) { throw "Fixture CA thumbprint $thumbprint remained trusted after removal." }
+  } finally {
+    $verify.Close()
+    $verify.Dispose()
   }
 }
 function Wait-CommunityFixture($Fixture) {
@@ -83,17 +126,26 @@ function Wait-CommunityFixture($Fixture) {
     if (Test-Path -LiteralPath $Fixture.StatePath) {
       try { $state = Get-Content -LiteralPath $Fixture.StatePath -Raw | ConvertFrom-Json } catch { $state = $null }
       if ($state -and [int]$state.pid -eq [int]$Fixture.Process.Id) {
-        $httpReady = $false
+        $expectedPortal = "https://127.0.0.1:$($Fixture.PortalPort)"
+        if ($state.portal_scheme -ne 'https') { throw "Community fixture state portal_scheme must be https but was '$($state.portal_scheme)'." }
+        if ([string]$state.portal_url -ne $expectedPortal) { throw "Community fixture state portal_url mismatch: expected $expectedPortal but state reported $($state.portal_url)" }
+        if (-not $state.runtime_environment -or [string]$state.runtime_environment.TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN -ne $expectedPortal) { throw "Community fixture state runtime_environment.TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN mismatch: expected $expectedPortal but state reported $($state.runtime_environment.TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN)" }
+        $expectedCa = [IO.Path]::GetFullPath((Join-Path $Fixture.Root 'tls\ca.crt'))
+        if (-not $state.paths.ca_cert) { throw 'Community fixture state did not expose paths.ca_cert.' }
+        $actualCa = [IO.Path]::GetFullPath([string]$state.paths.ca_cert)
+        if ($actualCa -ne $expectedCa) { throw "Community fixture CA path mismatch: expected $expectedCa but state reported $actualCa" }
+        Add-CommunityFixtureTrust $Fixture $actualCa
+        $httpsReady = $false
         try {
-          $response = Invoke-WebRequest -Uri "http://127.0.0.1:$($Fixture.PortalPort)/" -UseBasicParsing -TimeoutSec 2
-          $httpReady = $null -ne $response.StatusCode
-        } catch { $httpReady = $null -ne $_.Exception.Response }
-        if ($httpReady) { return $state }
+          $response = Invoke-WebRequest -Uri "https://127.0.0.1:$($Fixture.PortalPort)/" -UseBasicParsing -TimeoutSec 2
+          $httpsReady = $null -ne $response.StatusCode
+        } catch { $httpsReady = $null -ne $_.Exception.Response }
+        if ($httpsReady) { return $state }
       }
     }
     Start-Sleep -Milliseconds 500
   }
-  throw 'Community fixture did not become ready (fixture-state plus HTTP) within 180 seconds.'
+  throw 'Community fixture did not become ready (fixture-state, trust, and HTTPS) within 180 seconds.'
 }
 function Set-CommunityRuntimeEnvironment($Fixture, $State, $Restore) {
   if (-not $State.runtime_environment) { throw 'Community fixture state did not expose runtime_environment.' }
@@ -102,7 +154,7 @@ function Set-CommunityRuntimeEnvironment($Fixture, $State, $Restore) {
     $values[$property.Name] = [string]$property.Value
   }
   $values['TOWNLIGHT_COMMUNITY_FIXTURE_ROOT'] = $Fixture.Root
-  $values['TOWNLIGHT_COMMUNITY_PORTAL_URL'] = "http://127.0.0.1:$($Fixture.PortalPort)"
+  $values['TOWNLIGHT_COMMUNITY_PORTAL_URL'] = "https://127.0.0.1:$($Fixture.PortalPort)"
   foreach ($name in $values.Keys) {
     $Restore[$name] = [pscustomobject]@{
       present = Test-Path -LiteralPath ('Env:'+$name)
@@ -157,7 +209,7 @@ function Run-Installed([string]$Phase) {
         portal_port = $fixture.PortalPort
         smtp_port = $fixture.SmtpPort
         state = $fixture.StatePath
-        readiness = 'fixture-state PID matched the owned process and the portal answered HTTP'
+        readiness = 'fixture-state PID matched the owned process, paths.ca_cert matched fixture root/tls/ca.crt, and the portal answered verified HTTPS'
         fixture_is_acceptance = $false
       }
     }
@@ -218,8 +270,15 @@ function Run-Installed([string]$Phase) {
     }
   } finally {
     # The fixture must outlive the app, and only then may its exact owned PID stop.
-    Stop-CommunityFixture $fixture
-    if ($environmentRestore.Count -gt 0) { Restore-ProcessEnvironment $environmentRestore }
+    try {
+      Stop-CommunityFixture $fixture
+    } finally {
+      try {
+        if ($environmentRestore.Count -gt 0) { Restore-ProcessEnvironment $environmentRestore }
+      } finally {
+        Remove-CommunityFixtureTrust $fixture
+      }
+    }
   }
 }
 function Product-Registration {

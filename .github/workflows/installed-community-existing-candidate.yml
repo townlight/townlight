@@ -82,5 +82,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: installed-community-existing-signed-11001
-          path: ${{ runner.temp }}/installed-community-evidence
+          path: |
+            ${{ runner.temp }}/installed-community-evidence/**
+            !${{ runner.temp }}/installed-community-evidence/community-fixture/publisher.token
+            !${{ runner.temp }}/installed-community-evidence/community-fixture/resident.key
+            !${{ runner.temp }}/installed-community-evidence/community-fixture/tls/localhost.key
           retention-days: 7
