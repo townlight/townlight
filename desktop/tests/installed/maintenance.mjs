@@ -14,12 +14,49 @@ const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:
 const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
 assert(page, 'Installed WebView page is absent');
 const run = async name => page.evaluate(await readFile(new URL(name, import.meta.url), 'utf8'));
-const native = (command, args={}) => page.evaluate(({command,args}) => window.__TAURI_INTERNALS__.invoke(command,args), {command,args});
+const native = (command, args={}) => page.evaluate(async ({command,args}) => {
+  try {
+    return await window.__TAURI_INTERNALS__.invoke(command,args);
+  } catch (error) {
+    if (typeof error === 'string') throw new Error(error);
+    const safe = {};
+    if (error && typeof error === 'object') {
+      for (const key of ['code','message','retryable','status']) {
+        if (error[key] !== undefined) safe[key] = error[key];
+      }
+    }
+    const detail = typeof safe.message === 'string' ? safe.message
+      : safe.code !== undefined ? String(safe.code)
+      : 'Native command failed';
+    const wrapped = new Error(detail);
+    if (safe.code !== undefined) wrapped.code = safe.code;
+    if (safe.retryable !== undefined) wrapped.retryable = safe.retryable;
+    if (safe.status !== undefined) wrapped.status = safe.status;
+    throw wrapped;
+  }
+}, {command,args});
 const accepted = result => { assert.equal(result?.accepted, true, JSON.stringify(result)); return result; };
 const save = async (name, value) => writeFile(path.join(output,name+'.json'), JSON.stringify(value,null,2));
 const admin = async () => {
-  await native('auth_action',{action:'sign-out',payload:null});
-  accepted(await native('auth_action',{action:'sign-in',payload:{email:'audit-admin@example.invalid',passcode:'Audit-fixture-2026-11-04!'}}));
+  await page.evaluate(async () => {
+    const a = window.audit;
+    const app = () => a.native('get_app_state');
+    const settings = async () => {
+      await a.click('[data-surface="IT/Admin"]', {confirm:false});
+      await a.nav('settings');
+    };
+    await settings();
+    await a.click('[data-auth-action="sign-out"]');
+    await settings();
+    a.fill('[data-access-field="email"]', 'audit-admin@example.invalid');
+    a.fill('[data-access-field="passcode"]', 'Audit-fixture-2026-11-04!');
+    await a.click('[data-auth-action="sign-in"]');
+    await a.until(async () => {
+      const {access} = await app();
+      return access.signed_in && access.role === 'local-admin';
+    });
+    await a.until(() => !!document.querySelector('[data-auth-action="sign-out"]'));
+  });
 };
 const municipal = operation => native('municipal_staff_request',{request:{operation}});
 const readback = async ids => {
@@ -38,7 +75,7 @@ try {
   // Observe its rendered result before sending another native state request.
   await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
-  let ids, communityIds;
+  let ids, communityIds, communityMeetingId, communityExpected, communityBaseline;
   if (mode==='upgrade') {
     ids=JSON.parse(await readFile(path.join(output,'seed-workflows.json'),'utf8'));
     await admin();
@@ -52,11 +89,42 @@ try {
     assert(setup.final.first_run.finished, 'Installed first-run incomplete');
     await save(mode+'-setup',setup);
     if(mode!=='recorder') {
-      ids=await run('municipal-workflows.js');
-      assert(ids.passed,'Installed municipal workflows failed');
-      await save(mode+'-workflows',ids);
-      await admin();
-      await readback(ids);
+      if (mode==='community') {
+        // Earlier exact-candidate municipal receipts remain preserved evidence;
+        // community mode creates only its own canonical meeting fixture.
+        await admin();
+        // Full-profile first-run leaves legacy Records activation to this documented operator action.
+        await page.evaluate(async () => {
+          const a = window.audit;
+          const app = () => a.native('get_app_state');
+          if ((await app()).domain_authority !== 'python-records') {
+            await a.click('[data-surface="IT/Admin"]', {confirm:false});
+            await a.nav('health');
+            await a.click('[data-supervisor-action="activate-records"]', {timeout:600000});
+            await a.until(async () => (await app()).domain_authority === 'python-records', 600000);
+          }
+        });
+        const created = await native('meetings_domain_request',{request:{operation:'create-meeting',
+          payload:{
+            title:'Synthetic Community linkage meeting',
+            scheduled_start:new Date(Date.now()+86400000).toISOString(),
+            location:'Synthetic chamber',
+            meeting_type:'regular',
+          },
+        }});
+        communityMeetingId = created.id;
+        assert.match(String(communityMeetingId), /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, 'Community meeting creation returned no UUID');
+        const communityMeetingReadback = await native('meetings_domain_request',{request:{operation:'get-meeting', id: communityMeetingId}});
+        assert.equal(communityMeetingReadback?.id, communityMeetingId, 'Community meeting readback id');
+        assert.equal(communityMeetingReadback?.title, created.title, 'Community meeting readback title');
+        await save('community-source-fixture',{meetingId: communityMeetingId, created, readback: communityMeetingReadback});
+      } else {
+        ids=await run('municipal-workflows.js');
+        assert(ids.passed,'Installed municipal workflows failed');
+        await save(mode+'-workflows',ids);
+        await admin();
+        await readback(ids);
+      }
     }
     if (mode==='community') {
       assert(process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT, 'Community fixture root is required');
@@ -65,7 +133,7 @@ try {
       // runs do not depend on the community harness.
       const { communityWorkflows, communityReadback } = await import('./community-workflows.mjs');
       const community = await communityWorkflows({
-        page, native, save, meetingId: ids.meeting_id, output,
+        page, native, save, meetingId: communityMeetingId, output,
         fixtureRoot: process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT,
         portalBaseUrl: process.env.TOWNLIGHT_COMMUNITY_PORTAL_URL,
       });
@@ -77,14 +145,17 @@ try {
       assert(communityIdValues.length > 0 && communityIdValues.every(value => value !== undefined && value !== null && String(value).length > 0), 'Community ids contain empty values');
       await save('community-outcome', community);
       await save('community-actual-ids', {
-        meeting_id: ids.meeting_id, board_id: ids.board_id,
-        solicitation_id: ids.solicitation_id, contract_id: ids.contract_id,
+        meeting_id: communityMeetingId,
         community: communityIds,
       });
+      communityExpected = community.recovery;
+      communityBaseline = await communityReadback({native, ids: communityIds, expected: communityExpected});
+      await save('community-before-restart', communityBaseline);
       accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
       accepted(await native('supervisor_action',{action:'start',serviceId:null}));
       await admin();
-      const restartReadback = await communityReadback({native, ids: communityIds, save});
+      const restartReadback = await communityReadback({native, ids: communityIds, save, expected: communityExpected});
+      assert.deepEqual(restartReadback, communityBaseline, 'community restart readback must match baseline');
       await save('community-restart-readback', restartReadback);
     }
   }
@@ -128,7 +199,8 @@ try {
     if(ids) await readback(ids);
     if(communityIds) {
       const { communityReadback } = await import('./community-workflows.mjs');
-      const restoredReadback = await communityReadback({native, ids: communityIds, save});
+      const restoredReadback = await communityReadback({native, ids: communityIds, save, expected: communityExpected});
+      assert.deepEqual(restoredReadback, communityBaseline, 'community restored readback must match baseline');
       await save('community-restored-readback', restoredReadback);
     }
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});

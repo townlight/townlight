@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { verifyPublishedDataset } from "./dataset-artifact.mjs";
 
 const PRIVATE_KEY = /(^|_)(resident|household|private|account|card|bank|routing|ssn|dob)(_|$)/i;
 const ROW_KEYS = ["metric", "state", "count", "amount_cents", "minutes"];
@@ -221,11 +222,19 @@ export async function installedParksMaintenanceData({ page, native, save, resour
     await page.waitForTimeout(500);
   }
   assert.ok(job, "public data publication was not delivered");
-  const deliveredSha256 = job.artifact_sha256 ?? receipt.artifact_sha256;
-  assert.equal(deliveredSha256, previewSha256, "delivered aggregate hash did not match the preview");
   const datasetId = job.meeting_id ?? receipt.meeting_id;
   assert.ok(datasetId, "delivered publication did not include a dataset id");
 
+  const revision = await call(native, "parks_request", {
+    operation: "data-revision",
+    revision_id: previewId,
+  });
+  assert.ok(revision && typeof revision === "object", "data-revision did not return the stored revision");
+  assert.equal(String(revision.id), String(previewId), "stored revision id did not match the preview");
+  assert.equal(revision.sha256, previewSha256, "stored revision hash did not match the preview");
+  assert.ok(revision.approved_at, "stored revision was not approved");
+
+  let downloaded;
   let body;
   const until = Date.now() + 15000;
   while (Date.now() < until) {
@@ -233,15 +242,17 @@ export async function installedParksMaintenanceData({ page, native, save, resour
       failOnStatusCode: false,
     });
     if (response.status() === 200) {
-      body = await response.json();
+      downloaded = await response.body();
+      body = JSON.parse(downloaded.toString("utf8"));
       break;
     }
     await page.waitForTimeout(500);
   }
   assert.ok(body, "delivered aggregate did not appear on the public portal");
+  const datasetVerification = verifyPublishedDataset(revision, downloaded);
   assert.deepEqual(body, previewRows, "delivered aggregate rows did not match the preview");
   assertNoPrivateFinance(body, "approved aggregate");
-  const portal = { approval: receipt, pending: false, passed: true, status: 200, body, job };
+  const portal = { approval: receipt, pending: false, passed: true, status: 200, body, job, datasetVerification, revisionSha256: revision.sha256 };
 
   const result = {
     linkId,

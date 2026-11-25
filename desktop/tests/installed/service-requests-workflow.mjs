@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
+import { verifyPublishedDataset } from './dataset-artifact.mjs';
 
 const VIEW = '[data-service-requests-view]';
 const STATUS = `${VIEW} [data-status]`;
@@ -374,7 +375,12 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
   const archiveErrorBefore = await text(page.locator(RECORDS_ERROR));
   await page.locator(`${RECORDS} [data-role="archive"]`).click();
   await waitRecordsOutcome(archiveStatusBefore, archiveErrorBefore, /Archive handed off to Records\./, 'Archive service request to Records');
-  const handoff = parseLabeled(await text(page.locator(RECORDS_RESULT)));
+  const handoffReceiptText = await page.locator(RECORDS_RESULT).evaluate((element) => {
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll('button').forEach((button) => button.remove());
+    return clone.textContent ?? '';
+  });
+  const handoff = parseLabeled(handoffReceiptText);
   assert.ok(handoff.Tracking, 'returned Records tracking');
   assert.ok(handoff['Records request ID'], 'returned Records request ID');
   assert.ok(handoff['Attachment ID'], 'returned Records attachment ID');
@@ -453,7 +459,7 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
     await delay(500);
   }
   assert.ok(datasetBytes, 'Delivered dataset did not appear on the public portal');
-  assert.equal(createHash('sha256').update(datasetBytes).digest('hex'), preview.sha256, 'delivered dataset bytes hash');
+  const datasetVerification = verifyPublishedDataset(revision, datasetBytes);
   const publishedRevision = array(dataStatusAfter.revisions, 'revisions')
     .find(item => String(item?.id ?? '') === String(preview.id));
   assert.ok(publishedRevision, 'published revision is visible in data status');
@@ -502,6 +508,7 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
       data_status_before: dataStatusBefore,
       data_status_after: dataStatusAfter,
       data_publish_receipt: queued,
+      dataset_artifact: datasetVerification,
       notifications: notifications.map(item => ({id: item?.id ?? null, state: item?.state ?? null})),
       notification_capture: captured ?? null,
     },
