@@ -19,12 +19,7 @@ import {ensureResidentSubscriber} from './resident-communications.mjs';
 
 const LOCAL_PORT = process.env.TOWNLIGHT_LOCAL_PORT || '15480';
 
-async function readSessionHash() {
-  const file = join(process.env.LOCALAPPDATA, "CivicSuite", "config", "local-session.json");
-  const parsed = JSON.parse(await readFile(file, 'utf8'));
-  if (typeof parsed.session_hash === 'string' && parsed.session_hash) return parsed.session_hash;
-  throw new Error('local-session.json with session_hash not found');
-}
+
 
 async function configureEmail(native, fixtureRoot) {
   const state = JSON.parse(await readFile(join(fixtureRoot, 'fixture-state.json'), 'utf8'));
@@ -82,14 +77,41 @@ async function waitMailJson(fixtureRoot, recipient, expectedBody) {
 }
 
 async function downloadRecordsAttachment({requestId, attachmentId, expectedSha256, expectedSize}) {
-  const sessionHash = await readSessionHash();
-  const url = `http://127.0.0.1:${LOCAL_PORT}/desktop/v1/requests/${requestId}/documents/${attachmentId}/content`;
-  const response = await fetch(url, {headers: {'X-Townlight-Session': sessionHash}});
-  assert.equal(response.status, 200, `records download HTTP ${response.status}`);
-  const buffer = Buffer.from(await response.arrayBuffer());
-  assert.equal(buffer.length, expectedSize, 'records download size');
-  assert.equal(createHash('sha256').update(buffer).digest('hex'), expectedSha256, 'records download sha256');
-  return buffer;
+  const base = `http://127.0.0.1:${LOCAL_PORT}`;
+  let proof;
+  try {
+    const signInResponse = await fetch(`${base}/staff/v1/session`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: 'audit-admin@example.invalid',
+        passcode: 'Audit-fixture-2026-11-04!',
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    assert.equal(signInResponse.status, 200, `staff sign-in HTTP ${signInResponse.status}`);
+    ({proof} = await signInResponse.json());
+    assert.ok(typeof proof === 'string' && proof, 'staff session proof');
+    const url = `${base}/staff/v1/api/desktop/v1/requests/${requestId}/documents/${attachmentId}/content`;
+    const response = await fetch(url, {
+      headers: {'X-Townlight-Session': proof},
+      signal: AbortSignal.timeout(30000),
+    });
+    assert.equal(response.status, 200, `records download HTTP ${response.status}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    assert.equal(buffer.length, expectedSize, 'records download size');
+    assert.equal(createHash('sha256').update(buffer).digest('hex'), expectedSha256, 'records download sha256');
+    return buffer;
+  } finally {
+    if (proof) {
+      const signOutResponse = await fetch(`${base}/staff/v1/session`, {
+        method: 'DELETE',
+        headers: {'X-Townlight-Session': proof},
+        signal: AbortSignal.timeout(10000),
+      });
+      assert.equal(signOutResponse.status, 200, `staff sign-out HTTP ${signOutResponse.status}`);
+    }
+  }
 }
 
 export async function communityWorkflows({page, native, save, meetingId, output, fixtureRoot, portalBaseUrl}) {
