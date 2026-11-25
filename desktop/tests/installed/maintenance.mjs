@@ -38,8 +38,25 @@ const native = (command, args={}) => page.evaluate(async ({command,args}) => {
 const accepted = result => { assert.equal(result?.accepted, true, JSON.stringify(result)); return result; };
 const save = async (name, value) => writeFile(path.join(output,name+'.json'), JSON.stringify(value,null,2));
 const admin = async () => {
-  await native('auth_action',{action:'sign-out',payload:null});
-  accepted(await native('auth_action',{action:'sign-in',payload:{email:'audit-admin@example.invalid',passcode:'Audit-fixture-2026-11-04!'}}));
+  await page.evaluate(async () => {
+    const a = window.audit;
+    const app = () => a.native('get_app_state');
+    const settings = async () => {
+      await a.click('[data-surface="IT/Admin"]', {confirm:false});
+      await a.nav('settings');
+    };
+    await settings();
+    await a.click('[data-auth-action="sign-out"]');
+    await settings();
+    a.fill('[data-access-field="email"]', 'audit-admin@example.invalid');
+    a.fill('[data-access-field="passcode"]', 'Audit-fixture-2026-11-04!');
+    await a.click('[data-auth-action="sign-in"]');
+    await a.until(async () => {
+      const {access} = await app();
+      return access.signed_in && access.role === 'local-admin';
+    });
+    await a.until(() => !!document.querySelector('[data-auth-action="sign-out"]'));
+  });
 };
 const municipal = operation => native('municipal_staff_request',{request:{operation}});
 const readback = async ids => {
