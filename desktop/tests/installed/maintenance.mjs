@@ -77,7 +77,7 @@ try {
   // Observe its rendered result before sending another native state request.
   await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
-  let ids, communityIds, communityMeetingId, communityExpected, communityBaseline;
+  let ids, communityIds, communityMeetingId, communityExpected, communityBaseline, communityUnattended;
   if (mode==='upgrade') {
     ids=JSON.parse(await readFile(path.join(output,'seed-workflows.json'),'utf8'));
     await admin();
@@ -142,6 +142,7 @@ try {
       assert(community && typeof community === 'object', 'communityWorkflows returned no outcome');
       assert(community.passed === true, 'Community workflows failed');
       communityIds = community.ids;
+      communityUnattended = community.unattended;
       assert(communityIds && typeof communityIds === 'object', 'Community ids missing');
       const communityIdValues = Object.values(communityIds);
       assert(communityIdValues.length > 0 && communityIdValues.every(value => value !== undefined && value !== null && String(value).length > 0), 'Community ids contain empty values');
@@ -229,7 +230,7 @@ try {
   }
   if(mode==="community"){
     const {prepareUnattended}=await import("./communications-unattended.mjs");
-    await prepareUnattended({native,save});
+    await prepareUnattended({native,save,linkage:communityUnattended});
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});

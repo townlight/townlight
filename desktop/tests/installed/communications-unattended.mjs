@@ -1,17 +1,7 @@
+import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-
-const PENDING_FILE = "communications-unattended-pending.json";
-const STOPPED_FILE = "communications-app-stopped.json";
-const RECEIPT_FILE = "communications-unattended.json";
-const POLL_INTERVAL_MS = 500;
-const POLL_TIMEOUT_MS = 120_000;
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function unwrapNative(value) {
   if (value == null) {
@@ -35,38 +25,7 @@ async function communications(native, request) {
   return unwrapNative(raw);
 }
 
-function requireString(value, label) {
-  if (typeof value !== "string" || value.length === 0) {
-    throw new Error(`${label} must be a non-empty string`);
-  }
-  return value;
-}
-
-function asTimestamp(value, label) {
-  const timestamp = new Date(value);
-  if (Number.isNaN(timestamp.getTime())) {
-    throw new Error(`${label} must be a valid timestamp`);
-  }
-  return timestamp;
-}
-
-function decodeQuotedPrintable(input) {
-  const source = String(input).replace(/=\r?\n/g, "");
-  const bytes = [];
-  for (let index = 0; index < source.length; index += 1) {
-    const char = source[index];
-    const hex = source.slice(index + 1, index + 3);
-    if (char === "=" && /^[0-9A-Fa-f]{2}$/.test(hex)) {
-      bytes.push(parseInt(hex, 16));
-      index += 2;
-    } else {
-      bytes.push(source.charCodeAt(index) & 0xff);
-    }
-  }
-  return Buffer.from(bytes).toString("utf8");
-}
-
-export async function prepareUnattended({ native, save }) {
+export async function prepareUnattended({ native, save, linkage }) {
   if (typeof native !== "function") {
     throw new Error("prepareUnattended requires native(command, {request})");
   }
@@ -74,41 +33,61 @@ export async function prepareUnattended({ native, save }) {
     throw new Error("prepareUnattended requires save(key, value)");
   }
 
-  const stamp = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-  const title = `Unattended acceptance ${stamp}`;
-  const body = `Synthetic unattended acceptance body ${stamp}`;
+  assert.equal(typeof linkage?.articleId, "string");
+  assert.equal(typeof linkage?.sourceId, "string");
+  assert.match(linkage?.recipientSha256 ?? "", /^[0-9a-f]{64}$/);
+  const id = linkage.articleId;
+  const previous = await communications(native, { operation: "article", id });
+  assert.equal(previous.id, id);
+  assert.equal(previous.state, "withdrawn");
+  assert.ok(Number.isInteger(previous.current_revision) && previous.current_revision > 0);
+  assert.match(previous.revision.sha256, /^[0-9a-f]{64}$/);
+  const refs = previous.revision.source_refs;
+  assert.ok(Array.isArray(refs) && refs.length === 1);
+  const sourceRef = refs[0];
+  assert.equal(sourceRef.kind, "meetings");
+  assert.equal(sourceRef.id, linkage.sourceId);
+  assert.equal(sourceRef.eligible, true);
+  assert.match(sourceRef.sha256, /^[0-9a-f]{64}$/);
+  assert.equal(sourceRef.revision, sourceRef.sha256);
 
-  const created = await communications(native, {
-    operation: "create",
+  const currentSource = await communications(native, {operation: "source", payload: {kind: sourceRef.kind, id: sourceRef.id}});
+  assert.deepEqual(currentSource.reference, sourceRef, "source must remain current and eligible");
+  const archives = linkage.archives;
+  assert.ok(archives?.original && archives?.corrected, "prior archives required");
+  for (const archive of Object.values(archives)) {
+    assert.equal(archive.articleId, id);
+    assert.match(archive.sha256, /^[0-9a-f]{64}$/);
+  }
+  assert.notEqual(archives.original.attachmentId, archives.corrected.attachmentId);
+  assert.equal(archives.corrected.revision, previous.current_revision);
+  assert.equal(archives.corrected.contentSha256, previous.revision.sha256);
+  const priorHistory = previous.history.filter((row) => row.state === "published").map((row) => ({ id: row.id, revision: row.revision, action: row.action }));
+  const oldRevision = previous.current_revision;
+  const oldSha256 = previous.revision.sha256;
+  const body = `${previous.revision.body}\n\nUnattended ${Date.now()}-${randomUUID()}`;
+  await communications(native, {
+    operation: "edit",
+    id,
     payload: {
-      title,
+      expected_revision: oldRevision,
+      title: previous.revision.title,
       body,
-      kind: "announcement",
-      language: "en",
-      sources: [],
+      kind: previous.kind,
+      language: previous.revision.language,
+      sources: [{ kind: sourceRef.kind, id: sourceRef.id }],
       access_reviewed: true,
+      translation_provenance: previous.revision.translation_provenance || null,
     },
   });
-
-  const id = requireString(
-    created.id ?? created.article?.id ?? created.article_id,
-    "created announcement id",
-  );
-
   const article = await communications(native, { operation: "article", id });
-  const revision =
-    article.current_revision ??
-    article.revision?.current_revision ??
-    article.article?.current_revision;
-  const sha256 =
-    article.revision?.sha256 ??
-    article.article?.revision?.sha256 ??
-    article.sha256;
-
-  if (!Number.isInteger(revision) || revision < 1) {
-    throw new Error("article current_revision must be a positive integer");
-  }
-  requireString(sha256, "article revision.sha256");
+  const revision = article.current_revision;
+  const sha256 = article.revision.sha256;
+  assert.equal(article.id, id);
+  assert.ok(Number.isInteger(revision) && revision > oldRevision);
+  assert.match(sha256, /^[0-9a-f]{64}$/);
+  assert.notEqual(sha256, oldSha256);
+  assert.deepEqual(article.revision.source_refs, previous.revision.source_refs);
 
   await communications(native, {
     operation: "review",
@@ -130,7 +109,7 @@ export async function prepareUnattended({ native, save }) {
   });
 
   const dueAt = new Date(Date.now() + 60_000).toISOString();
-  await communications(native, {
+  const scheduled = await communications(native, {
     operation: "schedule",
     id,
     payload: {
@@ -143,124 +122,16 @@ export async function prepareUnattended({ native, save }) {
     },
   });
 
-  const pending = { id, body, due_at: dueAt, sha256, revision };
+  const scheduleRows = scheduled.history.filter((row) => row.article_id === id && row.revision === revision && row.action === "publish" && Array.isArray(row.channels) && row.channels.length === 2 && row.channels.includes("website") && row.channels.includes("email") && Date.parse(row.due_at) === Date.parse(dueAt) && row.state === "pending" && typeof row.id === "string" && row.id.length > 0);
+  assert.equal(scheduleRows.length, 1);
+  const scheduleRow = scheduleRows[0];
+  const pending = { id, body, due_at: dueAt, sha256, revision, source_ref: sourceRef, recipient_sha256: linkage.recipientSha256, publication_id: scheduleRow.id, prior_history: priorHistory, archives };
   await save("communications-unattended-pending", pending);
   return pending;
 }
 
-export async function verifyUnattended({ output, portalBaseUrl, fixtureRoot }) {
-  requireString(output, "output");
-  requireString(portalBaseUrl, "portalBaseUrl");
-  requireString(fixtureRoot, "fixtureRoot");
-
-  const pendingPath = path.join(output, PENDING_FILE);
-  const stoppedPath = path.join(output, STOPPED_FILE);
-  const receiptPath = path.join(output, RECEIPT_FILE);
-
-  const pending = JSON.parse(await readFile(pendingPath, "utf8"));
-  const stopped = JSON.parse(await readFile(stoppedPath, "utf8"));
-
-  requireString(pending.id, "pending id");
-  requireString(pending.body, "pending body");
-  requireString(pending.sha256, "pending sha256");
-  const dueAt = asTimestamp(pending.due_at, "pending due_at");
-
-  if (stopped.exited !== true) {
-    throw new Error("communications-app-stopped.json must set exited:true");
-  }
-  requireString(String(stopped.pid ?? ""), "stopped pid");
-  const stoppedAt = asTimestamp(stopped.at, "stopped at");
-  if (!(stoppedAt.getTime() < dueAt.getTime())) {
-    throw new Error("stopped.at must be earlier than pending due_at");
-  }
-
-  const baseUrl = portalBaseUrl.replace(/\/+$/, "");
-  const articleUrl = `${baseUrl}/communications/${encodeURIComponent(pending.id)}/`;
-  const deadline = Date.now() + POLL_TIMEOUT_MS;
-  let page;
-
-  while (Date.now() <= deadline) {
-    try {
-      const response = await fetch(articleUrl, {
-        signal: AbortSignal.timeout(15_000),
-      });
-      const text = await response.text();
-      if (response.status === 200 && text.includes(pending.body)) {
-        page = { url: articleUrl, status: response.status };
-        break;
-      }
-    } catch {
-      // Portal not ready yet; bounded polling continues.
-    }
-    if (Date.now() + POLL_INTERVAL_MS > deadline) {
-      break;
-    }
-    await sleep(POLL_INTERVAL_MS);
-  }
-
-  if (!page) {
-    throw new Error("Portal article did not become visible with the expected body within 120s");
-  }
-
-  const mailDir = path.join(fixtureRoot, "mail");
-  let capturedMail;
-
-  while (!capturedMail && Date.now() <= deadline) {
-    const mailEntries = await readdir(mailDir, { withFileTypes: true });
-    for (const entry of mailEntries) {
-      if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".json")) {
-        continue;
-      }
-      const record = JSON.parse(await readFile(path.join(mailDir, entry.name), "utf8"));
-      if (typeof record.eml !== "string" || record.recipients == null) {
-        continue;
-      }
-      if (path.basename(record.eml) !== record.eml) {
-        throw new Error("mail record.eml must be a file name without path separators");
-      }
-      const receivedAt = asTimestamp(record.received_at, "mail received_at");
-      if (!(receivedAt.getTime() >= stoppedAt.getTime())) {
-        continue;
-      }
-      const decoded = decodeQuotedPrintable(await readFile(path.join(mailDir, record.eml), "latin1"));
-      if (!decoded.includes(pending.body)) {
-        continue;
-      }
-      capturedMail = {
-        file: entry.name,
-        recipients: record.recipients,
-        received_at: record.received_at,
-        message_id: record.message_id ?? null,
-        subject: record.subject ?? null,
-      };
-      break;
-    }
-    if (capturedMail || Date.now() + POLL_INTERVAL_MS > deadline) {
-      break;
-    }
-    await sleep(POLL_INTERVAL_MS);
-  }
-
-  if (!capturedMail) {
-    throw new Error("No real captured mail contains the announcement body after stopped.at");
-  }
-
-  const receipt = {
-    passed: true,
-    synthetic: true,
-    id: pending.id,
-    body_sha256: pending.sha256,
-    revision: pending.revision,
-    stopped: { pid: stopped.pid, exited: true, at: stopped.at },
-    publish: { url: page.url, status: page.status },
-    captured_mail: capturedMail,
-    checked_at: new Date().toISOString(),
-  };
-
-  await mkdir(output, { recursive: true });
-  await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, "utf8");
-  return receipt;
-}
+export { verifyUnattended } from "./communications-postexit.mjs";
+import { verifyUnattended } from "./communications-postexit.mjs";
 
 const isMain =
   process.argv[1] != null &&
