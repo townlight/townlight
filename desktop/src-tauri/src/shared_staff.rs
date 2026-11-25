@@ -118,6 +118,15 @@ pub(crate) fn run_client_cli() -> Option<i32> {
         RecordsDomainRequest {
             request: crate::domain_client::RecordsRequest,
         },
+        ServiceRequestsRequest {
+            request: crate::service_requests_client::ServiceRequestsRequest,
+        },
+        CommunicationsRequest {
+            request: crate::communications_client::CommunicationsRequest,
+        },
+        ParksRequest {
+            request: crate::parks_client::ParksRequest,
+        },
         RecordsAttachmentDownload {
             request_id: uuid::Uuid,
             attachment_id: uuid::Uuid,
@@ -169,6 +178,21 @@ pub(crate) fn run_client_cli() -> Option<i32> {
                     }
                     Request::RecordsDomainRequest { request } => {
                         crate::records_domain_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::ServiceRequestsRequest { request } => {
+                        crate::service_requests_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::CommunicationsRequest { request } => {
+                        crate::communications_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::ParksRequest { request } => {
+                        crate::parks_request(request)
                             .await
                             .map_err(|value| serde_json::json!(value))
                     }

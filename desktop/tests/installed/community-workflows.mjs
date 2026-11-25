@@ -67,7 +67,7 @@ async function waitMailJson(fixtureRoot, recipient, expectedBody) {
         const parsed = JSON.parse(await readFile(join(dir, name), 'utf8'));
         const recipients = Array.isArray(parsed.recipients) ? parsed.recipients : [];
         if (!recipients.some(r => typeof r === 'string' && r.toLowerCase().includes(recipient.toLowerCase()))) continue;
-        const emlName = parsed?.metadata?.eml;
+        const emlName = parsed?.eml;
         if (typeof emlName !== 'string' || !emlName) continue;
         const base = emlName.split(/[\\/]/).pop();
         if (!base || base !== emlName || base === '.' || base === '..') continue;

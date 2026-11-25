@@ -142,6 +142,7 @@ function Run-Installed([string]$Phase) {
   $environmentRestore = @{}
   New-Item -Path $debugPolicy -Force | Out-Null
   New-ItemProperty -LiteralPath $debugPolicy -Name $appName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
+  $communityReady = $false
   try {
     if ($Phase -eq 'community') {
       $python = Resolve-CommunityPython
@@ -179,6 +180,7 @@ function Run-Installed([string]$Phase) {
       try {
         node tests/installed/maintenance.mjs $Phase $EvidenceRoot
         if ($LASTEXITCODE -ne 0) { throw "Installed $Phase acceptance failed." }
+        if ($Phase -eq 'community') { $communityReady = $true }
       } finally { Pop-Location }
     } finally {
       if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
@@ -186,7 +188,33 @@ function Run-Installed([string]$Phase) {
         Stop-Process -Id $script:ownedApp.Id -Force
         $script:ownedApp.WaitForExit()
       }
+      if ($script:ownedApp) {
+        $script:ownedApp.Refresh()
+        [ordered]@{
+          pid = $script:ownedApp.Id
+          exited = $script:ownedApp.HasExited
+          at = [DateTime]::UtcNow.ToString('o')
+        } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'communications-app-stopped.json') -Encoding utf8
+      }
       $script:ownedApp=$null
+    }
+    if ($communityReady) {
+      $staffStdout = Join-Path $EvidenceRoot 'communications-staff-host.stdout.log'
+      $staffStderr = Join-Path $EvidenceRoot 'communications-staff-host.stderr.log'
+      $staff = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','start' -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $staffStdout -RedirectStandardError $staffStderr
+      if ($staff.ExitCode -ne 0) { throw "Townlight staff host start failed: $($staff.ExitCode)" }
+      try {
+        Push-Location (Join-Path $repo 'desktop')
+        try {
+          node tests/installed/communications-unattended.mjs verify $EvidenceRoot $env:TOWNLIGHT_COMMUNITY_PORTAL_URL $fixture.Root
+          if ($LASTEXITCODE -ne 0) { throw 'Installed community communications unattended verification failed.' }
+        } finally {
+          Pop-Location
+        }
+      } finally {
+        $staffStop = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','stop' -WindowStyle Hidden -Wait -PassThru
+        if ($staffStop.ExitCode -ne 0) { throw "Townlight staff host stop failed: $($staffStop.ExitCode)" }
+      }
     }
   } finally {
     # The fixture must outlive the app, and only then may its exact owned PID stop.

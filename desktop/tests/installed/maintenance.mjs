@@ -137,6 +137,10 @@ try {
     if (mode === 'recorder') await stationLargeHandoff(recording,save);
     assert.equal((await native('station_action',{action:'stop',selectedDirectory:null})).stopped,true);
   }
+  if(mode==="community"){
+    const {prepareUnattended}=await import("./communications-unattended.mjs");
+    await prepareUnattended({native,save});
+  }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
 } catch(error) {
