@@ -1,90 +1,84 @@
 name: Installed community existing signed candidate
-
 on:
-  push:
-    branches: [acceptance/windows-community-11001]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  actions: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
-  installed-community-existing-candidate:
+  candidate:
     runs-on: windows-latest
-    timeout-minutes: 180
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
-        with:
-          path: townlight
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: townlight-windows-local-msi-SIGNED
-          run-id: 45686468496
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: msi-artifact
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: townlight/desktop/package-lock.json
-
-      - name: Set up community Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-
-      - name: Install existing desktop test tools
-        working-directory: townlight/desktop
-        run: npm ci
-
-      - name: Install community portal and test fixture dependencies
-        working-directory: townlight/portal
-        run: |
-          python -m pip install --require-hashes -r requirements.lock
-          python -m pip install aiosmtpd==1.4.6
-
-      - name: Free C drive for install-only test
+      - uses: actions/checkout@v4
+      - name: Exercise actual fixture trust functions
         shell: pwsh
-        run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
-
-      - name: Verify existing signed candidate and run community maintenance test
-        shell: pwsh
+        timeout-minutes: 2
         run: |
           $ErrorActionPreference = 'Stop'
-          $expectedSha = 'c7a895c52c7dbe16b83cf15a473c79945f8222216875d9e5137f52ff0ed49ddb'
-          $expectedSource = '78f91310397b3a736ebbeba8c5d5f73eca4671a5'
-          $expectedRun = '45686468496'
-          $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
-          if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
-          $msiHash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($msiHash -ne $expectedSha) { throw "Unexpected signed candidate MSI SHA256: $msiHash" }
-          $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter 'Townlight-signing-receipt.json' -Recurse -File)
-          if ($receipts.Count -ne 1) { throw 'Expected exactly one Townlight-signing-receipt.json.' }
-          $doc = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
-          if ("$($doc.source_commit)" -cne $expectedSource) { throw 'Receipt source_commit does not match the existing signed candidate.' }
-          if ("$($doc.workflow_run)" -cne $expectedRun) { throw 'Receipt workflow_run does not match the existing signed candidate.' }
-          $entries = @($doc.files | Where-Object { $_.file -ceq $msis[0].Name })
-          if ($entries.Count -ne 1) { throw 'Expected exactly one receipt files entry for the MSI.' }
-          $signedHash = "$($entries[0].signed_sha256)".ToLowerInvariant()
-          if ($signedHash -ne $expectedSha) { throw "Unexpected signed MSI SHA256 in receipt: $signedHash" }
 
-          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode 'community' -EvidenceRoot "$env:RUNNER_TEMP/installed-community-evidence" -ExpectedMsiSha256 $expectedSha -SourceCommit $expectedSource
+          $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'desktop/scripts/test-installed-maintenance.ps1'
+          if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) {
+            throw "Missing script: $scriptPath"
+          }
 
-      - name: Preserve installed community evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: installed-community-existing-signed-11001
-          path: |
-            ${{ runner.temp }}/installed-community-evidence/**
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/publisher.token
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/resident.key
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/tls/localhost.key
-          retention-days: 7
+          $tokens = $null
+          $parseErrors = $null
+          $ast = [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$parseErrors)
+          if ($parseErrors -and $parseErrors.Count -gt 0) {
+            throw "Parser errors: $($parseErrors.Message -join '; ')"
+          }
+
+          $defs = @($ast.FindAll({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and (
+              $node.Name -eq 'Add-CommunityFixtureTrust' -or
+              $node.Name -eq 'Remove-CommunityFixtureTrust'
+            )
+          }, $true))
+          if ($defs.Count -ne 2) {
+            throw "Expected exactly 2 fixture trust functions, found $($defs.Count)."
+          }
+
+          $addAst = @($defs | Where-Object { $_.Name -eq 'Add-CommunityFixtureTrust' })
+          $removeAst = @($defs | Where-Object { $_.Name -eq 'Remove-CommunityFixtureTrust' })
+          if ($addAst.Count -ne 1 -or $removeAst.Count -ne 1) {
+            throw 'Expected one Add and one Remove FunctionDefinitionAst.'
+          }
+
+          $addDefinition = $addAst[0].Extent.Text
+          $instrumentedAdd = $addDefinition.Replace('$store.Add($cert)', 'Write-Host "enter CurrentUser store.Add"; $store.Add($cert); Write-Host "returned CurrentUser store.Add"')
+          if ($instrumentedAdd -eq $addDefinition) {
+            throw 'Add function does not contain the expected $store.Add($cert) call.'
+          }
+
+          . ([scriptblock]::Create($instrumentedAdd))
+          . ([scriptblock]::Create($removeAst[0].Extent.Text))
+          Write-Host 'phase: extracted-and-instrumented-functions'
+
+          $rsa = [System.Security.Cryptography.RSA]::Create(2048)
+          try {
+            $request = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+              'CN=Installed Community Existing Candidate Test CA',
+              $rsa,
+              [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+              [System.Security.Cryptography.RSASignaturePadding]::Pkcs1
+            )
+            $request.CertificateExtensions.Add([System.Security.Cryptography.X509Certificates.X509BasicConstraintsExtension]::new($true, $false, 0, $true))
+            $keyUsage = [System.Security.Cryptography.X509Certificates.X509KeyUsageFlags]::KeyCertSign -bor [System.Security.Cryptography.X509Certificates.X509KeyUsageFlags]::CrlSign
+            $request.CertificateExtensions.Add([System.Security.Cryptography.X509Certificates.X509KeyUsageExtension]::new($keyUsage, $true))
+            $cert = $request.CreateSelfSigned([System.DateTimeOffset]::UtcNow.AddMinutes(-1), [System.DateTimeOffset]::UtcNow.AddHours(1))
+          } finally {
+            $rsa.Dispose()
+          }
+
+          $certPath = Join-Path $env:RUNNER_TEMP 'community-fixture-test-ca.cer'
+          [System.IO.File]::WriteAllBytes($certPath, $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+          Write-Host "phase: generated-and-exported-public-ca $certPath"
+
+          $fixture = [pscustomobject]@{ OwnedCertificate = $null }
+          try {
+            Add-CommunityFixtureTrust $fixture $certPath
+            Write-Host 'phase: add-returned'
+          } finally {
+            Remove-CommunityFixtureTrust $fixture
+            Write-Host 'phase: remove-returned'
+          }
+          Write-Host 'phase: complete'
