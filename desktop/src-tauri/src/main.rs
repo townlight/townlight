@@ -1316,6 +1316,10 @@ async fn service_requests_request(
     request: service_requests_client::ServiceRequestsRequest,
 ) -> Result<Value, domain_client::DomainError> {
     use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return service_requests_client::execute(request, proof).await;
+    }
     let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
     let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
@@ -1344,6 +1348,10 @@ async fn communications_request(
     request: communications_client::CommunicationsRequest,
 ) -> Result<Value, domain_client::DomainError> {
     use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return communications_client::execute(request, proof).await;
+    }
     let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
     let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
@@ -1368,6 +1376,10 @@ async fn parks_request(
     request: parks_client::ParksRequest,
 ) -> Result<Value, domain_client::DomainError> {
     use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return parks_client::execute(request, proof).await;
+    }
     let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
     let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
