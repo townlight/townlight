@@ -283,9 +283,9 @@
         "manifest_path": "backend/pyproject.toml"
       },
       "versions": {
-        "development": "1.8.0.dev4",
+        "development": "1.8.0.dev5",
         "released": null,
-        "installer": "1.8.0.dev4",
+        "installer": "1.8.0.dev5",
         "public_status": "1.8.0.dev4"
       },
       "release": {
@@ -312,7 +312,7 @@
         "tier": 1,
         "role": "records workflow",
         "status": "naming_candidate_acceptance_pending",
-        "source_commit": "7cbdab22a8d8939a6e022022bacb7de51ac4f6ca"
+        "source_commit": "eaaab2294ee3ce9dd62fdb61e9c581bf453c9202"
       }
     },
     "meetings": {
