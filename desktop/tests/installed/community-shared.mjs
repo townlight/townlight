@@ -10,6 +10,8 @@ async function call(native, command, request) {
 }
 
 function shaValue(value) {
+  const revisionSha = value?.revision?.sha256;
+  if (typeof revisionSha === 'string' && revisionSha) return revisionSha;
   for (const key of ['revision_sha', 'revisionSha', 'content_sha', 'sha256', 'sha']) {
     if (typeof value?.[key] === 'string' && value[key].length > 0) return value[key];
   }
@@ -92,7 +94,7 @@ export async function communityShared({
   const articleId = createdArticle.id ?? createdArticle.article_id;
   assert.ok(articleId, 'communications article id required');
 
-  const articleRead = await call(hostNative, 'article', {
+  const articleRead = await call(hostNative, 'communications_request', {
     operation: 'article',
     id: articleId,
   });
@@ -105,7 +107,8 @@ export async function communityShared({
   if (createdSha && readSha) assert.equal(readSha, createdSha, 'article revision SHA mismatch');
   else if (readSha) assert.ok(readSha.length > 0, 'article revision SHA must be nonempty');
 
-  const catalog = await call(guestNative, 'catalog-get', {
+  const catalog = await call(guestNative, 'parks_request', {
+    operation: 'catalog-get',
     kind: 'resource',
     id: ids.parksResource,
   });
@@ -117,7 +120,8 @@ export async function communityShared({
   startsAt.setUTCHours(10, 0, 0, 0);
   const endsAt = new Date(startsAt.getTime() + 60 * 60 * 1000);
 
-  const bookingCreate = await call(guestNative, 'bookings-create', {
+  const bookingCreate = await call(guestNative, 'parks_request', {
+    operation: 'bookings-create',
     payload: {
       resource_id: ids.parksResource,
       household_id: ids.parksHousehold,
@@ -135,7 +139,8 @@ export async function communityShared({
   const createdBooking = bookingCreate.bookings[0];
   assert.ok(createdBooking?.id, 'created booking id required');
 
-  const bookingRead = await call(hostNative, 'bookings-get', {
+  const bookingRead = await call(hostNative, 'parks_request', {
+    operation: 'bookings-get',
     booking_id: createdBooking.id,
   });
   const fetchedBooking = bookingRead.booking ?? bookingRead;
@@ -147,7 +152,8 @@ export async function communityShared({
   );
   assert.notEqual(fetchedBooking.revision, undefined, 'booking revision required');
 
-  const transition = await call(guestNative, 'bookings-transition', {
+  const transition = await call(guestNative, 'parks_request', {
+    operation: 'bookings-transition',
     booking_id: createdBooking.id,
     payload: {
       expected_revision: createdBooking.revision ?? fetchedBooking.revision,
@@ -157,7 +163,8 @@ export async function communityShared({
   });
   assert.ok(transition, 'bookings-transition response required');
 
-  const bookingAfterRead = await call(hostNative, 'bookings-get', {
+  const bookingAfterRead = await call(hostNative, 'parks_request', {
+    operation: 'bookings-get',
     booking_id: createdBooking.id,
   });
   const bookingAfter = bookingAfterRead.booking ?? bookingAfterRead;
@@ -170,25 +177,15 @@ export async function communityShared({
     assert.equal(String(bookingAfter.state).toLowerCase(), 'cancelled', 'booking state not cancelled');
   }
 
-  try {
-    const recordsResult = await call(guestNative, 'records_domain_request', {
+  await assert.rejects(
+    async () => call(guestNative, 'records_domain_request', {
       operation: 'view',
       request_id: ids.parksFinanceRecords,
-    });
-    assert.match(
-      JSON.stringify(recordsResult),
-      /403|forbidden|not authorized|permission/i,
-      'Records request unexpectedly succeeded',
-    );
-  } catch (error) {
-    assert.match(
-      String(error?.message ?? error),
-      /403|forbidden|not authorized|permission/i,
-      'Records request was not actually rejected',
-    );
-  }
+    }),
+    /403|forbidden|not authorized|permission/i,
+  );
 
-  await save({
+  await save("shared-community-workflows", {
     publicIDs: {
       serviceRequest: ids.serviceRequest,
       article: articleId,

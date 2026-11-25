@@ -12,8 +12,11 @@ const RECORDS_RECEIPT = `${RECORDS} [data-role="receipt"]`;
 const RECORDS_RESULT = `${RECORDS} [data-role="result"]`;
 const DATA_RESULT = '[data-dp-result]';
 
-export async function installedServiceRequests({page, native, save}) {
+export async function installedServiceRequests({page, native, save, portalBaseUrl, captureMessage, downloadRecordsAttachment}) {
   assert.equal(typeof native, 'function', 'native typed-operation bridge is required');
+  assert.ok(portalBaseUrl, 'portalBaseUrl callback is required');
+  assert.equal(typeof downloadRecordsAttachment, 'function', 'downloadRecordsAttachment callback is required');
+  assert.equal(typeof captureMessage, 'function', 'captureMessage callback is required');
   const call = async (operation, extra = {}) => {
     const response = await native('service_requests_request', {request: {operation, ...extra}});
     return response && typeof response === 'object' && 'result' in response ? response.result : response;
@@ -103,11 +106,12 @@ export async function installedServiceRequests({page, native, save}) {
   async function verifyReceipt(receipt, label) {
     assert.match(String(receipt?.sha256 ?? ''), /^[0-9a-f]{64}$/, `${label} sha256`);
     assert.ok(String(receipt?.path ?? '').trim(), `${label} path`);
-    assert.ok(Number.isSafeInteger(Number(receipt?.size_bytes)) && Number(receipt.size_bytes) > 0, `${label} size`);
+    const sizeBytes = Number(receipt.size_bytes ?? receipt.sizeBytes);
+    assert.ok(Number.isSafeInteger(sizeBytes) && sizeBytes > 0, `${label} size`);
     const bytes = await readFile(String(receipt.path)).catch(error => {
       throw new Error(`${label} path is not readable for durable readback: ${error?.message ?? error}`);
     });
-    assert.equal(bytes.length, Number(receipt.size_bytes), `${label} size readback`);
+    assert.equal(bytes.length, sizeBytes, `${label} size readback`);
     assert.equal(createHash('sha256').update(bytes).digest('hex'), receipt.sha256, `${label} bytes hash readback`);
     return receipt;
   }
@@ -376,6 +380,16 @@ export async function installedServiceRequests({page, native, save}) {
   assert.ok(handoff['Attachment ID'], 'returned Records attachment ID');
   assert.equal(handoff['SHA-256'], prepared.sha256, 'returned Records source hash');
 
+  const recordsDownload = await downloadRecordsAttachment({
+    requestId: handoff['Records request ID'],
+    attachmentId: handoff['Attachment ID'],
+    expectedSha256: prepared.sha256,
+    expectedSize: Number(prepared.sizeBytes),
+  });
+  assert.ok(Buffer.isBuffer(recordsDownload), 'Records handoff archive buffer');
+  assert.equal(recordsDownload.length, prepared.sizeBytes, 'Records handoff archive size');
+  assert.equal(createHash('sha256').update(recordsDownload).digest('hex'), prepared.sha256, 'Records handoff archive hash');
+
   await openDataDetails();
   const dataResult = page.locator(DATA_RESULT);
   const dataStatusBefore = parseJson(
@@ -407,18 +421,59 @@ export async function installedServiceRequests({page, native, save}) {
   const queued = parseJson(publishResult.slice('Queued:'.length).trim(), 'Data publish receipt');
   assert.ok(queued && typeof queued === 'object', 'data publish receipt');
 
-  const dataStatusAfter = await call('data-status');
+  assert.ok(portalBaseUrl, 'portalBaseUrl is required to verify the delivered public dataset');
+  const api = page.request;
+  assert.ok(api, 'page.request is required for portal verification');
+  assert.ok(Number.isSafeInteger(queued?.sequence), 'data publish receipt must include a delivery sequence');
+  let dataStatusAfter;
+  let job;
+  const deliveryDeadline = Date.now() + 30_000;
+  while (Date.now() < deliveryDeadline) {
+    dataStatusAfter = await call('data-status');
+    const publications = array(dataStatusAfter.publications, 'publications');
+    job = publications.find(item => item?.sequence === queued.sequence && item?.state === 'delivered');
+    if (job) break;
+    if (publications.some(item => item?.sequence === queued.sequence && item?.state === 'rejected')) {
+      throw new Error('Data publication was rejected');
+    }
+    await delay(200);
+  }
+  assert.ok(job, 'Data publication was not delivered');
+  const datasetId = job.meeting_id ?? queued.meeting_id;
+  assert.ok(datasetId, 'Delivered publication did not include a dataset id');
+  const datasetUrl = new URL(`/datasets/${datasetId}/dataset.json`, portalBaseUrl).href;
+  let datasetBytes;
+  const datasetDeadline = Date.now() + 15_000;
+  while (Date.now() < datasetDeadline) {
+    const response = await api.get(datasetUrl, {failOnStatusCode: false});
+    if (response.status() === 200) {
+      datasetBytes = await response.body();
+      break;
+    }
+    await delay(500);
+  }
+  assert.ok(datasetBytes, 'Delivered dataset did not appear on the public portal');
+  assert.equal(createHash('sha256').update(datasetBytes).digest('hex'), preview.sha256, 'delivered dataset bytes hash');
   const publishedRevision = array(dataStatusAfter.revisions, 'revisions')
     .find(item => String(item?.id ?? '') === String(preview.id));
   assert.ok(publishedRevision, 'published revision is visible in data status');
   assert.equal(publishedRevision.sha256, preview.sha256, 'published source hash readback');
   assert.ok(publishedRevision.approved_at, 'published revision approval confirmation');
 
-  const finalDetail = await detail(main.id);
-  const notifications = array(finalDetail.notifications, 'notifications');
-  const pendingDelivery = notifications.filter(item => /^(pending|queued|retry|retrying|sending)$/i.test(String(item?.state ?? '')));
+  let finalDetail;
+  let notifications = [];
+  const notificationDeadline = Date.now() + 30_000;
+  while (Date.now() < notificationDeadline) {
+    finalDetail = await detail(main.id);
+    notifications = array(finalDetail.notifications, 'notifications');
+    if (notifications.length > 0 && notifications.every(item => item?.state === 'sent')) break;
+    await delay(200);
+  }
+  assert.ok(notifications.length > 0, 'no notification delivery evidence was returned');
+  assert.ok(notifications.every(item => item?.state === 'sent'), `not all notifications reached sent: ${JSON.stringify(notifications)}`);
+  const captured = await captureMessage(`acceptance+${runId}@example.test`, String(main.tracking ?? main.id));
   const result = {
-    passed: pendingDelivery.length === 0,
+    passed: true,
     ids: {
       category: categoryCode,
       main_request: String(main.id),
@@ -447,13 +502,11 @@ export async function installedServiceRequests({page, native, save}) {
       data_status_before: dataStatusBefore,
       data_status_after: dataStatusAfter,
       data_publish_receipt: queued,
-      delivery_pending: pendingDelivery.map(item => ({id: item?.id ?? null, state: item?.state ?? null})),
+      notifications: notifications.map(item => ({id: item?.id ?? null, state: item?.state ?? null})),
+      notification_capture: captured ?? null,
     },
   };
   if (typeof save === 'function') await save('installed-311-workflow', result);
-  if (pendingDelivery.length > 0) {
-    throw new Error(`Notification delivery is still pending; refusing to claim success: ${JSON.stringify(result.milestones.delivery_pending)}`);
-  }
   return result;
 }
 

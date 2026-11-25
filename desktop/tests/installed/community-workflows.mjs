@@ -102,7 +102,14 @@ export async function communityWorkflows({page, native, save, meetingId, output,
   await configureEmail(native, fixtureRoot);
 
   await nav(page, 'service-requests');
-  const staff = await installedServiceRequests({page, native, save});
+  const staff = await installedServiceRequests({
+    page,
+    native,
+    save,
+    portalBaseUrl,
+    downloadRecordsAttachment,
+    captureMessage: (recipient, expectedBody) => waitMailJson(fixtureRoot, recipient, expectedBody),
+  });
 
   const resident = await installedResident311({native, portalBaseUrl, save, categoryCode: staff.ids.category});
 
