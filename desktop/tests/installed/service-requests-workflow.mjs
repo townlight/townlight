@@ -374,7 +374,12 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
   const archiveErrorBefore = await text(page.locator(RECORDS_ERROR));
   await page.locator(`${RECORDS} [data-role="archive"]`).click();
   await waitRecordsOutcome(archiveStatusBefore, archiveErrorBefore, /Archive handed off to Records\./, 'Archive service request to Records');
-  const handoff = parseLabeled(await text(page.locator(RECORDS_RESULT)));
+  const handoffReceiptText = await page.locator(RECORDS_RESULT).evaluate((element) => {
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll('button').forEach((button) => button.remove());
+    return clone.textContent ?? '';
+  });
+  const handoff = parseLabeled(handoffReceiptText);
   assert.ok(handoff.Tracking, 'returned Records tracking');
   assert.ok(handoff['Records request ID'], 'returned Records request ID');
   assert.ok(handoff['Attachment ID'], 'returned Records attachment ID');
