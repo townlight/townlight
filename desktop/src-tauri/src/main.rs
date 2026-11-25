@@ -165,6 +165,16 @@ fn navigation() -> Vec<NavigationItem> {
             description: "Resident intake, department queues and resolution",
         },
         NavigationItem {
+            id: "communications",
+            label: "Communications",
+            description: "Approved announcements, publication and email",
+        },
+        NavigationItem {
+            id: "parks",
+            label: "Parks and Recreation",
+            description: "Facilities, reservations, registration and maintenance",
+        },
+        NavigationItem {
             id: "search",
             label: "Search City Knowledge",
             description: "Cross-module local search with citations",
@@ -1760,6 +1770,9 @@ mod tests {
             "data",
             "budget",
             "grants",
+            "service-requests",
+            "communications",
+            "parks",
         ];
         let main_js = include_str!("../../src/main.js");
         let start = main_js

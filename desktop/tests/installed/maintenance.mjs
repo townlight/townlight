@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {stationRecorder,stationLargeHandoff} from './station-recorder.mjs';
 if (process.env.GITHUB_ACTIONS !== 'true' || process.platform !== 'win32') throw Error('Disposable hosted Windows only');
 const [mode, output] = process.argv.slice(2);
-assert(['seed', 'fresh', 'upgrade', 'recorder'].includes(mode));
+assert(['seed', 'fresh', 'upgrade', 'recorder', 'community'].includes(mode));
 await mkdir(output, {recursive:true});
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:60000});
 const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
@@ -38,7 +38,7 @@ try {
   // Observe its rendered result before sending another native state request.
   await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
-  let ids;
+  let ids, communityIds;
   if (mode==='upgrade') {
     ids=JSON.parse(await readFile(path.join(output,'seed-workflows.json'),'utf8'));
     await admin();
@@ -57,6 +57,35 @@ try {
       await save(mode+'-workflows',ids);
       await admin();
       await readback(ids);
+    }
+    if (mode==='community') {
+      assert(process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT, 'Community fixture root is required');
+      assert(process.env.TOWNLIGHT_COMMUNITY_PORTAL_URL, 'Community portal URL is required');
+      // Imported only in community mode so historical fresh/upgrade/recorder
+      // runs do not depend on the community harness.
+      const { communityWorkflows, communityReadback } = await import('./community-workflows.mjs');
+      const community = await communityWorkflows({
+        page, native, save, meetingId: ids.meeting_id, output,
+        fixtureRoot: process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT,
+        portalBaseUrl: process.env.TOWNLIGHT_COMMUNITY_PORTAL_URL,
+      });
+      assert(community && typeof community === 'object', 'communityWorkflows returned no outcome');
+      assert(community.passed === true, 'Community workflows failed');
+      communityIds = community.ids;
+      assert(communityIds && typeof communityIds === 'object', 'Community ids missing');
+      const communityIdValues = Object.values(communityIds);
+      assert(communityIdValues.length > 0 && communityIdValues.every(value => value !== undefined && value !== null && String(value).length > 0), 'Community ids contain empty values');
+      await save('community-outcome', community);
+      await save('community-actual-ids', {
+        meeting_id: ids.meeting_id, board_id: ids.board_id,
+        solicitation_id: ids.solicitation_id, contract_id: ids.contract_id,
+        community: communityIds,
+      });
+      accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
+      accepted(await native('supervisor_action',{action:'start',serviceId:null}));
+      await admin();
+      const restartReadback = await communityReadback({native, ids: communityIds, save});
+      await save('community-restart-readback', restartReadback);
     }
   }
   if (mode === "recorder") {
@@ -78,7 +107,7 @@ try {
   if (mode === 'fresh') await clerkWorkflows({ page, native, save, meetingId: ids.meeting_id });
   let recording;
   if(mode==='recorder'||mode==='fresh') recording=await stationRecorder({native,save,admin,longCapture:mode==='fresh'});
-  if (mode==='fresh'||mode==='recorder') {
+  if (mode==='fresh'||mode==='recorder'||mode==='community') {
     accepted(await native('supervisor_action',{action:'backup',serviceId:null}));
     const restore=await native('supervisor_action',{action:'restore',serviceId:null});
     // Restore intentionally leaves services stopped. It is not accepted as
@@ -97,6 +126,11 @@ try {
       await save('station-after-restore',{passed:true,recording,restored_file_hash_verified:true});
     }
     if(ids) await readback(ids);
+    if(communityIds) {
+      const { communityReadback } = await import('./community-workflows.mjs');
+      const restoredReadback = await communityReadback({native, ids: communityIds, save});
+      await save('community-restored-readback', restoredReadback);
+    }
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
   }
   if(recording) {
