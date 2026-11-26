@@ -1,0 +1,31 @@
+name: Noninstalled recorder qualification
+on:
+  push:
+    branches: [acceptance/fresh-recorder-qualification]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recorder-qualification:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: townlight-windows-local-msi-SIGNED
+          run-id: 45863660564
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: msi-artifact
+      - name: Qualify exact payload without installing or launching Townlight
+        shell: pwsh
+        run: ./desktop/tests/qualification/run-recorder-qualification.ps1 -ArtifactRoot ./msi-artifact -EvidenceRoot "${{ runner.temp }}/recorder-qualification-evidence"
+      - name: Preserve diagnostic JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recorder-qualification
+          path: ${{ runner.temp }}/recorder-qualification-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 7
