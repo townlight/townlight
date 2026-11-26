@@ -21,7 +21,7 @@ export async function installedParksEnrollment({ page, native, save, householdId
       await window.audit.nav("parks");
     });
     await page.locator("[data-session-program]").waitFor({ state: "visible" });
-    await page.locator("[data-parks-sessions]").waitFor({ state: "visible" });
+    await page.locator('section.parks-sessions[aria-labelledby="parks-sessions-heading"]').waitFor({ state: "visible" });
   }
 
   async function selectSession(programId, sessionId) {
@@ -191,7 +191,7 @@ export async function installedParksEnrollment({ page, native, save, householdId
   const initialRoster = await readDomRoster();
   must(initialRoster.length === 2, "Initial roster did not contain exactly two registrations.");
 
-  const privacyText = await page.locator("[data-parks-sessions]").innerText();
+  const privacyText = await page.locator('section.parks-sessions[aria-labelledby="parks-sessions-heading"]').innerText();
   must(
     privacyText.includes("Private staff only") &&
       privacyText.includes("Minor status and accommodations are never public"),
