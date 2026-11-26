@@ -6,7 +6,7 @@ import {mkdtemp, mkdir, writeFile, readFile, rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {prepareUnattended} from './communications-unattended.mjs';
-import {assertArchive, assertMail, assertPublished, verifyUnattended} from './communications-postexit.mjs';
+import {assertArchive, assertArchiveIdentity, assertMail, assertPublished, verifyUnattended} from './communications-postexit.mjs';
 const hash = v => createHash('sha256').update(v).digest('hex');
 const id = '11111111-1111-4111-8111-111111111111';
 const source = {kind:'meetings',id:'22222222-2222-4222-8222-222222222222',eligible:true,revision:hash('"source snapshot"'),sha256:hash('"source snapshot"'),title:'Synthetic minutes',url:'/public/meetings/data/22222222-2222-4222-8222-222222222222'};
@@ -69,18 +69,21 @@ test('controlled post-exit normal verifier authenticates, verifies MIME/public/s
   const metadata={recipients:[recipient],received_at:new Date().toISOString(),headers:{'message-id':['<real-capture@example.test>']},eml:'final.eml'};
   await writeFile(join(root,'mail','final.json'),JSON.stringify(metadata));
   await writeFile(join(root,'mail','final.eml'),`From: fixture@example.test\r\nTo: ${recipient}\r\nMessage-ID: <real-capture@example.test>\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${Buffer.from(pending.body+'\n'+url).toString('base64')}\r\n`);
-  const fixtureBytes={'old-request':Buffer.from('original archive'),'corrected-request':Buffer.from('corrected archive'),'final-request':bytes};
+  const fixtureBytes={'final-request':bytes};
+  for(const a of Object.values(pending.archives)){const b=zip({...pending,revision:a.revision,sha256:a.contentSha256},row);a.sha256=hash(b);a.sizeBytes=b.length;fixtureBytes[a.requestId]=b;}
+  await writeFile(join(root,'communications-unattended-pending.json'),JSON.stringify(pending));
   const fetchImpl=async(input,init={})=>{
    const u=new URL(input);requests.push(`${init.method||'GET'} ${u.pathname}`);
    const json=v=>new Response(JSON.stringify(v),{status:200});
+   if(u.pathname==='/ready'){const response=json({status:'ready'});Object.defineProperty(response,'url',{value:u.href});return response;}
    if(u.pathname==='/staff/v1/session') {if(init.method==='DELETE')signedOut=true;return json({proof:'controlled-session'});}
-   if(u.hostname==='portal.example.test')return new Response(u.pathname.endsWith('/sources/0/')?'source snapshot':pending.body.split('\n\n').join('</p>\n\n<p>'));
+   if(u.hostname==='portal.example.test')return new Response(u.pathname.endsWith('/sources/0/')?'&quot;source snapshot&quot;':pending.body.split('\n\n').join('</p>\n\n<p>'));
    assert.equal(init.headers['X-Townlight-Session'],'controlled-session');
    if(u.pathname.endsWith(`/communications/articles/${id}`))return json(article);
-   if(u.pathname.endsWith('/records'))return json(archive);
+   if(u.pathname.endsWith('/records')){assert.match(init.headers['X-Townlight-Operation'],/^[0-9a-f-]{36}$/);return json(archive);}
    const match=/\/requests\/([^/]+)\/(view|documents\/[^/]+\/content)$/.exec(u.pathname);assert.ok(match,u.pathname);
-   const a=match[1]==='final-request'?{requestId:'final-request',attachmentId:'final-attachment',revision:pending.revision,sha256:archive.sha256,sizeBytes:archive.size}:Object.values(archives).find(a=>a.requestId===match[1]);
-   if(match[2]==='view')return json({documents:[{attachment_id:a.attachmentId,sha256:a.sha256,size_bytes:a.sizeBytes,original_path:`townlight-comms-archive:${id}:${a.revision}:${a.sha256}`}]});
+   const a=match[1]==='final-request'?{requestId:'final-request',attachmentId:'final-attachment',revision:pending.revision,sha256:archive.sha256,sizeBytes:archive.size}:Object.values(pending.archives).find(a=>a.requestId===match[1]);
+   if(match[2]==='view')return json({documents:[{attachment_id:a.attachmentId,sha256:a.sha256,size_bytes:a.sizeBytes,original_path:''}]});
    return new Response(fixtureBytes[match[1]]);
   };
   const receipt=await verifyUnattended({output:root,fixtureRoot:root,portalBaseUrl:'https://portal.example.test',fetchImpl,timeoutMs:1000});
@@ -91,6 +94,9 @@ test('controlled post-exit normal verifier authenticates, verifies MIME/public/s
   const badSource=structuredClone(pending);badSource.source_ref.sha256='0'.repeat(64);assert.throws(()=>assertPublished(article,badSource));
   assert.throws(()=>assertMail({...metadata,recipients:['other@example.test']},[pending.body+' '+url],pending,stopped,url));
   assert.throws(()=>assertMail({...metadata,received_at:stopped.at},[pending.body+' '+url],pending,stopped,url));
+  const identity={articleId:id,revision:pending.revision,contentSha256:pending.sha256,sha256:archive.sha256,sizeBytes:archive.size};
+  assertArchiveIdentity(bytes,identity,pending);
+  for(const field of ['articleId','revision','contentSha256'])assert.throws(()=>assertArchiveIdentity(bytes,{...identity,[field]:field==='revision'?99:'wrong'},pending));
   const tampered=Buffer.from(bytes);tampered[0]^=1;assert.throws(()=>assertArchive(tampered,archive,pending,row));
   const wrongRef=structuredClone(pending);wrongRef.source_ref.sha256='0'.repeat(64);assert.throws(()=>assertArchive(bytes,archive,wrongRef,row));
  }finally{await rm(root,{recursive:true,force:true});}

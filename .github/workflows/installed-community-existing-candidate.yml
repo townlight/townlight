@@ -25,7 +25,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-SIGNED
-          run-id: 45734827373
+          run-id: 45863660564
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: msi-artifact
 
@@ -58,9 +58,9 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $expectedSha = 'ca63bfd9e8f28cb01fe4d4e7668e8fd669dedaac64fa0d3f6242b0e6c7ef594a'
-          $expectedSource = 'e6ea9431f17e41a3315c0ad3e3bb48e8424cf7cf'
-          $expectedRun = '45734827373'
+          $expectedSha = '8845a59ed5846f7ee3bd196f290610aa5d9c14dbd0794cf99f44f09d6ee55ea8'
+          $expectedSource = 'd1687e6950032352f74a2890d0b2fbce107ce131'
+          $expectedRun = '45863660564'
           $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
           if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
           $msiHash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
