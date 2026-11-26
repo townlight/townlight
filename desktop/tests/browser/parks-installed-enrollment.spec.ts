@@ -92,7 +92,7 @@ test('drives installed parks enrollment against bound sessions UI', async ({ pag
         return clone(row);
       }
       case 'sessions-roster': {
-        const roster = registrations.map((registration) => {
+        const roster = registrations.filter(registration => registration.state === 'confirmed' || registration.state === 'waitlisted').map((registration) => {
           const participant = participants.find((item) => item.id === registration.participant_id);
           const household = households.find((item) => item.id === participant?.household_id);
           return {
