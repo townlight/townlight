@@ -21,7 +21,7 @@ export async function installedParksEnrollment({ page, native, save, householdId
       await window.audit.nav("parks");
     });
     await page.locator("[data-session-program]").waitFor({ state: "visible" });
-    await page.locator("[data-parks-sessions]").waitFor({ state: "visible" });
+    await page.locator('section.parks-sessions[aria-labelledby="parks-sessions-heading"]').waitFor({ state: "visible" });
   }
 
   async function selectSession(programId, sessionId) {
@@ -191,7 +191,7 @@ export async function installedParksEnrollment({ page, native, save, householdId
   const initialRoster = await readDomRoster();
   must(initialRoster.length === 2, "Initial roster did not contain exactly two registrations.");
 
-  const privacyText = await page.locator("[data-parks-sessions]").innerText();
+  const privacyText = await page.locator('section.parks-sessions[aria-labelledby="parks-sessions-heading"]').innerText();
   must(
     privacyText.includes("Private staff only") &&
       privacyText.includes("Minor status and accommodations are never public"),
@@ -225,9 +225,9 @@ export async function installedParksEnrollment({ page, native, save, householdId
   must(promoted?.state === "confirmed", "Promoted registration is not confirmed.");
 
   await selectSession(programId, sessionId);
-  await waitForRosterRow(firstName, "cancelled");
   await waitForRosterRow(secondName, "confirmed");
   const promotedRoster = await readDomRoster();
+  must(promotedRoster.length === 1 && promotedRoster.every(row => row.name !== firstName), "Active roster must exclude cancelled registration.");
   must(
     promotedRoster.filter((row) => row.name === secondName).length === 1,
     "Promoted registration appears more than once in the roster.",
@@ -258,12 +258,14 @@ export async function installedParksEnrollment({ page, native, save, householdId
   await selectSession(programId, sessionId);
   await waitForRosterRow(secondName, "confirmed", "Yes");
   const finalRoster = await readDomRoster();
+  must(finalRoster.length === 1 && finalRoster.every(row => row.name !== firstName), "Active roster must exclude cancelled registration.");
   const finalSecondRows = finalRoster.filter((row) => row.name === secondName);
   must(finalSecondRows.length === 1, "Final roster contains duplicate promoted rows.");
   must(finalSecondRows[0].checkedIn === "Yes", "DOM roster did not persist attendance.");
 
   const nativeRoster = await parksRequest("sessions-roster", { session_id: sessionId });
   must(Array.isArray(nativeRoster), "Native roster readback is not an array.");
+  must(nativeRoster.length === 1 && nativeRoster.every(row => row.state !== "cancelled" && row.name !== firstName), "Native active roster must exclude cancelled registration.");
   const nativeSecondRows = nativeRoster.filter(
     (row) => String(row?.name) === secondName,
   );
