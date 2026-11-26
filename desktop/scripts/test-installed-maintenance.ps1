@@ -7,6 +7,7 @@ param(
   [ValidatePattern('^[0-9a-f]{64}$')][string]$ExpectedMsiSha256
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'installed-foreground-process.ps1')
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
 if ($UnsignedRecorderCandidate) {
@@ -258,9 +259,14 @@ function Run-Installed([string]$Phase) {
     if ($communityReady) {
       $staffStdout = Join-Path $EvidenceRoot 'communications-staff-host.stdout.log'
       $staffStderr = Join-Path $EvidenceRoot 'communications-staff-host.stderr.log'
-      $staff = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','start' -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $staffStdout -RedirectStandardError $staffStderr
-      if ($staff.ExitCode -ne 0) { throw "Townlight staff host start failed: $($staff.ExitCode)" }
-      try {
+      $staffStopStdout = Join-Path $EvidenceRoot 'staff-stop.stdout.log'
+      $staffStopStderr = Join-Path $EvidenceRoot 'staff-stop.stderr.log'
+
+      Invoke-InstalledWithCleanup -Action {
+        Write-Host 'Community phase: staff host start'
+        Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','start') -Label 'Townlight staff host start' -Stdout $staffStdout -Stderr $staffStderr -TimeoutSeconds 300
+
+        Write-Host 'Community phase: unattended verification'
         Push-Location (Join-Path $repo 'desktop')
         try {
           node tests/installed/communications-unattended.mjs verify $EvidenceRoot $env:TOWNLIGHT_COMMUNITY_PORTAL_URL $fixture.Root
@@ -268,14 +274,15 @@ function Run-Installed([string]$Phase) {
         } finally {
           Pop-Location
         }
-      } finally {
-        $staffStop = Start-Process -FilePath $exe -ArgumentList '--townlight-staff-host','stop' -WindowStyle Hidden -Wait -PassThru
-        if ($staffStop.ExitCode -ne 0) { throw "Townlight staff host stop failed: $($staffStop.ExitCode)" }
+      } -Cleanup {
+        Write-Host 'Community phase: staff host stop'
+        Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','stop') -Label 'Townlight staff host stop' -Stdout $staffStopStdout -Stderr $staffStopStderr -TimeoutSeconds 120
       }
     }
   } finally {
     # The fixture must outlive the app, and only then may its exact owned PID stop.
     try {
+      if ($fixture) { Write-Host 'Community phase: fixture shutdown' }
       Stop-CommunityFixture $fixture
     } finally {
       try {
