@@ -18,7 +18,7 @@ def main():
     payload, root = a.payload.resolve(), a.root.resolve()
     if not a.payload.is_absolute() or not payload.exists(): raise SystemExit('payload invalid')
     if not a.root.is_absolute() or not root.is_dir() or any(root.iterdir()): raise SystemExit('root invalid')
-    r = {'passed': False, 'stage': 'setup', 'primary_error': None, 'cleanup_errors': [],
+    r = {'passed': False, 'fixture_noise_strength': 10, 'stage': 'setup', 'primary_error': None, 'cleanup_errors': [],
          'host': {'processor': platform.processor(), 'logical_cpus': os.cpu_count(), 'platform': platform.platform()},
          'started_at': now()}
     save(root, r)
@@ -68,10 +68,45 @@ def main():
             raise RuntimeError('output probe')
         if p.get('size_bytes', 0) <= 0 or p.get('elapsed', 0) < 85:
             raise RuntimeError('output incomplete')
+        out_streams = {s.get('codec'): s for s in (p.get('probe') or {}).get('streams', {}).values() if s.get('codec') in ('video', 'audio')}
+        if set(out_streams) != {'audio', 'video'}:
+            raise RuntimeError('output cadence')
+        positive = [row for row in (p.get('rows') or []) if row.get('bytes_written', 0) > 0]
+        if len(positive) < 2:
+            raise RuntimeError('output cadence')
+        observed_output_wall_span = positive[-1].get('elapsed', 0) - positive[0].get('elapsed', 0)
+        if observed_output_wall_span < 54:
+            raise RuntimeError('output cadence')
+        p['observed_output_wall_span'] = observed_output_wall_span
+        minimum_media_span = max(54.0, observed_output_wall_span - 2.0)
+        expected_fps = {'video': 30.0, 'audio': 46.875}
+        for name in ('video', 'audio'):
+            s = out_streams[name]
+            if s.get('pts_span', 0) < minimum_media_span or s.get('backward_dts_count') != 0 or s.get('max_dts_gap', 9) > 0.1:
+                raise RuntimeError('output cadence')
+            expected_packets = s.get('pts_span', 0) * expected_fps[name]
+            if expected_packets <= 0 or not (0.97 <= s.get('packet_count', 0) / expected_packets <= 1.03):
+                raise RuntimeError('output cadence')
+        if abs(out_streams['video'].get('pts_span', 0) - out_streams['audio'].get('pts_span', 0)) > 1.0:
+            raise RuntimeError('output cadence')
+        positive = [row for row in (p.get('rows') or []) if row.get('bytes_written', 0) > 0]
+        if not positive:
+            raise RuntimeError('output byte slope')
+        steady = [row for row in positive if row.get('elapsed', 0) >= positive[0].get('elapsed', 0) + 10]
+        if len(steady) < 2:
+            raise RuntimeError('output byte slope')
+        first, last = steady[0], steady[-1]
+        dt = last.get('elapsed', 0) - first.get('elapsed', 0)
+        steady_bytes_per_second = (last.get('bytes_written', 0) - first.get('bytes_written', 0)) / dt if dt > 0 else 0
+        p['steady_bytes_per_second'] = steady_bytes_per_second
+        p['steady_bytes_per_second_minimum'] = 500000
+        if steady_bytes_per_second < 500000:
+            raise RuntimeError('output byte slope')
+        save(root, r)
         r['passed'] = True; r['stage'] = 'complete'
     except Exception as e:
         r['primary_error'] = {'stage': r['stage'], 'type': type(e).__name__,
-            'predicate': str(e) if isinstance(e, RuntimeError) and str(e) in {'media commit mismatch', 'safe input timing', 'product worker failed', 'product error', 'product log flags', 'output probe', 'output incomplete'} else None}
+            'predicate': str(e) if isinstance(e, RuntimeError) and str(e) in {'media commit mismatch', 'safe input timing', 'product worker failed', 'product error', 'product log flags', 'output probe', 'output incomplete', 'output cadence', 'output byte slope'} else None}
     finally:
         r['ended_at'] = now(); save(root, r)
         print(json.dumps({k: r[k] for k in ('passed', 'stage', 'primary_error')}))

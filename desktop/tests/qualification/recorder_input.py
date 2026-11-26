@@ -57,7 +57,7 @@ def generate(ffmpeg, root):
     root = Path(root)
     out = root / 'chamber.ts'
     with open(root / 'generate.log', 'wb') as err:
-        subprocess.run([str(ffmpeg), '-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=960x540:rate=30,noise=alls=20:allf=t+u', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '18', '-c:v', 'libopenh264', '-g', '30', '-b:v', '6500k', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-f', 'mpegts', str(out)], timeout=180, check=True, stdout=subprocess.DEVNULL, stderr=err)
+        subprocess.run([str(ffmpeg), '-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=960x540:rate=30,noise=alls=10:allf=t+u', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '18', '-c:v', 'libopenh264', '-g', '30', '-b:v', '6500k', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-f', 'mpegts', str(out)], timeout=180, check=True, stdout=subprocess.DEVNULL, stderr=err)
     return out
 
 
