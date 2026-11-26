@@ -31,7 +31,12 @@ def secured(response):
 
 
 def render_page(request, context, status=200):
-    return secured(render(request, TEMPLATE, context, status=status))
+    response = secured(render(request, TEMPLATE, context, status=status))
+    # Origin (scheme/host/port only) keeps Edge same-origin form POSTs working;
+    # paths and queries are omitted, and non-form modes remain no-referrer.
+    if context.get("mode") in {"form", "resource", "household"}:
+        response["Referrer-Policy"] = "origin"
+    return response
 
 
 def pending(request, command_id):
