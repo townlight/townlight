@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
+import ssl
+
 import httpx
 import pytest
 from django.core.wsgi import get_wsgi_application
@@ -33,7 +35,10 @@ def test_parks_catalog_publisher_integration(runtime, publisher, settings):
 
     assert read_catalog()["available"] is False
 
+    client_kwargs = []
+
     def client_factory(**kwargs):
+        client_kwargs.append(kwargs)
         return httpx.Client(
             transport=httpx.WSGITransport(get_wsgi_application()), **kwargs
         )
@@ -44,6 +49,11 @@ def test_parks_catalog_publisher_integration(runtime, publisher, settings):
         client_factory=client_factory,
     )
     assert publisher_obj.tick() is True
+    kwargs = client_kwargs[0]
+    assert kwargs["trust_env"] is False
+    assert isinstance(kwargs["verify"], ssl.SSLContext)
+    assert kwargs["verify"].check_hostname is True
+    assert kwargs["verify"].verify_mode == ssl.CERT_REQUIRED
 
     catalog = read_catalog()
     assert catalog["available"] is True

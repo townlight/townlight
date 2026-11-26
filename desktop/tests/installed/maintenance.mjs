@@ -235,8 +235,10 @@ try {
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
 } catch(error) {
-  await save(mode+'-failure',{error:String(error),stack:error.stack,text:await page.locator('body').innerText().catch(()=>'' )});
-  await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
+  const failure = {error:String(error),stack:error.stack};
+  if(mode!=="community") failure.text = await page.locator('body').innerText().catch(()=>'' );
+  await save(mode+'-failure',failure);
+  if(mode!=="community") await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
   throw error;
 } finally {
   try {
