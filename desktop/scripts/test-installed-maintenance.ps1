@@ -73,15 +73,18 @@ function Start-CommunityFixture([string]$Python) {
   }
 }
 function Add-CommunityFixtureTrust($Fixture, [string]$CaPath) {
+  if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') { throw "Refusing fixture trust outside ephemeral GitHub-hosted Windows runner." }
   if ($Fixture.OwnedCertificate) { return }
   $cert = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Certificate2 -ArgumentList $CaPath
-  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
   try {
     $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
     $existing = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $cert.Thumbprint, $false)
     if ($existing.Count -gt 0) { throw "Fixture CA thumbprint $($cert.Thumbprint) is already trusted; refusing to alter preexisting trust." }
+    Write-Host "Community fixture: adding CA trust to LocalMachine Root"
     $Fixture.OwnedCertificate = $cert
     $store.Add($cert)
+    Write-Host "Community fixture: CA trust added"
   } catch {
     if (-not $Fixture.OwnedCertificate) { $cert.Dispose() }
     throw
@@ -91,10 +94,11 @@ function Add-CommunityFixtureTrust($Fixture, [string]$CaPath) {
   }
 }
 function Remove-CommunityFixtureTrust($Fixture) {
+  if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') { throw "Refusing fixture trust removal outside ephemeral GitHub-hosted Windows runner." }
   if (-not $Fixture -or -not $Fixture.OwnedCertificate) { return }
   $cert = $Fixture.OwnedCertificate
   $thumbprint = $cert.Thumbprint
-  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  $store = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
   try {
     $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
     $store.Remove($cert)
@@ -104,11 +108,12 @@ function Remove-CommunityFixtureTrust($Fixture) {
     $Fixture.OwnedCertificate = $null
     $cert.Dispose()
   }
-  $verify = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser)
+  $verify = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Store -ArgumentList @([System.Security.Cryptography.X509Certificates.StoreName]::Root, [System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
   try {
     $verify.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
     $remaining = $verify.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $thumbprint, $false)
     if ($remaining.Count -gt 0) { throw "Fixture CA thumbprint $thumbprint remained trusted after removal." }
+    Write-Host "Community fixture: CA trust removed and verified absent"
   } finally {
     $verify.Close()
     $verify.Dispose()
