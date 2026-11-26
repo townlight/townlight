@@ -14,9 +14,11 @@ $probe=Join-Path $job 'probe'
 $primary=$cleanup=$null; $code=-1; $childrenAbsent=$false; $stage='private_root'
 try {
     New-Item -ItemType Directory -Path $job | Out-Null
-    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
-    & icacls.exe $job /inheritance:r /grant:r ($sid+':(OI)(CI)F') | Out-Null
-    if($LASTEXITCODE -ne 0){throw 'Private ACL failed'}
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User
+    $acl=[Security.AccessControl.DirectorySecurity]::new()
+    $acl.SetOwner($sid); $acl.SetAccessRuleProtection($true,$false)
+    $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($sid,'FullControl','ContainerInherit,ObjectInherit','None','Allow'))
+    Set-Acl -LiteralPath $job -AclObject $acl
     [ordered]@{source_commit=$candidate.SourceCommit;workflow_run=$candidate.Run;msi_sha256=$candidate.MsiSHA256;harness_commit=$env:GITHUB_SHA;purpose='Noninstalled short recorder diagnostic only'} | ConvertTo-Json | Set-Content (Join-Path $evidence 'candidate.json')
     $cpu=Get-CimInstance Win32_Processor; $os=Get-CimInstance Win32_OperatingSystem
     [ordered]@{cpu=@($cpu|Select-Object Name,NumberOfCores,NumberOfLogicalProcessors);total_memory_kib=$os.TotalVisibleMemorySize;free_memory_kib=$os.FreePhysicalMemory;started_at=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $evidence 'capacity.json')
