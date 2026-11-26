@@ -18,7 +18,7 @@ def main():
     payload, root = a.payload.resolve(), a.root.resolve()
     if not a.payload.is_absolute() or not payload.exists(): raise SystemExit('payload invalid')
     if not a.root.is_absolute() or not root.is_dir() or any(root.iterdir()): raise SystemExit('root invalid')
-    r = {'passed': False, 'fixture_noise_strength': 10, 'stage': 'setup', 'primary_error': None, 'cleanup_errors': [],
+    r = {'passed': False, 'fixture_noise_strength': 20, 'stage': 'setup', 'primary_error': None, 'cleanup_errors': [],
          'host': {'processor': platform.processor(), 'logical_cpus': os.cpu_count(), 'platform': platform.platform()},
          'started_at': now()}
     save(root, r)

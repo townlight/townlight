@@ -1,4 +1,4 @@
-name: Noninstalled recorder qualification
+name: Qualified original fixture signed fresh
 on:
   push:
     branches: [acceptance/fresh-recorder-qualification]
@@ -7,25 +7,64 @@ permissions:
   contents: read
   actions: read
 jobs:
-  recorder-qualification:
+  qualified-fresh:
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 125
     steps:
       - uses: actions/checkout@v5
+        with:
+          path: harness
+      - uses: actions/checkout@v5
+        with:
+          ref: d1687e6950032352f74a2890d0b2fbce107ce131
+          path: townlight
       - uses: actions/download-artifact@v4
         with:
           name: townlight-windows-local-msi-SIGNED
           run-id: 45863660564
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: msi-artifact
-      - name: Qualify exact payload without installing or launching Townlight
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: townlight/desktop/package-lock.json
+      - name: Install desktop dependencies
+        working-directory: townlight/desktop
+        run: npm ci
+      - name: Prepare installer test volume
         shell: pwsh
-        run: ./desktop/tests/qualification/run-recorder-qualification.ps1 -ArtifactRoot ./msi-artifact -EvidenceRoot "${{ runner.temp }}/recorder-qualification-evidence"
+        run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
+      - name: Qualify exact payload without installing or launching Townlight
+        id: qualify
+        shell: pwsh
+        run: ./harness/desktop/tests/qualification/run-recorder-qualification.ps1 -ArtifactRoot ./msi-artifact -EvidenceRoot "${{ runner.temp }}/recorder-qualification-evidence"
+      - name: Test installed maintenance fresh
+        if: success() && steps.qualify.conclusion == 'success'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $msis = @(Get-ChildItem -Path ./msi-artifact -Filter *.msi -File -Recurse)
+          if ($msis.Count -ne 1) { throw "Expected exactly one MSI, found $($msis.Count)" }
+          $expected = '8845a59ed5846f7ee3bd196f290610aa5d9c14dbd0794cf99f44f09d6ee55ea8'
+          $hash = (Get-FileHash -Algorithm SHA256 -Path $msis[0].FullName).Hash.ToLowerInvariant()
+          if ($hash -ne $expected) { throw "MSI SHA256 mismatch: $hash" }
+          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode fresh -EvidenceRoot "${{ runner.temp }}/installed-fresh-evidence" -SourceCommit d1687e6950032352f74a2890d0b2fbce107ce131 -ExpectedMsiSha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "Installed maintenance test failed with exit code $LASTEXITCODE" }
       - name: Preserve diagnostic JSON
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: recorder-qualification
           path: ${{ runner.temp }}/recorder-qualification-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Preserve installed fresh evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualified-signed-installed-fresh
+          path: ${{ runner.temp }}/installed-fresh-evidence/**
           if-no-files-found: warn
           retention-days: 7
