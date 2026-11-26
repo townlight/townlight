@@ -6,8 +6,8 @@ import {setTimeout as delay} from 'node:timers/promises';
 const FINANCE = '.finance-render';
 const SELECTED = `${FINANCE} [data-finance-selected]`;
 const RECORDS = '[data-handoff]';
-const PREVIEW = `${RECORDS} [data-handoff-preview-result]`;
-const RECEIPT = `${RECORDS} [data-handoff-receipt]`;
+const PREVIEW = '[data-handoff-preview-result]';
+const RECEIPT = '[data-handoff-receipt]';
 
 export async function installedParksFinanceRecords({page, native, save, bookingId, obligationId, downloadRecordsAttachment}) {
   assert.equal(typeof native, 'function', 'native typed-operation bridge is required');
@@ -145,7 +145,7 @@ export async function installedParksFinanceRecords({page, native, save, bookingI
     await records.locator(PREVIEW).waitFor({state: 'visible', timeout: 15_000});
     const archiveSha = (await text(records.locator('[data-handoff-sha256]'))).trim();
     assert.match(archiveSha, /^[0-9a-f]{64}$/i, 'archive bundle SHA-256 preview');
-    const archiveSize = Number(await text(records.locator('[data-handoff-size]')));
+    const archiveSize = Number(await records.locator('[data-handoff-size]').getAttribute('data-handoff-bytes'));
     assert.ok(Number.isSafeInteger(archiveSize) && archiveSize > 0, 'archive bundle size preview');
 
     await records.locator('[data-handoff-review-checkbox]').check();
