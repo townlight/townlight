@@ -4,6 +4,7 @@ import hashlib
 import json
 import secrets
 import sqlite3
+import ssl
 import sys
 import uuid
 from pathlib import Path
@@ -368,6 +369,9 @@ def test_config_is_reread_and_client_is_private(repo):
     kwargs = portals[0].client_kwargs
     assert kwargs["base_url"] == "https://portal.example"
     assert kwargs["trust_env"] is False
+    assert isinstance(kwargs["verify"], ssl.SSLContext)
+    assert kwargs["verify"].check_hostname is True
+    assert kwargs["verify"].verify_mode == ssl.CERT_REQUIRED
     assert kwargs["follow_redirects"] is False
     assert kwargs["timeout"] == 30
     assert CATALOG_PATH in portals[0].paths

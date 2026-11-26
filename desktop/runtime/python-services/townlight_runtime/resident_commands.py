@@ -13,6 +13,7 @@ import json
 import logging
 import re
 import sqlite3
+import ssl
 import threading
 import uuid
 from urllib.parse import urlsplit
@@ -279,6 +280,7 @@ class ResidentCommandPump:
             trust_env=False,
             follow_redirects=False,
             timeout=REQUEST_TIMEOUT_SECONDS,
+            verify=ssl.create_default_context(),
         ) as client:
             _post_json(client, CATALOG_PATH, token, self._catalog_body())
             commands = self._claim(client, token)
