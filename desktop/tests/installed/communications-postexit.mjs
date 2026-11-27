@@ -79,12 +79,19 @@ from email.parser import BytesParser
 m=BytesParser(policy=email.policy.default).parsebytes(sys.stdin.buffer.read())
 print(json.dumps([p.get_content() for p in m.walk() if p.get_content_type()=='text/plain']))`, bytes);
 }
+export function mailContainsFinalContent(decodedParts, pending, articleUrl) {
+  const body = pending.body.replaceAll("\r\n", "\n");
+  return decodedParts.some(text => {
+    const t = text.replaceAll("\r\n", "\n");
+    return t.includes(body) && t.includes(articleUrl);
+  });
+}
 export function assertMail(record, decodedParts, pending, stopped, articleUrl) {
   assert.ok(Array.isArray(record.recipients) && record.recipients.length === 1, 'one exact synthetic envelope recipient');
   assert.equal(hash(record.recipients[0].trim().toLowerCase()), pending.recipient_sha256, 'confirmed recipient digest');
   assert.ok(Date.parse(record.received_at) >= Date.parse(pending.due_at), 'mail after scheduled time');
   assert.ok(Date.parse(record.received_at) >= Date.parse(stopped.at), 'mail after close');
-  assert.ok(decodedParts.some(text => text.includes(pending.body) && text.includes(articleUrl)), 'decoded mail final body and article URL');
+  assert.ok(mailContainsFinalContent(decodedParts, pending, articleUrl), 'decoded mail final body and article URL');
   assert.ok(record.headers?.['message-id']?.[0], 'actual SMTP Message-ID');
 }
 export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staffBaseUrl = `http://127.0.0.1:${process.env.TOWNLIGHT_LOCAL_PORT || '15480'}`, fetchImpl = fetch, timeoutMs = 120000}) {
@@ -149,7 +156,7 @@ export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staf
         const record = JSON.parse(await readFile(join(fixtureRoot, 'mail', name), 'utf8'));
         if (typeof record.eml !== 'string' || basename(record.eml) !== record.eml) continue;
         const parts = inspectMail(await readFile(join(fixtureRoot, 'mail', record.eml)));
-        if (!parts.some(text => text.includes(pending.body))) continue;
+        if (!mailContainsFinalContent(parts, pending, articleUrl)) continue;
         assertMail(record, parts, pending, stopped, articleUrl);
         capturedMail = {file: name, recipient_sha256: pending.recipient_sha256, received_at: record.received_at, message_id: record.headers['message-id'][0], meaning: 'SMTP acceptance only'};
         break;
