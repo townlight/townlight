@@ -52,7 +52,7 @@ function Invoke-UleInstalledNode {
     try {
         $env:TOWNLIGHT_ULE_CONTROL_DIR = $controlRoot
         $env:TOWNLIGHT_ULE_CONTROL_NONCE = $nonce
-        $node = (Get-Command node -CommandType Application -ErrorAction Stop).Source
+        $node = (Get-Command node -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         # EvidenceRoot is supplied by the owning wrapper, never by request.json.
         if ($EvidenceRoot.Contains('"')) { throw 'Invalid evidence path.' }
         $ownedNode = Start-Process -FilePath $node -WorkingDirectory (Join-Path $RepositoryRoot 'desktop') -WindowStyle Hidden -PassThru `
