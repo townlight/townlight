@@ -3,6 +3,33 @@ import { requestUleLibraryPostExit } from './ule-host-control.mjs';
 import { connectUleDesktop } from './ule-hosted-connect.mjs';
 import { signInUleActor } from './ule-actors.mjs';
 import { createUleFixtureConfig } from './ule-fixture-config.mjs';
+import { setTimeout as delay } from 'node:timers/promises';
+
+export async function waitForUleDesktopPage(browser, { timeout = 120000, poll = 250 } = {}) {
+  const deadline = Date.now() + timeout;
+
+  for (;;) {
+    const observed = browser
+      .contexts()
+      .flatMap((context) => context.pages())
+      .filter((candidate) => !candidate.isClosed())
+      .map((candidate) => ({ page: candidate, url: candidate.url() }));
+
+    const page = observed.find(({ url }) => !url.startsWith('devtools:'))?.page;
+    if (page) {
+      return page;
+    }
+
+    if (Date.now() >= deadline) {
+      const urls = observed.map(({ url }) => url);
+      throw new Error(
+        `Expected an active browser page after reconnecting ULE desktop; observed pages: ${urls.length ? urls.join(', ') : '(none)'}`,
+      );
+    }
+
+    await delay(poll);
+  }
+}
 
 export async function reconnectUleAfterLibrary({ pending, getBrowser, setBrowser, setPage, native, run }) {
   const receipt = await requestUleLibraryPostExit(pending);
@@ -16,10 +43,7 @@ export async function reconnectUleAfterLibrary({ pending, getBrowser, setBrowser
   const browser = await connectUleDesktop();
   setBrowser(browser);
 
-  const page = browser
-    .contexts()
-    .flatMap((context) => context.pages())
-    .find((candidate) => !candidate.url().startsWith('devtools:'));
+  const page = await waitForUleDesktopPage(browser);
 
   assert.ok(page, 'Expected an active browser page after reconnecting ULE desktop');
   setPage(page);
