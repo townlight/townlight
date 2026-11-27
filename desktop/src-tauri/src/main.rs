@@ -1477,7 +1477,12 @@ async fn library_request(
     use domain_client::DomainError;
     if shared_staff::configured() {
         let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
-        return department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Library, request, proof).await;
+        return department_workpapers_client::execute_publication(
+            department_workpapers_client::PublicationModule::Library,
+            request,
+            proof,
+        )
+        .await;
     }
     let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
@@ -1495,7 +1500,12 @@ async fn library_request(
         return Err(DomainError::denied());
     }
     let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
-    department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Library, request, proof).await
+    department_workpapers_client::execute_publication(
+        department_workpapers_client::PublicationModule::Library,
+        request,
+        proof,
+    )
+    .await
 }
 
 #[tauri::command]
@@ -1505,7 +1515,12 @@ async fn elections_request(
     use domain_client::DomainError;
     if shared_staff::configured() {
         let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
-        return department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Elections, request, proof).await;
+        return department_workpapers_client::execute_publication(
+            department_workpapers_client::PublicationModule::Elections,
+            request,
+            proof,
+        )
+        .await;
     }
     let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
     let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
@@ -1523,7 +1538,12 @@ async fn elections_request(
         return Err(DomainError::denied());
     }
     let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
-    department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Elections, request, proof).await
+    department_workpapers_client::execute_publication(
+        department_workpapers_client::PublicationModule::Elections,
+        request,
+        proof,
+    )
+    .await
 }
 
 #[tauri::command]

@@ -17,24 +17,11 @@ const ELECTIONS_SETTINGS: &str = "/desktop/v1/elections/settings";
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum UtilitiesRequest {
     Policies {},
-    RegisterPolicy {
-        payload: Value,
-    },
-    OpenRequest {
-        request_id: Uuid,
-    },
-    SaveDraft {
-        request_id: Uuid,
-        payload: Value,
-    },
-    ApproveReply {
-        request_id: Uuid,
-        payload: Value,
-    },
-    RetryReply {
-        request_id: Uuid,
-        payload: Value,
-    },
+    RegisterPolicy { payload: Value },
+    OpenRequest { request_id: Uuid },
+    SaveDraft { request_id: Uuid, payload: Value },
+    ApproveReply { request_id: Uuid, payload: Value },
+    RetryReply { request_id: Uuid, payload: Value },
 }
 
 #[derive(Deserialize)]
@@ -109,11 +96,7 @@ fn plan_utilities(
     request: UtilitiesRequest,
 ) -> Result<(Method, String, Option<Value>), DomainError> {
     let (method, path, body) = match request {
-        UtilitiesRequest::Policies {} => (
-            Method::GET,
-            format!("{UTILITIES_BASE}/policies"),
-            None,
-        ),
+        UtilitiesRequest::Policies {} => (Method::GET, format!("{UTILITIES_BASE}/policies"), None),
         UtilitiesRequest::RegisterPolicy { payload } => (
             Method::POST,
             format!("{UTILITIES_BASE}/policies"),
@@ -264,8 +247,7 @@ mod tests {
         assert_eq!(path, "/desktop/v1/utilities/policies");
         assert!(body.is_some());
 
-        let request_id =
-            Uuid::parse_str("00112233-4455-6677-8899-aabbccddeeff").unwrap();
+        let request_id = Uuid::parse_str("00112233-4455-6677-8899-aabbccddeeff").unwrap();
         let (method, path, body) = utilities_ok(UtilitiesRequest::OpenRequest { request_id });
         assert!(method == Method::GET);
         assert_eq!(
@@ -368,10 +350,8 @@ mod tests {
     fn publication_actions_use_module_base() {
         let id = Uuid::parse_str("00112233-4455-6677-8899-aabbccddeeff").unwrap();
 
-        let (method, path, body) = publication_ok(
-            PublicationModule::Library,
-            PublicationRequest::List {},
-        );
+        let (method, path, body) =
+            publication_ok(PublicationModule::Library, PublicationRequest::List {});
         assert!(method == Method::GET);
         assert_eq!(path, "/desktop/v1/library/items");
         assert!(body.is_none());
@@ -431,11 +411,9 @@ mod tests {
 
     #[test]
     fn library_settings_are_rejected() {
-        assert!(plan_publication(
-            PublicationModule::Library,
-            PublicationRequest::Settings {},
-        )
-        .is_err());
+        assert!(
+            plan_publication(PublicationModule::Library, PublicationRequest::Settings {},).is_err()
+        );
         assert!(plan_publication(
             PublicationModule::Library,
             PublicationRequest::SaveSettings {

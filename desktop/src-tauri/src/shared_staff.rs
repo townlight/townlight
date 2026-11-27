@@ -200,21 +200,15 @@ pub(crate) fn run_client_cli() -> Option<i32> {
                             .await
                             .map_err(|value| serde_json::json!(value))
                     }
-                    Request::UtilitiesRequest { request } => {
-                        crate::utilities_request(request)
-                            .await
-                            .map_err(|value| serde_json::json!(value))
-                    }
-                    Request::LibraryRequest { request } => {
-                        crate::library_request(request)
-                            .await
-                            .map_err(|value| serde_json::json!(value))
-                    }
-                    Request::ElectionsRequest { request } => {
-                        crate::elections_request(request)
-                            .await
-                            .map_err(|value| serde_json::json!(value))
-                    }
+                    Request::UtilitiesRequest { request } => crate::utilities_request(request)
+                        .await
+                        .map_err(|value| serde_json::json!(value)),
+                    Request::LibraryRequest { request } => crate::library_request(request)
+                        .await
+                        .map_err(|value| serde_json::json!(value)),
+                    Request::ElectionsRequest { request } => crate::elections_request(request)
+                        .await
+                        .map_err(|value| serde_json::json!(value)),
                     Request::ParksRequest { request } => crate::parks_request(request)
                         .await
                         .map_err(|value| serde_json::json!(value)),
