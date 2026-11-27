@@ -15,6 +15,7 @@ ALLOCATION = re.compile(
     r"|agenda-items(?:/[0-9a-f-]+/reviews)?|packets/[0-9a-f-]+/(?:council-preview|council-approval))"
     r"|requests(?:/[0-9a-f-]+/actions)?"
     r"|communications/articles(?:/[0-9a-f-]+/(?:revisions|attachments|records))?"
+    r"|(?:library|elections)/items(?:/[0-9a-f-]+/revisions)?"
     r"|parks/(?:catalog/(?:resource|program)|households|participants|bookings|sessions|registrations|refunds"
     r"|resources/[0-9a-f-]+/(?:closures|maintenance)"
     r"|attachments/(?:resource|program|booking|registration)/[0-9a-f-]+"

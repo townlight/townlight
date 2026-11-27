@@ -98,7 +98,15 @@ def test_read_request_returns_minimal_tracker_link(repo, principal):
     assert result == {
         "request_id": request_id,
         "resident_id": staff["tracking"],
+        "id": request_id,
+        "tracking": staff["tracking"],
+        "category": staff["category"],
+        "description": staff["description"],
+        "location": staff["location"],
+        "state": staff["state"],
+        "revision": staff["revision"],
     }
+    assert result["description"] == "Broken bin lid"
     assert "contact" not in result
     assert "resident_token_hash" not in result
     assert "email" not in result

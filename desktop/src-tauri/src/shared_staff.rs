@@ -124,6 +124,15 @@ pub(crate) fn run_client_cli() -> Option<i32> {
         CommunicationsRequest {
             request: crate::communications_client::CommunicationsRequest,
         },
+        UtilitiesRequest {
+            request: crate::department_workpapers_client::UtilitiesRequest,
+        },
+        LibraryRequest {
+            request: crate::department_workpapers_client::PublicationRequest,
+        },
+        ElectionsRequest {
+            request: crate::department_workpapers_client::PublicationRequest,
+        },
         ParksRequest {
             request: crate::parks_client::ParksRequest,
         },
@@ -188,6 +197,21 @@ pub(crate) fn run_client_cli() -> Option<i32> {
                     }
                     Request::CommunicationsRequest { request } => {
                         crate::communications_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::UtilitiesRequest { request } => {
+                        crate::utilities_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::LibraryRequest { request } => {
+                        crate::library_request(request)
+                            .await
+                            .map_err(|value| serde_json::json!(value))
+                    }
+                    Request::ElectionsRequest { request } => {
+                        crate::elections_request(request)
                             .await
                             .map_err(|value| serde_json::json!(value))
                     }

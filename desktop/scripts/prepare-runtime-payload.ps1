@@ -31,6 +31,9 @@ param(
     [string]$ServiceRequestsRoot = '',
     [string]$CommunicationsRoot = '',
     [string]$ParksRoot = '',
+    [string]$UtilitiesRoot = '',
+    [string]$LibraryRoot = '',
+    [string]$ElectionsRoot = '',
     [ValidateSet('planning-preview', 'planning-staff-beta', 'permitting-preview', 'inspections-preview')]
     [string]$PlanningBuildProfile = 'planning-preview',
     [switch]$SkipDownloads,
@@ -783,7 +786,7 @@ function Test-PythonServiceImports {
         $ImportNames += @("townlight_planning.migrations", "townlight_planning.workflow_store", "townlight_runtime.planning_bridge", "townlight_records.requests.planning_sources")
     }
     if ($ProductProfile -eq "inspections-preview") {
-        $ImportNames += @("townlight_311.workflow", "townlight_runtime.service_requests", "townlight_comms.workflow", "townlight_parks.workflow")
+        $ImportNames += @("townlight_311.workflow", "townlight_runtime.service_requests", "townlight_comms.workflow", "townlight_parks.workflow", "civicutility.workflow", "civiclibrary.publication", "civicelections.publication", "townlight_runtime.department_workpapers")
     }
     if ($ProductProfile -eq "meetings-beta") {
         $ImportNames += @(
@@ -896,6 +899,9 @@ function Install-PythonServicePackages {
                 'townlight/311' = $ServiceRequestsRoot
                 'townlight/comms' = $CommunicationsRoot
                 'townlight/parks' = $ParksRoot
+                'townlight/utility' = $UtilitiesRoot
+                'townlight/library' = $LibraryRoot
+                'townlight/elections' = $ElectionsRoot
             }
             foreach ($Repository in $MunicipalRoots.Keys) {
                 if (-not $MunicipalRoots[$Repository]) { throw "Explicit pinned source required: $Repository" }
@@ -1002,7 +1008,7 @@ function Install-PythonServicePackages {
     }
     if ($ProductProfile -in @("planning-preview", "permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_planning") }
     if ($ProductProfile -in @("permitting-preview", "inspections-preview")) { $InstalledPackages += @("townlight_permitting") }
-    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget", "townlight_grants", "townlight_311") }
+    if ($ProductProfile -eq "inspections-preview") { $InstalledPackages += @("townlight_inspections", "townlight-inspection-transcriber", "townlight_station", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget", "townlight_grants", "townlight_311", "civicutility", "civiclibrary", "civicelections") }
     if ($ProductProfile -eq "meetings-beta") {
         $InstalledPackages += @("townlight_meetings")
     }

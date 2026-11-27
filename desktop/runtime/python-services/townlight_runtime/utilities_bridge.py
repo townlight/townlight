@@ -121,7 +121,7 @@ class UtilitiesRequestBridge:
         self.repository = repository
 
     def read_request(self, principal: object, request_id: str) -> dict:
-        """Return only the stable request and resident-tracker references."""
+        """Return the staff request summary and opaque existing tracker link."""
         _authorize(principal)
         request_id = _request_id(request_id)
 
@@ -137,6 +137,13 @@ class UtilitiesRequestBridge:
         return {
             "request_id": request_id,
             "resident_id": tracking.strip(),
+            "id": request_id,
+            "tracking": tracking.strip(),
+            "category": request.get("category"),
+            "description": request.get("description"),
+            "location": request.get("location"),
+            "state": request.get("state"),
+            "revision": request.get("revision"),
         }
 
     def post_reply(

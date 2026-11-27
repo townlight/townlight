@@ -62,6 +62,16 @@ fn allocation_route(path: &str) -> bool {
                 _,
                 "revisions" | "attachments" | "records"
             ]
+            | ["", "desktop", "v1", "library" | "elections", "items"]
+            | [
+                "",
+                "desktop",
+                "v1",
+                "library" | "elections",
+                "items",
+                _,
+                "revisions"
+            ]
             | [
                 "",
                 "desktop",

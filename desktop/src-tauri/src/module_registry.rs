@@ -22,6 +22,9 @@ const MUNICIPAL_MODULES: &[&str] = &[
     "townlight_grants",
     "townlight_comms",
     "townlight_parks",
+    "townlight_utilities",
+    "townlight_library",
+    "townlight_elections",
     "townlight_311",
 ];
 

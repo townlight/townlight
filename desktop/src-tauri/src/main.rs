@@ -3,6 +3,7 @@ mod auth;
 mod code_client;
 mod communications_client;
 mod demo_fixture;
+mod department_workpapers_client;
 mod domain_client;
 mod domain_files;
 mod first_run;
@@ -173,6 +174,21 @@ fn navigation() -> Vec<NavigationItem> {
             id: "parks",
             label: "Parks and Recreation",
             description: "Facilities, reservations, registration and maintenance",
+        },
+        NavigationItem {
+            id: "utilities",
+            label: "Utilities",
+            description: "Approved policy replies to existing resident requests",
+        },
+        NavigationItem {
+            id: "library",
+            label: "Library",
+            description: "Approved programs and scheduled announcements",
+        },
+        NavigationItem {
+            id: "elections",
+            label: "Elections",
+            description: "Sourced checklists and designated official approval",
         },
         NavigationItem {
             id: "search",
@@ -535,6 +551,9 @@ async fn shared_app_state() -> Result<AppState, String> {
         "townlight_311",
         "townlight_comms",
         "townlight_parks",
+        "townlight_utilities",
+        "townlight_library",
+        "townlight_elections",
     ]
     .into_iter()
     .map(str::to_string)
@@ -568,6 +587,9 @@ async fn shared_app_state() -> Result<AppState, String> {
                         | "service-requests"
                         | "communications"
                         | "parks"
+                        | "utilities"
+                        | "library"
+                        | "elections"
                 )
             })
             .collect(),
@@ -1417,6 +1439,94 @@ async fn parks_request(
 }
 
 #[tauri::command]
+async fn utilities_request(
+    request: department_workpapers_client::UtilitiesRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return department_workpapers_client::execute_utilities(request, proof).await;
+    }
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_utilities")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_utilities"))
+        || (matches!(
+            &request,
+            department_workpapers_client::UtilitiesRequest::RegisterPolicy { .. }
+        ) && !access_is_local_admin(&access))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    department_workpapers_client::execute_utilities(request, proof).await
+}
+
+#[tauri::command]
+async fn library_request(
+    request: department_workpapers_client::PublicationRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Library, request, proof).await;
+    }
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_library")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_library"))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Library, request, proof).await
+}
+
+#[tauri::command]
+async fn elections_request(
+    request: department_workpapers_client::PublicationRequest,
+) -> Result<Value, domain_client::DomainError> {
+    use domain_client::DomainError;
+    if shared_staff::configured() {
+        let proof = shared_staff::proof().map_err(|_| DomainError::denied())?;
+        return department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Elections, request, proof).await;
+    }
+    let _guard = profile_gate::operation().map_err(|_| DomainError::maintenance())?;
+    let access = auth::require_signed_in_session().map_err(|_| DomainError::denied())?;
+    let selection = module_registry::module_selection_state().map_err(|_| DomainError::denied())?;
+    if selection.profile_id != "inspections-preview"
+        || !selection
+            .enabled_module_ids
+            .iter()
+            .any(|id| id == "townlight_elections")
+        || !access
+            .role
+            .as_deref()
+            .is_some_and(|role| auth::role_allows_module(role, "townlight_elections"))
+    {
+        return Err(DomainError::denied());
+    }
+    let proof = auth::domain_session_proof().map_err(|_| DomainError::denied())?;
+    department_workpapers_client::execute_publication(department_workpapers_client::PublicationModule::Elections, request, proof).await
+}
+
+#[tauri::command]
 async fn municipal_staff_request(
     request: municipal_staff::StaffRequest,
 ) -> Result<Value, domain_client::DomainError> {
@@ -1607,6 +1717,9 @@ pub fn run() {
         municipal_staff_request,
         service_requests_request,
         communications_request,
+        utilities_request,
+        library_request,
+        elections_request,
         parks_request,
         permitting_pick_bundle,
         planning_public_request,
@@ -1650,6 +1763,9 @@ pub fn run() {
                         | "meetings_domain_request"
                         | "service_requests_request"
                         | "communications_request"
+                        | "utilities_request"
+                        | "library_request"
+                        | "elections_request"
                         | "parks_request"
                         | "open_domain_exports"
                 )
