@@ -1,6 +1,66 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { savePublicationSource, approvePublicationSource, handoffPublicationSource,
   approvePublicationCommunication, linkPublicationReceipt, readPublicationHistory } from '../installed/ule-publication.mjs';
+
+test('native error envelope survives actual evaluate serialization', async ({ page }) => {
+  const source = await readFile(new URL('../installed/maintenance.mjs', import.meta.url), 'utf8');
+  const start = source.indexOf('const native =');
+  const end = source.indexOf('\nconst accepted =', start);
+  expect(start).toBeGreaterThan(-1);
+  expect(end).toBeGreaterThan(start);
+  const snippet = source.slice(start, end);
+  const native = new Function('page', snippet + ';return native;')(page);
+
+  await page.evaluate(() => {
+    window.__TAURI_INTERNALS__ ||= {};
+    window.__TAURI_INTERNALS__.invoke = async () => {
+      throw { code: 'service-unavailable', message: 'Synthetic unavailable', outcome_unknown: true, private_notes: 'DO-NOT-COPY' };
+    };
+  });
+
+  let capturedError;
+  try {
+    await native('communications_request', {});
+  } catch (error) {
+    capturedError = error;
+  }
+  expect(capturedError).toBeTruthy();
+  expect(capturedError.message).toBe('Synthetic unavailable');
+  expect(capturedError.code).toBe('service-unavailable');
+  expect(capturedError.outcome_unknown).toBe(true);
+  expect(capturedError.private_notes).toBeUndefined();
+});
+
+test('Library handoff failure saves safe correlated diagnostics without retry', async ({ page }) => {
+  const id = '11111111-1111-4111-8111-111111111111';
+  const sha = 'a'.repeat(64);
+  const source = { id, revision: 1, sha256: sha, content: { title: 'Fixture', starts_at: '2027-01-01T12:00:00Z', location: 'Room', description: 'Public', extra_private: 'SECRET' }, approval: { revision: 1, sha256: sha, actor_id: 'official', name: 'Official', approved_at: 'now', extra_private: 'SECRET' }, private_notes: 'SECRET', author: { secret: 'SECRET' } };
+  const calls = [];
+  const originalError = Object.assign(new Error('Synthetic unavailable'), { code: 'service-unavailable', outcome_unknown: true, private_notes: 'SECRET' });
+  const native = async (command, { request }) => {
+    calls.push([command, request.operation]);
+    if (command === 'communications_request') throw originalError;
+    if (command === 'library_request') return { result: source };
+  };
+  const saved = [];
+  const save = async (name, payload) => { saved.push([name, payload]); };
+  let caught;
+  try { await handoffPublicationSource(page, { native, kind: 'library', id, save }); } catch (error) { caught = error; }
+  expect(caught).toBe(originalError);
+  expect(calls).toEqual([['library_request', 'get'], ['communications_request', 'source'], ['library_request', 'source']]);
+  expect(saved).toHaveLength(1);
+  const [name, payload] = saved[0];
+  expect(name).toBe('ule-library-handoff-failure');
+  expect(payload.lookup).toEqual({ command: 'communications_request', operation: 'source', payload: { kind: 'library', id } });
+  expect(payload.lookup_error).toEqual({ code: 'service-unavailable', message: 'Synthetic unavailable', outcome_unknown: true });
+  expect(payload.source_probe).toEqual({ id, revision: 1, sha256: sha, content: { title: 'Fixture', starts_at: '2027-01-01T12:00:00Z', location: 'Room', description: 'Public' }, approval: { revision: 1, sha256: sha, actor_id: 'official', name: 'Official', approved_at: 'now' } });
+  const json = JSON.stringify(payload);
+  expect(json).not.toContain('SECRET');
+  expect(json).not.toContain('private_notes');
+  expect(json).not.toContain('author');
+  expect(json).not.toContain('extra_private');
+});
 
 // Helper contract check against actual rendered views. The in-memory transport is
 // a fixture, not installed authorization, publication, or Records acceptance.

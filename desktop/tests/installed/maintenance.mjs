@@ -15,27 +15,29 @@ let browser = mode==='ule-recovery' ? await connectUleDesktop() : await chromium
 let page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
 assert(page, 'Installed WebView page is absent');
 const run = async name => page.evaluate(await readFile(new URL(name, import.meta.url), 'utf8'));
-const native = (command, args={}) => page.evaluate(async ({command,args}) => {
-  try {
-    return await window.__TAURI_INTERNALS__.invoke(command,args);
-  } catch (error) {
-    if (typeof error === 'string') throw new Error(error);
-    const safe = {};
-    if (error && typeof error === 'object') {
-      for (const key of ['code','message','retryable','status']) {
-        if (error[key] !== undefined) safe[key] = error[key];
+const native = async (command, args={}) => {
+  const envelope = await page.evaluate(async ({command,args}) => {
+    try {
+      return {ok:true, result: await window.__TAURI_INTERNALS__.invoke(command,args)};
+    } catch (error) {
+      if (typeof error === 'string') return {ok:false, error:{message:error}};
+      const safe = {};
+      if (error && typeof error === 'object') {
+        if (typeof error.code === 'string') safe.code = error.code;
+        if (typeof error.message === 'string') safe.message = error.message;
+        if (typeof error.outcome_unknown === 'boolean') safe.outcome_unknown = error.outcome_unknown;
       }
+      if (typeof safe.message !== 'string') safe.message = 'Native command failed';
+      return {ok:false, error:safe};
     }
-    const detail = typeof safe.message === 'string' ? safe.message
-      : safe.code !== undefined ? String(safe.code)
-      : 'Native command failed';
-    const wrapped = new Error(detail);
-    if (safe.code !== undefined) wrapped.code = safe.code;
-    if (safe.retryable !== undefined) wrapped.retryable = safe.retryable;
-    if (safe.status !== undefined) wrapped.status = safe.status;
-    throw wrapped;
-  }
-}, {command,args});
+  }, {command,args});
+  if (envelope.ok) return envelope.result;
+  const detail = typeof envelope.error?.message === 'string' ? envelope.error.message : 'Native command failed';
+  const wrapped = new Error(detail);
+  if (envelope.error?.code !== undefined) wrapped.code = envelope.error.code;
+  if (envelope.error?.outcome_unknown !== undefined) wrapped.outcome_unknown = envelope.error.outcome_unknown;
+  throw wrapped;
+};
 const accepted = result => { assert.equal(result?.accepted, true, JSON.stringify(result)); return result; };
 const save = async (name, value) => writeFile(path.join(output,name+'.json'), JSON.stringify(value,null,2));
 const admin = async () => {

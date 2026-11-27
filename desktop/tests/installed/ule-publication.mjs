@@ -139,14 +139,66 @@ export async function approvePublicationSource(page, { native, kind, id }) {
   return approved;
 }
 
+function errorProjection(error) {
+  const out = {};
+  if (typeof error?.code === 'string') out.code = error.code;
+  if (typeof error?.message === 'string') out.message = error.message;
+  if (typeof error?.outcome_unknown === 'boolean') out.outcome_unknown = error.outcome_unknown;
+  return out;
+}
+
+function failedSourceProjection(source) {
+  const approval = {};
+  for (const field of ['revision', 'sha256']) {
+    if (Object.hasOwn(source?.approval ?? {}, field)) approval[field] = source.approval[field];
+  }
+  return { id: source?.id, revision: source?.revision, sha256: source?.sha256, approval };
+}
+
+function sourceProbeProjection(kind, source) {
+  const content = {};
+  for (const field of kindFields(kind)) {
+    if (Object.hasOwn(source?.content ?? {}, field)) content[field] = source.content[field];
+  }
+  const approval = {};
+  for (const field of ['revision', 'sha256', 'actor_id', 'name', 'approved_at']) {
+    if (Object.hasOwn(source?.approval ?? {}, field)) approval[field] = source.approval[field];
+  }
+  return { id: source?.id, revision: source?.revision, sha256: source?.sha256, content, approval };
+}
+
+async function handoffFailureEvidence(native, kind, id, source, lookupError) {
+  const base = {
+    lookup: { command: 'communications_request', operation: 'source', payload: { kind, id } },
+    source: failedSourceProjection(source),
+    lookup_error: errorProjection(lookupError),
+  };
+  try {
+    const probe = await call(native, `${kind}_request`, { operation: 'source', id });
+    return { ...base, source_probe: sourceProbeProjection(kind, probe) };
+  } catch (probeError) {
+    return { ...base, source_probe_error: errorProjection(probeError) };
+  }
+}
+
 /** Saves and requests review; approval remains an explicit caller-controlled action. */
-export async function handoffPublicationSource(page, { native, kind, id, expectedArticleId }) {
+export async function handoffPublicationSource(page, { native, kind, id, expectedArticleId, save }) {
   const source = await sourceRead(native, kind, id);
   assert.equal(source.approval?.sha256, source.sha256, 'source must be approved');
   if (kind === 'elections' && source.revision > 1) assert.ok(expectedArticleId, 'correction target required');
-  const resolved = await call(native, 'communications_request', {
-    operation: 'source', payload: { kind, id },
-  });
+  let resolved;
+  try {
+    resolved = await call(native, 'communications_request', {
+      operation: 'source', payload: { kind, id },
+    });
+  } catch (error) {
+    if (typeof save === 'function') {
+      try {
+        await save(`ule-${kind}-handoff-failure`, await handoffFailureEvidence(native, kind, id, source, error));
+      } catch {}
+    }
+    throw error;
+  }
   const reference = resolved.reference;
   assert.deepEqual(reference, { kind, id, revision: source.sha256, sha256: source.sha256,
     title: source.content.title, url: `/desktop/v1/${kind}/items/${id}/source`, eligible: true });

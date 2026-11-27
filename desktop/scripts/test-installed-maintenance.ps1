@@ -261,6 +261,20 @@ function Run-Installed([string]$Phase) {
         if ($Phase -eq 'community') { $communityReady = $true }
       } finally { Pop-Location }
     } finally {
+      if ($Phase -eq 'ule' -or $Phase -eq 'ule-upgrade') {
+        foreach ($logPair in @(
+          @{ Source = (Join-Path $profile 'Data/logs/python-services.log'); Dest = 'ule-precleanup-python-services.log' },
+          @{ Source = (Join-Path $profile 'Data/logs/postgres.log'); Dest = 'ule-precleanup-postgres.log' }
+        )) {
+          try {
+            if (Test-Path -LiteralPath $logPair.Source -PathType Leaf) {
+              Copy-Item -LiteralPath $logPair.Source -Destination (Join-Path $EvidenceRoot $logPair.Dest) -ErrorAction Stop
+            }
+          } catch {
+            Write-Warning "ULE pre-cleanup diagnostic copy failed for $($logPair.Source): $($_.Exception.Message)"
+          }
+        }
+      }
       if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
         # This Process object is the exact executable launched by this function.
         Stop-Process -Id $script:ownedApp.Id -Force

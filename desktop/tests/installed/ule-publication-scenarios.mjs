@@ -56,7 +56,7 @@ export async function installedUlePublications({
   const comms = async (kind, source, expectedArticleId) => {
     await actor('clerk');
     await navigate(kind);
-    const article = await handoffPublicationSource(page, { native, kind, id: source.id, expectedArticleId });
+    const article = await handoffPublicationSource(page, { native, kind, id: source.id, expectedArticleId, save });
     await actor('communicationsApprover');
     await navigate('communications');
     return approvePublicationCommunication(page, { native, article });
