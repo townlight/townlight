@@ -1619,8 +1619,12 @@
           "health_check": "python-services"
         }
       ],
-      "migrations": [],
-      "tasks": [],
+      "migrations": [
+        "utilities-sqlite-schema-v1"
+      ],
+      "tasks": [
+        "utilities-policy-reply"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/utilities.sqlite3"
@@ -1670,8 +1674,12 @@
           "health_check": "python-services"
         }
       ],
-      "migrations": [],
-      "tasks": [],
+      "migrations": [
+        "library-sqlite-schema-v1"
+      ],
+      "tasks": [
+        "library-program-review"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/library.sqlite3"
@@ -1683,7 +1691,6 @@
         "uninstall": "backup-first-profile-removal"
       },
       "source_commit": "a718ade5e034e9218ec4f5b146e7a467735abe3b",
-      "source_commit_note": "temporary current base pin; coordinator will update to final commit before candidate build",
       "proof_required": [
         "installed_library_workflow"
       ]
@@ -1722,8 +1729,12 @@
           "health_check": "python-services"
         }
       ],
-      "migrations": [],
-      "tasks": [],
+      "migrations": [
+        "elections-sqlite-schema-v1"
+      ],
+      "tasks": [
+        "elections-checklist-review"
+      ],
       "model_needs": [],
       "backup_restore_hooks": [
         "Data/elections.sqlite3",
@@ -1736,7 +1747,6 @@
         "uninstall": "backup-first-profile-removal"
       },
       "source_commit": "54168e2158eb4e0f9356ed980916e2a5d43327d8",
-      "source_commit_note": "temporary current base pin; coordinator will update to final commit before candidate build",
       "proof_required": [
         "installed_elections_workflow"
       ]
