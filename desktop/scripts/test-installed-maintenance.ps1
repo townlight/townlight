@@ -302,11 +302,11 @@ try {
   if ($Mode -eq 'upgrade') {
     $previous=Join-Path $env:RUNNER_TEMP 'townlight-previous-release'
     New-Item -ItemType Directory -Path $previous | Out-Null
-    gh release download townlight-windows-v1.9.3.2 --repo townlight/townlight --pattern '*.msi' --dir $previous
+    gh release download townlight-windows-v1.10.0.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
     if ($LASTEXITCODE -ne 0) { throw 'Previous public MSI download failed.' }
     $old=@(Get-ChildItem -LiteralPath $previous -Filter '*.msi' -File)
-    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77') { throw 'Previous release identity mismatch.' }
-    Install-Candidate $old[0].FullName 'baseline-1.9.3.2'
+    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '8845a59ed5846f7ee3bd196f290610aa5d9c14dbd0794cf99f44f09d6ee55ea8') { throw 'Previous release identity mismatch.' }
+    Install-Candidate $old[0].FullName 'baseline-1.10.0.1'
     Run-Installed 'seed'
     $marker=Join-Path $profile 'Data\maintenance-retention.txt'
     [IO.File]::WriteAllText($marker,'Synthetic Windows maintenance retention marker')
