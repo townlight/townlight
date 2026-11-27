@@ -3,6 +3,8 @@ param(
   [ValidateSet('fresh','upgrade','recorder','community','ule','ule-upgrade')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
   [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA,
+  [string]$PortalCheckout,
+  [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedPortalCommit,
   [switch]$UnsignedRecorderCandidate,
   [ValidatePattern('^[0-9a-f]{64}$')][string]$ExpectedMsiSha256
 )
@@ -12,6 +14,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'installed-ule-postexit.ps1')
 . (Join-Path $PSScriptRoot 'installed-ule-verify.ps1')
 . (Join-Path $PSScriptRoot 'installed-ule-reopen.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-portal-source.ps1')
 . (Join-Path $PSScriptRoot 'ule-preservation.ps1')
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
@@ -23,9 +26,29 @@ if ($ExpectedMsiSha256) {
   if ((Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedMsiSha256) { throw 'Candidate artifact hash differs.' }
 }
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$script:communityPortalRoot = Join-Path $repo 'portal'
+if ([bool]$PortalCheckout -ne [bool]$ExpectedPortalCommit) { throw 'PortalCheckout and ExpectedPortalCommit must be supplied together.' }
+$portalSourceProof = $null
+if ($PortalCheckout) {
+  $portalSourceProof = Resolve-UlePortalSource -PortalCheckout $PortalCheckout -ExpectedPortalCommit $ExpectedPortalCommit -SignedSourceCommit $SourceCommit
+  $script:communityPortalRoot = $portalSourceProof.portal_root
+}
 $candidateVersion = (Get-Content (Join-Path $repo 'config/inspections-msi-candidate.json') -Raw | ConvertFrom-Json).windows_product_version
 $EvidenceRoot = [IO.Path]::GetFullPath($EvidenceRoot)
 New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
+if ($portalSourceProof) {
+  $harnessCommit = & git -C $repo rev-parse HEAD
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve harness commit.' }
+  $harnessCommit = $harnessCommit.Trim()
+  [ordered]@{
+    msi_source_commit = $SourceCommit
+    portal_commit = $portalSourceProof.portal_commit
+    harness_commit = $harnessCommit
+    portal_root = $portalSourceProof.portal_root
+    validator_sha256 = $portalSourceProof.validator_sha256
+    changed_paths = $portalSourceProof.changed_paths
+  } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'three-source-identities.json') -Encoding UTF8
+}
 $profile = Join-Path $env:LOCALAPPDATA 'CivicSuite'
 if (Test-Path -LiteralPath $profile) { throw 'Clean installed acceptance requires an absent pre-existing Townlight profile.' }
 $exe = Join-Path $env:ProgramFiles 'Townlight\townlight-desktop.exe'
@@ -49,7 +72,7 @@ function Resolve-CommunityPython {
   return $command.Source
 }
 function Assert-CommunityTestTools([string]$Python) {
-  $portalRoot = Join-Path $repo 'portal'
+  $portalRoot = $script:communityPortalRoot
   Push-Location $portalRoot
   try {
     & $Python -c "import aiosmtpd, django, portal, waitress, cryptography"
@@ -59,7 +82,7 @@ function Assert-CommunityTestTools([string]$Python) {
 function Start-CommunityFixture([string]$Python) {
   $fixtureRoot = Join-Path $EvidenceRoot 'community-fixture'
   New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
-  $portalRoot = Join-Path $repo 'portal'
+  $portalRoot = $script:communityPortalRoot
   $scriptPath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\tests\installed\community-services.py'))
   if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) { throw "Community fixture script is absent: $scriptPath" }
   if (-not (Test-Path -LiteralPath $portalRoot -PathType Container)) { throw "Portal root is absent: $portalRoot" }
