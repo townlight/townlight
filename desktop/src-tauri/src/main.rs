@@ -1921,6 +1921,9 @@ mod tests {
             "service-requests",
             "communications",
             "parks",
+            "utilities",
+            "library",
+            "elections",
         ];
         let main_js = include_str!("../../src/main.js");
         let start = main_js

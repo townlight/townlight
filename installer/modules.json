@@ -63,7 +63,10 @@
         "townlight_grants",
         "townlight_311",
         "townlight_comms",
-        "townlight_parks"
+        "townlight_parks",
+        "townlight_utilities",
+        "townlight_library",
+        "townlight_elections"
       ],
       "disabled": false,
       "development_only": false
@@ -325,8 +328,8 @@
         "backup",
         "restore"
       ],
-      "current_version": "1.8.0.dev5",
-      "source_commit": "eaaab2294ee3ce9dd62fdb61e9c581bf453c9202",
+      "current_version": "1.8.0.dev6",
+      "source_commit": "1a6ae14ca2d4d6d42c684d0c257bf392fdee8378",
       "routes": [
         {
           "id": "records-requests",
@@ -1479,7 +1482,7 @@
       "selectable": true,
       "required": false,
       "townlight_core_requirement": "1.3.0.dev2",
-      "current_version": "0.2.0",
+      "current_version": "0.2.1",
       "installer_status": "windows_candidate_acceptance_pending",
       "dependencies": [
         "townlight_core",
@@ -1520,7 +1523,7 @@
         "disable": "profile-selection",
         "uninstall": "backup-first-profile-removal"
       },
-      "source_commit": "8ec0061daaddb55100f437f0f4b71627b88e2561",
+      "source_commit": "dc9ed4cc2fe42d7ae1fcc01c81267d7e6c8f63f0",
       "proof_required": [
         "installed_communications_workflow"
       ]
@@ -1580,6 +1583,162 @@
       "source_commit": "f9617ce680a0c22cf15dce2022480ec7a0a11bf9",
       "proof_required": [
         "installed_parks_workflow"
+      ]
+    },
+    {
+      "id": "townlight_utilities",
+      "display_name": "Townlight Utilities",
+      "repo": "townlight/utility",
+      "tier": 3,
+      "role": "utilities workflow",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_records",
+        "townlight_311"
+      ],
+      "routes": [
+        {
+          "id": "utilities",
+          "label": "Utilities",
+          "path": "/utilities",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "townlight_utilities"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/utilities.sqlite3"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "5ee09fba3154c7d6a5e8b01f4a2ea73004afd682",
+      "proof_required": [
+        "installed_utilities_workflow"
+      ]
+    },
+    {
+      "id": "townlight_library",
+      "display_name": "Townlight Library",
+      "repo": "townlight/library",
+      "tier": 3,
+      "role": "library workflow",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_records",
+        "townlight_comms"
+      ],
+      "routes": [
+        {
+          "id": "library",
+          "label": "Library",
+          "path": "/library",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "townlight_library"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/library.sqlite3"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "a718ade5e034e9218ec4f5b146e7a467735abe3b",
+      "source_commit_note": "temporary current base pin; coordinator will update to final commit before candidate build",
+      "proof_required": [
+        "installed_library_workflow"
+      ]
+    },
+    {
+      "id": "townlight_elections",
+      "display_name": "Townlight Elections",
+      "repo": "townlight/elections",
+      "tier": 3,
+      "role": "elections workflow",
+      "selectable": true,
+      "required": false,
+      "townlight_core_requirement": "1.3.0.dev2",
+      "current_version": "0.2.0",
+      "installer_status": "windows_candidate_acceptance_pending",
+      "dependencies": [
+        "townlight_core",
+        "townlight_records",
+        "townlight_comms"
+      ],
+      "routes": [
+        {
+          "id": "elections",
+          "label": "Elections",
+          "path": "/elections",
+          "surface": "Staff"
+        }
+      ],
+      "permissions": [
+        "townlight_elections"
+      ],
+      "services": [
+        {
+          "id": "python-services",
+          "kind": "bundled-python",
+          "health_check": "python-services"
+        }
+      ],
+      "migrations": [],
+      "tasks": [],
+      "model_needs": [],
+      "backup_restore_hooks": [
+        "Data/elections.sqlite3",
+        "config/elections-officials.json"
+      ],
+      "lifecycle": {
+        "install": "bundled-profile-payload",
+        "update": "verified-candidate-payload",
+        "disable": "profile-selection",
+        "uninstall": "backup-first-profile-removal"
+      },
+      "source_commit": "54168e2158eb4e0f9356ed980916e2a5d43327d8",
+      "source_commit_note": "temporary current base pin; coordinator will update to final commit before candidate build",
+      "proof_required": [
+        "installed_elections_workflow"
       ]
     }
   ]

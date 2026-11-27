@@ -7,6 +7,9 @@ import { createGrantsView } from "./grants/view.ts";
 import { createServiceRequestsView } from "./service-requests/view.ts";
 import { createCommunicationsView } from "./communications/view.ts";
 import { createParksView } from "./parks/view.ts";
+import { createUtilitiesView } from "./utilities/view.ts";
+import { createLibraryView } from "./library/view.ts";
+import { createElectionsView } from "./elections/view.ts";
 import { createRecordsRenderer } from "./records/view.js";
 import { createRecordsController } from "./records/controller.ts";
 import { createMeetingsView } from "./meetings/view.js";
@@ -23,7 +26,7 @@ import { bindMeetingsSources } from "./records/meetings-sources.ts";
 import { bindCodeSources } from "./records/code-sources.ts";
 import { bindZoningSources } from "./records/zoning-sources.ts";
 
-const municipalAreas = ["boards", "contracts", "procurement", "data", "budget", "grants", "service-requests", "communications", "parks"];
+const municipalAreas = ["boards", "contracts", "procurement", "data", "budget", "grants", "service-requests", "communications", "parks", "utilities", "library", "elections"];
 const openHallIcon = new URL("../src-tauri/icons/icon.ico", import.meta.url).href;
 const municipalView = createMunicipalView(invoke, escapeHtml, openMunicipalLink);
 const dataView = createDataView(invoke, escapeHtml);
@@ -59,12 +62,29 @@ const parksView = createParksView(invoke, {
   openRecords: openModuleRecords,
   openServiceRequest: openModuleServiceRequest
 });
+const utilitiesView = createUtilitiesView(invoke, {
+  get isAdmin() { return accessState().role === "local-admin"; }
+});
+const libraryView = createLibraryView(invoke, {
+  get isAdmin() { return accessState().role === "local-admin"; },
+  openCommunications: openDepartmentCommunications
+});
+const electionsView = createElectionsView(invoke, {
+  get isAdmin() { return accessState().role === "local-admin"; },
+  openCommunications: openDepartmentCommunications
+});
+async function openDepartmentCommunications(seed) {
+  if (!areaIsEnabled("communications") || !municipalAccess("communications")) throw new Error("Communications are unavailable.");
+  state.activeArea = "communications";
+  render();
+  await communicationsView.prepareSource(seed);
+}
 let municipalRecord = null;
 
 function municipalAccess(area) {
   const access = accessState();
   return access.signed_in && !isPublicSurface()
-    && (["local-admin", "city-staff"].includes(access.role) || ((area === "boards" || area === "budget" || area === "service-requests" || area === "communications" || area === "parks") && access.role === "clerk"));
+    && (["local-admin", "city-staff"].includes(access.role) || ((area === "boards" || area === "budget" || area === "service-requests" || area === "communications" || area === "parks" || area === "utilities" || area === "library" || area === "elections") && access.role === "clerk"));
 }
 
 function openMunicipalLink(area, id) {
@@ -135,7 +155,7 @@ const PRODUCT_MODULE_IDS_BY_PROFILE = {
   "city-core": CITY_CORE_PRODUCT_MODULE_IDS,
   "zoning-beta": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning"],
   "planning-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning"],
-  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget", "townlight_grants", "townlight_311", "townlight_comms", "townlight_parks"],
+  "inspections-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting", "townlight_inspections", "townlight_boards", "townlight_contracts", "townlight_procurement", "townlight_data", "townlight_budget", "townlight_grants", "townlight_311", "townlight_comms", "townlight_parks", "townlight_utilities", "townlight_library", "townlight_elections"],
   "permitting-preview": [...CITY_CORE_PRODUCT_MODULE_IDS, "townlight_zoning", "townlight_planning", "townlight_permitting"]
 };
 const MODULE_AREA_BY_ID = {
@@ -155,6 +175,9 @@ const MODULE_AREA_BY_ID = {
   "service-requests": "townlight_311",
   communications: "townlight_comms",
   parks: "townlight_parks",
+  utilities: "townlight_utilities",
+  library: "townlight_library",
+  elections: "townlight_elections",
   notice: "townlight_notice",
   access: "townlight_access"
 };
@@ -5221,6 +5244,15 @@ function renderActiveArea() {
   } else if (state.activeArea === "parks") {
     return municipalAccess("parks") ? parksView.render()
       : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
+  } else if (state.activeArea === "utilities") {
+    return municipalAccess("utilities") ? utilitiesView.render()
+      : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
+  } else if (state.activeArea === "library") {
+    return municipalAccess("library") ? libraryView.render()
+      : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
+  } else if (state.activeArea === "elections") {
+    return municipalAccess("elections") ? electionsView.render()
+      : '<section><h2>Staff access required</h2><p>Sign in with an authorized Townlight staff account.</p></section>';
   }
   if (municipalAreas.includes(state.activeArea)) {
     return municipalAccess(state.activeArea) ? municipalView.render(state.activeArea)
@@ -5353,6 +5385,7 @@ function render() {
     clearAccountWork();
     publicMeetingsView.reset(); publicCodeView.reset();
     noticeView.reset(); planningView.reset(); publicPlanningView.reset(); permittingView.reset(); inspectionsView.reset();
+    utilitiesView.reset(); libraryView.reset(); electionsView.reset(); communicationsView.reset();
     planningAccount = account;
   }
   if (state.appLoadError) {
@@ -5411,6 +5444,12 @@ function bindEvents() {
     void communicationsView.bind(document);
   } else if (state.activeArea === "parks" && municipalAccess("parks")) {
     void parksView.bind(document);
+  } else if (state.activeArea === "utilities" && municipalAccess("utilities")) {
+    void utilitiesView.bind(document);
+  } else if (state.activeArea === "library" && municipalAccess("library")) {
+    void libraryView.bind(document);
+  } else if (state.activeArea === "elections" && municipalAccess("elections")) {
+    void electionsView.bind(document);
   } else if (municipalAreas.includes(state.activeArea) && municipalAccess(state.activeArea)) {
     void municipalView.bind(state.activeArea, accessState().role === "local-admin", municipalRecord);
   }

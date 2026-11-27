@@ -2,6 +2,8 @@
 
 # Townlight Windows Local Runtime
 
+Runtime **0.5.0** candidate adds authoritative host Utilities, Library, and Elections SQLite workpapers through the existing 311, Communications, and Records flows. See the [candidate guide](../../docs/windows-utilities-library-elections.md). Source checks only; signed installed acceptance is pending.
+
 This directory defines the desktop supervisor contract for the Windows Local
 1.0 profile.
 

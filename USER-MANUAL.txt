@@ -1,10 +1,12 @@
-## Windows 1.9.3.2 current release
+## Windows 1.10.0.1 current published release
 
-Townlight for Windows 1.9.3.2 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md).
+Townlight for Windows 1.10.0.1 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
 
-[Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/HANDOFF-Windows-1.9.3.2.md)
+[Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/HANDOFF-Windows-1.10.0.1.md)
 
-Windows x64 Beta 1 · MSI 1.9.3.2
+Candidate 1.11.0.1 is unpublished; see the [candidate guide](docs/windows-utilities-library-elections.md). Signed installed acceptance for the candidate is pending.
+
+Windows x64 Beta 1 · MSI 1.10.0.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 

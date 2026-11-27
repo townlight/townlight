@@ -1,5 +1,9 @@
 # Townlight desktop
 
+Candidate **1.11.0-1** (MSI **1.11.0.1**) is unpublished. The public signed baseline remains **1.10.0.1**, and candidate signed installed acceptance is pending. See the [candidate guide](../docs/windows-utilities-library-elections.md).
+
+## Historical planning notes
+
 Planning **1.5.1-beta.1** is in [release preparation](../docs/installer/planning-layouts-beta-preparation.md).
 The merged [Planning staff workspace layouts](../docs/desktop/planning-workspace.md)
 add the analyses list and Draft, Reviewed and public-preview workflow. This source

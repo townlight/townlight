@@ -3,7 +3,7 @@
   "development_only": false,
   "sources": {
     "townlight/core": "2f6ba9be4a95e3772dc47a3682ac780c5283b626",
-    "townlight/sunshine": "eaaab2294ee3ce9dd62fdb61e9c581bf453c9202",
+    "townlight/sunshine": "1a6ae14ca2d4d6d42c684d0c257bf392fdee8378",
     "townlight/meetings": "93fea47d9528e283c5835a1ef568f3f0cfa1fd56",
     "townlight/ordinances": "296c13ac9075ed2849098952dcb1fddfbf4e8cd4",
     "townlight/zone": "25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4",
@@ -20,7 +20,10 @@
     "townlight/budget": "180fa171f1ec511936fd5c7368d2c15988522b13",
     "townlight/grants": "790892f620767a2fcaf6b8f072ff45df15a963c1",
     "townlight/311": "e97872e3bbba5bb512d3231f689dbc66f1104134",
-    "townlight/comms": "8ec0061daaddb55100f437f0f4b71627b88e2561",
-    "townlight/parks": "f9617ce680a0c22cf15dce2022480ec7a0a11bf9"
+    "townlight/comms": "dc9ed4cc2fe42d7ae1fcc01c81267d7e6c8f63f0",
+    "townlight/parks": "f9617ce680a0c22cf15dce2022480ec7a0a11bf9",
+    "townlight/utility": "5ee09fba3154c7d6a5e8b01f4a2ea73004afd682",
+    "townlight/library": "a718ade5e034e9218ec4f5b146e7a467735abe3b",
+    "townlight/elections": "54168e2158eb4e0f9356ed980916e2a5d43327d8"
   }
 }

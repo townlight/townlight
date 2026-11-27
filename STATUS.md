@@ -42,7 +42,7 @@ Status labels below are the suite's shared status set, generated from
 - **Candidate â€” installed acceptance pending:** Prepared software; completion and publication require the recorded exact-candidate acceptance.
 - **Published beta capability:** Available in a published bounded Townlight desktop beta or recorded standalone release; select the documented profile and read its limits.
 
-## Module Status (20 kept modules)
+## Module Status (23 kept modules)
 
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
@@ -66,6 +66,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight 311 | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 | Townlight Communications | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 | Townlight Parks | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
+| Townlight Utilities | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
+| Townlight Library | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
+| Townlight Elections | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
 
 <!-- END GENERATED MODULE STATUS -->
 

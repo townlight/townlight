@@ -1,3 +1,5 @@
+**Unpublished candidate:** Windows 1.11.0.1. The public signed baseline remains Windows 1.10.0.1, and signed installed acceptance for the candidate is pending. See the [candidate guide](docs/windows-utilities-library-elections.md).
+
 ## Townlight for Windows 1.10.0.1
 
 The signed Windows beta includes three new workspaces.
