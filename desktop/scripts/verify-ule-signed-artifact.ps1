@@ -24,7 +24,7 @@ try {
     foreach ($entry in $archive.Entries) {
         if ($entry.FullName -cnotin $expectedEntries -or $entry.Length -gt 2147483647 -or $entry.Length -le 0) { throw 'Unexpected or oversized signed ZIP entry.' }
     }
-    $ownedRoot = Join-Path $env:RUNNER_TEMP ("ule-signed-artifact-" + [guid]::NewGuid().ToString('N'))
+    $ownedRoot = Join-Path $env:RUNNER_TEMP ("u-" + [guid]::NewGuid().ToString('N'))
     [IO.Directory]::CreateDirectory($ownedRoot) | Out-Null
     foreach ($entry in $archive.Entries) {
         [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $ownedRoot $entry.FullName), $false)
@@ -51,7 +51,7 @@ $signatureVerifier = Join-Path $PSScriptRoot 'verify-publication-signature.ps1'
 & $signatureVerifier -Path $msiPath *> (Join-Path $ownedRoot 'msi-signature.log')
 $msiSignature = Get-AuthenticodeSignature -LiteralPath $msiPath
 if ($msiSignature.SignerCertificate.Subject -cne $rf.subject -or $msiSignature.TimeStamperCertificate.Subject -cne $rf.timestamp_subject) { throw 'Actual MSI certificate metadata differs from receipt.' }
-$administrativeRoot = Join-Path $ownedRoot 'administrative'
+$administrativeRoot = Join-Path $ownedRoot 'a'
 [IO.Directory]::CreateDirectory($administrativeRoot) | Out-Null
 $extractionLog = Join-Path $ownedRoot 'administrative-extraction.log'
 # Administrative extraction does not register or install the product.
