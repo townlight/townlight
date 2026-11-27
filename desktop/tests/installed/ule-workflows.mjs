@@ -71,7 +71,15 @@ export async function uleWorkflows(config) {
   const secondID = second.requestId;
 
   await config.switchActor('unauthorized');
-  await assert.rejects(async () => config.native('utilities_request', { request: { operation: 'open-request', request_id: firstID } }));
+  await assert.rejects(
+    async () => config.native('utilities_request', { request: { operation: 'open-request', request_id: firstID } }),
+    (error) => {
+      assert.strictEqual(error?.code, 'access-denied');
+      assert.strictEqual(error?.outcome_unknown, false);
+      return true;
+    }
+  );
+  await config.save('ule-utility-unauthorized-denied', { requestId: firstID, code: 'access-denied', denied: true });
   await config.switchActor('administrator');
 
   const publications = await installedUlePublications(config);
