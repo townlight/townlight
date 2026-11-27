@@ -286,7 +286,7 @@
         "development": "1.8.0.dev5",
         "released": null,
         "installer": "1.8.0.dev5",
-        "public_status": "1.8.0.dev4"
+        "public_status": "1.8.0.dev5"
       },
       "release": {
         "tag": null,
@@ -306,7 +306,7 @@
         "availability": "runtime",
         "arch_tier": 1,
         "legacy_grade": "released",
-        "public_status_released_at": "2026-11-09"
+        "public_status_released_at": "2026-11-27"
       },
       "installer": {
         "tier": 1,

@@ -47,7 +47,7 @@ Status labels below are the suite's shared status set, generated from
 | Module | Version | Status | Released | Note |
 |---|---|---|---|---|
 | Townlight Core | 1.3.0.dev2 | Shared platform | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
-| Townlight Records | 1.8.0.dev4 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
+| Townlight Records | 1.8.0.dev5 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 | Townlight Meetings | 1.0.6 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Code | 1.0.9 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |
 | Townlight Access | 0.5.0 | Published beta capability | 2026-11-09 | Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module. |

@@ -61,14 +61,14 @@
       "id": "townlight_records",
       "name": "Townlight Records",
       "arch_tier": 1,
-      "current_version": "1.8.0.dev4",
+      "current_version": "1.8.0.dev5",
       "townlight_core_requirement": "1.3.0.dev2",
       "public_status": {
         "grade": "released",
-        "released_date": "2026-11-09",
+        "released_date": "2026-11-27",
         "release_url_state": "released",
-        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.2.1",
-        "note": "Included in Windows 1.9.2.1. See the signed release for current installed checks and limits; this does not create a standalone release of the module."
+        "release_url": "https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1",
+        "note": "Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance."
       }
     },
     {
