@@ -16,7 +16,7 @@ function Get-InspectionsBuildContract {
         $Overlay.productName -ne 'Townlight' -or
         $Overlay.bundle.windows.wix.upgradeCode -ne '0b97efae-2a2e-4e88-a81c-3aad1a52c2cc' -or
         $Contract.inspections_package_version -ne '0.3.0+dev.2' -or $Contract.permitting_package_version -ne '0.3.0+dev.2' -or
-        $Contract.core_package_version -ne '1.3.0.dev2' -or $Contract.records_package_version -ne '1.8.0.dev6' -or
+        $Contract.core_package_version -ne '1.3.0.dev2' -or $Contract.records_package_version -ne '1.8.0.dev7' -or
         $Contract.service_requests_package_version -ne '0.2.0' -or
         $Contract.planning_package_version -ne '0.4.0.dev2' -or
         $Contract.meetings_package_version -ne '1.0.6' -or $Contract.code_package_version -ne '1.0.9' -or

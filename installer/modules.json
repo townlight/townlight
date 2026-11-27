@@ -328,8 +328,8 @@
         "backup",
         "restore"
       ],
-      "current_version": "1.8.0.dev6",
-      "source_commit": "1a6ae14ca2d4d6d42c684d0c257bf392fdee8378",
+      "current_version": "1.8.0.dev7",
+      "source_commit": "6f375cf0b81a88b4bb89e00a5076b665cad889d9",
       "routes": [
         {
           "id": "records-requests",
