@@ -183,6 +183,11 @@ class CommunicationsPublicationTests(TestCase):
             article["id"], article["revision"]["title"], first_artifact
         )
         self.assertEqual(self.post(first, article["id"], 1).status_code, 200)
+        self.assertGreater(article["current_revision"], 1)
+        first_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertNotContains(
+            first_response, 'class="corrected-publication"', status_code=200
+        )
 
         article = self.repository.edit(
             article["id"],
@@ -201,9 +206,20 @@ class CommunicationsPublicationTests(TestCase):
         self.assertEqual(
             self.post(correction, article["id"], 2).json()["status"], "applied"
         )
+        corrected_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertContains(
+            corrected_response, 'class="corrected-publication"', status_code=200
+        )
+        self.assertContains(corrected_response, "Corrected public summary.")
 
         stale = self.post(first, article["id"], 1)
         self.assertEqual(stale.status_code, 409)
+
+        retried = self.post(correction, article["id"], 2)
+        self.assertEqual(retried.json()["status"], "unchanged")
+        retried_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertContains(retried_response, 'class="corrected-publication"')
+        self.assertEqual(ArticlePublicationRevision.objects.count(), 2)
 
         withdrawal = self.bundle(article["id"], article["revision"]["title"])
         self.assertEqual(

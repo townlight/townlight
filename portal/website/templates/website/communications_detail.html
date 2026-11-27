@@ -5,6 +5,7 @@
 <article class="container">
   <nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/communications/">Public communications</a></nav>
   <h1>{{ article.title }}</h1>
+  {% if is_corrected %}<p class="corrected-publication">Corrected</p>{% endif %}
   {% if article.language %}<p class="muted">Language: <span lang="{{ article.language }}">{{ article.language }}</span></p>{% endif %}
   <div class="article-body">{{ article.body|linebreaks }}</div>
   {% if sources %}
