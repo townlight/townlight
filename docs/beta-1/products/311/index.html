@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Townlight 311 - resident service request support for Townlight</title>
+<style>
+.skip{position:absolute;left:-9999px;top:0;background:#fff;color:#17202a;padding:12px 16px;border-radius:0 0 12px 0;z-index:100;font-weight:800}.skip:focus{left:0;outline:4px solid #d8ad48}body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background:linear-gradient(135deg,#eef8ff,#fff8ed)}main,header,footer{width:min(1080px,calc(100% - 32px));margin:auto}header{padding:56px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#244f73;font-weight:800}h1{font:700 clamp(2.5rem,7vw,5.5rem)/.95 Georgia,serif;margin:.1em 0}.lede{font-size:1.25rem;line-height:1.6;max-width:820px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:rgba(255,255,255,.88);border:1px solid #dac7a4;border-radius:24px;padding:24px;box-shadow:0 18px 36px #26323b18}.badge{display:inline-block;background:#214f7a;color:white;padding:.5rem .8rem;border-radius:999px;font-weight:900}.callout{background:#fff7e6;border:1px solid #d8ad48;border-left:8px solid #d8ad48;border-radius:18px;padding:20px 24px;margin:24px 0;box-shadow:0 12px 24px #26323b12}.callout h2{margin-top:0}a{color:#244f73}:focus-visible{outline:4px solid #d8ad48;outline-offset:3px}@media(max-width:720px){.grid{grid-template-columns:1fr}header{padding-top:34px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header>
+  <p class="eyebrow">Townlight / Townlight 311</p>
+  <h1>Resident requests routed without black-box dispatch.</h1>
+  <p class="lede">Townlight 311 is the Townlight module for resident service-request intake, privacy-aware tracking, staff workflow, records, notifications, and Open311-compatible interchange.</p>
+  <div class="callout"><h2>Townlight for Windows 1.10.0.1</h2><p><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download the signed Windows 1.10.0.1 installer</a> · <a href="https://townlight.github.io/manuals/311.html">311 manual</a> · <a href="https://townlight.github.io/api/candidate-1.10.0.1/311.html">API reference</a></p></div>
+</header>
+<main id="main">
+  <section class="grid" aria-label="Townlight 311 overview">
+    <article class="card">
+      <h2>Service requests and tracking</h2>
+      <ul>
+        <li>Resident intake with resident photos and privacy-aware tracking; resident-facing tracking does not expose internal detail. The recovery flow is designed so staff never disclose another resident's data.</li>
+        <li>Department queues, assignment and transfer, staff lifecycle, duplicate handling, and reopen.</li>
+        <li>SMTP notifications with a durable outbox and states <code>sent</code>, <code>pending</code>, <code>failed</code>, and <code>uncertain</code>. Delivery is not guaranteed.</li>
+        <li>Open311 authenticated catalogue, read, and create with JSON/XML for the supported subset only. This is <strong>not full Open311 conformance</strong>.</li>
+        <li>CSV/JSON import up to <strong>2 MiB</strong> and <strong>1000 rows</strong>, keyed by stable external IDs plus a source key, with an exact preview hash. Export is capped at <strong>10,000 requests</strong>; an export that would exceed the cap fails rather than truncating.</li>
+        <li>Records/Data output: ZIP archives report the actual bytes written plus the operation history.</li>
+        <li>Parks maintenance linked to resident service requests.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h2>Roles and Records/Data receiving</h2>
+      <p>Existing native roles are <code>local-admin</code>, <code>city-staff</code>, and <code>clerk</code>. Clerk gets 311 only. Records/Data receiving requires additional permissions and is not granted automatically by the Clerk role.</p>
+    </article>
+    <article class="card">
+      <h2>Deployment requirements</h2>
+      <p>The resident portal and SMTP must be <strong>separately deployed and configured</strong>. Notification delivery is not guaranteed; <code>uncertain</code> means delivery status is unknown after a send was attempted.</p>
+      <p>A placeholder checklist is not promoted as a workflow. Use the configured portal and SMTP setup for the environment.</p>
+    </article>
+    <article class="card">
+      <h2>Explicit limits</h2>
+      <p>Townlight 311 does not dispatch crews, create official work orders, handle emergencies, provide legal advice, call live LLMs, write back to 311 systems, or replace a 311 system of record. Open311 support is the authenticated supported subset only; it is not full Open311 conformance.</p>
+    </article>
+
+    <article class="card">
+      <h2>Repository and manual</h2>
+      <p><a href="https://github.com/townlight/311">github.com/townlight/311</a></p>
+      <p><a href="https://github.com/townlight/311/blob/main/README.md">README on GitHub main</a> and <a href="https://github.com/townlight/311/blob/main/USER-MANUAL.md">USER-MANUAL.md on GitHub main</a>.</p>
+    </article>
+  </section>
+
+
+</main>
+<footer><p>AGPL-3.0 code. CC BY 4.0 docs.</p></footer>
+</body>
+</html>

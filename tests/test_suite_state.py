@@ -52,12 +52,12 @@ def test_records_product_is_a_system_and_publication_is_recorded() -> None:
     assert records["status"] == "candidate"
     assert records["public_website_status"] == "prepared; unpublished candidate"
     release = state["desktop_release"]
-    assert release["version"] == "1.9.3-2"
-    assert release["tag"] == "townlight-windows-v1.9.3.2"
+    assert release["version"] == "1.10.0-1"
+    assert release["tag"] == "townlight-windows-v1.10.0.1"
     assert release["channel"] == "public-beta"
-    assert release["published_at"] == "2026-11-24"
-    assert release["runtime_version"] == "0.3.4"
-    assert release["commit"] == "67d56f24c12be4f2a409d1940ca4199a226adcfc"
+    assert release["published_at"] == "2026-11-27"
+    assert release["runtime_version"] == "0.4.0"
+    assert release["commit"] == "d1687e6950032352f74a2890d0b2fbce107ce131"
     prior_handoff = ROOT / "release" / "CANDIDATE-Windows-1.9.2.1.md"
     assert (
         "Suite commit `1bc45be5a14aa969e53b87b1cef1f278dadc79a4`"

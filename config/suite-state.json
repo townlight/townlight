@@ -12,13 +12,13 @@
     "legacy_organizations": []
   },
   "desktop_release": {
-    "version": "1.9.3-2",
-    "tag": "townlight-windows-v1.9.3.2",
-    "commit": "67d56f24c12be4f2a409d1940ca4199a226adcfc",
+    "version": "1.10.0-1",
+    "tag": "townlight-windows-v1.10.0.1",
+    "commit": "d1687e6950032352f74a2890d0b2fbce107ce131",
     "channel": "public-beta",
-    "published_at": "2026-11-24",
+    "published_at": "2026-11-27",
     "asset_policy": "windows-msi",
-    "runtime_version": "0.3.4"
+    "runtime_version": "0.4.0"
   },
   "asset_policies": {
     "windows-msi": [
@@ -286,7 +286,7 @@
         "development": "1.8.0.dev5",
         "released": null,
         "installer": "1.8.0.dev5",
-        "public_status": "1.8.0.dev4"
+        "public_status": "1.8.0.dev5"
       },
       "release": {
         "tag": null,
@@ -306,7 +306,7 @@
         "availability": "runtime",
         "arch_tier": 1,
         "legacy_grade": "released",
-        "public_status_released_at": "2026-11-09"
+        "public_status_released_at": "2026-11-27"
       },
       "installer": {
         "tier": 1,
@@ -1140,8 +1140,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-27"
       },
       "installer": {
         "tier": 3,
@@ -1192,8 +1192,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-27"
       },
       "installer": {
         "tier": 3,
@@ -1246,8 +1246,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-27"
       },
       "installer": {
         "tier": 3,

@@ -2,14 +2,12 @@
 
 ## Status and scope
 
-**Candidate identifier:** Windows `1.10.0.1`, runtime `0.4.0`.
+**Release:** Windows `1.10.0.1`, runtime `0.4.0`.
 
-This guide documents the current candidate for Townlight 311, Townlight Communications, and Townlight Parks. It is an operator, administrator, and integration reference for the supplied source tree and manuals. Target platform: Windows.
+This guide documents the Windows release of Townlight 311, Townlight Communications, and Townlight Parks. It is an operator, administrator, and integration reference for the supplied source tree and manuals. Target platform: Windows.
 
-- The candidate is unpublished; no public download is available yet.
-- The public Windows release `1.9.3.2` does not include these candidate modules.
-- Source-level checks passed for this candidate. Installed acceptance and upgrade evidence remain pending.
-- This document is not a release note, acceptance record, or marketing claim.
+- [Download the signed Windows installer](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi).
+- Hosted Windows and two-PC verification covered 311, Communications and Parks. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
 - Existing staff authentication and native session proof remain the access model.
 - The manuals and source tree are the source of truth. Where a UI label, endpoint, or command is not present in the supplied material, this guide describes it as a configuration reference or integration question.
 
@@ -231,7 +229,7 @@ Supported source identifiers:
 
 The resolver returns a reference with `kind: "parks"`, the original identifier, revision digest, title, public URL, SHA-256 digest, and `eligible: true`, plus the captured content. Invalid identifiers return `422`; ineligible sources return `404`; invalid source responses return `503`.
 
-Source-level checks passed for this resolver. Installed behavior remains pending.
+The published API reference documents the resolver contract.
 
 ---
 
@@ -312,7 +310,7 @@ Payments and refunds:
 - Fee arithmetic is in integer cents with an explicit currency.
 - Deposits and refunds are represented in integer cents with the session currency.
 - Offline payments and refunds are recorded in an append-only ledger. Each entry carries the staff actor and a reference. Corrections are made by adding an opposite entry, not by editing history. Receipts are issued from ledger records.
-- The hosted Stripe adapter is optional. In this source candidate no Stripe account is configured and no live charge is verified.
+- The hosted Stripe adapter is optional. In this release no Stripe account is configured and no live charge is verified.
 - When configured by an operator, the host creates a Checkout session for a specific obligation, the resident completes Checkout at the hosted provider, and the host retrieves the provider transaction and verifies transaction identity, amount, currency, and obligation identity against its own records. Only after that verification does the host append a ledger payment.
 - Provider return URLs are not payment proof. A resident returning from a cancelled or interrupted Checkout is not evidence of payment.
 - Card data does not enter Townlight; only provider identifiers and verified amounts are recorded.
@@ -339,7 +337,7 @@ Parks failures and constraints:
 
 - Parks migrations are required. In the supplied source, the runtime refuses to start Parks when `townlight_parks` migrations are not applied.
 - Production bootstrap is `False`. Tables are created only through explicit, programmatic migrations from the package migrations module. This guide does not invent migration command-line syntax.
-- The optional hosted Stripe path is documented as when-configured. Live payment processing is not verified in this candidate.
+- The optional hosted Stripe path is documented as when-configured. Live payment processing is not verified in this release.
 - Notifications are queued. Queued is not delivered.
 
 ---
@@ -394,7 +392,7 @@ The portal uses these source-confirmed settings where applicable:
 
 `TOWNLIGHT_SECRET_KEY`, `TOWNLIGHT_DEBUG`, `TOWNLIGHT_ALLOWED_HOSTS`, `TOWNLIGHT_CSRF_TRUSTED_ORIGINS`, `TOWNLIGHT_TRUST_TLS_PROXY`, `TOWNLIGHT_DB`, `TOWNLIGHT_STATIC_ROOT`, `TOWNLIGHT_MEDIA_ROOT`, `TOWNLIGHT_BRAND`, `TOWNLIGHT_BASE_URL`, `TOWNLIGHT_RELEASE_ROOT`.
 
-These portal settings are not configured by the Windows candidate installer.
+These portal settings are not configured by the Windows installer.
 
 ### Portal selection contract pointer
 
@@ -533,7 +531,7 @@ Restore preserves the relationship between durable command identities, ledger en
 - Payment intents and refund intents persist across restart.
 - Ambiguous provider outcomes are reconciled before retry.
 - If restoring to an earlier host queue, reconcile its state against the website before sending further revisions.
-- Upgrade evidence for the candidate is pending. The installed candidate has not been validated for upgrade preservation, migration, or rollback.
+- Upgrade from Windows 1.9.3.2 preserved the existing profile. See the release acceptance for the tested backup, restore and uninstall paths.
 
 ---
 
@@ -554,7 +552,7 @@ Restore preserves the relationship between durable command identities, ledger en
 | Website publication stays queued or retrying | The website has not confirmed the action. The host delivers queued copies and withdrawals after staff sign out. Refresh the meeting/publication status before treating a copy or withdrawal as live. |
 | Portal publication credentials fail | Verify the Windows token file, website digest file, canonical HTTPS origin, TLS trust, and header preservation on `/townlight/v1/publications/`. Rotate the matching files to replace the token; remove the digest file to revoke delivery. |
 | Resident command pump or Communications host does not start | Check `TOWNLIGHT_SHARED_STAFF_HOST=1` and `TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN`, plus the required repository and email settings shown in source. |
-| Parks payment stays ambiguous | Provider return URLs are not payment proof. Verify the provider transaction, amount, currency, and obligation identity. Reconcile before retry. No live charge is verified in this candidate. |
+| Parks payment stays ambiguous | Provider return URLs are not payment proof. Verify the provider transaction, amount, currency, and obligation identity. Reconcile before retry. No live charge is verified in this release. |
 | Parks waitlist promotion or attendance retried | Durable command identity and idempotent check-in prevent duplicates. If the result is unclear, inspect durable state rather than repeating the action. |
 | Shutdown reports a worker did not stop cleanly | The runtime raises after attempting to stop product threads. Restart after checking durable queue and provider state. A resumed job is not delivery evidence. |
 
@@ -562,16 +560,13 @@ Restore preserves the relationship between durable command identities, ledger en
 
 ## 9. Acceptance and factual notes
 
-- **Installed acceptance is pending.** Source-level checks passed; installed behavior remains pending.
-- **Upgrade evidence is pending.** Upgrade preservation, migration, and rollback are not demonstrated for this candidate.
-- **Public release exclusion:** Windows release `1.9.3.2` does not include these candidate modules.
-- **No public download yet:** Windows `1.10.0.1` / runtime `0.4.0` is an unpublished candidate.
+- Windows 1.10.0.1 passed hosted Windows and physical two-PC acceptance. [Read the acceptance report](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
 - **No automatic website or SMTP claim:** The Windows application does not automatically publish a website and does not configure SMTP. The public portal is a separate configured deployment.
-- **No live Stripe claim:** The hosted Stripe adapter is optional and no live charge is verified in this candidate.
-- **Communications Parks source adapter:** The supplied source implements the Parks source resolver. Source-level checks passed; installed verification is pending.
+- **No live Stripe claim:** The hosted Stripe adapter is optional and no live charge is verified in this release.
+- **Communications Parks source adapter:** The supplied source implements the Parks source resolver. See the release acceptance for exercised source types.
 - **Parks HTTP contract:** A complete Parks HTTP endpoint list is not present in the supplied material. The source-confirmed routes used by the Communications resolver are listed in Section 6.
 - **Migration syntax:** Parks migrations are programmatic. This guide does not invent command-line syntax for migrations.
 - **Role matrix:** `local-admin` and `city-staff` have all profile-module capabilities; `clerk` has Meetings/Notice/Access/311/Communications/Parks and no Records/Code/Data capability; `records-staff` has Records only; `code-staff` has Code only.
-- **Windows target:** This guide covers the Windows candidate.
+- **Windows target:** This guide covers the Windows release.
 
-This document describes the current candidate state only. It is not an acceptance record and does not establish installed, signed, released, or upgraded status.
+[Windows 1.10.0.1 release, source, and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1).

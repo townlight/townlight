@@ -2,7 +2,7 @@
 
 Shared staff uses one Windows host as the system of record. It runs the same signed Townlight desktop and bundled runtime as the workstations. The host owns the PostgreSQL database, managed files, recording hardware and Station. The staff workstations open the existing Townlight desktop in shared mode. Their edits go to the city host, and downloaded files are copies. The normal stand-alone install does not enable this mode.
 
-Townlight for Windows 1.9.3.2 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md).
+Townlight for Windows 1.10.0.1 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
 
 ## Prepare the city host
 

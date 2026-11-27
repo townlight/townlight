@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Townlight Communications 1.10.0.1 — Windows public beta</title>
+<meta name="description" content="Draft, approve, publish and archive city communications in Townlight for Windows 1.10.0.1.">
+<style>
+:root{color-scheme:light;--ink:#17202a;--muted:#40515f;--navy:#174f6f;--blue:#244f73;--gold:#d8ad48;--paper:#fffdf8;--line:#dac7a4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(135deg,#fff8ed,#eef8ff);line-height:1.6}main,header,footer{width:min(1080px,calc(100% - 32px));margin:auto}header{padding:56px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:var(--blue);font-weight:800;margin:0 0 .7rem}h1{font:700 clamp(2.5rem,7vw,5.5rem)/.95 Georgia,serif;margin:.1em 0;max-width:12ch}.lede{font-size:1.2rem;max-width:850px}.notice{background:var(--paper);border:1px solid var(--line);border-left:8px solid var(--navy);border-radius:18px;padding:1rem 1.25rem;max-width:900px}.badge{display:inline-block;background:var(--navy);color:#fff;padding:.45rem .8rem;border-radius:999px;font-weight:800;letter-spacing:.02em}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 18px 36px #26323b18}.card h2,.card h3{margin-top:0;line-height:1.2}.card p:last-child,.card ul:last-child{margin-bottom:0}.wide{grid-column:1/-1}.section-head{margin:2.5rem 0 1rem}.section-head h2{font:700 clamp(1.6rem,4vw,2.4rem)/1.1 Georgia,serif;margin:.2rem 0}.section-head p{max-width:760px;margin:.3rem 0 0;color:var(--muted)}a{color:var(--blue);text-underline-offset:.18em;font-weight:650}a:hover{text-decoration-thickness:3px}:focus-visible{outline:4px solid var(--gold);outline-offset:3px;border-radius:4px}.skip{position:absolute;left:-9999px;top:0;background:#fff;color:var(--navy);padding:.8rem 1rem;z-index:2}.skip:focus{left:16px;top:16px}code{background:#edf3f7;padding:.1rem .3rem;border-radius:4px;word-break:break-word}.status-list{list-style:none;padding:0;margin:0}.status-list li{padding:.7rem 0;border-top:1px solid var(--line)}.status-list li:first-child{border-top:0;padding-top:0}.label{display:block;font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;font-weight:800;color:var(--muted)}.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:0;list-style:none;counter-reset:step}.flow li{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1rem;counter-increment:step}.flow li::before{content:counter(step);display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;margin-bottom:.55rem;border-radius:50%;background:var(--navy);color:#fff;font-weight:800}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:#fff}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;vertical-align:top;padding:.9rem 1rem;border-bottom:1px solid #e8ddc8}th{background:#eef6fb;font-size:.9rem}tr:last-child td{border-bottom:0}nav ul{display:flex;flex-wrap:wrap;gap:.45rem 1.2rem;padding:0;margin:1.2rem 0 0;list-style:none}footer{padding:24px 0 48px;color:var(--muted)}.parks{border-left:8px solid var(--gold);background:#fffaf0}@media(max-width:800px){.flow{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}header{padding-top:34px}h1{max-width:14ch}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{body{background:#fff}.card,.notice{box-shadow:none}.skip{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header>
+  <p class="eyebrow">Townlight / Townlight Communications</p>
+  <h1>Source-backed public communications.</h1>
+  <p class="lede">Townlight Communications is a Windows suite integration for drafting, reviewing, approving, scheduling, correcting, and archiving city communications while keeping the source trail attached.</p>
+  <p><span class="badge">Windows public beta 1.10.0.1</span></p>
+  <div class="notice">
+    <p><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download the signed Windows 1.10.0.1 installer</a> · <a href="https://townlight.github.io/manuals/communications.html">Communications manual</a> · <a href="https://townlight.github.io/api/candidate-1.10.0.1/comms.html">API reference</a></p>
+  </div>
+  <nav aria-label="Page sections">
+    <ul>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#capabilities">Capabilities</a></li>
+      <li><a href="#screens">Screens</a></li>
+      <li><a href="#roles">Roles and handoffs</a></li>
+      <li><a href="#it-configuration">IT configuration</a></li>
+      <li><a href="#limits">Limits</a></li>
+      <li><a href="#evidence">Installed verification</a></li>
+      <li><a href="#links">Source links</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main">
+  <section aria-labelledby="how-it-works">
+    <div class="section-head">
+      <p class="eyebrow">Workflow</p>
+      <h2 id="how-it-works">How it works</h2>
+      <p>Each public item follows an explicit path from source selection to a durable public record. Staff approval stays human and tied to the exact revision reviewed.</p>
+    </div>
+    <ol class="flow">
+      <li><strong>Source</strong><br>Select a supported source and verify that it is public, current, and eligible for publication.</li>
+      <li><strong>Draft</strong><br>Draft in plain text with source references attached. Editing clears prior approval.</li>
+      <li><strong>Review</strong><br>Preview the exact revision, access report, and source snapshots before sign-off.</li>
+      <li><strong>Approve and schedule</strong><br>Record the approval hash, actor, and time; schedule portal or email delivery.</li>
+      <li><strong>Publish and preserve</strong><br>Capture receipts, corrections, withdrawals, source snapshots, and a Records archive entry.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="capabilities">
+    <div class="section-head">
+      <p class="eyebrow">Staff and resident workflows</p>
+      <h2 id="capabilities">Communications capabilities</h2>
+
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Drafting and review</h3>
+        <ul>
+          <li>Source-backed draft review with public eligibility checked at runtime.</li>
+          <li>Exact-revision previews and explicit human approvals.</li>
+          <li>Edit invalidation, stale-review prevention, and optimistic revision checks across two-PC work.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Publishing and history</h3>
+        <ul>
+          <li>Scheduled publication to the resident portal and email.</li>
+          <li>Correction and withdrawal with ordered publication history.</li>
+          <li>Source snapshots and a Records archive containing published revisions and receipts.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Resident experience</h3>
+        <ul>
+          <li>Approved article list and detail in the resident portal.</li>
+          <li>Subscriber confirmation, preferences, and unsubscribe.</li>
+          <li>No resident access to staff drafts or private source data.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Evidence and controls</h3>
+        <ul>
+          <li>Source references retain kind, identifier, revision, digest, and public URL.</li>
+          <li>Approval hashes and content digests support exact-revision accountability.</li>
+          <li>Visible queued, delivered, and failed states; destructive actions require confirmation.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="screens">
+    <div class="section-head">
+      <p class="eyebrow">Interface outline</p>
+      <h2 id="screens">Screens, without mock screenshots</h2>
+      <p>The staff workspace and resident portal provide different views of the same publication.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Staff Communications workspace</h3>
+        <p>Saved draft list and filters, source picker, plain-text editor, exact-revision preview, Access review, approval, scheduling, delivery status, correction and withdrawal, and Records archive.</p>
+      </article>
+      <article class="card">
+        <h3>Resident portal</h3>
+        <p>Approved article list and article detail, plus subscription confirmation, preferences, and unsubscribe. Staff drafts and private source data are not exposed.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="roles">
+    <div class="section-head">
+      <p class="eyebrow">Responsibility</p>
+      <h2 id="roles">Roles and handoffs</h2>
+      <p>The design reuses the existing staff shell and existing administrator, city-staff, and clerk grants. No new authentication provider is introduced.</p>
+    </div>
+    <div class="grid">
+      <article class="card"><h3>Author or editor</h3><p>Selects sources, prepares plain text, and resolves source or access issues beside the relevant field.</p></article>
+      <article class="card"><h3>Reviewer or clerk</h3><p>Reviews the exact revision and access report, records explicit approval, and schedules the approved item.</p></article>
+      <article class="card"><h3>IT or city operator</h3><p>Uses the Windows suite and existing city configuration, including encrypted SMTP settings. There is no package or pip installation path for the city operator.</p></article>
+      <article class="card"><h3>Resident subscriber</h3><p>Confirms opt-in, manages preferences or unsubscribes, and reads only approved public articles.</p></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="it-configuration">
+    <div class="section-head">
+      <p class="eyebrow">Deployment</p>
+      <h2 id="it-configuration">IT configuration</h2>
+    </div>
+    <div class="grid">
+      <article class="card wide">
+        <ul>
+          <li><strong>Platform:</strong> Windows suite integration; the Communications source is under development.</li>
+          <li><strong>Identity:</strong> native staff authentication and existing administrator, city-staff, and clerk grants.</li>
+          <li><strong>Runtime boundary:</strong> native staff gateway under <code>/desktop/v1/communications</code>; fixed allowlisted browser commands, with no arbitrary URL access.</li>
+          <li><strong>Data:</strong> durable Communications domain with immutable revisions, source snapshots, approvals, schedules, delivery state, and Records archive.</li>
+          <li><strong>Email:</strong> existing city SMTP transport and encrypted settings, with a separate Communications outbox and visible uncertain-send state.</li>
+          <li><strong>Installation:</strong> included in the signed Windows suite installer.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits">
+    <div class="section-head">
+      <p class="eyebrow">Scope boundaries</p>
+      <h2 id="limits">Limits and non-claims</h2>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Not included</h3>
+        <ul>
+          <li>No social channels.</li>
+          <li>No AI automation.</li>
+          <li>Staff approval required before scheduled publication.</li>
+          <li>No campaign or advocacy content.</li>
+          <li>No legal advice or certified translations.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Human control</h3>
+        <p>Staff approval remains explicit. Missing, private, or stale sources block approval. Manual source-backed content does not require AI. Subscriptions are opt-in, and future mail excludes unsubscribed recipients.</p>
+      </article>
+      <article class="card parks wide">
+        <h3>Parks integration</h3>
+        <p>Staff can select eligible public Parks sources for a Communications draft.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="evidence"><h2 id="evidence">Installed Windows verification</h2><p>After the desktop closed, the scheduled article went live, its email reached the test mailbox, and Records archived the published revision. <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Release acceptance</a>.</p></section>
+
+  <section aria-labelledby="links">
+    <div class="section-head">
+      <p class="eyebrow">Repository</p>
+      <h2 id="links">Source links</h2>
+      <p>Find source code and design details in the module repository.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>Repository</h3>
+        <p><a href="https://github.com/townlight/comms">townlight/comms on GitHub</a></p>
+      </article>
+      <article class="card">
+        <h3>README and design manual</h3>
+        <p><a href="https://github.com/townlight/comms/blob/main/README.md">README on GitHub blob main</a><br>
+        <a href="https://github.com/townlight/comms/blob/main/USER-MANUAL.md">User manual on GitHub blob main</a><br>
+        <a href="https://github.com/townlight/comms/blob/main/COMMUNICATIONS-DESIGN.md">Communications design manual on GitHub blob main</a></p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>AGPL-3.0 code; CC BY 4.0 documentation.</p>
+</footer>
+</body>
+</html>
