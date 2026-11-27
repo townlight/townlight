@@ -11,7 +11,7 @@ _CANON_KEYS = {
 }
 _REF_KEYS = {"kind", "id", "revision", "title", "url", "sha256", "eligible"}
 _ATT_KEYS = {"id", "name", "media_type", "size", "sha256", "public"}
-_KINDS = {"meetings", "code", "notice", "311", "parks"}
+_KINDS = {"meetings", "code", "notice", "311", "parks", "library", "elections"}
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _RESERVED = {
     "CON", "PRN", "AUX", "NUL", "CLOCK$",
