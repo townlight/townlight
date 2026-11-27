@@ -1,90 +1,144 @@
-name: Installed community existing signed candidate
+name: Installed ULE signed candidate
 
 on:
-  push:
-    branches: [acceptance/windows-community-11001]
   workflow_dispatch:
+    inputs:
+      signing_run_id:
+        description: Signing workflow run ID
+        required: true
+        type: string
+      build_run_id:
+        description: Build workflow run ID
+        required: true
+        type: string
+      source_commit:
+        description: Source commit
+        required: true
+        type: string
+      intake_sha256:
+        description: Intake SHA-256
+        required: true
+        type: string
+      unsigned_msi_sha256:
+        description: Unsigned MSI SHA-256
+        required: true
+        type: string
+      msi_sha256:
+        description: Signed MSI SHA-256
+        required: true
+        type: string
+      exe_sha256:
+        description: Signed EXE SHA-256
+        required: true
+        type: string
+      mode:
+        description: Installer test mode
+        required: true
+        type: choice
+        options:
+          - ule
+          - ule-upgrade
+        default: ule
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}/${{ github.ref }}/${{ inputs.mode }}
   cancel-in-progress: false
 
 jobs:
-  installed-community-existing-candidate:
+  installed-ule-signed-candidate:
     runs-on: windows-latest
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
         with:
           path: townlight
+          fetch-depth: 0
 
-      - uses: actions/download-artifact@v4
+      - name: Download signed native payload
+        uses: actions/download-artifact@v4
         with:
-          name: townlight-windows-local-msi-SIGNED
-          run-id: 45863660564
+          name: signed-native-payload
+          run-id: ${{ inputs.signing_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: msi-artifact
+          path: signed-artifact
 
-      - uses: actions/setup-node@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: 22
           cache: npm
           cache-dependency-path: townlight/desktop/package-lock.json
 
-      - name: Set up community Python
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
-      - name: Install existing desktop test tools
-        working-directory: townlight/desktop
+      - name: Install desktop dependencies
         run: npm ci
+        working-directory: townlight/desktop
 
-      - name: Install community portal and test fixture dependencies
+      - name: Install portal locked dependencies
+        run: pip install --require-hashes -r requirements.lock
         working-directory: townlight/portal
-        run: |
-          python -m pip install --require-hashes -r requirements.lock
-          python -m pip install aiosmtpd==1.4.6
 
-      - name: Free C drive for install-only test
+      - name: Install portal test dependency
+        run: pip install aiosmtpd==1.4.6
+        working-directory: townlight/portal
+
+      - name: Prepare installer test volume
         shell: pwsh
         run: ./townlight/desktop/scripts/prepare-installer-test-volume.ps1
 
-      - name: Verify existing signed candidate and run community maintenance test
+      - name: Verify and execute installed candidate
         shell: pwsh
+        working-directory: townlight
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ULE_SIGN_RUN: ${{ inputs.signing_run_id }}
+          ULE_BUILD_RUN: ${{ inputs.build_run_id }}
+          ULE_SOURCE: ${{ inputs.source_commit }}
+          ULE_INTAKE: ${{ inputs.intake_sha256 }}
+          ULE_UNSIGNED: ${{ inputs.unsigned_msi_sha256 }}
+          ULE_MSI: ${{ inputs.msi_sha256 }}
+          ULE_EXE: ${{ inputs.exe_sha256 }}
+          ULE_MODE: ${{ inputs.mode }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $expectedSha = '8845a59ed5846f7ee3bd196f290610aa5d9c14dbd0794cf99f44f09d6ee55ea8'
-          $expectedSource = 'd1687e6950032352f74a2890d0b2fbce107ce131'
-          $expectedRun = '45863660564'
-          $msis = @(Get-ChildItem -LiteralPath msi-artifact -Filter '*.msi' -Recurse -File)
-          if ($msis.Count -ne 1) { throw 'Expected exactly one signed candidate MSI.' }
-          $msiHash = (Get-FileHash -LiteralPath $msis[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($msiHash -ne $expectedSha) { throw "Unexpected signed candidate MSI SHA256: $msiHash" }
-          $receipts = @(Get-ChildItem -LiteralPath msi-artifact -Filter 'Townlight-signing-receipt.json' -Recurse -File)
-          if ($receipts.Count -ne 1) { throw 'Expected exactly one Townlight-signing-receipt.json.' }
-          $doc = Get-Content -LiteralPath $receipts[0].FullName -Raw | ConvertFrom-Json
-          if ("$($doc.source_commit)" -cne $expectedSource) { throw 'Receipt source_commit does not match the existing signed candidate.' }
-          if ("$($doc.workflow_run)" -cne $expectedRun) { throw 'Receipt workflow_run does not match the existing signed candidate.' }
-          $entries = @($doc.files | Where-Object { $_.file -ceq $msis[0].Name })
-          if ($entries.Count -ne 1) { throw 'Expected exactly one receipt files entry for the MSI.' }
-          $signedHash = "$($entries[0].signed_sha256)".ToLowerInvariant()
-          if ($signedHash -ne $expectedSha) { throw "Unexpected signed MSI SHA256 in receipt: $signedHash" }
+          $null = & ./desktop/scripts/verify-ule-build-provenance.ps1 `
+            -BuildRun $env:ULE_BUILD_RUN `
+            -SigningRun $env:ULE_SIGN_RUN `
+            -SourceCommit $env:ULE_SOURCE
+          $verified = & ./desktop/scripts/verify-ule-signed-artifact.ps1 `
+            -SignedArtifactRoot ../signed-artifact `
+            -ExpectedSigningRun $env:ULE_SIGN_RUN `
+            -ExpectedIntakeSha256 $env:ULE_INTAKE `
+            -ExpectedUnsignedMsiSha256 $env:ULE_UNSIGNED `
+            -ExpectedMsiSha256 $env:ULE_MSI `
+            -ExpectedExeSha256 $env:ULE_EXE
+          $evidenceRoot = Join-Path $env:RUNNER_TEMP ('installed-ule-' + $env:ULE_MODE)
+          New-Item -ItemType Directory -Force -Path $evidenceRoot | Out-Null
+          $verified | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $evidenceRoot 'candidate-identity.json') -Encoding utf8
+          & ./desktop/scripts/test-installed-maintenance.ps1 `
+            -MsiPath $verified.msi_path `
+            -Mode $env:ULE_MODE `
+            -EvidenceRoot $evidenceRoot `
+            -ExpectedMsiSha256 $env:ULE_MSI `
+            -SourceCommit $env:ULE_SOURCE
 
-          ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode 'community' -EvidenceRoot "$env:RUNNER_TEMP/installed-community-evidence" -ExpectedMsiSha256 $expectedSha -SourceCommit $expectedSource
-
-      - name: Preserve installed community evidence
+      - name: Upload installed candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: installed-community-existing-signed-11001
+          name: installed-ule-${{ inputs.mode }}-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/installed-community-evidence/**
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/publisher.token
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/resident.key
-            !${{ runner.temp }}/installed-community-evidence/community-fixture/tls/localhost.key
+            ${{ runner.temp }}/installed-ule-${{ inputs.mode }}/**
+            !${{ runner.temp }}/installed-ule-${{ inputs.mode }}/**/community-fixture/publisher.token
+            !${{ runner.temp }}/installed-ule-${{ inputs.mode }}/**/resident.key
+            !${{ runner.temp }}/installed-ule-${{ inputs.mode }}/**/tls/localhost.key
           retention-days: 7

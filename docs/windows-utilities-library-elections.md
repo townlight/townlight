@@ -31,3 +31,20 @@ Private notes remain staff workpapers and are excluded from public, mail, and ar
 With existing stopped writers, back up and restore full Data plus config, preserving 311/Comms/Records data. Do not copy live partial DBs. Reopen original IDs, revisions, and receipts after restart.
 
 Candidate source checks do not establish signed installed, upgrade, recovery, or two-PC acceptance; those remain pending.
+
+## Hosted signed candidate acceptance
+
+Prepared instructions only; no installed pass is claimed here.
+
+Use `.github/workflows/installed-community-existing-candidate.yml` (display: **Installed ULE signed candidate**), dispatched from the candidate branch with required inputs: `signing_run_id`, `build_run_id`, `source_commit`, `intake_sha256`, `unsigned_msi_sha256`, `msi_sha256`, `exe_sha256`, and `mode` (`ule` or `ule-upgrade`).
+
+- `ule`: fresh signed install of Utilities/Library/Elections.
+- `ule-upgrade`: seed real 311/Comms/Records on signed 1.10.0.1, then upgrade.
+
+Acceptance verifies exact build source; MSI and embedded EXE signatures/hashes; Library publication after GUI exit; same-URL Elections correction/archives; real Utilities reply/replay; restart; authoritative backup/restore; then uninstall profile retention.
+
+The test caller suppresses acknowledgement only after real typed approval commits. Treat ordinary rendered-UI reopen and typed retry on the same durable key as separate evidence; do not describe this as network loss.
+
+Require `source_commit` to be an ancestor of the harness with unchanged compiled inputs: `desktop/src`, `desktop/src-tauri`, `desktop/runtime`, `config`, `installer`, `portal`. Test-only harness changes do not require rebuilding an identical product.
+
+Keep a count for each installed outcome across failures. After two same-cause failures diagnose and change the approach. After three failures on one installed outcome, obtain Astra diagnostic and allow at most three further attempts. No automatic reruns. Main, tags, releases, and Pages publication remain held.

@@ -94,7 +94,7 @@ export function assertMail(record, decodedParts, pending, stopped, articleUrl) {
   assert.ok(mailContainsFinalContent(decodedParts, pending, articleUrl), 'decoded mail final body and article URL');
   assert.ok(record.headers?.['message-id']?.[0], 'actual SMTP Message-ID');
 }
-export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staffBaseUrl = `http://127.0.0.1:${process.env.TOWNLIGHT_LOCAL_PORT || '15480'}`, fetchImpl = fetch, timeoutMs = 120000}) {
+export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staffCredentials = {email: 'audit-admin@example.invalid', passcode: 'Audit-fixture-2026-11-04!'}, staffBaseUrl = `http://127.0.0.1:${process.env.TOWNLIGHT_LOCAL_PORT || '15480'}`, fetchImpl = fetch, timeoutMs = 120000}) {
   const pending = JSON.parse(await readFile(join(output, 'communications-unattended-pending.json'), 'utf8'));
   const stopped = JSON.parse(await readFile(join(output, 'communications-app-stopped.json'), 'utf8'));
   assert.equal(stopped.exited, true, 'owned staff app exited');
@@ -123,7 +123,7 @@ export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staf
   try {
     const readiness = await waitForStaffReady({staffBaseUrl: base, fetchImpl, timeoutMs});
     stage = 'staff-sign-in';
-    ({proof} = await (await request('/staff/v1/session', {email: 'audit-admin@example.invalid', passcode: 'Audit-fixture-2026-11-04!'})).json());
+    ({proof} = await (await request('/staff/v1/session', staffCredentials)).json());
     assert.ok(typeof proof === 'string' && proof);
     const api = '/staff/v1/api/desktop/v1';
     const deadline = Date.now() + timeoutMs;
