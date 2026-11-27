@@ -30,7 +30,7 @@ export async function verifyUtilityPublic({
     trackingToken: residentPrivate.trackingToken,
     expectedBody: body,
     privateNotes,
-    wrongToken: 'incorrect-fixture-token',
+    wrongToken: 'incorrect-fixture-token-0000000000000000',
   });
 
   assert.equal(denied.accessDenied, true);

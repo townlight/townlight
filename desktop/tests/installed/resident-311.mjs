@@ -413,7 +413,7 @@ async function utilityResidentLookup(context, baseUrl, tracking, trackingToken) 
   return {response, body, commandUrl: response.status() === 200 ? commandUrlFrom(body, baseUrl) : null};
 }
 
-const utilityText = value => stripTags(value).replace(/\s+/g, ' ').trim();
+const utilityText = value => stripTags(String(value).replace(/<br\s*\/?>/gi, " ")).replace(/\s+/g, ' ').trim();
 const utilityExpected = value => String(value).replace(/\s+/g, ' ').trim();
 
 async function utilityResidentBaseline(native, requestId, description) {

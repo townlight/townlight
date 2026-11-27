@@ -2,6 +2,7 @@ import {test, expect} from '@playwright/test';
 import {createServer} from 'node:http';
 import {randomUUID} from 'node:crypto';
 import {installedUtilityResident, readUtilityResident} from '../installed/resident-311.mjs';
+import {verifyUtilityPublic} from '../installed/ule-utility-public.mjs';
 
 // Transport qualification against the actual helpers and resident form contracts.
 // Real portal/311/publisher behavior is verified by installed acceptance separately.
@@ -10,7 +11,9 @@ const tracking = `TL311-${requestId.replaceAll('-', '')}`;
 const token = 'A'.repeat(40);
 const otherToken = 'B'.repeat(40);
 const question = 'Which payment options are available?';
-const reply = 'Installments are available under city policy 7.3.';
+const replyBody = 'Installments are available under city policy 7.3.';
+const citation = 'City Utility Policy 7.3';
+const reply = `${replyBody}\n\nCitations:\n- ${citation}`;
 const notes = 'PRIVATE Utilities workpaper ABC-937';
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
@@ -44,7 +47,7 @@ async function fixture() {
     const id = /\/commands\/([0-9a-f-]{36})\//.exec(path)?.[1];
     const command = commands.get(id);
     if (command === 'create') return send(`<h2>Save these private details now</h2><dl><dt>Tracking number</dt><dd><code>${tracking}</code></dd><dt>Access token</dt><dd><code>${token}</code></dd></dl><a href="/service-requests/requests/${requestId}/">Open your request</a>`);
-    if (command === 'read') return send(`<h2>Request ${tracking}</h2><p>${escape(question)}</p>${published ? `<p>${escape(reply)}</p>` : ''}${leak ? `<p>${escape(notes)}</p>` : ''}<h3>Add a comment</h3><form method="post" action="/service-requests/requests/${requestId}/"><textarea name="message"></textarea></form>`);
+    if (command === 'read') return send(`<h2>Request ${tracking}</h2><p>${escape(question)}</p>${published ? `<p>${escape(reply).replaceAll('\n', '<br>')}</p>` : ''}${leak ? `<p>${escape(notes)}</p>` : ''}<h3>Add a comment</h3><form method="post" action="/service-requests/requests/${requestId}/"><textarea name="message"></textarea></form>`);
     if (command === 'denied') return send('<h2>Request not completed</h2><p>We could not complete that request. Please try again.</p>', 502);
     return send('Not found', 404);
   });
@@ -89,6 +92,19 @@ for (const browser of [true, false]) {
       expect(read.requestId).toBe(requestId);
       expect(read.expectedBodyVisible).toBe(true);
       expect(read.privateNotesAbsent).toBe(true);
+      const verification = await verifyUtilityPublic({
+        context: {requestId, body: replyBody, privateNotes: notes, policy: {citation}, resident: created},
+        portalBaseUrl: host.url,
+        residentPage: browser ? page : undefined,
+        captureMessage: async (recipient, body) => {
+          expect(recipient).toBe(created.private.contactEmail);
+          expect(body).toBe(replyBody);
+          return {id: 'synthetic-capture'};
+        },
+      });
+      expect(verification.trackerVerified).toBe(true);
+      expect(verification.wrongTokenDenied).toBe(true);
+      await expect(readUtilityResident({...options, portalBaseUrl: host.url, tracking, trackingToken: token, expectedBody: reply.replace('7.3', '7.4'), privateNotes: notes})).rejects.toThrow();
       host.leak();
       await expect(readUtilityResident({...options, portalBaseUrl: host.url, tracking, trackingToken: token, expectedBody: reply, privateNotes: notes})).rejects.toThrow('private staff notes leaked');
     } finally {
