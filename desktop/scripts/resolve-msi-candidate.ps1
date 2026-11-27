@@ -32,6 +32,9 @@ $GrantsRef = ''
 $ServiceRequestsRef = ''
 $CommunicationsRef = ''
 $ParksRef = ''
+$UtilitiesRef = ''
+$LibraryRef = ''
+$ElectionsRef = ''
 $TauriArgs = ''
 $RuntimeProfile = $Selected
 $PlanningContract = ''
@@ -86,12 +89,15 @@ if ($Selected -eq 'inspections-preview') {
     $ServiceRequestsRef = $Build.Pins.sources.'townlight/311'
     $CommunicationsRef = $Build.Pins.sources.'townlight/comms'
     $ParksRef = $Build.Pins.sources.'townlight/parks'
+    $UtilitiesRef = $Build.Pins.sources.'townlight/utility'
+    $LibraryRef = $Build.Pins.sources.'townlight/library'
+    $ElectionsRef = $Build.Pins.sources.'townlight/elections'
     $RuntimeProfile = 'inspections-preview'
     $PlanningContract = $Build.ContractPath
     $DesktopVersion = $Build.Contract.desktop_version
     $TauriArgs = '--config src-tauri/tauri.inspections-candidate.conf.json'
 }
-$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; budget_ref=$BudgetRef; grants_ref=$GrantsRef; service_requests_ref=$ServiceRequestsRef; communications_ref=$CommunicationsRef; parks_ref=$ParksRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
+$Result = [ordered]@{product_profile=$Selected; runtime_profile=$RuntimeProfile; records_ref=$RecordsRef; planning_ref=$PlanningRef; permitting_ref=$PermittingRef; inspections_ref=$InspectionsRef; station_ref=$StationRef; boards_ref=$BoardsRef; contracts_ref=$ContractsRef; procurement_ref=$ProcurementRef; data_ref=$DataRef; budget_ref=$BudgetRef; grants_ref=$GrantsRef; service_requests_ref=$ServiceRequestsRef; communications_ref=$CommunicationsRef; parks_ref=$ParksRef; utilities_ref=$UtilitiesRef; library_ref=$LibraryRef; elections_ref=$ElectionsRef; tauri_args=$TauriArgs; planning_contract=$PlanningContract; desktop_version=$DesktopVersion}
 if ($env:GITHUB_OUTPUT) {
     foreach ($Key in $Result.Keys) { "$Key=$($Result[$Key])" | Out-File -LiteralPath $env:GITHUB_OUTPUT -Append -Encoding utf8 }
 }

@@ -4059,7 +4059,7 @@ checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
 
 [[package]]
 name = "townlight-desktop"
-version = "1.10.0-1"
+version = "1.11.0-1"
 dependencies = [
  "argon2",
  "base64 0.22.1",

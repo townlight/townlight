@@ -306,6 +306,33 @@ jobs:
           path: parks-module
           persist-credentials: false
 
+      - name: Check out pinned Townlight Utilities source
+        if: steps.candidate.outputs.utilities_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/utility
+          ref: ${{ steps.candidate.outputs.utilities_ref }}
+          path: utilities-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Library source
+        if: steps.candidate.outputs.library_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/library
+          ref: ${{ steps.candidate.outputs.library_ref }}
+          path: library-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Elections source
+        if: steps.candidate.outputs.elections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/elections
+          ref: ${{ steps.candidate.outputs.elections_ref }}
+          path: elections-module
+          persist-credentials: false
+
       - name: Validate publication-signing context
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
         shell: pwsh
@@ -424,7 +451,7 @@ jobs:
           if ('${{ steps.candidate.outputs.planning_ref }}' -ne '') {
             $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
             if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module") }
+            if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module", '-UtilitiesRoot', "${{ github.workspace }}\utilities-module", '-LibraryRoot', "${{ github.workspace }}\library-module", '-ElectionsRoot', "${{ github.workspace }}\elections-module") }
             npm run prepare-runtime-payload -- @parameters
           } else {
             npm run prepare-runtime-payload -- -ProductProfile zoning-beta @sourceRoots
@@ -879,6 +906,33 @@ jobs:
           path: parks-module
           persist-credentials: false
 
+      - name: Check out pinned Townlight Utilities source
+        if: steps.candidate.outputs.utilities_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/utility
+          ref: ${{ steps.candidate.outputs.utilities_ref }}
+          path: utilities-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Library source
+        if: steps.candidate.outputs.library_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/library
+          ref: ${{ steps.candidate.outputs.library_ref }}
+          path: library-module
+          persist-credentials: false
+
+      - name: Check out pinned Townlight Elections source
+        if: steps.candidate.outputs.elections_ref != ''
+        uses: actions/checkout@v5
+        with:
+          repository: townlight/elections
+          ref: ${{ steps.candidate.outputs.elections_ref }}
+          path: elections-module
+          persist-credentials: false
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -914,7 +968,7 @@ jobs:
           )
           $parameters = @('-ProductProfile', '${{ steps.candidate.outputs.runtime_profile }}', '-PlanningBuildProfile', '${{ steps.candidate.outputs.product_profile }}', '-PlanningRoot', "${{ github.workspace }}\plan") + $sourceRoots
           if ('${{ steps.candidate.outputs.permitting_ref }}' -ne '') { $parameters += @('-PermittingRoot', "${{ github.workspace }}\permit") }
-          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module") }
+          if ('${{ steps.candidate.outputs.inspections_ref }}' -ne '') { $parameters += @('-InspectionsRoot', "${{ github.workspace }}\inspect", '-StationRoot', "${{ github.workspace }}\station\beta-1", '-BoardsRoot', "${{ github.workspace }}\boards", '-ContractsRoot', "${{ github.workspace }}\contracts", '-ProcurementRoot', "${{ github.workspace }}\procurement", '-DataRoot', "${{ github.workspace }}\data-module", '-BudgetRoot', "${{ github.workspace }}\budget-module", '-GrantsRoot', "${{ github.workspace }}\grants-module", '-ServiceRequestsRoot', "${{ github.workspace }}\service-requests-module", '-CommunicationsRoot', "${{ github.workspace }}\communications-module", '-ParksRoot', "${{ github.workspace }}\parks-module", '-UtilitiesRoot', "${{ github.workspace }}\utilities-module", '-LibraryRoot', "${{ github.workspace }}\library-module", '-ElectionsRoot', "${{ github.workspace }}\elections-module") }
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
