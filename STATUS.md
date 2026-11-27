@@ -63,9 +63,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight Data | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
 | Townlight Budget | 0.2.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
 | Townlight Grants | 0.3.0 | Published beta capability | 2026-11-23 | Included in Windows beta with acceptance scope; no standalone artifact. |
-| Townlight 311 | 0.2.0 | Candidate â€” installed acceptance pending | — | Source integrated; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
-| Townlight Communications | 0.2.0 | Candidate â€” installed acceptance pending | — | Source integrated; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
-| Townlight Parks | 0.2.0 | Candidate â€” installed acceptance pending | — | Source pin pending merge; installed Windows candidate acceptance pending. Not part of released 1.9.3.2. |
+| Townlight 311 | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
+| Townlight Communications | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
+| Townlight Parks | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 
 <!-- END GENERATED MODULE STATUS -->
 

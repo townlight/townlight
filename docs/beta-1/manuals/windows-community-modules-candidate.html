@@ -1,0 +1,1063 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Townlight Windows Community Modules | Townlight</title>
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../brand/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="https://townlight.github.io/brand/png/townlight-hall-app-icon-180.png">
+</head><body><a class="skip" href="#main">Skip to content</a>
+<header><a class="brand" href="../index.html"><img src="../brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a>
+<span class="edition">Windows 1.10.0.1</span>
+<nav aria-label="Main"><a href="../index.html#products">Products</a><a href="suite.html">Suite manual</a>
+<a href="../reference/index.html">Technical reference</a><a href="../versions.html">Versions and release</a></nav></header>
+<main id="main" class="reading wrap"><p class="edition">Windows 1.10.0.1</p>
+<p class="docmeta"><a href="https://townlight.github.io/pdf/Townlight-Windows-Community-Modules-Candidate.pdf">Printable PDF</a> · <a href="https://townlight.github.io/docx/Townlight-Windows-Community-Modules-Candidate.docx">Editable Word</a></p>
+<article class="docbody">
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#townlight-311-communications-and-parks-operator-admin-and-integration-guide"
+id="toc-townlight-311-communications-and-parks-operator-admin-and-integration-guide">Townlight
+311, Communications, and Parks — Operator, Admin, and Integration
+Guide</a>
+<ul>
+<li><a href="#status-and-scope" id="toc-status-and-scope">Status and
+scope</a></li>
+<li><a href="#roles-and-module-access"
+id="toc-roles-and-module-access">1. Roles and module access</a></li>
+<li><a href="#architecture" id="toc-architecture">2.
+Architecture</a></li>
+<li><a href="#core-workflows" id="toc-core-workflows">3. Core
+workflows</a></li>
+<li><a href="#optional-public-website-and-publication-integration"
+id="toc-optional-public-website-and-publication-integration">4. Optional
+public website and publication integration</a></li>
+<li><a href="#configuration-reference"
+id="toc-configuration-reference">5. Configuration reference</a></li>
+<li><a href="#api-and-native-json-contract-pointers"
+id="toc-api-and-native-json-contract-pointers">6. API and native JSON
+contract pointers</a></li>
+<li><a href="#backup-restore-and-upgrade-references"
+id="toc-backup-restore-and-upgrade-references">7. Backup, restore, and
+upgrade references</a></li>
+<li><a href="#troubleshooting" id="toc-troubleshooting">8.
+Troubleshooting</a></li>
+<li><a href="#acceptance-and-factual-notes"
+id="toc-acceptance-and-factual-notes">9. Acceptance and factual
+notes</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="townlight-311-communications-and-parks-operator-admin-and-integration-guide">Townlight
+311, Communications, and Parks — Operator, Admin, and Integration
+Guide</h1>
+<h2 id="status-and-scope">Status and scope</h2>
+<p><strong>Release</strong> Windows <code>1.10.0.1</code>, runtime
+<code>0.4.0</code>.</p>
+<p>This guide covers setup and daily use of Townlight 311,
+Communications and Parks on Windows.</p>
+<p><a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download
+the signed Windows installer</a>.</p>
+<p>See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Windows
+acceptance record</a> for hosted Windows and two-PC results.</p>
+<ul>
+<li>Existing staff authentication and native session proof remain the
+access model.</li>
+<li>The manuals and source tree are the source of truth. Where a UI
+label, endpoint, or command is not present in the supplied material,
+this guide describes it as a configuration reference or integration
+question.</li>
+</ul>
+<hr />
+<h2 id="roles-and-module-access">1. Roles and module access</h2>
+<p>The existing native roles are:</p>
+<ul>
+<li><code>local-admin</code></li>
+<li><code>city-staff</code></li>
+<li><code>clerk</code></li>
+<li><code>records-staff</code></li>
+<li><code>code-staff</code></li>
+</ul>
+<p>The supplied role maps in <code>desktop/src-tauri/src/auth.rs</code>
+and
+<code>records/backend/townlight_records/auth/desktop_session.py</code>
+agree on module access.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Module access</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local-admin</code></td>
+<td>All profile modules</td>
+<td>The source role map returns unrestricted access (<code>None</code>).
+This includes Records and Code when the active profile mounts them. The
+first Townlight admin uses this role. Administrative actions such as
+staff-user creation, disable/reactivate, and passcode reset are gated by
+the admin session check.</td>
+</tr>
+<tr>
+<td><code>city-staff</code></td>
+<td>All profile modules</td>
+<td>The source role map returns unrestricted access (<code>None</code>).
+This includes Records and Code when the active profile mounts them.
+Day-to-day city work is still constrained by the installed profile and
+configured permissions.</td>
+</tr>
+<tr>
+<td><code>clerk</code></td>
+<td><code>townlight_meetings</code>, <code>townlight_notice</code>,
+<code>townlight_access</code>, <code>townlight_311</code>,
+<code>townlight_comms</code>, <code>townlight_parks</code></td>
+<td>Clerk has 311, Communications, and Parks workflow access. Clerk does
+<strong>not</strong> have <code>townlight_records</code> or
+<code>townlight_code</code>, and the role map grants no Data
+receiving/export capability.</td>
+</tr>
+<tr>
+<td><code>records-staff</code></td>
+<td><code>townlight_records</code> only</td>
+<td>Records-only staff role.</td>
+</tr>
+<tr>
+<td><code>code-staff</code></td>
+<td><code>townlight_code</code> only</td>
+<td>Code-only staff role.</td>
+</tr>
+</tbody>
+</table>
+<p><code>local-admin</code> and <code>city-staff</code> have all
+profile-module capabilities. <code>clerk</code> has the six modules
+listed above. <code>records-staff</code> has Records only.
+<code>code-staff</code> has Code only. Code is an existing role
+(<code>code-staff</code>), not an invented role.</p>
+<h3
+id="workflow-access-versus-recordsdata-administrative-capability">Workflow
+access versus Records/Data administrative capability</h3>
+<p>Module access is distinct from workflow use. Clerk can operate 311,
+Communications, and Parks workflows because those modules are present in
+Clerk’s mapping. That does not grant Clerk the Records module, the Code
+module, or Data receiving/export capability. A 311 request,
+Communications article, or Parks maintenance link does not by itself
+grant Records archive/read-back or Data export. Those capabilities
+follow the module map and the configured administrative surface.</p>
+<p>Records archive/read-back is controlled by
+<code>townlight_records</code> module access. In the supplied role map,
+<code>local-admin</code>, <code>city-staff</code>, and
+<code>records-staff</code> have that module; Clerk and
+<code>code-staff</code> do not. Code is controlled by
+<code>townlight_code</code> module access; <code>local-admin</code>,
+<code>city-staff</code>, and <code>code-staff</code> have that module;
+Clerk and <code>records-staff</code> do not.</p>
+<p>Staff-user creation in <code>auth.rs</code> accepts
+<code>city-staff</code>, <code>clerk</code>, <code>records-staff</code>,
+and <code>code-staff</code>. The first admin role is
+<code>local-admin</code>. Local staff sessions expire after 12 hours and
+are authenticated with an HMAC session hash stored in
+<code>local-session.json</code>. The runtime validates the current
+session, account state, role, expiry, passcode verifier, and per-install
+session key.</p>
+<hr />
+<h2 id="architecture">2. Architecture</h2>
+<figure>
+<img
+src="https://townlight.github.io/assets/diagrams/community/windows-community-modules-candidate-1.svg"
+alt="2. Architecture — diagram 1" />
+<figcaption aria-hidden="true">2. Architecture — diagram 1</figcaption>
+</figure>
+<p>The native runtime is private and binds to loopback only. The runtime
+host is <code>127.0.0.1</code>; the default runtime port is
+<code>15480</code>.</p>
+<p>Residents submit through the resident portal into an encrypted
+command inbox. The outbound host pump applies authenticated resident
+commands. Durable command identities prevent replay-driven duplication.
+Queued work is not confirmed until the host applies it.</p>
+<p>The public website path is optional and separately deployed. It
+requires a configured public portal, TLS, and publication/command
+credentials. The Windows application does not automatically publish a
+website or configure SMTP.</p>
+<hr />
+<h2 id="core-workflows">3. Core workflows</h2>
+<h3 id="townlight-311">3.1 Townlight 311</h3>
+<h4 id="resident-flow-to-staff-lifecycle">Resident flow to staff
+lifecycle</h4>
+<figure>
+<img
+src="https://townlight.github.io/assets/diagrams/community/windows-community-modules-candidate-2.svg"
+alt="Resident flow to staff lifecycle — diagram 2" />
+<figcaption aria-hidden="true">Resident flow to staff lifecycle —
+diagram 2</figcaption>
+</figure>
+<p>Normal 311 behavior:</p>
+<ul>
+<li>Residents submit service requests through resident intake.</li>
+<li>Resident-facing tracking does not expose internal detail.</li>
+<li>The recovery flow is designed so staff never disclose another
+resident’s data.</li>
+<li>Staff follow the staff lifecycle and role assignments maintained by
+administrators.</li>
+<li>Clerk has 311 workflow access. Clerk does not receive Records or
+Data capability from the role map.</li>
+<li><code>local-admin</code> and <code>city-staff</code> have all
+profile-module capabilities, including 311 and Records when
+mounted.</li>
+<li>Records are produced as ZIP archives that report the actual bytes
+written plus the operation history.</li>
+</ul>
+<p>Failures and constraints:</p>
+<ul>
+<li><code>DATABASE_URL</code> is required. The native runtime refuses to
+start without it.</li>
+<li>For profiles that require PostgreSQL, <code>DATABASE_URL</code> is a
+PostgreSQL URL.</li>
+<li>311 migrations are required. In the supplied source, the runtime
+refuses to start 311 routes when <code>townlight_311</code> migrations
+are not applied.</li>
+<li>If the 311 module cannot import, <code>/health</code> reports the
+module error.</li>
+<li>Notification states are <code>sent</code>, <code>pending</code>,
+<code>failed</code>, and <code>uncertain</code>. Delivery is not
+guaranteed. <code>uncertain</code> means status is unknown after a send
+was attempted.</li>
+<li>SMTP setup is administrative. It is not implied by installing
+Townlight or enabling the public website.</li>
+</ul>
+<p>Admin limits from the 311 manual:</p>
+<ul>
+<li>Attachments: <strong>10 MiB</strong> each.</li>
+<li>Import: CSV or JSON up to <strong>2 MiB</strong> and <strong>1000
+rows</strong>, keyed by stable external IDs plus a source key, with an
+exact preview hash.</li>
+<li>Export: capped at <strong>10,000 requests</strong>. An export that
+would exceed the cap fails rather than truncating.</li>
+<li>Open311 support covers authenticated catalogue, read, and create
+with JSON/XML for the supported subset only. It is not full Open311
+conformance.</li>
+</ul>
+<h4 id="source-and-api-pointers">311 source and API pointers</h4>
+<ul>
+<li>Windows route base: <code>/desktop/v1/service-requests</code>.</li>
+<li>Open311 route base:
+<code>/desktop/v1/service-requests/open311/...</code>.</li>
+<li>The old <code>townlight_311.main</code> module is a developer-only
+prototype helper API. It is not the Windows runtime and is not a
+complete standalone product.</li>
+<li>The resident-facing tracking, recovery, and staff lifecycle behavior
+described here comes from the 311 manual. Additional internal 311 routes
+or button labels are not invented in this guide.</li>
+</ul>
+<hr />
+<h3 id="townlight-communications">3.2 Townlight Communications</h3>
+<h4
+id="draft-exact-revision-approval-scheduled-publication-correction-and-withdrawal">Draft,
+exact-revision approval, scheduled publication, correction, and
+withdrawal</h4>
+<figure>
+<img
+src="https://townlight.github.io/assets/diagrams/community/windows-community-modules-candidate-3.svg"
+alt="Draft, exact-revision approval, scheduled publication, correction, and withdrawal — diagram 3" />
+<figcaption aria-hidden="true">Draft, exact-revision approval, scheduled
+publication, correction, and withdrawal — diagram 3</figcaption>
+</figure>
+<p>Normal Communications behavior:</p>
+<ul>
+<li>Create or reopen a draft.</li>
+<li>Select sources from the module sources exposed by the runtime. The
+supplied source includes a Parks source resolver.</li>
+<li>Save the draft and run an Access check.</li>
+<li>Review and approve one exact revision. Approval applies to that
+revision only. Later edits clear it.</li>
+<li>Schedule publication to the website and email for the approved
+revision.</li>
+<li>Publish, then archive the published revision to Records
+<strong>before</strong> editing, correcting, or withdrawing it.</li>
+<li>Corrections preserve prior revisions. Withdrawal prevents stale
+content from being restored.</li>
+<li>Captured approved source snapshots, public URLs, digests, and
+revision provenance remain with the article.</li>
+<li>Public attachments require review.</li>
+<li>Private source content cannot be published.</li>
+<li>Missing, private, or stale sources block approval.</li>
+</ul>
+<p>Publication and delivery:</p>
+<ul>
+<li>The host configuration supplies the portal credential and
+origin.</li>
+<li>Normal operation uses an unattended host service, not an operator
+window, so scheduled work can complete after the staff app closes.</li>
+<li>Website tasks travel through the existing authenticated portal
+receiver, with receipt URL and hash retained.</li>
+<li>Email uses the city email settings shared with 311 SMTP.</li>
+<li>Subscribers must confirm their email address and can manage
+preferences or unsubscribe.</li>
+<li><code>queued</code> means pending, not SMTP accepted.</li>
+<li>Only <code>sent</code> means SMTP accepted, not human receipt.</li>
+<li><code>failed</code> and <code>uncertain</code> results are shown
+separately. An <code>uncertain</code> send is not retried
+automatically.</li>
+<li>Deterministic message identifiers and durable records support safe
+retries only when non-delivery is known.</li>
+</ul>
+<p>Records:</p>
+<ul>
+<li>The Records archive stores the actual published bytes, source
+references, attachments, and receipts, and returns a real
+identifier.</li>
+<li>Records archive/read-back requires <code>townlight_records</code>
+module access. Clerk does not have that module;
+<code>local-admin</code>, <code>city-staff</code>, and
+<code>records-staff</code> do.</li>
+<li>Existing staff roles control drafting, review, and approval
+according to the module map.</li>
+<li>No resident account can see staff drafts or private source
+data.</li>
+<li>Publication metrics are limited to explicit approved aggregate
+reporting, not subscriber lists.</li>
+</ul>
+<p>Failures and constraints:</p>
+<ul>
+<li>Communications migrations are required. In the supplied source, the
+runtime refuses to start Communications when
+<code>townlight_comms</code> migrations are not applied.</li>
+<li>Browser requests use a fixed native command allowlist and cannot
+choose arbitrary URLs.</li>
+<li>Portal inbound operations use encrypted authenticated inbox and pump
+patterns. The desktop service remains private.</li>
+<li>Production uses a real PostgreSQL schema with explicit migration.
+SQLite translation is for tests, and production bootstrap is false.</li>
+<li>Revisions are immutable and approval binds the exact public-content
+hash.</li>
+<li>Optimistic revisions and database transactions prevent two-PC lost
+updates.</li>
+<li>Plain text is stored and escaped paragraphs are rendered; HTML is
+not trusted.</li>
+<li>Source eligibility is checked at runtime against the owning module.
+User-supplied flags cannot authorize publication.</li>
+<li>The email outbox has durable state separate from 311. Subscriber
+tokens are hashed and private.</li>
+<li>The host service owns portal credentials and origin
+configuration.</li>
+</ul>
+<h4 id="communications-parks-source-resolver">Communications Parks
+source resolver</h4>
+<p>The Parks communications adapter is implemented in the supplied
+source at
+<code>desktop/runtime/python-services/townlight_runtime/communications_parks_sources.py</code>.
+It resolves Parks sources through the fixed internal application after
+native proof validation.</p>
+<p>Supported source identifiers:</p>
+<ul>
+<li><code>program:&lt;uuid&gt;</code>: fetches
+<code>/desktop/v1/parks/catalog/program/{program_id}</code> with
+<code>public_only=True</code>, requires a public snapshot, and builds a
+digest over <code>id</code>, <code>revision</code>, <code>title</code>,
+<code>description</code>, <code>timezone</code>, <code>min_age</code>,
+<code>max_age</code>, <code>eligibility_text</code>, and
+<code>accessibility</code>.</li>
+<li><code>resource:&lt;uuid&gt;:closure:&lt;uuid&gt;</code>: fetches the
+public resource snapshot and
+<code>/desktop/v1/parks/resources/{resource_id}/closures</code>, selects
+the matching closure, normalizes <code>starts_at</code> and
+<code>ends_at</code> to UTC, and builds a digest over resource ID, name,
+address, timezone, closure ID, start, and end.</li>
+</ul>
+<p>The resolver returns a reference with <code>kind: "parks"</code>, the
+original identifier, revision digest, title, public URL, SHA-256 digest,
+and <code>eligible: true</code>, plus the captured content. Invalid
+identifiers return <code>422</code>; ineligible sources return
+<code>404</code>; invalid source responses return <code>503</code>.</p>
+<hr />
+<h3 id="townlight-parks">3.3 Townlight Parks</h3>
+<h4
+id="catalogue-booking-payment-roster-and-maintenance-flow">Catalogue,
+booking, payment, roster, and maintenance flow</h4>
+<figure>
+<img
+src="https://townlight.github.io/assets/diagrams/community/windows-community-modules-candidate-4.svg"
+alt="Catalogue, booking, payment, roster, and maintenance flow — diagram 4" />
+<figcaption aria-hidden="true">Catalogue, booking, payment, roster, and
+maintenance flow — diagram 4</figcaption>
+</figure>
+<p>Normal Parks behavior:</p>
+<ul>
+<li>Public facility and program catalogue and availability views.</li>
+<li>Booking and registration for residents.</li>
+<li>Session rosters, waitlists, promotion, and attendance.</li>
+<li>Household, participant, and minor data held privately.</li>
+<li>Fees, deposits, refunds, and reconciliation in integer cents with
+explicit currency.</li>
+<li>Offline payment and refund recording in an append-only ledger.</li>
+<li>Optional hosted Stripe Checkout adapter that verifies the provider
+transaction, amount, currency, and obligation identity at the host
+before any ledger record is created.</li>
+<li>Maintenance links that create real 311 requests with durable
+idempotency and returned 311 request identity.</li>
+<li>Explicitly approved Communications source snapshots.</li>
+<li>Records private ZIP archive/read-back and approved aggregate Data
+export according to module access.</li>
+<li>Notifications are recorded as queued items. <strong>Queued is not
+delivered.</strong></li>
+</ul>
+<p>Facility, program, and booking constraints:</p>
+<ul>
+<li>Each facility and program carries an explicit timezone. Hours are
+reviewed against that timezone before being shown publicly or used for
+availability.</li>
+<li>Daylight-saving transitions are reviewed explicitly. A stated local
+clock time may not map to a single UTC instant on a transition day.</li>
+<li>Facilities support setup and cleanup buffers. Buffers apply around a
+booking when availability is evaluated and when the reservation is
+locked.</li>
+<li>Closures and blackouts suppress availability for the affected
+windows and are evaluated in the facility’s timezone.</li>
+<li>A facility reservation may be single or recurring.</li>
+<li>The resource and session rows are locked in the same transaction as
+overlap checks and occupancy writes.</li>
+<li>Recurrence is applied all or nothing. A recurrence that would
+conflict as a whole is rejected as a whole, with no partial writes left
+behind.</li>
+<li>Locks are acquired in a stable order so concurrent requests do not
+deadlock.</li>
+<li>Conflicts produce a clear resident-facing error explaining which
+slot or constraint failed and how to revise the request.</li>
+<li>Reschedule and cancel use the same locking discipline as
+creation.</li>
+<li>A rejected or requested change names the constraint and a revision
+path. Retrying without a revision is expected to fail again.</li>
+</ul>
+<p>Capacity and attendance constraints:</p>
+<ul>
+<li>Programs and sessions carry eligibility rules, including age ranges
+where configured, and a capacity.</li>
+<li>Registration is checked against eligibility and remaining capacity
+under the same transactional discipline used for facility
+reservations.</li>
+<li>When a session is full, a registration may be placed on a
+waitlist.</li>
+<li>Promotion from waitlist occurs against capacity with durable command
+identity, so a retried promotion is not duplicated. Promotion does not
+silently exceed capacity.</li>
+<li>Session rosters are private to permitted staff.</li>
+<li>Attendance check-in is idempotent. A repeated check-in for the same
+attendee and session does not create a second attendance record.</li>
+<li>Rosters and attendance are excluded from public pages and from
+aggregate Data exports containing participant detail.</li>
+</ul>
+<p>Payments and refunds:</p>
+<ul>
+<li>Fee arithmetic is in integer cents with an explicit currency.</li>
+<li>Deposits and refunds are represented in integer cents with the
+session currency.</li>
+<li>Offline payments and refunds are recorded in an append-only ledger.
+Each entry carries the staff actor and a reference. Corrections are made
+by adding an opposite entry, not by editing history. Receipts are issued
+from ledger records.</li>
+<li>The optional hosted Stripe adapter requires a separately configured
+account. No live charge was tested.</li>
+<li>When configured by an operator, the host creates a Checkout session
+for a specific obligation, the resident completes Checkout at the hosted
+provider, and the host retrieves the provider transaction and verifies
+transaction identity, amount, currency, and obligation identity against
+its own records. Only after that verification does the host append a
+ledger payment.</li>
+<li>Provider return URLs are not payment proof. A resident returning
+from a cancelled or interrupted Checkout is not evidence of
+payment.</li>
+<li>Card data does not enter Townlight; only provider identifiers and
+verified amounts are recorded.</li>
+<li>Ambiguous provider outcomes are reconciled before retry. Payment
+intents and refund intents persist across restart.</li>
+</ul>
+<p>Maintenance and 311:</p>
+<ul>
+<li>Maintenance workflows create real 311 requests, not local
+placeholders.</li>
+<li>Each link carries a durable idempotency key so a retried submission
+does not create a duplicate 311 request.</li>
+<li>The recorded location and photo bytes are the actual submitted
+bytes.</li>
+<li>The returned 311 request identity is stored with the link so staff
+can track progress and resolution against the real request.</li>
+<li>Staff can view progress and resolution of a linked 311 request
+within the Parks surface. The 311 system is the source of truth for
+request lifecycle; Parks does not assert a status the 311 system has not
+returned.</li>
+</ul>
+<p>Records, Data, and private attachments:</p>
+<ul>
+<li>Attachments are private.</li>
+<li>Records archive/read-back is a private ZIP path controlled by
+<code>townlight_records</code> module access.</li>
+<li>For archive review, rely on the exact content hash produced by the
+review step, not a filename or description.</li>
+<li>Aggregate Data export requires explicit approval. Approval records
+who approved the export and what aggregate scope was approved.</li>
+<li>Aggregate Data export excludes participant, contact, and
+accommodation details.</li>
+<li>Public pages never expose attachments, archive contents, archive
+hashes, household or participant data, accommodation notes, or private
+tracking identifiers.</li>
+</ul>
+<p>Parks failures and constraints:</p>
+<ul>
+<li>Parks migrations are required. In the supplied source, the runtime
+refuses to start Parks when <code>townlight_parks</code> migrations are
+not applied.</li>
+<li>Production bootstrap is <code>False</code>. Tables are created only
+through explicit, programmatic migrations from the package migrations
+module. This guide does not invent migration command-line syntax.</li>
+<li>Configure and verify the optional Stripe integration with your
+payment provider before using it.</li>
+<li>Notifications are queued. Queued is not delivered.</li>
+</ul>
+<hr />
+<h2 id="optional-public-website-and-publication-integration">4. Optional
+public website and publication integration</h2>
+<p>The public website is optional and separate. It requires a separately
+configured public portal, TLS, and command inbox/publication
+credentials. The Windows application does not automatically publish a
+website and does not configure SMTP.</p>
+<figure>
+<img
+src="https://townlight.github.io/assets/diagrams/community/windows-community-modules-candidate-5.svg"
+alt="4. Optional public website and publication integration — diagram 5" />
+<figcaption aria-hidden="true">4. Optional public website and
+publication integration — diagram 5</figcaption>
+</figure>
+<p>Rules for the optional website path:</p>
+<ul>
+<li>The public portal is separately deployed. The existing signed
+Windows installer is unchanged and does not install it.</li>
+<li>Website delivery is authenticated. The host uses
+<code>TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN</code> as the canonical website
+HTTPS origin.</li>
+<li>The Windows host uses
+<code>TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE</code> pointing to an
+absolute file containing a random 32-byte base64url token without
+padding.</li>
+<li>The website uses
+<code>TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE</code> pointing to an
+absolute file containing the lowercase SHA-256 of the token text without
+its line terminator.</li>
+<li>Credential files are restricted to their service accounts.</li>
+<li>Serve <code>/townlight/v1/publications/</code> over the website’s
+canonical HTTPS origin and preserve its <code>Authorization</code> and
+<code>Content-Length</code> headers.</li>
+<li>For a city-issued certificate, install the issuing CA in the Windows
+trust store available to the publisher’s service identity and make sure
+the certificate covers the configured hostname.</li>
+<li>Allow upload bodies of the configured recording limit plus 2 MiB on
+this route and provision private disk accordingly.</li>
+<li>The worker and receiver read their credential files on each request.
+Rotate the matching files to replace the token, or remove the digest
+file to revoke delivery.</li>
+<li>Existing public pages stay visible until an authorized withdrawal
+reaches the website.</li>
+</ul>
+<p>Portal TLS and deployment settings:</p>
+<ul>
+<li>Use a same-host TLS reverse proxy.</li>
+<li>Set <code>TOWNLIGHT_TRUST_TLS_PROXY=1</code> only when the proxy
+strips client forwarded headers, supplies its own HTTPS scheme, and sets
+the canonical <code>Host</code>.</li>
+<li>Set <code>TOWNLIGHT_DEBUG=0</code> for deployment.</li>
+<li>Set a unique <code>TOWNLIGHT_SECRET_KEY</code> of at least 50
+characters.</li>
+<li>Set <code>TOWNLIGHT_ALLOWED_HOSTS</code>, HTTPS
+<code>TOWNLIGHT_BASE_URL</code>, HTTPS
+<code>TOWNLIGHT_CSRF_TRUSTED_ORIGINS</code>, and
+<code>TOWNLIGHT_STATIC_ROOT</code>.</li>
+<li>Run migrations and <code>collectstatic</code> for the separate
+portal as documented for the portal.</li>
+<li>The native desktop port and the private release directory remain
+private.</li>
+<li>Serve collected static assets only and proxy all other routes.</li>
+</ul>
+<p>The portal uses these source-confirmed settings where applicable:</p>
+<p><code>TOWNLIGHT_SECRET_KEY</code>, <code>TOWNLIGHT_DEBUG</code>,
+<code>TOWNLIGHT_ALLOWED_HOSTS</code>,
+<code>TOWNLIGHT_CSRF_TRUSTED_ORIGINS</code>,
+<code>TOWNLIGHT_TRUST_TLS_PROXY</code>, <code>TOWNLIGHT_DB</code>,
+<code>TOWNLIGHT_STATIC_ROOT</code>, <code>TOWNLIGHT_MEDIA_ROOT</code>,
+<code>TOWNLIGHT_BRAND</code>, <code>TOWNLIGHT_BASE_URL</code>,
+<code>TOWNLIGHT_RELEASE_ROOT</code>.</p>
+<p>These portal settings are not configured by the Windows
+installer.</p>
+<h3 id="portal-selection-contract-pointer">Portal selection contract
+pointer</h3>
+<p>The portal lookup calls authenticated:</p>
+<p><code>GET /desktop/v1/portal/selections?request_id=&lt;UUID&gt;</code></p>
+<p>It returns:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;selections&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;title&quot;</span><span class="fu">:</span><span class="st">&quot;&lt;public archive title&gt;&quot;</span><span class="fu">,</span><span class="dt">&quot;selection&quot;</span><span class="fu">:{</span><span class="er">...</span><span class="fu">}}</span><span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<p>Each selection contains all publication fields with
+<code>approve_publication: false</code>. Selecting a choice sends
+<code>request_id</code>, <code>release_copy_id</code>, and
+<code>archive_id</code> as query parameters and fills the form. Both
+Meetings and Records permissions remain required.</p>
+<p>The portal manual also documents an operator selection file for
+<code>python manage.py sync_townlight selection.json</code> with
+fields:</p>
+<p><code>action</code>, <code>approve_publication</code>,
+<code>archive_id</code>, <code>meeting_id</code>,
+<code>recording_id</code>, <code>request_id</code>,
+<code>release_copy_id</code>, <code>expected_release_sha256</code>.</p>
+<p>Those identifiers are placeholders in the example. A prepared release
+copy alone is not public; separate explicit approval authorizes
+export.</p>
+<hr />
+<h2 id="configuration-reference">5. Configuration reference</h2>
+<p>Only environment names present in the supplied source or manuals are
+listed. This is a configuration reference, not an installation script.
+Secret values are kept out of this guide.</p>
+<h3 id="native-runtime">Native runtime</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>Purpose and constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TOWNLIGHT_PRODUCT_PROFILE</code></td>
+<td>Selects the product profile. Default in source is
+<code>records-beta</code>. In the supplied source, the 311,
+Communications, and Parks routers/repositories are wired under the
+<code>inspections-preview</code> profile. Other profile values are
+defined in source.</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>Required. The runtime refuses to start without it. Profiles that
+require PostgreSQL enforce a PostgreSQL URL.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_PROFILE_ROOT</code></td>
+<td>Absolute profile root. Used for config, secrets, queues, and related
+private state.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_DATA_DIR</code></td>
+<td>Alternative data directory input from source. The profile root
+defaults to its parent when used.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_RUNTIME_HOST</code></td>
+<td>Must remain <code>127.0.0.1</code>. The runtime raises if another
+host is set.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_RUNTIME_PORT</code></td>
+<td>Native runtime port. Default <code>15480</code>.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_SHARED_STAFF_HOST</code></td>
+<td>Set to <code>1</code> to install shared staff routing and start the
+host workers described in source. Without it, unattended host work is
+not started.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN</code></td>
+<td>Canonical website HTTPS origin used by host publication and related
+workers. Required for the Communications host, resident command pump,
+and Parks email/catalog work as shown in source.</td>
+</tr>
+<tr>
+<td><code>JWT_SECRET_FILE</code></td>
+<td>Secret file path set by the runtime when local secrets are
+initialized.</td>
+</tr>
+<tr>
+<td><code>FIRST_ADMIN_PASSWORD_FILE</code></td>
+<td>Secret file path set by the runtime when local secrets are
+initialized.</td>
+</tr>
+<tr>
+<td><code>ENCRYPTION_KEY</code></td>
+<td>Runtime-held encryption key value/file reference set by the
+runtime.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_CODE_SOURCE_REGISTRY_DB_URL</code></td>
+<td>Set by the runtime from <code>DATABASE_URL</code> for the relevant
+city-core-style profiles. Code readiness uses it.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_FILE</code></td>
+<td>Windows-host credential file for portal publication. Restricted
+absolute file.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_PORTAL_PUBLISHER_TOKEN_SHA256_FILE</code></td>
+<td>Website-side digest file for the matching portal publication token.
+Restricted absolute file.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_NATIVE_ORIGIN</code></td>
+<td>Trusted private native runtime origin for the separate portal
+bridge. HTTPS or loopback HTTP as documented.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_NATIVE_PROOF_FILE</code></td>
+<td>Absolute server-only file containing the native session proof. The
+proof is not sent to the browser. Restricted to the portal service
+account. Refresh after session expiry, sign-out, account change, or
+credential change.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_DISPLAY_TIMEZONE</code></td>
+<td>Optional IANA display timezone for the portal bridge. Default
+<code>UTC</code>.</td>
+</tr>
+<tr>
+<td><code>TOWNLIGHT_PORTAL_MAX_BYTES</code></td>
+<td>Portal transport maximum. Default 8 GiB, upper bound 64 GiB. This is
+not the end-to-end recording limit.</td>
+</tr>
+</tbody>
+</table>
+<p>Source defaults also include <code>PORTAL_MODE</code>,
+<code>OLLAMA_BASE_URL</code>,
+<code>TOWNLIGHT_MEETINGS_OLLAMA_BASE_URL</code>, and
+<code>TOWNLIGHT_CORE_LLM_PROVIDER</code>. These are configuration
+references only.</p>
+<h3 id="records-code-and-portal-restrictions">Records, Code, and portal
+restrictions</h3>
+<ul>
+<li>Records archive/read-back uses <code>townlight_records</code> module
+access.</li>
+<li>Code uses <code>townlight_code</code> module access and is
+profile-dependent.</li>
+<li>The public portal is separate from the native runtime. It requires
+its own TLS configuration, publication credentials, and command
+inbox/publication setup.</li>
+<li>SMTP settings are administrative. MSI installation, native startup,
+and website publication do not configure SMTP automatically.</li>
+</ul>
+<hr />
+<h2 id="api-and-native-json-contract-pointers">6. API and native JSON
+contract pointers</h2>
+<h3 id="runtime-health">Runtime health</h3>
+<p>Source pointer:
+<code>desktop/runtime/python-services/townlight_runtime/services.py</code>.</p>
+<ul>
+<li><code>GET /health</code> and <code>GET /modules</code> return the
+same runtime health payload. Status is <code>200</code> only when the
+payload status is <code>ok</code>; otherwise <code>503</code>.</li>
+<li>Payload fields include:
+<ul>
+<li><code>status</code>: <code>ok</code> or <code>degraded</code></li>
+<li><code>service</code>: <code>townlight-runtime</code></li>
+<li><code>version</code></li>
+<li><code>product_profile</code></li>
+<li><code>modules</code>: entries with <code>id</code>, <code>ok</code>,
+<code>import</code>, and either <code>version</code> or
+<code>error</code></li>
+<li><code>database</code>: <code>ok</code>, <code>status</code>, and
+<code>message</code></li>
+<li><code>local_only</code>: <code>true</code></li>
+</ul></li>
+<li>Database status values include <code>missing</code>,
+<code>unavailable</code>, <code>ready</code>, and
+<code>migrations-needed</code>.</li>
+<li><code>GET /ready</code> returns
+<code>{"status":"ready"|"not-ready","reason":"..."}</code> with
+<code>200</code> or <code>503</code>.</li>
+<li>A <code>domain-inactive</code> readiness reason means the domain
+application is not active.</li>
+<li>Domain readiness checks schema readiness for the mounted modules.
+For Code and other restricted modules, readiness may report a specific
+schema-unavailable reason.</li>
+</ul>
+<h3 id="section">311</h3>
+<ul>
+<li>Windows route base: <code>/desktop/v1/service-requests</code>.</li>
+<li>Open311 route base:
+<code>/desktop/v1/service-requests/open311/...</code>.</li>
+<li>Open311 support is authenticated catalogue, read, and create for the
+supported JSON/XML subset. It is not full Open311 conformance.</li>
+<li>Resident-facing tracking is privacy-aware. Internal detail is not
+exposed.</li>
+<li>Recovery is designed so staff never disclose another resident’s
+data.</li>
+<li>311 import preview, CSV/JSON limits, export cap, and notification
+statuses are as stated in Section 3.1.</li>
+</ul>
+<h3 id="communications">Communications</h3>
+<ul>
+<li>Desktop route base: <code>/desktop/v1/communications</code>.</li>
+<li>Protected by native staff authentication.</li>
+<li>Browser requests use a fixed native command allowlist and cannot
+choose arbitrary URLs.</li>
+<li>Revisions are immutable and approval binds the exact public-content
+hash.</li>
+<li>The supplied Parks resolver handles
+<code>program:&lt;uuid&gt;</code> and
+<code>resource:&lt;uuid&gt;:closure:&lt;uuid&gt;</code> source
+identifiers as described in Section 3.2.</li>
+<li>Exact JSON field lists for every Communications command are not
+reproduced in the supplied material. Use the source contract and the
+staff UI.</li>
+</ul>
+<h3 id="parks">Parks</h3>
+<ul>
+<li>Source-confirmed Parks routes used by the Communications resolver:
+<ul>
+<li><code>GET /desktop/v1/parks/catalog/program/{program_id}</code> with
+<code>public_only=True</code></li>
+<li><code>GET /desktop/v1/parks/catalog/resource/{resource_id}</code>
+with <code>public_only=True</code></li>
+<li><code>GET /desktop/v1/parks/resources/{resource_id}/closures</code></li>
+</ul></li>
+<li>The supplied manuals describe public catalogue and availability
+responses, private staff workflows, and native bridges. They do not
+publish a complete Parks HTTP endpoint list.</li>
+<li>Public pages expose catalogue and availability only. They do not
+expose household, participant, minor, accommodation, contact,
+attachment, or private tracking details.</li>
+<li>Parks maintenance uses durable idempotency and returns a real 311
+request identity.</li>
+</ul>
+<h3 id="portal-selection-and-publication">Portal selection and
+publication</h3>
+<ul>
+<li><code>GET /desktop/v1/portal/selections?request_id=&lt;UUID&gt;</code>
+returns the selection JSON shape in Section 4.</li>
+<li>Both Meetings and Records permissions are required for that
+cross-module selection workflow.</li>
+<li>Portal publication uses <code>/townlight/v1/publications/</code> on
+the separate website origin.</li>
+<li>A failed sync leaves the previous publication intact. Repeating a
+successful sync updates the same archive identity.</li>
+</ul>
+<hr />
+<h2 id="backup-restore-and-upgrade-references">7. Backup, restore, and
+upgrade references</h2>
+<p>Back up the database, private files, and keys as a related unit. A
+database-only backup is incomplete.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>What to preserve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Native database</td>
+<td>The database selected by <code>DATABASE_URL</code>, including
+workflow, audit, ledger, outbox, and queue-related schemas.</td>
+</tr>
+<tr>
+<td>Native profile</td>
+<td><code>TOWNLIGHT_PROFILE_ROOT</code>, including
+<code>config/secrets</code>, local session state, publisher queue state,
+and any profile-backed payment or email settings.</td>
+</tr>
+<tr>
+<td>Records and attachments</td>
+<td>Records archives, private managed files, Parks attachments,
+Communications attachments, 311 photo bytes, and archive/read-back
+data.</td>
+</tr>
+<tr>
+<td>Communications and Parks outboxes</td>
+<td>Durable queue work, email outbox state, publisher queue work, and
+reconciliation state.</td>
+</tr>
+<tr>
+<td>Portal</td>
+<td>The portal database selected by <code>TOWNLIGHT_DB</code>,
+<code>TOWNLIGHT_MEDIA_ROOT</code>, and
+<code>TOWNLIGHT_RELEASE_ROOT</code>.</td>
+</tr>
+<tr>
+<td>Credentials</td>
+<td>Portal proof files, publisher token files, token digest files, and
+native profile secrets. Restricted and protected.</td>
+</tr>
+</tbody>
+</table>
+<p>Restore preserves the relationship between durable command
+identities, ledger entries, queued work, publication state, and Records
+archives.</p>
+<ul>
+<li>After restart, the runtime reopens durable requests and resumes
+known-safe jobs without duplicates.</li>
+<li>A resumed job is not evidence of delivery or provider settlement
+until the host re-verifies.</li>
+<li>Payment intents and refund intents persist across restart.</li>
+<li>Ambiguous provider outcomes are reconciled before retry.</li>
+<li>If restoring to an earlier host queue, reconcile its state against
+the website before sending further revisions.</li>
+<li>The signed installer passed the direct upgrade from 1.9.3.2 with the
+existing profile preserved. Back up city data before upgrading.</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">8. Troubleshooting</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Source-supported cause and response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runtime fails with <code>DATABASE_URL must be configured</code></td>
+<td>Configure <code>DATABASE_URL</code>. Start through the Townlight
+supervisor or provide the explicit PostgreSQL URL expected by the
+profile.</td>
+</tr>
+<tr>
+<td>Runtime reports PostgreSQL required</td>
+<td>The selected profile requires a PostgreSQL
+<code>DATABASE_URL</code>.</td>
+</tr>
+<tr>
+<td>Runtime fails with unsupported product profile</td>
+<td>Use a profile defined in source.</td>
+</tr>
+<tr>
+<td><code>/health</code> reports <code>degraded</code> with module
+import error</td>
+<td>A required module failed to import. Check that the deployed package
+set matches the installed release and profile.</td>
+</tr>
+<tr>
+<td><code>/health</code> database status is
+<code>migrations-needed</code></td>
+<td>The database is reachable but the task-queue schema is not ready.
+Apply the explicit migrations for the deployed package set. This guide
+does not invent a migration CLI.</td>
+</tr>
+<tr>
+<td><code>/ready</code> returns <code>not-ready</code> with
+<code>domain-inactive</code></td>
+<td>The domain application is not active. Verify activation state for
+the profile and database before expecting domain routes to serve.</td>
+</tr>
+<tr>
+<td>311, Communications, or Parks refuses to start</td>
+<td>Check the corresponding package migrations. The supplied source
+refuses to start service requests, Communications, or Parks when their
+migrations are not ready.</td>
+</tr>
+<tr>
+<td>Code readiness reports a Code schema problem</td>
+<td>Check the Code source-registry readiness and the profile.
+<code>code-staff</code> is the Code-only role; <code>local-admin</code>
+and <code>city-staff</code> also have Code when the profile mounts
+it.</td>
+</tr>
+<tr>
+<td>Email state stays <code>queued</code></td>
+<td>Queued is pending, not SMTP accepted. The host worker must apply the
+work. Verify <code>TOWNLIGHT_SHARED_STAFF_HOST=1</code> and the relevant
+host configuration.</td>
+</tr>
+<tr>
+<td>Email state is <code>uncertain</code></td>
+<td>Status is unknown after a send was attempted. Reconcile with the
+mail path and durable outbox state.</td>
+</tr>
+<tr>
+<td>Website publication stays queued or retrying</td>
+<td>The website has not confirmed the action. The host delivers queued
+copies and withdrawals after staff sign out. Refresh the
+meeting/publication status before treating a copy or withdrawal as
+live.</td>
+</tr>
+<tr>
+<td>Portal publication credentials fail</td>
+<td>Verify the Windows token file, website digest file, canonical HTTPS
+origin, TLS trust, and header preservation on
+<code>/townlight/v1/publications/</code>. Rotate the matching files to
+replace the token; remove the digest file to revoke delivery.</td>
+</tr>
+<tr>
+<td>Resident command pump or Communications host does not start</td>
+<td>Check <code>TOWNLIGHT_SHARED_STAFF_HOST=1</code> and
+<code>TOWNLIGHT_PUBLISHER_PUBLISH_ORIGIN</code>, plus the required
+repository and email settings shown in source.</td>
+</tr>
+<tr>
+<td>Parks payment stays ambiguous</td>
+<td>Provider return URLs are not payment proof. Verify the provider
+transaction, amount, currency, and obligation identity. Reconcile before
+retry. No live charge is verified by release acceptance.</td>
+</tr>
+<tr>
+<td>Parks waitlist promotion or attendance retried</td>
+<td>Durable command identity and idempotent check-in prevent duplicates.
+If the result is unclear, inspect durable state rather than repeating
+the action.</td>
+</tr>
+<tr>
+<td>Shutdown reports a worker did not stop cleanly</td>
+<td>The runtime raises after attempting to stop product threads. Restart
+after checking durable queue and provider state. A resumed job is not
+delivery evidence.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="acceptance-and-factual-notes">9. Acceptance and factual
+notes</h2>
+<ul>
+<li><p>The signed Windows 1.10.0.1 installer passed hosted and two-PC
+acceptance. See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Windows
+acceptance record</a>.</p></li>
+<li><p>The tested upgrade preserved the existing profile when upgrading
+from Windows 1.9.3.2.</p></li>
+<li><p><strong>No automatic website or SMTP claim:</strong> The Windows
+application does not automatically publish a website and does not
+configure SMTP. The public portal is a separate configured
+deployment.</p></li>
+<li><p><strong>No live Stripe claim:</strong> The hosted Stripe adapter
+is optional and no live charge is verified by release
+acceptance.</p></li>
+<li><p>Communications can reference eligible Parks program and closure
+snapshots as described in Section 6.</p></li>
+<li><p><strong>Parks HTTP contract:</strong> A complete Parks HTTP
+endpoint list is not present in the supplied material. The
+source-confirmed routes used by the Communications resolver are listed
+in Section 6.</p></li>
+<li><p><strong>Migration syntax:</strong> Parks migrations are
+programmatic. This guide does not invent command-line syntax for
+migrations.</p></li>
+<li><p><strong>Role matrix:</strong> <code>local-admin</code> and
+<code>city-staff</code> have all profile-module capabilities;
+<code>clerk</code> has Meetings/Notice/Access/311/Communications/Parks
+and no Records/Code/Data capability; <code>records-staff</code> has
+Records only; <code>code-staff</code> has Code only.</p></li>
+</ul>
+</article></main>
+<footer>Townlight · Acceptance evidence applies only to its identified artifacts.<span><a href="../announcement.html">Announcement</a> · <a href="../support.html">Support</a></span></footer>
+</body></html>

@@ -1,0 +1,408 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Townlight Parks Manual Beta 1 | Townlight</title>
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../brand/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="https://townlight.github.io/brand/png/townlight-hall-app-icon-180.png">
+</head><body><a class="skip" href="#main">Skip to content</a>
+<header><a class="brand" href="../index.html"><img src="../brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a>
+<span class="edition">Windows 1.10.0.1</span>
+<nav aria-label="Main"><a href="../index.html#products">Products</a><a href="suite.html">Suite manual</a>
+<a href="../reference/index.html">Technical reference</a><a href="../versions.html">Versions and release</a></nav></header>
+<main id="main" class="reading wrap"><p class="edition">Windows 1.10.0.1</p>
+<p class="docmeta"><a href="https://townlight.github.io/pdf/Townlight-Parks-Manual-Beta-1.pdf">Printable PDF</a> · <a href="https://townlight.github.io/docx/Townlight-Parks-Manual-Beta-1.docx">Editable Word</a></p>
+<article class="docbody">
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#townlight-parks-0.2.0-user-manual"
+id="toc-townlight-parks-0.2.0-user-manual">Townlight Parks 0.2.0 — User
+Manual</a>
+<ul>
+<li><a href="#scope-and-status" id="toc-scope-and-status">1. Scope and
+status</a></li>
+<li><a href="#roles-and-access" id="toc-roles-and-access">2. Roles and
+access</a></li>
+<li><a href="#architecture" id="toc-architecture">3.
+Architecture</a></li>
+<li><a href="#user-flow-resident-booking-and-registration"
+id="toc-user-flow-resident-booking-and-registration">4. User flow
+(resident booking and registration)</a></li>
+<li><a href="#facilities-programs-and-hours"
+id="toc-facilities-programs-and-hours">5. Facilities, programs and
+hours</a></li>
+<li><a href="#households-and-minors" id="toc-households-and-minors">6.
+Households and minors</a></li>
+<li><a href="#bookings" id="toc-bookings">7. Bookings</a></li>
+<li><a href="#sessions-capacity-and-attendance"
+id="toc-sessions-capacity-and-attendance">8. Sessions, capacity and
+attendance</a></li>
+<li><a href="#payments-and-refunds" id="toc-payments-and-refunds">9.
+Payments and refunds</a></li>
+<li><a href="#maintenance-links-and-311"
+id="toc-maintenance-links-and-311">10. Maintenance links and
+311</a></li>
+<li><a href="#attachments-and-records"
+id="toc-attachments-and-records">11. Attachments and Records</a></li>
+<li><a href="#admin-aggregate-data-approval"
+id="toc-admin-aggregate-data-approval">12. Admin aggregate data
+approval</a></li>
+<li><a href="#notifications" id="toc-notifications">13.
+Notifications</a></li>
+<li><a href="#technical-operations" id="toc-technical-operations">14.
+Technical operations</a></li>
+<li><a href="#errors-retry-and-revision-guidance"
+id="toc-errors-retry-and-revision-guidance">15. Errors, retry and
+revision guidance</a></li>
+<li><a href="#acceptance-status" id="toc-acceptance-status">16.
+Acceptance status</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="townlight-parks-0.2.0-user-manual">Townlight Parks 0.2.0 — User
+Manual</h1>
+<p>Townlight Parks 0.2.0 is included in Townlight for Windows 1.10.0.1.
+<a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download
+the signed Windows installer</a>.</p>
+<p>The Windows acceptance checks covered resident Parks workflows,
+maintenance and Records archiving. Payment processing through a live
+Stripe account is outside those checks.</p>
+<ul>
+<li>Package: <code>townlight-parks==0.2.0</code></li>
+<li>Import: <code>townlight_parks</code></li>
+<li>Core target: <code>townlight-core==1.3.0.dev2</code></li>
+<li>Target platform: Windows, Python <code>&gt;=3.11</code></li>
+<li>Database schema: <code>townlight_parks</code> (production bootstrap
+<code>False</code>; explicit migrations only)</li>
+</ul>
+<hr />
+<h2 id="scope-and-status">1. Scope and status</h2>
+<p>Townlight Parks supports the following parks and recreation
+workflows.</p>
+<ul>
+<li>Public facility and program catalogue and availability views.</li>
+<li>Booking and registration for residents.</li>
+<li>Session rosters, waitlists, promotion and attendance.</li>
+<li>Household, participant, and minor data held privately.</li>
+<li>Fees, deposits, refunds and reconciliation in integer cents with
+explicit currency.</li>
+<li>Offline payment and refund recording in an append-only ledger.</li>
+<li>An optional hosted Stripe Checkout adapter that verifies the
+provider transaction, amount, currency and obligation identity at the
+host before creating a ledger record.</li>
+<li>Maintenance links that create real 311 requests with durable
+idempotency and returned 311 request identity.</li>
+<li>Explicitly approved Communications source snapshots.</li>
+<li>Records private ZIP archive/readback and approved aggregate Data
+export.</li>
+<li>Notifications are recorded as queued items; <strong>queued is not
+the same as delivered</strong>.</li>
+</ul>
+<hr />
+<h2 id="roles-and-access">2. Roles and access</h2>
+<p>Existing Suite roles remain in force:</p>
+<ul>
+<li><code>local-admin</code> — configures the local instance, staff
+accounts, and permitted integrations; has all active profile module
+capabilities, including Records and Aggregate Data approval.</li>
+<li><code>city-staff</code> — operates day-to-day Parks workflows
+(facilities, programs, sessions, bookings, payments, maintenance links,
+notifications review); has all active profile module capabilities,
+including Records.</li>
+<li><code>clerk</code> — records and reconciles offline payments and
+refunds and manages receipts within the scope assigned by
+<code>local-admin</code>; has Meetings, Notice, Access, 311,
+Communications and Parks workflow access, but not Records, Code or
+Data.</li>
+<li><code>records-staff</code> — has Records access only.</li>
+<li><code>code-staff</code> — has Code access only.</li>
+</ul>
+<p>Records archive access is controlled by the Records capability:
+<code>local-admin</code> and <code>city-staff</code> have it, while
+<code>clerk</code> does not; <code>records-staff</code> has Records
+access only. Records producer archive handoff requires both the relevant
+module workflow access and Records access, so use
+<code>city-staff</code> or <code>local-admin</code> for that. Records
+retrieval can also be performed by <code>records-staff</code>. Aggregate
+Data export requires explicit <strong>approval</strong> by
+<code>local-admin</code> as described in §12. Public pages expose
+catalogue and availability only, and never household, participant,
+minor, accommodation, contact or private tracking details.</p>
+<p>The standalone <code>main.py</code> is a demonstration entry point.
+City staff use the Parks workspace in the installed Windows suite with
+their normal staff account.</p>
+<hr />
+<h2 id="architecture">3. Architecture</h2>
+<p>The following describes the source-level architecture. It does not
+assert a deployed topology.</p>
+<figure>
+<img src="https://townlight.github.io/assets/diagrams/community/parks-1.svg"
+alt="3. Architecture — diagram 1" />
+<figcaption aria-hidden="true">3. Architecture — diagram 1</figcaption>
+</figure>
+<p>Durable command identities in the inbox prevent replay-driven
+duplication. The host applies queued work only when its preconditions
+hold; a queued notification is not evidence of delivery.</p>
+<hr />
+<h2 id="user-flow-resident-booking-and-registration">4. User flow
+(resident booking and registration)</h2>
+<figure>
+<img src="https://townlight.github.io/assets/diagrams/community/parks-2.svg"
+alt="4. User flow (resident booking and registration) — diagram 2" />
+<figcaption aria-hidden="true">4. User flow (resident booking and
+registration) — diagram 2</figcaption>
+</figure>
+<p>The host is the authority. Provider return URLs are
+<strong>not</strong> payment proof; only a host-side verification of the
+provider transaction, amount, currency and obligation identity leads to
+a ledger payment record.</p>
+<hr />
+<h2 id="facilities-programs-and-hours">5. Facilities, programs and
+hours</h2>
+<h3 id="timezone-and-dst-review">5.1 Timezone and DST review</h3>
+<p>Each facility and program carries an explicit timezone. Hours are
+reviewed against that timezone before they are shown publicly or used
+for availability. Daylight-saving transitions are reviewed explicitly by
+staff: the review step exists because a locally stated hour is not the
+same instant across a DST boundary, and booking, closure and buffer
+arithmetic must use the resolved instant. Do not assume that a stated
+local clock time maps to a single UTC instant on a transition day.</p>
+<h3 id="buffers-and-closures">5.2 Buffers and closures</h3>
+<p>Facilities support setup and cleanup buffers. Buffers are applied
+around a booking when availability is evaluated and when the reservation
+is locked. Closures and blackouts suppress availability for the affected
+windows and are themselves evaluated in the facility’s timezone.</p>
+<p>Availability shown on public pages reflects catalogue and
+availability only; it does not reveal household, participant, minor,
+accommodation, contact, or private tracking details.</p>
+<hr />
+<h2 id="households-and-minors">6. Households and minors</h2>
+<p>Households group participants. Participant and household records are
+private. Minor records, accessibility/accommodation notes, and contact
+details are private and are not exposed to public pages or to aggregate
+exports. Staff access to household and participant records is limited by
+role and by the Records permission where archived material is
+involved.</p>
+<p>Where a workflow requires accommodation information, that information
+is collected through the private staff path and is not surfaced in the
+public catalogue or availability response.</p>
+<hr />
+<h2 id="bookings">7. Bookings</h2>
+<h3 id="recurrence-conflicts-and-locking">7.1 Recurrence, conflicts and
+locking</h3>
+<p>A facility reservation may be single or recurring. When a request is
+stored:</p>
+<ul>
+<li>The resource and session rows are locked in the same transaction as
+the overlap checks and occupancy writes.</li>
+<li>Recurrence is applied <strong>all or nothing</strong>; a recurrence
+that would conflict as a whole is rejected as a whole, and partial
+writes are not left behind.</li>
+<li>Locks are acquired in a stable order so that concurrent requests do
+not deadlock.</li>
+</ul>
+<p>Conflicts produce a clear, resident-facing error that explains which
+slot or constraint failed and how to revise the request. There are no
+“silent” partial bookings.</p>
+<h3 id="approval-reschedule-and-cancel">7.2 Approval, reschedule and
+cancel</h3>
+<p>Approval may be required per facility or per program, at staff
+discretion. Reschedule and cancel are staff or resident actions subject
+to the same locking discipline as creation: a reschedule is validated
+against conflicts and buffers before it is applied, and a cancel
+releases occupied windows and records the change against the durable
+command identity.</p>
+<p>A rejected or failed request returns an error that names the
+constraint (for example, overlap, buffer, closure, or approval denied)
+and a concrete revision path. Retrying a rejected request without a
+revision is expected to fail again; the error is guidance, not an
+invitation to retry blindly.</p>
+<hr />
+<h2 id="sessions-capacity-and-attendance">8. Sessions, capacity and
+attendance</h2>
+<h3 id="capacity-and-age-eligibility">8.1 Capacity and age
+eligibility</h3>
+<p>Programs and sessions carry eligibility rules, including age ranges
+where configured, and a capacity. Registration is checked against
+eligibility and remaining capacity under the same transactional
+discipline used for facility reservations.</p>
+<h3 id="waitlists-and-promotion">8.2 Waitlists and promotion</h3>
+<p>When a session is full, a registration may be placed on a waitlist.
+Promotion from waitlist occurs against the session’s capacity, with
+durable command identity so a retried promotion is not duplicated.
+Promotion does not silently exceed capacity.</p>
+<h3 id="rosters-and-attendance">8.3 Rosters and attendance</h3>
+<p>Session rosters are private to staff permitted to see them.
+Attendance check-in is idempotent: a repeated check-in for the same
+attendee and session does not create a second attendance record. Rosters
+and attendance are excluded from public pages and from aggregate Data
+exports containing participant detail.</p>
+<hr />
+<h2 id="payments-and-refunds">9. Payments and refunds</h2>
+<p>All fee arithmetic is in integer cents with an explicit currency.
+Deposits and refunds are also represented in integer cents with the
+session’s currency.</p>
+<h3 id="offline-payments-and-refunds">9.1 Offline payments and
+refunds</h3>
+<p>Offline payments and refunds are recorded in an <strong>append-only
+ledger</strong>. Each entry carries the staff actor and a reference.
+Corrections are made by adding an opposite entry, not by editing
+history. Receipts are issued from ledger records.</p>
+<h3 id="optional-hosted-stripe-checkout-when-configured">9.2 Optional
+hosted Stripe Checkout (when configured)</h3>
+<p>The hosted Stripe adapter requires a separately configured account.
+No live charge was tested in release acceptance.</p>
+<p>When it is configured by an operator, the intended path is:</p>
+<ol type="1">
+<li>The host creates a Checkout session for a specific obligation.</li>
+<li>The resident completes Checkout at the hosted provider.</li>
+<li>The host retrieves the provider transaction and verifies the
+transaction identity, amount, currency and obligation identity against
+its own records.</li>
+<li>Only after that verification does the host append a ledger
+payment.</li>
+</ol>
+<p>Provider return URLs are not payment proof. A resident returning from
+a cancelled or interrupted Checkout is not evidence of payment. Card
+data does not enter Townlight; only provider identifiers and verified
+amounts are recorded. Ambiguous provider outcomes are reconciled before
+retry, and payment intents and refund intents persist across
+restart.</p>
+<hr />
+<h2 id="maintenance-links-and-311">10. Maintenance links and 311</h2>
+<p>Maintenance workflows create <strong>real</strong> 311 requests, not
+local placeholders. Each link carries a durable idempotency key so a
+retried submission does not create a duplicate 311 request. The recorded
+location and photo bytes are the actual submitted bytes. The returned
+311 request identity is stored with the link so that staff can track
+progress and resolution against the real request.</p>
+<p>Staff can view the progress and resolution state of a linked 311
+request within the Parks surface. The 311 integration is the source of
+truth for the request lifecycle; Parks does not assert a status the 311
+system has not returned.</p>
+<hr />
+<h2 id="attachments-and-records">11. Attachments and Records</h2>
+<p>Attachments are private. The Records archive is a private ZIP
+archive/readback path and is controlled by the separate Records
+permission. For archive review, the operator should rely on the
+<strong>exact content hash</strong> produced by the review step: the
+hash identifies the archived content that was reviewed, rather than a
+filename or a description of contents.</p>
+<p>Records archive access is controlled by the Records capability:
+<code>local-admin</code> and <code>city-staff</code> have it,
+<code>clerk</code> does not, and <code>records-staff</code> has Records
+access only. Records producer archive handoff requires both the relevant
+module workflow access and Records access, so use
+<code>city-staff</code> or <code>local-admin</code> for that; Records
+retrieval can also be performed by <code>records-staff</code>. When in
+doubt, verify the exact content hash and the access check rather than
+relying on a filename.</p>
+<p>Public pages never expose attachments, archive contents, archive
+hashes, household or participant data, accommodation notes, or private
+tracking identifiers.</p>
+<p>Aggregate Data exports are restricted to the approved aggregate scope
+described in §12; participant, contact and accommodation details are
+excluded.</p>
+<hr />
+<h2 id="admin-aggregate-data-approval">12. Admin aggregate data
+approval</h2>
+<p>Aggregate Data export requires explicit approval by
+<code>local-admin</code>. Approval is a discrete action that records who
+approved the export and what aggregate scope was approved. The export is
+restricted to that scope and excludes participant, contact and
+accommodation details. Approval is available to <code>local-admin</code>
+and is not available to <code>clerk</code>, <code>records-staff</code>
+or <code>code-staff</code>; it is a separate gate.</p>
+<hr />
+<h2 id="notifications">13. Notifications</h2>
+<p>Notifications are recorded in an outbox. A queued notification is
+<strong>queued, not delivered</strong>. The delivery worker is a
+separate step and its success is not assumed by the queue record. Staff
+reviewing notifications should distinguish queued state from delivered
+state, and should not treat the presence of a queued entry as evidence
+that the resident received it.</p>
+<p>Retries at the delivery layer are the responsibility of the delivery
+worker and are expected to be safe against duplicate commands, but
+queued work is not confirmed until the host applies it.</p>
+<hr />
+<h2 id="technical-operations">14. Technical operations</h2>
+<h3 id="stack-and-host-roles">14.1 Stack and host roles</h3>
+<p>The Suite combines TypeScript staff surfaces with a Python runtime,
+resident portal and encrypted command handling. Parks reuses the shared
+command/session proof and allocation-receipt approach used by 311 and
+Communications. Host roles are <code>local-admin</code>,
+<code>city-staff</code>, <code>clerk</code>, <code>records-staff</code>
+and <code>code-staff</code>. <code>local-admin</code> and
+<code>city-staff</code> have all active profile module capabilities;
+<code>clerk</code> has Meetings, Notice, Access, 311, Communications and
+Parks workflow access but not Records, Code or Data;
+<code>records-staff</code> has Records only; <code>code-staff</code> has
+Code only. Target platform is Windows with Python
+<code>&gt;=3.11</code>.</p>
+<h3 id="migrations">14.2 Migrations</h3>
+<p>Production bootstrap is <code>False</code>. Tables are created only
+through explicit, programmatic migrations invoked from the package
+migrations module: <code>migrations.upgrade(engine)</code> followed by
+<code>migrations.assert_ready(engine)</code>. Operators should call the
+migrations module from their own deployment code and rely on
+<code>assert_ready</code> to fail closed if the schema is not ready.</p>
+<h3 id="encrypted-keys-and-portal-csrf">14.3 Encrypted keys and portal
+CSRF</h3>
+<p>Profile encryption keys are held encrypted and are not present in
+source control, configuration files, logs, or the repository. The
+resident portal applies CSRF protection and session ownership checks to
+resident commands. Secrets and card details must not be placed in
+configuration files, logs, or the repository.</p>
+<h3 id="command-inbox-and-source-api-privacy">14.4 Command inbox and
+source API privacy</h3>
+<p>Durable command identities in the inbox prevent replay duplication.
+The source API must not expose private household, participant, minor,
+accommodation, contact, attachment, or private tracking details; public
+responses are limited to catalogue and availability. Queued work is not
+confirmed until the host applies it. Ambiguous provider outcomes are
+reconciled before retry.</p>
+<h3 id="backup-and-restore">14.5 Backup and restore</h3>
+<p>Back up the database, managed files, portal inbox, profile encryption
+keys and publisher queue <strong>together</strong>. Restore preserves
+the relationship between durable command identities, ledger entries, and
+queued work. Payment intents and refund intents persist across restart.
+After a restart, the runtime reopens durable requests and resumes
+known-safe jobs without duplicates; a resumed job is not evidence of
+delivery or of provider settlement until the host re-verifies.</p>
+<hr />
+<h2 id="errors-retry-and-revision-guidance">15. Errors, retry and
+revision guidance</h2>
+<ul>
+<li>A failed validation returns a clear error naming the constraint that
+failed (for example: timezone or DST resolution, buffer, closure,
+overlap, capacity, eligibility, approval denied, or provider
+verification).</li>
+<li>A rejected request is not automatically retryable as-is. The error
+identifies what to revise; retrying without a revision is expected to
+fail again.</li>
+<li>Retries of accepted commands are safe against duplication because of
+durable command identities, unless the command was explicitly
+rejected.</li>
+<li>Provider payment outcomes that are ambiguous are reconciled against
+the provider before a retry is attempted.</li>
+<li>Queued notifications and resumed jobs are not confirmed until the
+host applies them; do not treat queue state as delivery state.</li>
+</ul>
+<p>Use the Parks workspace in the installed Windows suite for ordinary
+staff operations.</p>
+<hr />
+<h2 id="acceptance-status">16. Acceptance status</h2>
+<p>The <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Windows
+acceptance record</a> covers Parks reservations, enrollment, maintenance
+and private Records archiving.</p>
+<ul>
+<li>The optional hosted Stripe adapter requires configuration. Release
+acceptance did not use a live charge.</li>
+<li>Notifications are queued, and queued is <strong>not</strong>
+delivered.</li>
+</ul>
+</article></main>
+<footer>Townlight · Acceptance evidence applies only to its identified artifacts.<span><a href="../announcement.html">Announcement</a> · <a href="../support.html">Support</a></span></footer>
+</body></html>

@@ -58,9 +58,9 @@ def reference(slug, schema, identity, site=SITE, candidate_version='1.10.0.1', r
     title = 'Townlight ' + slug.title() + ' API reference'
     esc = html.escape
     manual_slug = 'communications' if slug == 'comms' else slug
-    schema_href = f'/api/candidate-1.10.0.1/{slug}-openapi.json'
+    schema_href = f'{slug}-openapi.json'
     body = [f'<h1>{esc(title)}</h1>',
-            f'<p>Prepared Windows {esc(candidate_version)} unpublished candidate, runtime {esc(runtime_version)}. Unpublished source schema; no installed acceptance is claimed.</p>',
+            f'<p>Townlight for Windows {esc(candidate_version)}, runtime {esc(runtime_version)}. <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download the signed Windows installer</a> · <a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Installed acceptance</a>.</p>',
             f'<p>{esc(identity)}. The HTTP host is {esc(schema["info"]["title"])} '
             f'{esc(schema["info"]["version"])}. Component package versions and the host API version are separate identities.</p>',
             '<p>Generated from the actual native inspections-preview composition without application lifespan, migrations or database/network access. It describes route and validation contracts; it does not establish endpoint behavior, individual authorization or installed acceptance. Standalone product applications have separate deployment boundaries.</p>',
@@ -158,7 +158,7 @@ def main():
         if not document['paths']:
             raise ValueError('No actual composed API routes for ' + slug)
         if slug == 'suite':
-            identity = (f'Windows {candidate_version} unpublished candidate; '
+            identity = (f'Windows {candidate_version} release; '
                         f'townlight-runtime {runtime_version}')
         else:
             modules = state.get('modules', {})
@@ -169,8 +169,8 @@ def main():
                                 if isinstance(value, str)), '')
                 identity = module.get('public_name', slug) + (' ' + version if version else '')
             else:
-                identity = slug + ' source candidate (unpublished)'
-        document['info']['description'] = 'Prepared source schema for the actual native composition; installed acceptance remains pending. Exported without lifespan, migrations or database/network access.'
+                identity = slug + ' native runtime'
+        document['info']['description'] = 'Route and data contracts exported from the Windows 1.10.0.1 native runtime without server startup, migrations, or database or network access.'
         document['x-townlight-component'] = {'view': slug, 'identity': identity, 'evidence': 'source-schema-only'}
         json_path = output_dir / f'{slug}-openapi.json'
         html_path = output_dir / f'{slug}.html'

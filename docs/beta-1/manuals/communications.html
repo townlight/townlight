@@ -1,0 +1,131 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Townlight Communications Manual Beta 1 | Townlight</title>
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../brand/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="https://townlight.github.io/brand/png/townlight-hall-app-icon-180.png">
+</head><body><a class="skip" href="#main">Skip to content</a>
+<header><a class="brand" href="../index.html"><img src="../brand/svg/townlight-hall-lockup.svg" alt="Townlight" width="217" height="45"></a>
+<span class="edition">Windows 1.10.0.1</span>
+<nav aria-label="Main"><a href="../index.html#products">Products</a><a href="suite.html">Suite manual</a>
+<a href="../reference/index.html">Technical reference</a><a href="../versions.html">Versions and release</a></nav></header>
+<main id="main" class="reading wrap"><p class="edition">Windows 1.10.0.1</p>
+<p class="docmeta"><a href="https://townlight.github.io/pdf/Townlight-Communications-Manual-Beta-1.pdf">Printable PDF</a> · <a href="https://townlight.github.io/docx/Townlight-Communications-Manual-Beta-1.docx">Editable Word</a></p>
+<article class="docbody">
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#townlight-communications-0.2.0-user-manual"
+id="toc-townlight-communications-0.2.0-user-manual">Townlight
+Communications 0.2.0 User Manual</a>
+<ul>
+<li><a href="#status-and-scope" id="toc-status-and-scope">Status and
+scope</a></li>
+<li><a href="#staff-workflow" id="toc-staff-workflow">Staff
+workflow</a></li>
+<li><a href="#portal-email-and-delivery"
+id="toc-portal-email-and-delivery">Portal, email and delivery</a></li>
+<li><a href="#records-and-roles" id="toc-records-and-roles">Records and
+roles</a></li>
+<li><a href="#acceptance-status" id="toc-acceptance-status">Acceptance
+status</a></li>
+<li><a href="#technical-architecture"
+id="toc-technical-architecture">Technical architecture</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="townlight-communications-0.2.0-user-manual">Townlight
+Communications 0.2.0 User Manual</h1>
+<h2 id="status-and-scope">Status and scope</h2>
+<p>Townlight Communications 0.2.0 is included in Townlight for Windows
+1.10.0.1. <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download
+the signed Windows installer</a>. The package is
+<code>townlight-comms</code>, imported as <code>townlight_comms</code>,
+with Townlight Core 1.3.0.dev2.</p>
+<p>The canonical application is the Communications workspace in the
+Townlight Windows staff shell with existing roles: local-admin and
+city-staff have all active profile-module capabilities plus Records;
+clerk has Meetings, Notice, Access, 311, Communications and Parks
+workflow access, but not Records, Code or Data; records-staff has
+Records only; code-staff has Code only. Aggregate Data approval uses
+local-admin. Records archive handoff and retrieval use the separate
+Records permission. The standalone <code>main.py</code> in this
+repository remains a prototype for draft helpers; it is not a secured
+workflow server or production deployment procedure.</p>
+<h2 id="staff-workflow">Staff workflow</h2>
+<ol type="1">
+<li>Create or reopen a draft. Select eligible sources from Meetings,
+Code, Notice, 311 or Parks.</li>
+<li>Save the draft and run an Access check. Review and approve one exact
+revision. Approval applies to that revision only; later edits clear
+it.</li>
+<li>Schedule publication to the website and email for the approved
+revision.</li>
+<li>Publish, then archive the published revision to Records BEFORE
+editing, correcting, or withdrawing it; Records producer archive handoff
+requires both the module and Records access, so use city-staff or
+local-admin; Records retrieval can also use records-staff. Corrections
+preserve prior revisions, and withdrawal prevents stale content from
+being restored.</li>
+</ol>
+<p>Captured approved source snapshots, public URLs, digests and revision
+provenance remain with the article. Public attachments require review.
+Private source content cannot be published, and missing, private or
+stale sources block approval.</p>
+<h2 id="portal-email-and-delivery">Portal, email and delivery</h2>
+<p>The host configuration supplies the portal credential and origin.
+Normal operation uses an unattended host service, not an operator
+window, so scheduled work can complete after the staff app closes.
+Website tasks travel through the existing authenticated portal receiver,
+with receipt URL and hash retained.</p>
+<p>Email uses the city email settings shared with 311 SMTP. Subscribers
+must confirm their email address and can manage preferences or
+unsubscribe. Queued means pending, not SMTP accepted. Only sent means
+SMTP accepted the message, not human receipt. Failed and uncertain
+results are shown separately, and an uncertain send is never retried
+automatically. Deterministic message identifiers and durable records
+support safe retries only when non-delivery is known.</p>
+<h2 id="records-and-roles">Records and roles</h2>
+<p>The Records archive stores the actual published bytes, source
+references, attachments and receipts, and returns a real identifier.
+Records retrieval requires Records access. Existing staff roles continue
+to control drafting, review and approval; no resident account can see
+staff drafts or private source data. Publication metrics are limited to
+explicit approved aggregate reporting, not subscriber lists.</p>
+<h2 id="acceptance-status">Acceptance status</h2>
+<p>On the signed Windows release, a scheduled article reached the portal
+after the desktop closed. The test mailbox accepted its email, and
+Records returned the same article revision and content hash. See the <a
+href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md">Windows
+acceptance record</a>.</p>
+<h2 id="technical-architecture">Technical architecture</h2>
+<figure>
+<img src="https://townlight.github.io/assets/diagrams/community/communications-1.svg"
+alt="Technical architecture — diagram 1" />
+<figcaption aria-hidden="true">Technical architecture — diagram
+1</figcaption>
+</figure>
+<p>The desktop runtime is <code>/desktop/v1/communications</code>,
+protected by native staff authentication. Browser requests use a fixed
+native command allowlist and cannot choose arbitrary URLs. Portal
+inbound operations use encrypted authenticated inbox and pump patterns;
+the desktop service remains private. Production uses a real PostgreSQL
+schema with explicit migration; SQLite translation is for tests, and
+production bootstrap is false. Revisions are immutable and approval
+binds the exact public-content hash. Optimistic revisions and database
+transactions prevent two-PC lost updates. Plain text is stored and
+escaped paragraphs are rendered; HTML is not trusted.</p>
+<p>Source eligibility is checked at runtime against the owning module;
+user-supplied flags cannot authorize publication. The email outbox has
+durable state separate from 311, and subscriber tokens are hashed and
+private. The host service owns portal credentials and origin
+configuration.</p>
+<p>Back up database data, profile keys, durable queue work and Records
+files as one unit. The product does not provide Mac or Linux
+installation instructions.</p>
+<p>Documentation authoring and translation provenance are recorded
+separately from product implementation.</p>
+</article></main>
+<footer>Townlight · Acceptance evidence applies only to its identified artifacts.<span><a href="../announcement.html">Announcement</a> · <a href="../support.html">Support</a></span></footer>
+</body></html>

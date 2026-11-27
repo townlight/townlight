@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "Prepared source schema for the actual native composition; installed acceptance remains pending. Exported without lifespan, migrations or database/network access.",
+    "description": "Route and data contracts exported from the Windows 1.10.0.1 native runtime without server startup, migrations, or database or network access.",
     "version": "1.8.0.dev5"
   },
   "paths": {
@@ -39541,7 +39541,7 @@
   },
   "x-townlight-component": {
     "view": "suite",
-    "identity": "Windows 1.10.0.1 unpublished candidate; townlight-runtime 0.4.0",
+    "identity": "Windows 1.10.0.1 release; townlight-runtime 0.4.0",
     "evidence": "source-schema-only"
   }
 }

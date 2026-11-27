@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Townlight Parks manages reservations, enrollments and maintenance in Townlight for Windows 1.10.0.1.">
+  <title>Townlight Parks — Windows 1.10.0.1</title>
+  <style>
+    :root {
+      --navy: #081d30;
+      --navy-2: #12314f;
+      --gold: #e0b24c;
+      --gold-soft: #f5e6b8;
+      --gold-deep: #7a5200;
+      --paper: #f7f3e8;
+      --card: #fffdf6;
+      --ink: #102132;
+      --muted: #4c5b6a;
+      --line: #d9cfa9;
+      --focus: #0b5fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .skip {
+      position: absolute;
+      left: 1rem;
+      top: -5rem;
+      z-index: 10;
+      background: var(--gold);
+      color: var(--navy);
+      padding: 0.65rem 0.9rem;
+      border-radius: 0.35rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .skip:focus {
+      top: 1rem;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 2rem));
+      margin-inline: auto;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 85% 10%, rgba(224, 178, 76, 0.18), transparent 28rem),
+        linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: #fffdf6;
+      border-bottom: 0.4rem solid var(--gold);
+      padding: 4rem 0 3.5rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 1rem;
+      color: var(--gold-soft);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--navy);
+      border-radius: 999px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      margin: 0.7rem 0 0.6rem;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.7rem, 8vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+
+    .lede {
+      max-width: 68ch;
+      margin: 0;
+      color: #f5efdc;
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+    }
+
+    main {
+      padding: 2.2rem 0 3rem;
+    }
+
+    h2 {
+      margin: 0 0 0.8rem;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3vw, 2.15rem);
+      line-height: 1.15;
+      color: var(--navy);
+    }
+
+    h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.12rem;
+      line-height: 1.25;
+      color: var(--navy);
+    }
+
+    p {
+      margin: 0 0 0.9rem;
+    }
+
+    p:last-child,
+    ul:last-child {
+      margin-bottom: 0;
+    }
+
+    a {
+      color: #0b4f78;
+      font-weight: 700;
+      text-underline-offset: 0.16em;
+    }
+
+    a:hover {
+      color: var(--gold-deep);
+    }
+
+    a:focus-visible,
+    .skip:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+      border-radius: 0.2rem;
+    }
+
+    code {
+      background: #eee5c9;
+      color: #2a2414;
+      border-radius: 0.35rem;
+      padding: 0.08rem 0.32rem;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.92em;
+      overflow-wrap: anywhere;
+    }
+
+    .notice,
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      box-shadow: 0 12px 34px rgba(8, 29, 48, 0.08);
+      padding: clamp(1.2rem, 3vw, 2rem);
+      margin-bottom: 1.2rem;
+    }
+
+    .notice {
+      border-left: 0.5rem solid var(--gold);
+    }
+
+    .notice strong {
+      color: var(--navy);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.2rem;
+      box-shadow: 0 8px 24px rgba(8, 29, 48, 0.06);
+    }
+
+    .card h3 {
+      border-bottom: 2px solid var(--gold-soft);
+      padding-bottom: 0.45rem;
+    }
+
+    ul {
+      margin: 0.6rem 0 0;
+      padding-left: 1.25rem;
+    }
+
+    li {
+      margin: 0.35rem 0;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.1rem;
+      margin-top: 1rem;
+    }
+
+    .columns > div {
+      background: #fffaf0;
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+      padding: 1rem;
+    }
+
+    .links {
+      list-style: none;
+      padding: 0;
+      margin: 0.8rem 0 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.65rem;
+    }
+
+    .links a {
+      display: block;
+      background: #fffaf0;
+      border: 1px solid var(--line);
+      border-radius: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      background: var(--gold-soft);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      padding: 1.4rem 0 2.5rem;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 620px) {
+      .hero {
+        padding: 2.7rem 0 2.4rem;
+      }
+
+      main {
+        padding-top: 1.3rem;
+      }
+
+      .notice,
+      .panel {
+        padding: 1rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Townlight Suite · Parks</p>
+      <span class="badge">Windows public beta 1.10.0.1</span>
+      <h1>Townlight Parks</h1>
+      <p class="lede">Manage parks facilities, reservations, programs, enrollment and maintenance.</p>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="notice" aria-labelledby="release-status">
+      <h2 id="release-status">Release status</h2>
+      <p><a href="https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi">Download the signed Windows 1.10.0.1 installer</a> · <a href="https://townlight.github.io/manuals/parks.html">Parks manual</a> · <a href="https://townlight.github.io/api/candidate-1.10.0.1/parks.html">API reference</a></p>
+    </section>
+
+    <section aria-labelledby="features">
+      <h2 id="features">Parks and recreation workflows</h2>
+
+      <div class="grid">
+        <article class="card">
+          <h3>Resident booking and program registration</h3>
+          <ul>
+            <li>Public facility and program catalogue, availability, booking and registration forms.</li>
+            <li>Facility reservations with recurrence, setup/cleanup buffers, closures/blackouts, rescheduling and cancellation.</li>
+            <li>Resource and session rows are locked in the same transaction as overlap checks and occupancy writes.</li>
+            <li>Recurrences are all-or-nothing and lock in stable order.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Private households and participants</h3>
+          <ul>
+            <li>Households, participants, and minor/accessibility/contact data stay private.</li>
+            <li>Public pages expose catalogue and availability only.</li>
+            <li>Public pages do not expose household, participant, minor, accommodation, contact, or private tracking details.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Programs, capacity and waitlists</h3>
+          <ul>
+            <li>Programs and sessions with eligibility, capacity, enrollment, waitlists and promotion.</li>
+            <li>Private rosters and idempotent attendance check-in.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Fees, offline ledger and optional Stripe</h3>
+          <ul>
+            <li>Fees, deposits, refunds and reconciliation in integer cents with explicit currency.</li>
+            <li>Offline payments and refunds are recorded in an append-only ledger with staff actor and reference.</li>
+            <li>Optional hosted Stripe Checkout adapter for online payment. A city must configure its own Stripe account, and no live charge has been verified.</li>
+            <li>Card data does not enter Townlight. Provider return URLs are not payment proof; the host retrieves and verifies provider transaction, amount, currency and obligation identity before recording a ledger payment.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>311 and Communications</h3>
+          <ul>
+            <li>Maintenance links create real 311 requests with durable idempotency, actual location/photo bytes, and returned 311 request identity.</li>
+            <li>Explicitly approved public closures and program descriptions can become Communications source snapshots.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Records and Data</h3>
+          <ul>
+            <li>Records private ZIP archive and readback.</li>
+            <li>Approved aggregate Data export.</li>
+            <li>Records archive access remains permission-controlled.</li>
+            <li>Data exports exclude participant, contact and accommodation details.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="roles">
+      <h2 id="roles">Operator/admin roles, privacy, and configuration</h2>
+
+      <div class="columns">
+        <div>
+          <h3>Roles and access</h3>
+          <p>Existing roles remain <code>local-admin</code>, <code>city-staff</code>, and <code>clerk</code>. Records archive permission is separate. Parks reuses the shared command/session proof and allocation-receipt approach used by 311 and Communications.</p>
+          <p>A standalone <code>main.py</code> is retained as a foundation/demo entry point. It is not the full Suite authentication path, not a normal installer, and not the ordinary city-staff deployment route. Ordinary city staff should use the signed Windows suite installer.</p>
+        </div>
+
+        <div>
+          <h3>Privacy, concurrency and recovery</h3>
+          <p>Private tracking links, CSRF checks and session ownership protect resident commands. Durable command identities prevent replay duplication; queued work is not confirmed until the host applies it.</p>
+          <p>Back up the database, managed files, portal inbox, profile encryption keys and publisher queue together. Restart must reopen durable requests and resume known-safe jobs without duplicates. Payment and refund intents persist across restart; ambiguous provider outcomes are reconciled before retry.</p>
+        </div>
+
+        <div>
+          <h3>Configuration</h3>
+          <p>Target Windows, Python <code>&gt;=3.11</code>. Package <code>townlight-parks==0.2.0</code>; import <code>townlight_parks</code>; Core target <code>townlight-core==1.3.0.dev2</code>.</p>
+          <p>For development, install Core from the pinned <code>townlight/core</code> git commit <code>2f6ba9be4a95e3772dc47a3682ac780c5283b626</code>. The Core package requirement is not a promise of PyPI availability.</p>
+          <p>Database schema: <code>townlight_parks</code>. Production bootstrap is <code>False</code>; tables are created only through explicit programmatic migrations (<code>migrations.upgrade(engine)</code>, then <code>migrations.assert_ready(engine)</code> via the package migrations module). </p>
+          <p>Configure database credentials and hosted payment secrets outside source control. Do not place secrets or card details in configuration files, logs, or the repository.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="documentation">
+      <h2 id="documentation">Documentation and links</h2>
+      <ul class="links">
+        <li><a href="https://github.com/townlight/parks">Repository</a></li>
+        <li><a href="https://github.com/townlight/parks/blob/main/README.md">Repository README</a></li>
+        <li><a href="https://github.com/townlight/parks/blob/main/USER-MANUAL.md">User manual (USER-MANUAL.md)</a></li>
+        <li><a href="https://github.com/townlight/parks/blob/main/docs/architecture.md">Architecture notes</a></li>
+        <li><a href="https://townlight.github.io/">Townlight Suite website</a></li>
+      </ul>
+      <p class="small">Licensing remains as existing: code under AGPL-3.0-only with the existing public-institution exception; documentation under CC BY. See <a href="https://github.com/townlight/parks/blob/main/LICENSE-CODE">LICENSE-CODE</a> and <a href="https://github.com/townlight/parks/blob/main/LICENSE-DOCS">LICENSE-DOCS</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>Townlight Parks is included in the Windows 1.10.0.1 public beta.</p>
+    </div>
+  </footer>
+</body>
+</html>

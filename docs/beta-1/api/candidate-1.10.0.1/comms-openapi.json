@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Townlight Records",
-    "description": "Prepared source schema for the actual native composition; installed acceptance remains pending. Exported without lifespan, migrations or database/network access.",
+    "description": "Route and data contracts exported from the Windows 1.10.0.1 native runtime without server startup, migrations, or database or network access.",
     "version": "1.8.0.dev5"
   },
   "paths": {

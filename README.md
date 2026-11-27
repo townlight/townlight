@@ -1,20 +1,14 @@
-## Windows 1.9.3.2 current release
+## Townlight for Windows 1.10.0.1
 
-Windows 1.9.3.2 adds private Records staff attachment downloads with byte-count and SHA-256 verification, plus a Station control fix during session renewal. Physical candidate component checks verified a 2,174,280,536-byte private attachment on R7 and a short Station run with four successful polls and HTTP 202 Stop. The signed MSI passed direct-upgrade, lifecycle, and fresh exact-artifact acceptance checks. Published 2026-11-24T05:50:39Z.
-
-Signed MSI SHA-256 `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77`; size 1,866,072,064 bytes. In [signing/build run 45321294952](https://github.com/townlight/townlight/actions/runs/45321294952), direct-upgrade and lifecycle jobs passed but initial fresh maintenance failed on fixture setup. A fixture-only correction without rebuilding the MSI was followed by passing exact-artifact [fresh run 45328280431](https://github.com/townlight/townlight/actions/runs/45328280431).
-
-[Release notes](docs/installer/windows-1.9.3.2-candidate.md) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Release catalog](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) · [Acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md)
-
-## Windows 1.10.0.1 source candidate (311, Communications, Parks)
-
-Windows 1.9.3.2 remains the current public download. Windows 1.10.0.1 is a source candidate: installed acceptance is pending, tags and software publication are held, and no new download link is provided. The candidate adds:
+The signed Windows beta includes three new workspaces.
 
 - **311:** resident private inbox and request tracking.
 - **Communications:** subscription consent and outbound updates.
 - **Parks:** facility bookings and program registration.
 
-These flows require a separately configured resident portal, SMTP, and optional payment service; no automatic public website is implied. See the [Windows 1.10.0.1 source candidate guide](docs/windows-311-communications-parks.md).
+These flows require a separately configured resident portal, SMTP, and optional payment service; no automatic public website is implied. See the [Windows 1.10.0.1 operator guide](docs/windows-311-communications-parks.md).
+
+[Signed Windows installer](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi) · [Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md)
 
 <p align="center">
   <picture>
@@ -23,11 +17,11 @@ These flows require a separately configured resident portal, SMTP, and optional 
   </picture>
 </p>
 
-[Download Windows beta 1.9.3.2](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/HANDOFF-Windows-1.9.3.2.md)
+[Download Windows beta 1.10.0.1](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi) · [Public announcement](https://townlight.github.io/announcement.html) · [Support and feedback](https://townlight.github.io/support.html) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/HANDOFF-Windows-1.10.0.1.md)
 
-See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.10.0.1 release acceptance for the exact installed checks, artifact identity and limits.
 
-Windows x64 Beta 1 · MSI 1.9.3.2
+Windows x64 Beta 1 · MSI 1.10.0.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
 
@@ -67,21 +61,21 @@ Staff should start with First run and Connected workflows. Administrators should
 | Identity | Value |
 |----|----|
 | Public documentation identity | Townlight Beta 1 |
-| Windows MSI version | 1.9.3.2 |
-| Native desktop source version | 1.9.3-2 |
-| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) |
+| Windows MSI version | 1.10.0.1 |
+| Native desktop source version | 1.10.0-1 |
+| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/SHA256SUMS-Windows-1.10.0.1.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md) |
 | Corresponding source | Released Windows x64 beta |
 | Current owned software license | AGPL-3.0-only |
-| Supported acceptance profile | Signed 1.9.3.2 setup, backup/restore, uninstall, and adjacent upgrade verified. |
+| Supported acceptance profile | Signed 1.10.0.1 setup, backup/restore, uninstall, and adjacent upgrade verified. |
 
-See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.10.0.1 release acceptance for the exact installed checks, artifact identity and limits.
 
 ### Component versions
 
 | Component     | Distribution          | Installed version |
 |---------------|-----------------------|-------------------|
 | Core          | townlight-core        | 1.3.0.dev2        |
-| Records       | townlight-records     | 1.8.0.dev4        |
+| Records       | townlight-records     | 1.8.0.dev5        |
 | Meetings      | townlight-meetings    | 1.0.6             |
 | Code          | townlight-code        | 1.0.9             |
 | Zoning        | townlight-zoning      | 0.2.3             |
@@ -97,18 +91,21 @@ See the Windows 1.9.3.2 release acceptance for the exact installed checks, artif
 | Data | townlight-data | 0.2.0 |
 | Budget | townlight-budget | 0.2.0 |
 | Grants | townlight-grants | 0.3.0 |
-| Local runtime | townlight-runtime | 0.3.4 |
+| 311 | townlight-311 | 0.2.0 |
+| Communications | townlight-comms | 0.2.0 |
+| Parks | townlight-parks | 0.2.0 |
+| Local runtime | townlight-runtime | 0.4.0 |
 
 ## First run
 
-See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
+See the Windows 1.10.0.1 release acceptance for the exact installed checks, artifact identity and limits.
 
 ### Fresh installation
 
-Run the signed Windows 1.9.3.2 MSI and use an empty database and a new Townlight profile for first run.
+Run the signed Windows 1.10.0.1 MSI and use an empty database and a new Townlight profile for first run.
 
-1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.9.3.2](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) release.
-2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) for the tested setup.
+1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.10.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) release.
+2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md) for the tested setup.
 3.  Launch Townlight under the intended Windows account and choose storage folders. On the setup screen, choose the full bundled profile labeled **Townlight Inspections candidate**; it includes Records, Meetings, Code, Access, Notice, Zoning, Planning, Permitting, Inspections, Boards & Commissions, Contracts, Procurement, Data, Budget, and Grants.
 4.  Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
 5.  Select **Run Health Check**, then choose **Finish setup**; in System Health, if **Prepare Records** appears, choose it and follow its prompts, otherwise skip it.
@@ -117,7 +114,7 @@ Run the signed Windows 1.9.3.2 MSI and use an empty database and a new Townlight
 
 ### Existing installation
 
-**Upgrading an existing installation.** For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.9.3.2 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.1; earlier paths have separate prior evidence.
+**Upgrading an existing installation.** For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.10.0.1 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.2; earlier paths have separate prior evidence.
 
 ## Daily workflow
 
@@ -284,11 +281,11 @@ This write requires Meetings to be enabled and the signed-in staff role to permi
 
 ### Complete technical contract
 
-The [Suite API catalogue](https://townlight.github.io/api/suite.html) and [Suite API JSON](https://townlight.github.io/api/suite-openapi.json) are the historical Windows 1.8.2.1 schema snapshot. For Windows 1.9.3.2, see the release [source](https://github.com/townlight/townlight/tree/67d56f24c12be4f2a409d1940ca4199a226adcfc), the signed [shared staff guide](https://github.com/townlight/townlight/blob/67d56f24c12be4f2a409d1940ca4199a226adcfc/docs/installer/windows-shared-staff.md), and the [reference directory](https://townlight.github.io/reference/index.html). Station has a separate service API documented in its [product manual](https://townlight.github.io/manuals/station.html).
+The [Suite API catalogue](https://townlight.github.io/api/suite.html) and [Suite API JSON](https://townlight.github.io/api/suite-openapi.json) are the historical Windows 1.8.2.1 schema snapshot. For Windows 1.10.0.1, see the release [source](https://github.com/townlight/townlight/tree/d1687e6950032352f74a2890d0b2fbce107ce131), the signed [shared staff guide](https://github.com/townlight/townlight/blob/d1687e6950032352f74a2890d0b2fbce107ce131/docs/installer/windows-shared-staff.md), and the [reference directory](https://townlight.github.io/reference/index.html). Station has a separate service API documented in its [product manual](https://townlight.github.io/manuals/station.html).
 
 ### Windows Suite workflows
 
-Townlight Windows 1.9.3.2 is a signed Suite package; Data, Budget, and Grants were first bundled in Windows 1.9.3.1 and remain in the current signed 1.9.3.2 Windows beta. See the [operator manual](USER-MANUAL.md) for the workflows.
+Townlight Windows 1.10.0.1 is a signed Suite package; Data, Budget, and Grants were first bundled in Windows 1.9.3.1 and remain in the current signed 1.10.0.1 Windows beta. See the [operator manual](USER-MANUAL.md) for the workflows.
 
 ## MCP and automation boundary
 
@@ -357,6 +354,14 @@ The release acceptance summary and corresponding-source archive identify the exa
 > **Windows 1.9.2.1 acceptance.** See the Windows 1.9.2.1 release acceptance for the exact installed checks, artifact identity and limits. [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.2.1/ACCEPTANCE-Windows-1.9.2.1.md).
 
 > Boards & Commissions, Contracts and Procurement were added in Windows 1.8.0.1. Its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.0.1/ACCEPTANCE-Windows-1.8.0.1.md) identifies the staff workflows, role boundaries, persistence and upgrade exercised on that build. Those results are not a new 1.8.1.1 upgrade test.
+
+### Windows 1.9.3.2 previous release
+
+Windows 1.9.3.2 adds private Records staff attachment downloads with byte-count and SHA-256 verification, plus a Station control fix during session renewal. Physical candidate component checks verified a 2,174,280,536-byte private attachment on R7 and a short Station run with four successful polls and HTTP 202 Stop. The signed MSI passed direct-upgrade, lifecycle, and fresh exact-artifact acceptance checks. Published 2026-11-24T05:50:39Z.
+
+Signed MSI SHA-256 `b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77`; size 1,866,072,064 bytes. In [signing/build run 45321294952](https://github.com/townlight/townlight/actions/runs/45321294952), direct-upgrade and lifecycle jobs passed but initial fresh maintenance failed on fixture setup. A fixture-only correction without rebuilding the MSI was followed by passing exact-artifact [fresh run 45328280431](https://github.com/townlight/townlight/actions/runs/45328280431).
+
+[Release notes](docs/installer/windows-1.9.3.2-candidate.md) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/Townlight-Windows-x64-1.9.3.2.msi) · [Release catalog](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) · [Checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) · [Acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md)
 
 ### Windows 1.9.3.1 previous release
 
