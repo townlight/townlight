@@ -1,4 +1,17 @@
+function Stop-UleUnattendedVerificationService {
+    if ($null -eq $script:UleStaffHostCleanup) { return }
+    $cleanup = $script:UleStaffHostCleanup
+    $script:UleStaffHostCleanup = $null
+    & $cleanup
+}
+
 function Invoke-UleUnattendedVerification {
+    $stopService = {
+        Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','stop') -Label 'ULE staff host stop' -Stdout (Join-Path $EvidenceRoot 'ule-staff-stop.stdout.log') -Stderr (Join-Path $EvidenceRoot 'ule-staff-stop.stderr.log') -TimeoutSeconds 120
+    }.GetNewClosure()
+    $script:UleStaffHostCleanup = $stopService
+    $script:UleUnattendedVerified = $false
+
     Invoke-InstalledWithCleanup -Action {
         Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','start') -Label 'ULE staff host start' -Stdout (Join-Path $EvidenceRoot 'ule-staff-start.stdout.log') -Stderr (Join-Path $EvidenceRoot 'ule-staff-start.stderr.log') -TimeoutSeconds 300
 
@@ -8,11 +21,14 @@ function Invoke-UleUnattendedVerification {
             if ($LASTEXITCODE -ne 0) {
                 throw "Unattended verification failed with exit code $LASTEXITCODE"
             }
+            $script:UleUnattendedVerified = $true
         }
         finally {
             Pop-Location
         }
     } -Cleanup {
-        Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','stop') -Label 'ULE staff host stop' -Stdout (Join-Path $EvidenceRoot 'ule-staff-stop.stdout.log') -Stderr (Join-Path $EvidenceRoot 'ule-staff-stop.stderr.log') -TimeoutSeconds 120
+        if (-not $script:UleUnattendedVerified) {
+            Stop-UleUnattendedVerificationService
+        }
     }
 }

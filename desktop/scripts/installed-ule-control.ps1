@@ -78,8 +78,14 @@ function Invoke-UleInstalledNode {
         if ($ownedNode.ExitCode -ne 0) { throw "ULE installed node failed; inspect $controlRoot/node.stderr.log" }
         return @{ control_root = $controlRoot; exit_code = $ownedNode.ExitCode; library_postexit_completed = $processed }
     } finally {
-        if ($null -ne $ownedNode -and -not $ownedNode.HasExited) { $ownedNode.Kill(); $ownedNode.WaitForExit() }
-        [Environment]::SetEnvironmentVariable('TOWNLIGHT_ULE_CONTROL_DIR', $oldRoot, 'Process')
-        [Environment]::SetEnvironmentVariable('TOWNLIGHT_ULE_CONTROL_NONCE', $oldNonce, 'Process')
+        try {
+            if (Get-Command Stop-UleUnattendedVerificationService -ErrorAction SilentlyContinue) {
+                Stop-UleUnattendedVerificationService
+            }
+        } finally {
+            if ($null -ne $ownedNode -and -not $ownedNode.HasExited) { $ownedNode.Kill(); $ownedNode.WaitForExit() }
+            [Environment]::SetEnvironmentVariable('TOWNLIGHT_ULE_CONTROL_DIR', $oldRoot, 'Process')
+            [Environment]::SetEnvironmentVariable('TOWNLIGHT_ULE_CONTROL_NONCE', $oldNonce, 'Process')
+        }
     }
 }
