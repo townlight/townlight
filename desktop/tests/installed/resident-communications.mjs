@@ -236,6 +236,7 @@ async function submitForm(context, url, fields, stage) {
   const response = await context.post(url, {
     form: fields,
     failOnStatusCode: false,
+    headers: { Origin: new URL(url).origin },
   });
   const status = response.status();
   const text = await response.text();

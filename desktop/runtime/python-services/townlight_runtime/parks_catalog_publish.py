@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import sqlite3
+import ssl
 import threading
 
 import httpx
@@ -92,6 +93,7 @@ class ParksCatalogPublisher:
                 follow_redirects=False,
                 trust_env=False,
                 timeout=REQUEST_TIMEOUT_SECONDS,
+                verify=ssl.create_default_context(),
             ) as client:
                 _post_json(client, CATALOG_PATH, token, body, parse=False)
         except _KNOWN_ERRORS:

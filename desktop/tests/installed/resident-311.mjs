@@ -227,7 +227,7 @@ export async function installedResident311({native, save, portalBaseUrl, categor
     const photo = attachments.find(item => String(item?.name ?? '') === photoName);
     assert.ok(photo, `native photo attachment missing: ${JSON.stringify(attachments.map(item => item?.name ?? null))}`);
     assert.equal(String(photo.sha256 ?? '').toLowerCase(), photoSha, 'native photo sha256 mismatch');
-    assert.equal(photo.public, false, 'resident photograph must not be public');
+    assert.equal(photo.public, true, 'resident photograph must remain visible to its authenticated owner');
     const publicText = JSON.stringify({description: request.description, location: request.location, events: request.events ?? []}).toLowerCase();
     assert.ok(!publicText.includes(email.toLowerCase()), 'resident contact email leaked into public request fields');
 

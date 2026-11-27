@@ -50,7 +50,12 @@ def _secured(response):
 
 
 def _render(request, context, status=200):
-    return _secured(render(request, "website/resident_service_requests.html", context, status=status))
+    response = _secured(render(request, "website/resident_service_requests.html", context, status=status))
+    # Origin (scheme/host/port only) is needed for Edge native same-origin form POSTs;
+    # paths and queries stay hidden, and non-form modes remain no-referrer.
+    if context.get("mode") in {"home", "lookup", "detail", "recovery", "recovery_complete"}:
+        response["Referrer-Policy"] = "origin"
+    return response
 
 
 def _redirect(url):

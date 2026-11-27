@@ -35,6 +35,7 @@ class CommunicationsHost:
         self.queue = queue
         self.publisher = CommunicationsPublisher(repo, queue, public_origin, profile_root)
         self.subscription_email = CommunicationsSubscriptionEmail(repo, email_store, recovery_key)
+        self.publication_email = CommunicationsEmailDelivery(repo, email_store)
         self._logged_error = False
 
     def _website_ack(self, job: dict[str, Any]) -> dict[str, Any] | None:
@@ -99,6 +100,7 @@ class CommunicationsHost:
             prepared += 1
 
         subscription_processed = self.subscription_email.tick(stop)
+        self.publication_email.tick(stop)
 
         reconciled = 0
         for job in self.repo.queued_publications(limit=_RECONCILE_LIMIT):

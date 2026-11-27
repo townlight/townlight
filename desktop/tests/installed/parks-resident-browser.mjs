@@ -96,7 +96,7 @@ export async function installedResidentParks({
     await page.waitForLoadState('domcontentloaded');
     await settle();
 
-    const captureLink = page.locator('a[href*="/capture/"]').first();
+    const captureLink = page.getByRole('link', {name: /^\/parks\/household\/[A-Za-z0-9_-]{43}\/$/}).first();
     must(await captureLink.count(), 'Household capture link missing');
     const privateUrl = new URL(must(await captureLink.getAttribute('href'), 'Capture href missing'), root).href;
     await page.goto(privateUrl);

@@ -69,13 +69,15 @@ const readback = async ids => {
   assert(source.includes(ids.solicitation_id), 'Saved procurement missing');
   await save(mode+'-readback',{passed:true,ids,boards,contracts,procurement});
 };
+let pendingContext;
+let pendingFunctions;
 try {
   // WebView CDP becoming available precedes the app's first native state load.
   // On upgrade that load refreshes the runtime under the profile lifecycle gate.
   // Observe its rendered result before sending another native state request.
   await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
-  let ids, communityIds, communityMeetingId, communityExpected, communityBaseline;
+  let ids, communityIds, communityMeetingId, communityExpected, communityBaseline, communityUnattended;
   if (mode==='upgrade') {
     ids=JSON.parse(await readFile(path.join(output,'seed-workflows.json'),'utf8'));
     await admin();
@@ -140,6 +142,7 @@ try {
       assert(community && typeof community === 'object', 'communityWorkflows returned no outcome');
       assert(community.passed === true, 'Community workflows failed');
       communityIds = community.ids;
+      communityUnattended = community.unattended;
       assert(communityIds && typeof communityIds === 'object', 'Community ids missing');
       const communityIdValues = Object.values(communityIds);
       assert(communityIdValues.length > 0 && communityIdValues.every(value => value !== undefined && value !== null && String(value).length > 0), 'Community ids contain empty values');
@@ -148,6 +151,19 @@ try {
         meeting_id: communityMeetingId,
         community: communityIds,
       });
+      const { preparePendingNotification, readPendingNotification, deliverPendingNotification, restorePendingNotificationSettings } = await import('./pending-notification-recovery.mjs');
+      pendingFunctions = { readPendingNotification, deliverPendingNotification, restorePendingNotificationSettings };
+      pendingContext = await preparePendingNotification({
+        native,
+        requestId: communityIds.residentRequest,
+        fixtureRoot: process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT,
+        quiesce: async () => {
+          accepted(await native('supervisor_action', { action: 'stop', serviceId: 'python-services' }));
+          accepted(await native('supervisor_action', { action: 'start', serviceId: 'python-services' }));
+          await admin();
+        },
+      });
+      await save('community-pending-before-restart', await readPendingNotification(pendingContext));
       communityExpected = community.recovery;
       communityBaseline = await communityReadback({native, ids: communityIds, expected: communityExpected});
       await save('community-before-restart', communityBaseline);
@@ -157,6 +173,7 @@ try {
       const restartReadback = await communityReadback({native, ids: communityIds, save, expected: communityExpected});
       assert.deepEqual(restartReadback, communityBaseline, 'community restart readback must match baseline');
       await save('community-restart-readback', restartReadback);
+      await save('community-pending-after-restart', await pendingFunctions.readPendingNotification(pendingContext));
     }
   }
   if (mode === "recorder") {
@@ -202,6 +219,8 @@ try {
       const restoredReadback = await communityReadback({native, ids: communityIds, save, expected: communityExpected});
       assert.deepEqual(restoredReadback, communityBaseline, 'community restored readback must match baseline');
       await save('community-restored-readback', restoredReadback);
+      await save('community-pending-after-restore', await pendingFunctions.readPendingNotification(pendingContext));
+      await save('community-pending-delivered', await pendingFunctions.deliverPendingNotification(pendingContext));
     }
     await save('backup-restore',{passed:true,restore,services_restarted:true,records_read_back:true});
   }
@@ -211,12 +230,28 @@ try {
   }
   if(mode==="community"){
     const {prepareUnattended}=await import("./communications-unattended.mjs");
-    await prepareUnattended({native,save});
+    await prepareUnattended({native,save,linkage:communityUnattended});
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
 } catch(error) {
-  await save(mode+'-failure',{error:String(error),stack:error.stack,text:await page.locator('body').innerText().catch(()=>'' )});
-  await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
+  const failure = {error:String(error),stack:error.stack};
+  if(mode!=="community") failure.text = await page.locator('body').innerText().catch(()=>'' );
+  await save(mode+'-failure',failure);
+  if(mode!=="community") await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
   throw error;
-} finally { await browser.close(); }
+} finally {
+  try {
+    if (pendingContext && !pendingContext.restored) {
+      try {
+        const receipt = await pendingFunctions.restorePendingNotificationSettings(pendingContext);
+        await save('community-pending-settings-cleanup', receipt);
+      } catch {
+        await save('community-pending-settings-cleanup', { passed: false, error: 'pending notification settings cleanup incomplete' });
+        throw new Error('pending notification settings cleanup incomplete');
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+}

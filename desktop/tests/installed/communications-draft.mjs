@@ -168,6 +168,10 @@ export async function createApprovedCommunication({ page, native, meetingId }) {
     "rejected schedule must not create publication history",
   );
 
+  await page.fill('form[data-review] [name="note"]', "Reviewed edited revision by installed acceptance.");
+  await page.click('form[data-review] button[type="submit"]');
+  await waitStatus(page, "Article sent for review");
+
   await page.check("[data-approve-confirm]");
   await page.click("[data-approve]");
   await waitStatus(page, "Revision approved");
