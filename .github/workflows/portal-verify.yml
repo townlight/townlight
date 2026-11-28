@@ -18,7 +18,7 @@ jobs:
           repository: townlight/comms
           ref: dc9ed4cc2fe42d7ae1fcc01c81267d7e6c8f63f0
           path: test-components/comms
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: python -m pip install --require-hashes -r requirements.lock
