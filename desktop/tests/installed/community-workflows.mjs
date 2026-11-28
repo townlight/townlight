@@ -67,8 +67,9 @@ export async function waitMailJson(fixtureRoot, recipient, expectedBody) {
         const base = emlName.split(/[\\/]/).pop();
         if (!base || base !== emlName || base === '.' || base === '..') continue;
         const raw = await readFile(join(dir, base), 'latin1');
-        const decoded = Buffer.from(raw.replace(/=\r?\n/g, '').replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))), 'latin1').toString('utf8');
-        if (expectedBody && !decoded.includes(expectedBody)) continue;
+        const decoded = Buffer.from(raw.replace(/=\r?\n/g, '').replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))), 'latin1').toString('utf8').replaceAll('\r\n', '\n');
+        const expected = expectedBody ? expectedBody.replaceAll('\r\n', '\n') : '';
+        if (expected && !decoded.includes(expected)) continue;
         return parsed;
       } catch {}
     }

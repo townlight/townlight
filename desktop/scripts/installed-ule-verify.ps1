@@ -2,14 +2,11 @@ function Stop-UleUnattendedVerificationService {
     if ($null -eq $script:UleStaffHostCleanup) { return }
     $cleanup = $script:UleStaffHostCleanup
     $script:UleStaffHostCleanup = $null
-    & $cleanup
+    Invoke-InstalledForegroundProcess -FilePath $cleanup.Exe -ArgumentList @('--townlight-staff-host','stop') -Label 'ULE staff host stop' -Stdout (Join-Path $cleanup.EvidenceRoot 'ule-staff-stop.stdout.log') -Stderr (Join-Path $cleanup.EvidenceRoot 'ule-staff-stop.stderr.log') -TimeoutSeconds 120
 }
 
 function Invoke-UleUnattendedVerification {
-    $stopService = {
-        Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','stop') -Label 'ULE staff host stop' -Stdout (Join-Path $EvidenceRoot 'ule-staff-stop.stdout.log') -Stderr (Join-Path $EvidenceRoot 'ule-staff-stop.stderr.log') -TimeoutSeconds 120
-    }.GetNewClosure()
-    $script:UleStaffHostCleanup = $stopService
+    $script:UleStaffHostCleanup = @{ Exe = $exe; EvidenceRoot = $EvidenceRoot }
     $script:UleUnattendedVerified = $false
 
     Invoke-InstalledWithCleanup -Action {
