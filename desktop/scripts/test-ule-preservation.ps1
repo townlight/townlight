@@ -15,21 +15,30 @@ function Expect-PreservationFailure([scriptblock]$Action, [string]$Name) {
   $checks.Add($Name)
 }
 try {
-  foreach ($relative in @('Data/archives','Data/logs','Data/WebView','config','outside')) {
+  foreach ($relative in @('Data/archives','Data/logs','Data/WebView','Data/station','config','outside')) {
     New-Item -ItemType Directory -Path (Join-Path $profile $relative) -Force | Out-Null
   }
   foreach ($relative in @('Data/utilities.sqlite3','Data/library.sqlite3','Data/elections.sqlite3',
-      'Data/archives/fixture [v1].log','Data/archives/fixture [v2].zip','config/city-profile.json')) {
+      'Data/archives/fixture [v1].log','Data/archives/fixture [v2].zip','Data/archives/background.log','config/city-profile.json')) {
     [IO.File]::WriteAllText((Join-Path $profile $relative), "Fictional preserved bytes $relative")
   }
   [IO.File]::WriteAllText((Join-Path $profile 'Data/logs/worker.log'), 'Transient log')
   [IO.File]::WriteAllText((Join-Path $profile 'Data/WebView/cache.bin'), 'Transient cache')
-  $expected = Get-UlePreservationManifest -ProfileRoot $profile
-  if ($expected.files.Count -ne 6) { throw 'Unexpected authoritative file set.' }
-  if (@($expected.files.path) -cnotcontains 'Data/archives/fixture [v1].log') { throw 'Literal bracket or log attachment was omitted.' }
-  $serialized = $expected | ConvertTo-Json -Depth 8 | ConvertFrom-Json
-  Assert-UlePreservationManifest -ProfileRoot $profile -Expected $serialized | Out-Null
-  $checks.Add('unchanged-and-serialized-manifest')
+  $stationLog = Join-Path $profile 'Data/station/background.log'
+  [IO.File]::WriteAllText($stationLog, 'Volatile station diagnostic log')
+  $stationLock = [IO.File]::Open($stationLog, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  try {
+    $expected = Get-UlePreservationManifest -ProfileRoot $profile
+    if ($expected.files.Count -ne 7) { throw 'Unexpected authoritative file set.' }
+    if (@($expected.files.path) -cnotcontains 'Data/archives/fixture [v1].log') { throw 'Literal bracket or log attachment was omitted.' }
+    if (@($expected.files.path) -ccontains 'Data/station/background.log') { throw 'Exact volatile station log was not excluded.' }
+    if (@($expected.files.path) -cnotcontains 'Data/archives/background.log') { throw 'Similarly named authoritative log was omitted.' }
+    $serialized = $expected | ConvertTo-Json -Depth 8 | ConvertFrom-Json
+    Assert-UlePreservationManifest -ProfileRoot $profile -Expected $serialized | Out-Null
+    $checks.Add('unchanged-and-serialized-manifest-with-locked-exact-station-log')
+  } finally {
+    $stationLock.Dispose()
+  }
   [IO.File]::WriteAllText((Join-Path $profile 'Data/logs/worker.log'), 'Changed transient log')
   Assert-UlePreservationManifest -ProfileRoot $profile -Expected $expected | Out-Null
   $checks.Add('transient-log-exclusion-and-literal-log-attachment')
@@ -40,6 +49,13 @@ try {
   [IO.File]::WriteAllBytes($changed, $bytes)
   Expect-PreservationFailure { Assert-UlePreservationManifest $profile $expected } 'same-size-content-change'
   [IO.File]::WriteAllBytes($changed, $original)
+  $nearby = Join-Path $profile 'Data/archives/background.log'
+  $original = [IO.File]::ReadAllBytes($nearby)
+  $bytes = [byte[]]$original.Clone()
+  $bytes[0] = $bytes[0] -bxor 1
+  [IO.File]::WriteAllBytes($nearby, $bytes)
+  Expect-PreservationFailure { Assert-UlePreservationManifest $profile $expected } 'similarly-named-authoritative-log-change'
+  [IO.File]::WriteAllBytes($nearby, $original)
   $missing = Join-Path $profile 'Data/archives/fixture [v1].log'
   $original = [IO.File]::ReadAllBytes($missing)
   Remove-Item -LiteralPath $missing -Force

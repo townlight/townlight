@@ -27,8 +27,10 @@ function Get-UlePreservationManifest {
         if ($item.PSIsContainer) {
           if ($item.Name -notin @('WebView', 'cache', 'caches', 'logs')) { $pending.Enqueue($full) }
         } else {
+          $relative = $full.Substring($prefix.Length).Replace('\', '/')
+          if ($relative -eq 'Data/station/background.log') { continue }
           $files.Add([pscustomobject]@{
-            path = $full.Substring($prefix.Length).Replace('\', '/')
+            path = $relative
             size = [int64]$item.Length
             sha256 = (Get-FileHash -LiteralPath $full -Algorithm SHA256 -ErrorAction Stop).Hash.ToLowerInvariant()
           })
