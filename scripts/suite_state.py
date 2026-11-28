@@ -251,8 +251,8 @@ def validate_state(data: dict[str, Any]) -> list[str]:
     if not isinstance(modules, dict):
         return errors + ["modules: must be an object"]
     module_ids = set(modules)
-    if len(module_ids) != 20:
-        errors.append(f"modules: expected 20 catalog modules, found {len(module_ids)}")
+    if len(module_ids) != 23:
+        errors.append(f"modules: expected 23 catalog modules, found {len(module_ids)}")
 
     order = data.get("module_order")
     if not isinstance(order, list):
@@ -525,8 +525,8 @@ def validate_schema_document(schema: dict[str, Any]) -> list[str]:
     if properties.get("schema_version", {}).get("const") != 1:
         errors.append("schema: schema_version const must be 1")
     modules = properties.get("modules", {})
-    if modules.get("minProperties") != 20 or modules.get("maxProperties") != 20:
-        errors.append("schema: modules must require exactly 20 entries")
+    if modules.get("minProperties") != 23 or modules.get("maxProperties") != 23:
+        errors.append("schema: modules must require exactly 23 entries")
     definitions = schema.get("$defs")
     if not isinstance(definitions, dict):
         return errors + ["schema: $defs must be an object"]

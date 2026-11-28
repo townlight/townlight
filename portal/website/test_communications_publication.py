@@ -183,6 +183,11 @@ class CommunicationsPublicationTests(TestCase):
             article["id"], article["revision"]["title"], first_artifact
         )
         self.assertEqual(self.post(first, article["id"], 1).status_code, 200)
+        self.assertGreater(article["current_revision"], 1)
+        first_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertNotContains(
+            first_response, 'class="corrected-publication"', status_code=200
+        )
 
         article = self.repository.edit(
             article["id"],
@@ -201,9 +206,20 @@ class CommunicationsPublicationTests(TestCase):
         self.assertEqual(
             self.post(correction, article["id"], 2).json()["status"], "applied"
         )
+        corrected_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertContains(
+            corrected_response, 'class="corrected-publication"', status_code=200
+        )
+        self.assertContains(corrected_response, "Corrected public summary.")
 
         stale = self.post(first, article["id"], 1)
         self.assertEqual(stale.status_code, 409)
+
+        retried = self.post(correction, article["id"], 2)
+        self.assertEqual(retried.json()["status"], "unchanged")
+        retried_response = self.client.get(f"/communications/{article['id']}/")
+        self.assertContains(retried_response, 'class="corrected-publication"')
+        self.assertEqual(ArticlePublicationRevision.objects.count(), 2)
 
         withdrawal = self.bundle(article["id"], article["revision"]["title"])
         self.assertEqual(
@@ -246,3 +262,53 @@ class CommunicationsPublicationTests(TestCase):
 
         self.assertEqual(ArticlePublication.objects.count(), 0)
         self.assertEqual(ArticlePublicationRevision.objects.count(), 0)
+
+    def test_library_elections_source_kinds_are_accepted(self):
+        article_ids = set()
+        for kind in ("library", "elections"):
+            self.source["kind"] = kind
+            article = self.draft()
+            article_ids.add(article["id"])
+            artifact = self.approved_artifact(
+                article, f"Checked {kind} source."
+            )
+            data = self.bundle(
+                article["id"], article["revision"]["title"], artifact
+            )
+
+            first = self.post(data, article["id"], 1)
+            self.assertEqual(first.status_code, 200)
+            self.assertEqual(first.json()["status"], "applied")
+            replay = self.post(data, article["id"], 1)
+            self.assertEqual(replay.status_code, 200)
+            self.assertEqual(replay.json()["status"], "unchanged")
+
+            base = f"/communications/{article['id']}"
+            detail = self.client.get(base + "/")
+            self.assertEqual(detail.status_code, 200)
+            source_response = self.client.get(base + "/sources/0/")
+            self.assertEqual(source_response.status_code, 200)
+            self.assertContains(
+                source_response, "the budget was adopted 5-2"
+            )
+
+        self.assertEqual(len(article_ids), 2)
+        self.assertEqual(ArticlePublicationRevision.objects.count(), 2)
+
+    def test_unknown_or_ineligible_source_refs_rejected(self):
+        from .communications_content import _source_ref
+
+        for kind in ("library", "elections"):
+            valid = dict(self.source)
+            valid["kind"] = kind
+            self.assertIsNone(_source_ref(valid))
+
+        unknown = dict(self.source)
+        unknown["kind"] = "unknown"
+        with self.assertRaises(ValueError):
+            _source_ref(unknown)
+
+        ineligible = dict(self.source)
+        ineligible["eligible"] = False
+        with self.assertRaises(ValueError):
+            _source_ref(ineligible)

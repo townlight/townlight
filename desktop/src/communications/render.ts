@@ -41,6 +41,8 @@ export function renderCommunications(): string {
               <option value="notice">Notice</option>
               <option value="311">311</option>
               <option value="parks">Parks</option>
+              <option value="library">Library</option>
+              <option value="elections">Elections</option>
             </select>
             <label for="comms-source-id">Source ID</label>
             <input id="comms-source-id" name="source_id" type="text" />

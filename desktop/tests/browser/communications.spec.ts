@@ -39,11 +39,18 @@ async function mount(page) {
       const request = input.request;
       const op = request.operation;
       if (op === 'articles') {
+        if (w.holdList) {
+          w.holdList = false;
+          return new Promise(resolve => { w.releaseList = resolve; });
+        }
         return [{ id: ID, title: HOSTILE, state: 'draft', current_revision: 5, revision: { title: HOSTILE, sha256: H1 } }];
       }
       if (op === 'article') {
         if (request.id !== ID) throw new Error('article id');
         return w.article;
+      }
+      if (op === 'source') {
+        return { reference: { kind: request.payload.kind, id: request.payload.id, title: 'Approved source', eligible: w.eligible !== false } };
       }
       if (op === 'access-review') {
         if (request.payload?.title !== 'Water notice' || request.payload?.access_reviewed !== false) throw new Error('access-review payload');
@@ -85,11 +92,65 @@ async function mount(page) {
     };
     const mod = await import('/src/communications/view.ts');
     const view = mod.createCommunicationsView(invoke, { openRecords: (id: string) => { w.openedRecords = id; } });
+    w.view = view;
     document.body.innerHTML = view.render();
     view.bind();
   }, { ID, HOSTILE, H1, H2, H3, ATTACHMENT });
   await expect(page.locator('[data-comms-view] [data-article-id]').first()).toBeVisible();
 }
+
+  test('account reset discards pending list and restores controls', async ({ page }) => {
+    await mount(page);
+    await page.evaluate(() => { (window as any).holdList = true; });
+    await page.locator('[data-refresh]').click();
+    await expect.poll(() => page.evaluate(() => typeof (window as any).releaseList)).toBe('function');
+    await page.evaluate(({ ID, H1 }) => {
+      const w = window as any;
+      w.view.reset();
+      document.body.innerHTML = w.view.render();
+      w.view.bind();
+      w.releaseList([{ id: ID, title: 'STALE_ACCOUNT_RESPONSE', state: 'draft', current_revision: 5, revision: { title: 'STALE_ACCOUNT_RESPONSE', sha256: H1 } }]);
+    }, { ID, H1 });
+    await expect.poll(() => page.locator('[data-comms-view]').getAttribute('data-busy')).not.toBe('true');
+    const root = page.locator('[data-comms-view]');
+    await expect(root.locator('[name="title"]')).toHaveValue('');
+    await expect(root.locator('[name="body"]')).toHaveValue('');
+    await expect(root.locator('[data-sources]')).toBeEmpty();
+    await expect(root).not.toContainText('STALE_ACCOUNT_RESPONSE');
+    const currentId = await root.getAttribute('data-current-id');
+    expect(currentId === null || currentId === '').toBe(true);
+    await expect(page.locator('[data-refresh]')).toBeEnabled();
+  });
+
+  test('approved source seed', async ({ page }) => {
+    await mount(page);
+    await page.evaluate(async ({ ID, HOSTILE }) => {
+      await (window as any).view.prepareSource({ kind: 'elections', id: '11111111-1111-4111-8111-111111111111', title: HOSTILE, body: HOSTILE, article_id: ID });
+    }, { ID, HOSTILE });
+    const root = page.locator('[data-comms-view]');
+    await expect(root).toHaveAttribute('data-current-id', ID);
+    await expect(root).toHaveAttribute('data-current-revision', '5');
+    await expect(root.locator("[name=title]")).toHaveValue(HOSTILE);
+    await expect(root.locator("[name=body]")).toHaveValue(HOSTILE);
+    await expect(root.locator('[data-sources]')).toContainText('elections');
+    await expect(root.locator('[data-sources]')).toContainText('11111111-1111-4111-8111-111111111111');
+    await expect(root.locator('[name=access_reviewed]')).not.toBeChecked();
+    const ops = await page.evaluate(() => (window as any).calls.map((c: any) => c.input.request.operation));
+    const sourceAt = ops.indexOf('source');
+    expect(sourceAt).toBeGreaterThanOrEqual(0);
+    expect(sourceAt).toBeLessThan(ops.indexOf('article'));
+    for (const op of ['create', 'edit', 'review', 'approve', 'schedule']) expect(ops).not.toContain(op);
+    const error = await page.evaluate(async ({ ID, HOSTILE }) => {
+      (window as any).eligible = false;
+      try {
+        await (window as any).view.prepareSource({ kind: 'elections', id: '11111111-1111-4111-8111-111111111111', title: HOSTILE, body: HOSTILE, article_id: ID });
+        return '';
+      } catch (e: any) {
+        return String(e && e.message || e);
+      }
+    }, { ID, HOSTILE });
+    expect(error).toContain('could not be verified');
+  });
 
 const requestFor = (page, operation: string) => page.evaluate((operation) => {
   const call = (window as any).calls.find((entry: any) => entry.input.request.operation === operation);

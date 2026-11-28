@@ -165,11 +165,13 @@ def communications_detail(request, article_id):
         attachments = _project_attachments(manifest)
     except ArtifactError:
         return _unavailable()
+    is_corrected = publication.publication_history.filter(action='publish', sequence__lt=publication.sequence).exclude(artifact_sha256='').exclude(artifact_sha256=publication.artifact_sha256).exists()
     return render(request, "website/communications_detail.html", {
         "publication": publication,
         "article": manifest,
         "sources": sources,
         "attachments": attachments,
+        "is_corrected": is_corrected,
     })
 
 

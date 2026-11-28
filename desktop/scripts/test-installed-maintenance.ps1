@@ -1,23 +1,54 @@
 param(
   [Parameter(Mandatory=$true)][string]$MsiPath,
-  [ValidateSet('fresh','upgrade','recorder','community')][string]$Mode,
+  [ValidateSet('fresh','upgrade','recorder','community','ule','ule-upgrade')][string]$Mode,
   [Parameter(Mandatory=$true)][string]$EvidenceRoot,
   [ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit = $env:GITHUB_SHA,
+  [string]$PortalCheckout,
+  [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedPortalCommit,
   [switch]$UnsignedRecorderCandidate,
   [ValidatePattern('^[0-9a-f]{64}$')][string]$ExpectedMsiSha256
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'installed-foreground-process.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-control.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-postexit.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-verify.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-reopen.ps1')
+. (Join-Path $PSScriptRoot 'installed-ule-portal-source.ps1')
+. (Join-Path $PSScriptRoot 'ule-preservation.ps1')
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable GitHub-hosted Windows only.' }
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
 if ($UnsignedRecorderCandidate) {
   if ($Mode -ne 'recorder' -or -not $ExpectedMsiSha256) { throw 'Unsigned acceptance is limited to a hash-bound unpublished recorder candidate.' }
   if ((Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedMsiSha256) { throw 'Candidate artifact hash differs.' }
 }
+if ($ExpectedMsiSha256) {
+  if ((Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedMsiSha256) { throw 'Candidate artifact hash differs.' }
+}
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$script:communityPortalRoot = Join-Path $repo 'portal'
+if ([bool]$PortalCheckout -ne [bool]$ExpectedPortalCommit) { throw 'PortalCheckout and ExpectedPortalCommit must be supplied together.' }
+$portalSourceProof = $null
+if ($PortalCheckout) {
+  $portalSourceProof = Resolve-UlePortalSource -PortalCheckout $PortalCheckout -ExpectedPortalCommit $ExpectedPortalCommit -SignedSourceCommit $SourceCommit
+  $script:communityPortalRoot = $portalSourceProof.portal_root
+}
 $candidateVersion = (Get-Content (Join-Path $repo 'config/inspections-msi-candidate.json') -Raw | ConvertFrom-Json).windows_product_version
 $EvidenceRoot = [IO.Path]::GetFullPath($EvidenceRoot)
 New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
+if ($portalSourceProof) {
+  $harnessCommit = & git -C $repo rev-parse HEAD
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve harness commit.' }
+  $harnessCommit = $harnessCommit.Trim()
+  [ordered]@{
+    msi_source_commit = $SourceCommit
+    portal_commit = $portalSourceProof.portal_commit
+    harness_commit = $harnessCommit
+    portal_root = $portalSourceProof.portal_root
+    validator_sha256 = $portalSourceProof.validator_sha256
+    changed_paths = $portalSourceProof.changed_paths
+  } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'three-source-identities.json') -Encoding UTF8
+}
 $profile = Join-Path $env:LOCALAPPDATA 'CivicSuite'
 if (Test-Path -LiteralPath $profile) { throw 'Clean installed acceptance requires an absent pre-existing Townlight profile.' }
 $exe = Join-Path $env:ProgramFiles 'Townlight\townlight-desktop.exe'
@@ -41,7 +72,7 @@ function Resolve-CommunityPython {
   return $command.Source
 }
 function Assert-CommunityTestTools([string]$Python) {
-  $portalRoot = Join-Path $repo 'portal'
+  $portalRoot = $script:communityPortalRoot
   Push-Location $portalRoot
   try {
     & $Python -c "import aiosmtpd, django, portal, waitress, cryptography"
@@ -51,7 +82,7 @@ function Assert-CommunityTestTools([string]$Python) {
 function Start-CommunityFixture([string]$Python) {
   $fixtureRoot = Join-Path $EvidenceRoot 'community-fixture'
   New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
-  $portalRoot = Join-Path $repo 'portal'
+  $portalRoot = $script:communityPortalRoot
   $scriptPath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\tests\installed\community-services.py'))
   if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) { throw "Community fixture script is absent: $scriptPath" }
   if (-not (Test-Path -LiteralPath $portalRoot -PathType Container)) { throw "Portal root is absent: $portalRoot" }
@@ -202,7 +233,7 @@ function Run-Installed([string]$Phase) {
   New-ItemProperty -LiteralPath $debugPolicy -Name $appName -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
   $communityReady = $false
   try {
-    if ($Phase -eq 'community') {
+    if ($Phase -in @('community','ule','ule-upgrade') -or ($Phase -eq 'seed' -and $env:TOWNLIGHT_ULE_UPGRADE_SEED -eq '1')) {
       $python = Resolve-CommunityPython
       Assert-CommunityTestTools $python
       $fixture = Start-CommunityFixture $python
@@ -236,11 +267,37 @@ function Run-Installed([string]$Phase) {
       if (-not $ready) { throw 'Installed Townlight WebView did not become ready.' }
       Push-Location (Join-Path $repo 'desktop')
       try {
-        node tests/installed/maintenance.mjs $Phase $EvidenceRoot
-        if ($LASTEXITCODE -ne 0) { throw "Installed $Phase acceptance failed." }
+        if ($Phase -eq 'ule' -or $Phase -eq 'ule-upgrade') {
+          $uleControl = Invoke-UleInstalledNode -RepositoryRoot $repo -EvidenceRoot $EvidenceRoot -Phase $Phase -OnLibraryPostExit { param($pending) Invoke-UleLibraryPostExit -Pending $pending }
+          if ($uleControl.library_postexit_completed -ne $true) { throw 'ULE library post-exit did not complete.' }
+          if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
+            $null = Stop-UleOwnedDesktop -App $script:ownedApp
+          }
+          $null = Invoke-InstalledForegroundProcess -FilePath $exe -ArgumentList @('--townlight-staff-host','stop') -Label 'ULE recovery service stop' -Stdout (Join-Path $EvidenceRoot 'ule-recovery-service-stop.stdout.log') -Stderr (Join-Path $EvidenceRoot 'ule-recovery-service-stop.stderr.log') -TimeoutSeconds 120
+          $script:ownedApp = Start-UleOwnedDesktop -Exe $exe
+          node tests/installed/maintenance.mjs 'ule-recovery' $EvidenceRoot
+          if ($LASTEXITCODE -ne 0) { throw 'Installed ule-recovery acceptance failed.' }
+        } else {
+          node tests/installed/maintenance.mjs $Phase $EvidenceRoot
+          if ($LASTEXITCODE -ne 0) { throw "Installed $Phase acceptance failed." }
+        }
         if ($Phase -eq 'community') { $communityReady = $true }
       } finally { Pop-Location }
     } finally {
+      if ($Phase -eq 'ule' -or $Phase -eq 'ule-upgrade') {
+        foreach ($logPair in @(
+          @{ Source = (Join-Path $profile 'Data/logs/python-services.log'); Dest = 'ule-precleanup-python-services.log' },
+          @{ Source = (Join-Path $profile 'Data/logs/postgres.log'); Dest = 'ule-precleanup-postgres.log' }
+        )) {
+          try {
+            if (Test-Path -LiteralPath $logPair.Source -PathType Leaf) {
+              Copy-Item -LiteralPath $logPair.Source -Destination (Join-Path $EvidenceRoot $logPair.Dest) -ErrorAction Stop
+            }
+          } catch {
+            Write-Warning "ULE pre-cleanup diagnostic copy failed for $($logPair.Source): $($_.Exception.Message)"
+          }
+        }
+      }
       if ($script:ownedApp -and -not $script:ownedApp.HasExited) {
         # This Process object is the exact executable launched by this function.
         Stop-Process -Id $script:ownedApp.Id -Force
@@ -299,14 +356,15 @@ function Product-Registration {
 }
 try {
   $retained=@()
-  if ($Mode -eq 'upgrade') {
+  if ($Mode -in @('upgrade','ule-upgrade')) {
     $previous=Join-Path $env:RUNNER_TEMP 'townlight-previous-release'
     New-Item -ItemType Directory -Path $previous | Out-Null
-    gh release download townlight-windows-v1.9.3.2 --repo townlight/townlight --pattern '*.msi' --dir $previous
+    gh release download townlight-windows-v1.10.0.1 --repo townlight/townlight --pattern '*.msi' --dir $previous
     if ($LASTEXITCODE -ne 0) { throw 'Previous public MSI download failed.' }
     $old=@(Get-ChildItem -LiteralPath $previous -Filter '*.msi' -File)
-    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b00510e0649552b5efd9744513bf9fcaf59cbee5755fd864eb922a5151c96b77') { throw 'Previous release identity mismatch.' }
-    Install-Candidate $old[0].FullName 'baseline-1.9.3.2'
+    if ($old.Count -ne 1 -or (Get-FileHash -LiteralPath $old[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '8845a59ed5846f7ee3bd196f290610aa5d9c14dbd0794cf99f44f09d6ee55ea8') { throw 'Previous release identity mismatch.' }
+    Install-Candidate $old[0].FullName 'baseline-1.10.0.1'
+    if ($Mode -eq 'ule-upgrade') { $env:TOWNLIGHT_ULE_UPGRADE_SEED = '1' }
     Run-Installed 'seed'
     $marker=Join-Path $profile 'Data\maintenance-retention.txt'
     [IO.File]::WriteAllText($marker,'Synthetic Windows maintenance retention marker')
@@ -328,9 +386,17 @@ try {
   foreach ($entry in $retained) {
     if ((Get-FileHash -LiteralPath (Join-Path $profile $entry.path) -Algorithm SHA256).Hash -ne $entry.sha256) { throw "Upgrade changed retained $($entry.path)" }
   }
+  if ($Mode -in @('ule','ule-upgrade')) {
+    $ulePreservation = Get-UlePreservationManifest -ProfileRoot $profile
+    $ulePreservation | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $EvidenceRoot 'ule-preservation-before-uninstall.json') -Encoding utf8
+  }
   $uninstallLog=Join-Path $EvidenceRoot 'uninstall.log'
   $p=Start-Process msiexec.exe -ArgumentList @('/x',('"'+$MsiPath+'"'),'/qn','/norestart','/l*v',('"'+$uninstallLog+'"')) -WindowStyle Hidden -Wait -PassThru
   if ($p.ExitCode -notin @(0,3010) -or @(Product-Registration).Count -ne 0 -or (Test-Path -LiteralPath $exe)) { throw 'Uninstall did not remove program and Windows registration.' }
+  if ($Mode -in @('ule','ule-upgrade')) {
+    $ulePreservationAfter = Assert-UlePreservationManifest -ProfileRoot $profile -Expected $ulePreservation
+    $ulePreservationAfter | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $EvidenceRoot 'ule-preservation-after-uninstall.json') -Encoding utf8
+  }
   foreach ($relative in @('config\city-profile.json','Data\postgres\PG_VERSION')) {
     if (-not (Test-Path -LiteralPath (Join-Path $profile $relative))) { throw "Uninstall removed saved city state: $relative" }
   }

@@ -58,6 +58,9 @@ def _required_module_imports(profile: str) -> list[tuple[str, str]]:
         imports.append(("townlight_data", "townlight_data.public_dataset"))
         imports.append(("townlight_budget", "townlight_budget.adoption"))
         imports.append(("townlight_grants", "townlight_grants.grant_cases"))
+        imports.append(("townlight_utilities", "civicutility.workflow"))
+        imports.append(("townlight_library", "civiclibrary.publication"))
+        imports.append(("townlight_elections", "civicelections.publication"))
     return imports
 
 
@@ -513,6 +516,16 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.include_router(parks_staff_router)
         from townlight_runtime.parks_data import router as parks_data_router
         domain_app.include_router(parks_data_router)
+        from townlight_runtime.utilities_staff import router as utilities_staff_router
+        domain_app.include_router(utilities_staff_router)
+        from townlight_runtime.library_staff import router as library_staff_router
+        domain_app.include_router(library_staff_router)
+        from townlight_runtime.elections_staff import router as elections_staff_router
+        domain_app.include_router(elections_staff_router)
+        from townlight_runtime.election_official_settings import (
+            router as election_official_settings_router,
+        )
+        domain_app.include_router(election_official_settings_router)
     if domain_enabled and _product_profile() == "inspections-preview":
         from cryptography.fernet import Fernet
         from sqlalchemy import create_engine
@@ -550,6 +563,8 @@ def create_runtime_app(*, domain_enabled: bool = False):
         domain_app.state.desktop_parks_key = key
         from townlight_runtime.parks_payment_settings import ParksPaymentSettingsStore
         domain_app.state.desktop_parks_payments = ParksPaymentSettingsStore(_profile_root(), lambda: key)
+        from .department_workpapers import initialize_department_workpapers
+        initialize_department_workpapers(domain_app, _profile_root())
     async def demo_marker(session):
         from sqlalchemy import select
 

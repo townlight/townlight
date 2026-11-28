@@ -32,7 +32,11 @@ from .communications_schemas import (
     Schedule,
     SourceLookup,
 )
-from .communications_sources import resolve_source, verify_sources
+from .communications_sources import resolve_source
+from .election_publication import (
+    require_election_provenance,
+    validate_election_binding,
+)
 
 router = APIRouter(prefix="/desktop/v1/communications", tags=["communications"])
 
@@ -73,6 +77,13 @@ async def _call(func: Any, *args: Any, **kwargs: Any) -> Any:
         raise HTTPException(status_code=503, detail="communications storage unavailable") from exc
 
 
+def _election_guard(func: Any, *args: Any) -> Any:
+    try:
+        return func(*args)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
 def _actor_id(actor: User) -> str:
     identifier = getattr(actor, "id", None)
     if identifier is None:
@@ -97,11 +108,20 @@ async def _prepare_save(
     draft: Draft,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     refs: list[dict[str, Any]] = []
+    snapshots: list[dict[str, Any]] = []
     for selector in draft.sources:
         resolved = await resolve_source(
             request, proof, selector.kind, selector.id
         )
         refs.append(resolved["reference"])
+        snapshots.append(
+            {
+                "reference": resolved["reference"],
+                "content": resolved["content"],
+            }
+        )
+
+    _election_guard(validate_election_binding, draft.title, draft.body, snapshots)
 
     finding = _as_finding(
         await run_in_threadpool(
@@ -271,6 +291,9 @@ async def create_revision(
 ) -> Any:
     actor_id = _actor_id(actor)
     refs, access_review = await _prepare_save(request, proof, actor_id, payload)
+    current = await _call(repo.get, str(article_id))
+    previous_refs = _field(_field(current, "revision"), "source_refs")
+    _election_guard(require_election_provenance, previous_refs, refs)
     return await _call(
         repo.edit,
         str(article_id),
@@ -317,6 +340,13 @@ async def approve_article(
         payload.expected_sha256,
     )
     refs, snapshots = await _resolve_saved_snapshots(request, proof, saved_refs)
+    revision = _field(_current, "revision")
+    _election_guard(
+        validate_election_binding,
+        _field(revision, "title"),
+        _field(revision, "body"),
+        snapshots,
+    )
     result = await _call(
         repo.approve,
         str(article_id),
@@ -351,7 +381,14 @@ async def schedule_article(
         payload.expected_sha256,
     )
     if payload.action != "withdraw":
-        await verify_sources(request, proof, saved_refs)
+        _, snapshots = await _resolve_saved_snapshots(request, proof, saved_refs)
+        revision = _field(_current, "revision")
+        _election_guard(
+            validate_election_binding,
+            _field(revision, "title"),
+            _field(revision, "body"),
+            snapshots,
+        )
         stored = await _call(
             repo.get_source_snapshots,
             str(article_id),

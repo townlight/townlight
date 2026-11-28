@@ -21,6 +21,43 @@ snapshots=article['source_snapshots']
 digests=[hashlib.sha256(json.dumps(s['content'],sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).hexdigest() for s in snapshots]
 print(json.dumps(dict(article=article,receipts=receipts,source_digests=digests)))`, bytes);
 }
+function readbackInteger(value) {
+  return Number.isInteger(value) && value >= 0 ? value : null;
+}
+function publicationReadbackState(value) {
+  return ['published', 'scheduled', 'claimed', 'queued', 'failed', 'uncertain'].includes(value) ? value : 'unknown';
+}
+function publicationReadbackWebsiteStatus(value) {
+  return ['delivered', 'queued', 'rejected', 'superseded', 'withdrawn'].includes(value) ? value : 'unknown';
+}
+function publicationReadbackDiagnostic(row, attempts, code) {
+  const email = row && row.email_summary && typeof row.email_summary === 'object' ? row.email_summary : {};
+  return {
+    type: 'publication-readback-diagnostic',
+    stage: 'publication-readback',
+    code,
+    attempts: readbackInteger(attempts),
+    publication: row ? {
+      state: publicationReadbackState(row.state),
+      email_summary: {
+        sent: readbackInteger(email.sent),
+        remaining: readbackInteger(email.remaining),
+        failed: readbackInteger(email.failed),
+        uncertain: readbackInteger(email.uncertain)
+      },
+      website_status: publicationReadbackWebsiteStatus(row.website_receipt?.status)
+    } : null
+  };
+}
+function publicationReadbackTerminalCode(row) {
+  if (row?.state === 'failed') return 'PUBLICATION_FAILED';
+  if (row?.state === 'uncertain') return 'PUBLICATION_UNCERTAIN';
+  return undefined;
+}
+async function recordPublicationReadbackFailure(output, publication, attempts, code) {
+  const diagnostic = publicationReadbackDiagnostic(publication, attempts, code);
+  await writeFile(join(output, 'communications-publication-readback-failure.json'), `${JSON.stringify(diagnostic, null, 2)}\n`);
+}
 function delivered(row) {
   return row.state === 'published' && row.website_receipt?.status === 'delivered' &&
     row.email_summary?.sent > 0 && ['remaining','failed','uncertain'].every(key => row.email_summary[key] === 0);
@@ -94,7 +131,7 @@ export function assertMail(record, decodedParts, pending, stopped, articleUrl) {
   assert.ok(mailContainsFinalContent(decodedParts, pending, articleUrl), 'decoded mail final body and article URL');
   assert.ok(record.headers?.['message-id']?.[0], 'actual SMTP Message-ID');
 }
-export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staffBaseUrl = `http://127.0.0.1:${process.env.TOWNLIGHT_LOCAL_PORT || '15480'}`, fetchImpl = fetch, timeoutMs = 120000}) {
+export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staffCredentials = {email: 'audit-admin@example.invalid', passcode: 'Audit-fixture-2026-11-04!'}, staffBaseUrl = `http://127.0.0.1:${process.env.TOWNLIGHT_LOCAL_PORT || '15480'}`, fetchImpl = fetch, timeoutMs = 120000, staffReadiness = waitForStaffReady}) {
   const pending = JSON.parse(await readFile(join(output, 'communications-unattended-pending.json'), 'utf8'));
   const stopped = JSON.parse(await readFile(join(output, 'communications-app-stopped.json'), 'utf8'));
   assert.equal(stopped.exited, true, 'owned staff app exited');
@@ -121,20 +158,38 @@ export async function verifyUnattended({output, portalBaseUrl, fixtureRoot, staf
     return response;
   };
   try {
-    const readiness = await waitForStaffReady({staffBaseUrl: base, fetchImpl, timeoutMs});
+    const readiness = await staffReadiness({staffBaseUrl: base, fetchImpl, timeoutMs});
     stage = 'staff-sign-in';
-    ({proof} = await (await request('/staff/v1/session', {email: 'audit-admin@example.invalid', passcode: 'Audit-fixture-2026-11-04!'})).json());
+    ({proof} = await (await request('/staff/v1/session', staffCredentials)).json());
     assert.ok(typeof proof === 'string' && proof);
     const api = '/staff/v1/api/desktop/v1';
     const deadline = Date.now() + timeoutMs;
     stage = 'publication-readback';
     let publication;
-    while (true) {
-      const article = await (await request(`${api}/communications/articles/${pending.id}`)).json();
-      publication = assertPublished(article, pending);
-      if (delivered(publication)) break;
-      assert.ok(Date.now() < deadline, 'scheduled publication did not finish');
-      await new Promise(resolve => setTimeout(resolve, 500));
+    let readbackAttempts = 0;
+    try {
+      while (true) {
+        readbackAttempts += 1;
+        const article = await (await request(`${api}/communications/articles/${pending.id}`)).json();
+        publication = assertPublished(article, pending);
+        const terminalCode = publicationReadbackTerminalCode(publication);
+        if (terminalCode) {
+          await recordPublicationReadbackFailure(output, publication, readbackAttempts, terminalCode);
+          throw new Error(`post-exit publication-readback failed (${terminalCode})`, {cause: {code: terminalCode}});
+        }
+        if (delivered(publication)) break;
+        if (Date.now() >= deadline) {
+          const code = 'PUBLICATION_READBACK_TIMEOUT';
+          await recordPublicationReadbackFailure(output, publication, readbackAttempts, code);
+          throw new Error(`post-exit publication-readback failed (${code})`, {cause: {code}});
+        }
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('post-exit ')) throw error;
+      const code = 'PUBLICATION_READBACK_FAILED';
+      await recordPublicationReadbackFailure(output, publication, readbackAttempts, code);
+      throw new Error(`post-exit publication-readback failed (${code})`, {cause: {code}});
     }
     assert.equal(publication.website_receipt.url, articleUrl, 'website receipt same article URL');
     stage = 'public-article';

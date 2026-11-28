@@ -4,6 +4,13 @@ import { bindCommunicationFiles } from "./files.ts";
 
 type Invoke = (name: string, input: unknown) => Promise<unknown>;
 type Options = { openRecords?: (id: string) => unknown };
+export type SourceSeed = {
+  kind: "library" | "elections";
+  id: string;
+  title: string;
+  body: string;
+  article_id?: string;
+};
 type SourceRef = { kind: string; id: string; title?: string; eligible?: boolean };
 
 const boundRoots = new WeakSet<object>();
@@ -14,12 +21,18 @@ export function createCommunicationsView(invoke: Invoke, options: Options = {}) 
   let currentRevision = 0;
   let sources: SourceRef[] = [];
   let busy = 0;
+  let generation = 0;
   let fileActions: { refresh: () => void } | undefined;
+  let prepareSourceBound: ((seed: SourceSeed) => Promise<void>) | null = null;
 
   const call = async (operation: string, payload: Record<string, unknown> = {}) => {
+    const requestGeneration = generation;
     const response: any = await invoke("communications_request", {
       request: { operation, ...payload },
     });
+    if (requestGeneration !== generation) {
+      throw new Error("Staff account changed; reopen this workspace.");
+    }
     return response && typeof response === "object" && "result" in response
       ? response.result
       : response;
@@ -45,6 +58,7 @@ export function createCommunicationsView(invoke: Invoke, options: Options = {}) 
     };
 
     async function run(task: () => Promise<void>) {
+      const runGeneration = generation;
       busy += 1;
       root.setAttribute("aria-busy", "true");
       const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("button"));
@@ -52,8 +66,11 @@ export function createCommunicationsView(invoke: Invoke, options: Options = {}) 
       try {
         await task();
       } catch (error) {
-        status(error instanceof Error ? error.message : "Request failed");
+        if (runGeneration === generation) {
+          status(error instanceof Error ? error.message : "Request failed");
+        }
       } finally {
+        if (runGeneration !== generation) return;
         busy -= 1;
         if (busy === 0) {
           root.setAttribute("aria-busy", "false");
@@ -378,6 +395,49 @@ Revision: ${revision.sha256 ?? ''}`;
       }
     });
 
+    prepareSourceBound = async (seed: SourceSeed) => {
+      if (seed.kind !== "library" && seed.kind !== "elections") {
+        throw new Error("Invalid source kind");
+      }
+      if (!seed.id) throw new Error("Source ID is required");
+      const data: any = await call("source", { payload: { kind: seed.kind, id: seed.id } });
+      const reference = data?.reference;
+      if (reference?.eligible !== true || reference?.kind !== seed.kind || reference?.id !== seed.id) {
+        throw new Error(`Source ${seed.kind}/${seed.id} could not be verified`);
+      }
+      if (seed.article_id) {
+        await load(seed.article_id);
+      } else {
+        current = null;
+        currentId = "";
+        currentRevision = 0;
+        editor.reset();
+        delete root.dataset.currentId;
+        delete root.dataset.currentRevision;
+      }
+      editor.fill({
+        kind: "announcement",
+        revision: {
+          title: seed.title,
+          body: seed.body,
+          language: "en",
+          access_review: { reviewed: false },
+        },
+      });
+      sources = [{
+        kind: seed.kind,
+        id: seed.id,
+        title: reference.title ?? seed.title,
+        eligible: true,
+      }];
+      previewEl?.replaceChildren();
+      reportEl?.replaceChildren();
+      renderSources();
+      renderCurrent();
+      fileActions?.refresh();
+      status("Prepared unsaved draft from verified source; review required before saving.");
+    };
+
     fileActions = bindCommunicationFiles(root, {
       call,
       current: () => current,
@@ -388,5 +448,22 @@ Revision: ${revision.sha256 ?? ''}`;
     void run(loadList);
   }
 
-  return { render: renderCommunications, bind };
+  return {
+    render: renderCommunications,
+    bind,
+    reset() {
+      generation += 1;
+      current = null;
+      currentId = "";
+      currentRevision = 0;
+      sources = [];
+      busy = 0;
+      fileActions = undefined;
+      prepareSourceBound = null;
+    },
+    async prepareSource(seed: SourceSeed) {
+      if (!prepareSourceBound) throw new Error("Communications view is not bound");
+      await prepareSourceBound(seed);
+    },
+  };
 }

@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
-SourceKind = Literal["meetings", "code", "notice", "311", "parks"]
+SourceKind = Literal["meetings", "code", "notice", "311", "parks", "library", "elections"]
 DraftKind = Literal[
     "meeting_summary",
     "ordinance_explainer",

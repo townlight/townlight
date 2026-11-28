@@ -256,3 +256,250 @@ export async function installedResident311({native, save, portalBaseUrl, categor
     await context.dispose();
   }
 }
+
+async function utilityResidentContext({ page, baseUrl }) {
+  if (!page) {
+    return await playwrightRequest.newContext({
+      baseURL: baseUrl,
+      ignoreHTTPSErrors: false,
+    });
+  }
+
+  const baseOrigin = new URL(baseUrl).origin;
+
+  return {
+    async get(url) {
+      const resolved = new URL(url, baseUrl);
+      assert(resolved.origin === baseOrigin, 'utilityResidentContext get URL must be same-origin');
+      const response = await page.goto(resolved.href, { waitUntil: 'domcontentloaded' });
+      assert(response, 'utilityResidentContext get expected a response');
+      return {
+        status: () => response.status(),
+        text: () => page.content(),
+      };
+    },
+    async post(url, { form }) {
+      return await utilityResidentBrowserPost(page, baseUrl, url, form);
+    },
+    async dispose() {},
+  };
+}
+
+async function utilityResidentFill(form, fields) {
+  for (const [name, value] of Object.entries(fields)) {
+    assert(/^[A-Za-z_][A-Za-z0-9_]*$/.test(name), 'invalid field name: ' + name);
+    if (value === undefined) continue;
+
+    const locator = form.locator('[name="' + name + '"]');
+    assert((await locator.count()) === 1, 'expected exactly one control named ' + name);
+
+    const { tagName, type } = await locator.evaluate((el) => ({ tagName: el.tagName, type: el.type }));
+
+    if (type === 'hidden') {
+      assert((await locator.inputValue()) === String(value), 'hidden control mismatch: ' + name);
+      continue;
+    }
+
+    if (tagName === 'SELECT') {
+      await locator.selectOption(String(value));
+      continue;
+    }
+
+    if (
+      tagName === 'TEXTAREA' ||
+      (tagName === 'INPUT' && ['text', 'email', 'tel', 'search', 'url', 'number'].includes(type))
+    ) {
+      await locator.fill(String(value));
+      continue;
+    }
+
+    throw new Error('unsupportedcontrols');
+  }
+}
+
+async function utilityResidentBrowserPost(page, baseUrl, url, fields) {
+  const base = new URL(baseUrl);
+  const target = new URL(url, base);
+  assert(target.origin === base.origin);
+
+  const formCount = await page.locator('form').count();
+  const matchingForms = [];
+
+  for (let i = 0; i < formCount; i += 1) {
+    const form = page.locator('form').nth(i);
+    const { action, method } = await form.evaluate((el) => ({
+      action: el.action,
+      method: el.method,
+    }));
+
+    if (action === target.href && method.toLowerCase() === 'post') {
+      matchingForms.push(form);
+    }
+  }
+
+  assert(matchingForms.length === 1);
+  const form = matchingForms[0];
+
+  await utilityResidentFill(form, fields);
+
+  const submit = form.locator('button[type="submit"], input[type="submit"]');
+  const submitCount = await submit.count();
+  assert(submitCount === 1);
+
+  const [navigationResponse] = await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+    submit.click(),
+  ]);
+
+  assert(navigationResponse);
+
+  return {
+    status: () => navigationResponse.status(),
+    text: () => page.content(),
+  };
+}
+
+async function utilityResidentHome(context, baseUrl, categoryCode) {
+  const homeUrl = new URL(CREATE_PATH, baseUrl).href;
+  const deadline = Date.now() + 60000;
+
+  while (true) {
+    const response = await context.get(homeUrl);
+    assert.equal(response.status(), 200, 'resident catalog home status');
+    const homeHtml = await response.text();
+
+    let hasCategoryOption = false;
+    for (const match of homeHtml.matchAll(/<option\b([^>]*)>/gi)) {
+      const optionAttributes = attributes(match[1]);
+      if (optionAttributes.value === categoryCode) {
+        hasCategoryOption = true;
+        break;
+      }
+    }
+
+    if (hasCategoryOption) {
+      const forms = parseForms(homeHtml);
+      const createForm = forms.find((form) => {
+        return 'category' in form.fields && 'description' in form.fields && 'email' in form.fields;
+      });
+
+      if (createForm) {
+        return { homeUrl, homeHtml, createForm };
+      }
+    }
+
+    if (Date.now() >= deadline) {
+      throw new Error("catalognotready");
+    }
+
+    await delay(500);
+  }
+}
+
+async function utilityResidentLookup(context, baseUrl, tracking, trackingToken) {
+  const homeUrl = new URL(CREATE_PATH, baseUrl).href;
+  const home = await context.get(homeUrl);
+  assert.equal(home.status(), 200, 'resident home status');
+  const link = anchors(await home.text()).find(item => /track an existing request/i.test(item.text));
+  assert.ok(link, 'actual resident lookup link missing');
+  const lookupUrl = new URL(link.href, baseUrl).href;
+  assert.equal(new URL(lookupUrl).origin, new URL(baseUrl).origin);
+  const lookup = await context.get(lookupUrl);
+  assert.equal(lookup.status(), 200, 'resident lookup status');
+  const form = parseForms(await lookup.text()).find(item => 'tracking' in item.fields && 'access_token' in item.fields);
+  assert.ok(form, 'actual lookup form missing');
+  const response = await submitForm(context, form, {tracking, access_token: trackingToken}, lookupUrl, baseUrl);
+  const body = await response.text();
+  return {response, body, commandUrl: response.status() === 200 ? commandUrlFrom(body, baseUrl) : null};
+}
+
+const utilityText = value => stripTags(String(value).replace(/<br\s*\/?>/gi, " ")).replace(/\s+/g, ' ').trim();
+const utilityExpected = value => String(value).replace(/\s+/g, ' ').trim();
+
+async function utilityResidentBaseline(native, requestId, description) {
+  let result = await native('service_requests_request', {request: {operation: 'request', id: requestId}});
+  if (result && typeof result === 'object' && 'result' in result) result = result.result;
+  const request = result?.request ?? result;
+  assert.equal(request?.id, requestId, 'canonical resident request ID');
+  assert.equal(request?.description, description, 'canonical payment question');
+  assert.ok(Array.isArray(request.events) && Array.isArray(request.notifications), 'canonical event/notification projection');
+  return {revision: request.revision, eventCount: request.events.length, notificationCount: request.notifications.length};
+}
+
+/** Focused synthetic payment question; no resident comment/photo or state changes. */
+export async function installedUtilityResident({native, portalBaseUrl, categoryCode, description, contactEmail, page} = {}) {
+  assert.ok(typeof portalBaseUrl === 'string' && portalBaseUrl);
+  assert.ok(typeof categoryCode === 'string' && categoryCode);
+  assert.ok(typeof description === 'string' && description.trim());
+  const baseUrl = portalBaseUrl.endsWith('/') ? portalBaseUrl : `${portalBaseUrl}/`;
+  const email = contactEmail || `utility+${randomUUID()}@example.test`;
+  const context = await utilityResidentContext({page, baseUrl});
+  try {
+    const {homeUrl, createForm} = await utilityResidentHome(context, baseUrl, categoryCode);
+    const createCommandId = createForm.fields.command_id;
+    assert.match(createCommandId ?? '', /^[0-9a-f-]{36}$/i, 'actual create command UUID');
+    const overrides = {category: categoryCode, description, location: 'Utilities acceptance', email, phone: ''};
+    if ('contact_name' in createForm.fields) overrides.contact_name = 'Utilities Resident';
+    const submitted = await submitForm(context, createForm, overrides, homeUrl, baseUrl);
+    assert.equal(submitted.status(), 200, 'resident question submit status');
+    const commandUrl = commandUrlFrom(await submitted.text(), baseUrl);
+    const created = await pollCommand(context, commandUrl, html => /Save these private details now/i.test(html) && /Access token/i.test(html), 'Create utility question');
+    const {tracking, accessToken} = createdCredentials(created.body);
+    const detailUrl = detailUrlFrom(created.body, baseUrl);
+    const requestId = /\/requests\/([0-9a-f-]{36})\//i.exec(detailUrl)?.[1];
+    assert.match(requestId ?? '', /^[0-9a-f-]{36}$/i, 'created request ID');
+    const lookup = await readUtilityResident({page, portalBaseUrl: baseUrl, tracking, trackingToken: accessToken, expectedBody: description, privateNotes: ''});
+    assert.equal(lookup.requestId, requestId, 'lookup must reopen the original case');
+    const evidence = {requestId, tracking, description, createCommandId, createStatus: created.status, lookupStatus: lookup.status};
+    if (native) evidence.baseline = await utilityResidentBaseline(native, requestId, description);
+    return {evidence, private: {trackingToken: accessToken, contactEmail: email}};
+  } finally {
+    await context.dispose();
+  }
+}
+
+/** The provided page makes every navigation/form submission on the physical PC. */
+export async function readUtilityResident({portalBaseUrl, tracking, trackingToken, expectedBody, privateNotes, wrongToken, page} = {}) {
+  assert.ok(typeof portalBaseUrl === 'string' && portalBaseUrl);
+  assert.ok(typeof tracking === 'string' && tracking);
+  assert.ok(typeof trackingToken === 'string' && trackingToken);
+  assert.ok(typeof expectedBody === 'string' && expectedBody.trim());
+  assert.equal(typeof privateNotes, 'string');
+  if (wrongToken !== undefined) assert.ok(typeof wrongToken === 'string' && /^[A-Za-z0-9_-]{32,128}$/.test(wrongToken), 'wrong token must have the real token format');
+  const baseUrl = portalBaseUrl.endsWith('/') ? portalBaseUrl : `${portalBaseUrl}/`;
+  const context = await utilityResidentContext({page, baseUrl});
+  try {
+    const lookup = await utilityResidentLookup(context, baseUrl, tracking, wrongToken ?? trackingToken);
+    let completed;
+    if (wrongToken !== undefined) {
+      let response = lookup.response;
+      let html = lookup.body;
+      const deadline = Date.now() + 60_000;
+      for (;;) {
+        const text = utilityText(html);
+        assert.ok(!text.includes(utilityExpected(expectedBody)), 'another resident saw the approved text');
+        assert.ok(!privateNotes || !decodeHtml(html).includes(privateNotes), 'private notes leaked');
+        assert.ok(!/name=["']message["']/i.test(html), 'another resident received a case update form');
+        if ([404, 502].includes(response.status()) && /That resident request is not available|Request not completed/i.test(text)) {
+          return {requestId: null, tracking, accessDenied: true, expectedBodyVisible: false, privateNotesAbsent: true, status: response.status()};
+        }
+        assert.equal(response.status(), 200, 'unexpected wrong-token response');
+        assert.ok(lookup.commandUrl && Date.now() < deadline, 'wrong-token command did not reach a denial');
+        await delay(500);
+        response = await context.get(lookup.commandUrl);
+        html = await response.text();
+      }
+    }
+    assert.equal(lookup.response.status(), 200, 'resident lookup submit status');
+    completed = await pollCommand(context, lookup.commandUrl, html => /Add a comment/i.test(html) && /name=["']message["']/i.test(html), 'Read approved utility reply');
+    const text = utilityText(completed.body);
+    const requestId = /\/requests\/([0-9a-f-]{36})\//i.exec(completed.body)?.[1];
+    assert.match(requestId ?? '', /^[0-9a-f-]{36}$/i, 'actual original request form ID');
+    assert.ok(text.includes(tracking), 'original tracking reference absent');
+    assert.ok(text.includes(utilityExpected(expectedBody)), 'approved text is absent from original case');
+    assert.ok(!privateNotes || !decodeHtml(completed.body).includes(privateNotes), 'private staff notes leaked');
+    return {requestId, tracking, accessDenied: false, expectedBodyVisible: true, privateNotesAbsent: true, status: completed.status};
+  } finally {
+    await context.dispose();
+  }
+}

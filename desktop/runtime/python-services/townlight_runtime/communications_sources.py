@@ -133,10 +133,18 @@ async def resolve_source(
         from .communications_department_sources import department_source
 
         return await department_source(request, proof, kind, identifier)
+    elif kind == "library":
+        from .communications_library_sources import library_source
+
+        return await library_source(request, proof, identifier)
     elif kind == "parks":
         from .communications_parks_sources import parks_source
 
         return await parks_source(request, proof, identifier)
+    elif kind == "elections":
+        from .communications_elections_sources import elections_source
+
+        return await elections_source(request, proof, identifier)
     else:
         raise HTTPException(status_code=422, detail="source kind not implemented")
 

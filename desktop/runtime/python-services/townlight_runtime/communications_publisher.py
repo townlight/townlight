@@ -7,6 +7,8 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .election_publication import validate_election_binding
+
 
 class CommunicationsPublisher:
     def __init__(self, repo, queue, public_origin, profile_root):
@@ -64,6 +66,7 @@ class CommunicationsPublisher:
         try:
             if action in ("publish", "correct"):
                 snapshots = self.repo.get_source_snapshots(article_id, revision, content_sha)
+                validate_election_binding(content["title"], content["body"], snapshots)
                 artifact = self.repo.build_public_artifact(article_id, revision, content_sha, snapshots)
                 artifact_sha = hashlib.sha256(artifact).hexdigest()
                 artifacts = self.profile_root / "communications" / "artifacts"

@@ -27,7 +27,7 @@ def test_catalog_has_20_kept_townlight_modules_with_unique_technical_ids() -> No
     state = _load(suite_state.STATE_PATH)
     modules = state["modules"]
     assert isinstance(modules, dict)
-    assert len(modules) == 20
+    assert len(modules) == 23
     assert modules["data"]["maturity"]["state"] == "candidate"
     assert modules["data"]["versions"]["public_status"] == "0.2.0"
     assert modules["budget"]["maturity"]["state"] == "candidate"

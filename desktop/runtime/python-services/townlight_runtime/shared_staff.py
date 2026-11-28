@@ -386,10 +386,12 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         records_download = RECORDS_DOWNLOAD.fullmatch(path) if request.method == "GET" else None
         records_upload = request.method == "POST" and RECORDS_FILE.fullmatch(path) is not None
         query = request.url.query
+        from .department_proxy import department_route
         from .parks_proxy import parks_data_route, parks_route
         from .service_request_proxy import BINARY_DOWNLOAD, forward_binary
         parks = parks_route(request.method, path, query)
         parks_data = parks_data_route(request.method, path, query)
+        department = department_route(request.method, path, query)
         binary_download = request.method == "GET" and BINARY_DOWNLOAD.fullmatch(path) is not None
         service_request_read = request.method == "GET" and (SERVICE_REQUEST_READ.fullmatch(path) is not None
                                                                or SERVICE_REQUEST_DATA_READ.fullmatch(path) is not None)
@@ -399,7 +401,7 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         communications_read = request.method == "GET" and COMMUNICATIONS_READ.fullmatch(path) is not None
         communications_write = request.method == "POST" and COMMUNICATIONS_WRITE.fullmatch(path) is not None
         communications = communications_read or communications_write
-        if parks or parks_data:
+        if parks or parks_data or department is not None:
             allowed_query = True
         elif council_file:
             pairs = request.query_params.multi_items()
@@ -446,7 +448,7 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
         else:
             allowed_query = (not query or path == "/desktop/v1/portal/selections"
                              and re.fullmatch(rf"request_id={UUID}", query))
-        if (allowed.fullmatch(path) is None and not council_file and not records_upload and not records_download and not service_request and not binary_download and not communications and not parks and not parks_data
+        if (allowed.fullmatch(path) is None and not council_file and not records_upload and not records_download and not service_request and not binary_download and not communications and not parks and not parks_data and department is None
                 or not allowed_query):
             return json_response({"detail": "This operation is only available on the city host."}, status=404)
         proof = request.headers.get("x-townlight-session")
@@ -457,6 +459,8 @@ def install_shared_staff(app: FastAPI, domain_app: FastAPI, profile_root: Path):
             raise HTTPException(403, "Townlight Parks is not available.")
         if parks_data and not (principal.allows_module("townlight_parks") and principal.allows_module("townlight_data")):
             raise HTTPException(403, "Townlight Data is not available.")
+        if department is not None and not principal.allows_module(department):
+            raise HTTPException(403, "This department is not available.")
         if binary_download:
             return await forward_binary(
                 domain_app, request, path, proof, principal, profile_root, staff.resolve

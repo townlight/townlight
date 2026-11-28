@@ -13,7 +13,7 @@ const RECORDS_RECEIPT = `${RECORDS} [data-role="receipt"]`;
 const RECORDS_RESULT = `${RECORDS} [data-role="result"]`;
 const DATA_RESULT = '[data-dp-result]';
 
-export async function installedServiceRequests({page, native, save, portalBaseUrl, captureMessage, downloadRecordsAttachment}) {
+export async function installedServiceRequests({page, native, save, portalBaseUrl, captureMessage, downloadRecordsAttachment, recordsSeedOnly = false}) {
   assert.equal(typeof native, 'function', 'native typed-operation bridge is required');
   assert.ok(portalBaseUrl, 'portalBaseUrl callback is required');
   assert.equal(typeof downloadRecordsAttachment, 'function', 'downloadRecordsAttachment callback is required');
@@ -164,7 +164,9 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
   await page.locator(`${VIEW} [data-filter]`).waitFor({state: 'visible'});
   await page.locator(`${VIEW} [data-create]`).waitFor({state: 'visible'});
   await page.locator(`${RECORDS}`).waitFor({state: 'attached'});
-  await page.locator('[data-dp-preview]').waitFor({state: 'attached'});
+  if (!recordsSeedOnly) {
+    await page.locator('[data-dp-preview]').waitFor({state: 'attached'});
+  }
 
   const categoryForm = page.locator(`${VIEW} [data-category]`);
   if ((await categoryForm.count()) === 0) {
@@ -395,6 +397,31 @@ export async function installedServiceRequests({page, native, save, portalBaseUr
   assert.ok(Buffer.isBuffer(recordsDownload), 'Records handoff archive buffer');
   assert.equal(recordsDownload.length, prepared.sizeBytes, 'Records handoff archive size');
   assert.equal(createHash('sha256').update(recordsDownload).digest('hex'), prepared.sha256, 'Records handoff archive hash');
+
+  if (recordsSeedOnly) {
+    let seedDetail;
+    let seedNotifications = [];
+    const seedNotificationDeadline = Date.now() + 30_000;
+    while (Date.now() < seedNotificationDeadline) {
+      seedDetail = await detail(main.id);
+      seedNotifications = array(seedDetail.notifications, 'notifications');
+      if (seedNotifications.length > 0 && seedNotifications.every(item => item?.state === 'sent')) break;
+      await delay(200);
+    }
+    assert.ok(seedNotifications.length > 0, 'no notification delivery evidence was returned');
+    assert.ok(seedNotifications.every(item => item?.state === 'sent'), `not all notifications reached sent: ${JSON.stringify(seedNotifications)}`);
+    return {
+      passed: true,
+      ids: {
+        main_request: String(main.id),
+        records_request: handoff['Records request ID'],
+        records_attachment: handoff['Attachment ID'],
+      },
+      milestones: {
+        records_result_sha256: prepared.sha256,
+      },
+    };
+  }
 
   await openDataDetails();
   const dataResult = page.locator(DATA_RESULT);

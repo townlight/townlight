@@ -1,5 +1,15 @@
 # Changelog
 
+## Windows 1.11.0.1 public beta
+
+- Utilities connects approved, cited guidance replies to the original 311 tracker and notification.
+- Library hands approved program revisions to Communications and retains their published Records archives.
+- Elections adds separate official approval and same-URL corrections with immutable archive versions.
+
+A hosted fresh exercise observed all three products plus backup and restore. A two-PC check confirmed Townlight Utilities and Townlight Library’s scheduled portal publication, test email, and a verified Records attachment after desktop exit. That check stopped before reopened-desktop checks and Townlight Elections. An upgrade from 1.10.0.1 reached retained data and Townlight Library, but Elections upgrade and final uninstall preservation remain unverified.
+
+[Release and corresponding source](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md)
+
 ## Windows 1.9.2.1 public beta — published 2026-11-22 UTC
 
 - Add shared Windows host/workstation use of Meetings and Records with existing staff roles, reviewed council packet revisions, and queued delivery of explicitly approved portal content.

@@ -6,35 +6,38 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {stationRecorder,stationLargeHandoff} from './station-recorder.mjs';
+import {connectUleDesktop} from './ule-hosted-connect.mjs';
 if (process.env.GITHUB_ACTIONS !== 'true' || process.platform !== 'win32') throw Error('Disposable hosted Windows only');
 const [mode, output] = process.argv.slice(2);
-assert(['seed', 'fresh', 'upgrade', 'recorder', 'community'].includes(mode));
+assert(['seed', 'fresh', 'upgrade', 'recorder', 'community', 'ule', 'ule-upgrade', 'ule-recovery'].includes(mode));
 await mkdir(output, {recursive:true});
-const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:60000});
-const page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
+let browser = mode==='ule-recovery' ? await connectUleDesktop() : await chromium.connectOverCDP('http://127.0.0.1:9222', {timeout:60000});
+let page = browser.contexts().flatMap(c => c.pages()).find(p => !p.url().startsWith('devtools:'));
 assert(page, 'Installed WebView page is absent');
 const run = async name => page.evaluate(await readFile(new URL(name, import.meta.url), 'utf8'));
-const native = (command, args={}) => page.evaluate(async ({command,args}) => {
-  try {
-    return await window.__TAURI_INTERNALS__.invoke(command,args);
-  } catch (error) {
-    if (typeof error === 'string') throw new Error(error);
-    const safe = {};
-    if (error && typeof error === 'object') {
-      for (const key of ['code','message','retryable','status']) {
-        if (error[key] !== undefined) safe[key] = error[key];
+const native = async (command, args={}) => {
+  const envelope = await page.evaluate(async ({command,args}) => {
+    try {
+      return {ok:true, result: await window.__TAURI_INTERNALS__.invoke(command,args)};
+    } catch (error) {
+      if (typeof error === 'string') return {ok:false, error:{message:error}};
+      const safe = {};
+      if (error && typeof error === 'object') {
+        if (typeof error.code === 'string') safe.code = error.code;
+        if (typeof error.message === 'string') safe.message = error.message;
+        if (typeof error.outcome_unknown === 'boolean') safe.outcome_unknown = error.outcome_unknown;
       }
+      if (typeof safe.message !== 'string') safe.message = 'Native command failed';
+      return {ok:false, error:safe};
     }
-    const detail = typeof safe.message === 'string' ? safe.message
-      : safe.code !== undefined ? String(safe.code)
-      : 'Native command failed';
-    const wrapped = new Error(detail);
-    if (safe.code !== undefined) wrapped.code = safe.code;
-    if (safe.retryable !== undefined) wrapped.retryable = safe.retryable;
-    if (safe.status !== undefined) wrapped.status = safe.status;
-    throw wrapped;
-  }
-}, {command,args});
+  }, {command,args});
+  if (envelope.ok) return envelope.result;
+  const detail = typeof envelope.error?.message === 'string' ? envelope.error.message : 'Native command failed';
+  const wrapped = new Error(detail);
+  if (envelope.error?.code !== undefined) wrapped.code = envelope.error.code;
+  if (envelope.error?.outcome_unknown !== undefined) wrapped.outcome_unknown = envelope.error.outcome_unknown;
+  throw wrapped;
+};
 const accepted = result => { assert.equal(result?.accepted, true, JSON.stringify(result)); return result; };
 const save = async (name, value) => writeFile(path.join(output,name+'.json'), JSON.stringify(value,null,2));
 const admin = async () => {
@@ -77,6 +80,21 @@ try {
   // Observe its rendered result before sending another native state request.
   await page.locator('.sidebar [data-area="home"]').waitFor({state:'visible',timeout:600000});
   await run('observer.js');
+  if (['ule','ule-upgrade','ule-recovery'].includes(mode)) {
+    const {recoverUleHosted}=await import('./ule-hosted-recovery.mjs');
+    const {runUleHosted}=await import('./ule-hosted-run.mjs');
+    const {reconnectUleAfterLibrary}=await import('./ule-hosted-reconnect.mjs');
+    if (mode==='ule-recovery') {
+      await recoverUleHosted({getPage:()=>page,native,save,output});
+    } else {
+      const fixtureRoot=process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT;
+      const portalBaseUrl=process.env.TOWNLIGHT_COMMUNITY_PORTAL_URL;
+      if(!fixtureRoot) throw new Error('TOWNLIGHT_COMMUNITY_FIXTURE_ROOT is required');
+      if(!portalBaseUrl) throw new Error('TOWNLIGHT_COMMUNITY_PORTAL_URL is required');
+      await runUleHosted({getPage:()=>page,native,save,run,mode,output,fixtureRoot,portalBaseUrl,afterLibrarySchedule:pending=>reconnectUleAfterLibrary({pending,getBrowser:()=>browser,setBrowser:value=>{browser=value},setPage:value=>{page=value},native,run})});
+    }
+    await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
+  } else {
   let ids, communityIds, communityMeetingId, communityExpected, communityBaseline, communityUnattended;
   if (mode==='upgrade') {
     ids=JSON.parse(await readFile(path.join(output,'seed-workflows.json'),'utf8'));
@@ -176,6 +194,31 @@ try {
       await save('community-pending-after-restart', await pendingFunctions.readPendingNotification(pendingContext));
     }
   }
+  if (process.env.TOWNLIGHT_ULE_UPGRADE_SEED === '1' && mode === 'seed') {
+    const fixtureRoot = process.env.TOWNLIGHT_COMMUNITY_FIXTURE_ROOT;
+    const portalBaseUrl = process.env.TOWNLIGHT_COMMUNITY_PORTAL_URL;
+    if (!fixtureRoot || !portalBaseUrl) throw new Error('ULE seed requires TOWNLIGHT_COMMUNITY_FIXTURE_ROOT and TOWNLIGHT_COMMUNITY_PORTAL_URL');
+    await page.evaluate(async () => {
+      const a = window.audit;
+      const app = () => a.native('get_app_state');
+      if ((await app()).domain_authority !== 'python-records') {
+        await a.click('[data-surface="IT/Admin"]', {confirm:false});
+        await a.nav('health');
+        await a.click('[data-supervisor-action="activate-records"]', {timeout:600000});
+        await a.until(async () => (await app()).domain_authority === 'python-records', 600000);
+      }
+    });
+    const { seedUleUpgrade } = await import('./ule-upgrade-seed.mjs');
+    const { downloadRecordsAttachment } = await import('./community-workflows.mjs');
+    await seedUleUpgrade({ page, native, save, meetingId: ids.meeting_id, fixtureRoot, portalBaseUrl, downloadRecordsAttachment });
+  }
+  if (process.env.TOWNLIGHT_ULE_UPGRADE_SEED === '1' && mode === 'upgrade') {
+    const seed = JSON.parse(await readFile(path.join(output, 'ule-upgrade-seed.json'), 'utf8'));
+    if (!seed.ids || !seed.expected) throw new Error('ULE upgrade seed missing ids or expected');
+    const { readUleUpgrade } = await import('./ule-upgrade-seed.mjs');
+    const { downloadRecordsAttachment } = await import('./community-workflows.mjs');
+    await readUleUpgrade({ native, ids: seed.ids, expected: seed.expected, downloadRecordsAttachment, save, stage: 'after-upgrade' });
+  }
   if (mode === "recorder") {
     await page.evaluate(async () => {
       const a = window.audit;
@@ -234,11 +277,12 @@ try {
   }
   accepted(await native('supervisor_action',{action:'stop',serviceId:null}));
   await save(mode+'-complete',{passed:true,at:new Date().toISOString()});
+  }
 } catch(error) {
   const failure = {error:String(error),stack:error.stack};
-  if(mode!=="community") failure.text = await page.locator('body').innerText().catch(()=>'' );
+  if(!['community','ule','ule-upgrade','ule-recovery'].includes(mode)) failure.text = await page.locator('body').innerText().catch(()=>'' );
   await save(mode+'-failure',failure);
-  if(mode!=="community") await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
+  if(!['community','ule','ule-upgrade','ule-recovery'].includes(mode)) await page.screenshot({path:path.join(output,mode+'-failure.png'),fullPage:true}).catch(()=>{});
   throw error;
 } finally {
   try {
