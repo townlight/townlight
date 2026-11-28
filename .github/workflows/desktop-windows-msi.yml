@@ -972,7 +972,7 @@ jobs:
           npm run prepare-runtime-payload -- @parameters
 
       - name: Set up Python for native Planning boundary checks
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           # These checks import the prepared CPython 3.13 payload's native wheels.
           python-version: "3.13"
@@ -1154,7 +1154,7 @@ jobs:
 
       - name: Prepare isolated Data resident portal
         if: needs.windows-local-msi.outputs.candidate_profile == 'inspections-preview'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 
@@ -1456,7 +1456,7 @@ jobs:
           cache-dependency-path: townlight/desktop/package-lock.json
       - name: Set up community Python
         if: matrix.mode == 'community'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - name: Install existing desktop test tools
