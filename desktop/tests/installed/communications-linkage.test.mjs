@@ -90,6 +90,15 @@ test('controlled post-exit normal verifier authenticates, verifies MIME/public/s
   assert.equal(receipt.passed,true);assert.equal(signedOut,true);assert.equal(receipt.captured_mail.meaning,'SMTP acceptance only');
   assert.ok(requests.includes(`POST /staff/v1/api/desktop/v1/communications/articles/${id}/records`));
   assert.equal(JSON.parse(await readFile(join(root,'communications-unattended.json'),'utf8')).records.sha256,hash(bytes));
+  row.state = 'uncertain';
+  await assert.rejects(verifyUnattended({output:root,fixtureRoot:root,portalBaseUrl:'https://portal.example.test',fetchImpl,timeoutMs:1000}),
+    error => error.cause?.code === 'PUBLICATION_UNCERTAIN');
+  const failure = JSON.parse(await readFile(join(root,'communications-publication-readback-failure.json'),'utf8'));
+  assert.equal(failure.attempts, 1);
+  assert.equal(failure.publication.state, 'uncertain');
+  assert.equal(failure.publication.website_status, 'delivered');
+  assert.doesNotMatch(JSON.stringify(failure), /portal\.example|controlled-session/);
+  row.state = 'published';
   for(const field of ['id','revision','sha256']){const bad=structuredClone(pending);bad[field]=field==='revision'?99:'wrong';assert.throws(()=>assertPublished(article,bad));}
   const badSource=structuredClone(pending);badSource.source_ref.sha256='0'.repeat(64);assert.throws(()=>assertPublished(article,badSource));
   assert.throws(()=>assertMail({...metadata,recipients:['other@example.test']},[pending.body+' '+url],pending,stopped,url));
