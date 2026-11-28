@@ -9,7 +9,7 @@ import { deliverApprovedCommunicationVersion, readPublic } from './communication
 export async function installedUlePublications({
   page, residentPage, publicPage = residentPage, native, save, fixtureRoot, portalBaseUrl, actors, switchActor,
   library, elections, subscriberEmail, captureMessage, downloadRecordsAttachment,
-  afterLibrarySchedule,
+  afterLibrarySchedule, recordsPathsRedacted = false,
 }) {
   assert.equal(typeof switchActor, 'function');
   assert.equal(typeof afterLibrarySchedule, 'function', 'Library requires observed post-exit delivery');
@@ -71,7 +71,7 @@ export async function installedUlePublications({
     await actor('communicationsApprover');
     await navigate('communications');
     const result = await deliverApprovedCommunicationVersion({ page, native, save, article,
-      portalBaseUrl, fixtureRoot, captureMessage, downloadRecordsAttachment, publicPage, ...options });
+      portalBaseUrl, fixtureRoot, captureMessage, downloadRecordsAttachment, publicPage, recordsPathsRedacted, ...options });
     page = result.page;
     native = result.native;
     const { page: ignoredPage, native: ignoredNative, ...evidence } = result;

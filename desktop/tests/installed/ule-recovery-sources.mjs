@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readRecoveryRecords } from './ule-recovery-records.mjs';
 
-export async function readRecoverySource({ native, kind, entry, downloadRecordsAttachment }) {
+export async function readRecoverySource({ native, kind, entry, downloadRecordsAttachment, recordsPathsRedacted }) {
   const response = await native(`${kind}_request`, {
     request: { operation: 'get', id: entry.id, revision: entry.revision },
   });
@@ -41,6 +41,7 @@ export async function readRecoverySource({ native, kind, entry, downloadRecordsA
     native,
     records: entry.records,
     downloadRecordsAttachment,
+    recordsPathsRedacted,
     article: entry.article,
     source,
   });

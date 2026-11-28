@@ -9,7 +9,7 @@ async function call(native, command, request) {
 
 /** Authenticated reads only; caller owns stopping, restarting, backup and restore. */
 export async function captureUleRecovery({
-  native, utilityRequestId, utilityRequestIds = [], publications, downloadRecordsAttachment,
+  native, utilityRequestId, utilityRequestIds = [], publications, downloadRecordsAttachment, recordsPathsRedacted = false,
 }) {
   assert.equal(typeof native, 'function');
   assert.equal(typeof downloadRecordsAttachment, 'function');
@@ -36,7 +36,7 @@ export async function captureUleRecovery({
   const sources = [];
   for (let index = 0; index < entries.length; index += 1) {
     sources.push(await readRecoverySource({ native, kind: index === 0 ? 'library' : 'elections',
-      entry: entries[index], downloadRecordsAttachment }));
+      entry: entries[index], downloadRecordsAttachment, recordsPathsRedacted }));
   }
   const communications = [];
   for (const id of new Set(entries.map(entry => entry.article.id))) {
@@ -51,7 +51,8 @@ export async function captureUleRecovery({
     assert.deepEqual(article.revision.source_refs, [latest.source_ref]);
     communications.push(article);
   }
-  return { inputs: { utilityRequestIds: ids, publications }, utilities, sources, communications };
+  const inputs = { utilityRequestIds: ids, publications, ...(recordsPathsRedacted ? { recordsPathsRedacted } : {}) };
+  return { inputs, utilities, sources, communications };
 }
 
 export async function verifyUleRecovery({ native, expected, downloadRecordsAttachment, save, stage = 'readback' }) {

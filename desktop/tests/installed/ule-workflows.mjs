@@ -89,6 +89,7 @@ export async function uleWorkflows(config) {
     utilityRequestIds: [firstID, secondID],
     publications: publications.recoveryExpected,
     downloadRecordsAttachment: config.downloadRecordsAttachment,
+    recordsPathsRedacted: config.recordsPathsRedacted,
   });
 
   await config.save('ule-identities', { utilityRequestIds: [firstID, secondID] });

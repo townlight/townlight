@@ -154,7 +154,11 @@ async function verifyRecordsArchive(native, requestId, displayedHash, downloadRe
   const expectedSha256 = String(document.sha256 ?? "").toLowerCase();
   assert.match(expectedSha256, SHA256, "records archive attachment sha256");
   assert.equal(expectedSha256, normalizedDisplayed, "records archive attachment hash matches displayed hash");
-  assert.equal(document.original_path, `townlight-comms-archive:${expected.articleId}:${expected.revision}:${expectedSha256}`, "records archive original_path");
+  if (expected.recordsPathsRedacted) {
+    assert.ok(document.original_path === '', 'shared staff Records archive path must be redacted');
+  } else {
+    assert.equal(document.original_path, `townlight-comms-archive:${expected.articleId}:${expected.revision}:${expectedSha256}`, "records archive original_path");
+  }
   assert.equal(document.citation, `Townlight communications article ${expected.articleId}; revision ${expected.revision}; archive sha256 ${expectedSha256}.`, "records archive citation");
   const expectedSize = Number(document.size_bytes);
   assert.ok(Number.isSafeInteger(expectedSize) && expectedSize > 0, "records archive attachment size");
@@ -348,7 +352,7 @@ export async function installedCommunicationsDelivery({
 export async function deliverApprovedCommunicationVersion({
   page, native, save, article, portalBaseUrl, action = 'publish', subscriberEmail,
   fixtureRoot, captureMessage, downloadRecordsAttachment, privateNotes = [],
-  expectedPublicUrl, afterSchedule, timeoutMs = 180_000, publicPage,
+  expectedPublicUrl, afterSchedule, timeoutMs = 180_000, publicPage, recordsPathsRedacted = false,
 } = {}) {
   assert.ok(['publish', 'correct'].includes(action));
   assert.ok(article?.id && article.source_ref, 'exact approved article and source reference required');
@@ -472,7 +476,7 @@ export async function deliverApprovedCommunicationVersion({
   const records = await verifyRecordsArchive(native, requestId, displayedHash, async request => {
     bytes = await downloadRecordsAttachment(request);
     return bytes;
-  }, { articleId: article.id, revision: article.revision, contentSha256: article.sha256 });
+  }, { articleId: article.id, revision: article.revision, contentSha256: article.sha256, recordsPathsRedacted });
   const extracted = inspectArchive(bytes);
   assert.equal(extracted.article.article_id, article.id);
   assert.equal(extracted.article.revision, article.revision);
@@ -507,9 +511,15 @@ export async function deliverApprovedCommunicationVersion({
   const recordView = unwrap(await native('records_domain_request', {
     request: { operation: 'view', request_id: records.requestId },
   }));
-  const exactDocuments = (recordView.documents ?? []).filter(document =>
-    document.original_path === `townlight-comms-archive:${article.id}:${article.revision}:${records.sha256}`);
+  const archivePath = `townlight-comms-archive:${article.id}:${article.revision}:${records.sha256}`;
+  const citation = `Townlight communications article ${article.id}; revision ${article.revision}; archive sha256 ${records.sha256}.`;
+  const exactDocuments = (recordView.documents ?? []).filter(document => recordsPathsRedacted
+    ? document.citation === citation && String(document.sha256).toLowerCase() === records.sha256
+    : document.original_path === archivePath);
   assert.equal(exactDocuments.length, 1, 'archive retry must not create a duplicate document');
+  if (recordsPathsRedacted) {
+    assert.ok(exactDocuments[0].original_path === '', 'shared staff Records retry path must be redacted');
+  }
   assert.equal(String(exactDocuments[0].attachment_id ?? exactDocuments[0].id), records.attachmentId);
   for (const note of privateNotes.filter(Boolean)) {
     assert.ok(!publicRead.text.includes(note) && !publicRead.text.includes(escaped(note)), 'private notes in public page');

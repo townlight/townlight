@@ -79,6 +79,27 @@ test('captures all three workpapers and separately verifies both immutable Elect
   assert.deepEqual(saved, ['ule-restored-readback']);
 });
 
+test('shared staff recovery requires redacted paths and exact archive citations', async () => {
+  const { config, documents } = fixture();
+  config.recordsPathsRedacted = true;
+  const { library, elections } = config.publications;
+  for (const { article, records } of [library, ...elections]) {
+    const document = documents.get(records.requestId);
+    document.original_path = '';
+    document.citation = `Townlight communications article ${article.id}; revision ${article.revision}; archive sha256 ${records.sha256}.`;
+  }
+  const expected = await captureUleRecovery(config);
+  assert.equal(expected.inputs.recordsPathsRedacted, true);
+  await verifyUleRecovery({ ...config, expected });
+
+  const document = documents.get(library.records.requestId);
+  document.original_path = 'exposed path';
+  await assert.rejects(captureUleRecovery(config), /must be redacted/);
+  document.original_path = '';
+  document.citation = 'wrong revision';
+  await assert.rejects(captureUleRecovery(config), /wrong revision/);
+});
+
 for (const defect of ['utility-private-note', 'source-private-note', 'historical-link', 'self-approval',
   'archive-bytes', 'records-revision', 'current-article']) {
   test(`recovery rejects ${defect}`, async () => {

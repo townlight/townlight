@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { inspectArchive } from './communications-postexit.mjs';
 
-export async function readRecoveryRecords({ native, records, downloadRecordsAttachment, article, source }) {
+export async function readRecoveryRecords({ native, records, downloadRecordsAttachment, article, source, recordsPathsRedacted = false }) {
   const response = await native('records_domain_request', {
     request: { operation: 'view', request_id: records.requestId },
   });
@@ -29,10 +29,12 @@ export async function readRecoveryRecords({ native, records, downloadRecordsAtta
 
   if (!article) return { records, document, archived: null };
 
-  assert.equal(
-    document.original_path,
-    `townlight-comms-archive:${article.id}:${article.revision}:${records.sha256}`,
-  );
+  if (recordsPathsRedacted) {
+    assert.ok(document.original_path === '', 'shared staff Records archive path must be redacted');
+    assert.equal(document.citation, `Townlight communications article ${article.id}; revision ${article.revision}; archive sha256 ${records.sha256}.`);
+  } else {
+    assert.equal(document.original_path, `townlight-comms-archive:${article.id}:${article.revision}:${records.sha256}`);
+  }
   const archived = inspectArchive(bytes);
   assert.equal(archived.article.article_id, article.id);
   assert.equal(archived.article.revision, article.revision);
