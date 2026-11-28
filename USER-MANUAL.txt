@@ -1,14 +1,14 @@
-## Windows 1.10.0.1 current published release
+## Townlight for Windows 1.11.0.1
 
-Townlight for Windows 1.10.0.1 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
+Townlight Windows 1.11.0.1 is a signed public beta, desktop build 1.11.0-1, with Townlight Utilities, Townlight Library, and Townlight Elections for staff-led public workflows.
 
-[Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/Townlight-Windows-x64-1.10.0.1.msi) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/HANDOFF-Windows-1.10.0.1.md)
+- **Utilities** sends a cited policy reply to the original 311 case and resident tracker.
+- **Library** publishes approved program announcements through Communications and links the archived revision in Records.
+- **Elections** publishes approved official checklists and same-URL corrections with retained Records versions.
 
-Candidate 1.11.0.1 is unpublished; see the [candidate guide](docs/windows-utilities-library-elections.md). Signed installed acceptance for the candidate is pending.
+Named staff permissions, a configured HTTPS portal, SMTP, Records, and host services are required. See the [Utilities, Library, and Elections operator guide](docs/windows-utilities-library-elections.md) and the [311, Communications, and Parks operator guide](docs/windows-311-communications-parks.md).
 
-Windows x64 Beta 1 · MSI 1.10.0.1
-
-Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
+[Signed Windows installer](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/Townlight-Windows-x64-1.11.0.1.msi) · [Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md)
 
 - <a href="https://townlight.github.io/manuals/suite.html#townlight-suite-manual" id="toc-townlight-suite-manual">Townlight Suite Manual</a>
   - <a href="https://townlight.github.io/manuals/suite.html#using-this-manual" id="toc-using-this-manual">Using this manual</a>
@@ -41,58 +41,60 @@ Townlight connects municipal workflows around retained sources, named staff and 
 
 Staff should start with First run and Connected workflows. Administrators should read Architecture, Configuration, Security and Recovery. Developers should use the API reference and per-product source contracts. Each acceptance result applies only to the artifact identified by its receipt.
 
-## Windows 1.10.0.1 source candidate
-
-Windows 1.9.3.2 remains the current public download. Windows 1.10.0.1 is a source candidate with installed acceptance pending; tags and software publication are held, and no new download link is provided. Candidate modules cover 311 resident private inbox/tracking, Communications subscription consent, and Parks bookings/registration. These flows require a separately configured resident portal, SMTP, and optional payment service; no automatic public website is implied. See the [Windows 1.10.0.1 source candidate guide](docs/windows-311-communications-parks.md).
-
 ## Beta identity
 
 | Identity | Value |
-|----|----|
+|---|---|
 | Public documentation identity | Townlight Beta 1 |
-| Windows MSI version | 1.9.3.2 |
-| Native desktop source version | 1.9.3-2 |
-| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/SHA256SUMS-Windows-1.9.3.2.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) |
-| Corresponding source | Released Windows x64 beta |
+| Windows MSI version | 1.11.0.1 |
+| Native desktop source version | 1.11.0-1 |
+| Released artifact identity | [SHA-256 checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/SHA256SUMS-Windows-1.11.0.1.txt) and [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md) |
+| Corresponding source | [Windows x64 beta release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) |
 | Current owned software license | AGPL-3.0-only |
-| Supported acceptance profile | Signed 1.9.3.2 setup, backup/restore, uninstall, and adjacent upgrade verified. |
+| Supported acceptance profile | Signed hosted fresh workflows and backup/restore, plus scoped two-PC verification. |
 
-See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
+A hosted fresh exercise observed all three products plus backup and restore. A two-PC check confirmed Townlight Utilities and Townlight Library’s scheduled portal publication, test email, and a verified Records attachment after desktop exit. That check stopped before reopened-desktop checks and Townlight Elections. An upgrade from 1.10.0.1 reached retained data and Townlight Library, but Elections upgrade and final uninstall preservation remain unverified.
 
 ### Component versions
 
-| Component     | Distribution          | Installed version |
-|---------------|-----------------------|-------------------|
-| Core          | townlight-core        | 1.3.0.dev2        |
-| Records       | townlight-records     | 1.8.0.dev4        |
-| Meetings      | townlight-meetings    | 1.0.6             |
-| Code          | townlight-code        | 1.0.9             |
-| Zoning        | townlight-zoning      | 0.2.3             |
-| Planning      | townlight-planning    | 0.4.0.dev2        |
-| Permitting    | townlight-permitting  | 0.3.0+dev.2       |
-| Inspections   | townlight-inspections | 0.3.0+dev.2       |
-| Station       | townlight-station     | 0.4.4             |
-| Access        | townlight-access      | 0.5.0             |
-| Notice        | townlight-notice      | 0.3.0             |
+| Component | Distribution | Installed version |
+|---|---|---|
+| Core | townlight-core | 1.3.0.dev2 |
+| Records | townlight-records | 1.8.0.dev7 |
+| Meetings | townlight-meetings | 1.0.6 |
+| Code | townlight-code | 1.0.9 |
+| Zoning | townlight-zoning | 0.2.3 |
+| Planning | townlight-planning | 0.4.0.dev2 |
+| Permitting | townlight-permitting | 0.3.0+dev.2 |
+| Inspections | townlight-inspections | 0.3.0+dev.2 |
+| Station | townlight-station | 0.4.4 |
+| Access | townlight-access | 0.5.0 |
+| Notice | townlight-notice | 0.3.0 |
 | Boards & Commissions | townlight-boards | 0.2.1 |
 | Contracts | townlight-contracts | 0.2.1 |
 | Procurement | townlight-procurement | 0.3.1 |
 | Data | townlight-data | 0.2.0 |
 | Budget | townlight-budget | 0.2.0 |
 | Grants | townlight-grants | 0.3.0 |
-| Local runtime | townlight-runtime | 0.3.4 |
+| 311 | townlight-311 | 0.2.0 |
+| Communications | townlight-comms | 0.2.1 |
+| Parks | townlight-parks | 0.2.0 |
+| Utilities | civicutility | 0.2.0 |
+| Library | civiclibrary | 0.2.0 |
+| Elections | civicelections | 0.2.0 |
+| Local runtime | townlight-runtime | 0.5.0 |
 
 ## First run
 
-See the Windows 1.9.3.2 release acceptance for the exact installed checks, artifact identity and limits.
+See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md) for the exact installed checks and their scope.
 
 ### Fresh installation
 
-Run the signed Windows 1.9.3.2 MSI and use an empty database and a new Townlight profile for first run.
+Run the signed Windows 1.11.0.1 MSI and use an empty database and a new Townlight profile for first run.
 
-1.  Download the signed MSI, matching source and checksums from the [Windows x64 beta 1.9.3.2](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.2) release.
-2.  Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.2/ACCEPTANCE-Windows-1.9.3.2.md) for the tested setup.
-3.  Launch Townlight under the intended Windows account and choose storage folders. On the setup screen, choose the full bundled profile labeled **Townlight Inspections candidate**; it includes Records, Meetings, Code, Access, Notice, Zoning, Planning, Permitting, Inspections, Boards & Commissions, Contracts, Procurement, Data, Budget, and Grants.
+1. Download the signed MSI, corresponding source, and checksums from the [Windows x64 beta 1.11.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) release.
+2. Verify the MSI hash and Authenticode publisher before installation. See the [Windows acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md) for the tested setup.
+3. Launch Townlight under the intended Windows account and choose storage folders. In setup, choose the full bundled profile labeled **Townlight Inspections candidate**. See [component versions](#component-versions) for its workspaces.
 4.  Enter the city profile, time zone and contacts. Create the first named local administrator, sign in and choose protected backup storage. **Continue without local AI** is valid for the deterministic workflows.
 5.  Select **Run Health Check**, then choose **Finish setup**; in System Health, if **Prepare Records** appears, choose it and follow its prompts, otherwise skip it.
 6.  Create named staff through Settings. Import authorized sources using each product’s source library. All examples in this package are synthetic; they are not municipal authority.
@@ -100,7 +102,7 @@ Run the signed Windows 1.9.3.2 MSI and use an empty database and a new Townlight
 
 ### Existing installation
 
-**Upgrading an existing installation.** For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.9.3.2 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.1; earlier paths have separate prior evidence.
+**Evaluating an upgrade.** For an existing city, make and verify a backup before testing an upgrade. The 1.10.0.1 upgrade exercise confirmed retained data and the Library workflow. Elections after upgrade and final uninstall preservation remain unverified. Use an isolated copy for evaluation.
 
 ## Daily workflow
 
@@ -117,6 +119,21 @@ Keep originals and derivatives separate. Review the intended audience before exp
 Drafting, review, approval, attachment, export, fulfillment and publication are separate operations. A Townlight workpaper does not itself adopt law, issue a permit, impose a fine or release a records response. The responsible staff member records the applicable decision.
 
 ## Connected workflows
+
+### Utilities replies to the original 311 case
+
+An administrator registers the approved billing guidance policy and its version. A clerk opens the original 311 case, selects the cited policy, drafts the reply with protected notes, and explicitly approves the reply. The resident tracker shows the reply and citation, and the resident receives a matching email. Retry the same approved reply using its durable key. The workspace covers guidance and replies.
+
+### Library programs to Communications and Records
+
+Staff save the program title, time, location, public description, and private notes, then a local administrator approves that version. A separate Communications review, approval, and scheduling step publishes the approved snapshot to the portal and sends it to opted-in subscribers. Link the published article revision to the program revision and verify its Records archive. Use this workflow for program announcements.
+
+### Elections checklists and corrections
+
+A clerk drafts the checklist with jurisdiction, election, official source URL, and source version. An administrator designates an eligible official who differs from the author, who approves the exact revision. Separate Communications approval publishes it, and a correction is independently approved, uses the same URL, and retains separate immutable Records archives. Use this workflow for staff-approved checklists and corrections.
+
+Named staff permissions, a configured HTTPS portal, SMTP, Records, and host services are required. Follow the [department workflow guide](docs/windows-utilities-library-elections.md) for approval roles, retried delivery, links, and recovery.
+
 
 ### Meeting capture to a Records response
 
@@ -144,7 +161,7 @@ Core provides shared contracts, named account/session support, ingestion/task he
 
 ### Shared Windows staff and approved portal publication
 
-Shared Windows staff access and approved portal publication were introduced in 1.9.2.1 and remains in 1.9.3.2; earlier test scope is version-specific. In shared mode, named Windows workstations use Meetings and Records through the city's private HTTPS endpoint, while the host owns the database, managed files and Station capture. Townlight Clerk and Records Staff remain separate named roles; existing City Staff and Local Admin retain only the actions their previous permissions allow, and Code Staff gains no Meetings or Records authority. On a workstation, clerks can prepare council packets and send a reviewed correction; the host verifies copied files and records the operator. Station capture and administration remain on the host.
+Shared Windows staff access and approved portal publication were introduced in 1.9.2.1 and remain available in 1.11.0.1; earlier test scope is version-specific. In shared mode, named Windows workstations use Meetings and Records through the city's private HTTPS endpoint, while the host owns the database, managed files and Station capture. Townlight Clerk and Records Staff remain separate named roles; existing City Staff and Local Admin retain only the actions their previous permissions allow, and Code Staff gains no Meetings or Records authority. On a workstation, clerks can prepare council packets and send a reviewed correction; the host verifies copied files and records the operator. Station capture and administration remain on the host.
 
 Fulfilling a Records request does not publish its contents. Staff must separately review and approve the exact council packet revision or eligible Records release copy for the portal. The shared host queues approved actions, retries after sign-out, outage or restart, and reports the confirmed status in Meetings. A packet correction replaces that packet only; packet and recording withdrawals are separate. Read the [Windows staff workflow guide](https://townlight.github.io/manuals/windows-staff-workflows.html), [shared staff guide](docs/installer/windows-shared-staff.md), and [Portal guide](https://github.com/townlight/townlight/blob/1bc45be5a14aa969e53b87b1cef1f278dadc79a4/docs/portal/guide.md). The historical Windows 1.9.2.1 acceptance used synthetic data and a test portal on the physical host with a clean Windows Sandbox guest on the same PC; it does not establish two physical PCs, a different computer or account, or a production portal or city network.
 
@@ -534,7 +551,7 @@ The resident portal is deployed separately. See the [Townlight Portal Guide](htt
 6. Visit `/datasets/` at the configured portal for CSV, JSON and dictionary.
 7. To correct, prepare and publish a new revision. To take offline, confirm Withdraw and wait for delivery.
 
-Townlight Windows 1.9.3.2 is a signed Suite package; Data, Budget, and Grants were first bundled in Windows 1.9.3.1 and remain in the current signed 1.9.3.2 Windows beta.
+The Windows 1.11.0.1 beta retains Data, Budget, and Grants, which were first bundled in Windows 1.9.3.1.
 
 ## Townlight Budget (Windows Suite)
 
@@ -545,7 +562,7 @@ Townlight Windows 1.9.3.2 is a signed Suite package; Data, Budget, and Grants we
 5. As a clerk or local administrator, select the saved evidence in Budget and record the carried result and resident summary.
 6. With a configured publisher, a local administrator selects **Queue adopted budget for publication** and checks the public Portal Datasets view for the CSV and summary.
 
-Townlight Windows 1.9.3.2 is a signed Suite package; Data, Budget, and Grants were first bundled in Windows 1.9.3.1 and remain in the current signed 1.9.3.2 Windows beta.
+The Windows 1.11.0.1 beta retains Data, Budget, and Grants, which were first bundled in Windows 1.9.3.1.
 
 
 ## Townlight Grants (Windows Suite)

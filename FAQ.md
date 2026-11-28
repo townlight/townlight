@@ -1,5 +1,13 @@
 # Townlight FAQ — current Windows guide
 
+## Windows 1.11.0.1 beta
+
+**Where do I download Townlight?** Use the [signed Windows x64 installer](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/Townlight-Windows-x64-1.11.0.1.msi) and [matching checksums](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/SHA256SUMS-Windows-1.11.0.1.txt). Begin setup with the [suite manual](USER-MANUAL.md).
+
+**How do the three department workspaces connect to Townlight?** The [department workflow guide](docs/windows-utilities-library-elections.md) covers cited replies on the original 311 case, Library program announcements, and Elections checklists and corrections. It explains the staff approvals, resident portal and email, and Records archives.
+
+**What did the installed checks cover?** A hosted fresh exercise observed all three products plus backup and restore. A two-PC check confirmed Townlight Utilities and Townlight Library’s scheduled portal publication, test email, and a verified Records attachment after desktop exit. That check stopped before reopened-desktop checks and Townlight Elections. An upgrade from 1.10.0.1 reached retained data and Townlight Library, but Elections upgrade and final uninstall preservation remain unverified. See the [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md).
+
 ## Shared meeting imports · Windows 1.8.1.1
 
 Windows 1.8.1.1 adds shared meeting imports for 31 source families, with 34 supported source/format pairs. Installed Windows Sandbox checks exercised preview, save and durable readback using public captures and fixtures, plus the documented Townlight handoffs. These checks do not establish automatic discovery on every live portal or a complete retest of every module.
@@ -11,7 +19,7 @@ Windows 1.8.1.1 has fresh-install acceptance. An in-place upgrade to 1.8.1.1 was
 The accepted MSI contains Townlight Runtime 0.3.1 and Meetings 1.0.6 distributions. Its health version strings still report Runtime 0.3.0 and Meetings 1.0.5. Default-branch source corrects those display strings; the signed MSI and its exact build source remain unchanged.
 
 
-**Where do I download Townlight?** Get [Windows x64 beta 1.8.1.1](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/Townlight-Windows-x64-1.8.1.1.msi) and the matching checksum from the [GitHub release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1). Follow the [suite manual](USER-MANUAL.md).
+**Where can I get the historical release?** Get [Windows x64 beta 1.8.1.1](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.8.1.1/Townlight-Windows-x64-1.8.1.1.msi) and the matching checksum from the [GitHub release](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.8.1.1). Follow the [suite manual](USER-MANUAL.md).
 
 **How do I get Boards & Commissions, Contracts and Procurement?** Choose **Townlight Inspections candidate** during Windows setup. This is the full profile. Use the existing clerk, city-staff and local administrator roles described in the [staff guide](https://townlight.github.io/manuals/windows-staff-workflows.html).
 

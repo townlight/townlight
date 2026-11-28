@@ -1,10 +1,16 @@
 # Townlight Windows beta status
 
-## Windows 1.9.3.1 current release
+## Windows 1.11.0.1 signed public beta
 
-Windows 1.9.3.1 is the current explicit Suite release. It includes Data reviewed Contract datasets, Budget adoption, Grants award/report and archive workflows.
+Townlight Windows 1.11.0.1 is a signed public beta, desktop build 1.11.0-1, with Townlight Utilities, Townlight Library, and Townlight Elections for staff-led public workflows.
 
-[Release and downloads](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.9.3.1) · [Signed Windows MSI](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/Townlight-Windows-x64-1.9.3.1.msi) · [Acceptance and limits](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/ACCEPTANCE-Windows-1.9.3.1.md) · [Maintainer handoff](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.9.3.1/HANDOFF-Windows-1.9.3.1.md)
+A hosted fresh exercise observed all three products plus backup and restore. A two-PC check confirmed Townlight Utilities and Townlight Library’s scheduled portal publication, test email, and a verified Records attachment after desktop exit. That check stopped before reopened-desktop checks and Townlight Elections. An upgrade from 1.10.0.1 reached retained data and Townlight Library, but Elections upgrade and final uninstall preservation remain unverified.
+
+[Signed Windows installer](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/Townlight-Windows-x64-1.11.0.1.msi) · [Release and checksums](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) · [Installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md) · [Department workflow guide](docs/windows-utilities-library-elections.md)
+
+## Windows 1.10.0.1 · Previous 311, Communications, and Parks release
+
+See its [operator guide](docs/windows-311-communications-parks.md) and [release acceptance](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1).
 
 ## Windows 1.9.2.1 · Shared staff and approved portal publication
 
@@ -66,9 +72,9 @@ Status labels below are the suite's shared status set, generated from
 | Townlight 311 | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 | Townlight Communications | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
 | Townlight Parks | 0.2.0 | Published beta capability | 2026-11-27 | Included in Townlight for Windows 1.10.0.1. See the release for installed acceptance. |
-| Townlight Utilities | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
-| Townlight Library | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
-| Townlight Elections | — | Candidate â€” installed acceptance pending | — | Unpublished Windows 1.11.0.1 candidate; signed installed acceptance pending. |
+| Townlight Utilities | — | Published beta capability | 2026-11-28 | Version 0.2.0 in the Windows 1.11.0.1 beta. Hosted and two-PC checks covered cited 311 replies and replay. |
+| Townlight Library | — | Published beta capability | 2026-11-28 | Version 0.2.0 in the Windows 1.11.0.1 beta. Hosted workflows and two-PC post-exit portal, mail, and archive verified. |
+| Townlight Elections | — | Published beta capability | 2026-11-28 | Version 0.2.0 in the Windows 1.11.0.1 beta. Hosted fresh publication and correction verified. |
 
 <!-- END GENERATED MODULE STATUS -->
 

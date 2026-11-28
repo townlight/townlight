@@ -1,10 +1,10 @@
 # Windows staff workflows
 
-## Windows 1.10.0.1
+## Windows 1.11.0.1
 
-Townlight for Windows 1.10.0.1 is the current signed public beta. See the [release notes](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) and [acceptance record](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md).
+Townlight Windows 1.11.0.1 is a signed public beta, desktop build 1.11.0-1, with Townlight Utilities, Townlight Library, and Townlight Elections for staff-led public workflows. Read the [department workflow guide](../windows-utilities-library-elections.md) and [installed acceptance](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md).
 
-For an existing city, make and verify a backup, close Townlight, run the signed Windows 1.10.0.1 MSI, then reopen Townlight under the same Windows account and existing profile. Direct upgrade is tested from 1.9.3.2; earlier paths have separate prior evidence.
+For an existing city, make and verify a backup before testing an upgrade. The 1.10.0.1 upgrade exercise confirmed retained data and the Library workflow. Elections after upgrade and final uninstall preservation remain unverified. Use an isolated copy for evaluation.
 
 ## Staff access
 
@@ -50,4 +50,4 @@ Authorized Records staff signed into the shared Windows workstation should open 
 
 ## Release and support
 
-[Download Windows 1.10.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.10.0.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.10.0.1/ACCEPTANCE-Windows-1.10.0.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
+[Download Windows 1.11.0.1](https://github.com/townlight/townlight/releases/tag/townlight-windows-v1.11.0.1) and read its [acceptance summary](https://github.com/townlight/townlight/releases/download/townlight-windows-v1.11.0.1/ACCEPTANCE-Windows-1.11.0.1.md). The same release includes the corresponding source, hashes, signing receipt, and installed evidence.
