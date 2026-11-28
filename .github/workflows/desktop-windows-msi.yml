@@ -132,7 +132,7 @@ jobs:
           path: townlight
 
       - name: Retrieve hash-verified inspection voice build input
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: beta-1-inspection-voice-build-input
           path: townlight/.runtime-cache/windows-local-1.0
@@ -734,7 +734,7 @@ jobs:
           path: townlight
 
       - name: Retrieve hash-verified inspection voice build input
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: beta-1-inspection-voice-build-input
           path: townlight/.runtime-cache/windows-local-1.0
@@ -1029,7 +1029,7 @@ jobs:
           path: townlight
 
       - name: Download built Windows Local MSI
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.windows-local-msi.outputs.artifact_name }}
           path: msi-artifact
@@ -1364,7 +1364,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           path: townlight
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: townlight-windows-local-msi-UNSIGNED
           path: msi-artifact
@@ -1445,7 +1445,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           path: townlight
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: ${{ needs.windows-local-msi.outputs.artifact_name }}
           path: msi-artifact
