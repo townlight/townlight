@@ -22,7 +22,7 @@ jobs:
   model-pin:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: HEAD the pinned model URL and compare size and sha256 to the manifest
         run: |
           set -euo pipefail

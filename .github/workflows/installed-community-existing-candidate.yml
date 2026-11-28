@@ -58,14 +58,14 @@ jobs:
     timeout-minutes: 180
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: townlight
           fetch-depth: 0
 
       - name: Checkout portal source
         if: ${{ inputs.portal_commit != '' }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.portal_commit }}
           path: portal-source

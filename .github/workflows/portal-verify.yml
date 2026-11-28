@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # Test-only fixture: checkout the actual townlight/comms producer at the pinned ref so the cross-repo publication test exercises real producer code.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: townlight/comms
           ref: dc9ed4cc2fe42d7ae1fcc01c81267d7e6c8f63f0
