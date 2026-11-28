@@ -49,38 +49,38 @@ jobs:
             installer_version: 0.1.0
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Check out Townlight Records bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/sunshine
           ref: 6f375cf0b81a88b4bb89e00a5076b665cad889d9
           path: modules/townlight_records
 
       - name: Check out TownlightMeetings bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/meetings
           ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: modules/townlight_meetings
 
       - name: Check out TownlightCode bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/ordinances
           ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: modules/townlight_code
 
       - name: Check out Townlight Notice bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/notice
           ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: modules/townlight_notice
 
       - name: Check out Townlight Access bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/access
           ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
@@ -134,38 +134,38 @@ jobs:
             installer_version: 0.1.2
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Check out Townlight Records bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/sunshine
           ref: 6f375cf0b81a88b4bb89e00a5076b665cad889d9
           path: modules/townlight_records
 
       - name: Check out TownlightMeetings bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/meetings
           ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: modules/townlight_meetings
 
       - name: Check out TownlightCode bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/ordinances
           ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: modules/townlight_code
 
       - name: Check out Townlight Notice bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/notice
           ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: modules/townlight_notice
 
       - name: Check out Townlight Access bundle source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/access
           ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d

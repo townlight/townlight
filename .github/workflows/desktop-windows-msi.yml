@@ -42,7 +42,7 @@ jobs:
     outputs:
       relevant: ${{ steps.diff.outputs.relevant }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -127,7 +127,7 @@ jobs:
       candidate_profile: ${{ steps.candidate.outputs.product_profile }}
     steps:
       - name: Check out Townlight
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: townlight
 
@@ -152,14 +152,14 @@ jobs:
           ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $requestedProfile -SourceBranch $env:SOURCE_BRANCH -SignForPublication:($env:PUBLICATION_SIGNING -eq 'true')
 
       - name: Check out Townlight Core runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/core
           ref: 2f6ba9be4a95e3772dc47a3682ac780c5283b626
           path: townlight_core
 
       - name: Check out Townlight Records runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/sunshine
           ref: ${{ steps.candidate.outputs.records_ref }}
@@ -167,7 +167,7 @@ jobs:
 
       - name: Check out Townlight Planning candidate source
         if: steps.candidate.outputs.planning_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/plan
           ref: ${{ steps.candidate.outputs.planning_ref }}
@@ -175,7 +175,7 @@ jobs:
 
       - name: Check out Townlight Permitting candidate source
         if: steps.candidate.outputs.permitting_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/permit
           ref: ${{ steps.candidate.outputs.permitting_ref }}
@@ -183,42 +183,42 @@ jobs:
 
       - name: Check out Townlight Inspections candidate source
         if: steps.candidate.outputs.inspections_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/inspect
           ref: ${{ steps.candidate.outputs.inspections_ref }}
           path: inspect
 
       - name: Check out Townlight Meetings runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/meetings
           ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/ordinances
           ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/zone
           ref: 25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4
           path: zone
 
       - name: Check out Townlight Notice runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/notice
           ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: townlight_notice
 
       - name: Check out Townlight Access runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/access
           ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
@@ -226,7 +226,7 @@ jobs:
 
       - name: Check out exact Station Beta 1 source
         if: steps.candidate.outputs.station_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/station
           ref: ${{ steps.candidate.outputs.station_ref }}
@@ -234,7 +234,7 @@ jobs:
 
       - name: Check out pinned Townlight Boards source
         if: steps.candidate.outputs.boards_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/boards
           ref: ${{ steps.candidate.outputs.boards_ref }}
@@ -242,7 +242,7 @@ jobs:
 
       - name: Check out pinned Townlight Contracts source
         if: steps.candidate.outputs.contracts_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/contracts
           ref: ${{ steps.candidate.outputs.contracts_ref }}
@@ -250,14 +250,14 @@ jobs:
 
       - name: Check out pinned Townlight Procurement source
         if: steps.candidate.outputs.procurement_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/procure
           ref: ${{ steps.candidate.outputs.procurement_ref }}
           path: procurement
       - name: Check out pinned Townlight Data source
         if: steps.candidate.outputs.data_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/data
           ref: ${{ steps.candidate.outputs.data_ref }}
@@ -265,7 +265,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight Budget source
         if: steps.candidate.outputs.budget_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/budget
           ref: ${{ steps.candidate.outputs.budget_ref }}
@@ -273,7 +273,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight Grants source
         if: steps.candidate.outputs.grants_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/grants
           ref: ${{ steps.candidate.outputs.grants_ref }}
@@ -281,7 +281,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight 311 source
         if: steps.candidate.outputs.service_requests_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/311
           ref: ${{ steps.candidate.outputs.service_requests_ref }}
@@ -290,7 +290,7 @@ jobs:
 
       - name: Check out pinned Townlight Communications source
         if: steps.candidate.outputs.communications_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/comms
           ref: ${{ steps.candidate.outputs.communications_ref }}
@@ -299,7 +299,7 @@ jobs:
 
       - name: Check out pinned Townlight Parks source
         if: steps.candidate.outputs.parks_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/parks
           ref: ${{ steps.candidate.outputs.parks_ref }}
@@ -308,7 +308,7 @@ jobs:
 
       - name: Check out pinned Townlight Utilities source
         if: steps.candidate.outputs.utilities_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/utility
           ref: ${{ steps.candidate.outputs.utilities_ref }}
@@ -317,7 +317,7 @@ jobs:
 
       - name: Check out pinned Townlight Library source
         if: steps.candidate.outputs.library_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/library
           ref: ${{ steps.candidate.outputs.library_ref }}
@@ -326,7 +326,7 @@ jobs:
 
       - name: Check out pinned Townlight Elections source
         if: steps.candidate.outputs.elections_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/elections
           ref: ${{ steps.candidate.outputs.elections_ref }}
@@ -729,7 +729,7 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Check out Townlight
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: townlight
 
@@ -753,42 +753,42 @@ jobs:
           ./townlight/desktop/scripts/resolve-msi-candidate.ps1 -RequestedProfile $profile
 
       - name: Check out Townlight Core runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/core
           ref: 2f6ba9be4a95e3772dc47a3682ac780c5283b626
           path: townlight_core
 
       - name: Check out Townlight Records runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/sunshine
           ref: ${{ steps.candidate.outputs.records_ref }}
           path: townlight_records
 
       - name: Check out Townlight Meetings runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/meetings
           ref: 93fea47d9528e283c5835a1ef568f3f0cfa1fd56
           path: townlight_meetings
 
       - name: Check out Townlight Code runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/ordinances
           ref: 296c13ac9075ed2849098952dcb1fddfbf4e8cd4
           path: townlight_code
 
       - name: Check out Townlight Zoning runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/zone
           ref: 25e6034304d5ffe30e0f6aad58ad9f73dc78d5f4
           path: zone
 
       - name: Check out Townlight Planning development source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/plan
           ref: ${{ steps.candidate.outputs.planning_ref }}
@@ -796,7 +796,7 @@ jobs:
 
       - name: Check out Townlight Permitting development source
         if: steps.candidate.outputs.permitting_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/permit
           ref: ${{ steps.candidate.outputs.permitting_ref }}
@@ -804,21 +804,21 @@ jobs:
 
       - name: Check out Townlight Inspections development source
         if: steps.candidate.outputs.inspections_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/inspect
           ref: ${{ steps.candidate.outputs.inspections_ref }}
           path: inspect
 
       - name: Check out Townlight Notice runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/notice
           ref: b93bd4c907b5cf59e12afc5332ed177ac3e12bfd
           path: townlight_notice
 
       - name: Check out Townlight Access runtime source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/access
           ref: 6c4f2aefb587eba57f5daa3cff4779530e57a61d
@@ -826,7 +826,7 @@ jobs:
 
       - name: Check out exact Station Beta 1 source
         if: steps.candidate.outputs.station_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/station
           ref: ${{ steps.candidate.outputs.station_ref }}
@@ -834,7 +834,7 @@ jobs:
 
       - name: Check out pinned Townlight Boards source
         if: steps.candidate.outputs.boards_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/boards
           ref: ${{ steps.candidate.outputs.boards_ref }}
@@ -842,7 +842,7 @@ jobs:
 
       - name: Check out pinned Townlight Contracts source
         if: steps.candidate.outputs.contracts_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/contracts
           ref: ${{ steps.candidate.outputs.contracts_ref }}
@@ -850,14 +850,14 @@ jobs:
 
       - name: Check out pinned Townlight Procurement source
         if: steps.candidate.outputs.procurement_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/procure
           ref: ${{ steps.candidate.outputs.procurement_ref }}
           path: procurement
       - name: Check out pinned Townlight Data source
         if: steps.candidate.outputs.data_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/data
           ref: ${{ steps.candidate.outputs.data_ref }}
@@ -865,7 +865,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight Budget source
         if: steps.candidate.outputs.budget_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/budget
           ref: ${{ steps.candidate.outputs.budget_ref }}
@@ -873,7 +873,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight Grants source
         if: steps.candidate.outputs.grants_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/grants
           ref: ${{ steps.candidate.outputs.grants_ref }}
@@ -881,7 +881,7 @@ jobs:
           persist-credentials: false
       - name: Check out pinned Townlight 311 source
         if: steps.candidate.outputs.service_requests_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/311
           ref: ${{ steps.candidate.outputs.service_requests_ref }}
@@ -890,7 +890,7 @@ jobs:
 
       - name: Check out pinned Townlight Communications source
         if: steps.candidate.outputs.communications_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/comms
           ref: ${{ steps.candidate.outputs.communications_ref }}
@@ -899,7 +899,7 @@ jobs:
 
       - name: Check out pinned Townlight Parks source
         if: steps.candidate.outputs.parks_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/parks
           ref: ${{ steps.candidate.outputs.parks_ref }}
@@ -908,7 +908,7 @@ jobs:
 
       - name: Check out pinned Townlight Utilities source
         if: steps.candidate.outputs.utilities_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/utility
           ref: ${{ steps.candidate.outputs.utilities_ref }}
@@ -917,7 +917,7 @@ jobs:
 
       - name: Check out pinned Townlight Library source
         if: steps.candidate.outputs.library_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/library
           ref: ${{ steps.candidate.outputs.library_ref }}
@@ -926,7 +926,7 @@ jobs:
 
       - name: Check out pinned Townlight Elections source
         if: steps.candidate.outputs.elections_ref != ''
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: townlight/elections
           ref: ${{ steps.candidate.outputs.elections_ref }}
@@ -1024,7 +1024,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Check out Townlight
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: townlight
 
@@ -1361,7 +1361,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           path: townlight
       - uses: actions/download-artifact@v4
@@ -1442,7 +1442,7 @@ jobs:
       matrix:
         mode: [fresh, upgrade, community]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           path: townlight
       - uses: actions/download-artifact@v4
