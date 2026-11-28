@@ -108,7 +108,7 @@ jobs:
             --header 'Accept: application/octet-stream' > Townlight-Beta-1-Inspection-Voice-Assets.zip
           echo '0325c199b215316d8cbb5374150867f7fe2352e6a640ce80218dbac57d569fa8  Townlight-Beta-1-Inspection-Voice-Assets.zip' | sha256sum --check
       - name: Pass the pinned build input to read-only Windows jobs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: beta-1-inspection-voice-build-input
           path: Townlight-Beta-1-Inspection-Voice-Assets.zip
@@ -688,7 +688,7 @@ jobs:
 
       - name: Upload UNSIGNED Windows Local MSI for private CI testing
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.sign_for_publication) }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: townlight-windows-local-msi-UNSIGNED
           path: |
@@ -709,7 +709,7 @@ jobs:
 
       - name: Upload SIGNED Windows Local MSI for publication gate
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_for_publication }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: townlight-windows-local-msi-SIGNED
           path: |
@@ -1006,7 +1006,7 @@ jobs:
 
       - name: Upload integration runtime logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-townlight_core-integration-logs
           path: townlight/desktop/runtime/payload/runtime-payload-lock.json
@@ -1348,7 +1348,7 @@ jobs:
 
       - name: Upload MSI lifecycle logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-msi-lifecycle-logs
           path: ${{ runner.temp }}\townlight-msi-*.log
@@ -1424,7 +1424,7 @@ jobs:
           }
           $taskInfo | Format-List | Out-String | Set-Content -LiteralPath (Join-Path $diag 'townlight-station-task-info.txt') -Encoding utf8
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: installed-recorder-candidate
@@ -1482,7 +1482,7 @@ jobs:
           ./townlight/desktop/scripts/test-installed-maintenance.ps1 -MsiPath $msis[0].FullName -Mode '${{ matrix.mode }}' -EvidenceRoot "$env:RUNNER_TEMP/installed-evidence"
       - name: Preserve installed acceptance evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: signed-installed-${{ matrix.mode }}
           path: |
