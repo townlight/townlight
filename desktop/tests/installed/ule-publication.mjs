@@ -52,7 +52,10 @@ async function openSource(page, kind, id, revision) {
   await root.locator(`[data-${kind}-list]`).selectOption(id);
   await waitSourceForm(page, kind, id);
   if (revision) {
-    await root.locator(`[data-${kind}-history]`).selectOption(String(revision));
+    const history = root.locator(`[data-${kind}-history]`);
+    if (await history.inputValue() !== String(revision)) {
+      await history.selectOption(String(revision));
+    }
     await waitSourceForm(page, kind, id, revision);
   }
   return root;
