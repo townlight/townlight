@@ -262,3 +262,53 @@ class CommunicationsPublicationTests(TestCase):
 
         self.assertEqual(ArticlePublication.objects.count(), 0)
         self.assertEqual(ArticlePublicationRevision.objects.count(), 0)
+
+    def test_library_elections_source_kinds_are_accepted(self):
+        article_ids = set()
+        for kind in ("library", "elections"):
+            self.source["kind"] = kind
+            article = self.draft()
+            article_ids.add(article["id"])
+            artifact = self.approved_artifact(
+                article, f"Checked {kind} source."
+            )
+            data = self.bundle(
+                article["id"], article["revision"]["title"], artifact
+            )
+
+            first = self.post(data, article["id"], 1)
+            self.assertEqual(first.status_code, 200)
+            self.assertEqual(first.json()["status"], "applied")
+            replay = self.post(data, article["id"], 1)
+            self.assertEqual(replay.status_code, 200)
+            self.assertEqual(replay.json()["status"], "unchanged")
+
+            base = f"/communications/{article['id']}"
+            detail = self.client.get(base + "/")
+            self.assertEqual(detail.status_code, 200)
+            source_response = self.client.get(base + "/sources/0/")
+            self.assertEqual(source_response.status_code, 200)
+            self.assertContains(
+                source_response, "the budget was adopted 5-2"
+            )
+
+        self.assertEqual(len(article_ids), 2)
+        self.assertEqual(ArticlePublicationRevision.objects.count(), 2)
+
+    def test_unknown_or_ineligible_source_refs_rejected(self):
+        from .communications_content import _source_ref
+
+        for kind in ("library", "elections"):
+            valid = dict(self.source)
+            valid["kind"] = kind
+            self.assertIsNone(_source_ref(valid))
+
+        unknown = dict(self.source)
+        unknown["kind"] = "unknown"
+        with self.assertRaises(ValueError):
+            _source_ref(unknown)
+
+        ineligible = dict(self.source)
+        ineligible["eligible"] = False
+        with self.assertRaises(ValueError):
+            _source_ref(ineligible)
