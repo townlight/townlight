@@ -1305,8 +1305,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-28"
       },
       "installer": {
         "tier": 3,
@@ -1358,8 +1358,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-28"
       },
       "installer": {
         "tier": 3,
@@ -1411,8 +1411,8 @@
         "state": "candidate",
         "availability": "runtime",
         "arch_tier": 3,
-        "legacy_grade": "candidate",
-        "public_status_released_at": null
+        "legacy_grade": "released",
+        "public_status_released_at": "2026-11-28"
       },
       "installer": {
         "tier": 3,
